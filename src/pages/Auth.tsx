@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Mail, Lock, User, Eye, EyeOff, ArrowLeft } from 'lucide-react';
@@ -16,6 +15,7 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [linkedinLoading, setLinkedinLoading] = useState(false);
+  const [oauthLoading, setOauthLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const { signIn, signUp, resetPassword, user } = useAuth();
   const { toast } = useToast();
@@ -34,11 +34,63 @@ const Auth = () => {
   // Check if user came from analyze page
   const fromAnalyze = location.state?.from === '/analyze';
 
+  // Handle OAuth callback
   useEffect(() => {
-    if (user) {
+    const handleOAuthCallback = async () => {
+      // Check if we're in an OAuth callback (tokens in URL hash)
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const accessToken = hashParams.get('access_token');
+      const refreshToken = hashParams.get('refresh_token');
+      
+      if (accessToken && refreshToken) {
+        console.log('OAuth callback detected, processing tokens...');
+        setOauthLoading(true);
+        
+        try {
+          // Let Supabase handle the session from the URL
+          const { data, error } = await supabase.auth.getSession();
+          
+          if (error) {
+            console.error('Error getting session from OAuth callback:', error);
+            toast({ 
+              title: 'Authentication Error', 
+              description: 'Failed to complete sign-in. Please try again.', 
+              variant: 'destructive' 
+            });
+          } else if (data.session) {
+            console.log('OAuth session established successfully');
+            toast({ 
+              title: 'Success', 
+              description: 'Successfully signed in!' 
+            });
+            
+            // Clean up the URL by removing the hash
+            window.history.replaceState({}, document.title, window.location.pathname);
+            
+            // Redirect to home page
+            navigate('/');
+          }
+        } catch (error) {
+          console.error('Unexpected error during OAuth callback:', error);
+          toast({ 
+            title: 'Error', 
+            description: 'An unexpected error occurred during sign-in', 
+            variant: 'destructive' 
+          });
+        } finally {
+          setOauthLoading(false);
+        }
+      }
+    };
+
+    handleOAuthCallback();
+  }, [navigate, toast]);
+
+  useEffect(() => {
+    if (user && !oauthLoading) {
       navigate('/');
     }
-  }, [user, navigate]);
+  }, [user, navigate, oauthLoading]);
 
   const validateForm = () => {
     if (mode === 'register') {
@@ -194,7 +246,20 @@ const Auth = () => {
     resetForm();
   };
 
-  const isAnyLoading = loading || googleLoading || linkedinLoading;
+  const isAnyLoading = loading || googleLoading || linkedinLoading || oauthLoading;
+
+  // Show loading screen during OAuth processing
+  if (oauthLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Completing sign-in...</h2>
+          <p className="text-gray-600">Please wait while we finalize your authentication.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
