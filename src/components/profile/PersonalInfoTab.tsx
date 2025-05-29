@@ -1,18 +1,23 @@
 
 import React, { useState, useEffect } from 'react';
-import { User, Mail, Save } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { User, Mail, Lock, Save } from 'lucide-react';
 
 const PersonalInfoTab: React.FC = () => {
-  const { user } = useAuth();
+  const { user, updatePassword } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [profile, setProfile] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
+    first_name: '',
+    last_name: '',
+    email: ''
+  });
+  const [passwords, setPasswords] = useState({
+    current: '',
+    new: '',
+    confirm: ''
   });
 
   useEffect(() => {
@@ -29,107 +34,210 @@ const PersonalInfoTab: React.FC = () => {
         .eq('id', user?.id)
         .single();
 
-      if (error) throw error;
+      if (error && error.code !== 'PGRST116') throw error;
 
-      setProfile({
-        firstName: data.first_name || '',
-        lastName: data.last_name || '',
-        email: data.email || '',
-      });
+      if (data) {
+        setProfile({
+          first_name: data.first_name || '',
+          last_name: data.last_name || '',
+          email: data.email || user?.email || ''
+        });
+      } else {
+        setProfile({
+          first_name: '',
+          last_name: '',
+          email: user?.email || ''
+        });
+      }
     } catch (error) {
       toast({ title: 'Error', description: 'Failed to load profile', variant: 'destructive' });
     }
   };
 
-  const updateProfile = async (e: React.FormEvent) => {
+  const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
       const { error } = await supabase
         .from('profiles')
-        .update({
-          first_name: profile.firstName,
-          last_name: profile.lastName,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', user?.id);
+        .upsert({
+          id: user?.id,
+          first_name: profile.first_name,
+          last_name: profile.last_name,
+          email: profile.email,
+          updated_at: new Date().toISOString()
+        });
 
       if (error) throw error;
 
-      toast({ title: 'Success', description: 'Profile updated successfully!' });
-    } catch (error) {
-      toast({ title: 'Error', description: 'Failed to update profile', variant: 'destructive' });
+      // Update email in auth if changed
+      if (profile.email !== user?.email) {
+        const { error: emailError } = await supabase.auth.updateUser({
+          email: profile.email
+        });
+        if (emailError) throw emailError;
+        toast({ 
+          title: 'Success', 
+          description: 'Profile updated! Please check your new email for verification.' 
+        });
+      } else {
+        toast({ title: 'Success', description: 'Profile updated successfully!' });
+      }
+    } catch (error: any) {
+      toast({ 
+        title: 'Error', 
+        description: error.message || 'Failed to update profile', 
+        variant: 'destructive' 
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdatePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (passwords.new !== passwords.confirm) {
+      toast({ title: 'Error', description: 'New passwords do not match', variant: 'destructive' });
+      return;
+    }
+
+    if (passwords.new.length < 6) {
+      toast({ title: 'Error', description: 'Password must be at least 6 characters', variant: 'destructive' });
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const { error } = await updatePassword(passwords.new);
+      if (error) throw error;
+
+      toast({ title: 'Success', description: 'Password updated successfully!' });
+      setPasswords({ current: '', new: '', confirm: '' });
+    } catch (error: any) {
+      toast({ 
+        title: 'Error', 
+        description: error.message || 'Failed to update password', 
+        variant: 'destructive' 
+      });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h2 className="text-xl font-semibold text-gray-900 mb-6">Personal Information</h2>
-      <form onSubmit={updateProfile} className="space-y-6">
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
-              First Name
-            </label>
-            <div className="relative">
-              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+    <div className="space-y-8">
+      {/* Profile Information */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="flex items-center mb-6">
+          <User className="h-5 w-5 text-gray-500 mr-2" />
+          <h3 className="text-lg font-medium text-gray-900">Profile Information</h3>
+        </div>
+
+        <form onSubmit={handleUpdateProfile} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
+                First Name
+              </label>
               <input
                 id="firstName"
                 type="text"
-                value={profile.firstName}
-                onChange={(e) => setProfile({...profile, firstName: e.target.value})}
-                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                required
+                value={profile.first_name}
+                onChange={(e) => setProfile({ ...profile, first_name: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Enter your first name"
               />
             </div>
-          </div>
-          <div>
-            <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
-              Last Name
-            </label>
-            <div className="relative">
-              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+
+            <div>
+              <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
+                Last Name
+              </label>
               <input
                 id="lastName"
                 type="text"
-                value={profile.lastName}
-                onChange={(e) => setProfile({...profile, lastName: e.target.value})}
-                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                required
+                value={profile.last_name}
+                onChange={(e) => setProfile({ ...profile, last_name: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Enter your last name"
               />
             </div>
           </div>
-        </div>
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-            Email Address
-          </label>
-          <div className="relative">
-            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+              Email Address
+            </label>
             <input
               id="email"
               type="email"
               value={profile.email}
-              disabled
-              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500"
+              onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Enter your email address"
             />
           </div>
-          <p className="text-xs text-gray-500 mt-1">Email cannot be changed from this page</p>
-        </div>
-        <div className="flex justify-end">
+
           <button
             type="submit"
             disabled={loading}
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
+            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <Save className="h-4 w-4 mr-2" />
-            Save Changes
+            {loading ? 'Saving...' : 'Save Changes'}
           </button>
+        </form>
+      </div>
+
+      {/* Password Change */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="flex items-center mb-6">
+          <Lock className="h-5 w-5 text-gray-500 mr-2" />
+          <h3 className="text-lg font-medium text-gray-900">Change Password</h3>
         </div>
-      </form>
+
+        <form onSubmit={handleUpdatePassword} className="space-y-4">
+          <div>
+            <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-1">
+              New Password
+            </label>
+            <input
+              id="newPassword"
+              type="password"
+              value={passwords.new}
+              onChange={(e) => setPasswords({ ...passwords, new: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Enter new password"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+              Confirm New Password
+            </label>
+            <input
+              id="confirmPassword"
+              type="password"
+              value={passwords.confirm}
+              onChange={(e) => setPasswords({ ...passwords, confirm: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Confirm new password"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading || !passwords.new || !passwords.confirm}
+            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            <Lock className="h-4 w-4 mr-2" />
+            {loading ? 'Updating...' : 'Update Password'}
+          </button>
+        </form>
+      </div>
     </div>
   );
 };
