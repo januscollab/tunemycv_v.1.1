@@ -20,22 +20,38 @@ const CreditManagement = () => {
 
   const loadCreditStats = async () => {
     try {
-      const { data, error } = await supabase.rpc('get_user_stats');
-      if (error) throw error;
+      // Get total users count
+      const { count: totalUsers, error: usersError } = await supabase
+        .from('profiles')
+        .select('*', { count: 'exact', head: true });
 
-      const users = data || [];
-      const totalUsers = users.length;
-      const totalCredits = users.reduce((sum, user) => sum + user.credits, 0);
-      const totalAnalyses = users.reduce((sum, user) => sum + user.total_analyses, 0);
-      const averageCredits = totalUsers > 0 ? Math.round(totalCredits / totalUsers * 100) / 100 : 0;
+      if (usersError) throw usersError;
+
+      // Get total credits
+      const { data: creditsData, error: creditsError } = await supabase
+        .from('user_credits')
+        .select('credits');
+
+      if (creditsError) throw creditsError;
+
+      // Get total analyses count
+      const { count: totalAnalyses, error: analysesError } = await supabase
+        .from('analysis_results')
+        .select('*', { count: 'exact', head: true });
+
+      if (analysesError) throw analysesError;
+
+      const totalCredits = creditsData?.reduce((sum, user) => sum + (user.credits || 0), 0) || 0;
+      const averageCredits = totalUsers && totalUsers > 0 ? Math.round(totalCredits / totalUsers * 100) / 100 : 0;
 
       setStats({
-        totalUsers,
+        totalUsers: totalUsers || 0,
         totalCredits,
         averageCredits,
-        totalAnalyses
+        totalAnalyses: totalAnalyses || 0
       });
     } catch (error) {
+      console.error('Error loading credit statistics:', error);
       toast({ title: 'Error', description: 'Failed to load credit statistics', variant: 'destructive' });
     } finally {
       setLoading(false);

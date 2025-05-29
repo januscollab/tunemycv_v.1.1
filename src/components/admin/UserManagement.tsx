@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Search, Plus, Eye, Edit, Trash2 } from 'lucide-react';
+import { Search, Eye } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -30,10 +30,56 @@ const UserManagement = () => {
 
   const loadUsers = async () => {
     try {
-      const { data, error } = await supabase.rpc('get_user_stats');
-      if (error) throw error;
-      setUsers(data || []);
+      // Get users with their profiles, credits, and analysis data
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select(`
+          id,
+          email,
+          first_name,
+          last_name,
+          created_at
+        `);
+
+      if (profilesError) throw profilesError;
+
+      // Get credits for all users
+      const { data: creditsData, error: creditsError } = await supabase
+        .from('user_credits')
+        .select('user_id, credits');
+
+      if (creditsError) throw creditsError;
+
+      // Get analysis counts and last analysis for all users
+      const { data: analysesData, error: analysesError } = await supabase
+        .from('analysis_results')
+        .select('user_id, created_at');
+
+      if (analysesError) throw analysesError;
+
+      // Combine the data
+      const usersWithStats = profilesData?.map(profile => {
+        const userCredits = creditsData?.find(c => c.user_id === profile.id);
+        const userAnalyses = analysesData?.filter(a => a.user_id === profile.id) || [];
+        const lastAnalysis = userAnalyses.length > 0 
+          ? Math.max(...userAnalyses.map(a => new Date(a.created_at).getTime()))
+          : null;
+
+        return {
+          user_id: profile.id,
+          email: profile.email || '',
+          first_name: profile.first_name || '',
+          last_name: profile.last_name || '',
+          created_at: profile.created_at || '',
+          credits: userCredits?.credits || 0,
+          total_analyses: userAnalyses.length,
+          last_analysis: lastAnalysis ? new Date(lastAnalysis).toISOString() : ''
+        };
+      }) || [];
+
+      setUsers(usersWithStats);
     } catch (error) {
+      console.error('Error loading users:', error);
       toast({ title: 'Error', description: 'Failed to load users', variant: 'destructive' });
     } finally {
       setLoading(false);
