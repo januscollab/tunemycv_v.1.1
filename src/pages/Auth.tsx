@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Mail, Lock, User, Eye, EyeOff, ArrowLeft } from 'lucide-react';
@@ -13,6 +14,8 @@ const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const [linkedinLoading, setLinkedinLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const { signIn, signUp, resetPassword, user } = useAuth();
   const { toast } = useToast();
@@ -70,20 +73,55 @@ const Auth = () => {
     return true;
   };
 
+  const getRedirectUrl = () => {
+    // Use production URL if available, otherwise fall back to current origin
+    const baseUrl = window.location.hostname === 'localhost' 
+      ? window.location.origin 
+      : 'https://www.tunemycv.com';
+    return `${baseUrl}/auth`;
+  };
+
   const handleGoogleSignIn = async () => {
-    setLoading(true);
+    setGoogleLoading(true);
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth`
+          redirectTo: getRedirectUrl()
         }
       });
       if (error) throw error;
     } catch (error: any) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      console.error('Google sign-in error:', error);
+      toast({ 
+        title: 'Error', 
+        description: error.message || 'Failed to sign in with Google', 
+        variant: 'destructive' 
+      });
     } finally {
-      setLoading(false);
+      setGoogleLoading(false);
+    }
+  };
+
+  const handleLinkedInSignIn = async () => {
+    setLinkedinLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'linkedin_oidc',
+        options: {
+          redirectTo: getRedirectUrl()
+        }
+      });
+      if (error) throw error;
+    } catch (error: any) {
+      console.error('LinkedIn sign-in error:', error);
+      toast({ 
+        title: 'Error', 
+        description: error.message || 'Failed to sign in with LinkedIn', 
+        variant: 'destructive' 
+      });
+    } finally {
+      setLinkedinLoading(false);
     }
   };
 
@@ -156,6 +194,8 @@ const Auth = () => {
     resetForm();
   };
 
+  const isAnyLoading = loading || googleLoading || linkedinLoading;
+
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
@@ -186,12 +226,13 @@ const Auth = () => {
         </div>
 
         <div className="bg-white rounded-lg shadow-lg p-8">
-          {/* Google Sign In Button */}
+          {/* Social Sign In Buttons */}
           {mode !== 'forgot-password' && (
-            <div className="mb-6">
+            <div className="mb-6 space-y-3">
+              {/* Google Sign In Button */}
               <button
                 onClick={handleGoogleSignIn}
-                disabled={loading}
+                disabled={isAnyLoading}
                 className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24">
@@ -200,7 +241,19 @@ const Auth = () => {
                   <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                   <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                 </svg>
-                {loading ? 'Signing in...' : `Continue with Google`}
+                {googleLoading ? 'Signing in...' : 'Continue with Google'}
+              </button>
+
+              {/* LinkedIn Sign In Button */}
+              <button
+                onClick={handleLinkedInSignIn}
+                disabled={isAnyLoading}
+                className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-white bg-[#0077B5] hover:bg-[#006399] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <svg className="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                </svg>
+                {linkedinLoading ? 'Signing in...' : 'Continue with LinkedIn'}
               </button>
               
               <div className="relative my-6">
@@ -376,7 +429,7 @@ const Auth = () => {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={isAnyLoading}
               className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
