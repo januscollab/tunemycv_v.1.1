@@ -13,16 +13,22 @@ const SocialAuthButtons: React.FC<SocialAuthButtonsProps> = ({ isAnyLoading }) =
   const { toast } = useToast();
 
   const getRedirectUrl = () => {
-    // Use production URL if available, otherwise fall back to current origin
-    const baseUrl = window.location.hostname === 'localhost' 
-      ? window.location.origin 
-      : 'https://www.tunemycv.com';
-    return `${baseUrl}/auth`;
+    // Check if we're on production domain
+    if (window.location.hostname === 'www.tunemycv.com' || window.location.hostname === 'tunemycv.com') {
+      return 'https://www.tunemycv.com/auth';
+    }
+    // Check if we're on a Lovable preview domain
+    if (window.location.hostname.includes('.lovable.app')) {
+      return `${window.location.origin}/auth`;
+    }
+    // Default to localhost for development
+    return 'http://localhost:3000/auth';
   };
 
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
     try {
+      console.log('Google OAuth redirect URL:', getRedirectUrl());
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -45,6 +51,7 @@ const SocialAuthButtons: React.FC<SocialAuthButtonsProps> = ({ isAnyLoading }) =
   const handleLinkedInSignIn = async () => {
     setLinkedinLoading(true);
     try {
+      console.log('LinkedIn OAuth redirect URL:', getRedirectUrl());
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'linkedin_oidc',
         options: {
