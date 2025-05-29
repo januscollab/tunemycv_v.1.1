@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ArrowLeft, Download, BarChart3, CheckCircle, XCircle, TrendingUp, Star, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Download, BarChart3, CheckCircle, XCircle, TrendingUp, Star, AlertCircle, Zap, Target, BookOpen, Users } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 
 interface AnalysisResultsProps {
@@ -21,6 +21,8 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
     return 'bg-red-50 border-red-200';
   };
 
+  const isAIAnalysis = result.analysis_type === 'ai';
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 py-8">
@@ -33,10 +35,18 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
             <ArrowLeft className="h-4 w-4" />
             <span>Analyze Another CV</span>
           </button>
-          <button className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
-            <Download className="h-4 w-4" />
-            <span>Download PDF</span>
-          </button>
+          <div className="flex items-center space-x-3">
+            {isAIAnalysis && (
+              <div className="flex items-center space-x-1 bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm">
+                <Zap className="h-3 w-3" />
+                <span>AI Enhanced</span>
+              </div>
+            )}
+            <button className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+              <Download className="h-4 w-4" />
+              <span>Download PDF</span>
+            </button>
+          </div>
         </div>
 
         {/* Main Score Card */}
@@ -95,6 +105,10 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
                 <span className="font-semibold text-red-600">{result.keywords_missing?.length || 0}</span>
               </div>
               <div className="flex justify-between">
+                <span className="text-gray-600">Analysis Type:</span>
+                <span className="font-semibold">{isAIAnalysis ? 'AI Enhanced' : 'Basic'}</span>
+              </div>
+              <div className="flex justify-between">
                 <span className="text-gray-600">Analysis Date:</span>
                 <span className="font-semibold">{new Date(result.created_at).toLocaleDateString()}</span>
               </div>
@@ -143,6 +157,93 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
           </div>
         </div>
 
+        {/* AI-Enhanced Sections (only show if AI analysis) */}
+        {isAIAnalysis && (
+          <>
+            {/* Skills Gap Analysis */}
+            {result.skills_gap_analysis && result.skills_gap_analysis.length > 0 && (
+              <div className="bg-white rounded-lg shadow p-6 mb-8">
+                <div className="flex items-center mb-4">
+                  <Target className="h-5 w-5 text-purple-600 mr-2" />
+                  <h2 className="text-xl font-semibold text-gray-900">Skills Gap Analysis</h2>
+                </div>
+                <div className="space-y-4">
+                  {result.skills_gap_analysis.map((category: any, index: number) => (
+                    <div key={index} className="border border-gray-200 rounded-lg p-4">
+                      <h3 className="font-semibold text-gray-900 mb-2">{category.category}</h3>
+                      {category.missing && category.missing.length > 0 && (
+                        <div className="mb-3">
+                          <p className="text-sm text-red-600 font-medium mb-1">Missing Skills:</p>
+                          <div className="flex flex-wrap gap-2">
+                            {category.missing.map((skill: string, skillIndex: number) => (
+                              <span key={skillIndex} className="bg-red-100 text-red-800 px-2 py-1 rounded text-sm">
+                                {skill}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {category.suggestions && category.suggestions.length > 0 && (
+                        <div>
+                          <p className="text-sm text-blue-600 font-medium mb-1">Suggestions:</p>
+                          <ul className="text-sm text-gray-700">
+                            {category.suggestions.map((suggestion: string, suggestionIndex: number) => (
+                              <li key={suggestionIndex} className="flex items-start">
+                                <span className="text-blue-500 mr-2">•</span>
+                                {suggestion}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* ATS Optimization */}
+            {result.ats_optimization && result.ats_optimization.length > 0 && (
+              <div className="bg-white rounded-lg shadow p-6 mb-8">
+                <div className="flex items-center mb-4">
+                  <BookOpen className="h-5 w-5 text-indigo-600 mr-2" />
+                  <h2 className="text-xl font-semibold text-gray-900">ATS Optimization Tips</h2>
+                </div>
+                <ul className="space-y-3">
+                  {result.ats_optimization.map((tip: string, index: number) => (
+                    <li key={index} className="flex items-start">
+                      <div className="w-6 h-6 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-sm font-semibold mr-3 mt-0.5 flex-shrink-0">
+                        {index + 1}
+                      </div>
+                      <span className="text-gray-700">{tip}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Interview Preparation */}
+            {result.interview_prep && result.interview_prep.length > 0 && (
+              <div className="bg-white rounded-lg shadow p-6 mb-8">
+                <div className="flex items-center mb-4">
+                  <Users className="h-5 w-5 text-green-600 mr-2" />
+                  <h2 className="text-xl font-semibold text-gray-900">Interview Preparation</h2>
+                </div>
+                <ul className="space-y-3">
+                  {result.interview_prep.map((prep: string, index: number) => (
+                    <li key={index} className="flex items-start">
+                      <div className="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-sm font-semibold mr-3 mt-0.5 flex-shrink-0">
+                        {index + 1}
+                      </div>
+                      <span className="text-gray-700">{prep}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </>
+        )}
+
         {/* Keyword Analysis */}
         <div className="bg-white rounded-lg shadow p-6 mb-8">
           <div className="flex items-center mb-4">
@@ -153,11 +254,11 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
             <div>
               <h3 className="font-semibold text-green-600 mb-3 flex items-center">
                 <CheckCircle className="h-4 w-4 mr-1" />
-                Found Keywords (First 5)
+                Found Keywords
               </h3>
               {result.keywords_found && result.keywords_found.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
-                  {result.keywords_found.slice(0, 5).map((keyword: string, index: number) => (
+                  {result.keywords_found.slice(0, 10).map((keyword: string, index: number) => (
                     <span key={index} className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
                       {keyword}
                     </span>
@@ -170,11 +271,11 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
             <div>
               <h3 className="font-semibold text-red-600 mb-3 flex items-center">
                 <XCircle className="h-4 w-4 mr-1" />
-                Missing Keywords (First 5)
+                Missing Keywords
               </h3>
               {result.keywords_missing && result.keywords_missing.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
-                  {result.keywords_missing.slice(0, 5).map((keyword: string, index: number) => (
+                  {result.keywords_missing.slice(0, 10).map((keyword: string, index: number) => (
                     <span key={index} className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm">
                       {keyword}
                     </span>
@@ -188,7 +289,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
         </div>
 
         {/* Recommendations */}
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white rounded-lg shadow p-6 mb-8">
           <div className="flex items-center mb-4">
             <TrendingUp className="h-5 w-5 text-blue-600 mr-2" />
             <h2 className="text-xl font-semibold text-gray-900">Recommendations</h2>
@@ -209,18 +310,24 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
           )}
         </div>
 
-        {/* Premium Features Teaser */}
-        <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg border border-purple-200 p-6 mt-8">
-          <div className="text-center">
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Want More Detailed Analysis?</h3>
-            <p className="text-gray-600 mb-4">
-              Upgrade to Premium for comprehensive keyword analysis, detailed recommendations, and advanced compatibility insights.
-            </p>
-            <button className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-2 rounded-md hover:from-purple-700 hover:to-blue-700 transition-colors">
-              Upgrade to Premium
-            </button>
+        {/* Premium Features Teaser (only show for basic analysis) */}
+        {!isAIAnalysis && (
+          <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg border border-purple-200 p-6 mt-8">
+            <div className="text-center">
+              <Zap className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Want AI-Powered Analysis?</h3>
+              <p className="text-gray-600 mb-4">
+                Get comprehensive skills gap analysis, ATS optimization tips, interview preparation guidance, and detailed insights with our AI-enhanced analysis.
+              </p>
+              <button 
+                onClick={onStartNew}
+                className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-2 rounded-md hover:from-purple-700 hover:to-blue-700 transition-colors"
+              >
+                Try AI Analysis
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

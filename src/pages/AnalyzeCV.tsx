@@ -1,11 +1,11 @@
-
 import React, { useState } from 'react';
-import { Upload, FileText, Briefcase, Check, X, Eye, BarChart3, Download } from 'lucide-react';
+import { Upload, FileText, Briefcase, Check, X, Eye, BarChart3, Download, Zap, CreditCard } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { validateFile, extractTextFromFile, formatFileSize } from '@/utils/fileUtils';
 import AnalysisResults from '@/components/analysis/AnalysisResults';
+import { useQuery } from '@tanstack/react-query';
 
 interface UploadedFile {
   file: File;
@@ -25,6 +25,24 @@ const AnalyzeCV = () => {
   const [jobTitle, setJobTitle] = useState('');
   const [showPreview, setShowPreview] = useState<string | null>(null);
   const [analysisResult, setAnalysisResult] = useState<any>(null);
+  const [useAI, setUseAI] = useState(true);
+
+  // Fetch user credits
+  const { data: userCredits } = useQuery({
+    queryKey: ['user-credits', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data, error } = await supabase
+        .from('user_credits')
+        .select('credits')
+        .eq('user_id', user.id)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+  });
 
   const cvTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
   const jobDescTypes = [...cvTypes, 'text/plain'];
@@ -133,40 +151,68 @@ const AnalyzeCV = () => {
 
       if (jobError) throw jobError;
 
-      // Perform basic analysis
-      const cvText = uploadedFiles.cv.extractedText.toLowerCase();
-      const jobText = uploadedFiles.jobDescription.extractedText.toLowerCase();
+      let analysisData;
 
-      // Extract key terms from job description
-      const jobWords = jobText.split(/\W+/).filter(word => word.length > 3);
-      const keyTerms = [...new Set(jobWords)].slice(0, 20);
+      // Try AI analysis first if enabled and user has credits
+      if (useAI && userCredits?.credits && userCredits.credits > 0) {
+        try {
+          console.log('Attempting AI analysis...');
+          const { data: aiResult, error: aiError } = await supabase.functions.invoke('analyze-cv-with-ai', {
+            body: {
+              cvText: uploadedFiles.cv.extractedText,
+              jobDescriptionText: uploadedFiles.jobDescription.extractedText,
+              jobTitle: jobTitle || extractJobTitleFromText(uploadedFiles.jobDescription.extractedText),
+              userId: user?.id
+            }
+          });
 
-      // Find matching terms in CV
-      const matchingTerms = keyTerms.filter(term => cvText.includes(term));
-      const missingTerms = keyTerms.filter(term => !cvText.includes(term));
+          if (aiError) throw aiError;
 
-      // Calculate compatibility score
-      const compatibilityScore = Math.round((matchingTerms.length / keyTerms.length) * 100);
+          if (aiResult?.success) {
+            console.log('AI analysis successful');
+            const aiAnalysis = aiResult.analysis;
+            
+            analysisData = {
+              user_id: user?.id,
+              cv_upload_id: cvUpload.id,
+              job_description_upload_id: jobUpload.id,
+              job_title: jobTitle || extractJobTitleFromText(uploadedFiles.jobDescription.extractedText),
+              company_name: extractCompanyFromText(uploadedFiles.jobDescription.extractedText),
+              compatibility_score: aiAnalysis.compatibilityScore,
+              keywords_found: aiAnalysis.keywordsFound,
+              keywords_missing: aiAnalysis.keywordsMissing,
+              strengths: aiAnalysis.strengths,
+              weaknesses: aiAnalysis.weaknesses,
+              recommendations: aiAnalysis.recommendations,
+              executive_summary: aiAnalysis.executiveSummary,
+              analysis_type: 'ai',
+              skills_gap_analysis: aiAnalysis.skillsGapAnalysis,
+              ats_optimization: aiAnalysis.atsOptimization,
+              interview_prep: aiAnalysis.interviewPrep
+            };
 
-      // Extract job title and company if not provided
-      const extractedJobTitle = jobTitle || extractJobTitleFromText(uploadedFiles.jobDescription.extractedText);
-      const extractedCompany = extractCompanyFromText(uploadedFiles.jobDescription.extractedText);
-
-      // Generate analysis results
-      const analysisData = {
-        user_id: user?.id,
-        cv_upload_id: cvUpload.id,
-        job_description_upload_id: jobUpload.id,
-        job_title: extractedJobTitle,
-        company_name: extractedCompany,
-        compatibility_score: compatibilityScore,
-        keywords_found: matchingTerms.slice(0, 10),
-        keywords_missing: missingTerms.slice(0, 10),
-        strengths: generateStrengths(matchingTerms, compatibilityScore),
-        weaknesses: generateWeaknesses(missingTerms, compatibilityScore),
-        recommendations: generateRecommendations(missingTerms, compatibilityScore),
-        executive_summary: generateExecutiveSummary(compatibilityScore, extractedJobTitle)
-      };
+            toast({ 
+              title: 'AI Analysis Complete!', 
+              description: `Advanced analysis completed. ${aiResult.creditsRemaining} credits remaining.` 
+            });
+          } else {
+            throw new Error('AI analysis failed');
+          }
+        } catch (aiError) {
+          console.log('AI analysis failed, falling back to basic analysis:', aiError);
+          toast({ 
+            title: 'AI Analysis Unavailable', 
+            description: 'Using basic analysis instead.',
+            variant: 'destructive' 
+          });
+          
+          // Fall back to basic analysis
+          analysisData = await performBasicAnalysis(cvUpload, jobUpload);
+        }
+      } else {
+        // Use basic analysis
+        analysisData = await performBasicAnalysis(cvUpload, jobUpload);
+      }
 
       // Save analysis results
       const { data: analysisResult, error: analysisError } = await supabase
@@ -186,6 +232,38 @@ const AnalyzeCV = () => {
     } finally {
       setAnalyzing(false);
     }
+  };
+
+  const performBasicAnalysis = async (cvUpload: any, jobUpload: any) => {
+    const cvText = uploadedFiles.cv!.extractedText.toLowerCase();
+    const jobText = uploadedFiles.jobDescription!.extractedText.toLowerCase();
+
+    const jobWords = jobText.split(/\W+/).filter(word => word.length > 3);
+    const keyTerms = [...new Set(jobWords)].slice(0, 20);
+
+    const matchingTerms = keyTerms.filter(term => cvText.includes(term));
+    const missingTerms = keyTerms.filter(term => !cvText.includes(term));
+
+    const compatibilityScore = Math.round((matchingTerms.length / keyTerms.length) * 100);
+
+    const extractedJobTitle = jobTitle || extractJobTitleFromText(uploadedFiles.jobDescription!.extractedText);
+    const extractedCompany = extractCompanyFromText(uploadedFiles.jobDescription!.extractedText);
+
+    return {
+      user_id: user?.id,
+      cv_upload_id: cvUpload.id,
+      job_description_upload_id: jobUpload.id,
+      job_title: extractedJobTitle,
+      company_name: extractedCompany,
+      compatibility_score: compatibilityScore,
+      keywords_found: matchingTerms.slice(0, 10),
+      keywords_missing: missingTerms.slice(0, 10),
+      strengths: generateStrengths(matchingTerms, compatibilityScore),
+      weaknesses: generateWeaknesses(missingTerms, compatibilityScore),
+      recommendations: generateRecommendations(missingTerms, compatibilityScore),
+      executive_summary: generateExecutiveSummary(compatibilityScore, extractedJobTitle),
+      analysis_type: 'basic'
+    };
   };
 
   const extractJobTitleFromText = (text: string): string => {
@@ -248,6 +326,7 @@ const AnalyzeCV = () => {
   };
 
   const canAnalyze = uploadedFiles.cv && uploadedFiles.jobDescription;
+  const hasCreditsForAI = userCredits?.credits && userCredits.credits > 0;
 
   if (analysisResult) {
     return <AnalysisResults result={analysisResult} onStartNew={() => setAnalysisResult(null)} />;
@@ -261,6 +340,55 @@ const AnalyzeCV = () => {
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Upload your CV and job description to get instant compatibility analysis with actionable recommendations.
           </p>
+          
+          {/* Credits and Analysis Type Selection */}
+          <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <div className="flex items-center justify-center space-x-4 mb-4">
+              <div className="flex items-center space-x-2">
+                <CreditCard className="h-5 w-5 text-blue-600" />
+                <span className="text-blue-900 font-medium">
+                  Credits: {userCredits?.credits || 0}
+                </span>
+              </div>
+            </div>
+            
+            <div className="flex items-center justify-center space-x-6">
+              <label className="flex items-center space-x-2">
+                <input
+                  type="radio"
+                  checked={useAI && hasCreditsForAI}
+                  onChange={() => setUseAI(true)}
+                  disabled={!hasCreditsForAI}
+                  className="text-blue-600"
+                />
+                <div className="flex items-center space-x-2">
+                  <Zap className="h-4 w-4 text-yellow-500" />
+                  <span className={hasCreditsForAI ? 'text-gray-900' : 'text-gray-400'}>
+                    AI Analysis (1 credit)
+                  </span>
+                </div>
+              </label>
+              
+              <label className="flex items-center space-x-2">
+                <input
+                  type="radio"
+                  checked={!useAI || !hasCreditsForAI}
+                  onChange={() => setUseAI(false)}
+                  className="text-blue-600"
+                />
+                <div className="flex items-center space-x-2">
+                  <BarChart3 className="h-4 w-4 text-blue-500" />
+                  <span className="text-gray-900">Basic Analysis (Free)</span>
+                </div>
+              </label>
+            </div>
+            
+            {!hasCreditsForAI && (
+              <p className="text-sm text-orange-600 mt-2">
+                No credits available for AI analysis. Using basic analysis.
+              </p>
+            )}
+          </div>
         </div>
 
         <div className="space-y-6">
@@ -406,12 +534,23 @@ const AnalyzeCV = () => {
               {analyzing ? (
                 <div className="flex items-center justify-center space-x-2">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  <span>Analyzing CV...</span>
+                  <span>
+                    {useAI && hasCreditsForAI ? 'Running AI Analysis...' : 'Analyzing CV...'}
+                  </span>
                 </div>
               ) : (
                 <div className="flex items-center justify-center space-x-2">
-                  <BarChart3 className="h-4 w-4" />
-                  <span>Analyze CV Compatibility</span>
+                  {useAI && hasCreditsForAI ? (
+                    <>
+                      <Zap className="h-4 w-4" />
+                      <span>Analyze with AI (1 credit)</span>
+                    </>
+                  ) : (
+                    <>
+                      <BarChart3 className="h-4 w-4" />
+                      <span>Analyze CV Compatibility</span>
+                    </>
+                  )}
                 </div>
               )}
             </button>
