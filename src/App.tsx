@@ -14,43 +14,54 @@ import Resources from "./pages/Resources";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import { useState } from "react";
 
-const queryClient = new QueryClient();
+const App = () => {
+  // Create QueryClient inside component to avoid initialization issues
+  const [queryClient] = useState(() => new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 60 * 1000, // 1 minute
+        retry: 1,
+      },
+    },
+  }));
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AuthProvider>
-          <div className="min-h-screen flex flex-col">
-            <Navigation />
-            <main className="flex-1">
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/analyze" element={
-                  <ProtectedRoute>
-                    <AnalyzeCV />
-                  </ProtectedRoute>
-                } />
-                <Route path="/resources" element={<Resources />} />
-                <Route path="/profile" element={
-                  <ProtectedRoute>
-                    <Profile />
-                  </ProtectedRoute>
-                } />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </main>
-            <Footer />
-          </div>
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AuthProvider>
+            <div className="min-h-screen flex flex-col">
+              <Navigation />
+              <main className="flex-1">
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/analyze" element={
+                    <ProtectedRoute>
+                      <AnalyzeCV />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/resources" element={<Resources />} />
+                  <Route path="/profile" element={
+                    <ProtectedRoute>
+                      <Profile />
+                    </ProtectedRoute>
+                  } />
+                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </main>
+              <Footer />
+            </div>
+          </AuthProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
