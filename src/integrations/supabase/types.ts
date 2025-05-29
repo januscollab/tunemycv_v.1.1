@@ -9,6 +9,72 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      analysis_results: {
+        Row: {
+          company_name: string | null
+          compatibility_score: number
+          created_at: string | null
+          cv_upload_id: string
+          executive_summary: string | null
+          id: string
+          job_description_upload_id: string
+          job_title: string | null
+          keywords_found: Json | null
+          keywords_missing: Json | null
+          recommendations: string[] | null
+          strengths: string[] | null
+          user_id: string
+          weaknesses: string[] | null
+        }
+        Insert: {
+          company_name?: string | null
+          compatibility_score: number
+          created_at?: string | null
+          cv_upload_id: string
+          executive_summary?: string | null
+          id?: string
+          job_description_upload_id: string
+          job_title?: string | null
+          keywords_found?: Json | null
+          keywords_missing?: Json | null
+          recommendations?: string[] | null
+          strengths?: string[] | null
+          user_id: string
+          weaknesses?: string[] | null
+        }
+        Update: {
+          company_name?: string | null
+          compatibility_score?: number
+          created_at?: string | null
+          cv_upload_id?: string
+          executive_summary?: string | null
+          id?: string
+          job_description_upload_id?: string
+          job_title?: string | null
+          keywords_found?: Json | null
+          keywords_missing?: Json | null
+          recommendations?: string[] | null
+          strengths?: string[] | null
+          user_id?: string
+          weaknesses?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analysis_results_cv_upload_id_fkey"
+            columns: ["cv_upload_id"]
+            isOneToOne: false
+            referencedRelation: "uploads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analysis_results_job_description_upload_id_fkey"
+            columns: ["job_description_upload_id"]
+            isOneToOne: false
+            referencedRelation: "uploads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string | null
