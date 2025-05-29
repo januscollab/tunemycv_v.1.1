@@ -1,10 +1,7 @@
-
 import { Link } from 'react-router-dom';
 import { FileText, TrendingUp, Mail, Phone, MapPin } from 'lucide-react';
-
 const Footer = () => {
-  return (
-    <footer className="bg-gray-900 text-white">
+  return <footer className="bg-gray-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo and Description */}
@@ -22,7 +19,7 @@ const Footer = () => {
             <div className="flex space-x-4">
               <div className="flex items-center text-gray-300">
                 <Mail className="h-4 w-4 mr-2" />
-                <span className="text-sm">contact@tunemycv.com</span>
+                <span className="text-sm">hello@tunemycv.com</span>
               </div>
             </div>
           </div>
@@ -89,8 +86,6 @@ const Footer = () => {
           </p>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
-
 export default Footer;
