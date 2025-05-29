@@ -1,20 +1,21 @@
 
 import { Link } from 'react-router-dom';
-import { FileText, TrendingUp, Mail, Phone, MapPin } from 'lucide-react';
+import { Mail } from 'lucide-react';
 
 const Footer = () => {
   return (
-    <footer className="bg-blueberry text-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <footer className="bg-gradient-to-br from-blueberry via-blueberry/90 to-blueberry/80 text-white relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-r from-blueberry/90 via-blueberry/70 to-blueberry/90"></div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo and Description */}
           <div className="col-span-1 md:col-span-2">
             <Link to="/" className="flex items-center space-x-2 mb-4">
-              <div className="flex items-center space-x-1">
-                <FileText className="h-8 w-8 text-citrus" />
-                <TrendingUp className="h-6 w-6 text-apricot" />
-              </div>
-              <span className="text-2xl font-bold">TuneMyCV</span>
+              <img 
+                src="/lovable-uploads/uploaded-logo.png" 
+                alt="TuneMyCV Logo" 
+                className="h-10 w-auto"
+              />
             </Link>
             <p className="text-apple-core mb-4 max-w-md">
               Optimize your CV and increase your chances of landing your dream job with our AI-powered analysis and personalized recommendations.
@@ -22,7 +23,12 @@ const Footer = () => {
             <div className="flex space-x-4">
               <div className="flex items-center text-apple-core">
                 <Mail className="h-4 w-4 mr-2 text-citrus" />
-                <span className="text-sm">hello@tunemycv.com</span>
+                <a 
+                  href="mailto:hello@tunemycv.com"
+                  className="text-sm hover:text-citrus transition-colors"
+                >
+                  hello@tunemycv.com
+                </a>
               </div>
             </div>
           </div>
@@ -89,6 +95,10 @@ const Footer = () => {
           </p>
         </div>
       </div>
+      
+      {/* Background decoration */}
+      <div className="absolute -top-10 -right-10 w-40 h-40 bg-citrus/10 rounded-full blur-2xl"></div>
+      <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-apricot/10 rounded-full blur-2xl"></div>
     </footer>
   );
 };

@@ -10,7 +10,7 @@ const Testimonials = () => {
       company: "Tech Corp",
       content: "TuneMyCV helped me land my dream job at a top tech company. The AI analysis identified key areas for improvement that I never would have noticed myself.",
       rating: 5,
-      avatar: "/placeholder.svg?height=80&width=80&text=SJ"
+      avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b47c?w=80&h=80&fit=crop&crop=face"
     },
     {
       name: "Michael Chen",
@@ -18,7 +18,7 @@ const Testimonials = () => {
       company: "Growth Solutions",
       content: "The detailed feedback and cover letter assistance were game-changers. I went from 0 responses to 5 interview invitations in just two weeks!",
       rating: 5,
-      avatar: "/placeholder.svg?height=80&width=80&text=MC"
+      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face"
     },
     {
       name: "Emily Rodriguez",
@@ -26,7 +26,7 @@ const Testimonials = () => {
       company: "Analytics Plus",
       content: "The interview preparation scripts gave me the confidence I needed. I felt so prepared and ultimately got the job with a 30% salary increase!",
       rating: 5,
-      avatar: "/placeholder.svg?height=80&width=80&text=ER"
+      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=face"
     },
     {
       name: "David Thompson",
@@ -34,7 +34,7 @@ const Testimonials = () => {
       company: "Innovation Labs",
       content: "As someone changing careers, TuneMyCV helped me highlight transferable skills I didn't know I had. The personalized recommendations were spot-on.",
       rating: 5,
-      avatar: "/placeholder.svg?height=80&width=80&text=DT"
+      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=face"
     },
     {
       name: "Lisa Park",
@@ -42,7 +42,7 @@ const Testimonials = () => {
       company: "Design Studio",
       content: "The ATS optimization feature is brilliant. My CV now passes through applicant tracking systems that previously filtered me out automatically.",
       rating: 5,
-      avatar: "/placeholder.svg?height=80&width=80&text=LP"
+      avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=80&h=80&fit=crop&crop=face"
     },
     {
       name: "James Wilson",
@@ -50,7 +50,7 @@ const Testimonials = () => {
       company: "Capital Ventures",
       content: "TuneMyCV transformed my entire job search strategy. The insights were incredibly valuable and helped me stand out from other candidates.",
       rating: 5,
-      avatar: "/placeholder.svg?height=80&width=80&text=JW"
+      avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&h=80&fit=crop&crop=face"
     }
   ];
 

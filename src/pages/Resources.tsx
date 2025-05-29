@@ -45,12 +45,12 @@ const Resources = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-apple-core/10">
       <div className="max-w-7xl mx-auto px-4 py-12">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Career Resources</h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <h1 className="text-4xl font-bold text-blueberry mb-4">Career Resources</h1>
+          <p className="text-xl text-blueberry/80 max-w-3xl mx-auto">
             Everything you need to build a compelling CV and advance your career. From templates to expert advice.
           </p>
         </div>
@@ -58,21 +58,21 @@ const Resources = () => {
         {/* Resource Categories */}
         <div className="grid md:grid-cols-3 gap-8 mb-16">
           {resourceCategories.map((category, index) => (
-            <div key={index} className="bg-white rounded-lg shadow-lg p-6">
+            <div key={index} className="bg-white rounded-lg shadow-lg p-6 border border-apple-core/30 hover:shadow-xl transition-shadow">
               <div className="flex items-center mb-4">
-                <category.icon className="h-8 w-8 text-blue-600 mr-3" />
-                <h3 className="text-xl font-semibold text-gray-900">{category.title}</h3>
+                <category.icon className="h-8 w-8 text-apricot mr-3" />
+                <h3 className="text-xl font-semibold text-blueberry">{category.title}</h3>
               </div>
-              <p className="text-gray-600 mb-4">{category.description}</p>
+              <p className="text-blueberry/70 mb-4">{category.description}</p>
               <ul className="space-y-2">
                 {category.items.map((item, itemIndex) => (
-                  <li key={itemIndex} className="flex items-center text-gray-700">
-                    <div className="w-2 h-2 bg-blue-600 rounded-full mr-3"></div>
+                  <li key={itemIndex} className="flex items-center text-blueberry/80">
+                    <div className="w-2 h-2 bg-citrus rounded-full mr-3"></div>
                     {item}
                   </li>
                 ))}
               </ul>
-              <button className="mt-4 text-blue-600 font-medium hover:text-blue-700 transition-colors">
+              <button className="mt-4 text-apricot font-medium hover:text-apricot/80 transition-colors">
                 Explore All →
               </button>
             </div>
@@ -81,10 +81,10 @@ const Resources = () => {
 
         {/* Featured Articles */}
         <div className="mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Featured Articles</h2>
+          <h2 className="text-3xl font-bold text-blueberry mb-8 text-center">Featured Articles</h2>
           <div className="grid md:grid-cols-3 gap-8">
             {featuredArticles.map((article, index) => (
-              <div key={index} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+              <div key={index} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow border border-apple-core/30">
                 <img 
                   src={article.image} 
                   alt={article.title}
@@ -92,13 +92,13 @@ const Resources = () => {
                 />
                 <div className="p-6">
                   <div className="flex items-center mb-2">
-                    <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded">
+                    <span className="bg-citrus/20 text-blueberry text-xs font-medium px-2 py-1 rounded">
                       {article.category}
                     </span>
-                    <span className="text-gray-500 text-sm ml-2">{article.readTime}</span>
+                    <span className="text-blueberry/60 text-sm ml-2">{article.readTime}</span>
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{article.title}</h3>
-                  <button className="text-blue-600 font-medium hover:text-blue-700 transition-colors">
+                  <h3 className="text-lg font-semibold text-blueberry mb-2">{article.title}</h3>
+                  <button className="text-apricot font-medium hover:text-apricot/80 transition-colors">
                     Read More →
                   </button>
                 </div>
@@ -108,22 +108,29 @@ const Resources = () => {
         </div>
 
         {/* Stats Section */}
-        <div className="bg-blue-600 rounded-lg p-8 text-white text-center">
-          <h2 className="text-2xl font-bold mb-8">Join Thousands of Successful Job Seekers</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div>
-              <div className="text-3xl font-bold mb-2">50,000+</div>
-              <div className="text-blue-100">CVs Analyzed</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold mb-2">85%</div>
-              <div className="text-blue-100">Success Rate</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold mb-2">15k+</div>
-              <div className="text-blue-100">Happy Users</div>
+        <div className="bg-gradient-to-br from-blueberry via-blueberry/90 to-blueberry/80 rounded-lg p-8 text-white text-center relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-blueberry/90 via-blueberry/70 to-blueberry/90"></div>
+          <div className="relative z-10">
+            <h2 className="text-2xl font-bold mb-8 text-citrus">Join Thousands of Successful Job Seekers</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="bg-white/10 rounded-lg p-6 backdrop-blur-sm border border-apple-core/20">
+                <div className="text-3xl font-bold mb-2 text-citrus">50,000+</div>
+                <div className="text-apple-core">CVs Analyzed</div>
+              </div>
+              <div className="bg-white/10 rounded-lg p-6 backdrop-blur-sm border border-apple-core/20">
+                <div className="text-3xl font-bold mb-2 text-citrus">85%</div>
+                <div className="text-apple-core">Success Rate</div>
+              </div>
+              <div className="bg-white/10 rounded-lg p-6 backdrop-blur-sm border border-apple-core/20">
+                <div className="text-3xl font-bold mb-2 text-citrus">15k+</div>
+                <div className="text-apple-core">Happy Users</div>
+              </div>
             </div>
           </div>
+          
+          {/* Background decoration */}
+          <div className="absolute -top-10 -right-10 w-40 h-40 bg-citrus/10 rounded-full blur-2xl"></div>
+          <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-apricot/10 rounded-full blur-2xl"></div>
         </div>
       </div>
     </div>

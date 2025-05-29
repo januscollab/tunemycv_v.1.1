@@ -146,35 +146,35 @@ const Auth = () => {
   return (
     <>
       <OAuthCallback onLoadingChange={setOauthLoading} />
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gradient-to-br from-apple-core/20 via-white to-citrus/10 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
           <div className="text-center">
-            <Link to="/" className="inline-flex items-center text-blue-600 hover:text-blue-700 mb-4">
+            <Link to="/" className="inline-flex items-center text-apricot hover:text-apricot/80 mb-4">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Home
             </Link>
             
             {fromAnalyze && (
-              <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
-                <div className="text-sm text-blue-800">
+              <div className="bg-citrus/10 border border-citrus/30 rounded-md p-4 mb-6">
+                <div className="text-sm text-blueberry">
                   <strong>Login Required:</strong> You need to sign in to analyze your CV and access personalized insights.
                 </div>
               </div>
             )}
             
-            <h2 className="text-3xl font-bold text-gray-900">
+            <h2 className="text-3xl font-bold text-blueberry">
               {mode === 'login' && 'Welcome back'}
               {mode === 'register' && 'Create your account'}
               {mode === 'forgot-password' && 'Reset your password'}
             </h2>
-            <p className="mt-2 text-gray-600">
+            <p className="mt-2 text-blueberry/70">
               {mode === 'login' && 'Sign in to your TuneMyCV account'}
               {mode === 'register' && 'Join TuneMyCV and optimize your career'}
               {mode === 'forgot-password' && 'Enter your email to receive reset instructions'}
             </p>
           </div>
 
-          <div className="bg-white rounded-lg shadow-lg p-8">
+          <div className="bg-white rounded-lg shadow-lg p-8 border border-apple-core/30">
             {mode !== 'forgot-password' && (
               <SocialAuthButtons isAnyLoading={isAnyLoading} />
             )}

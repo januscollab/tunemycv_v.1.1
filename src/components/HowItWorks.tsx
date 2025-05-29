@@ -6,21 +6,15 @@ const HowItWorks = () => {
   const steps = [
     {
       icon: Upload,
-      title: "Upload Your CV",
-      description: "Simply upload your CV and the job description you are applying for",
+      title: "Upload Your CV & Job Description",
+      description: "Simply upload your CV and the job description you are applying for analysis",
       image: "/placeholder.svg?height=300&width=400&text=Upload+CV"
     },
     {
       icon: Search,
-      title: "AI Analysis",
-      description: "TuneMyCV performs a comprehensive analysis of your compatibility for the role based on your CV",
+      title: "Comprehensive Assessment of Role Compatibility",
+      description: "Driven by our curated AI models, TuneMyCV performs a comprehensive analysis of your compatibility for the role and provides a detailed report based on your CV",
       image: "/placeholder.svg?height=300&width=400&text=AI+Analysis"
-    },
-    {
-      icon: FileText,
-      title: "Detailed Report",
-      description: "Get a detailed report with vital key information to guide you on tuning your CV to better align with the job requirements",
-      image: "/placeholder.svg?height=300&width=400&text=CV+Report"
     },
     {
       icon: Mail,
@@ -44,7 +38,7 @@ const HowItWorks = () => {
             How TuneMyCV Works
           </h2>
           <p className="text-xl text-blueberry/80 max-w-3xl mx-auto">
-            Your journey to landing your dream job starts here. Follow our simple 5-step process to transform your career prospects.
+            Your journey to landing your dream job starts here. Follow our simple 4-step process to transform your career prospects.
           </p>
         </div>
 
