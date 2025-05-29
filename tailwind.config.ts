@@ -23,30 +23,36 @@ export default {
 				sans: ['Inter', 'system-ui', 'sans-serif'],
 			},
 			colors: {
+				// Custom palette from the image
+				blueberry: '#6B7A8F',
+				apricot: '#F7882F',
+				citrus: '#F7C32E',
+				'apple-core': '#DCC7AA',
+				
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
+					DEFAULT: '#F7882F', // Apricot as primary
+					foreground: '#FFFFFF'
 				},
 				secondary: {
-					DEFAULT: 'hsl(var(--secondary))',
-					foreground: 'hsl(var(--secondary-foreground))'
+					DEFAULT: '#DCC7AA', // Apple core as secondary
+					foreground: '#6B7A8F' // Blueberry text
 				},
 				destructive: {
 					DEFAULT: 'hsl(var(--destructive))',
 					foreground: 'hsl(var(--destructive-foreground))'
 				},
 				muted: {
-					DEFAULT: 'hsl(var(--muted))',
-					foreground: 'hsl(var(--muted-foreground))'
+					DEFAULT: '#DCC7AA', // Apple core for muted
+					foreground: '#6B7A8F' // Blueberry for muted text
 				},
 				accent: {
-					DEFAULT: 'hsl(var(--accent))',
-					foreground: 'hsl(var(--accent-foreground))'
+					DEFAULT: '#F7C32E', // Citrus for accents
+					foreground: '#6B7A8F'
 				},
 				popover: {
 					DEFAULT: 'hsl(var(--popover))',
