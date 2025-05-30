@@ -55,6 +55,14 @@ const CompatibilityBreakdownSection: React.FC<CompatibilityBreakdownProps> = ({ 
     return 'text-red-600';
   };
 
+  const getPresentItems = (category: any) => {
+    return category.present || category.relevantExperience || category.relevantQualifications || [];
+  };
+
+  const getMissingItems = (category: any) => {
+    return category.missing || category.missingExperience || category.missingQualifications || [];
+  };
+
   return (
     <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
       <div className="flex items-center mb-6">
@@ -67,6 +75,9 @@ const CompatibilityBreakdownSection: React.FC<CompatibilityBreakdownProps> = ({ 
         {categories.map(({ key, label, icon }) => {
           const category = compatibilityBreakdown[key as keyof typeof compatibilityBreakdown];
           if (!category) return null;
+
+          const presentItems = getPresentItems(category);
+          const missingItems = getMissingItems(category);
 
           return (
             <div key={key} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
@@ -88,14 +99,14 @@ const CompatibilityBreakdownSection: React.FC<CompatibilityBreakdownProps> = ({ 
 
               <div className="grid md:grid-cols-2 gap-4">
                 {/* Present/Found items */}
-                {(category.present || category.relevantExperience || category.relevantQualifications) && (
+                {presentItems.length > 0 && (
                   <div>
                     <h4 className="text-sm font-medium text-green-600 mb-2 flex items-center">
                       <CheckCircle className="h-4 w-4 mr-1" />
                       Present/Found
                     </h4>
                     <div className="space-y-1">
-                      {(category.present || category.relevantExperience || category.relevantQualifications || []).map((item: string, index: number) => (
+                      {presentItems.map((item: string, index: number) => (
                         <div key={index} className="text-xs bg-green-50 text-green-800 px-2 py-1 rounded">
                           {item}
                         </div>
@@ -105,14 +116,14 @@ const CompatibilityBreakdownSection: React.FC<CompatibilityBreakdownProps> = ({ 
                 )}
 
                 {/* Missing items */}
-                {(category.missing || category.missingExperience || category.missingQualifications) && (
+                {missingItems.length > 0 && (
                   <div>
                     <h4 className="text-sm font-medium text-red-600 mb-2 flex items-center">
                       <XCircle className="h-4 w-4 mr-1" />
                       Missing/Needed
                     </h4>
                     <div className="space-y-1">
-                      {(category.missing || category.missingExperience || category.missingQualifications || []).map((item: string, index: number) => (
+                      {missingItems.map((item: string, index: number) => (
                         <div key={index} className="text-xs bg-red-50 text-red-800 px-2 py-1 rounded">
                           {item}
                         </div>

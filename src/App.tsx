@@ -1,3 +1,5 @@
+
+import React, { useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -15,9 +17,8 @@ import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
-import { useState } from "react";
 
-const App = () => {
+const App: React.FC = () => {
   // Create QueryClient inside component to avoid initialization issues
   const [queryClient] = useState(() => new QueryClient({
     defaultOptions: {
