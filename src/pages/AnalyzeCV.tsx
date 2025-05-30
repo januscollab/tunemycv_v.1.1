@@ -5,10 +5,9 @@ import { useToast } from '@/hooks/use-toast';
 import { validateFile, extractTextFromFile } from '@/utils/fileUtils';
 import { extractJobTitleFromText } from '@/utils/analysisUtils';
 import AnalysisResults from '@/components/analysis/AnalysisResults';
-import CVSelector from '@/components/analyze/CVSelector';
-import JobDescriptionTextInput from '@/components/analyze/JobDescriptionTextInput';
+import AnalyzeCVHeader from '@/components/analyze/AnalyzeCVHeader';
+import AnalyzeCVMainContent from '@/components/analyze/AnalyzeCVMainContent';
 import CreditsPanel from '@/components/analyze/CreditsPanel';
-import AnalyzeButton from '@/components/analyze/AnalyzeButton';
 import { useAnalysis } from '@/hooks/useAnalysis';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -28,7 +27,6 @@ const AnalyzeCV = () => {
     jobDescription?: UploadedFile;
   }>({});
   const [jobTitle, setJobTitle] = useState('');
-  const [showPreview, setShowPreview] = useState<string | null>(null);
 
   const { analyzing, analysisResult, setAnalysisResult, performAnalysis } = useAnalysis();
 
@@ -60,7 +58,7 @@ const AnalyzeCV = () => {
     toast({ title: 'Success', description: 'CV selected successfully!' });
   };
 
-  const handleFileUpload = async (file: File, type: 'job_description') => {
+  const handleJobDescriptionFileUpload = async (file: File) => {
     const errors = validateFile(file, jobDescTypes, maxSize);
     
     if (errors.length > 0) {
@@ -75,7 +73,7 @@ const AnalyzeCV = () => {
       const uploadedFile: UploadedFile = {
         file,
         extractedText,
-        type
+        type: 'job_description'
       };
 
       setUploadedFiles(prev => ({
@@ -97,7 +95,7 @@ const AnalyzeCV = () => {
     }
   };
 
-  const handleJobDescriptionText = (text: string) => {
+  const handleJobDescriptionTextSubmit = (text: string) => {
     if (!text.trim()) {
       toast({ title: 'Error', description: 'Please enter job description text', variant: 'destructive' });
       return;
@@ -124,24 +122,18 @@ const AnalyzeCV = () => {
     toast({ title: 'Success', description: 'Job description added successfully!' });
   };
 
-  const removeFile = (type: 'cv' | 'jobDescription') => {
+  const removeJobDescription = () => {
     setUploadedFiles(prev => {
       const updated = { ...prev };
-      delete updated[type];
+      delete updated.jobDescription;
       return updated;
     });
-  };
-
-  const togglePreview = (type: 'cv' | 'job_description') => {
-    const previewKey = type === 'cv' ? 'cv' : 'jobDescription';
-    setShowPreview(showPreview === previewKey ? null : previewKey);
   };
 
   const handleAnalysis = () => {
     performAnalysis(uploadedFiles, jobTitle, true, userCredits);
   };
 
-  const canAnalyze = uploadedFiles.cv && uploadedFiles.jobDescription;
   const hasCreditsForAI = userCredits?.credits && userCredits.credits > 0;
 
   if (analysisResult) {
@@ -153,90 +145,21 @@ const AnalyzeCV = () => {
       <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Main Analysis Section */}
         <div className="lg:col-span-3">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-blueberry dark:text-citrus mb-4">Analyze Your CV</h1>
-            <p className="text-xl text-blueberry/80 dark:text-apple-core max-w-2xl mx-auto">
-              Upload your CV and job description to get comprehensive compatibility analysis with actionable recommendations.
-            </p>
-          </div>
-
-          <div className="space-y-6">
-            {/* Job Title */}
-            <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
-              <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-4">Job Title</h3>
-              <input
-                type="text"
-                value={jobTitle}
-                onChange={(e) => setJobTitle(e.target.value)}
-                placeholder="e.g., Senior Software Engineer (auto-extracted from job description)"
-                className="w-full px-3 py-2 border border-apple-core/30 dark:border-citrus/30 rounded-md focus:outline-none focus:ring-2 focus:ring-apricot focus:border-transparent bg-white dark:bg-blueberry/10 text-blueberry dark:text-apple-core"
-              />
-              <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mt-2">
-                Job title will be automatically extracted from the job description if not provided.
-              </p>
-            </div>
-
-            {/* CV Selection */}
-            <CVSelector
-              onCVSelect={handleCVSelect}
-              selectedCV={uploadedFiles.cv}
-              uploading={uploading}
-            />
-
-            {/* Job Description Upload */}
-            <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
-              <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-4">Job Description</h3>
-              <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mb-4">Upload a file (PDF, DOCX, TXT) or paste the text directly</p>
-              
-              <div className="space-y-4">
-                {!uploadedFiles.jobDescription ? (
-                  <>
-                    <div className="border-2 border-dashed border-apple-core/30 dark:border-citrus/30 rounded-lg p-6 text-center">
-                      <label className="cursor-pointer">
-                        <span className="text-apricot hover:text-apricot/80 font-medium">Click to upload</span>
-                        <span className="text-blueberry/70 dark:text-apple-core/70"> or drag and drop your job description file</span>
-                        <input
-                          type="file"
-                          className="hidden"
-                          accept=".pdf,.docx,.txt"
-                          onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0], 'job_description')}
-                          disabled={uploading}
-                        />
-                      </label>
-                    </div>
-                    
-                    <div className="text-center text-blueberry/60 dark:text-apple-core/60">or</div>
-                    
-                    <JobDescriptionTextInput onSubmit={handleJobDescriptionText} disabled={uploading} />
-                  </>
-                ) : (
-                  <div className="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <div>
-                        <p className="font-medium text-green-900">{uploadedFiles.jobDescription.file.name}</p>
-                        <p className="text-sm text-green-700">Job description ready</p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => removeFile('jobDescription')}
-                      className="p-2 text-red-600 hover:bg-red-100 rounded-md"
-                    >
-                      ×
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Analyze Button */}
-            <AnalyzeButton
-              onAnalyze={handleAnalysis}
-              canAnalyze={!!canAnalyze}
-              analyzing={analyzing}
-              hasCreditsForAI={hasCreditsForAI}
-            />
-          </div>
+          <AnalyzeCVHeader />
+          
+          <AnalyzeCVMainContent
+            uploadedFiles={uploadedFiles}
+            jobTitle={jobTitle}
+            setJobTitle={setJobTitle}
+            uploading={uploading}
+            analyzing={analyzing}
+            hasCreditsForAI={hasCreditsForAI}
+            onCVSelect={handleCVSelect}
+            onJobDescriptionFileUpload={handleJobDescriptionFileUpload}
+            onJobDescriptionTextSubmit={handleJobDescriptionTextSubmit}
+            onRemoveJobDescription={removeJobDescription}
+            onAnalysis={handleAnalysis}
+          />
         </div>
 
         {/* Credits Panel */}
