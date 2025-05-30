@@ -5,7 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import { validateFile, extractTextFromFile } from '@/utils/fileUtils';
 import { extractJobTitleFromText } from '@/utils/analysisUtils';
 import AnalysisResults from '@/components/analysis/AnalysisResults';
-import FileUploadSection from '@/components/analyze/FileUploadSection';
+import CVSelector from '@/components/analyze/CVSelector';
 import JobDescriptionTextInput from '@/components/analyze/JobDescriptionTextInput';
 import CreditsPanel from '@/components/analyze/CreditsPanel';
 import AnalyzeButton from '@/components/analyze/AnalyzeButton';
@@ -29,7 +29,6 @@ const AnalyzeCV = () => {
   }>({});
   const [jobTitle, setJobTitle] = useState('');
   const [showPreview, setShowPreview] = useState<string | null>(null);
-  const [useAI, setUseAI] = useState(true);
 
   const { analyzing, analysisResult, setAnalysisResult, performAnalysis } = useAnalysis();
 
@@ -50,13 +49,19 @@ const AnalyzeCV = () => {
     enabled: !!user?.id,
   });
 
-  const cvTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-  const jobDescTypes = [...cvTypes, 'text/plain'];
+  const jobDescTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
   const maxSize = 5 * 1024 * 1024; // 5MB
 
-  const handleFileUpload = async (file: File, type: 'cv' | 'job_description') => {
-    const allowedTypes = type === 'cv' ? cvTypes : jobDescTypes;
-    const errors = validateFile(file, allowedTypes, maxSize);
+  const handleCVSelect = (uploadedFile: UploadedFile) => {
+    setUploadedFiles(prev => ({
+      ...prev,
+      cv: uploadedFile
+    }));
+    toast({ title: 'Success', description: 'CV selected successfully!' });
+  };
+
+  const handleFileUpload = async (file: File, type: 'job_description') => {
+    const errors = validateFile(file, jobDescTypes, maxSize);
     
     if (errors.length > 0) {
       toast({ title: 'Upload Error', description: errors.join('. '), variant: 'destructive' });
@@ -75,16 +80,16 @@ const AnalyzeCV = () => {
 
       setUploadedFiles(prev => ({
         ...prev,
-        [type === 'cv' ? 'cv' : 'jobDescription']: uploadedFile
+        jobDescription: uploadedFile
       }));
 
       // Auto-extract job title from job description
-      if (type === 'job_description' && !jobTitle) {
+      if (!jobTitle) {
         const extractedJobTitle = extractJobTitleFromText(extractedText);
         setJobTitle(extractedJobTitle);
       }
 
-      toast({ title: 'Success', description: `${type === 'cv' ? 'CV' : 'Job description'} uploaded successfully!` });
+      toast({ title: 'Success', description: 'Job description uploaded successfully!' });
     } catch (error) {
       toast({ title: 'Error', description: 'Failed to process file', variant: 'destructive' });
     } finally {
@@ -133,7 +138,7 @@ const AnalyzeCV = () => {
   };
 
   const handleAnalysis = () => {
-    performAnalysis(uploadedFiles, jobTitle, useAI, userCredits);
+    performAnalysis(uploadedFiles, jobTitle, true, userCredits);
   };
 
   const canAnalyze = uploadedFiles.cv && uploadedFiles.jobDescription;
@@ -171,14 +176,10 @@ const AnalyzeCV = () => {
               </p>
             </div>
 
-            {/* CV Upload */}
-            <FileUploadSection
-              type="cv"
-              uploadedFile={uploadedFiles.cv}
-              onFileUpload={handleFileUpload}
-              onRemoveFile={() => removeFile('cv')}
-              onTogglePreview={() => togglePreview('cv')}
-              showPreview={showPreview === 'cv'}
+            {/* CV Selection */}
+            <CVSelector
+              onCVSelect={handleCVSelect}
+              selectedCV={uploadedFiles.cv}
               uploading={uploading}
             />
 
@@ -190,30 +191,40 @@ const AnalyzeCV = () => {
               <div className="space-y-4">
                 {!uploadedFiles.jobDescription ? (
                   <>
-                    <FileUploadSection
-                      type="job_description"
-                      uploadedFile={uploadedFiles.jobDescription}
-                      onFileUpload={handleFileUpload}
-                      onRemoveFile={() => removeFile('jobDescription')}
-                      onTogglePreview={() => togglePreview('job_description')}
-                      showPreview={showPreview === 'jobDescription'}
-                      uploading={uploading}
-                    />
+                    <div className="border-2 border-dashed border-apple-core/30 dark:border-citrus/30 rounded-lg p-6 text-center">
+                      <label className="cursor-pointer">
+                        <span className="text-apricot hover:text-apricot/80 font-medium">Click to upload</span>
+                        <span className="text-blueberry/70 dark:text-apple-core/70"> or drag and drop your job description file</span>
+                        <input
+                          type="file"
+                          className="hidden"
+                          accept=".pdf,.docx,.txt"
+                          onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0], 'job_description')}
+                          disabled={uploading}
+                        />
+                      </label>
+                    </div>
                     
                     <div className="text-center text-blueberry/60 dark:text-apple-core/60">or</div>
                     
                     <JobDescriptionTextInput onSubmit={handleJobDescriptionText} disabled={uploading} />
                   </>
                 ) : (
-                  <FileUploadSection
-                    type="job_description"
-                    uploadedFile={uploadedFiles.jobDescription}
-                    onFileUpload={handleFileUpload}
-                    onRemoveFile={() => removeFile('jobDescription')}
-                    onTogglePreview={() => togglePreview('job_description')}
-                    showPreview={showPreview === 'jobDescription'}
-                    uploading={uploading}
-                  />
+                  <div className="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <div>
+                        <p className="font-medium text-green-900">{uploadedFiles.jobDescription.file.name}</p>
+                        <p className="text-sm text-green-700">Job description ready</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => removeFile('jobDescription')}
+                      className="p-2 text-red-600 hover:bg-red-100 rounded-md"
+                    >
+                      ×
+                    </button>
+                  </div>
                 )}
               </div>
             </div>
@@ -223,18 +234,18 @@ const AnalyzeCV = () => {
               onAnalyze={handleAnalysis}
               canAnalyze={!!canAnalyze}
               analyzing={analyzing}
-              useAI={useAI}
+              useAI={true}
               hasCreditsForAI={hasCreditsForAI}
             />
           </div>
         </div>
 
-        {/* Credits and Analysis Type Panel */}
+        {/* Credits Panel */}
         <div className="lg:col-span-1">
           <CreditsPanel
             credits={userCredits?.credits || 0}
-            useAI={useAI}
-            setUseAI={setUseAI}
+            useAI={true}
+            setUseAI={() => {}}
             hasCreditsForAI={hasCreditsForAI}
           />
         </div>

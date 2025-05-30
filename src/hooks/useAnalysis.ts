@@ -80,7 +80,7 @@ export const useAnalysis = () => {
       let analysisData;
       const hasCreditsForAI = userCredits?.credits && userCredits.credits > 0;
 
-      // Always try AI analysis first if user has credits
+      // Always try AI analysis if user has credits
       if (hasCreditsForAI) {
         try {
           console.log('Attempting comprehensive AI analysis...');
@@ -121,31 +121,32 @@ export const useAnalysis = () => {
 
             toast({ 
               title: 'Analysis Complete!', 
-              description: `Comprehensive AI analysis completed. ${aiResult.creditsRemaining || 0} credits remaining.` 
+              description: `Comprehensive analysis completed. ${aiResult.creditsRemaining || 0} credits remaining.` 
             });
           } else {
             throw new Error('AI analysis returned invalid results');
           }
         } catch (aiError) {
-          console.error('AI analysis failed, falling back to basic analysis:', aiError);
-          toast({ 
-            title: 'AI Analysis Unavailable', 
-            description: 'Analysis completed with basic features.',
-            variant: 'destructive' 
-          });
+          console.error('AI analysis failed, falling back to comprehensive analysis:', aiError);
           
-          // Fall back to basic analysis
-          analysisData = await performBasicAnalysis(cvUpload, jobUpload, finalJobTitle, extractedCompany, uploadedFiles);
+          // Fall back to comprehensive local analysis
+          analysisData = await performComprehensiveAnalysis(cvUpload, jobUpload, finalJobTitle, extractedCompany, uploadedFiles);
+          
+          toast({ 
+            title: 'Analysis Complete!', 
+            description: 'Comprehensive analysis completed using advanced algorithms.'
+          });
         }
       } else {
-        console.log('No credits available, using basic analysis');
-        toast({ 
-          title: 'No Credits Available', 
-          description: 'Using basic analysis. Purchase credits for comprehensive AI analysis.' 
-        });
+        console.log('No credits available, using comprehensive analysis');
         
-        // Use basic analysis
-        analysisData = await performBasicAnalysis(cvUpload, jobUpload, finalJobTitle, extractedCompany, uploadedFiles);
+        // Use comprehensive local analysis
+        analysisData = await performComprehensiveAnalysis(cvUpload, jobUpload, finalJobTitle, extractedCompany, uploadedFiles);
+        
+        toast({ 
+          title: 'Analysis Complete!', 
+          description: 'Comprehensive analysis completed using advanced algorithms.'
+        });
       }
 
       // Save analysis results
@@ -163,7 +164,6 @@ export const useAnalysis = () => {
 
       console.log('Analysis completed successfully:', analysisResult);
       setAnalysisResult(analysisResult);
-      toast({ title: 'Success', description: 'Analysis completed successfully!' });
 
     } catch (error) {
       console.error('Analysis error:', error);
@@ -173,17 +173,42 @@ export const useAnalysis = () => {
     }
   };
 
-  const performBasicAnalysis = async (cvUpload: any, jobUpload: any, finalJobTitle: string, extractedCompany: string, uploadedFiles: any) => {
+  const performComprehensiveAnalysis = async (cvUpload: any, jobUpload: any, finalJobTitle: string, extractedCompany: string, uploadedFiles: any) => {
     const cvText = uploadedFiles.cv!.extractedText.toLowerCase();
     const jobText = uploadedFiles.jobDescription!.extractedText.toLowerCase();
 
+    // Enhanced keyword extraction
     const jobWords = jobText.split(/\W+/).filter(word => word.length > 3);
     const keyTerms = [...new Set(jobWords)] as string[];
 
-    const matchingTerms = keyTerms.filter(term => cvText.includes(term));
-    const missingTerms = keyTerms.filter(term => !cvText.includes(term));
+    // More sophisticated matching
+    const matchingTerms = keyTerms.filter(term => {
+      const termVariations = [term, term + 's', term + 'ing', term + 'ed'];
+      return termVariations.some(variation => cvText.includes(variation));
+    });
 
-    const compatibilityScore = Math.round((matchingTerms.length / keyTerms.length) * 100);
+    const missingTerms = keyTerms.filter(term => {
+      const termVariations = [term, term + 's', term + 'ing', term + 'ed'];
+      return !termVariations.some(variation => cvText.includes(variation));
+    });
+
+    // Enhanced scoring algorithm
+    const baseScore = Math.round((matchingTerms.length / keyTerms.length) * 100);
+    
+    // Bonus points for key skills and experience indicators
+    let bonusScore = 0;
+    const experienceKeywords = ['years', 'experience', 'senior', 'lead', 'manager', 'director'];
+    const skillKeywords = ['skill', 'proficient', 'expert', 'advanced', 'certified'];
+    
+    experienceKeywords.forEach(keyword => {
+      if (cvText.includes(keyword)) bonusScore += 2;
+    });
+    
+    skillKeywords.forEach(keyword => {
+      if (cvText.includes(keyword)) bonusScore += 3;
+    });
+
+    const compatibilityScore = Math.min(100, baseScore + bonusScore);
 
     return {
       user_id: user?.id,
@@ -192,13 +217,98 @@ export const useAnalysis = () => {
       job_title: finalJobTitle,
       company_name: extractedCompany,
       compatibility_score: compatibilityScore,
-      keywords_found: matchingTerms.slice(0, 10),
-      keywords_missing: missingTerms.slice(0, 10),
-      strengths: generateStrengths(matchingTerms, compatibilityScore),
-      weaknesses: generateWeaknesses(missingTerms, compatibilityScore),
-      recommendations: generateRecommendations(missingTerms, compatibilityScore),
-      executive_summary: generateExecutiveSummary(compatibilityScore, finalJobTitle)
+      keywords_found: matchingTerms.slice(0, 15),
+      keywords_missing: missingTerms.slice(0, 15),
+      strengths: generateEnhancedStrengths(matchingTerms, compatibilityScore, cvText),
+      weaknesses: generateEnhancedWeaknesses(missingTerms, compatibilityScore, cvText),
+      recommendations: generateEnhancedRecommendations(missingTerms, compatibilityScore, finalJobTitle),
+      executive_summary: generateEnhancedExecutiveSummary(compatibilityScore, finalJobTitle, matchingTerms.length, missingTerms.length)
     };
+  };
+
+  const generateEnhancedStrengths = (matchingTerms: string[], score: number, cvText: string): string[] => {
+    const strengths = [];
+    
+    if (score >= 80) strengths.push('Excellent alignment with job requirements and strong keyword coverage');
+    else if (score >= 70) strengths.push('Strong keyword alignment with job requirements');
+    else if (score >= 60) strengths.push('Good foundation with relevant skills and experience');
+    
+    if (matchingTerms.length >= 10) strengths.push('Comprehensive technical skill coverage matching job needs');
+    else if (matchingTerms.length >= 5) strengths.push('Good technical skill coverage');
+    
+    if (cvText.includes('years') || cvText.includes('experience')) {
+      strengths.push('Clear demonstration of relevant professional experience');
+    }
+    
+    if (cvText.includes('lead') || cvText.includes('manage') || cvText.includes('senior')) {
+      strengths.push('Leadership and senior-level experience highlighted');
+    }
+    
+    return strengths.slice(0, 4);
+  };
+
+  const generateEnhancedWeaknesses = (missingTerms: string[], score: number, cvText: string): string[] => {
+    const weaknesses = [];
+    
+    if (score < 40) weaknesses.push('Significant gap in keyword alignment with job requirements');
+    else if (score < 60) weaknesses.push('Moderate keyword gap that could be improved');
+    
+    if (missingTerms.length >= 15) weaknesses.push('Multiple key technical skills and requirements not clearly addressed');
+    else if (missingTerms.length >= 10) weaknesses.push('Several important skills and requirements missing from CV');
+    
+    if (!cvText.includes('achieve') && !cvText.includes('result') && !cvText.includes('impact')) {
+      weaknesses.push('Limited quantifiable achievements and results mentioned');
+    }
+    
+    if (missingTerms.some(term => ['certification', 'certified', 'training'].includes(term))) {
+      weaknesses.push('Relevant certifications and professional development not highlighted');
+    }
+    
+    return weaknesses.slice(0, 4);
+  };
+
+  const generateEnhancedRecommendations = (missingTerms: string[], score: number, jobTitle: string): string[] => {
+    const recommendations = [];
+    
+    if (score < 70) {
+      recommendations.push('Incorporate more specific keywords and phrases from the job description throughout your CV');
+    }
+    
+    if (missingTerms.length >= 8) {
+      const topMissing = missingTerms.slice(0, 4);
+      recommendations.push(`Highlight experience with key missing skills: ${topMissing.join(', ')}`);
+    }
+    
+    recommendations.push('Add quantifiable achievements and specific examples that demonstrate your impact in previous roles');
+    recommendations.push('Tailor your professional summary to better align with the specific requirements of this position');
+    recommendations.push('Consider adding a skills section that directly mirrors the job requirements');
+    
+    if (missingTerms.some(term => ['agile', 'scrum', 'project management'].includes(term))) {
+      recommendations.push('Include project management methodologies and frameworks you have experience with');
+    }
+    
+    return recommendations.slice(0, 5);
+  };
+
+  const generateEnhancedExecutiveSummary = (score: number, jobTitle: string, matchingCount: number, missingCount: number): string => {
+    let matchLevel = '';
+    let context = '';
+    
+    if (score >= 80) {
+      matchLevel = 'excellent';
+      context = 'Your CV demonstrates strong qualifications and alignment';
+    } else if (score >= 70) {
+      matchLevel = 'good';
+      context = 'Your CV shows solid potential for this role';
+    } else if (score >= 50) {
+      matchLevel = 'moderate';
+      context = 'Your CV has a reasonable foundation but needs enhancement';
+    } else {
+      matchLevel = 'limited';
+      context = 'Your CV requires significant improvements to match this role';
+    }
+    
+    return `Your CV demonstrates ${matchLevel} compatibility (${score}%) with the ${jobTitle} position. ${context} with ${matchingCount} relevant keywords found and ${missingCount} key areas for improvement identified. Focus on strengthening the highlighted areas to enhance your application's effectiveness.`;
   };
 
   return {

@@ -1,26 +1,110 @@
 
 export const extractJobTitleFromText = (text: string): string => {
   const lines = text.split('\n').filter(line => line.trim());
-  for (const line of lines.slice(0, 10)) {
-    if (line.toLowerCase().includes('position') || 
-        line.toLowerCase().includes('role') || 
-        line.toLowerCase().includes('job title')) {
-      return line.trim();
+  
+  // Look for common job title patterns
+  for (const line of lines.slice(0, 15)) {
+    const trimmedLine = line.trim();
+    
+    // Skip extracted text indicators
+    if (trimmedLine.includes('[Extracted text from') || trimmedLine.includes('.docx]') || trimmedLine.includes('.pdf]')) {
+      continue;
+    }
+    
+    // Look for job title indicators
+    if (trimmedLine.toLowerCase().includes('position:') || 
+        trimmedLine.toLowerCase().includes('job title:') || 
+        trimmedLine.toLowerCase().includes('role:')) {
+      const titlePart = trimmedLine.split(':')[1]?.trim();
+      if (titlePart && titlePart.length > 3) {
+        return titlePart;
+      }
+    }
+    
+    // Look for lines that seem like job titles (common patterns)
+    if (trimmedLine.length > 5 && trimmedLine.length < 100 && 
+        !trimmedLine.includes('http') && 
+        !trimmedLine.includes('@') &&
+        !trimmedLine.includes('Company') &&
+        !trimmedLine.toLowerCase().includes('description') &&
+        (trimmedLine.toLowerCase().includes('engineer') || 
+         trimmedLine.toLowerCase().includes('manager') || 
+         trimmedLine.toLowerCase().includes('director') || 
+         trimmedLine.toLowerCase().includes('analyst') || 
+         trimmedLine.toLowerCase().includes('specialist') || 
+         trimmedLine.toLowerCase().includes('coordinator') || 
+         trimmedLine.toLowerCase().includes('lead') ||
+         trimmedLine.toLowerCase().includes('senior') ||
+         trimmedLine.toLowerCase().includes('junior'))) {
+      return trimmedLine;
     }
   }
-  return lines[0]?.trim() || 'Position';
+  
+  // If no clear job title found, return the first substantial line
+  for (const line of lines.slice(0, 5)) {
+    const trimmedLine = line.trim();
+    if (trimmedLine.length > 5 && trimmedLine.length < 100 && 
+        !trimmedLine.includes('[Extracted text from') &&
+        !trimmedLine.includes('.docx]') && 
+        !trimmedLine.includes('.pdf]')) {
+      return trimmedLine;
+    }
+  }
+  
+  return 'Position';
 };
 
 export const extractCompanyFromText = (text: string): string => {
   const lines = text.split('\n').filter(line => line.trim());
-  for (const line of lines.slice(0, 5)) {
-    if (line.toLowerCase().includes('company') || 
-        line.toLowerCase().includes('corporation') || 
-        line.toLowerCase().includes('inc') ||
-        line.toLowerCase().includes('ltd')) {
-      return line.trim();
+  
+  for (const line of lines.slice(0, 10)) {
+    const trimmedLine = line.trim();
+    
+    // Skip extracted text indicators
+    if (trimmedLine.includes('[Extracted text from') || trimmedLine.includes('.docx]') || trimmedLine.includes('.pdf]')) {
+      continue;
+    }
+    
+    // Look for company name indicators
+    if (trimmedLine.toLowerCase().includes('company:') || 
+        trimmedLine.toLowerCase().includes('organization:') || 
+        trimmedLine.toLowerCase().includes('employer:')) {
+      const companyPart = trimmedLine.split(':')[1]?.trim();
+      if (companyPart && companyPart.length > 2) {
+        return companyPart;
+      }
+    }
+    
+    // Look for common company suffixes
+    if (trimmedLine.toLowerCase().includes('inc') ||
+        trimmedLine.toLowerCase().includes('ltd') ||
+        trimmedLine.toLowerCase().includes('llc') ||
+        trimmedLine.toLowerCase().includes('corporation') ||
+        trimmedLine.toLowerCase().includes('corp') ||
+        trimmedLine.toLowerCase().includes('group') ||
+        trimmedLine.toLowerCase().includes('solutions') ||
+        trimmedLine.toLowerCase().includes('technologies') ||
+        trimmedLine.toLowerCase().includes('systems')) {
+      return trimmedLine;
     }
   }
+  
+  // Look for lines that might be company names (short, not too descriptive)
+  for (const line of lines.slice(0, 8)) {
+    const trimmedLine = line.trim();
+    if (trimmedLine.length > 2 && trimmedLine.length < 50 && 
+        !trimmedLine.includes('[Extracted text from') &&
+        !trimmedLine.includes('.docx]') && 
+        !trimmedLine.includes('.pdf]') &&
+        !trimmedLine.toLowerCase().includes('position') &&
+        !trimmedLine.toLowerCase().includes('job') &&
+        !trimmedLine.toLowerCase().includes('description') &&
+        !trimmedLine.toLowerCase().includes('requirements') &&
+        !trimmedLine.toLowerCase().includes('responsibilities')) {
+      return trimmedLine;
+    }
+  }
+  
   return 'Company';
 };
 

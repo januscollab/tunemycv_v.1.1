@@ -2,7 +2,7 @@
 import React from 'react';
 import PersonalInfoTab from './PersonalInfoTab';
 import AnalysisHistoryTab from './AnalysisHistoryTab';
-import FileUploadTab from './FileUploadTab';
+import CVManagementTab from './CVManagementTab';
 import SettingsTab from './SettingsTab';
 import PasswordChangeTab from './PasswordChangeTab';
 
@@ -17,7 +17,7 @@ const ProfileTabContent: React.FC<ProfileTabContentProps> = ({ activeTab }) => {
     case 'history':
       return <AnalysisHistoryTab />;
     case 'files':
-      return <FileUploadTab />;
+      return <CVManagementTab />;
     case 'password':
       return <PasswordChangeTab />;
     case 'settings':
