@@ -230,320 +230,263 @@ serve(async (req) => {
       );
     }
 
-    // Enhanced comprehensive AI prompt with structured output and multi-item requirements
+    // Enhanced comprehensive AI prompt with structured output
     const prompt = `
-Analyze the following CV against the job description with extreme precision and provide a COMPREHENSIVE, multi-faceted analysis. You are an expert career consultant with 15+ years of experience across multiple industries.
+You are a senior career consultant and CV optimization expert with 15+ years of experience in talent acquisition, career coaching, and industry analysis. Your task is to provide a COMPREHENSIVE, DETAILED analysis of the candidate's CV against the job description.
 
-CRITICAL REQUIREMENTS FOR COMPREHENSIVE ANALYSIS:
-1. RESPOND ONLY WITH VALID JSON in the exact structure specified below.
-2. PROVIDE MULTIPLE ITEMS (3-7) for all key analysis sections - this is essential for thorough analysis.
-3. Be thorough, specific, and actionable in ALL recommendations.
-4. Extract the company name from the job description if available.
-5. Consider industry standards, ATS compatibility, and current recruitment best practices.
-6. Identify ALL relevant keywords from the job description comprehensively.
-7. Ensure all numerical scores are justified with specific evidence.
-8. For each gap identified, provide specific strategies and examples.
-9. Include concrete sample text for CV improvements.
-10. Maintain professional career consulting depth throughout.
+CRITICAL ANALYSIS REQUIREMENTS:
+1. PROVIDE MULTIPLE DETAILED ITEMS for each analysis section (minimum 3-5, maximum 7 per section)
+2. BE THOROUGH AND COMPREHENSIVE - this is professional career consulting, not a brief summary
+3. ANALYZE DEEPLY using industry standards and current market expectations
+4. PROVIDE SPECIFIC, ACTIONABLE RECOMMENDATIONS with concrete examples
+5. CONSIDER ATS optimization, industry trends, and competitive positioning
+6. EXTRACT ALL RELEVANT KEYWORDS without limitation (aim for 15-25+ keywords)
+7. RESPOND ONLY WITH VALID JSON in the exact structure specified below
 
-COMPREHENSIVE ANALYSIS REQUIREMENTS:
-- Executive Summary: Provide 3-5 key strengths AND 3-5 key weaknesses with detailed analysis
-- Priority Recommendations: List 5-7 actionable recommendations ranked by impact
+ANALYSIS DEPTH REQUIREMENTS:
+- Executive Summary: Provide 3-5 key strengths AND 3-5 key weaknesses/improvement areas
+- Priority Recommendations: Provide 5-7 ranked, actionable recommendations
 - Skills Gap Analysis: Identify 3-5 critical gaps AND 3-5 development areas
-- Interview Prep: Generate 5-7 likely questions with comprehensive preparation guidance
-- Keyword Analysis: Analyze ALL relevant keywords comprehensively (typically 10-20+ keywords)
-- ATS Optimization: Provide multiple format and content improvement suggestions
+- Interview Preparation: Provide 5-7 likely questions, 3-5 strengths to emphasize, 3-5 weaknesses to address
+- Keyword Analysis: Extract 15-25+ relevant keywords from the job description
 
-CV:
+CV TO ANALYZE:
 ${cvText}
 
-Job Description:
+JOB DESCRIPTION TO MATCH AGAINST:
 ${jobDescriptionText}
 
-Position (if provided):
+POSITION (if provided):
 ${jobTitle || 'Not specified'}
 
-Respond with valid JSON in the following structure (ENSURE MULTIPLE ITEMS IN ALL ARRAYS):
+RESPOND WITH COMPREHENSIVE ANALYSIS IN THIS EXACT JSON STRUCTURE:
 {
   "compatibilityScore": 0-100,
   "companyName": "Extracted company name from job description",
   "position": "Properly formatted job title",
   "executiveSummary": {
-    "overview": "Comprehensive 3-4 sentence summary of overall compatibility and key findings",
+    "overview": "Comprehensive 3-4 sentence overview of overall compatibility and positioning",
     "strengths": [
       {
-        "title": "First key strength title",
-        "description": "Detailed explanation with specific evidence from CV and job requirements",
+        "title": "Specific strength title with concrete evidence",
+        "description": "Detailed 2-3 sentence explanation with specific examples from CV and relevance to job requirements",
         "relevance": 0-100
       },
       {
-        "title": "Second key strength title",
-        "description": "Detailed explanation with specific evidence from CV and job requirements",
+        "title": "Second key strength with market positioning",
+        "description": "Detailed explanation showing competitive advantage and alignment with role",
         "relevance": 0-100
       },
       {
-        "title": "Third key strength title",
-        "description": "Detailed explanation with specific evidence from CV and job requirements",
-        "relevance": 0-100
-      },
-      {
-        "title": "Fourth key strength title",
-        "description": "Detailed explanation with specific evidence from CV and job requirements",
+        "title": "Third strength highlighting unique value proposition",
+        "description": "Specific examples and quantifiable achievements that differentiate the candidate",
         "relevance": 0-100
       }
+      // Continue for 3-5 total strengths
     ],
     "weaknesses": [
       {
-        "title": "First key weakness/gap title",
-        "description": "Detailed explanation with specific evidence and impact analysis",
+        "title": "Critical gap or weakness title",
+        "description": "Detailed explanation of why this is a concern and specific evidence from analysis",
         "impact": 0-100,
-        "recommendation": "Specific, actionable strategy to address this weakness"
+        "recommendation": "Specific, actionable strategy to address this weakness with timeline and steps"
       },
       {
-        "title": "Second key weakness/gap title", 
-        "description": "Detailed explanation with specific evidence and impact analysis",
+        "title": "Second key improvement area",
+        "description": "Thorough analysis of the gap and its implications for job success",
         "impact": 0-100,
-        "recommendation": "Specific, actionable strategy to address this weakness"
+        "recommendation": "Concrete action plan with specific resources or approaches"
       },
       {
-        "title": "Third key weakness/gap title",
-        "description": "Detailed explanation with specific evidence and impact analysis", 
+        "title": "Third development priority",
+        "description": "Detailed assessment of missing elements and their importance",
         "impact": 0-100,
-        "recommendation": "Specific, actionable strategy to address this weakness"
-      },
-      {
-        "title": "Fourth key weakness/gap title",
-        "description": "Detailed explanation with specific evidence and impact analysis",
-        "impact": 0-100,
-        "recommendation": "Specific, actionable strategy to address this weakness"
+        "recommendation": "Strategic approach to bridging this gap with measurable outcomes"
       }
+      // Continue for 3-5 total weaknesses
     ]
   },
   "compatibilityBreakdown": {
     "technicalSkills": {
       "score": 0-100,
       "present": ["Comprehensive list of technical skills found in CV that match job requirements"],
-      "missing": ["Comprehensive list of technical skills required in job description but missing from CV"],
-      "analysis": "Detailed multi-paragraph analysis of technical skills match with specific examples"
+      "missing": ["Detailed list of technical skills required in job description but missing from CV"],
+      "analysis": "In-depth analysis of technical skills alignment with specific examples and market context"
     },
     "experience": {
       "score": 0-100,
-      "relevantExperience": ["Comprehensive list of relevant experience points from CV"],
-      "missingExperience": ["Comprehensive list of experience requirements from job description not evidenced in CV"],
-      "analysis": "Detailed multi-paragraph analysis of experience match with specific examples"
+      "relevantExperience": ["Detailed list of relevant experience points from CV with quantifiable achievements"],
+      "missingExperience": ["Specific experience requirements from job description not evidenced in CV"],
+      "analysis": "Comprehensive analysis of experience match including industry relevance and career progression"
     },
     "education": {
       "score": 0-100,
-      "relevantQualifications": ["Comprehensive list of relevant qualifications from CV"],
-      "missingQualifications": ["Comprehensive list of qualification requirements from job description not evidenced in CV"],
-      "analysis": "Detailed analysis of education and qualification match"
+      "relevantQualifications": ["Complete list of relevant qualifications, certifications, and educational achievements"],
+      "missingQualifications": ["Educational or certification requirements from job description not met"],
+      "analysis": "Thorough evaluation of educational background and its alignment with role requirements"
     },
     "softSkills": {
       "score": 0-100,
-      "present": ["Comprehensive list of soft skills found in CV that match job requirements"],
-      "missing": ["Comprehensive list of soft skills required in job description but missing from CV"],
-      "analysis": "Detailed analysis of soft skills match with behavioral examples"
+      "present": ["Comprehensive list of soft skills demonstrated in CV that match job requirements"],
+      "missing": ["Soft skills required in job description but not evidenced in CV"],
+      "analysis": "Detailed assessment of soft skills demonstration and leadership capabilities"
     },
     "industryKnowledge": {
       "score": 0-100,
-      "present": ["Comprehensive list of industry knowledge areas found in CV that match job requirements"],
-      "missing": ["Comprehensive list of industry knowledge areas required in job description but missing from CV"],
-      "analysis": "Detailed analysis of industry knowledge match with specific context"
+      "present": ["Industry knowledge areas and sector expertise evidenced in CV"],
+      "missing": ["Industry knowledge requirements from job description not demonstrated"],
+      "analysis": "In-depth analysis of industry expertise and market understanding"
     }
   },
   "keywordAnalysis": {
-    "totalKeywords": 0,
-    "matchedKeywords": 0,
+    "totalKeywords": 15-25,
+    "matchedKeywords": 0-25,
     "keywordMatchPercentage": 0-100,
     "keywords": [
       {
-        "keyword": "First important keyword from job description",
+        "keyword": "Specific keyword from job description",
         "found": true/false,
         "importance": "high/medium/low",
         "occurrences": 0,
-        "context": "Context of how keyword is used in job description",
-        "suggestion": "Specific suggestion for including or better utilizing this keyword"
+        "context": "Detailed context of how keyword is used in job description and its strategic importance",
+        "suggestion": "Specific recommendation for incorporating or optimizing this keyword with sample text"
       }
+      // Continue for 15-25+ keywords
     ]
   },
   "priorityRecommendations": [
     {
-      "title": "Highest priority recommendation title",
-      "description": "Comprehensive explanation of why this is critical and how to implement",
-      "priority": "high",
-      "impact": "Detailed description of expected impact on application success",
-      "sampleText": "Specific example text that could be used in the CV"
+      "title": "High-impact recommendation title",
+      "description": "Comprehensive explanation of the recommendation with strategic rationale and expected outcomes",
+      "priority": "high/medium/low",
+      "impact": "Detailed description of expected impact on application success and career positioning",
+      "sampleText": "Specific, ready-to-use text example that could be incorporated into CV"
     },
     {
-      "title": "Second priority recommendation title",
-      "description": "Comprehensive explanation of why this is important and how to implement",
-      "priority": "high/medium",
-      "impact": "Detailed description of expected impact on application success",
-      "sampleText": "Specific example text that could be used in the CV"
-    },
-    {
-      "title": "Third priority recommendation title",
-      "description": "Comprehensive explanation of the recommendation and implementation strategy",
-      "priority": "medium",
-      "impact": "Detailed description of expected impact on application success",
-      "sampleText": "Specific example text that could be used in the CV"
-    },
-    {
-      "title": "Fourth priority recommendation title",
-      "description": "Comprehensive explanation of the recommendation and implementation strategy",
-      "priority": "medium",
-      "impact": "Detailed description of expected impact on application success",
-      "sampleText": "Specific example text that could be used in the CV"
-    },
-    {
-      "title": "Fifth priority recommendation title",
-      "description": "Comprehensive explanation of the recommendation and implementation strategy",
-      "priority": "medium/low",
-      "impact": "Detailed description of expected impact on application success",
-      "sampleText": "Specific example text that could be used in the CV"
+      "title": "Second priority enhancement",
+      "description": "Thorough explanation of implementation strategy and competitive advantage gained",
+      "priority": "high/medium/low",
+      "impact": "Quantifiable benefits and improved positioning in candidate pool",
+      "sampleText": "Concrete example text with industry-specific language and achievements"
     }
+    // Continue for 5-7 total recommendations
   ],
   "skillsGapAnalysis": {
     "criticalGaps": [
       {
-        "skill": "First critical missing skill or competency",
+        "skill": "Specific critical skill missing",
         "importance": "high/medium/low",
-        "description": "Detailed explanation of why this skill is critical for the role",
-        "bridgingStrategy": "Comprehensive strategy to address or compensate for this gap"
+        "description": "Detailed explanation of why this skill is essential for role success and industry standards",
+        "bridgingStrategy": "Comprehensive strategy to acquire this skill including timeline, resources, and certification paths"
       },
       {
-        "skill": "Second critical missing skill or competency",
-        "importance": "high/medium/low", 
-        "description": "Detailed explanation of why this skill is critical for the role",
-        "bridgingStrategy": "Comprehensive strategy to address or compensate for this gap"
-      },
-      {
-        "skill": "Third critical missing skill or competency",
+        "skill": "Second critical competency gap",
         "importance": "high/medium/low",
-        "description": "Detailed explanation of why this skill is critical for the role", 
-        "bridgingStrategy": "Comprehensive strategy to address or compensate for this gap"
+        "description": "Thorough analysis of skill importance and competitive implications",
+        "bridgingStrategy": "Specific action plan with measurable milestones and learning resources"
       }
+      // Continue for 3-5 critical gaps
     ],
     "developmentAreas": [
       {
-        "area": "First development area for career growth",
-        "description": "Comprehensive description of this development opportunity",
-        "relevance": "Detailed explanation of why this area is relevant to the role and career progression",
-        "actionPlan": "Specific, actionable steps to develop in this area"
+        "area": "Professional development priority",
+        "description": "Comprehensive explanation of development opportunity and career impact",
+        "relevance": "Detailed relevance to role success and long-term career growth",
+        "actionPlan": "Step-by-step development plan with specific actions, timeline, and success metrics"
       },
       {
-        "area": "Second development area for career growth",
-        "description": "Comprehensive description of this development opportunity",
-        "relevance": "Detailed explanation of why this area is relevant to the role and career progression",
-        "actionPlan": "Specific, actionable steps to develop in this area"
-      },
-      {
-        "area": "Third development area for career growth",
-        "description": "Comprehensive description of this development opportunity",
-        "relevance": "Detailed explanation of why this area is relevant to the role and career progression",
-        "actionPlan": "Specific, actionable steps to develop in this area"
+        "area": "Second growth opportunity",
+        "description": "In-depth analysis of development potential and strategic value",
+        "relevance": "Connection to role requirements and industry advancement",
+        "actionPlan": "Detailed roadmap for skill development with practical next steps"
       }
+      // Continue for 3-5 development areas
     ]
   },
   "atsOptimization": {
     "overallScore": 0-100,
     "formatIssues": [
       {
-        "issue": "Description of format issue that affects ATS scanning",
-        "impact": "How this impacts ATS scanning and ranking",
-        "fix": "Specific instructions on how to fix this issue"
+        "issue": "Specific formatting problem",
+        "impact": "Detailed explanation of how this impacts ATS parsing and candidate ranking",
+        "fix": "Step-by-step solution to resolve this formatting issue"
       }
+      // Multiple format issues if present
     ],
     "contentIssues": [
       {
-        "issue": "Description of content issue that affects ATS performance",
-        "impact": "How this impacts ATS scanning and ranking",
-        "fix": "Specific instructions on how to fix this issue"
+        "issue": "Content optimization opportunity",
+        "impact": "Comprehensive impact analysis on ATS performance and recruiter engagement",
+        "fix": "Detailed solution with specific content recommendations"
       }
+      // Multiple content issues with solutions
     ],
     "keywordDensity": {
-      "analysis": "Comprehensive analysis of keyword density and distribution",
-      "recommendation": "Specific recommendations for improving keyword optimization"
+      "analysis": "Thorough analysis of keyword optimization and ATS ranking factors",
+      "recommendation": "Specific strategy for improving keyword density and search visibility"
     },
     "sectionRecommendations": {
-      "missing": ["List of recommended sections missing from CV"],
-      "improvements": ["List of specific recommendations for existing sections"]
+      "missing": ["Essential CV sections missing that impact ATS performance"],
+      "improvements": ["Detailed recommendations for optimizing existing sections for better ATS compatibility"]
     }
   },
   "interviewPrep": {
     "likelyQuestions": [
       {
-        "question": "First likely interview question based on CV gaps or job requirements",
-        "rationale": "Detailed explanation of why this question might be asked",
-        "preparationTips": "Comprehensive guidance on how to prepare and structure the answer"
+        "question": "Specific interview question based on job requirements and CV analysis",
+        "rationale": "Detailed explanation of why this question will likely be asked and its strategic importance",
+        "preparationTips": "Comprehensive preparation strategy with key talking points and examples to highlight"
       },
       {
-        "question": "Second likely interview question based on CV gaps or job requirements",
-        "rationale": "Detailed explanation of why this question might be asked",
-        "preparationTips": "Comprehensive guidance on how to prepare and structure the answer"
-      },
-      {
-        "question": "Third likely interview question based on CV gaps or job requirements",
-        "rationale": "Detailed explanation of why this question might be asked",
-        "preparationTips": "Comprehensive guidance on how to prepare and structure the answer"
-      },
-      {
-        "question": "Fourth likely interview question based on CV gaps or job requirements",
-        "rationale": "Detailed explanation of why this question might be asked",
-        "preparationTips": "Comprehensive guidance on how to prepare and structure the answer"
-      },
-      {
-        "question": "Fifth likely interview question based on CV gaps or job requirements",
-        "rationale": "Detailed explanation of why this question might be asked",
-        "preparationTips": "Comprehensive guidance on how to prepare and structure the answer"
+        "question": "Second high-probability interview question",
+        "rationale": "Analysis of interviewer concerns and evaluation criteria driving this question",
+        "preparationTips": "Specific preparation approach with storytelling framework and quantifiable examples"
       }
+      // Continue for 5-7 likely questions
     ],
     "strengthsToEmphasize": [
       {
-        "strength": "First key strength to highlight in interview",
-        "relevance": "Why this strength is particularly relevant to the position",
-        "talkingPoints": ["Specific talking point 1", "Specific talking point 2", "Specific talking point 3"]
+        "strength": "Key competitive advantage to highlight",
+        "relevance": "Detailed explanation of strategic importance to role success",
+        "talkingPoints": ["Specific talking point 1 with quantifiable achievement", "Talking point 2 with industry context", "Talking point 3 with competitive differentiation"]
       },
       {
-        "strength": "Second key strength to highlight in interview",
-        "relevance": "Why this strength is particularly relevant to the position",
-        "talkingPoints": ["Specific talking point 1", "Specific talking point 2", "Specific talking point 3"]
-      },
-      {
-        "strength": "Third key strength to highlight in interview",
-        "relevance": "Why this strength is particularly relevant to the position",
-        "talkingPoints": ["Specific talking point 1", "Specific talking point 2", "Specific talking point 3"]
+        "strength": "Second critical strength for interview focus",
+        "relevance": "Comprehensive analysis of value proposition and market positioning",
+        "talkingPoints": ["Multiple specific examples and achievements", "Industry-relevant context and comparisons", "Future potential and growth trajectory"]
       }
+      // Continue for 3-5 strengths
     ],
     "weaknessesToAddress": [
       {
-        "weakness": "First potential weakness or concern to proactively address",
-        "strategy": "Comprehensive strategy for addressing this weakness in interview",
-        "talkingPoints": ["Specific talking point 1", "Specific talking point 2", "Specific talking point 3"]
+        "weakness": "Potential concern or gap to address proactively",
+        "strategy": "Comprehensive strategy for addressing this weakness including reframing approach",
+        "talkingPoints": ["Specific approach to acknowledge and redirect", "Concrete steps taken to address the gap", "Positive spin highlighting learning and growth"]
       },
       {
-        "weakness": "Second potential weakness or concern to proactively address",
-        "strategy": "Comprehensive strategy for addressing this weakness in interview", 
-        "talkingPoints": ["Specific talking point 1", "Specific talking point 2", "Specific talking point 3"]
+        "weakness": "Second area requiring strategic positioning",
+        "strategy": "Detailed approach to minimize impact and demonstrate proactive development",
+        "talkingPoints": ["Multiple strategic responses", "Evidence of continuous improvement", "Relevance to role requirements and success factors"]
       }
+      // Continue for 3-5 potential weaknesses
     ]
   }
 }
 
-CRITICAL FINAL INSTRUCTIONS:
-- Respond ONLY with valid JSON. No markdown formatting, explanations, or additional text.
-- Ensure ALL arrays contain multiple items (3-7 items as specified) for comprehensive analysis.
-- Provide thorough, professional analysis suitable for senior career development consulting.
-- Focus on actionable insights with specific, measurable recommendations.
-- Consider industry standards, ATS compatibility, and market expectations comprehensively.
-- Be specific and concrete in all recommendations - avoid generic advice.
-- Extract company name accurately and format job title professionally.
-- Ensure each analysis section provides substantial professional value with detailed evidence and examples.
+FINAL CRITICAL INSTRUCTIONS:
+- RESPOND ONLY WITH VALID JSON - no markdown, explanations, or additional text
+- PROVIDE COMPREHENSIVE, PROFESSIONAL-GRADE ANALYSIS suitable for senior career consulting
+- INCLUDE MULTIPLE DETAILED ITEMS for each array section (3-7 items as specified)
+- FOCUS ON ACTIONABLE INSIGHTS with specific, measurable recommendations
+- CONSIDER CURRENT INDUSTRY STANDARDS, ATS SYSTEMS, and COMPETITIVE MARKET POSITIONING
+- EXTRACT COMPREHENSIVE KEYWORD LIST (15-25+ keywords) with strategic importance
+- PROVIDE SPECIFIC EVIDENCE from CV and job description for all assessments
+- MAINTAIN PROFESSIONAL TONE while being honest about gaps and opportunities
 `;
 
-    console.log('Calling OpenAI API with enhanced comprehensive multi-item prompt...');
+    console.log('Calling OpenAI API with enhanced comprehensive prompt...');
 
-    // Call OpenAI API with retry logic and increased token limit
+    // Call OpenAI API with retry logic
     let openAIResponse;
     let attempts = 0;
     const maxAttempts = 2;
@@ -561,7 +504,7 @@ CRITICAL FINAL INSTRUCTIONS:
             messages: [
               {
                 role: 'system',
-                content: 'You are an expert CV analysis consultant with deep expertise in recruitment, ATS systems, and career development. Your task is to analyze a candidate\'s CV against a specific job description and provide detailed, actionable insights to help the candidate improve their chances of success. You have 15+ years of experience in talent acquisition across multiple industries and understand both the technical aspects of ATS systems and the human elements of the hiring process. Your analysis is known for being thorough, comprehensive, and highly actionable with multiple detailed recommendations in each category. You ALWAYS provide 3-7 items in key analysis sections for comprehensive coverage. Always respond with valid JSON only, no additional text or formatting.'
+                content: 'You are a senior career consultant and CV optimization expert with 15+ years of experience in talent acquisition, career coaching, and industry analysis. Your analysis is known for being thorough, comprehensive, and highly actionable. You provide detailed, multi-faceted analysis that matches professional career consulting standards. You always provide multiple detailed items for each analysis section to ensure comprehensive coverage. Always respond with valid JSON only, no additional text or formatting.'
               },
               {
                 role: 'user',
@@ -569,7 +512,7 @@ CRITICAL FINAL INSTRUCTIONS:
               }
             ],
             temperature: 0.2,
-            max_tokens: 8000,
+            max_tokens: 4000,
             response_format: { type: "json_object" }
           }),
         });
@@ -595,7 +538,7 @@ CRITICAL FINAL INSTRUCTIONS:
     const openAIData = await openAIResponse.json();
     const aiResponseText = openAIData.choices[0].message.content;
     
-    console.log('Enhanced comprehensive OpenAI response received, length:', aiResponseText.length);
+    console.log('Enhanced OpenAI response received, length:', aiResponseText.length);
 
     // Parse and validate AI response
     let analysisResult: EnhancedAIAnalysisResult;
@@ -618,7 +561,7 @@ CRITICAL FINAL INSTRUCTIONS:
       console.error('Failed to update credits:', creditUpdateError);
     }
 
-    console.log('Enhanced comprehensive AI analysis with multi-item results completed successfully');
+    console.log('Enhanced comprehensive AI analysis completed successfully');
 
     return new Response(
       JSON.stringify({
