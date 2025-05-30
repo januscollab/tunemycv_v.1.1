@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { CheckCircle } from 'lucide-react';
 import ExecutiveSummarySection from './ExecutiveSummarySection';
@@ -96,29 +95,22 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
               <PriorityRecommendationsSection recommendations={result.priorityRecommendations} />
             )}
 
-            {/* Compatibility Breakdown */}
-            {result.compatibilityBreakdown && (
-              <CompatibilityBreakdownSection compatibilityBreakdown={result.compatibilityBreakdown} />
-            )}
+            {/* Side-by-side sections: Compatibility Breakdown and Keyword Analysis */}
+            <div className="grid lg:grid-cols-2 gap-8">
+              {/* Compatibility Breakdown */}
+              {result.compatibilityBreakdown && (
+                <CompatibilityBreakdownSection compatibilityBreakdown={result.compatibilityBreakdown} />
+              )}
 
-            {/* Keyword Analysis */}
-            {result.keywordAnalysis && (
-              <EnhancedKeywordAnalysis keywordAnalysis={result.keywordAnalysis} />
-            )}
+              {/* Keyword Analysis */}
+              {result.keywordAnalysis && (
+                <EnhancedKeywordAnalysis keywordAnalysis={result.keywordAnalysis} />
+              )}
+            </div>
 
             {/* Skills Gap Analysis */}
             {result.skillsGapAnalysis && (
               <SkillsGapAnalysis skillsGapAnalysis={result.skillsGapAnalysis} />
-            )}
-
-            {/* ATS Optimization */}
-            {result.atsOptimization && (
-              <ATSOptimizationSection atsOptimization={result.atsOptimization} />
-            )}
-
-            {/* Interview Preparation */}
-            {result.interviewPrep && (
-              <InterviewPrepSection interviewPrep={result.interviewPrep} />
             )}
           </div>
         ) : (

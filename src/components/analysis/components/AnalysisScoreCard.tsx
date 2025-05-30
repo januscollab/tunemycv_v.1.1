@@ -18,14 +18,14 @@ const AnalysisScoreCard: React.FC<AnalysisScoreCardProps> = ({
   const percentageScore = score > 1 ? score : Math.round(score * 100);
   
   const getScoreColor = (score: number) => {
-    if (score >= 80) return 'bg-green-500';
-    if (score >= 60) return 'bg-yellow-500';
-    return 'bg-red-500';
+    if (score >= 70) return 'bg-green-500';
+    if (score >= 50) return 'bg-orange-500';
+    return 'bg-red-400';
   };
 
   const getTextColor = (score: number) => {
-    if (score >= 80) return 'text-green-600';
-    if (score >= 60) return 'text-yellow-600';
+    if (score >= 70) return 'text-green-600';
+    if (score >= 50) return 'text-orange-600';
     return 'text-red-600';
   };
 

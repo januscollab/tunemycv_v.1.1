@@ -62,16 +62,15 @@ const EnhancedKeywordAnalysis: React.FC<EnhancedKeywordAnalysisProps> = ({ keywo
 
       {/* Detailed Keyword List */}
       <div className="space-y-3">
-        <div className="grid grid-cols-5 gap-2 text-xs font-medium text-blueberry/60 dark:text-apple-core/60 border-b pb-2">
+        <div className="grid grid-cols-4 gap-2 text-xs font-medium text-blueberry/60 dark:text-apple-core/60 border-b pb-2">
           <span>Keyword</span>
           <span>Importance</span>
           <span>Status</span>
-          <span>Occurrences</span>
           <span>Suggestion</span>
         </div>
         
         {keywords.map((keyword, index) => (
-          <div key={index} className="grid grid-cols-5 gap-2 text-sm items-start py-2 border-b border-gray-100 dark:border-gray-700 last:border-b-0">
+          <div key={index} className="grid grid-cols-4 gap-2 text-sm items-start py-2 border-b border-gray-100 dark:border-gray-700 last:border-b-0">
             <div>
               <span className="font-medium text-blueberry dark:text-apple-core">{keyword.keyword}</span>
               {keyword.context && (
@@ -90,10 +89,6 @@ const EnhancedKeywordAnalysis: React.FC<EnhancedKeywordAnalysisProps> = ({ keywo
                 {keyword.found ? 'Found' : 'Missing'}
               </span>
             </div>
-            
-            <span className="text-blueberry/70 dark:text-apple-core/80">
-              {keyword.found ? `${keyword.occurrences}x` : '0x'}
-            </span>
             
             <div className="text-xs text-blueberry/70 dark:text-apple-core/80">
               {keyword.suggestion}
