@@ -1,289 +1,221 @@
 
-import React, { useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
+import { Checkbox } from '@/components/ui/checkbox';
 import PasswordStrengthMeter from '@/components/PasswordStrengthMeter';
-import { validatePassword } from '@/utils/passwordValidation';
 import { sanitizeText, sanitizeEmail } from '@/utils/inputSanitization';
 
-interface AuthFormProps {
-  mode: 'signin' | 'signup';
-  onModeChange: (mode: 'signin' | 'signup') => void;
+type AuthMode = 'login' | 'register' | 'forgot-password';
+
+interface FormData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  acceptTerms: boolean;
 }
 
-const AuthForm: React.FC<AuthFormProps> = ({ mode, onModeChange }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [showResetForm, setShowResetForm] = useState(false);
-  
-  const { signIn, signUp, resetPassword } = useAuth();
-  const navigate = useNavigate();
-  const { toast } = useToast();
+interface AuthFormProps {
+  mode: AuthMode;
+  formData: FormData;
+  setFormData: React.Dispatch<React.SetStateAction<FormData>>;
+  onSubmit: (e: React.FormEvent) => void;
+  loading: boolean;
+  rememberMe: boolean;
+  setRememberMe: React.Dispatch<React.SetStateAction<boolean>>;
+  switchMode: (mode: AuthMode) => void;
+}
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Sanitize inputs
-    const sanitizedEmail = sanitizeEmail(email);
-    const sanitizedFirstName = sanitizeText(firstName);
-    const sanitizedLastName = sanitizeText(lastName);
-
-    if (mode === 'signup') {
-      // Validate password strength
-      const passwordValidation = validatePassword(password);
-      if (!passwordValidation.isValid) {
-        toast({
-          title: 'Password Requirements Not Met',
-          description: passwordValidation.errors.join('\n'),
-          variant: 'destructive',
-        });
-        return;
-      }
-
-      if (password !== confirmPassword) {
-        toast({
-          title: 'Error',
-          description: 'Passwords do not match',
-          variant: 'destructive',
-        });
-        return;
-      }
-
-      if (!sanitizedFirstName.trim() || !sanitizedLastName.trim()) {
-        toast({
-          title: 'Error',
-          description: 'First name and last name are required',
-          variant: 'destructive',
-        });
-        return;
-      }
-    }
-
-    setLoading(true);
-    try {
-      if (mode === 'signin') {
-        const { error } = await signIn(sanitizedEmail, password);
-        if (error) throw error;
-        navigate('/');
-      } else {
-        const { error } = await signUp(sanitizedEmail, password, sanitizedFirstName, sanitizedLastName);
-        if (error) throw error;
-        toast({
-          title: 'Success',
-          description: 'Please check your email to verify your account',
-        });
-      }
-    } catch (error: any) {
-      console.error('Auth error:', error);
-      toast({
-        title: 'Error',
-        description: error.message || 'An unexpected error occurred',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
+const AuthForm: React.FC<AuthFormProps> = ({
+  mode,
+  formData,
+  setFormData,
+  onSubmit,
+  loading,
+  rememberMe,
+  setRememberMe,
+  switchMode
+}) => {
+  const handleInputChange = (field: keyof FormData) => (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = field === 'acceptTerms' ? e.target.checked : e.target.value;
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
-
-  const handleResetPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const sanitizedEmail = sanitizeEmail(email);
-    
-    if (!sanitizedEmail) {
-      toast({
-        title: 'Error',
-        description: 'Please enter your email address',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const { error } = await resetPassword(sanitizedEmail);
-      if (error) throw error;
-      
-      toast({
-        title: 'Success',
-        description: 'Password reset email sent. Please check your inbox.',
-      });
-      setShowResetForm(false);
-    } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to send reset email',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (showResetForm) {
-    return (
-      <div className="space-y-6">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900">Reset Password</h2>
-          <p className="text-gray-600 mt-2">Enter your email to receive a reset link</p>
-        </div>
-        
-        <form onSubmit={handleResetPassword} className="space-y-4">
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="mt-1"
-              maxLength={254}
-            />
-          </div>
-          
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? 'Sending...' : 'Send Reset Email'}
-          </Button>
-          
-          <Button
-            type="button"
-            variant="ghost"
-            className="w-full"
-            onClick={() => setShowResetForm(false)}
-          >
-            Back to Sign In
-          </Button>
-        </form>
-      </div>
-    );
-  }
 
   return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-900">
-          {mode === 'signin' ? 'Sign In' : 'Create Account'}
-        </h2>
-        <p className="text-gray-600 mt-2">
-          {mode === 'signin' 
-            ? 'Welcome back! Please sign in to your account.' 
-            : 'Join us today and start optimizing your CV.'
-          }
-        </p>
+    <div className="mt-8">
+      <div className="relative">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-gray-300" />
+        </div>
+        <div className="relative flex justify-center text-sm">
+          <span className="px-2 bg-white text-gray-500">Or continue with email</span>
+        </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {mode === 'signup' && (
-          <>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="firstName">First Name</Label>
-                <Input
-                  id="firstName"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  required
-                  className="mt-1"
-                  maxLength={50}
-                />
-              </div>
-              <div>
-                <Label htmlFor="lastName">Last Name</Label>
-                <Input
-                  id="lastName"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  required
-                  className="mt-1"
-                  maxLength={50}
-                />
-              </div>
+      <form className="mt-6 space-y-6" onSubmit={onSubmit}>
+        {mode === 'register' && (
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="firstName" className="text-blueberry">
+                First name
+              </Label>
+              <Input
+                id="firstName"
+                name="firstName"
+                type="text"
+                required
+                value={formData.firstName}
+                onChange={handleInputChange('firstName')}
+                className="mt-1"
+                maxLength={50}
+              />
             </div>
-          </>
+            <div>
+              <Label htmlFor="lastName" className="text-blueberry">
+                Last name
+              </Label>
+              <Input
+                id="lastName"
+                name="lastName"
+                type="text"
+                required
+                value={formData.lastName}
+                onChange={handleInputChange('lastName')}
+                className="mt-1"
+                maxLength={50}
+              />
+            </div>
+          </div>
         )}
 
         <div>
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email" className="text-blueberry">
+            Email address
+          </Label>
           <Input
             id="email"
+            name="email"
             type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="email"
             required
+            value={formData.email}
+            onChange={handleInputChange('email')}
             className="mt-1"
             maxLength={254}
           />
         </div>
 
-        <div>
-          <Label htmlFor="password">Password</Label>
-          <Input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="mt-1"
-            maxLength={128}
-          />
-          {mode === 'signup' && password && (
-            <div className="mt-2">
-              <PasswordStrengthMeter password={password} />
-            </div>
-          )}
-        </div>
-
-        {mode === 'signup' && (
+        {mode !== 'forgot-password' && (
           <div>
-            <Label htmlFor="confirmPassword">Confirm Password</Label>
+            <Label htmlFor="password" className="text-blueberry">
+              Password
+            </Label>
+            <Input
+              id="password"
+              name="password"
+              type="password"
+              autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+              required
+              value={formData.password}
+              onChange={handleInputChange('password')}
+              className="mt-1"
+              maxLength={128}
+            />
+            {mode === 'register' && formData.password && (
+              <div className="mt-2">
+                <PasswordStrengthMeter password={formData.password} />
+              </div>
+            )}
+          </div>
+        )}
+
+        {mode === 'register' && (
+          <div>
+            <Label htmlFor="confirmPassword" className="text-blueberry">
+              Confirm password
+            </Label>
             <Input
               id="confirmPassword"
+              name="confirmPassword"
               type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              autoComplete="new-password"
               required
+              value={formData.confirmPassword}
+              onChange={handleInputChange('confirmPassword')}
               className="mt-1"
               maxLength={128}
             />
           </div>
         )}
 
-        <Button type="submit" className="w-full" disabled={loading}>
-          {loading ? 'Processing...' : (mode === 'signin' ? 'Sign In' : 'Create Account')}
-        </Button>
-
-        {mode === 'signin' && (
-          <Button
-            type="button"
-            variant="ghost"
-            className="w-full text-sm"
-            onClick={() => setShowResetForm(true)}
-          >
-            Forgot your password?
-          </Button>
+        {mode === 'login' && (
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <Checkbox
+                id="remember-me"
+                checked={rememberMe}
+                onCheckedChange={setRememberMe}
+              />
+              <Label htmlFor="remember-me" className="ml-2 text-sm text-blueberry">
+                Remember me
+              </Label>
+            </div>
+            <button
+              type="button"
+              onClick={() => switchMode('forgot-password')}
+              className="text-sm text-apricot hover:text-apricot/80"
+            >
+              Forgot password?
+            </button>
+          </div>
         )}
-      </form>
 
-      <div className="text-center">
-        <button
-          type="button"
-          onClick={() => onModeChange(mode === 'signin' ? 'signup' : 'signin')}
-          className="text-sm text-blue-600 hover:text-blue-500"
-        >
-          {mode === 'signin' 
-            ? "Don't have an account? Sign up" 
-            : 'Already have an account? Sign in'
-          }
-        </button>
-      </div>
+        {mode === 'register' && (
+          <div className="flex items-center">
+            <Checkbox
+              id="accept-terms"
+              checked={formData.acceptTerms}
+              onCheckedChange={(checked) => 
+                setFormData(prev => ({ ...prev, acceptTerms: checked === true }))
+              }
+              required
+            />
+            <Label htmlFor="accept-terms" className="ml-2 text-sm text-blueberry">
+              I agree to the{' '}
+              <a href="/terms" className="text-apricot hover:text-apricot/80">
+                Terms of Service
+              </a>{' '}
+              and{' '}
+              <a href="/privacy" className="text-apricot hover:text-apricot/80">
+                Privacy Policy
+              </a>
+            </Label>
+          </div>
+        )}
+
+        <div>
+          <Button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-apricot hover:bg-apricot/90 text-white"
+          >
+            {loading ? (
+              'Processing...'
+            ) : (
+              <>
+                {mode === 'login' && 'Sign in'}
+                {mode === 'register' && 'Create account'}
+                {mode === 'forgot-password' && 'Send reset email'}
+              </>
+            )}
+          </Button>
+        </div>
+      </form>
     </div>
   );
 };
