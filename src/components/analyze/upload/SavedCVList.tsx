@@ -9,12 +9,7 @@ interface CVUpload {
   file_size: number;
   created_at: string;
   extracted_text: string;
-}
-
-interface UploadedFile {
-  file: File;
-  extractedText: string;
-  type: 'cv' | 'job_description';
+  file_type: string;
 }
 
 interface SavedCVListProps {

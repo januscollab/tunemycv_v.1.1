@@ -9,10 +9,11 @@ import CVSelector from '@/components/analyze/CVSelector';
 import JobDescriptionTextInput from '@/components/analyze/JobDescriptionTextInput';
 import CreditsPanel from '@/components/analyze/CreditsPanel';
 import AnalyzeButton from '@/components/analyze/AnalyzeButton';
+import EnhancedFileUploadArea from '@/components/analyze/upload/EnhancedFileUploadArea';
 import { useAnalysis } from '@/hooks/useAnalysis';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Upload, FileText, X, Check } from 'lucide-react';
+import { Check, X } from 'lucide-react';
 
 interface UploadedFile {
   file: File;
@@ -79,9 +80,6 @@ const AnalyzeCV = () => {
     enabled: !!user?.id,
   });
 
-  const jobDescTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
-  const maxSize = 5 * 1024 * 1024; // 5MB
-
   const handleCVSelect = (uploadedFile: UploadedFile) => {
     setUploadedFiles(prev => ({
       ...prev,
@@ -90,14 +88,7 @@ const AnalyzeCV = () => {
     toast({ title: 'Success', description: 'CV selected successfully!' });
   };
 
-  const handleFileUpload = async (file: File, type: 'job_description') => {
-    const errors = validateFile(file, jobDescTypes, maxSize);
-    
-    if (errors.length > 0) {
-      toast({ title: 'Upload Error', description: errors.join('. '), variant: 'destructive' });
-      return;
-    }
-
+  const handleFileUpload = async (file: File) => {
     try {
       setUploading(true);
       const extractedText = await extractTextFromFile(file);
@@ -105,7 +96,7 @@ const AnalyzeCV = () => {
       const uploadedFile: UploadedFile = {
         file,
         extractedText,
-        type
+        type: 'job_description'
       };
 
       setUploadedFiles(prev => ({
@@ -235,21 +226,15 @@ const AnalyzeCV = () => {
               <div className="space-y-4">
                 {!uploadedFiles.jobDescription ? (
                   <>
-                    {/* File Upload Option */}
-                    <div className="border-2 border-dashed border-apple-core/30 dark:border-citrus/30 rounded-lg p-6 text-center">
-                      <Upload className="mx-auto h-8 w-8 text-blueberry/60 dark:text-apple-core/60 mb-2" />
-                      <label className="cursor-pointer">
-                        <span className="text-apricot hover:text-apricot/80 font-medium">Upload Job Description</span>
-                        <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mt-1">PDF, DOCX, TXT - max 5MB</p>
-                        <input
-                          type="file"
-                          className="hidden"
-                          accept=".pdf,.docx,.txt"
-                          onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0], 'job_description')}
-                          disabled={uploading || analyzing}
-                        />
-                      </label>
-                    </div>
+                    {/* Enhanced File Upload Option */}
+                    <EnhancedFileUploadArea
+                      onFileSelect={handleFileUpload}
+                      uploading={uploading}
+                      accept=".pdf,.docx,.txt"
+                      maxSize="5MB"
+                      label="Upload Job Description"
+                      type="job_description"
+                    />
                     
                     <div className="text-center text-blueberry/60 dark:text-apple-core/60">or</div>
                     
