@@ -1,162 +1,42 @@
 
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
+
+const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+const supabaseUrl = Deno.env.get('SUPABASE_URL');
+const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-interface AnalysisRequest {
-  cvText: string;
-  jobDescriptionText: string;
-  jobTitle?: string;
-  userId: string;
-}
-
-interface EnhancedAIAnalysisResult {
-  compatibilityScore: number;
-  companyName: string;
-  position: string;
-  executiveSummary: {
-    overview: string;
-    strengths: Array<{
-      title: string;
-      description: string;
-      relevance: number;
-    }>;
-    weaknesses: Array<{
-      title: string;
-      description: string;
-      impact: number;
-      recommendation: string;
-    }>;
-  };
-  compatibilityBreakdown: {
-    technicalSkills: {
-      score: number;
-      present: string[];
-      missing: string[];
-      analysis: string;
-    };
-    experience: {
-      score: number;
-      relevantExperience: string[];
-      missingExperience: string[];
-      analysis: string;
-    };
-    education: {
-      score: number;
-      relevantQualifications: string[];
-      missingQualifications: string[];
-      analysis: string;
-    };
-    softSkills: {
-      score: number;
-      present: string[];
-      missing: string[];
-      analysis: string;
-    };
-    industryKnowledge: {
-      score: number;
-      present: string[];
-      missing: string[];
-      analysis: string;
-    };
-  };
-  keywordAnalysis: {
-    totalKeywords: number;
-    matchedKeywords: number;
-    keywordMatchPercentage: number;
-    keywords: Array<{
-      keyword: string;
-      found: boolean;
-      importance: 'high' | 'medium' | 'low';
-      occurrences: number;
-      context: string;
-      suggestion: string;
-    }>;
-  };
-  priorityRecommendations: Array<{
-    title: string;
-    description: string;
-    priority: 'high' | 'medium' | 'low';
-    impact: string;
-    sampleText: string;
-  }>;
-  skillsGapAnalysis: {
-    criticalGaps: Array<{
-      skill: string;
-      importance: 'high' | 'medium' | 'low';
-      description: string;
-      bridgingStrategy: string;
-    }>;
-    developmentAreas: Array<{
-      area: string;
-      description: string;
-      relevance: string;
-      actionPlan: string;
-    }>;
-  };
-}
-
-// Function to clean and parse AI response
-const cleanAndParseJSON = (response: string): any => {
-  console.log('Raw AI response:', response);
-  
-  // Remove markdown code blocks if present
-  let cleanedResponse = response.trim();
-  
-  // Remove ```json and ``` markers
-  if (cleanedResponse.startsWith('```json')) {
-    cleanedResponse = cleanedResponse.replace(/^```json\s*/, '');
-  }
-  if (cleanedResponse.startsWith('```')) {
-    cleanedResponse = cleanedResponse.replace(/^```\s*/, '');
-  }
-  if (cleanedResponse.endsWith('```')) {
-    cleanedResponse = cleanedResponse.replace(/\s*```$/, '');
+// Enhanced content validation
+const validateContent = (content: string, maxLength: number): { isValid: boolean; error?: string } => {
+  if (!content || typeof content !== 'string') {
+    return { isValid: false, error: 'Content is required and must be text' };
   }
   
-  console.log('Cleaned response:', cleanedResponse);
-  
-  try {
-    return JSON.parse(cleanedResponse);
-  } catch (parseError) {
-    console.error('JSON parse error:', parseError);
-    throw new Error(`Failed to parse AI response as JSON: ${parseError.message}`);
+  if (content.length > maxLength) {
+    return { isValid: false, error: `Content exceeds maximum length of ${maxLength} characters` };
   }
-};
-
-// Function to validate the parsed analysis result
-const validateEnhancedAnalysisResult = (result: any): EnhancedAIAnalysisResult => {
-  const requiredFields = [
-    'compatibilityScore', 'companyName', 'position', 'executiveSummary',
-    'compatibilityBreakdown', 'keywordAnalysis', 'priorityRecommendations',
-    'skillsGapAnalysis'
+  
+  // Check for suspicious patterns
+  const suspiciousPatterns = [
+    /<script[\s\S]*?>[\s\S]*?<\/script>/gi,
+    /javascript:/gi,
+    /vbscript:/gi,
+    /<iframe[\s\S]*?>/gi,
   ];
   
-  for (const field of requiredFields) {
-    if (!(field in result)) {
-      throw new Error(`Missing required field: ${field}`);
+  for (const pattern of suspiciousPatterns) {
+    if (pattern.test(content)) {
+      return { isValid: false, error: 'Content contains potentially malicious code' };
     }
   }
   
-  // Ensure compatibility score is a number
-  if (typeof result.compatibilityScore !== 'number') {
-    result.compatibilityScore = parseInt(result.compatibilityScore) || 0;
-  }
-  
-  // Set defaults for missing nested structures
-  if (!result.executiveSummary.strengths) result.executiveSummary.strengths = [];
-  if (!result.executiveSummary.weaknesses) result.executiveSummary.weaknesses = [];
-  if (!result.keywordAnalysis.keywords) result.keywordAnalysis.keywords = [];
-  if (!result.priorityRecommendations) result.priorityRecommendations = [];
-  if (!result.skillsGapAnalysis.criticalGaps) result.skillsGapAnalysis.criticalGaps = [];
-  if (!result.skillsGapAnalysis.developmentAreas) result.skillsGapAnalysis.developmentAreas = [];
-  
-  return result as EnhancedAIAnalysisResult;
+  return { isValid: true };
 };
 
 serve(async (req) => {
@@ -165,257 +45,149 @@ serve(async (req) => {
   }
 
   try {
-    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    
-    if (!openAIApiKey) {
-      throw new Error('OpenAI API key not configured');
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'No authorization header' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    const { cvText, jobDescriptionText, jobTitle, userId }: AnalysisRequest = await req.json();
+    const supabase = createClient(supabaseUrl!, supabaseServiceKey!);
+    
+    // Verify the JWT token
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: 'Invalid or expired token' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
-    console.log('Starting enhanced AI analysis for user:', userId);
+    const { cvText, jobDescription } = await req.json();
 
-    // Check and deduct user credits
+    // Enhanced input validation
+    const cvValidation = validateContent(cvText, 50000); // 50KB limit
+    if (!cvValidation.isValid) {
+      return new Response(JSON.stringify({ error: `CV validation failed: ${cvValidation.error}` }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const jobValidation = validateContent(jobDescription, 25000); // 25KB limit
+    if (!jobValidation.isValid) {
+      return new Response(JSON.stringify({ error: `Job description validation failed: ${jobValidation.error}` }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Check combined content length
+    if (cvText.length + jobDescription.length > 60000) {
+      return new Response(JSON.stringify({ error: 'Combined content exceeds maximum analysis limit' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Check user credits
     const { data: userCredits, error: creditsError } = await supabase
       .from('user_credits')
       .select('credits')
-      .eq('user_id', userId)
+      .eq('user_id', user.id)
       .single();
 
     if (creditsError || !userCredits || userCredits.credits < 1) {
-      return new Response(
-        JSON.stringify({ error: 'Insufficient credits for AI analysis' }),
-        { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return new Response(JSON.stringify({ error: 'Insufficient credits' }), {
+        status: 402,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
-    // Simplified comprehensive AI prompt focused on core analysis
-    const prompt = `
-You are a senior career consultant and CV optimization expert. Analyze the CV against the job description and provide detailed insights.
+    // Proceed with OpenAI analysis
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are an expert CV analyzer and career counselor. Analyze the CV against the job description and provide detailed insights in JSON format.'
+          },
+          {
+            role: 'user',
+            content: `Please analyze this CV against the job description and provide a detailed analysis.
 
-CRITICAL REQUIREMENTS:
-1. Provide 3-7 detailed items for each analysis section
-2. Be thorough and comprehensive - this is professional career consulting
-3. Respond ONLY with valid JSON in the exact structure below
-4. Extract 15-25+ relevant keywords from the job description
-
-CV TO ANALYZE:
+CV Content:
 ${cvText}
 
-JOB DESCRIPTION:
-${jobDescriptionText}
+Job Description:
+${jobDescription}
 
-POSITION: ${jobTitle || 'Not specified'}
-
-RESPOND WITH ANALYSIS IN THIS EXACT JSON STRUCTURE:
+Please provide your analysis in JSON format with the following structure:
 {
-  "compatibilityScore": 0-100,
-  "companyName": "Company name from job description",
-  "position": "Job title",
-  "executiveSummary": {
-    "overview": "3-4 sentence overview of compatibility",
-    "strengths": [
-      {
-        "title": "Strength title",
-        "description": "Detailed 2-3 sentence explanation with specific examples",
-        "relevance": 0-100
-      }
-    ],
-    "weaknesses": [
-      {
-        "title": "Weakness/gap title",
-        "description": "Detailed explanation with evidence",
-        "impact": 0-100,
-        "recommendation": "Specific actionable strategy to address"
-      }
-    ]
-  },
-  "compatibilityBreakdown": {
-    "technicalSkills": {
-      "score": 0-100,
-      "present": ["Technical skills found in CV"],
-      "missing": ["Required technical skills missing"],
-      "analysis": "Detailed analysis of technical alignment"
-    },
-    "experience": {
-      "score": 0-100,
-      "relevantExperience": ["Relevant experience from CV"],
-      "missingExperience": ["Required experience missing"],
-      "analysis": "Analysis of experience match"
-    },
-    "education": {
-      "score": 0-100,
-      "relevantQualifications": ["Relevant qualifications"],
-      "missingQualifications": ["Missing qualifications"],
-      "analysis": "Educational background analysis"
-    },
-    "softSkills": {
-      "score": 0-100,
-      "present": ["Soft skills demonstrated"],
-      "missing": ["Required soft skills missing"],
-      "analysis": "Soft skills assessment"
-    },
-    "industryKnowledge": {
-      "score": 0-100,
-      "present": ["Industry knowledge areas"],
-      "missing": ["Missing industry knowledge"],
-      "analysis": "Industry expertise analysis"
-    }
-  },
-  "keywordAnalysis": {
-    "totalKeywords": 15-25,
-    "matchedKeywords": 0-25,
-    "keywordMatchPercentage": 0-100,
-    "keywords": [
-      {
-        "keyword": "Keyword from job description",
-        "found": true/false,
-        "importance": "high/medium/low",
-        "occurrences": 0,
-        "context": "Context and importance",
-        "suggestion": "How to incorporate/optimize"
-      }
-    ]
-  },
-  "priorityRecommendations": [
-    {
-      "title": "Recommendation title",
-      "description": "Comprehensive explanation and rationale",
-      "priority": "high/medium/low",
-      "impact": "Expected impact description",
-      "sampleText": "Ready-to-use text example"
-    }
-  ],
-  "skillsGapAnalysis": {
-    "criticalGaps": [
-      {
-        "skill": "Critical skill missing",
-        "importance": "high/medium/low",
-        "description": "Why this skill is essential",
-        "bridgingStrategy": "How to acquire this skill"
-      }
-    ],
-    "developmentAreas": [
-      {
-        "area": "Development area",
-        "description": "Development opportunity explanation",
-        "relevance": "Relevance to role success",
-        "actionPlan": "Specific development plan"
-      }
-    ]
-  }
-}
-
-INSTRUCTIONS:
-- RESPOND ONLY WITH VALID JSON
-- PROVIDE 3-7 ITEMS for strengths, weaknesses, recommendations, critical gaps, and development areas
-- EXTRACT 15-25+ KEYWORDS with strategic importance
-- FOCUS ON ACTIONABLE INSIGHTS with specific evidence
-- MAINTAIN PROFESSIONAL TONE while being honest about gaps
-`;
-
-    console.log('Calling OpenAI API with simplified prompt...');
-
-    // Call OpenAI API with retry logic
-    let openAIResponse;
-    let attempts = 0;
-    const maxAttempts = 2;
-
-    while (attempts < maxAttempts) {
-      try {
-        openAIResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${openAIApiKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model: 'gpt-4o',
-            messages: [
-              {
-                role: 'system',
-                content: 'You are a senior career consultant providing comprehensive CV analysis. Always respond with valid JSON only, no additional text.'
-              },
-              {
-                role: 'user',
-                content: prompt
-              }
-            ],
-            temperature: 0.2,
-            max_tokens: 6000,
-            response_format: { type: "json_object" }
-          }),
-        });
-
-        if (openAIResponse.ok) {
-          break;
-        } else {
-          console.error(`OpenAI API error (attempt ${attempts + 1}):`, openAIResponse.status);
-          attempts++;
-          if (attempts >= maxAttempts) {
-            throw new Error(`OpenAI API error: ${openAIResponse.status}`);
+  "compatibility_score": number (0-100),
+  "executive_summary": "string",
+  "strengths": ["array of strings"],
+  "weaknesses": ["array of strings"],
+  "recommendations": ["array of strings"],
+  "keywords_found": [{"keyword": "string", "relevance": "high|medium|low"}],
+  "keywords_missing": [{"keyword": "string", "importance": "high|medium|low"}]
+}`
           }
-        }
-      } catch (error) {
-        console.error(`OpenAI request failed (attempt ${attempts + 1}):`, error);
-        attempts++;
-        if (attempts >= maxAttempts) {
-          throw error;
-        }
-      }
+        ],
+        temperature: 0.3,
+        max_tokens: 4000,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`OpenAI API error: ${response.statusText}`);
     }
 
-    const openAIData = await openAIResponse.json();
-    const aiResponseText = openAIData.choices[0].message.content;
-    
-    console.log('Enhanced OpenAI response received, length:', aiResponseText.length);
+    const data = await response.json();
+    const analysisResult = data.choices[0].message.content;
 
-    // Parse and validate AI response
-    let analysisResult: EnhancedAIAnalysisResult;
+    // Parse the JSON response
+    let parsedResult;
     try {
-      const parsedResult = cleanAndParseJSON(aiResponseText);
-      analysisResult = validateEnhancedAnalysisResult(parsedResult);
-      console.log('AI response successfully parsed and validated');
+      parsedResult = JSON.parse(analysisResult);
     } catch (parseError) {
-      console.error('Failed to parse/validate AI response:', parseError);
-      throw new Error(`Invalid AI response format: ${parseError.message}`);
+      return new Response(JSON.stringify({ error: 'Failed to parse analysis result' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
-    // Deduct credit after successful analysis
-    const { error: creditUpdateError } = await supabase
+    // Deduct credits in a transaction
+    const { error: deductError } = await supabase
       .from('user_credits')
       .update({ credits: userCredits.credits - 1 })
-      .eq('user_id', userId);
+      .eq('user_id', user.id);
 
-    if (creditUpdateError) {
-      console.error('Failed to update credits:', creditUpdateError);
+    if (deductError) {
+      console.error('Failed to deduct credits:', deductError);
     }
 
-    console.log('Enhanced AI analysis completed successfully');
-
-    return new Response(
-      JSON.stringify({
-        success: true,
-        analysis: analysisResult,
-        creditsRemaining: userCredits.credits - 1
-      }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return new Response(JSON.stringify(parsedResult), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
 
   } catch (error) {
-    console.error('Error in enhanced AI analysis:', error);
-    return new Response(
-      JSON.stringify({ 
-        error: error.message,
-        fallback: true
-      }),
-      { 
-        status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
-    );
+    console.error('Error in analyze-cv-with-ai function:', error);
+    return new Response(JSON.stringify({ 
+      error: 'Internal server error',
+      details: error.message 
+    }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 });
