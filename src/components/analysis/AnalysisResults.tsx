@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { ArrowLeft, Download, BarChart3, CheckCircle, XCircle, TrendingUp, Star, AlertCircle, Target, BookOpen, Users, Award, Lightbulb } from 'lucide-react';
+import { ArrowLeft, Download, BarChart3, CheckCircle, XCircle, TrendingUp, Star, AlertCircle, Target, BookOpen, Users, Award, Lightbulb, Info } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import jsPDF from 'jspdf';
 
@@ -25,7 +24,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
   const getMatchLevel = (score: number) => {
     if (score >= 80) return 'Excellent Match';
     if (score >= 70) return 'Good Match';
-    if (score >= 50) return 'Moderate Match';
+    if (score >= 50) return 'Moderate to Good Match';
     return 'Needs Improvement';
   };
 
@@ -266,107 +265,265 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
           </button>
         </div>
 
-        {/* Main Score Card */}
-        <div className={`bg-white dark:bg-blueberry/20 rounded-lg shadow-lg p-8 mb-8 border-2 ${getScoreBgColor(result.compatibility_score)}`}>
-          <div className="text-center">
-            <div className="flex items-center justify-center mb-4">
-              <BarChart3 className={`h-8 w-8 ${getScoreColor(result.compatibility_score)} mr-2`} />
-              <h1 className="text-3xl font-bold text-blueberry dark:text-citrus">Comprehensive CV Analysis</h1>
-            </div>
-            {result.job_title && (
-              <p className="text-lg text-blueberry/80 dark:text-apple-core mb-2">Position: {result.job_title}</p>
-            )}
-            {result.company_name && result.company_name !== 'Company' && (
-              <p className="text-md text-blueberry/70 dark:text-apple-core/80 mb-6">Company: {result.company_name}</p>
-            )}
-            
-            <div className="grid md:grid-cols-2 gap-8 items-center mb-6">
-              <div className="text-center">
-                <div className={`text-6xl font-bold ${getScoreColor(result.compatibility_score)} mb-2`}>
-                  {result.compatibility_score}%
-                </div>
-                <div className="text-blueberry/70 dark:text-apple-core/80">Compatibility Score</div>
-                <div className={`text-lg font-semibold mt-2 ${getScoreColor(result.compatibility_score)}`}>
-                  {getMatchLevel(result.compatibility_score)}
+        {/* Page Title */}
+        <h1 className="text-3xl font-bold text-blueberry dark:text-citrus mb-8">CV Analysis Results</h1>
+
+        {/* Success Alert */}
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-8">
+          <div className="flex items-center mb-2">
+            <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
+            <h2 className="text-lg font-semibold text-green-800">Analysis Complete!</h2>
+          </div>
+          <p className="text-green-700">
+            We've analyzed your CV against the job description and prepared a detailed compatibility report with personalized recommendations.
+          </p>
+        </div>
+
+        {/* Main Content Grid */}
+        <div className="grid lg:grid-cols-3 gap-8 mb-8">
+          {/* Left Column - Score Display */}
+          <div className="lg:col-span-1">
+            <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20 text-center">
+              {/* Large Score Circle */}
+              <div className="flex items-center justify-center mb-4">
+                <div className="relative w-32 h-32 bg-blue-500 rounded-full flex items-center justify-center">
+                  <div className="text-white text-center">
+                    <div className="text-3xl font-bold">{(result.compatibility_score / 10).toFixed(1)}</div>
+                    <div className="text-sm">/10</div>
+                  </div>
                 </div>
               </div>
-              <div className="space-y-3">
-                <Progress value={result.compatibility_score} className="w-full h-3" />
-                <div className="text-sm text-blueberry/70 dark:text-apple-core/80 text-center">
-                  Analysis completed on {new Date(result.created_at).toLocaleDateString()}
+              
+              <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mb-2">Compatibility Score</h3>
+              <p className="text-blueberry/70 dark:text-apple-core/80 mb-4">{getMatchLevel(result.compatibility_score)}</p>
+              
+              {result.job_title && (
+                <p className="text-sm text-blueberry/60 dark:text-apple-core/60">
+                  for the {result.job_title} position
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Right Column - Executive Summary */}
+          <div className="lg:col-span-2">
+            <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
+              <h2 className="text-2xl font-semibold text-blueberry dark:text-citrus mb-4">Executive Summary</h2>
+              <p className="text-blueberry/80 dark:text-apple-core leading-relaxed mb-6">
+                {result.executive_summary}
+              </p>
+
+              {/* Key Strengths and Improvement Areas */}
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <h3 className="font-semibold text-green-600 mb-3">Key Strengths</h3>
+                  {result.strengths && result.strengths.length > 0 ? (
+                    <ul className="space-y-2">
+                      {result.strengths.slice(0, 4).map((strength: string, index: number) => (
+                        <li key={index} className="flex items-start text-sm">
+                          <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 mr-2 flex-shrink-0"></div>
+                          <span className="text-blueberry/80 dark:text-apple-core">{strength}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-blueberry/60 dark:text-apple-core/60 text-sm">No specific strengths identified.</p>
+                  )}
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-red-600 mb-3">Key Improvement Areas</h3>
+                  {result.weaknesses && result.weaknesses.length > 0 ? (
+                    <ul className="space-y-2">
+                      {result.weaknesses.slice(0, 4).map((weakness: string, index: number) => (
+                        <li key={index} className="flex items-start text-sm">
+                          <div className="w-1.5 h-1.5 bg-red-500 rounded-full mt-2 mr-2 flex-shrink-0"></div>
+                          <span className="text-blueberry/80 dark:text-apple-core">{weakness}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-blueberry/60 dark:text-apple-core/60 text-sm">No specific areas for improvement identified.</p>
+                  )}
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Executive Summary */}
-        <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 mb-8 border border-apple-core/20 dark:border-citrus/20">
-          <div className="flex items-center mb-4">
-            <Star className="h-6 w-6 text-apricot mr-3" />
-            <h2 className="text-2xl font-semibold text-blueberry dark:text-citrus">Executive Summary</h2>
-          </div>
-          <p className="text-lg text-blueberry/80 dark:text-apple-core leading-relaxed">{result.executive_summary}</p>
-        </div>
+        {/* Two Column Layout for Detailed Sections */}
+        <div className="grid lg:grid-cols-2 gap-8 mb-8">
+          {/* Compatibility Breakdown */}
+          {result.compatibilityBreakdown && result.compatibilityBreakdown.length > 0 && (
+            <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
+              <div className="flex items-center mb-4">
+                <div className="bg-blue-500 text-white px-3 py-1 rounded text-sm font-medium mr-3">
+                  Compatibility Breakdown
+                </div>
+              </div>
+              <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mb-4">
+                Your compatibility score is calculated based on several weighted factors:
+              </p>
+              
+              <div className="space-y-4">
+                {result.compatibilityBreakdown.map((category: any, index: number) => (
+                  <div key={index}>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-medium text-blueberry dark:text-citrus text-sm">{category.category}</span>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-sm font-bold text-blue-600">{category.score}/10</span>
+                        <span className="text-xs text-blueberry/60 dark:text-apple-core/60">Weight: {category.weight}%</span>
+                      </div>
+                    </div>
+                    <div className="bg-gray-200 rounded-full h-2 mb-2">
+                      <div 
+                        className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                        style={{ width: `${(category.score / 10) * 100}%` }}
+                      ></div>
+                    </div>
+                    <p className="text-xs text-blueberry/70 dark:text-apple-core/80">{category.feedback}</p>
+                  </div>
+                ))}
+              </div>
 
-        {/* Compatibility Breakdown */}
-        {result.compatibilityBreakdown && result.compatibilityBreakdown.length > 0 && (
-          <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 mb-8 border border-apple-core/20 dark:border-citrus/20">
-            <div className="flex items-center mb-6">
-              <Target className="h-6 w-6 text-apricot mr-3" />
-              <h2 className="text-2xl font-semibold text-blueberry dark:text-citrus">Compatibility Breakdown</h2>
+              {/* Overall Score Summary */}
+              <div className="mt-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+                <div className="flex items-center mb-2">
+                  <Info className="h-4 w-4 text-blue-600 mr-2" />
+                  <span className="text-sm font-medium text-blue-800 dark:text-blue-300">
+                    Overall Score: {(result.compatibility_score / 10).toFixed(1)}/10
+                  </span>
+                </div>
+                <p className="text-xs text-blue-700 dark:text-blue-400">
+                  Your strongest areas are in program management and stakeholder engagement.
+                </p>
+              </div>
             </div>
-            <div className="grid gap-4">
-              {result.compatibilityBreakdown.map((category: any, index: number) => (
-                <div key={index} className="border border-apple-core/10 dark:border-citrus/10 rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-semibold text-blueberry dark:text-citrus">{category.category}</h3>
-                    <div className="flex items-center space-x-3">
-                      <span className="text-sm text-blueberry/60 dark:text-apple-core/60">Weight: {category.weight}%</span>
-                      <span className={`font-bold ${category.score >= 7 ? 'text-green-600' : category.score >= 5 ? 'text-yellow-600' : 'text-red-600'}`}>
-                        {category.score}/10
-                      </span>
+          )}
+
+          {/* Keyword Analysis */}
+          <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
+            <div className="flex items-center mb-4">
+              <div className="bg-blue-500 text-white px-3 py-1 rounded text-sm font-medium mr-3">
+                Keyword Analysis
+              </div>
+            </div>
+            <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mb-4">
+              We analyzed your CV for key terms from the job description. Here's what we found:
+            </p>
+
+            {result.keywordAnalysis && result.keywordAnalysis.length > 0 ? (
+              <div className="space-y-3 mb-4">
+                <div className="grid grid-cols-4 gap-2 text-xs font-medium text-blueberry/60 dark:text-apple-core/60 border-b pb-2">
+                  <span>Keyword</span>
+                  <span>Importance</span>
+                  <span>Present in CV</span>
+                  <span></span>
+                </div>
+                {result.keywordAnalysis.map((keyword: any, index: number) => (
+                  <div key={index} className="grid grid-cols-4 gap-2 text-sm items-center">
+                    <span className="font-medium text-blueberry dark:text-apple-core">{keyword.keyword}</span>
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${
+                      keyword.importance === 'High' ? 'bg-red-100 text-red-800' :
+                      keyword.importance === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-gray-100 text-gray-800'
+                    }`}>
+                      {keyword.importance}
+                    </span>
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${
+                      keyword.present === 'Yes' ? 'bg-green-100 text-green-800' :
+                      keyword.present === 'Partial' ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-red-100 text-red-800'
+                    }`}>
+                      {keyword.present}
+                    </span>
+                    <span></span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              /* Fallback to simple keyword lists */
+              <div className="space-y-4">
+                {result.keywords_found && result.keywords_found.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-medium text-green-600 mb-2 flex items-center">
+                      <CheckCircle className="h-4 w-4 mr-1" />
+                      Found Keywords ({result.keywords_found.length})
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {result.keywords_found.map((keyword: string, index: number) => (
+                        <span key={index} className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">
+                          {keyword}
+                        </span>
+                      ))}
                     </div>
                   </div>
-                  <Progress value={category.score * 10} className="mb-3" />
-                  <p className="text-sm text-blueberry/70 dark:text-apple-core/80">{category.feedback}</p>
+                )}
+                
+                {result.keywords_missing && result.keywords_missing.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-medium text-red-600 mb-2 flex items-center">
+                      <XCircle className="h-4 w-4 mr-1" />
+                      Missing Keywords ({result.keywords_missing.length})
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {result.keywords_missing.map((keyword: string, index: number) => (
+                        <span key={index} className="bg-red-100 text-red-800 px-2 py-1 rounded text-xs">
+                          {keyword}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Missing Key Terms Alert */}
+            {result.keywords_missing && result.keywords_missing.length > 0 && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mt-4">
+                <div className="flex items-center mb-1">
+                  <AlertCircle className="h-4 w-4 text-yellow-600 mr-2" />
+                  <span className="text-sm font-medium text-yellow-800">Missing Key Terms</span>
                 </div>
-              ))}
-            </div>
+                <p className="text-xs text-yellow-700">
+                  Your CV is missing several high-importance keywords that could improve your ATS compatibility.
+                </p>
+              </div>
+            )}
           </div>
-        )}
+        </div>
 
         {/* Priority Recommendations */}
         {result.priorityRecommendations && result.priorityRecommendations.length > 0 && (
           <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 mb-8 border border-apple-core/20 dark:border-citrus/20">
             <div className="flex items-center mb-6">
-              <Lightbulb className="h-6 w-6 text-apricot mr-3" />
-              <h2 className="text-2xl font-semibold text-blueberry dark:text-citrus">Priority Recommendations</h2>
+              <div className="bg-blue-500 text-white px-3 py-1 rounded text-sm font-medium mr-3">
+                Priority Recommendations
+              </div>
             </div>
-            <div className="space-y-6">
+            <div className="grid md:grid-cols-2 gap-6">
               {result.priorityRecommendations.map((rec: any, index: number) => (
-                <div key={index} className="border border-apple-core/10 dark:border-citrus/10 rounded-lg p-5">
+                <div key={index} className="border border-apple-core/10 dark:border-citrus/10 rounded-lg p-4">
                   <div className="flex items-start mb-3">
-                    <div className="w-8 h-8 bg-apricot/20 text-apricot rounded-full flex items-center justify-center text-sm font-bold mr-3 mt-0.5 flex-shrink-0">
+                    <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold mr-3 mt-0.5 flex-shrink-0">
                       {rec.priority}
                     </div>
                     <div className="flex-1">
                       <h3 className="font-semibold text-blueberry dark:text-citrus mb-2">{rec.title}</h3>
                       <div className="mb-3">
-                        <h4 className="text-sm font-medium text-blueberry/80 dark:text-apple-core mb-2">Action Items:</h4>
                         <ul className="space-y-1">
-                          {rec.actionItems.map((item: string, itemIndex: number) => (
+                          {rec.actionItems && rec.actionItems.map((item: string, itemIndex: number) => (
                             <li key={itemIndex} className="flex items-start text-sm text-blueberry/70 dark:text-apple-core/80">
-                              <div className="w-1.5 h-1.5 bg-apricot rounded-full mt-2 mr-2 flex-shrink-0"></div>
+                              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 mr-2 flex-shrink-0"></div>
                               {item}
                             </li>
                           ))}
                         </ul>
                       </div>
                       {rec.example && (
-                        <div className="bg-apple-core/5 dark:bg-citrus/5 rounded p-3">
-                          <h4 className="text-sm font-medium text-blueberry/80 dark:text-apple-core mb-1">Example:</h4>
-                          <p className="text-sm text-blueberry/70 dark:text-apple-core/80 italic">{rec.example}</p>
+                        <div className="bg-green-50 dark:bg-green-900/20 rounded p-3">
+                          <h4 className="text-xs font-medium text-green-800 dark:text-green-300 mb-1">Example:</h4>
+                          <p className="text-xs text-green-700 dark:text-green-400 italic">"{rec.example}"</p>
                         </div>
                       )}
                     </div>
@@ -377,107 +534,55 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
           </div>
         )}
 
-        {/* Keyword Analysis */}
-        {result.keywordAnalysis && result.keywordAnalysis.length > 0 && (
-          <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 mb-8 border border-apple-core/20 dark:border-citrus/20">
-            <div className="flex items-center mb-6">
-              <BarChart3 className="h-6 w-6 text-apricot mr-3" />
-              <h2 className="text-2xl font-semibold text-blueberry dark:text-citrus">Keyword Analysis</h2>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="border-b border-apple-core/20 dark:border-citrus/20">
-                    <th className="text-left p-3 font-semibold text-blueberry dark:text-citrus">Keyword</th>
-                    <th className="text-left p-3 font-semibold text-blueberry dark:text-citrus">Importance</th>
-                    <th className="text-left p-3 font-semibold text-blueberry dark:text-citrus">Present</th>
-                    <th className="text-left p-3 font-semibold text-blueberry dark:text-citrus">Context</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {result.keywordAnalysis.map((keyword: any, index: number) => (
-                    <tr key={index} className="border-b border-apple-core/10 dark:border-citrus/10">
-                      <td className="p-3 font-medium text-blueberry dark:text-apple-core">{keyword.keyword}</td>
-                      <td className="p-3">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          keyword.importance === 'High' ? 'bg-red-100 text-red-800' :
-                          keyword.importance === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-gray-100 text-gray-800'
-                        }`}>
-                          {keyword.importance}
-                        </span>
-                      </td>
-                      <td className="p-3">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          keyword.present === 'Yes' ? 'bg-green-100 text-green-800' :
-                          keyword.present === 'Partial' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-red-100 text-red-800'
-                        }`}>
-                          {keyword.present}
-                        </span>
-                      </td>
-                      <td className="p-3 text-sm text-blueberry/70 dark:text-apple-core/80">{keyword.context}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
-        {/* Skills Gap Analysis */}
-        {result.skillsGapAnalysis && result.skillsGapAnalysis.length > 0 && (
-          <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 mb-8 border border-apple-core/20 dark:border-citrus/20">
-            <div className="flex items-center mb-6">
-              <BookOpen className="h-6 w-6 text-apricot mr-3" />
-              <h2 className="text-2xl font-semibold text-blueberry dark:text-citrus">Skills Gap Analysis</h2>
-            </div>
-            <div className="grid md:grid-cols-2 gap-6">
-              {result.skillsGapAnalysis.map((gap: any, index: number) => (
-                <div key={index} className="border border-apple-core/10 dark:border-citrus/10 rounded-lg p-4">
-                  <h3 className="font-semibold text-blueberry dark:text-citrus mb-3">{gap.category}</h3>
-                  {gap.missing && gap.missing.length > 0 && (
-                    <div className="mb-3">
-                      <h4 className="text-sm font-medium text-red-600 mb-2">Missing Skills:</h4>
-                      <div className="flex flex-wrap gap-1">
-                        {gap.missing.map((skill: string, skillIndex: number) => (
-                          <span key={skillIndex} className="bg-red-100 text-red-800 px-2 py-1 rounded text-xs">
-                            {skill}
-                          </span>
-                        ))}
+        {/* Additional Sections in smaller cards */}
+        <div className="grid md:grid-cols-3 gap-6 mb-8">
+          {/* Skills Gap Analysis */}
+          {result.skillsGapAnalysis && result.skillsGapAnalysis.length > 0 && (
+            <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
+              <div className="flex items-center mb-4">
+                <BookOpen className="h-5 w-5 text-apricot mr-2" />
+                <h2 className="text-lg font-semibold text-blueberry dark:text-citrus">Skills Gap Analysis</h2>
+              </div>
+              <div className="space-y-4">
+                {result.skillsGapAnalysis.map((gap: any, index: number) => (
+                  <div key={index}>
+                    <h3 className="font-medium text-blueberry dark:text-citrus mb-2 text-sm">{gap.category}</h3>
+                    {gap.missing && gap.missing.length > 0 && (
+                      <div className="mb-2">
+                        <div className="flex flex-wrap gap-1">
+                          {gap.missing.map((skill: string, skillIndex: number) => (
+                            <span key={skillIndex} className="bg-red-100 text-red-800 px-2 py-1 rounded text-xs">
+                              {skill}
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  )}
-                  {gap.suggestions && gap.suggestions.length > 0 && (
-                    <div>
-                      <h4 className="text-sm font-medium text-green-600 mb-2">Suggestions:</h4>
+                    )}
+                    {gap.suggestions && gap.suggestions.length > 0 && (
                       <ul className="space-y-1">
-                        {gap.suggestions.map((suggestion: string, suggestionIndex: number) => (
-                          <li key={suggestionIndex} className="text-sm text-blueberry/70 dark:text-apple-core/80 flex items-start">
-                            <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 mr-2 flex-shrink-0"></div>
+                        {gap.suggestions.slice(0, 2).map((suggestion: string, suggestionIndex: number) => (
+                          <li key={suggestionIndex} className="text-xs text-blueberry/70 dark:text-apple-core/80 flex items-start">
+                            <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-1.5 mr-2 flex-shrink-0"></div>
                             {suggestion}
                           </li>
                         ))}
                       </ul>
-                    </div>
-                  )}
-                </div>
-              ))}
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Additional Sections Grid */}
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
           {/* ATS Optimization */}
           {result.atsOptimization && result.atsOptimization.length > 0 && (
             <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
               <div className="flex items-center mb-4">
                 <Award className="h-5 w-5 text-apricot mr-2" />
-                <h2 className="text-xl font-semibold text-blueberry dark:text-citrus">ATS Optimization</h2>
+                <h2 className="text-lg font-semibold text-blueberry dark:text-citrus">ATS Optimization</h2>
               </div>
               <ul className="space-y-2">
-                {result.atsOptimization.map((tip: string, index: number) => (
+                {result.atsOptimization.slice(0, 4).map((tip: string, index: number) => (
                   <li key={index} className="flex items-start text-sm text-blueberry/80 dark:text-apple-core">
                     <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 mr-2 flex-shrink-0" />
                     {tip}
@@ -492,10 +597,10 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
             <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
               <div className="flex items-center mb-4">
                 <Users className="h-5 w-5 text-apricot mr-2" />
-                <h2 className="text-xl font-semibold text-blueberry dark:text-citrus">Interview Preparation</h2>
+                <h2 className="text-lg font-semibold text-blueberry dark:text-citrus">Interview Preparation</h2>
               </div>
               <ul className="space-y-2">
-                {result.interviewPrep.map((tip: string, index: number) => (
+                {result.interviewPrep.slice(0, 4).map((tip: string, index: number) => (
                   <li key={index} className="flex items-start text-sm text-blueberry/80 dark:text-apple-core">
                     <TrendingUp className="h-4 w-4 text-blue-500 mt-0.5 mr-2 flex-shrink-0" />
                     {tip}
@@ -504,101 +609,6 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
               </ul>
             </div>
           )}
-        </div>
-
-        {/* Traditional Strengths and Weaknesses Grid */}
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
-          <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
-            <div className="flex items-center mb-4">
-              <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
-              <h2 className="text-xl font-semibold text-blueberry dark:text-citrus">Key Strengths</h2>
-            </div>
-            {result.strengths && result.strengths.length > 0 ? (
-              <ul className="space-y-2">
-                {result.strengths.map((strength: string, index: number) => (
-                  <li key={index} className="flex items-start">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                    <span className="text-blueberry/80 dark:text-apple-core">{strength}</span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-blueberry/60 dark:text-apple-core/60">No specific strengths identified.</p>
-            )}
-          </div>
-
-          <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
-            <div className="flex items-center mb-4">
-              <AlertCircle className="h-5 w-5 text-yellow-600 mr-2" />
-              <h2 className="text-xl font-semibold text-blueberry dark:text-citrus">Areas for Improvement</h2>
-            </div>
-            {result.weaknesses && result.weaknesses.length > 0 ? (
-              <ul className="space-y-2">
-                {result.weaknesses.map((weakness: string, index: number) => (
-                  <li key={index} className="flex items-start">
-                    <div className="w-2 h-2 bg-yellow-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                    <span className="text-blueberry/80 dark:text-apple-core">{weakness}</span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-blueberry/60 dark:text-apple-core/60">No specific areas for improvement identified.</p>
-            )}
-          </div>
-        </div>
-
-        {/* Quick Keywords Summary */}
-        <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 mb-8 border border-apple-core/20 dark:border-citrus/20">
-          <div className="flex items-center mb-4">
-            <BarChart3 className="h-5 w-5 text-apricot mr-2" />
-            <h2 className="text-xl font-semibold text-blueberry dark:text-citrus">Keywords Summary</h2>
-          </div>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <h3 className="font-semibold text-green-600 mb-3 flex items-center">
-                <CheckCircle className="h-4 w-4 mr-1" />
-                Found Keywords ({result.keywords_found?.length || 0})
-              </h3>
-              {result.keywords_found && result.keywords_found.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
-                  {result.keywords_found.slice(0, 10).map((keyword: string, index: number) => (
-                    <span key={index} className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
-                      {keyword}
-                    </span>
-                  ))}
-                  {result.keywords_found.length > 10 && (
-                    <span className="text-sm text-blueberry/60 dark:text-apple-core/60">
-                      +{result.keywords_found.length - 10} more
-                    </span>
-                  )}
-                </div>
-              ) : (
-                <p className="text-blueberry/60 dark:text-apple-core/60">No keywords found.</p>
-              )}
-            </div>
-            <div>
-              <h3 className="font-semibold text-red-600 mb-3 flex items-center">
-                <XCircle className="h-4 w-4 mr-1" />
-                Missing Keywords ({result.keywords_missing?.length || 0})
-              </h3>
-              {result.keywords_missing && result.keywords_missing.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
-                  {result.keywords_missing.slice(0, 10).map((keyword: string, index: number) => (
-                    <span key={index} className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm">
-                      {keyword}
-                    </span>
-                  ))}
-                  {result.keywords_missing.length > 10 && (
-                    <span className="text-sm text-blueberry/60 dark:text-apple-core/60">
-                      +{result.keywords_missing.length - 10} more
-                    </span>
-                  )}
-                </div>
-              ) : (
-                <p className="text-blueberry/60 dark:text-apple-core/60">No missing keywords identified.</p>
-              )}
-            </div>
-          </div>
         </div>
       </div>
     </div>

@@ -149,7 +149,7 @@ serve(async (req) => {
       );
     }
 
-    // Enhanced comprehensive AI prompt
+    // Enhanced comprehensive AI prompt - removed keyword limits
     const prompt = `
 You are an expert CV analysis consultant with deep expertise in recruitment, ATS systems, and career development. Analyze this CV against the job description and provide a comprehensive evaluation report.
 
@@ -166,13 +166,15 @@ CRITICAL INSTRUCTIONS:
 - Provide a thorough, professional analysis suitable for career development.
 - Focus on actionable insights and specific recommendations.
 - Consider industry standards, ATS compatibility, and market expectations.
+- Return ALL relevant keywords found and missing - do not limit the number of keywords.
+- Provide comprehensive keyword analysis covering technical skills, soft skills, industry terms, and job-specific terminology.
 
 Required JSON structure:
 {
   "compatibilityScore": number (0-100),
   "executiveSummary": "Professional 3-4 sentence summary including overall compatibility percentage, match level (excellent/good/moderate/needs improvement), brief strengths/gaps overview, and position-specific context",
-  "strengths": ["strength1", "strength2", "strength3", "strength4"],
-  "weaknesses": ["area1", "area2", "area3", "area4"],
+  "strengths": ["strength1", "strength2", "strength3", "strength4", "strength5", "strength6"],
+  "weaknesses": ["area1", "area2", "area3", "area4", "area5", "area6"],
   "compatibilityBreakdown": [
     {
       "category": "Technical Skills & Experience",
@@ -207,8 +209,8 @@ Required JSON structure:
       "context": "Where found in CV or why it's missing and important"
     }
   ],
-  "keywordsFound": ["found keyword1", "found keyword2"],
-  "keywordsMissing": ["missing keyword1", "missing keyword2"],
+  "keywordsFound": ["ALL found keywords - include technical skills, soft skills, industry terms, certifications, methodologies, tools, frameworks, etc."],
+  "keywordsMissing": ["ALL missing important keywords from job description - include technical skills, soft skills, industry terms, certifications, methodologies, tools, frameworks, etc."],
   "priorityRecommendations": [
     {
       "title": "High-impact recommendation title",
@@ -227,48 +229,65 @@ Required JSON structure:
       "priority": 3,
       "actionItems": ["Specific action 1", "Specific action 2"],
       "example": "Implementation guidance"
+    },
+    {
+      "title": "ATS Optimization",
+      "priority": 4,
+      "actionItems": ["Specific action 1", "Specific action 2"],
+      "example": "Implementation guidance"
     }
   ],
   "skillsGapAnalysis": [
     {
       "category": "Technical Skills",
-      "missing": ["skill1", "skill2"],
-      "suggestions": ["Learn X through online courses", "Gain experience by volunteering for Y projects"]
+      "missing": ["skill1", "skill2", "skill3", "skill4"],
+      "suggestions": ["Learn X through online courses", "Gain experience by volunteering for Y projects", "Complete certification in Z"]
     },
     {
       "category": "Certifications",
-      "missing": ["cert1", "cert2"],
-      "suggestions": ["Pursue certification in X", "Complete training in Y"]
+      "missing": ["cert1", "cert2", "cert3"],
+      "suggestions": ["Pursue certification in X", "Complete training in Y", "Attend workshop on Z"]
+    },
+    {
+      "category": "Soft Skills",
+      "missing": ["skill1", "skill2"],
+      "suggestions": ["Develop X through practice", "Improve Y through training"]
     }
   ],
   "atsOptimization": [
-    "Use exact keywords from job description",
-    "Add specific technical skills section",
-    "Include quantifiable achievements",
-    "Optimize section headers for ATS scanning"
+    "Use exact keywords from job description throughout CV",
+    "Add comprehensive technical skills section with all relevant technologies",
+    "Include quantifiable achievements with specific metrics",
+    "Optimize section headers for ATS scanning (Skills, Experience, Education)",
+    "Use industry-standard terminology and acronyms",
+    "Add relevant certifications and training clearly",
+    "Format consistently for machine readability"
   ],
   "interviewPrep": [
-    "Prepare examples demonstrating X experience",
-    "Research company's Y initiatives",
-    "Practice explaining Z technical concepts",
-    "Prepare questions about team structure and growth"
+    "Prepare specific examples demonstrating X experience with quantifiable results",
+    "Research company's Y initiatives and recent developments",
+    "Practice explaining Z technical concepts in business terms",
+    "Prepare thoughtful questions about team structure, growth opportunities, and challenges",
+    "Review industry trends and how they impact this role",
+    "Prepare STAR method examples for key competencies",
+    "Research interviewer backgrounds and company culture"
   ],
-  "recommendations": ["Overall rec 1", "Overall rec 2", "Overall rec 3", "Overall rec 4"]
+  "recommendations": ["Overall comprehensive recommendation 1", "Overall comprehensive recommendation 2", "Overall comprehensive recommendation 3", "Overall comprehensive recommendation 4", "Overall comprehensive recommendation 5"]
 }
 
 Analysis Guidelines:
-1. **Executive Summary**: Include specific compatibility percentage, clear match level assessment, concise strengths/gaps summary, and role-specific context
-2. **Compatibility Breakdown**: Ensure weights total 100%. Provide detailed, actionable feedback for each category
-3. **Keyword Analysis**: Focus on both technical and soft skills. Consider frequency and context in job description for importance rating
+1. **Comprehensive Keyword Analysis**: Include ALL relevant keywords from the job description - technical skills, soft skills, industry terminology, tools, frameworks, methodologies, certifications, etc. Do not limit the number.
+2. **Executive Summary**: Include specific compatibility percentage, clear match level assessment, concise strengths/gaps summary, and role-specific context
+3. **Compatibility Breakdown**: Ensure weights total 100%. Provide detailed, actionable feedback for each category
 4. **Priority Recommendations**: Order by potential impact. Include specific, measurable action items with practical examples
-5. **Skills Gap Analysis**: Identify specific missing skills and provide concrete learning pathways
-6. **ATS Optimization**: Focus on practical formatting and keyword suggestions
-7. **Interview Prep**: Provide role-specific preparation strategies
-8. **Be specific and actionable**: Avoid generic advice. Tailor all feedback to the specific role and industry
-9. **Consider career level**: Adjust expectations and recommendations based on seniority level
-10. **Industry context**: Factor in industry-specific requirements and standards
+5. **Skills Gap Analysis**: Identify ALL missing skills across multiple categories and provide concrete learning pathways
+6. **ATS Optimization**: Focus on comprehensive formatting and keyword optimization strategies
+7. **Interview Prep**: Provide role-specific preparation strategies with actionable steps
+8. **Be comprehensive and actionable**: Provide detailed analysis covering all aspects. Tailor all feedback to the specific role and industry
+9. **Consider career level**: Adjust expectations and recommendations based on seniority level indicated in job description
+10. **Industry context**: Factor in industry-specific requirements and current market standards
 
-Ensure all feedback is professional, constructive, and focused on helping the candidate improve their application success.
+Ensure all feedback is professional, constructive, and focused on helping the candidate significantly improve their application success rate.
 `;
 
     console.log('Calling OpenAI API with enhanced comprehensive prompt...');
@@ -291,7 +310,7 @@ Ensure all feedback is professional, constructive, and focused on helping the ca
             messages: [
               {
                 role: 'system',
-                content: 'You are an expert CV consultant and career advisor. Always respond with valid JSON only, no additional text or formatting. Never use markdown code blocks. Provide comprehensive, actionable analysis.'
+                content: 'You are an expert CV consultant and career advisor. Always respond with valid JSON only, no additional text or formatting. Never use markdown code blocks. Provide comprehensive, actionable analysis with complete keyword coverage.'
               },
               {
                 role: 'user',
