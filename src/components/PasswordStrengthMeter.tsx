@@ -1,80 +1,91 @@
 
 import React from 'react';
+import { validatePassword } from '@/utils/passwordValidation';
 
 interface PasswordStrengthMeterProps {
   password: string;
 }
 
 const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({ password }) => {
-  const calculateStrength = (password: string): number => {
-    let score = 0;
-    if (password.length >= 8) score += 1;
-    if (/[a-z]/.test(password)) score += 1;
-    if (/[A-Z]/.test(password)) score += 1;
-    if (/[0-9]/.test(password)) score += 1;
-    if (/[^A-Za-z0-9]/.test(password)) score += 1;
-    return score;
+  const validation = validatePassword(password);
+  
+  const getStrengthColor = () => {
+    switch (validation.strength) {
+      case 'weak':
+        return 'bg-red-500';
+      case 'medium':
+        return 'bg-yellow-500';
+      case 'strong':
+        return 'bg-green-500';
+      default:
+        return 'bg-gray-300';
+    }
   };
 
-  const getStrengthText = (score: number): string => {
-    if (score === 0) return 'Enter a password';
-    if (score <= 2) return 'Weak';
-    if (score <= 3) return 'Fair';
-    if (score <= 4) return 'Good';
-    return 'Strong';
+  const getStrengthWidth = () => {
+    switch (validation.strength) {
+      case 'weak':
+        return 'w-1/3';
+      case 'medium':
+        return 'w-2/3';
+      case 'strong':
+        return 'w-full';
+      default:
+        return 'w-0';
+    }
   };
 
-  const getStrengthColor = (score: number): string => {
-    if (score === 0) return 'bg-gray-200';
-    if (score <= 2) return 'bg-red-500';
-    if (score <= 3) return 'bg-yellow-500';
-    if (score <= 4) return 'bg-blue-500';
-    return 'bg-green-500';
+  const getStrengthText = () => {
+    if (!password) return '';
+    switch (validation.strength) {
+      case 'weak':
+        return 'Weak';
+      case 'medium':
+        return 'Medium';
+      case 'strong':
+        return 'Strong';
+      default:
+        return '';
+    }
   };
-
-  const strength = calculateStrength(password);
-  const strengthText = getStrengthText(strength);
-  const strengthColor = getStrengthColor(strength);
 
   return (
-    <div className="mt-2">
-      <div className="flex justify-between items-center mb-1">
-        <span className="text-sm text-gray-600">Password strength:</span>
-        <span className={`text-sm font-medium ${
-          strength <= 2 ? 'text-red-600' : 
-          strength <= 3 ? 'text-yellow-600' : 
-          strength <= 4 ? 'text-blue-600' : 'text-green-600'
-        }`}>
-          {strengthText}
-        </span>
-      </div>
-      <div className="w-full bg-gray-200 rounded-full h-2">
-        <div 
-          className={`h-2 rounded-full transition-all duration-300 ${strengthColor}`}
-          style={{ width: `${(strength / 5) * 100}%` }}
-        ></div>
-      </div>
+    <div className="space-y-2">
       {password && (
-        <div className="mt-2 text-xs text-gray-600">
-          <p>Password should contain:</p>
-          <ul className="list-disc list-inside">
-            <li className={password.length >= 8 ? 'text-green-600' : 'text-gray-400'}>
-              At least 8 characters
-            </li>
-            <li className={/[a-z]/.test(password) ? 'text-green-600' : 'text-gray-400'}>
-              Lowercase letter
-            </li>
-            <li className={/[A-Z]/.test(password) ? 'text-green-600' : 'text-gray-400'}>
-              Uppercase letter
-            </li>
-            <li className={/[0-9]/.test(password) ? 'text-green-600' : 'text-gray-400'}>
-              Number
-            </li>
-            <li className={/[^A-Za-z0-9]/.test(password) ? 'text-green-600' : 'text-gray-400'}>
-              Special character
-            </li>
-          </ul>
-        </div>
+        <>
+          <div className="flex items-center space-x-2">
+            <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div 
+                className={`h-full transition-all duration-300 ${getStrengthColor()} ${getStrengthWidth()}`}
+              />
+            </div>
+            <span className={`text-sm font-medium ${
+              validation.strength === 'weak' ? 'text-red-600' :
+              validation.strength === 'medium' ? 'text-yellow-600' :
+              'text-green-600'
+            }`}>
+              {getStrengthText()}
+            </span>
+          </div>
+          
+          {validation.errors.length > 0 && (
+            <div className="space-y-1">
+              {validation.errors.map((error, index) => (
+                <p key={index} className="text-xs text-red-600 flex items-center">
+                  <span className="w-1 h-1 bg-red-600 rounded-full mr-2"></span>
+                  {error}
+                </p>
+              ))}
+            </div>
+          )}
+          
+          {validation.isValid && (
+            <p className="text-xs text-green-600 flex items-center">
+              <span className="w-1 h-1 bg-green-600 rounded-full mr-2"></span>
+              Password meets all requirements
+            </p>
+          )}
+        </>
       )}
     </div>
   );

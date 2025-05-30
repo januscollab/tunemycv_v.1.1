@@ -1,224 +1,290 @@
 
 import React, { useState } from 'react';
-import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
 import PasswordStrengthMeter from '@/components/PasswordStrengthMeter';
-
-type AuthMode = 'login' | 'register' | 'forgot-password';
-
-interface FormData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  acceptTerms: boolean;
-}
+import { validatePassword } from '@/utils/passwordValidation';
+import { sanitizeText, sanitizeEmail } from '@/utils/inputSanitization';
 
 interface AuthFormProps {
-  mode: AuthMode;
-  formData: FormData;
-  setFormData: (data: FormData) => void;
-  onSubmit: (e: React.FormEvent) => void;
-  loading: boolean;
-  rememberMe: boolean;
-  setRememberMe: (value: boolean) => void;
-  switchMode: (mode: AuthMode) => void;
+  mode: 'signin' | 'signup';
+  onModeChange: (mode: 'signin' | 'signup') => void;
 }
 
-const AuthForm: React.FC<AuthFormProps> = ({
-  mode,
-  formData,
-  setFormData,
-  onSubmit,
-  loading,
-  rememberMe,
-  setRememberMe,
-  switchMode
-}) => {
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+const AuthForm: React.FC<AuthFormProps> = ({ mode, onModeChange }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [showResetForm, setShowResetForm] = useState(false);
+  
+  const { signIn, signUp, resetPassword } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Sanitize inputs
+    const sanitizedEmail = sanitizeEmail(email);
+    const sanitizedFirstName = sanitizeText(firstName);
+    const sanitizedLastName = sanitizeText(lastName);
+
+    if (mode === 'signup') {
+      // Validate password strength
+      const passwordValidation = validatePassword(password);
+      if (!passwordValidation.isValid) {
+        toast({
+          title: 'Password Requirements Not Met',
+          description: passwordValidation.errors.join('\n'),
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        toast({
+          title: 'Error',
+          description: 'Passwords do not match',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      if (!sanitizedFirstName.trim() || !sanitizedLastName.trim()) {
+        toast({
+          title: 'Error',
+          description: 'First name and last name are required',
+          variant: 'destructive',
+        });
+        return;
+      }
+    }
+
+    setLoading(true);
+    try {
+      if (mode === 'signin') {
+        const { error } = await signIn(sanitizedEmail, password);
+        if (error) throw error;
+        navigate('/');
+      } else {
+        const { error } = await signUp(sanitizedEmail, password, sanitizedFirstName, sanitizedLastName);
+        if (error) throw error;
+        toast({
+          title: 'Success',
+          description: 'Please check your email to verify your account',
+        });
+      }
+    } catch (error: any) {
+      console.error('Auth error:', error);
+      toast({
+        title: 'Error',
+        description: error.message || 'An unexpected error occurred',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const sanitizedEmail = sanitizeEmail(email);
+    
+    if (!sanitizedEmail) {
+      toast({
+        title: 'Error',
+        description: 'Please enter your email address',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { error } = await resetPassword(sanitizedEmail);
+      if (error) throw error;
+      
+      toast({
+        title: 'Success',
+        description: 'Password reset email sent. Please check your inbox.',
+      });
+      setShowResetForm(false);
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to send reset email',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (showResetForm) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900">Reset Password</h2>
+          <p className="text-gray-600 mt-2">Enter your email to receive a reset link</p>
+        </div>
+        
+        <form onSubmit={handleResetPassword} className="space-y-4">
+          <div>
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="mt-1"
+              maxLength={254}
+            />
+          </div>
+          
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? 'Sending...' : 'Send Reset Email'}
+          </Button>
+          
+          <Button
+            type="button"
+            variant="ghost"
+            className="w-full"
+            onClick={() => setShowResetForm(false)}
+          >
+            Back to Sign In
+          </Button>
+        </form>
+      </div>
+    );
+  }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-6">
-      {mode === 'register' && (
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
-              First Name
-            </label>
-            <div className="relative">
-              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-              <input
-                id="firstName"
-                type="text"
-                required
-                value={formData.firstName}
-                onChange={(e) => setFormData({...formData, firstName: e.target.value})}
-                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="First name"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
-              Last Name
-            </label>
-            <div className="relative">
-              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-              <input
-                id="lastName"
-                type="text"
-                required
-                value={formData.lastName}
-                onChange={(e) => setFormData({...formData, lastName: e.target.value})}
-                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Last name"
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-          Email Address
-        </label>
-        <div className="relative">
-          <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-          <input
-            id="email"
-            type="email"
-            required
-            value={formData.email}
-            onChange={(e) => setFormData({...formData, email: e.target.value})}
-            className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Enter your email"
-          />
-        </div>
+    <div className="space-y-6">
+      <div className="text-center">
+        <h2 className="text-2xl font-bold text-gray-900">
+          {mode === 'signin' ? 'Sign In' : 'Create Account'}
+        </h2>
+        <p className="text-gray-600 mt-2">
+          {mode === 'signin' 
+            ? 'Welcome back! Please sign in to your account.' 
+            : 'Join us today and start optimizing your CV.'
+          }
+        </p>
       </div>
 
-      {mode !== 'forgot-password' && (
-        <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-            Password
-          </label>
-          <div className="relative">
-            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-            <input
-              id="password"
-              type={showPassword ? 'text' : 'password'}
-              required
-              value={formData.password}
-              onChange={(e) => setFormData({...formData, password: e.target.value})}
-              className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder={mode === 'register' ? 'Create a password' : 'Enter your password'}
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-            >
-              {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-            </button>
-          </div>
-          {mode === 'register' && <PasswordStrengthMeter password={formData.password} />}
-        </div>
-      )}
-
-      {mode === 'register' && (
-        <div>
-          <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
-            Confirm Password
-          </label>
-          <div className="relative">
-            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-            <input
-              id="confirmPassword"
-              type={showConfirmPassword ? 'text' : 'password'}
-              required
-              value={formData.confirmPassword}
-              onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
-              className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Confirm your password"
-            />
-            <button
-              type="button"
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-            >
-              {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-            </button>
-          </div>
-        </div>
-      )}
-
-      {mode === 'login' && (
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <input
-              id="remember-me"
-              type="checkbox"
-              checked={rememberMe}
-              onChange={(e) => setRememberMe(e.target.checked)}
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-            />
-            <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
-              Remember me
-            </label>
-          </div>
-          <button
-            type="button"
-            onClick={() => switchMode('forgot-password')}
-            className="text-sm text-blue-600 hover:text-blue-700"
-          >
-            Forgot password?
-          </button>
-        </div>
-      )}
-
-      {mode === 'register' && (
-        <div className="flex items-center">
-          <input
-            id="terms"
-            type="checkbox"
-            checked={formData.acceptTerms}
-            onChange={(e) => setFormData({...formData, acceptTerms: e.target.checked})}
-            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-          />
-          <label htmlFor="terms" className="ml-2 block text-sm text-gray-700">
-            I agree to the{' '}
-            <Link to="/terms" className="text-blue-600 hover:text-blue-700">
-              Terms of Service
-            </Link>{' '}
-            and{' '}
-            <Link to="/privacy" className="text-blue-600 hover:text-blue-700">
-              Privacy Policy
-            </Link>
-          </label>
-        </div>
-      )}
-
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {loading ? (
-          <div className="flex items-center justify-center">
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-            Processing...
-          </div>
-        ) : (
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {mode === 'signup' && (
           <>
-            {mode === 'login' && 'Sign In'}
-            {mode === 'register' && 'Create Account'}
-            {mode === 'forgot-password' && 'Send Reset Email'}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="firstName">First Name</Label>
+                <Input
+                  id="firstName"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  required
+                  className="mt-1"
+                  maxLength={50}
+                />
+              </div>
+              <div>
+                <Label htmlFor="lastName">Last Name</Label>
+                <Input
+                  id="lastName"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  required
+                  className="mt-1"
+                  maxLength={50}
+                />
+              </div>
+            </div>
           </>
         )}
-      </button>
-    </form>
+
+        <div>
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="mt-1"
+            maxLength={254}
+          />
+        </div>
+
+        <div>
+          <Label htmlFor="password">Password</Label>
+          <Input
+            id="password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className="mt-1"
+            maxLength={128}
+          />
+          {mode === 'signup' && password && (
+            <div className="mt-2">
+              <PasswordStrengthMeter password={password} />
+            </div>
+          )}
+        </div>
+
+        {mode === 'signup' && (
+          <div>
+            <Label htmlFor="confirmPassword">Confirm Password</Label>
+            <Input
+              id="confirmPassword"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              className="mt-1"
+              maxLength={128}
+            />
+          </div>
+        )}
+
+        <Button type="submit" className="w-full" disabled={loading}>
+          {loading ? 'Processing...' : (mode === 'signin' ? 'Sign In' : 'Create Account')}
+        </Button>
+
+        {mode === 'signin' && (
+          <Button
+            type="button"
+            variant="ghost"
+            className="w-full text-sm"
+            onClick={() => setShowResetForm(true)}
+          >
+            Forgot your password?
+          </Button>
+        )}
+      </form>
+
+      <div className="text-center">
+        <button
+          type="button"
+          onClick={() => onModeChange(mode === 'signin' ? 'signup' : 'signin')}
+          className="text-sm text-blue-600 hover:text-blue-500"
+        >
+          {mode === 'signin' 
+            ? "Don't have an account? Sign up" 
+            : 'Already have an account? Sign in'
+          }
+        </button>
+      </div>
+    </div>
   );
 };
 
