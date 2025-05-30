@@ -30,7 +30,7 @@ const UserManagement = () => {
 
   const loadUsers = async () => {
     try {
-      // Get all users from auth.users via profiles table
+      // Get users with their profiles, credits, and analysis data
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
         .select(`
@@ -77,7 +77,6 @@ const UserManagement = () => {
         };
       }) || [];
 
-      console.log('Loaded users:', usersWithStats.length);
       setUsers(usersWithStats);
     } catch (error) {
       console.error('Error loading users:', error);
@@ -177,12 +176,6 @@ const UserManagement = () => {
             ))}
           </TableBody>
         </Table>
-
-        {filteredUsers.length === 0 && (
-          <div className="text-center py-8 text-gray-500">
-            {searchTerm ? 'No users found matching your search.' : 'No users found.'}
-          </div>
-        )}
       </div>
 
       {selectedUser && (
