@@ -13,7 +13,7 @@ import LegacySummarySection from './components/LegacySummarySection';
 import LegacyCompatibilitySection from './components/LegacyCompatibilitySection';
 import LegacyKeywordSection from './components/LegacyKeywordSection';
 import PriorityRecommendationsSection from './components/PriorityRecommendationsSection';
-import VisualPDFGenerator from './utils/VisualPDFGenerator';
+import PDFGenerator from './utils/PDFGenerator';
 
 interface AnalysisResultsProps {
   result: any;
@@ -36,14 +36,14 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
   const position = result.position || result.job_title || 'the Position';
   const compatibilityScore = result.compatibilityScore || result.compatibility_score || 0;
 
-  const downloadPDF = async () => {
-    const pdfGenerator = new VisualPDFGenerator();
-    await pdfGenerator.generateVisualPDF(result, companyName, position);
+  const downloadPDF = () => {
+    const pdfGenerator = new PDFGenerator();
+    pdfGenerator.generatePDF(result);
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-apple-core/20 via-white to-citrus/10 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
-      <div className="max-w-6xl mx-auto px-4 py-8" id="analysis-content">
+      <div className="max-w-6xl mx-auto px-4 py-8">
         <AnalysisHeader onStartNew={onStartNew} onDownloadPDF={downloadPDF} />
 
         {/* Dynamic heading based on company and position */}
@@ -96,18 +96,15 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
               <PriorityRecommendationsSection recommendations={result.priorityRecommendations} />
             )}
 
-            {/* Side-by-Side Layout for Desktop: Compatibility Breakdown + Keyword Analysis */}
-            <div className="grid lg:grid-cols-2 gap-8">
-              {/* Compatibility Breakdown */}
-              {result.compatibilityBreakdown && (
-                <CompatibilityBreakdownSection compatibilityBreakdown={result.compatibilityBreakdown} />
-              )}
+            {/* Compatibility Breakdown */}
+            {result.compatibilityBreakdown && (
+              <CompatibilityBreakdownSection compatibilityBreakdown={result.compatibilityBreakdown} />
+            )}
 
-              {/* Keyword Analysis */}
-              {result.keywordAnalysis && (
-                <EnhancedKeywordAnalysis keywordAnalysis={result.keywordAnalysis} />
-              )}
-            </div>
+            {/* Keyword Analysis */}
+            {result.keywordAnalysis && (
+              <EnhancedKeywordAnalysis keywordAnalysis={result.keywordAnalysis} />
+            )}
 
             {/* Skills Gap Analysis */}
             {result.skillsGapAnalysis && (

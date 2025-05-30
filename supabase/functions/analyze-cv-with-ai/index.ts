@@ -192,16 +192,15 @@ serve(async (req) => {
       );
     }
 
-    // Enhanced comprehensive AI prompt with CV improvement suggestions and learning resources
+    // Simplified comprehensive AI prompt focused on core analysis
     const prompt = `
-You are a senior career consultant and CV optimization expert. Analyze the CV against the job description and provide detailed insights with specific improvement suggestions and learning resources.
+You are a senior career consultant and CV optimization expert. Analyze the CV against the job description and provide detailed insights.
 
 CRITICAL REQUIREMENTS:
 1. Provide 3-7 detailed items for each analysis section
-2. Include specific CV improvement text suggestions for missing items
-3. Generate actual learning resources with real URLs when possible
-4. Extract 20-30 relevant keywords from the job description
-5. Respond ONLY with valid JSON in the exact structure below
+2. Be thorough and comprehensive - this is professional career consulting
+3. Respond ONLY with valid JSON in the exact structure below
+4. Extract 15-25+ relevant keywords from the job description
 
 CV TO ANALYZE:
 ${cvText}
@@ -239,41 +238,36 @@ RESPOND WITH ANALYSIS IN THIS EXACT JSON STRUCTURE:
       "score": 0-100,
       "present": ["Technical skills found in CV"],
       "missing": ["Required technical skills missing"],
-      "analysis": "Detailed analysis of technical alignment",
-      "suggestions": ["Specific text to add to CV for each missing skill"]
+      "analysis": "Detailed analysis of technical alignment"
     },
     "experience": {
       "score": 0-100,
       "relevantExperience": ["Relevant experience from CV"],
       "missingExperience": ["Required experience missing"],
-      "analysis": "Analysis of experience match",
-      "suggestions": ["Specific experience descriptions to add to CV"]
+      "analysis": "Analysis of experience match"
     },
     "education": {
       "score": 0-100,
       "relevantQualifications": ["Relevant qualifications"],
       "missingQualifications": ["Missing qualifications"],
-      "analysis": "Educational background analysis",
-      "suggestions": ["How to present education/certifications in CV"]
+      "analysis": "Educational background analysis"
     },
     "softSkills": {
       "score": 0-100,
       "present": ["Soft skills demonstrated"],
       "missing": ["Required soft skills missing"],
-      "analysis": "Soft skills assessment",
-      "suggestions": ["Examples of how to demonstrate soft skills in CV"]
+      "analysis": "Soft skills assessment"
     },
     "industryKnowledge": {
       "score": 0-100,
       "present": ["Industry knowledge areas"],
       "missing": ["Missing industry knowledge"],
-      "analysis": "Industry expertise analysis",
-      "suggestions": ["Industry-specific terms and knowledge to include"]
+      "analysis": "Industry expertise analysis"
     }
   },
   "keywordAnalysis": {
-    "totalKeywords": 20-30,
-    "matchedKeywords": 0-30,
+    "totalKeywords": 15-25,
+    "matchedKeywords": 0-25,
     "keywordMatchPercentage": 0-100,
     "keywords": [
       {
@@ -281,8 +275,8 @@ RESPOND WITH ANALYSIS IN THIS EXACT JSON STRUCTURE:
         "found": true/false,
         "importance": "high/medium/low",
         "occurrences": 0,
-        "context": "Why this keyword is important for the role",
-        "suggestion": "Specific advice on how to incorporate or optimize this keyword"
+        "context": "Context and importance",
+        "suggestion": "How to incorporate/optimize"
       }
     ]
   },
@@ -292,7 +286,7 @@ RESPOND WITH ANALYSIS IN THIS EXACT JSON STRUCTURE:
       "description": "Comprehensive explanation and rationale",
       "priority": "high/medium/low",
       "impact": "Expected impact description",
-      "sampleText": "Ready-to-use text example for CV"
+      "sampleText": "Ready-to-use text example"
     }
   ],
   "skillsGapAnalysis": {
@@ -301,17 +295,7 @@ RESPOND WITH ANALYSIS IN THIS EXACT JSON STRUCTURE:
         "skill": "Critical skill missing",
         "importance": "high/medium/low",
         "description": "Why this skill is essential",
-        "bridgingStrategy": "How to acquire this skill",
-        "learningResources": [
-          {
-            "title": "Course or resource name",
-            "provider": "Platform or institution",
-            "url": "Actual URL when possible",
-            "type": "course/certification/documentation/book",
-            "duration": "Time estimate",
-            "level": "beginner/intermediate/advanced"
-          }
-        ]
+        "bridgingStrategy": "How to acquire this skill"
       }
     ],
     "developmentAreas": [
@@ -319,33 +303,21 @@ RESPOND WITH ANALYSIS IN THIS EXACT JSON STRUCTURE:
         "area": "Development area",
         "description": "Development opportunity explanation",
         "relevance": "Relevance to role success",
-        "actionPlan": "Specific development plan",
-        "learningResources": [
-          {
-            "title": "Learning resource",
-            "provider": "Provider name",
-            "url": "Resource URL",
-            "type": "course/certification/documentation/book",
-            "duration": "Estimated duration",
-            "level": "difficulty level"
-          }
-        ]
+        "actionPlan": "Specific development plan"
       }
     ]
   }
 }
 
-SPECIFIC INSTRUCTIONS:
+INSTRUCTIONS:
 - RESPOND ONLY WITH VALID JSON
 - PROVIDE 3-7 ITEMS for strengths, weaknesses, recommendations, critical gaps, and development areas
-- EXTRACT 20-30+ KEYWORDS with strategic importance (include both found and missing)
-- INCLUDE SPECIFIC CV TEXT SUGGESTIONS for missing items
-- PROVIDE REAL LEARNING RESOURCES with actual URLs when possible (Coursera, LinkedIn Learning, AWS, Google, Microsoft, etc.)
+- EXTRACT 15-25+ KEYWORDS with strategic importance
 - FOCUS ON ACTIONABLE INSIGHTS with specific evidence
 - MAINTAIN PROFESSIONAL TONE while being honest about gaps
 `;
 
-    console.log('Calling OpenAI API with enhanced prompt...');
+    console.log('Calling OpenAI API with simplified prompt...');
 
     // Call OpenAI API with retry logic
     let openAIResponse;
@@ -365,7 +337,7 @@ SPECIFIC INSTRUCTIONS:
             messages: [
               {
                 role: 'system',
-                content: 'You are a senior career consultant providing comprehensive CV analysis with specific improvement suggestions and learning resources. Always respond with valid JSON only, no additional text.'
+                content: 'You are a senior career consultant providing comprehensive CV analysis. Always respond with valid JSON only, no additional text.'
               },
               {
                 role: 'user',
@@ -373,7 +345,7 @@ SPECIFIC INSTRUCTIONS:
               }
             ],
             temperature: 0.2,
-            max_tokens: 8000,
+            max_tokens: 6000,
             response_format: { type: "json_object" }
           }),
         });
