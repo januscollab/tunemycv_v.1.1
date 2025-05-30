@@ -35,6 +35,14 @@ const Navigation = () => {
     { path: '/resources', label: 'Resources', icon: BookOpen },
   ];
 
+  const getUserDisplayName = () => {
+    if (user?.user_metadata?.first_name) {
+      return user.user_metadata.first_name;
+    }
+    // Fallback to email username if no first name
+    return user?.email?.split('@')[0] || 'User';
+  };
+
   return (
     <nav className="bg-white dark:bg-blueberry shadow-sm border-b border-apple-core/30 dark:border-citrus/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -86,6 +94,9 @@ const Navigation = () => {
                     Admin
                   </Link>
                 )}
+                <span className="text-sm text-blueberry dark:text-apple-core">
+                  Welcome, {getUserDisplayName()}
+                </span>
                 <div className="relative">
                   <button
                     onClick={() => setShowProfileMenu(!showProfileMenu)}
@@ -166,6 +177,11 @@ const Navigation = () => {
               
               {user ? (
                 <>
+                  {user && (
+                    <div className="px-3 py-2 text-sm text-blueberry dark:text-apple-core">
+                      Welcome, {getUserDisplayName()}
+                    </div>
+                  )}
                   {isAdmin && (
                     <Link
                       to="/admin"

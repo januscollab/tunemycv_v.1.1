@@ -55,7 +55,7 @@ const HowItWorks = () => {
     <section id="how-it-works" className="py-20 px-4 bg-white dark:bg-gray-900">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-blueberry dark:text-citrus mb-4">
+          <h2 className="text-4xl font-bold text-apricot dark:text-citrus mb-4">
             How TuneMyCV Works
           </h2>
           <p className="text-xl text-blueberry/80 dark:text-apple-core max-w-3xl mx-auto">
@@ -70,7 +70,7 @@ const HowItWorks = () => {
                 <div className="bg-gradient-to-br from-citrus/20 to-apricot/20 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6 border border-citrus/30">
                   <step.icon className="h-10 w-10 text-apricot" />
                 </div>
-                <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mb-4">
+                <h3 className="text-xl font-semibold text-apricot dark:text-citrus mb-4">
                   {step.title}
                 </h3>
                 <p className="text-blueberry/70 dark:text-apple-core/80 leading-relaxed">

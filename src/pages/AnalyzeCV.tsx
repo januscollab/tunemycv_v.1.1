@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Upload, FileText, Briefcase, Check, X, Eye, BarChart3, Download, Zap, CreditCard } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -72,6 +73,12 @@ const AnalyzeCV = () => {
         [type === 'cv' ? 'cv' : 'jobDescription']: uploadedFile
       }));
 
+      // Auto-extract job title from job description
+      if (type === 'job_description' && !jobTitle) {
+        const extractedJobTitle = extractJobTitleFromText(extractedText);
+        setJobTitle(extractedJobTitle);
+      }
+
       toast({ title: 'Success', description: `${type === 'cv' ? 'CV' : 'Job description'} uploaded successfully!` });
     } catch (error) {
       toast({ title: 'Error', description: 'Failed to process file', variant: 'destructive' });
@@ -98,6 +105,12 @@ const AnalyzeCV = () => {
       jobDescription: uploadedFile
     }));
 
+    // Auto-extract job title from job description
+    if (!jobTitle) {
+      const extractedJobTitle = extractJobTitleFromText(text);
+      setJobTitle(extractedJobTitle);
+    }
+
     toast({ title: 'Success', description: 'Job description added successfully!' });
   };
 
@@ -118,6 +131,9 @@ const AnalyzeCV = () => {
     try {
       setAnalyzing(true);
 
+      // Extract job title if not provided
+      const finalJobTitle = jobTitle || extractJobTitleFromText(uploadedFiles.jobDescription.extractedText);
+
       // Save files to database first
       const { data: cvUpload, error: cvError } = await supabase
         .from('uploads')
@@ -128,7 +144,7 @@ const AnalyzeCV = () => {
           file_size: uploadedFiles.cv.file.size,
           upload_type: 'cv',
           extracted_text: uploadedFiles.cv.extractedText,
-          job_title: jobTitle || null
+          job_title: finalJobTitle
         })
         .select()
         .single();
@@ -144,7 +160,7 @@ const AnalyzeCV = () => {
           file_size: uploadedFiles.jobDescription.file.size,
           upload_type: 'job_description',
           extracted_text: uploadedFiles.jobDescription.extractedText,
-          job_title: jobTitle || null
+          job_title: finalJobTitle
         })
         .select()
         .single();
@@ -161,7 +177,7 @@ const AnalyzeCV = () => {
             body: {
               cvText: uploadedFiles.cv.extractedText,
               jobDescriptionText: uploadedFiles.jobDescription.extractedText,
-              jobTitle: jobTitle || extractJobTitleFromText(uploadedFiles.jobDescription.extractedText),
+              jobTitle: finalJobTitle,
               userId: user?.id
             }
           });
@@ -176,7 +192,7 @@ const AnalyzeCV = () => {
               user_id: user?.id,
               cv_upload_id: cvUpload.id,
               job_description_upload_id: jobUpload.id,
-              job_title: jobTitle || extractJobTitleFromText(uploadedFiles.jobDescription.extractedText),
+              job_title: finalJobTitle,
               company_name: extractCompanyFromText(uploadedFiles.jobDescription.extractedText),
               compatibility_score: aiAnalysis.compatibilityScore,
               keywords_found: aiAnalysis.keywordsFound,
@@ -207,11 +223,11 @@ const AnalyzeCV = () => {
           });
           
           // Fall back to basic analysis
-          analysisData = await performBasicAnalysis(cvUpload, jobUpload);
+          analysisData = await performBasicAnalysis(cvUpload, jobUpload, finalJobTitle);
         }
       } else {
         // Use basic analysis
-        analysisData = await performBasicAnalysis(cvUpload, jobUpload);
+        analysisData = await performBasicAnalysis(cvUpload, jobUpload, finalJobTitle);
       }
 
       // Save analysis results
@@ -234,7 +250,7 @@ const AnalyzeCV = () => {
     }
   };
 
-  const performBasicAnalysis = async (cvUpload: any, jobUpload: any) => {
+  const performBasicAnalysis = async (cvUpload: any, jobUpload: any, finalJobTitle: string) => {
     const cvText = uploadedFiles.cv!.extractedText.toLowerCase();
     const jobText = uploadedFiles.jobDescription!.extractedText.toLowerCase();
 
@@ -246,14 +262,13 @@ const AnalyzeCV = () => {
 
     const compatibilityScore = Math.round((matchingTerms.length / keyTerms.length) * 100);
 
-    const extractedJobTitle = jobTitle || extractJobTitleFromText(uploadedFiles.jobDescription!.extractedText);
     const extractedCompany = extractCompanyFromText(uploadedFiles.jobDescription!.extractedText);
 
     return {
       user_id: user?.id,
       cv_upload_id: cvUpload.id,
       job_description_upload_id: jobUpload.id,
-      job_title: extractedJobTitle,
+      job_title: finalJobTitle,
       company_name: extractedCompany,
       compatibility_score: compatibilityScore,
       keywords_found: matchingTerms.slice(0, 10),
@@ -261,7 +276,7 @@ const AnalyzeCV = () => {
       strengths: generateStrengths(matchingTerms, compatibilityScore),
       weaknesses: generateWeaknesses(missingTerms, compatibilityScore),
       recommendations: generateRecommendations(missingTerms, compatibilityScore),
-      executive_summary: generateExecutiveSummary(compatibilityScore, extractedJobTitle),
+      executive_summary: generateExecutiveSummary(compatibilityScore, finalJobTitle),
       analysis_type: 'basic'
     };
   };
@@ -334,168 +349,70 @@ const AnalyzeCV = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 py-12">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Analyze Your CV</h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Upload your CV and job description to get instant compatibility analysis with actionable recommendations.
-          </p>
-          
-          {/* Credits and Analysis Type Selection */}
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-            <div className="flex items-center justify-center space-x-4 mb-4">
-              <div className="flex items-center space-x-2">
-                <CreditCard className="h-5 w-5 text-blue-600" />
-                <span className="text-blue-900 font-medium">
-                  Credits: {userCredits?.credits || 0}
-                </span>
-              </div>
-            </div>
-            
-            <div className="flex items-center justify-center space-x-6">
-              <label className="flex items-center space-x-2">
-                <input
-                  type="radio"
-                  checked={useAI && hasCreditsForAI}
-                  onChange={() => setUseAI(true)}
-                  disabled={!hasCreditsForAI}
-                  className="text-blue-600"
-                />
-                <div className="flex items-center space-x-2">
-                  <Zap className="h-4 w-4 text-yellow-500" />
-                  <span className={hasCreditsForAI ? 'text-gray-900' : 'text-gray-400'}>
-                    AI Analysis (1 credit)
-                  </span>
-                </div>
-              </label>
-              
-              <label className="flex items-center space-x-2">
-                <input
-                  type="radio"
-                  checked={!useAI || !hasCreditsForAI}
-                  onChange={() => setUseAI(false)}
-                  className="text-blue-600"
-                />
-                <div className="flex items-center space-x-2">
-                  <BarChart3 className="h-4 w-4 text-blue-500" />
-                  <span className="text-gray-900">Basic Analysis (Free)</span>
-                </div>
-              </label>
-            </div>
-            
-            {!hasCreditsForAI && (
-              <p className="text-sm text-orange-600 mt-2">
-                No credits available for AI analysis. Using basic analysis.
+      <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 lg:grid-cols-4 gap-8">
+        {/* Main Analysis Section */}
+        <div className="lg:col-span-3">
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">Analyze Your CV</h1>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Upload your CV and job description to get instant compatibility analysis with actionable recommendations.
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            {/* Job Title */}
+            <div className="bg-white rounded-lg shadow p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Job Title</h3>
+              <input
+                type="text"
+                value={jobTitle}
+                onChange={(e) => setJobTitle(e.target.value)}
+                placeholder="e.g., Senior Software Engineer (auto-extracted from job description)"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              <p className="text-sm text-gray-500 mt-2">
+                Job title will be automatically extracted from the job description if not provided.
               </p>
-            )}
-          </div>
-        </div>
+            </div>
 
-        <div className="space-y-6">
-          {/* Job Title */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Job Title (Optional)</h3>
-            <input
-              type="text"
-              value={jobTitle}
-              onChange={(e) => setJobTitle(e.target.value)}
-              placeholder="e.g., Senior Software Engineer"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-
-          {/* CV Upload */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Upload Your CV</h3>
-            <p className="text-sm text-gray-600 mb-4">Supported formats: PDF, DOCX (Max 5MB)</p>
-            
-            {!uploadedFiles.cv ? (
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                <FileText className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                <label className="cursor-pointer">
-                  <span className="text-blue-600 hover:text-blue-700 font-medium">Click to upload</span>
-                  <span className="text-gray-600"> or drag and drop your CV</span>
-                  <input
-                    type="file"
-                    className="hidden"
-                    accept=".pdf,.docx"
-                    onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0], 'cv')}
-                    disabled={uploading}
-                  />
-                </label>
-              </div>
-            ) : (
-              <div className="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <Check className="h-5 w-5 text-green-600" />
-                  <div>
-                    <p className="font-medium text-green-900">{uploadedFiles.cv.file.name}</p>
-                    <p className="text-sm text-green-700">{formatFileSize(uploadedFiles.cv.file.size)}</p>
-                  </div>
+            {/* CV Upload */}
+            <div className="bg-white rounded-lg shadow p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Upload Your CV</h3>
+              <p className="text-sm text-gray-600 mb-4">Supported formats: PDF, DOCX (Max 5MB)</p>
+              
+              {!uploadedFiles.cv ? (
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                  <FileText className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                  <label className="cursor-pointer">
+                    <span className="text-blue-600 hover:text-blue-700 font-medium">Click to upload</span>
+                    <span className="text-gray-600"> or drag and drop your CV</span>
+                    <input
+                      type="file"
+                      className="hidden"
+                      accept=".pdf,.docx"
+                      onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0], 'cv')}
+                      disabled={uploading}
+                    />
+                  </label>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => setShowPreview(showPreview === 'cv' ? null : 'cv')}
-                    className="p-2 text-green-600 hover:bg-green-100 rounded-md"
-                  >
-                    <Eye className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => removeFile('cv')}
-                    className="p-2 text-red-600 hover:bg-red-100 rounded-md"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Job Description Upload */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Job Description</h3>
-            <p className="text-sm text-gray-600 mb-4">Upload a file (PDF, DOCX, TXT) or paste the text directly</p>
-            
-            <div className="space-y-4">
-              {!uploadedFiles.jobDescription ? (
-                <>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                    <Briefcase className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                    <label className="cursor-pointer">
-                      <span className="text-blue-600 hover:text-blue-700 font-medium">Click to upload</span>
-                      <span className="text-gray-600"> job description file</span>
-                      <input
-                        type="file"
-                        className="hidden"
-                        accept=".pdf,.docx,.txt"
-                        onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0], 'job_description')}
-                        disabled={uploading}
-                      />
-                    </label>
-                  </div>
-                  
-                  <div className="text-center text-gray-500">or</div>
-                  
-                  <JobDescriptionTextInput onSubmit={handleJobDescriptionText} disabled={uploading} />
-                </>
               ) : (
                 <div className="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
                   <div className="flex items-center space-x-3">
                     <Check className="h-5 w-5 text-green-600" />
                     <div>
-                      <p className="font-medium text-green-900">{uploadedFiles.jobDescription.file.name}</p>
-                      <p className="text-sm text-green-700">{formatFileSize(uploadedFiles.jobDescription.file.size)}</p>
+                      <p className="font-medium text-green-900">{uploadedFiles.cv.file.name}</p>
+                      <p className="text-sm text-green-700">{formatFileSize(uploadedFiles.cv.file.size)}</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
                     <button
-                      onClick={() => setShowPreview(showPreview === 'jobDescription' ? null : 'jobDescription')}
+                      onClick={() => setShowPreview(showPreview === 'cv' ? null : 'cv')}
                       className="p-2 text-green-600 hover:bg-green-100 rounded-md"
                     >
                       <Eye className="h-4 w-4" />
                     </button>
                     <button
-                      onClick={() => removeFile('jobDescription')}
+                      onClick={() => removeFile('cv')}
                       className="p-2 text-red-600 hover:bg-red-100 rounded-md"
                     >
                       <X className="h-4 w-4" />
@@ -504,60 +421,182 @@ const AnalyzeCV = () => {
                 </div>
               )}
             </div>
-          </div>
 
-          {/* Preview */}
-          {showPreview && (
+            {/* Job Description Upload */}
             <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Preview: {showPreview === 'cv' ? 'CV' : 'Job Description'}
-              </h3>
-              <div className="bg-gray-50 rounded-md p-4 max-h-64 overflow-y-auto">
-                <pre className="whitespace-pre-wrap text-sm text-gray-700">
-                  {showPreview === 'cv' ? uploadedFiles.cv?.extractedText : uploadedFiles.jobDescription?.extractedText}
-                </pre>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Job Description</h3>
+              <p className="text-sm text-gray-600 mb-4">Upload a file (PDF, DOCX, TXT) or paste the text directly</p>
+              
+              <div className="space-y-4">
+                {!uploadedFiles.jobDescription ? (
+                  <>
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                      <Briefcase className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                      <label className="cursor-pointer">
+                        <span className="text-blue-600 hover:text-blue-700 font-medium">Click to upload</span>
+                        <span className="text-gray-600"> job description file</span>
+                        <input
+                          type="file"
+                          className="hidden"
+                          accept=".pdf,.docx,.txt"
+                          onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0], 'job_description')}
+                          disabled={uploading}
+                        />
+                      </label>
+                    </div>
+                    
+                    <div className="text-center text-gray-500">or</div>
+                    
+                    <JobDescriptionTextInput onSubmit={handleJobDescriptionText} disabled={uploading} />
+                  </>
+                ) : (
+                  <div className="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <Check className="h-5 w-5 text-green-600" />
+                      <div>
+                        <p className="font-medium text-green-900">{uploadedFiles.jobDescription.file.name}</p>
+                        <p className="text-sm text-green-700">{formatFileSize(uploadedFiles.jobDescription.file.size)}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => setShowPreview(showPreview === 'jobDescription' ? null : 'jobDescription')}
+                        className="p-2 text-green-600 hover:bg-green-100 rounded-md"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => removeFile('jobDescription')}
+                        className="p-2 text-red-600 hover:bg-red-100 rounded-md"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
-          )}
 
-          {/* Analyze Button */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <button
-              onClick={performAnalysis}
-              disabled={!canAnalyze || analyzing}
-              className={`w-full py-3 px-4 rounded-md font-medium transition-colors ${
-                canAnalyze && !analyzing
-                  ? 'bg-blue-600 text-white hover:bg-blue-700'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              }`}
-            >
-              {analyzing ? (
-                <div className="flex items-center justify-center space-x-2">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  <span>
-                    {useAI && hasCreditsForAI ? 'Running AI Analysis...' : 'Analyzing CV...'}
-                  </span>
+            {/* Preview */}
+            {showPreview && (
+              <div className="bg-white rounded-lg shadow p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Preview: {showPreview === 'cv' ? 'CV' : 'Job Description'}
+                </h3>
+                <div className="bg-gray-50 rounded-md p-4 max-h-64 overflow-y-auto">
+                  <pre className="whitespace-pre-wrap text-sm text-gray-700">
+                    {showPreview === 'cv' ? uploadedFiles.cv?.extractedText : uploadedFiles.jobDescription?.extractedText}
+                  </pre>
                 </div>
-              ) : (
-                <div className="flex items-center justify-center space-x-2">
-                  {useAI && hasCreditsForAI ? (
-                    <>
-                      <Zap className="h-4 w-4" />
-                      <span>Analyze with AI (1 credit)</span>
-                    </>
-                  ) : (
-                    <>
-                      <BarChart3 className="h-4 w-4" />
-                      <span>Analyze CV Compatibility</span>
-                    </>
-                  )}
-                </div>
+              </div>
+            )}
+
+            {/* Analyze Button */}
+            <div className="bg-white rounded-lg shadow p-6">
+              <button
+                onClick={performAnalysis}
+                disabled={!canAnalyze || analyzing}
+                className={`w-full py-3 px-4 rounded-md font-medium transition-colors ${
+                  canAnalyze && !analyzing
+                    ? 'bg-blue-600 text-white hover:bg-blue-700'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                {analyzing ? (
+                  <div className="flex items-center justify-center space-x-2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    <span>
+                      {useAI && hasCreditsForAI ? 'Running AI Analysis...' : 'Analyzing CV...'}
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center space-x-2">
+                    {useAI && hasCreditsForAI ? (
+                      <>
+                        <Zap className="h-4 w-4" />
+                        <span>Analyze with AI (1 credit)</span>
+                      </>
+                    ) : (
+                      <>
+                        <BarChart3 className="h-4 w-4" />
+                        <span>Analyze CV Compatibility</span>
+                      </>
+                    )}
+                  </div>
+                )}
+              </button>
+              {!canAnalyze && (
+                <p className="text-sm text-gray-500 text-center mt-2">
+                  Please upload both CV and job description to proceed
+                </p>
               )}
-            </button>
-            {!canAnalyze && (
-              <p className="text-sm text-gray-500 text-center mt-2">
-                Please upload both CV and job description to proceed
-              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Credits and Analysis Type Panel */}
+        <div className="lg:col-span-1">
+          <div className="bg-white rounded-lg shadow p-6 sticky top-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Analysis Options</h3>
+            
+            {/* Credits Display */}
+            <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <div className="flex items-center justify-center space-x-2 mb-2">
+                <CreditCard className="h-5 w-5 text-blue-600" />
+                <span className="text-blue-900 font-medium">
+                  Credits: {userCredits?.credits || 0}
+                </span>
+              </div>
+            </div>
+            
+            {/* Analysis Type Selection */}
+            <div className="space-y-4">
+              <label className="flex items-start space-x-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                <input
+                  type="radio"
+                  checked={useAI && hasCreditsForAI}
+                  onChange={() => setUseAI(true)}
+                  disabled={!hasCreditsForAI}
+                  className="text-blue-600 mt-0.5"
+                />
+                <div className="flex-1">
+                  <div className="flex items-center space-x-2">
+                    <Zap className="h-4 w-4 text-yellow-500" />
+                    <span className={`font-medium ${hasCreditsForAI ? 'text-gray-900' : 'text-gray-400'}`}>
+                      AI Analysis
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Advanced AI-powered analysis with detailed insights (1 credit)
+                  </p>
+                </div>
+              </label>
+              
+              <label className="flex items-start space-x-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                <input
+                  type="radio"
+                  checked={!useAI || !hasCreditsForAI}
+                  onChange={() => setUseAI(false)}
+                  className="text-blue-600 mt-0.5"
+                />
+                <div className="flex-1">
+                  <div className="flex items-center space-x-2">
+                    <BarChart3 className="h-4 w-4 text-blue-500" />
+                    <span className="font-medium text-gray-900">Basic Analysis</span>
+                  </div>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Quick keyword matching and compatibility score (Free)
+                  </p>
+                </div>
+              </label>
+            </div>
+            
+            {!hasCreditsForAI && (
+              <div className="mt-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                <p className="text-sm text-orange-700">
+                  No credits available for AI analysis. Using basic analysis.
+                </p>
+              </div>
             )}
           </div>
         </div>

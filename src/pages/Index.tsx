@@ -123,30 +123,30 @@ const Index = () => {
       <section className="py-20 px-4 bg-gradient-to-br from-blueberry via-blueberry/90 to-blueberry/80 text-white relative overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-r from-blueberry/90 via-blueberry/70 to-blueberry/90"></div>
-          <div className="absolute top-0 left-1/4 w-72 h-72 bg-citrus/5 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 right-1/3 w-96 h-96 bg-apricot/5 rounded-full blur-3xl"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-apple-core/5 rounded-full blur-2xl"></div>
+          <div className="absolute top-0 left-1/4 w-72 h-72 bg-citrus/10 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 right-1/3 w-96 h-96 bg-apricot/10 rounded-full blur-3xl"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-apple-core/10 rounded-full blur-2xl"></div>
         </div>
         <div className="max-w-6xl mx-auto relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4 text-citrus">Trusted by Job Seekers Worldwide</h2>
-            <p className="text-xl text-apple-core">
+            <p className="text-xl text-white/90">
               Join thousands of professionals who have successfully optimized their CVs with TuneMyCV
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 text-center">
-            <div className="bg-white/10 rounded-lg p-6 backdrop-blur-sm border border-apple-core/20">
+            <div className="bg-white/10 rounded-lg p-6 backdrop-blur-sm border border-white/20">
               <div className="text-4xl font-bold mb-2 text-citrus">50,000+</div>
-              <div className="text-apple-core">CVs Analyzed</div>
+              <div className="text-white/90">CVs Analyzed</div>
             </div>
-            <div className="bg-white/10 rounded-lg p-6 backdrop-blur-sm border border-apple-core/20">
+            <div className="bg-white/10 rounded-lg p-6 backdrop-blur-sm border border-white/20">
               <div className="text-4xl font-bold mb-2 text-citrus">89%</div>
-              <div className="text-apple-core">Interview Rate Increase</div>
+              <div className="text-white/90">Interview Rate Increase</div>
             </div>
-            <div className="bg-white/10 rounded-lg p-6 backdrop-blur-sm border border-apple-core/20">
+            <div className="bg-white/10 rounded-lg p-6 backdrop-blur-sm border border-white/20">
               <div className="text-4xl font-bold mb-2 text-citrus">120+</div>
-              <div className="text-apple-core">Countries Served</div>
+              <div className="text-white/90">Countries Served</div>
             </div>
           </div>
         </div>
