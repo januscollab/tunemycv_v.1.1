@@ -1,138 +1,159 @@
 
-import { BookOpen, Download, Video, Users, Award, TrendingUp } from 'lucide-react';
+import React from 'react';
+import { FileText, Users, BookOpen, Target, TrendingUp, CheckCircle } from 'lucide-react';
 
 const Resources = () => {
-  const resourceCategories = [
+  const resources = [
     {
-      title: "CV Templates",
-      icon: Download,
-      description: "Professional CV templates for different industries",
-      items: ["Modern Template", "Executive Template", "Creative Template", "Academic Template"]
+      title: "10 Common CV Mistakes to Avoid in 2025",
+      description: "Learn about the most frequent errors that can cost you job opportunities and how to fix them.",
+      icon: FileText,
+      link: "#",
+      category: "CV Tips"
     },
     {
-      title: "Video Guides",
-      icon: Video,
-      description: "Step-by-step video tutorials on CV optimization",
-      items: ["Writing Effective Summaries", "Showcasing Achievements", "Industry-Specific Tips", "Interview Preparation"]
+      title: "ATS Optimization Guide",
+      description: "Master the art of making your CV readable by Applicant Tracking Systems.",
+      icon: Target,
+      link: "#",
+      category: "Technical"
     },
     {
-      title: "Career Advice",
+      title: "Industry-Specific CV Templates",
+      description: "Download professionally designed CV templates tailored to your industry.",
       icon: BookOpen,
-      description: "Expert articles on career development and job search",
-      items: ["Networking Strategies", "Salary Negotiation", "Career Transitions", "LinkedIn Optimization"]
+      link: "#",
+      category: "Templates"
+    },
+    {
+      title: "Interview Preparation Toolkit",
+      description: "Comprehensive guide to preparing for job interviews with practice questions.",
+      icon: Users,
+      link: "#",
+      category: "Interview"
+    },
+    {
+      title: "Salary Negotiation Strategies",
+      description: "Expert tips on how to negotiate your salary and benefits package effectively.",
+      icon: TrendingUp,
+      link: "#",
+      category: "Career"
+    },
+    {
+      title: "LinkedIn Profile Optimization",
+      description: "Transform your LinkedIn profile to attract recruiters and opportunities.",
+      icon: CheckCircle,
+      link: "#",
+      category: "Social Media"
     }
   ];
 
-  const featuredArticles = [
-    {
-      title: "10 Common CV Mistakes to Avoid in 2024",
-      category: "CV Tips",
-      readTime: "5 min read",
-      image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=400&h=250&fit=crop"
-    },
-    {
-      title: "How to Tailor Your CV for Different Industries",
-      category: "Industry Insights",
-      readTime: "8 min read",
-      image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=250&fit=crop"
-    },
-    {
-      title: "The Future of CV Screening: AI and ATS Systems",
-      category: "Technology",
-      readTime: "6 min read",
-      image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=250&fit=crop"
-    }
+  const categories = [
+    "All",
+    "CV Tips",
+    "Technical",
+    "Templates", 
+    "Interview",
+    "Career",
+    "Social Media"
   ];
+
+  const [selectedCategory, setSelectedCategory] = React.useState("All");
+
+  const filteredResources = selectedCategory === "All" 
+    ? resources 
+    : resources.filter(resource => resource.category === selectedCategory);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-apple-core/10 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-blueberry/5">
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-blueberry dark:text-citrus mb-4">Career Resources</h1>
-          <p className="text-xl text-blueberry/80 dark:text-apple-core max-w-3xl mx-auto">
-            Everything you need to build a compelling CV and advance your career. From templates to expert advice.
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Hero Section */}
+      <section className="bg-gradient-to-br from-apple-core/30 via-white to-citrus/20 dark:from-blueberry/30 dark:via-gray-900 dark:to-citrus/10 py-20 px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <h1 className="text-5xl font-bold text-blueberry dark:text-citrus mb-6">
+            Career Resources
+          </h1>
+          <p className="text-xl text-blueberry/80 dark:text-apple-core mb-8">
+            Expert guides, templates, and tools to accelerate your job search and career growth
           </p>
         </div>
+      </section>
 
-        {/* Resource Categories */}
-        <div className="grid md:grid-cols-3 gap-8 mb-16">
-          {resourceCategories.map((category, index) => (
-            <div key={index} className="bg-white dark:bg-blueberry/20 rounded-lg shadow-lg p-6 border border-apple-core/30 dark:border-citrus/20 hover:shadow-xl transition-shadow">
-              <div className="flex items-center mb-4">
-                <category.icon className="h-8 w-8 text-apricot mr-3" />
-                <h3 className="text-xl font-semibold text-blueberry dark:text-citrus">{category.title}</h3>
-              </div>
-              <p className="text-blueberry/70 dark:text-apple-core/80 mb-4">{category.description}</p>
-              <ul className="space-y-2">
-                {category.items.map((item, itemIndex) => (
-                  <li key={itemIndex} className="flex items-center text-blueberry/80 dark:text-apple-core/90">
-                    <div className="w-2 h-2 bg-citrus rounded-full mr-3"></div>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <button className="mt-4 text-apricot font-medium hover:text-apricot/80 transition-colors">
-                Explore All →
+      {/* Resources Section */}
+      <section className="py-20 px-4">
+        <div className="max-w-7xl mx-auto">
+          {/* Category Filter */}
+          <div className="flex flex-wrap justify-center gap-4 mb-12">
+            {categories.map(category => (
+              <button
+                key={category}
+                onClick={() => setSelectedCategory(category)}
+                className={`px-6 py-2 rounded-full font-medium transition-colors ${
+                  selectedCategory === category
+                    ? 'bg-apricot text-white'
+                    : 'bg-white dark:bg-blueberry/20 text-blueberry dark:text-apple-core border border-apple-core/30 dark:border-citrus/20 hover:border-apricot hover:text-apricot'
+                }`}
+              >
+                {category}
               </button>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
 
-        {/* Featured Articles */}
-        <div className="mb-12">
-          <h2 className="text-3xl font-bold text-blueberry dark:text-citrus mb-8 text-center">Featured Articles</h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {featuredArticles.map((article, index) => (
-              <div key={index} className="bg-white dark:bg-blueberry/20 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow border border-apple-core/30 dark:border-citrus/20">
-                <img 
-                  src={article.image} 
-                  alt={article.title}
-                  className="w-full h-48 object-cover"
-                />
-                <div className="p-6">
-                  <div className="flex items-center mb-2">
-                    <span className="bg-citrus/20 text-blueberry dark:text-citrus text-xs font-medium px-2 py-1 rounded">
-                      {article.category}
-                    </span>
-                    <span className="text-blueberry/60 dark:text-apple-core/70 text-sm ml-2">{article.readTime}</span>
-                  </div>
-                  <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-2">{article.title}</h3>
-                  <button className="text-apricot font-medium hover:text-apricot/80 transition-colors">
-                    Read More →
-                  </button>
+          {/* Resources Grid */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredResources.map((resource, index) => (
+              <div key={index} className="bg-white dark:bg-blueberry/20 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow border border-apple-core/20 dark:border-citrus/20">
+                <div className="bg-apricot/20 rounded-full w-16 h-16 flex items-center justify-center mb-6">
+                  <resource.icon className="h-8 w-8 text-apricot" />
                 </div>
+                
+                <div className="mb-4">
+                  <span className="inline-block bg-citrus/20 text-citrus px-3 py-1 rounded-full text-sm font-medium mb-3">
+                    {resource.category}
+                  </span>
+                  <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mb-3">
+                    {resource.title}
+                  </h3>
+                  <p className="text-blueberry/70 dark:text-apple-core/80 leading-relaxed">
+                    {resource.description}
+                  </p>
+                </div>
+                
+                <a 
+                  href={resource.link}
+                  className="inline-flex items-center text-apricot font-medium hover:text-apricot/80 transition-colors"
+                >
+                  Read More →
+                </a>
               </div>
             ))}
           </div>
         </div>
+      </section>
 
-        {/* Stats Section */}
-        <div className="bg-gradient-to-br from-blueberry via-blueberry/90 to-blueberry/80 rounded-lg p-8 text-white text-center relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-blueberry/90 via-blueberry/70 to-blueberry/90"></div>
-          <div className="relative z-10">
-            <h2 className="text-2xl font-bold mb-8 text-citrus">Join Thousands of Successful Job Seekers</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="bg-white/10 rounded-lg p-6 backdrop-blur-sm border border-apple-core/20">
-                <div className="text-3xl font-bold mb-2 text-citrus">50,000+</div>
-                <div className="text-apple-core">CVs Analyzed</div>
-              </div>
-              <div className="bg-white/10 rounded-lg p-6 backdrop-blur-sm border border-apple-core/20">
-                <div className="text-3xl font-bold mb-2 text-citrus">85%</div>
-                <div className="text-apple-core">Success Rate</div>
-              </div>
-              <div className="bg-white/10 rounded-lg p-6 backdrop-blur-sm border border-apple-core/20">
-                <div className="text-3xl font-bold mb-2 text-citrus">15k+</div>
-                <div className="text-apple-core">Happy Users</div>
-              </div>
-            </div>
+      {/* Newsletter Section */}
+      <section className="py-20 px-4 bg-gradient-to-br from-blueberry via-blueberry/90 to-blueberry/80 text-white">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-4xl font-bold mb-6 text-citrus">Stay Updated</h2>
+          <p className="text-xl mb-8 text-white/90">
+            Get the latest career tips, CV trends, and job market insights delivered to your inbox
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-lg mx-auto">
+            <input
+              type="email"
+              placeholder="Enter your email"
+              className="flex-1 px-4 py-3 rounded-lg text-blueberry focus:outline-none focus:ring-2 focus:ring-citrus"
+            />
+            <button className="bg-apricot text-white px-6 py-3 rounded-lg font-semibold hover:bg-apricot/90 transition-colors">
+              Subscribe
+            </button>
           </div>
           
-          {/* Background decoration */}
-          <div className="absolute -top-10 -right-10 w-40 h-40 bg-citrus/10 rounded-full blur-2xl"></div>
-          <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-apricot/10 rounded-full blur-2xl"></div>
+          <p className="text-sm text-white/70 mt-4">
+            No spam, unsubscribe at any time
+          </p>
         </div>
-      </div>
+      </section>
     </div>
   );
 };

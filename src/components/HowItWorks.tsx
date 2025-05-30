@@ -7,55 +7,34 @@ const HowItWorks = () => {
     {
       icon: Upload,
       title: "Upload Your CV",
-      description: "Simply upload your current CV and any job description you're targeting. Our system supports multiple file formats."
+      description: "Simply upload your current CV and any job description you're targeting. Our system supports multiple file formats.",
+      image: "https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=300&h=200&fit=crop&crop=center"
     },
     {
       icon: Zap,
       title: "AI Analysis",
-      description: "Our advanced AI analyzes your CV against industry standards and ATS requirements, identifying strengths and areas for improvement."
+      description: "Our advanced AI analyzes your CV against industry standards and ATS requirements, identifying strengths and areas for improvement.",
+      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=300&h=200&fit=crop&crop=center"
     },
     {
       icon: Target,
       title: "Get Recommendations",
-      description: "Receive detailed, actionable feedback including keyword optimization, formatting suggestions, and content improvements."
+      description: "Receive detailed, actionable feedback including keyword optimization, formatting suggestions, and content improvements.",
+      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=300&h=200&fit=crop&crop=center"
     },
     {
       icon: TrendingUp,
       title: "Land Your Dream Job",
-      description: "Apply with confidence using your optimized CV and watch your interview rate increase significantly."
+      description: "Apply with confidence using your optimized CV and watch your interview rate increase significantly.",
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=200&fit=crop&crop=center"
     }
   ];
-
-  const FunArrow = () => (
-    <div className="hidden lg:flex items-center justify-center">
-      <svg width="60" height="40" viewBox="0 0 60 40" className="text-apricot">
-        <path
-          d="M5 20 Q 30 5, 55 20"
-          stroke="currentColor"
-          strokeWidth="3"
-          fill="none"
-          strokeLinecap="round"
-        />
-        <path
-          d="M50 15 L55 20 L50 25"
-          stroke="currentColor"
-          strokeWidth="3"
-          fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <circle cx="15" cy="18" r="2" fill="currentColor" opacity="0.6" />
-        <circle cx="25" cy="12" r="1.5" fill="currentColor" opacity="0.4" />
-        <circle cx="35" cy="15" r="1" fill="currentColor" opacity="0.3" />
-      </svg>
-    </div>
-  );
 
   return (
     <section id="how-it-works" className="py-20 px-4 bg-white dark:bg-gray-900">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-apricot dark:text-citrus mb-4">
+          <h2 className="text-4xl font-bold text-blueberry dark:text-citrus mb-4">
             How TuneMyCV Works
           </h2>
           <p className="text-xl text-blueberry/80 dark:text-apple-core max-w-3xl mx-auto">
@@ -63,27 +42,28 @@ const HowItWorks = () => {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-7 gap-8 items-center">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {steps.map((step, index) => (
-            <React.Fragment key={index}>
-              <div className="lg:col-span-1 text-center">
-                <div className="bg-gradient-to-br from-citrus/20 to-apricot/20 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6 border border-citrus/30">
-                  <step.icon className="h-10 w-10 text-apricot" />
+            <div key={index} className="text-center">
+              <div className="bg-gradient-to-br from-citrus/20 to-apricot/20 rounded-lg overflow-hidden mb-6 border border-citrus/30">
+                <img 
+                  src={step.image} 
+                  alt={step.title}
+                  className="w-full h-48 object-cover"
+                />
+                <div className="p-4">
+                  <div className="bg-gradient-to-br from-citrus/20 to-apricot/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 border border-citrus/30">
+                    <step.icon className="h-8 w-8 text-apricot" />
+                  </div>
                 </div>
-                <h3 className="text-xl font-semibold text-apricot dark:text-citrus mb-4">
-                  {step.title}
-                </h3>
-                <p className="text-blueberry/70 dark:text-apple-core/80 leading-relaxed">
-                  {step.description}
-                </p>
               </div>
-              
-              {index < steps.length - 1 && (
-                <div className="lg:col-span-1">
-                  <FunArrow />
-                </div>
-              )}
-            </React.Fragment>
+              <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mb-4">
+                {step.title}
+              </h3>
+              <p className="text-blueberry/70 dark:text-apple-core/80 leading-relaxed">
+                {step.description}
+              </p>
+            </div>
           ))}
         </div>
       </div>
