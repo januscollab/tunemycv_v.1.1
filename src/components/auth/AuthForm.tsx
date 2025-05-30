@@ -159,7 +159,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
               <Checkbox
                 id="remember-me"
                 checked={rememberMe}
-                onCheckedChange={setRememberMe}
+                onCheckedChange={(checked) => setRememberMe(checked === true)}
               />
               <Label htmlFor="remember-me" className="ml-2 text-sm text-blueberry">
                 Remember me
