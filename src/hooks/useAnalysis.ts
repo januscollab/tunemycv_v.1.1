@@ -155,10 +155,10 @@ export const useAnalysis = () => {
     const jobText = uploadedFiles.jobDescription!.extractedText.toLowerCase();
 
     const jobWords = jobText.split(/\W+/).filter(word => word.length > 3);
-    const keyTerms = [...new Set(jobWords)].slice(0, 20);
+    const keyTerms: string[] = [...new Set(jobWords)].slice(0, 20);
 
-    const matchingTerms = keyTerms.filter(term => cvText.includes(term));
-    const missingTerms = keyTerms.filter(term => !cvText.includes(term));
+    const matchingTerms: string[] = keyTerms.filter(term => cvText.includes(term));
+    const missingTerms: string[] = keyTerms.filter(term => !cvText.includes(term));
 
     const compatibilityScore = Math.round((matchingTerms.length / keyTerms.length) * 100);
 
@@ -171,8 +171,8 @@ export const useAnalysis = () => {
       job_title: finalJobTitle,
       company_name: extractedCompany,
       compatibility_score: compatibilityScore,
-      keywords_found: matchingTerms.slice(0, 10) as string[],
-      keywords_missing: missingTerms.slice(0, 10) as string[],
+      keywords_found: matchingTerms.slice(0, 10),
+      keywords_missing: missingTerms.slice(0, 10),
       strengths: generateStrengths(matchingTerms, compatibilityScore),
       weaknesses: generateWeaknesses(missingTerms, compatibilityScore),
       recommendations: generateRecommendations(missingTerms, compatibilityScore),
