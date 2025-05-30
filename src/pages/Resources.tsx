@@ -45,12 +45,12 @@ const Resources = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-apple-core/10">
+    <div className="min-h-screen bg-gradient-to-br from-apple-core/10 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-blueberry/5">
       <div className="max-w-7xl mx-auto px-4 py-12">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-blueberry mb-4">Career Resources</h1>
-          <p className="text-xl text-blueberry/80 max-w-3xl mx-auto">
+          <h1 className="text-4xl font-bold text-blueberry dark:text-citrus mb-4">Career Resources</h1>
+          <p className="text-xl text-blueberry/80 dark:text-apple-core max-w-3xl mx-auto">
             Everything you need to build a compelling CV and advance your career. From templates to expert advice.
           </p>
         </div>
@@ -58,15 +58,15 @@ const Resources = () => {
         {/* Resource Categories */}
         <div className="grid md:grid-cols-3 gap-8 mb-16">
           {resourceCategories.map((category, index) => (
-            <div key={index} className="bg-white rounded-lg shadow-lg p-6 border border-apple-core/30 hover:shadow-xl transition-shadow">
+            <div key={index} className="bg-white dark:bg-blueberry/20 rounded-lg shadow-lg p-6 border border-apple-core/30 dark:border-citrus/20 hover:shadow-xl transition-shadow">
               <div className="flex items-center mb-4">
                 <category.icon className="h-8 w-8 text-apricot mr-3" />
-                <h3 className="text-xl font-semibold text-blueberry">{category.title}</h3>
+                <h3 className="text-xl font-semibold text-blueberry dark:text-citrus">{category.title}</h3>
               </div>
-              <p className="text-blueberry/70 mb-4">{category.description}</p>
+              <p className="text-blueberry/70 dark:text-apple-core/80 mb-4">{category.description}</p>
               <ul className="space-y-2">
                 {category.items.map((item, itemIndex) => (
-                  <li key={itemIndex} className="flex items-center text-blueberry/80">
+                  <li key={itemIndex} className="flex items-center text-blueberry/80 dark:text-apple-core/90">
                     <div className="w-2 h-2 bg-citrus rounded-full mr-3"></div>
                     {item}
                   </li>
@@ -81,10 +81,10 @@ const Resources = () => {
 
         {/* Featured Articles */}
         <div className="mb-12">
-          <h2 className="text-3xl font-bold text-blueberry mb-8 text-center">Featured Articles</h2>
+          <h2 className="text-3xl font-bold text-blueberry dark:text-citrus mb-8 text-center">Featured Articles</h2>
           <div className="grid md:grid-cols-3 gap-8">
             {featuredArticles.map((article, index) => (
-              <div key={index} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow border border-apple-core/30">
+              <div key={index} className="bg-white dark:bg-blueberry/20 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow border border-apple-core/30 dark:border-citrus/20">
                 <img 
                   src={article.image} 
                   alt={article.title}
@@ -92,12 +92,12 @@ const Resources = () => {
                 />
                 <div className="p-6">
                   <div className="flex items-center mb-2">
-                    <span className="bg-citrus/20 text-blueberry text-xs font-medium px-2 py-1 rounded">
+                    <span className="bg-citrus/20 text-blueberry dark:text-citrus text-xs font-medium px-2 py-1 rounded">
                       {article.category}
                     </span>
-                    <span className="text-blueberry/60 text-sm ml-2">{article.readTime}</span>
+                    <span className="text-blueberry/60 dark:text-apple-core/70 text-sm ml-2">{article.readTime}</span>
                   </div>
-                  <h3 className="text-lg font-semibold text-blueberry mb-2">{article.title}</h3>
+                  <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-2">{article.title}</h3>
                   <button className="text-apricot font-medium hover:text-apricot/80 transition-colors">
                     Read More →
                   </button>

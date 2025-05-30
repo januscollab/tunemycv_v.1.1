@@ -10,7 +10,7 @@ const Profile = () => {
   const { credits, memberSince } = useUserData();
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-apple-core/10 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5 py-8">
       <div className="max-w-4xl mx-auto px-4">
         <ProfileHeader credits={credits} memberSince={memberSince} />
         <ProfileNavigation activeTab={activeTab} onTabChange={setActiveTab} />

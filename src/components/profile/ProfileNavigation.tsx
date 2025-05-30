@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { User, History, FileText, Settings, Lock } from 'lucide-react';
 
 interface ProfileNavigationProps {
   activeTab: string;
@@ -8,25 +9,28 @@ interface ProfileNavigationProps {
 
 const ProfileNavigation: React.FC<ProfileNavigationProps> = ({ activeTab, onTabChange }) => {
   const tabs = [
-    { id: 'personal', label: 'Personal Info' },
-    { id: 'history', label: 'Analysis History' },
-    { id: 'settings', label: 'Settings' },
+    { id: 'personal', label: 'Personal Info', icon: User },
+    { id: 'history', label: 'Analysis History', icon: History },
+    { id: 'files', label: 'My Files', icon: FileText },
+    { id: 'password', label: 'Password', icon: Lock },
+    { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
   return (
-    <div className="border-b border-apple-core/30 mb-8">
-      <nav className="-mb-px flex space-x-8">
+    <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 mb-6">
+      <nav className="flex space-x-8 overflow-x-auto">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => onTabChange(tab.id)}
-            className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+            className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors ${
               activeTab === tab.id
-                ? 'border-apricot text-apricot'
-                : 'border-transparent text-blueberry/70 hover:text-blueberry hover:border-apple-core'
+                ? 'bg-apricot text-white'
+                : 'text-blueberry dark:text-apple-core hover:bg-apple-core/20 dark:hover:bg-citrus/20'
             }`}
           >
-            {tab.label}
+            <tab.icon className="h-4 w-4" />
+            <span>{tab.label}</span>
           </button>
         ))}
       </nav>

@@ -5,14 +5,19 @@ import { Mail } from 'lucide-react';
 const Footer = () => {
   return (
     <footer className="bg-gradient-to-br from-blueberry via-blueberry/90 to-blueberry/80 text-white relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-r from-blueberry/90 via-blueberry/70 to-blueberry/90"></div>
+      <div className="absolute inset-0">
+        <div className="absolute inset-0 bg-gradient-to-r from-blueberry/90 via-blueberry/70 to-blueberry/90"></div>
+        <div className="absolute top-0 left-1/4 w-72 h-72 bg-citrus/5 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 right-1/3 w-96 h-96 bg-apricot/5 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-apple-core/5 rounded-full blur-2xl"></div>
+      </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo and Description */}
           <div className="col-span-1 md:col-span-2">
             <Link to="/" className="flex items-center space-x-2 mb-4">
               <img 
-                src="/lovable-uploads/uploaded-logo.png" 
+                src="/lovable-uploads/7aefb742-801d-4494-af3e-defd30462f1c.png" 
                 alt="TuneMyCV Logo" 
                 className="h-10 w-auto"
               />
@@ -95,10 +100,6 @@ const Footer = () => {
           </p>
         </div>
       </div>
-      
-      {/* Background decoration */}
-      <div className="absolute -top-10 -right-10 w-40 h-40 bg-citrus/10 rounded-full blur-2xl"></div>
-      <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-apricot/10 rounded-full blur-2xl"></div>
     </footer>
   );
 };

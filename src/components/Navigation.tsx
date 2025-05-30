@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import ThemeToggle from './ThemeToggle';
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -35,13 +36,16 @@ const Navigation = () => {
   ];
 
   return (
-    <nav className="bg-white shadow-sm border-b border-apple-core/30">
+    <nav className="bg-white dark:bg-blueberry shadow-sm border-b border-apple-core/30 dark:border-citrus/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
-              <Target className="h-8 w-8 text-apricot mr-2" />
-              <span className="text-xl font-bold text-blueberry">TuneMyCV</span>
+              <img 
+                src="/lovable-uploads/7aefb742-801d-4494-af3e-defd30462f1c.png" 
+                alt="TuneMyCV Logo" 
+                className="h-8 w-auto mr-2"
+              />
             </Link>
           </div>
 
@@ -56,7 +60,7 @@ const Navigation = () => {
                   className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                     isActive(item.path)
                       ? 'text-apricot bg-citrus/20'
-                      : 'text-blueberry hover:text-apricot hover:bg-apple-core/30'
+                      : 'text-blueberry dark:text-apple-core hover:text-apricot hover:bg-apple-core/30 dark:hover:bg-citrus/20'
                   }`}
                 >
                   <Icon className="h-4 w-4 mr-2" />
@@ -64,6 +68,8 @@ const Navigation = () => {
                 </Link>
               );
             })}
+            
+            <ThemeToggle />
             
             {user ? (
               <div className="flex items-center space-x-4">
@@ -73,7 +79,7 @@ const Navigation = () => {
                     className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                       isActive('/admin')
                         ? 'text-apricot bg-citrus/20'
-                        : 'text-blueberry hover:text-apricot hover:bg-apple-core/30'
+                        : 'text-blueberry dark:text-apple-core hover:text-apricot hover:bg-apple-core/30 dark:hover:bg-citrus/20'
                     }`}
                   >
                     <Shield className="h-4 w-4 mr-2" />
@@ -86,7 +92,7 @@ const Navigation = () => {
                     className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                       isActive('/profile')
                         ? 'text-apricot bg-citrus/20'
-                        : 'text-blueberry hover:text-apricot hover:bg-apple-core/30'
+                        : 'text-blueberry dark:text-apple-core hover:text-apricot hover:bg-apple-core/30 dark:hover:bg-citrus/20'
                     }`}
                   >
                     <User className="h-4 w-4 mr-2" />
@@ -94,17 +100,17 @@ const Navigation = () => {
                   </button>
                   
                   {showProfileMenu && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 border border-apple-core/30">
+                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-blueberry rounded-md shadow-lg py-1 border border-apple-core/30 dark:border-citrus/20">
                       <Link
                         to="/profile"
                         onClick={() => setShowProfileMenu(false)}
-                        className="block px-4 py-2 text-sm text-blueberry hover:bg-apple-core/30 hover:text-apricot"
+                        className="block px-4 py-2 text-sm text-blueberry dark:text-apple-core hover:bg-apple-core/30 dark:hover:bg-citrus/20 hover:text-apricot"
                       >
                         View Profile
                       </Link>
                       <button
                         onClick={handleLogout}
-                        className="block w-full text-left px-4 py-2 text-sm text-blueberry hover:bg-apple-core/30 hover:text-apricot"
+                        className="block w-full text-left px-4 py-2 text-sm text-blueberry dark:text-apple-core hover:bg-apple-core/30 dark:hover:bg-citrus/20 hover:text-apricot"
                       >
                         <LogOut className="h-4 w-4 inline mr-2" />
                         Logout
@@ -124,10 +130,11 @@ const Navigation = () => {
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden flex items-center">
+          <div className="md:hidden flex items-center space-x-2">
+            <ThemeToggle />
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="text-blueberry hover:text-apricot focus:outline-none"
+              className="text-blueberry dark:text-apple-core hover:text-apricot focus:outline-none"
             >
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
@@ -137,7 +144,7 @@ const Navigation = () => {
         {/* Mobile Navigation */}
         {isOpen && (
           <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-apple-core/30">
+            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-apple-core/30 dark:border-citrus/20">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 return (
@@ -148,7 +155,7 @@ const Navigation = () => {
                     className={`flex items-center px-3 py-2 rounded-md text-base font-medium transition-colors ${
                       isActive(item.path)
                         ? 'text-apricot bg-citrus/20'
-                        : 'text-blueberry hover:text-apricot hover:bg-apple-core/30'
+                        : 'text-blueberry dark:text-apple-core hover:text-apricot hover:bg-apple-core/30 dark:hover:bg-citrus/20'
                     }`}
                   >
                     <Icon className="h-5 w-5 mr-3" />
@@ -166,7 +173,7 @@ const Navigation = () => {
                       className={`flex items-center px-3 py-2 rounded-md text-base font-medium transition-colors ${
                         isActive('/admin')
                           ? 'text-apricot bg-citrus/20'
-                          : 'text-blueberry hover:text-apricot hover:bg-apple-core/30'
+                          : 'text-blueberry dark:text-apple-core hover:text-apricot hover:bg-apple-core/30 dark:hover:bg-citrus/20'
                       }`}
                     >
                       <Shield className="h-5 w-5 mr-3" />
@@ -179,7 +186,7 @@ const Navigation = () => {
                     className={`flex items-center px-3 py-2 rounded-md text-base font-medium transition-colors ${
                       isActive('/profile')
                         ? 'text-apricot bg-citrus/20'
-                        : 'text-blueberry hover:text-apricot hover:bg-apple-core/30'
+                        : 'text-blueberry dark:text-apple-core hover:text-apricot hover:bg-apple-core/30 dark:hover:bg-citrus/20'
                     }`}
                   >
                     <User className="h-5 w-5 mr-3" />
@@ -187,7 +194,7 @@ const Navigation = () => {
                   </Link>
                   <button
                     onClick={handleLogout}
-                    className="flex items-center w-full px-3 py-2 rounded-md text-base font-medium text-blueberry hover:text-apricot hover:bg-apple-core/30 transition-colors"
+                    className="flex items-center w-full px-3 py-2 rounded-md text-base font-medium text-blueberry dark:text-apple-core hover:text-apricot hover:bg-apple-core/30 dark:hover:bg-citrus/20 transition-colors"
                   >
                     <LogOut className="h-5 w-5 mr-3" />
                     Logout

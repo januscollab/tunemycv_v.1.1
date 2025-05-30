@@ -13,15 +13,15 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-gray-900">
       {/* Hero Section */}
-      <section id="hero" className="bg-gradient-to-br from-apple-core/30 via-white to-citrus/20 py-20 px-4 relative overflow-hidden">
+      <section id="hero" className="bg-gradient-to-br from-apple-core/30 via-white to-citrus/20 dark:from-blueberry/30 dark:via-gray-900 dark:to-citrus/10 py-20 px-4 relative overflow-hidden">
         <div className="max-w-6xl mx-auto text-center relative z-10">
-          <h1 className="text-5xl md:text-6xl font-bold text-blueberry mb-6">
+          <h1 className="text-5xl md:text-6xl font-bold text-blueberry dark:text-citrus mb-6">
             Optimize Your CV,
             <span className="text-apricot"> Accelerate Your Career</span>
           </h1>
-          <p className="text-xl text-blueberry/80 mb-8 max-w-3xl mx-auto">
+          <p className="text-xl text-blueberry/80 dark:text-apple-core mb-8 max-w-3xl mx-auto">
             TuneMyCV is an AI-powered platform that helps job seekers improve their CVs, 
             pass ATS systems, and increase their chances of landing their dream job.
           </p>
@@ -38,7 +38,7 @@ const Index = () => {
               </Link>
               <Link
                 to="/profile"
-                className="border-2 border-blueberry text-blueberry px-8 py-4 rounded-lg text-lg font-semibold hover:border-apricot hover:text-apricot transition-colors"
+                className="border-2 border-blueberry dark:border-citrus text-blueberry dark:text-citrus px-8 py-4 rounded-lg text-lg font-semibold hover:border-apricot hover:text-apricot transition-colors"
               >
                 View Profile
               </Link>
@@ -54,7 +54,7 @@ const Index = () => {
               </Link>
               <button
                 onClick={scrollToHowItWorks}
-                className="border-2 border-blueberry text-blueberry px-8 py-4 rounded-lg text-lg font-semibold hover:border-apricot hover:text-apricot transition-colors"
+                className="border-2 border-blueberry dark:border-citrus text-blueberry dark:text-citrus px-8 py-4 rounded-lg text-lg font-semibold hover:border-apricot hover:text-apricot transition-colors"
               >
                 Learn More
               </button>
@@ -71,47 +71,47 @@ const Index = () => {
       <HowItWorks />
 
       {/* Features Section */}
-      <section className="py-20 px-4 bg-apple-core/20">
+      <section className="py-20 px-4 bg-apple-core/20 dark:bg-blueberry/10">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-blueberry mb-4">
+            <h2 className="text-4xl font-bold text-blueberry dark:text-citrus mb-4">
               Why Choose TuneMyCV?
             </h2>
-            <p className="text-xl text-blueberry/80 max-w-2xl mx-auto">
+            <p className="text-xl text-blueberry/80 dark:text-apple-core max-w-2xl mx-auto">
               Our AI-powered platform provides comprehensive CV optimization to help you stand out in today's competitive job market.
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white rounded-xl shadow-lg p-8 text-center hover:shadow-xl transition-shadow border border-apple-core/30 relative overflow-hidden">
+            <div className="bg-white dark:bg-blueberry/20 rounded-xl shadow-lg p-8 text-center hover:shadow-xl transition-shadow border border-apple-core/30 dark:border-citrus/20 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-citrus/20 to-transparent rounded-bl-full"></div>
               <div className="bg-apricot/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6 relative z-10">
                 <CheckCircle className="h-8 w-8 text-apricot" />
               </div>
-              <h3 className="text-xl font-semibold text-blueberry mb-4">ATS Optimization</h3>
-              <p className="text-blueberry/70">
+              <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mb-4">ATS Optimization</h3>
+              <p className="text-blueberry/70 dark:text-apple-core/80">
                 Ensure your CV passes Applicant Tracking Systems with our advanced formatting and keyword optimization.
               </p>
             </div>
 
-            <div className="bg-white rounded-xl shadow-lg p-8 text-center hover:shadow-xl transition-shadow border border-apple-core/30 relative overflow-hidden">
+            <div className="bg-white dark:bg-blueberry/20 rounded-xl shadow-lg p-8 text-center hover:shadow-xl transition-shadow border border-apple-core/30 dark:border-citrus/20 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-apricot/20 to-transparent rounded-bl-full"></div>
               <div className="bg-citrus/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6 relative z-10">
                 <TrendingUp className="h-8 w-8 text-citrus" />
               </div>
-              <h3 className="text-xl font-semibold text-blueberry mb-4">AI-Powered Analysis</h3>
-              <p className="text-blueberry/70">
+              <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mb-4">AI-Powered Analysis</h3>
+              <p className="text-blueberry/70 dark:text-apple-core/80">
                 Get detailed feedback and personalized recommendations to improve your CV's impact and effectiveness.
               </p>
             </div>
 
-            <div className="bg-white rounded-xl shadow-lg p-8 text-center hover:shadow-xl transition-shadow border border-apple-core/30 relative overflow-hidden">
+            <div className="bg-white dark:bg-blueberry/20 rounded-xl shadow-lg p-8 text-center hover:shadow-xl transition-shadow border border-apple-core/30 dark:border-citrus/20 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-blueberry/20 to-transparent rounded-bl-full"></div>
               <div className="bg-blueberry/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6 relative z-10">
-                <Star className="h-8 w-8 text-blueberry" />
+                <Star className="h-8 w-8 text-blueberry dark:text-citrus" />
               </div>
-              <h3 className="text-xl font-semibold text-blueberry mb-4">Industry Expertise</h3>
-              <p className="text-blueberry/70">
+              <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mb-4">Industry Expertise</h3>
+              <p className="text-blueberry/70 dark:text-apple-core/80">
                 Leverage insights from thousands of successful job applications across various industries and roles.
               </p>
             </div>
@@ -121,7 +121,12 @@ const Index = () => {
 
       {/* Statistics Section */}
       <section className="py-20 px-4 bg-gradient-to-br from-blueberry via-blueberry/90 to-blueberry/80 text-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-blueberry/90 via-blueberry/70 to-blueberry/90"></div>
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-gradient-to-r from-blueberry/90 via-blueberry/70 to-blueberry/90"></div>
+          <div className="absolute top-0 left-1/4 w-72 h-72 bg-citrus/5 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 right-1/3 w-96 h-96 bg-apricot/5 rounded-full blur-3xl"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-apple-core/5 rounded-full blur-2xl"></div>
+        </div>
         <div className="max-w-6xl mx-auto relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4 text-citrus">Trusted by Job Seekers Worldwide</h2>
@@ -145,10 +150,6 @@ const Index = () => {
             </div>
           </div>
         </div>
-        
-        {/* Background decoration */}
-        <div className="absolute -top-10 -right-10 w-40 h-40 bg-citrus/10 rounded-full blur-2xl"></div>
-        <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-apricot/10 rounded-full blur-2xl"></div>
       </section>
 
       {/* Testimonials Section */}
@@ -156,12 +157,12 @@ const Index = () => {
 
       {/* CTA Section */}
       {!user && (
-        <section className="py-20 px-4 bg-gradient-to-br from-citrus/10 via-white to-apple-core/20">
+        <section className="py-20 px-4 bg-gradient-to-br from-citrus/10 via-white to-apple-core/20 dark:from-citrus/5 dark:via-gray-900 dark:to-apple-core/10">
           <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-4xl font-bold text-blueberry mb-6">
+            <h2 className="text-4xl font-bold text-blueberry dark:text-citrus mb-6">
               Ready to Transform Your Career?
             </h2>
-            <p className="text-xl text-blueberry/80 mb-8">
+            <p className="text-xl text-blueberry/80 dark:text-apple-core mb-8">
               Start optimizing your CV today and take the first step towards landing your dream job.
             </p>
             <Link
