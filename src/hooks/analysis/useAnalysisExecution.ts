@@ -18,14 +18,14 @@ export const useAnalysisExecution = () => {
   const executeAnalysis = async (
     uploadedFiles: { cv?: UploadedFile; jobDescription?: UploadedFile },
     jobTitle: string,
-    useAI: boolean,
+    useComprehensive: boolean,
     userCredits: any
   ) => {
     if (!uploadedFiles.cv || !uploadedFiles.jobDescription) {
       throw new Error('Please upload both CV and job description');
     }
 
-    console.log('Starting CV analysis...');
+    console.log('Starting comprehensive CV analysis...');
 
     const finalJobTitle = jobTitle || extractJobTitleFromText(uploadedFiles.jobDescription.extractedText);
     const extractedCompany = extractCompanyFromText(uploadedFiles.jobDescription.extractedText);
@@ -33,17 +33,17 @@ export const useAnalysisExecution = () => {
     // Save files to database first
     const { cvUpload, jobUpload } = await saveFilesToDatabase(uploadedFiles, finalJobTitle, user?.id!);
 
-    console.log('Files uploaded successfully, starting analysis...');
+    console.log('Files uploaded successfully, starting comprehensive analysis...');
 
     let analysisData;
     const hasCreditsForAI = userCredits?.credits && userCredits.credits > 0;
 
-    // Always try AI analysis if user has credits
+    // Always try AI analysis if user has credits, otherwise use comprehensive local analysis
     if (hasCreditsForAI) {
       try {
         const aiResult = await performAIAnalysis(uploadedFiles, finalJobTitle, user?.id!);
         
-        console.log('AI analysis successful');
+        console.log('AI-powered comprehensive analysis successful');
         const aiAnalysis = aiResult.analysis;
         
         analysisData = {
@@ -63,10 +63,10 @@ export const useAnalysisExecution = () => {
 
         toast({ 
           title: 'Analysis Complete!', 
-          description: `Comprehensive analysis completed. ${aiResult.creditsRemaining || 0} credits remaining.` 
+          description: `Comprehensive AI-powered analysis completed. ${aiResult.creditsRemaining || 0} credits remaining.` 
         });
       } catch (aiError) {
-        console.error('AI analysis failed, falling back to comprehensive analysis:', aiError);
+        console.error('AI analysis failed, falling back to comprehensive algorithmic analysis:', aiError);
         
         // Fall back to comprehensive local analysis
         analysisData = await performComprehensiveAnalysis(cvUpload, jobUpload, finalJobTitle, extractedCompany, uploadedFiles, user?.id!);
@@ -77,7 +77,7 @@ export const useAnalysisExecution = () => {
         });
       }
     } else {
-      console.log('No credits available, using comprehensive analysis');
+      console.log('No credits available, using comprehensive algorithmic analysis');
       
       // Use comprehensive local analysis
       analysisData = await performComprehensiveAnalysis(cvUpload, jobUpload, finalJobTitle, extractedCompany, uploadedFiles, user?.id!);
@@ -91,7 +91,7 @@ export const useAnalysisExecution = () => {
     // Save analysis results
     const analysisResult = await saveAnalysisResults(analysisData);
 
-    console.log('Analysis completed successfully:', analysisResult);
+    console.log('Comprehensive analysis completed successfully:', analysisResult);
     return analysisResult;
   };
 

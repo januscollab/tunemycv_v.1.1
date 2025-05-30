@@ -156,7 +156,7 @@ const AnalyzeCV = () => {
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold text-blueberry dark:text-citrus mb-4">Analyze Your CV</h1>
             <p className="text-xl text-blueberry/80 dark:text-apple-core max-w-2xl mx-auto">
-              Upload your CV and job description to get instant compatibility analysis with actionable recommendations.
+              Upload your CV and job description to get comprehensive compatibility analysis with actionable recommendations.
             </p>
           </div>
 
@@ -234,7 +234,6 @@ const AnalyzeCV = () => {
               onAnalyze={handleAnalysis}
               canAnalyze={!!canAnalyze}
               analyzing={analyzing}
-              useAI={true}
               hasCreditsForAI={hasCreditsForAI}
             />
           </div>
@@ -244,8 +243,6 @@ const AnalyzeCV = () => {
         <div className="lg:col-span-1">
           <CreditsPanel
             credits={userCredits?.credits || 0}
-            useAI={true}
-            setUseAI={() => {}}
             hasCreditsForAI={hasCreditsForAI}
           />
         </div>

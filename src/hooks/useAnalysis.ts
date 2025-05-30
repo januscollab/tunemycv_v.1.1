@@ -17,12 +17,12 @@ export const useAnalysis = () => {
   const performAnalysis = async (
     uploadedFiles: { cv?: UploadedFile; jobDescription?: UploadedFile },
     jobTitle: string,
-    useAI: boolean,
+    useComprehensive: boolean,
     userCredits: any
   ) => {
     try {
       setAnalyzing(true);
-      const result = await executeAnalysis(uploadedFiles, jobTitle, useAI, userCredits);
+      const result = await executeAnalysis(uploadedFiles, jobTitle, useComprehensive, userCredits);
       setAnalysisResult(result);
     } catch (error) {
       console.error('Analysis error:', error);
