@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { CheckCircle, XCircle, AlertCircle, Info } from 'lucide-react';
+import { CheckCircle, XCircle, AlertCircle, Info, ExternalLink } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface EnhancedKeywordAnalysisProps {
   keywordAnalysis: {
@@ -23,6 +24,20 @@ const EnhancedKeywordAnalysis: React.FC<EnhancedKeywordAnalysisProps> = ({ keywo
 
   const { totalKeywords, matchedKeywords, keywordMatchPercentage, keywords } = keywordAnalysis;
 
+  // Display up to 20 keywords, prioritizing high importance and missing keywords
+  const displayKeywords = keywords
+    .sort((a, b) => {
+      // Sort by: importance (high first), then missing keywords first
+      const importanceOrder = { high: 3, medium: 2, low: 1 };
+      const importanceA = importanceOrder[a.importance];
+      const importanceB = importanceOrder[b.importance];
+      
+      if (importanceA !== importanceB) return importanceB - importanceA;
+      if (a.found !== b.found) return a.found ? 1 : -1;
+      return 0;
+    })
+    .slice(0, 20);
+
   const getImportanceColor = (importance: string) => {
     switch (importance) {
       case 'high': return 'bg-red-100 text-red-800';
@@ -38,10 +53,21 @@ const EnhancedKeywordAnalysis: React.FC<EnhancedKeywordAnalysisProps> = ({ keywo
 
   return (
     <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
-      <div className="flex items-center mb-4">
-        <div className="bg-blue-500 text-white px-3 py-1 rounded text-sm font-medium mr-3">
-          Enhanced Keyword Analysis
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center">
+          <div className="bg-blue-500 text-white px-3 py-1 rounded text-sm font-medium mr-3">
+            Enhanced Keyword Analysis
+          </div>
         </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-blueberry/70 hover:text-blueberry"
+          onClick={() => window.open('/help#ats-keywords', '_blank')}
+        >
+          <ExternalLink className="h-4 w-4 mr-1" />
+          Learn about Applicant Tracking System (ATS)
+        </Button>
       </div>
 
       {/* Summary Stats */}
@@ -60,6 +86,19 @@ const EnhancedKeywordAnalysis: React.FC<EnhancedKeywordAnalysisProps> = ({ keywo
         </div>
       </div>
 
+      {/* Display limit notice */}
+      {keywords.length > 20 && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+          <div className="flex items-center">
+            <Info className="h-4 w-4 text-blue-600 mr-2" />
+            <span className="text-sm text-blue-800">
+              Showing top 20 keywords (prioritized by importance and missing status). 
+              Total keywords analyzed: {keywords.length}
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* Detailed Keyword List */}
       <div className="space-y-3">
         <div className="grid grid-cols-4 gap-2 text-xs font-medium text-blueberry/60 dark:text-apple-core/60 border-b pb-2">
@@ -69,7 +108,7 @@ const EnhancedKeywordAnalysis: React.FC<EnhancedKeywordAnalysisProps> = ({ keywo
           <span>Suggestion</span>
         </div>
         
-        {keywords.map((keyword, index) => (
+        {displayKeywords.map((keyword, index) => (
           <div key={index} className="grid grid-cols-4 gap-2 text-sm items-start py-2 border-b border-gray-100 dark:border-gray-700 last:border-b-0">
             <div>
               <span className="font-medium text-blueberry dark:text-apple-core">{keyword.keyword}</span>
@@ -106,7 +145,7 @@ const EnhancedKeywordAnalysis: React.FC<EnhancedKeywordAnalysisProps> = ({ keywo
           </div>
           <p className="text-xs text-yellow-700">
             Your CV matches {keywordMatchPercentage}% of the key terms from the job description. 
-            Consider incorporating more of the missing high-importance keywords to improve ATS compatibility.
+            Consider incorporating more of the missing high-importance keywords to improve Applicant Tracking System (ATS) compatibility.
           </p>
         </div>
       )}

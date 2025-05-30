@@ -29,8 +29,38 @@ const AnalyzeCV = () => {
     jobDescription?: UploadedFile;
   }>({});
   const [jobTitle, setJobTitle] = useState('');
+  const [currentLoadingMessage, setCurrentLoadingMessage] = useState('');
 
   const { analyzing, analysisResult, setAnalysisResult, performAnalysis } = useAnalysis();
+
+  // Humorous loading messages
+  const loadingMessages = [
+    "Deconstructing your CV...",
+    "Decoding job description secrets...",
+    "Feeding the analysis gremlins...",
+    "Teaching robots to read between the lines...",
+    "Matching your skills with cosmic precision...",
+    "Calculating your career compatibility...",
+    "Unleashing the keyword detectives...",
+    "Analyzing with the power of a thousand spreadsheets...",
+    "Consulting the CV oracle...",
+    "Performing digital alchemy on your resume..."
+  ];
+
+  // Rotate loading messages
+  React.useEffect(() => {
+    if (analyzing) {
+      let messageIndex = 0;
+      setCurrentLoadingMessage(loadingMessages[0]);
+      
+      const interval = setInterval(() => {
+        messageIndex = (messageIndex + 1) % loadingMessages.length;
+        setCurrentLoadingMessage(loadingMessages[messageIndex]);
+      }, 2500);
+
+      return () => clearInterval(interval);
+    }
+  }, [analyzing]);
 
   // Fetch user credits
   const { data: userCredits } = useQuery({
@@ -136,21 +166,29 @@ const AnalyzeCV = () => {
     performAnalysis(uploadedFiles, jobTitle, true, userCredits);
   };
 
+  const handleStartNew = () => {
+    setAnalysisResult(null);
+    setUploadedFiles({});
+    setJobTitle('');
+  };
+
   const canAnalyze = uploadedFiles.cv && uploadedFiles.jobDescription;
   const hasCreditsForAI = userCredits?.credits && userCredits.credits > 0;
 
   if (analysisResult) {
-    return <AnalysisResults result={analysisResult} onStartNew={() => setAnalysisResult(null)} />;
+    return <AnalysisResults result={analysisResult} onStartNew={handleStartNew} />;
   }
 
   return (
     <div className={`min-h-screen bg-gradient-to-br from-apple-core/20 via-white to-citrus/10 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5 ${analyzing ? 'pointer-events-none' : ''}`}>
       {analyzing && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-          <div className="bg-white dark:bg-blueberry/90 rounded-lg p-8 text-center">
+          <div className="bg-white dark:bg-blueberry/90 rounded-lg p-8 text-center max-w-md">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-apricot mx-auto mb-4"></div>
             <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-2">Analyzing Your CV</h3>
-            <p className="text-blueberry/70 dark:text-apple-core/80">Please wait while we perform comprehensive analysis...</p>
+            <p className="text-blueberry/70 dark:text-apple-core/80 min-h-[2rem] transition-opacity duration-500">
+              {currentLoadingMessage}
+            </p>
           </div>
         </div>
       )}

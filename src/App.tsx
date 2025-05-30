@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -16,6 +15,7 @@ import Resources from "./pages/Resources";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/AdminDashboard";
+import HelpCentre from "./pages/HelpCentre";
 import NotFound from "./pages/NotFound";
 
 const App: React.FC = () => {
@@ -48,6 +48,7 @@ const App: React.FC = () => {
                     </ProtectedRoute>
                   } />
                   <Route path="/resources" element={<Resources />} />
+                  <Route path="/help" element={<HelpCentre />} />
                   <Route path="/profile" element={
                     <ProtectedRoute>
                       <Profile />
