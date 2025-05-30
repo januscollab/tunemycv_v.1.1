@@ -103,7 +103,11 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
 
             {/* Tab Content */}
             {activeTab === 'saved' ? (
-              <SavedCVList onCVSelect={handleCVSelect} uploading={uploading} />
+              <SavedCVList 
+                savedCVs={[]} 
+                selectedCVId={null} 
+                onCVSelect={handleCVSelect} 
+              />
             ) : (
               <FileUploadWithSave 
                 onFileSelect={handleFileSelect}
