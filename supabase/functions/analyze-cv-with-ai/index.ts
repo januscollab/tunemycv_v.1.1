@@ -149,9 +149,9 @@ serve(async (req) => {
       );
     }
 
-    // Enhanced AI prompt for comprehensive analysis
+    // Enhanced comprehensive AI prompt
     const prompt = `
-You are an expert CV analysis consultant. Analyze this CV against the job description and provide a comprehensive evaluation.
+You are an expert CV analysis consultant with deep expertise in recruitment, ATS systems, and career development. Analyze this CV against the job description and provide a comprehensive evaluation report.
 
 CV Content:
 ${cvText}
@@ -161,81 +161,117 @@ ${jobDescriptionText}
 
 Position: ${jobTitle || 'Not specified'}
 
-IMPORTANT: Respond ONLY with valid JSON. Do not include markdown formatting or additional text.
+CRITICAL INSTRUCTIONS:
+- Respond ONLY with valid JSON. No markdown formatting, explanations, or additional text outside the JSON.
+- Provide a thorough, professional analysis suitable for career development.
+- Focus on actionable insights and specific recommendations.
+- Consider industry standards, ATS compatibility, and market expectations.
 
-Provide your analysis in this exact JSON format:
+Required JSON structure:
 {
   "compatibilityScore": number (0-100),
-  "keywordsFound": ["keyword1", "keyword2"],
-  "keywordsMissing": ["missing1", "missing2"],
-  "strengths": ["strength1", "strength2", "strength3"],
-  "weaknesses": ["weakness1", "weakness2", "weakness3"],
-  "recommendations": ["rec1", "rec2", "rec3"],
-  "executiveSummary": "2-3 sentence professional summary with match level and overall assessment",
+  "executiveSummary": "Professional 3-4 sentence summary including overall compatibility percentage, match level (excellent/good/moderate/needs improvement), brief strengths/gaps overview, and position-specific context",
+  "strengths": ["strength1", "strength2", "strength3", "strength4"],
+  "weaknesses": ["area1", "area2", "area3", "area4"],
   "compatibilityBreakdown": [
     {
-      "category": "Technical Skills",
+      "category": "Technical Skills & Experience",
       "score": number (1-10),
-      "weight": number (percentage),
-      "feedback": "specific assessment"
+      "weight": 35,
+      "feedback": "Detailed assessment of technical capabilities and relevant experience"
     },
     {
-      "category": "Experience Level",
+      "category": "Leadership & Management",
       "score": number (1-10),
-      "weight": number (percentage),
-      "feedback": "specific assessment"
+      "weight": 25,
+      "feedback": "Assessment of leadership experience and management capabilities"
     },
     {
       "category": "Industry Knowledge",
       "score": number (1-10),
-      "weight": number (percentage),
-      "feedback": "specific assessment"
+      "weight": 25,
+      "feedback": "Evaluation of sector-specific knowledge and understanding"
     },
     {
-      "category": "Soft Skills",
+      "category": "Communication & Soft Skills",
       "score": number (1-10),
-      "weight": number (percentage),
-      "feedback": "specific assessment"
+      "weight": 15,
+      "feedback": "Assessment of interpersonal and communication abilities"
     }
   ],
   "keywordAnalysis": [
     {
-      "keyword": "specific skill/term",
+      "keyword": "specific technical or soft skill term",
       "importance": "High|Medium|Low",
       "present": "Yes|No|Partial",
-      "context": "where found or why missing"
+      "context": "Where found in CV or why it's missing and important"
     }
   ],
+  "keywordsFound": ["found keyword1", "found keyword2"],
+  "keywordsMissing": ["missing keyword1", "missing keyword2"],
   "priorityRecommendations": [
     {
-      "title": "Priority recommendation title",
-      "priority": number (1-4),
-      "actionItems": ["specific action 1", "specific action 2"],
-      "example": "Example implementation text"
+      "title": "High-impact recommendation title",
+      "priority": 1,
+      "actionItems": ["Specific action 1", "Specific action 2", "Specific action 3"],
+      "example": "Concrete example of how to implement this recommendation"
+    },
+    {
+      "title": "Important improvement area",
+      "priority": 2,
+      "actionItems": ["Specific action 1", "Specific action 2"],
+      "example": "Practical implementation example"
+    },
+    {
+      "title": "Additional enhancement",
+      "priority": 3,
+      "actionItems": ["Specific action 1", "Specific action 2"],
+      "example": "Implementation guidance"
     }
   ],
   "skillsGapAnalysis": [
     {
       "category": "Technical Skills",
       "missing": ["skill1", "skill2"],
-      "suggestions": ["Learn X through Y", "Gain experience in Z"]
+      "suggestions": ["Learn X through online courses", "Gain experience by volunteering for Y projects"]
+    },
+    {
+      "category": "Certifications",
+      "missing": ["cert1", "cert2"],
+      "suggestions": ["Pursue certification in X", "Complete training in Y"]
     }
   ],
-  "atsOptimization": ["tip1", "tip2", "tip3"],
-  "interviewPrep": ["prep1", "prep2", "prep3"]
+  "atsOptimization": [
+    "Use exact keywords from job description",
+    "Add specific technical skills section",
+    "Include quantifiable achievements",
+    "Optimize section headers for ATS scanning"
+  ],
+  "interviewPrep": [
+    "Prepare examples demonstrating X experience",
+    "Research company's Y initiatives",
+    "Practice explaining Z technical concepts",
+    "Prepare questions about team structure and growth"
+  ],
+  "recommendations": ["Overall rec 1", "Overall rec 2", "Overall rec 3", "Overall rec 4"]
 }
 
 Analysis Guidelines:
-1. Executive Summary: Include overall compatibility percentage, match level (excellent/good/moderate/needs improvement), brief strengths/gaps summary, and position context
-2. Compatibility Breakdown: Ensure weights add to 100%. Score categories: Technical Skills (30%), Experience Level (25%), Industry Knowledge (25%), Soft Skills (20%)
-3. Keyword Analysis: Focus on both technical and soft skills. Mark importance based on job requirements frequency/emphasis
-4. Priority Recommendations: Order by impact. Include specific, actionable steps with examples
-5. Be specific and actionable in all feedback
-6. Consider ATS compatibility and industry standards
-7. Focus on both content and formatting improvements
+1. **Executive Summary**: Include specific compatibility percentage, clear match level assessment, concise strengths/gaps summary, and role-specific context
+2. **Compatibility Breakdown**: Ensure weights total 100%. Provide detailed, actionable feedback for each category
+3. **Keyword Analysis**: Focus on both technical and soft skills. Consider frequency and context in job description for importance rating
+4. **Priority Recommendations**: Order by potential impact. Include specific, measurable action items with practical examples
+5. **Skills Gap Analysis**: Identify specific missing skills and provide concrete learning pathways
+6. **ATS Optimization**: Focus on practical formatting and keyword suggestions
+7. **Interview Prep**: Provide role-specific preparation strategies
+8. **Be specific and actionable**: Avoid generic advice. Tailor all feedback to the specific role and industry
+9. **Consider career level**: Adjust expectations and recommendations based on seniority level
+10. **Industry context**: Factor in industry-specific requirements and standards
+
+Ensure all feedback is professional, constructive, and focused on helping the candidate improve their application success.
 `;
 
-    console.log('Calling OpenAI API with enhanced prompt...');
+    console.log('Calling OpenAI API with enhanced comprehensive prompt...');
 
     // Call OpenAI API with retry logic
     let openAIResponse;
@@ -255,15 +291,15 @@ Analysis Guidelines:
             messages: [
               {
                 role: 'system',
-                content: 'You are an expert CV consultant. Always respond with valid JSON only, no additional text or formatting. Never use markdown code blocks.'
+                content: 'You are an expert CV consultant and career advisor. Always respond with valid JSON only, no additional text or formatting. Never use markdown code blocks. Provide comprehensive, actionable analysis.'
               },
               {
                 role: 'user',
                 content: prompt
               }
             ],
-            temperature: 0.3,
-            max_tokens: 3000,
+            temperature: 0.2,
+            max_tokens: 4000,
           }),
         });
 
@@ -323,11 +359,11 @@ Analysis Guidelines:
     );
 
   } catch (error) {
-    console.error('Error in AI analysis:', error);
+    console.error('Error in comprehensive AI analysis:', error);
     return new Response(
       JSON.stringify({ 
         error: error.message,
-        fallback: true // Indicates frontend should use basic analysis
+        fallback: true // Indicates frontend should use comprehensive algorithmic analysis
       }),
       { 
         status: 500, 

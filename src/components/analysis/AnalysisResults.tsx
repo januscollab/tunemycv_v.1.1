@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { ArrowLeft, Download, BarChart3, CheckCircle, XCircle, TrendingUp, Star, AlertCircle, Target, BookOpen, Users } from 'lucide-react';
+import { ArrowLeft, Download, BarChart3, CheckCircle, XCircle, TrendingUp, Star, AlertCircle, Target, BookOpen, Users, Award, Lightbulb } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import jsPDF from 'jspdf';
 
@@ -19,6 +20,13 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
     if (score >= 70) return 'bg-green-50 border-green-200';
     if (score >= 40) return 'bg-yellow-50 border-yellow-200';
     return 'bg-red-50 border-red-200';
+  };
+
+  const getMatchLevel = (score: number) => {
+    if (score >= 80) return 'Excellent Match';
+    if (score >= 70) return 'Good Match';
+    if (score >= 50) return 'Moderate Match';
+    return 'Needs Improvement';
   };
 
   const downloadPDF = () => {
@@ -239,7 +247,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-apple-core/20 via-white to-citrus/10 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <button
@@ -254,7 +262,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
             className="flex items-center space-x-2 bg-apricot text-white px-4 py-2 rounded-md hover:bg-apricot/90 transition-colors"
           >
             <Download className="h-4 w-4" />
-            <span>Download PDF Report</span>
+            <span>Download Report</span>
           </button>
         </div>
 
@@ -263,70 +271,247 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
           <div className="text-center">
             <div className="flex items-center justify-center mb-4">
               <BarChart3 className={`h-8 w-8 ${getScoreColor(result.compatibility_score)} mr-2`} />
-              <h1 className="text-2xl font-bold text-blueberry dark:text-citrus">CV Compatibility Analysis</h1>
+              <h1 className="text-3xl font-bold text-blueberry dark:text-citrus">Comprehensive CV Analysis</h1>
             </div>
             {result.job_title && (
-              <p className="text-lg text-blueberry/80 dark:text-apple-core mb-2">For: {result.job_title}</p>
+              <p className="text-lg text-blueberry/80 dark:text-apple-core mb-2">Position: {result.job_title}</p>
             )}
             {result.company_name && result.company_name !== 'Company' && (
-              <p className="text-md text-blueberry/70 dark:text-apple-core/80 mb-6">At: {result.company_name}</p>
+              <p className="text-md text-blueberry/70 dark:text-apple-core/80 mb-6">Company: {result.company_name}</p>
             )}
             
-            <div className="flex items-center justify-center mb-6">
+            <div className="grid md:grid-cols-2 gap-8 items-center mb-6">
               <div className="text-center">
                 <div className={`text-6xl font-bold ${getScoreColor(result.compatibility_score)} mb-2`}>
                   {result.compatibility_score}%
                 </div>
                 <div className="text-blueberry/70 dark:text-apple-core/80">Compatibility Score</div>
+                <div className={`text-lg font-semibold mt-2 ${getScoreColor(result.compatibility_score)}`}>
+                  {getMatchLevel(result.compatibility_score)}
+                </div>
               </div>
-            </div>
-            
-            <Progress value={result.compatibility_score} className="w-full max-w-md mx-auto mb-4" />
-            
-            <div className="text-blueberry/70 dark:text-apple-core/80">
-              {result.compatibility_score >= 70 && "Excellent match! Your CV aligns well with this position."}
-              {result.compatibility_score >= 40 && result.compatibility_score < 70 && "Good potential! Some improvements could strengthen your application."}
-              {result.compatibility_score < 40 && "Room for improvement. Consider tailoring your CV more specifically."}
+              <div className="space-y-3">
+                <Progress value={result.compatibility_score} className="w-full h-3" />
+                <div className="text-sm text-blueberry/70 dark:text-apple-core/80 text-center">
+                  Analysis completed on {new Date(result.created_at).toLocaleDateString()}
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
+        {/* Executive Summary */}
+        <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 mb-8 border border-apple-core/20 dark:border-citrus/20">
+          <div className="flex items-center mb-4">
+            <Star className="h-6 w-6 text-apricot mr-3" />
+            <h2 className="text-2xl font-semibold text-blueberry dark:text-citrus">Executive Summary</h2>
+          </div>
+          <p className="text-lg text-blueberry/80 dark:text-apple-core leading-relaxed">{result.executive_summary}</p>
+        </div>
+
+        {/* Compatibility Breakdown */}
+        {result.compatibilityBreakdown && result.compatibilityBreakdown.length > 0 && (
+          <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 mb-8 border border-apple-core/20 dark:border-citrus/20">
+            <div className="flex items-center mb-6">
+              <Target className="h-6 w-6 text-apricot mr-3" />
+              <h2 className="text-2xl font-semibold text-blueberry dark:text-citrus">Compatibility Breakdown</h2>
+            </div>
+            <div className="grid gap-4">
+              {result.compatibilityBreakdown.map((category: any, index: number) => (
+                <div key={index} className="border border-apple-core/10 dark:border-citrus/10 rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-semibold text-blueberry dark:text-citrus">{category.category}</h3>
+                    <div className="flex items-center space-x-3">
+                      <span className="text-sm text-blueberry/60 dark:text-apple-core/60">Weight: {category.weight}%</span>
+                      <span className={`font-bold ${category.score >= 7 ? 'text-green-600' : category.score >= 5 ? 'text-yellow-600' : 'text-red-600'}`}>
+                        {category.score}/10
+                      </span>
+                    </div>
+                  </div>
+                  <Progress value={category.score * 10} className="mb-3" />
+                  <p className="text-sm text-blueberry/70 dark:text-apple-core/80">{category.feedback}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Priority Recommendations */}
+        {result.priorityRecommendations && result.priorityRecommendations.length > 0 && (
+          <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 mb-8 border border-apple-core/20 dark:border-citrus/20">
+            <div className="flex items-center mb-6">
+              <Lightbulb className="h-6 w-6 text-apricot mr-3" />
+              <h2 className="text-2xl font-semibold text-blueberry dark:text-citrus">Priority Recommendations</h2>
+            </div>
+            <div className="space-y-6">
+              {result.priorityRecommendations.map((rec: any, index: number) => (
+                <div key={index} className="border border-apple-core/10 dark:border-citrus/10 rounded-lg p-5">
+                  <div className="flex items-start mb-3">
+                    <div className="w-8 h-8 bg-apricot/20 text-apricot rounded-full flex items-center justify-center text-sm font-bold mr-3 mt-0.5 flex-shrink-0">
+                      {rec.priority}
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-blueberry dark:text-citrus mb-2">{rec.title}</h3>
+                      <div className="mb-3">
+                        <h4 className="text-sm font-medium text-blueberry/80 dark:text-apple-core mb-2">Action Items:</h4>
+                        <ul className="space-y-1">
+                          {rec.actionItems.map((item: string, itemIndex: number) => (
+                            <li key={itemIndex} className="flex items-start text-sm text-blueberry/70 dark:text-apple-core/80">
+                              <div className="w-1.5 h-1.5 bg-apricot rounded-full mt-2 mr-2 flex-shrink-0"></div>
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      {rec.example && (
+                        <div className="bg-apple-core/5 dark:bg-citrus/5 rounded p-3">
+                          <h4 className="text-sm font-medium text-blueberry/80 dark:text-apple-core mb-1">Example:</h4>
+                          <p className="text-sm text-blueberry/70 dark:text-apple-core/80 italic">{rec.example}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Keyword Analysis */}
+        {result.keywordAnalysis && result.keywordAnalysis.length > 0 && (
+          <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 mb-8 border border-apple-core/20 dark:border-citrus/20">
+            <div className="flex items-center mb-6">
+              <BarChart3 className="h-6 w-6 text-apricot mr-3" />
+              <h2 className="text-2xl font-semibold text-blueberry dark:text-citrus">Keyword Analysis</h2>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="border-b border-apple-core/20 dark:border-citrus/20">
+                    <th className="text-left p-3 font-semibold text-blueberry dark:text-citrus">Keyword</th>
+                    <th className="text-left p-3 font-semibold text-blueberry dark:text-citrus">Importance</th>
+                    <th className="text-left p-3 font-semibold text-blueberry dark:text-citrus">Present</th>
+                    <th className="text-left p-3 font-semibold text-blueberry dark:text-citrus">Context</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {result.keywordAnalysis.map((keyword: any, index: number) => (
+                    <tr key={index} className="border-b border-apple-core/10 dark:border-citrus/10">
+                      <td className="p-3 font-medium text-blueberry dark:text-apple-core">{keyword.keyword}</td>
+                      <td className="p-3">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          keyword.importance === 'High' ? 'bg-red-100 text-red-800' :
+                          keyword.importance === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                          {keyword.importance}
+                        </span>
+                      </td>
+                      <td className="p-3">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          keyword.present === 'Yes' ? 'bg-green-100 text-green-800' :
+                          keyword.present === 'Partial' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-red-100 text-red-800'
+                        }`}>
+                          {keyword.present}
+                        </span>
+                      </td>
+                      <td className="p-3 text-sm text-blueberry/70 dark:text-apple-core/80">{keyword.context}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Skills Gap Analysis */}
+        {result.skillsGapAnalysis && result.skillsGapAnalysis.length > 0 && (
+          <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 mb-8 border border-apple-core/20 dark:border-citrus/20">
+            <div className="flex items-center mb-6">
+              <BookOpen className="h-6 w-6 text-apricot mr-3" />
+              <h2 className="text-2xl font-semibold text-blueberry dark:text-citrus">Skills Gap Analysis</h2>
+            </div>
+            <div className="grid md:grid-cols-2 gap-6">
+              {result.skillsGapAnalysis.map((gap: any, index: number) => (
+                <div key={index} className="border border-apple-core/10 dark:border-citrus/10 rounded-lg p-4">
+                  <h3 className="font-semibold text-blueberry dark:text-citrus mb-3">{gap.category}</h3>
+                  {gap.missing && gap.missing.length > 0 && (
+                    <div className="mb-3">
+                      <h4 className="text-sm font-medium text-red-600 mb-2">Missing Skills:</h4>
+                      <div className="flex flex-wrap gap-1">
+                        {gap.missing.map((skill: string, skillIndex: number) => (
+                          <span key={skillIndex} className="bg-red-100 text-red-800 px-2 py-1 rounded text-xs">
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {gap.suggestions && gap.suggestions.length > 0 && (
+                    <div>
+                      <h4 className="text-sm font-medium text-green-600 mb-2">Suggestions:</h4>
+                      <ul className="space-y-1">
+                        {gap.suggestions.map((suggestion: string, suggestionIndex: number) => (
+                          <li key={suggestionIndex} className="text-sm text-blueberry/70 dark:text-apple-core/80 flex items-start">
+                            <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 mr-2 flex-shrink-0"></div>
+                            {suggestion}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Additional Sections Grid */}
         <div className="grid md:grid-cols-2 gap-6 mb-8">
-          {/* Executive Summary */}
-          <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
-            <div className="flex items-center mb-4">
-              <Star className="h-5 w-5 text-apricot mr-2" />
-              <h2 className="text-xl font-semibold text-blueberry dark:text-citrus">Executive Summary</h2>
+          {/* ATS Optimization */}
+          {result.atsOptimization && result.atsOptimization.length > 0 && (
+            <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
+              <div className="flex items-center mb-4">
+                <Award className="h-5 w-5 text-apricot mr-2" />
+                <h2 className="text-xl font-semibold text-blueberry dark:text-citrus">ATS Optimization</h2>
+              </div>
+              <ul className="space-y-2">
+                {result.atsOptimization.map((tip: string, index: number) => (
+                  <li key={index} className="flex items-start text-sm text-blueberry/80 dark:text-apple-core">
+                    <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 mr-2 flex-shrink-0" />
+                    {tip}
+                  </li>
+                ))}
+              </ul>
             </div>
-            <p className="text-blueberry/80 dark:text-apple-core">{result.executive_summary}</p>
-          </div>
+          )}
 
-          {/* Quick Stats */}
-          <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
-            <h2 className="text-xl font-semibold text-blueberry dark:text-citrus mb-4">Quick Stats</h2>
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-blueberry/70 dark:text-apple-core/80">Keywords Found:</span>
-                <span className="font-semibold text-green-600">{result.keywords_found?.length || 0}</span>
+          {/* Interview Preparation */}
+          {result.interviewPrep && result.interviewPrep.length > 0 && (
+            <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
+              <div className="flex items-center mb-4">
+                <Users className="h-5 w-5 text-apricot mr-2" />
+                <h2 className="text-xl font-semibold text-blueberry dark:text-citrus">Interview Preparation</h2>
               </div>
-              <div className="flex justify-between">
-                <span className="text-blueberry/70 dark:text-apple-core/80">Keywords Missing:</span>
-                <span className="font-semibold text-red-600">{result.keywords_missing?.length || 0}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-blueberry/70 dark:text-apple-core/80">Analysis Date:</span>
-                <span className="font-semibold text-blueberry dark:text-citrus">{new Date(result.created_at).toLocaleDateString()}</span>
-              </div>
+              <ul className="space-y-2">
+                {result.interviewPrep.map((tip: string, index: number) => (
+                  <li key={index} className="flex items-start text-sm text-blueberry/80 dark:text-apple-core">
+                    <TrendingUp className="h-4 w-4 text-blue-500 mt-0.5 mr-2 flex-shrink-0" />
+                    {tip}
+                  </li>
+                ))}
+              </ul>
             </div>
-          </div>
+          )}
         </div>
 
-        {/* Strengths and Weaknesses */}
+        {/* Traditional Strengths and Weaknesses Grid */}
         <div className="grid md:grid-cols-2 gap-6 mb-8">
           <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
             <div className="flex items-center mb-4">
               <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
-              <h2 className="text-xl font-semibold text-blueberry dark:text-citrus">Strengths</h2>
+              <h2 className="text-xl font-semibold text-blueberry dark:text-citrus">Key Strengths</h2>
             </div>
             {result.strengths && result.strengths.length > 0 ? (
               <ul className="space-y-2">
@@ -362,17 +547,17 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
           </div>
         </div>
 
-        {/* Keyword Analysis */}
+        {/* Quick Keywords Summary */}
         <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 mb-8 border border-apple-core/20 dark:border-citrus/20">
           <div className="flex items-center mb-4">
             <BarChart3 className="h-5 w-5 text-apricot mr-2" />
-            <h2 className="text-xl font-semibold text-blueberry dark:text-citrus">Keyword Analysis</h2>
+            <h2 className="text-xl font-semibold text-blueberry dark:text-citrus">Keywords Summary</h2>
           </div>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <h3 className="font-semibold text-green-600 mb-3 flex items-center">
                 <CheckCircle className="h-4 w-4 mr-1" />
-                Found Keywords
+                Found Keywords ({result.keywords_found?.length || 0})
               </h3>
               {result.keywords_found && result.keywords_found.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
@@ -381,6 +566,11 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
                       {keyword}
                     </span>
                   ))}
+                  {result.keywords_found.length > 10 && (
+                    <span className="text-sm text-blueberry/60 dark:text-apple-core/60">
+                      +{result.keywords_found.length - 10} more
+                    </span>
+                  )}
                 </div>
               ) : (
                 <p className="text-blueberry/60 dark:text-apple-core/60">No keywords found.</p>
@@ -389,7 +579,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
             <div>
               <h3 className="font-semibold text-red-600 mb-3 flex items-center">
                 <XCircle className="h-4 w-4 mr-1" />
-                Missing Keywords
+                Missing Keywords ({result.keywords_missing?.length || 0})
               </h3>
               {result.keywords_missing && result.keywords_missing.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
@@ -398,34 +588,17 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
                       {keyword}
                     </span>
                   ))}
+                  {result.keywords_missing.length > 10 && (
+                    <span className="text-sm text-blueberry/60 dark:text-apple-core/60">
+                      +{result.keywords_missing.length - 10} more
+                    </span>
+                  )}
                 </div>
               ) : (
                 <p className="text-blueberry/60 dark:text-apple-core/60">No missing keywords identified.</p>
               )}
             </div>
           </div>
-        </div>
-
-        {/* Recommendations */}
-        <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 mb-8 border border-apple-core/20 dark:border-citrus/20">
-          <div className="flex items-center mb-4">
-            <TrendingUp className="h-5 w-5 text-apricot mr-2" />
-            <h2 className="text-xl font-semibold text-blueberry dark:text-citrus">Recommendations</h2>
-          </div>
-          {result.recommendations && result.recommendations.length > 0 ? (
-            <ul className="space-y-3">
-              {result.recommendations.map((recommendation: string, index: number) => (
-                <li key={index} className="flex items-start">
-                  <div className="w-6 h-6 bg-apricot/20 text-apricot rounded-full flex items-center justify-center text-sm font-semibold mr-3 mt-0.5 flex-shrink-0">
-                    {index + 1}
-                  </div>
-                  <span className="text-blueberry/80 dark:text-apple-core">{recommendation}</span>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-blueberry/60 dark:text-apple-core/60">No specific recommendations available.</p>
-          )}
         </div>
       </div>
     </div>
