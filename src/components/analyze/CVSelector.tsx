@@ -4,8 +4,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { validateFile, extractTextFromFile } from '@/utils/fileUtils';
-import SavedCVList from './upload/SavedCVList';
-import FileUploadArea from './upload/FileUploadArea';
+import CVSelectorDropdown from './CVSelectorDropdown';
+import FileUploadWithSave from './upload/FileUploadWithSave';
 import UploadedFileDisplay from './upload/UploadedFileDisplay';
 
 interface UploadedFile {
@@ -70,7 +70,7 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
     onCVSelect(uploadedFile);
   };
 
-  const handleNewFileUpload = async (file: File) => {
+  const handleNewFileUpload = async (file: File, shouldSave: boolean) => {
     const cvTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
     const maxSize = 5 * 1024 * 1024; // 5MB
     const errors = validateFile(file, cvTypes, maxSize);
@@ -82,6 +82,37 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
 
     try {
       const extractedText = await extractTextFromFile(file);
+      
+      // Save to database if requested and user is logged in
+      if (shouldSave && user) {
+        const { error } = await supabase
+          .from('uploads')
+          .insert({
+            user_id: user.id,
+            file_name: file.name,
+            file_type: file.type,
+            file_size: file.size,
+            upload_type: 'cv',
+            extracted_text: extractedText
+          });
+
+        if (error) throw error;
+        
+        // Reload saved CVs
+        await loadSavedCVs();
+        toast({ 
+          title: 'Success', 
+          description: 'CV uploaded and saved successfully!',
+          className: 'bg-green-50 border-green-200'
+        });
+      } else {
+        toast({ 
+          title: 'Success', 
+          description: 'CV uploaded successfully!',
+          className: 'bg-green-50 border-green-200'
+        });
+      }
+
       const uploadedFile: UploadedFile = {
         file,
         extractedText,
@@ -90,6 +121,7 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
       setSelectedCVId(null);
       onCVSelect(uploadedFile);
     } catch (error) {
+      console.error('Error processing CV:', error);
       toast({ title: 'Error', description: 'Failed to process file', variant: 'destructive' });
     }
   };
@@ -101,22 +133,14 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
         Choose from your saved CVs or upload a new one
       </p>
 
-      <SavedCVList
-        savedCVs={savedCVs}
-        selectedCVId={selectedCVId}
-        onCVSelect={handleSavedCVSelect}
-      />
-
-      {savedCVs.length > 0 && (
-        <div className="text-center text-blueberry/60 dark:text-apple-core/60 mb-4">or</div>
-      )}
-
-      <FileUploadArea
+      <FileUploadWithSave
         onFileSelect={handleNewFileUpload}
         uploading={uploading}
         accept=".pdf,.docx"
         maxSize="5MB"
         label="Upload a new CV"
+        currentCVCount={savedCVs.length}
+        maxCVCount={5}
       />
 
       {selectedCV && !selectedCVId && (
@@ -124,6 +148,16 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
           uploadedFile={selectedCV}
           title="New upload ready for analysis"
         />
+      )}
+
+      {savedCVs.length > 0 && (
+        <div className="mt-6">
+          <CVSelectorDropdown
+            savedCVs={savedCVs}
+            selectedCVId={selectedCVId}
+            onCVSelect={handleSavedCVSelect}
+          />
+        </div>
       )}
     </div>
   );
