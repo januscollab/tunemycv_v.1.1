@@ -8,6 +8,10 @@ interface AnalysisResult {
   company_name: string;
   compatibility_score: number;
   created_at: string;
+  executive_summary: string;
+  strengths: string[];
+  weaknesses: string[];
+  recommendations: string[];
 }
 
 interface AnalysisListItemProps {

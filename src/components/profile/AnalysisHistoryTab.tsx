@@ -50,6 +50,10 @@ const AnalysisHistoryTab: React.FC = () => {
     }
   };
 
+  const handleViewDetails = (analysis: AnalysisResult) => {
+    setSelectedAnalysis(analysis);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -70,7 +74,7 @@ const AnalysisHistoryTab: React.FC = () => {
             <AnalysisListItem
               key={analysis.id}
               analysis={analysis}
-              onViewDetails={setSelectedAnalysis}
+              onViewDetails={handleViewDetails}
             />
           ))}
         </div>
