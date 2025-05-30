@@ -26,7 +26,7 @@ const Testimonials = () => {
       company: "Analytics Plus",
       content: "The interview preparation scripts gave me the confidence I needed. I felt so prepared and ultimately got the job with a 30% salary increase!",
       rating: 5,
-      avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b47c?w=80&h=80&fit=crop&crop=face"
+      avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=80&h=80&fit=crop&crop=face"
     },
     {
       name: "David Thompson",

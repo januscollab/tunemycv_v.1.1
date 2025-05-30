@@ -33,8 +33,10 @@ export const useAnalysis = () => {
       console.log('Starting CV analysis...');
 
       const finalJobTitle = jobTitle || extractJobTitleFromText(uploadedFiles.jobDescription.extractedText);
+      const extractedCompany = extractCompanyFromText(uploadedFiles.jobDescription.extractedText);
 
       // Save files to database first
+      console.log('Saving files to database...');
       const { data: cvUpload, error: cvError } = await supabase
         .from('uploads')
         .insert({
@@ -73,7 +75,7 @@ export const useAnalysis = () => {
         throw jobError;
       }
 
-      console.log('Files uploaded successfully, starting AI analysis...');
+      console.log('Files uploaded successfully, starting analysis...');
 
       let analysisData;
       const hasCreditsForAI = userCredits?.credits && userCredits.credits > 0;
@@ -98,7 +100,7 @@ export const useAnalysis = () => {
             throw aiError;
           }
 
-          if (aiResult?.success) {
+          if (aiResult?.success && aiResult?.analysis) {
             console.log('AI analysis successful');
             const aiAnalysis = aiResult.analysis;
             
@@ -107,26 +109,22 @@ export const useAnalysis = () => {
               cv_upload_id: cvUpload.id,
               job_description_upload_id: jobUpload.id,
               job_title: finalJobTitle,
-              company_name: extractCompanyFromText(uploadedFiles.jobDescription.extractedText),
+              company_name: extractedCompany,
               compatibility_score: aiAnalysis.compatibilityScore,
               keywords_found: aiAnalysis.keywordsFound,
               keywords_missing: aiAnalysis.keywordsMissing,
               strengths: aiAnalysis.strengths,
               weaknesses: aiAnalysis.weaknesses,
               recommendations: aiAnalysis.recommendations,
-              executive_summary: aiAnalysis.executiveSummary,
-              analysis_type: 'ai',
-              skills_gap_analysis: aiAnalysis.skillsGapAnalysis,
-              ats_optimization: aiAnalysis.atsOptimization,
-              interview_prep: aiAnalysis.interviewPrep
+              executive_summary: aiAnalysis.executiveSummary
             };
 
             toast({ 
               title: 'Analysis Complete!', 
-              description: `Comprehensive analysis completed. ${aiResult.creditsRemaining} credits remaining.` 
+              description: `Comprehensive AI analysis completed. ${aiResult.creditsRemaining || 0} credits remaining.` 
             });
           } else {
-            throw new Error('AI analysis failed');
+            throw new Error('AI analysis returned invalid results');
           }
         } catch (aiError) {
           console.error('AI analysis failed, falling back to basic analysis:', aiError);
@@ -137,7 +135,7 @@ export const useAnalysis = () => {
           });
           
           // Fall back to basic analysis
-          analysisData = await performBasicAnalysis(cvUpload, jobUpload, finalJobTitle, uploadedFiles);
+          analysisData = await performBasicAnalysis(cvUpload, jobUpload, finalJobTitle, extractedCompany, uploadedFiles);
         }
       } else {
         console.log('No credits available, using basic analysis');
@@ -147,10 +145,11 @@ export const useAnalysis = () => {
         });
         
         // Use basic analysis
-        analysisData = await performBasicAnalysis(cvUpload, jobUpload, finalJobTitle, uploadedFiles);
+        analysisData = await performBasicAnalysis(cvUpload, jobUpload, finalJobTitle, extractedCompany, uploadedFiles);
       }
 
       // Save analysis results
+      console.log('Saving analysis results to database...');
       const { data: analysisResult, error: analysisError } = await supabase
         .from('analysis_results')
         .insert(analysisData)
@@ -174,7 +173,7 @@ export const useAnalysis = () => {
     }
   };
 
-  const performBasicAnalysis = async (cvUpload: any, jobUpload: any, finalJobTitle: string, uploadedFiles: any) => {
+  const performBasicAnalysis = async (cvUpload: any, jobUpload: any, finalJobTitle: string, extractedCompany: string, uploadedFiles: any) => {
     const cvText = uploadedFiles.cv!.extractedText.toLowerCase();
     const jobText = uploadedFiles.jobDescription!.extractedText.toLowerCase();
 
@@ -185,8 +184,6 @@ export const useAnalysis = () => {
     const missingTerms = keyTerms.filter(term => !cvText.includes(term));
 
     const compatibilityScore = Math.round((matchingTerms.length / keyTerms.length) * 100);
-
-    const extractedCompany = extractCompanyFromText(uploadedFiles.jobDescription!.extractedText);
 
     return {
       user_id: user?.id,
@@ -200,8 +197,7 @@ export const useAnalysis = () => {
       strengths: generateStrengths(matchingTerms, compatibilityScore),
       weaknesses: generateWeaknesses(missingTerms, compatibilityScore),
       recommendations: generateRecommendations(missingTerms, compatibilityScore),
-      executive_summary: generateExecutiveSummary(compatibilityScore, finalJobTitle),
-      analysis_type: 'basic'
+      executive_summary: generateExecutiveSummary(compatibilityScore, finalJobTitle)
     };
   };
 

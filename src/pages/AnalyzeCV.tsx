@@ -144,29 +144,29 @@ const AnalyzeCV = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-apple-core/20 via-white to-citrus/10 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
       <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Main Analysis Section */}
         <div className="lg:col-span-3">
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">Analyze Your CV</h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <h1 className="text-4xl font-bold text-blueberry dark:text-citrus mb-4">Analyze Your CV</h1>
+            <p className="text-xl text-blueberry/80 dark:text-apple-core max-w-2xl mx-auto">
               Upload your CV and job description to get instant compatibility analysis with actionable recommendations.
             </p>
           </div>
 
           <div className="space-y-6">
             {/* Job Title */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Job Title</h3>
+            <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
+              <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-4">Job Title</h3>
               <input
                 type="text"
                 value={jobTitle}
                 onChange={(e) => setJobTitle(e.target.value)}
                 placeholder="e.g., Senior Software Engineer (auto-extracted from job description)"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-apple-core/30 dark:border-citrus/30 rounded-md focus:outline-none focus:ring-2 focus:ring-apricot focus:border-transparent bg-white dark:bg-blueberry/10 text-blueberry dark:text-apple-core"
               />
-              <p className="text-sm text-gray-500 mt-2">
+              <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mt-2">
                 Job title will be automatically extracted from the job description if not provided.
               </p>
             </div>
@@ -183,9 +183,9 @@ const AnalyzeCV = () => {
             />
 
             {/* Job Description Upload */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Job Description</h3>
-              <p className="text-sm text-gray-600 mb-4">Upload a file (PDF, DOCX, TXT) or paste the text directly</p>
+            <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
+              <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-4">Job Description</h3>
+              <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mb-4">Upload a file (PDF, DOCX, TXT) or paste the text directly</p>
               
               <div className="space-y-4">
                 {!uploadedFiles.jobDescription ? (
@@ -200,7 +200,7 @@ const AnalyzeCV = () => {
                       uploading={uploading}
                     />
                     
-                    <div className="text-center text-gray-500">or</div>
+                    <div className="text-center text-blueberry/60 dark:text-apple-core/60">or</div>
                     
                     <JobDescriptionTextInput onSubmit={handleJobDescriptionText} disabled={uploading} />
                   </>

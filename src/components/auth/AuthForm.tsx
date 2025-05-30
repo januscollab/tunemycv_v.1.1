@@ -1,6 +1,5 @@
 
 import React from 'react';
-import FormDivider from './FormDivider';
 import NameFields from './NameFields';
 import EmailField from './EmailField';
 import PasswordFields from './PasswordFields';
@@ -49,9 +48,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
 
   return (
     <div className="mt-8">
-      <FormDivider />
-
-      <form className="mt-6 space-y-6" onSubmit={onSubmit}>
+      <form className="space-y-6" onSubmit={onSubmit}>
         {mode === 'register' && (
           <NameFields
             firstName={formData.firstName}
