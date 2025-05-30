@@ -30,6 +30,7 @@ export const useAnalysis = () => {
 
     try {
       setAnalyzing(true);
+      console.log('Starting CV analysis...');
 
       const finalJobTitle = jobTitle || extractJobTitleFromText(uploadedFiles.jobDescription.extractedText);
 
@@ -48,7 +49,10 @@ export const useAnalysis = () => {
         .select()
         .single();
 
-      if (cvError) throw cvError;
+      if (cvError) {
+        console.error('CV upload error:', cvError);
+        throw cvError;
+      }
 
       const { data: jobUpload, error: jobError } = await supabase
         .from('uploads')
@@ -64,15 +68,20 @@ export const useAnalysis = () => {
         .select()
         .single();
 
-      if (jobError) throw jobError;
+      if (jobError) {
+        console.error('Job description upload error:', jobError);
+        throw jobError;
+      }
+
+      console.log('Files uploaded successfully, starting AI analysis...');
 
       let analysisData;
       const hasCreditsForAI = userCredits?.credits && userCredits.credits > 0;
 
-      // Try AI analysis first if enabled and user has credits
-      if (useAI && hasCreditsForAI) {
+      // Always try AI analysis first if user has credits
+      if (hasCreditsForAI) {
         try {
-          console.log('Attempting AI analysis...');
+          console.log('Attempting comprehensive AI analysis...');
           const { data: aiResult, error: aiError } = await supabase.functions.invoke('analyze-cv-with-ai', {
             body: {
               cvText: uploadedFiles.cv.extractedText,
@@ -82,7 +91,12 @@ export const useAnalysis = () => {
             }
           });
 
-          if (aiError) throw aiError;
+          console.log('AI analysis response:', aiResult);
+
+          if (aiError) {
+            console.error('AI analysis error:', aiError);
+            throw aiError;
+          }
 
           if (aiResult?.success) {
             console.log('AI analysis successful');
@@ -108,17 +122,17 @@ export const useAnalysis = () => {
             };
 
             toast({ 
-              title: 'AI Analysis Complete!', 
-              description: `Advanced analysis completed. ${aiResult.creditsRemaining} credits remaining.` 
+              title: 'Analysis Complete!', 
+              description: `Comprehensive analysis completed. ${aiResult.creditsRemaining} credits remaining.` 
             });
           } else {
             throw new Error('AI analysis failed');
           }
         } catch (aiError) {
-          console.log('AI analysis failed, falling back to basic analysis:', aiError);
+          console.error('AI analysis failed, falling back to basic analysis:', aiError);
           toast({ 
             title: 'AI Analysis Unavailable', 
-            description: 'Using basic analysis instead.',
+            description: 'Analysis completed with basic features.',
             variant: 'destructive' 
           });
           
@@ -126,6 +140,12 @@ export const useAnalysis = () => {
           analysisData = await performBasicAnalysis(cvUpload, jobUpload, finalJobTitle, uploadedFiles);
         }
       } else {
+        console.log('No credits available, using basic analysis');
+        toast({ 
+          title: 'No Credits Available', 
+          description: 'Using basic analysis. Purchase credits for comprehensive AI analysis.' 
+        });
+        
         // Use basic analysis
         analysisData = await performBasicAnalysis(cvUpload, jobUpload, finalJobTitle, uploadedFiles);
       }
@@ -137,14 +157,18 @@ export const useAnalysis = () => {
         .select()
         .single();
 
-      if (analysisError) throw analysisError;
+      if (analysisError) {
+        console.error('Analysis save error:', analysisError);
+        throw analysisError;
+      }
 
+      console.log('Analysis completed successfully:', analysisResult);
       setAnalysisResult(analysisResult);
       toast({ title: 'Success', description: 'Analysis completed successfully!' });
 
     } catch (error) {
       console.error('Analysis error:', error);
-      toast({ title: 'Error', description: 'Failed to analyze CV', variant: 'destructive' });
+      toast({ title: 'Error', description: 'Failed to analyze CV. Please try again.', variant: 'destructive' });
     } finally {
       setAnalyzing(false);
     }
@@ -155,10 +179,10 @@ export const useAnalysis = () => {
     const jobText = uploadedFiles.jobDescription!.extractedText.toLowerCase();
 
     const jobWords = jobText.split(/\W+/).filter(word => word.length > 3);
-    const keyTerms: string[] = [...new Set(jobWords)].slice(0, 20);
+    const keyTerms = [...new Set(jobWords)] as string[];
 
-    const matchingTerms: string[] = keyTerms.filter(term => cvText.includes(term));
-    const missingTerms: string[] = keyTerms.filter(term => !cvText.includes(term));
+    const matchingTerms = keyTerms.filter(term => cvText.includes(term));
+    const missingTerms = keyTerms.filter(term => !cvText.includes(term));
 
     const compatibilityScore = Math.round((matchingTerms.length / keyTerms.length) * 100);
 

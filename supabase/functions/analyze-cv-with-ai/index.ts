@@ -30,6 +30,24 @@ interface AIAnalysisResult {
   }[];
   atsOptimization: string[];
   interviewPrep: string[];
+  compatibilityBreakdown: {
+    category: string;
+    score: number;
+    weight: number;
+    feedback: string;
+  }[];
+  keywordAnalysis: {
+    keyword: string;
+    importance: 'High' | 'Medium' | 'Low';
+    present: 'Yes' | 'No' | 'Partial';
+    context: string;
+  }[];
+  priorityRecommendations: {
+    title: string;
+    priority: number;
+    actionItems: string[];
+    example: string;
+  }[];
 }
 
 // Function to clean and parse AI response
@@ -91,6 +109,9 @@ const validateAnalysisResult = (result: any): AIAnalysisResult => {
   result.skillsGapAnalysis = result.skillsGapAnalysis || [];
   result.atsOptimization = result.atsOptimization || [];
   result.interviewPrep = result.interviewPrep || [];
+  result.compatibilityBreakdown = result.compatibilityBreakdown || [];
+  result.keywordAnalysis = result.keywordAnalysis || [];
+  result.priorityRecommendations = result.priorityRecommendations || [];
   
   return result as AIAnalysisResult;
 };
@@ -112,7 +133,7 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const { cvText, jobDescriptionText, jobTitle, userId }: AnalysisRequest = await req.json();
 
-    console.log('Starting AI analysis for user:', userId);
+    console.log('Starting comprehensive AI analysis for user:', userId);
 
     // Check and deduct user credits
     const { data: userCredits, error: creditsError } = await supabase
@@ -128,9 +149,9 @@ serve(async (req) => {
       );
     }
 
-    // Prepare the AI prompt with more explicit instructions
+    // Enhanced AI prompt for comprehensive analysis
     const prompt = `
-You are an expert CV analysis assistant. Analyze the following CV against the job description and provide a comprehensive analysis.
+You are an expert CV analysis consultant. Analyze this CV against the job description and provide a comprehensive evaluation.
 
 CV Content:
 ${cvText}
@@ -138,9 +159,9 @@ ${cvText}
 Job Description:
 ${jobDescriptionText}
 
-Job Title: ${jobTitle || 'Not specified'}
+Position: ${jobTitle || 'Not specified'}
 
-IMPORTANT: Respond ONLY with valid JSON. Do not include any markdown formatting, explanations, or additional text. Return only the JSON object.
+IMPORTANT: Respond ONLY with valid JSON. Do not include markdown formatting or additional text.
 
 Provide your analysis in this exact JSON format:
 {
@@ -150,30 +171,71 @@ Provide your analysis in this exact JSON format:
   "strengths": ["strength1", "strength2", "strength3"],
   "weaknesses": ["weakness1", "weakness2", "weakness3"],
   "recommendations": ["rec1", "rec2", "rec3"],
-  "executiveSummary": "Brief 2-3 sentence summary",
+  "executiveSummary": "2-3 sentence professional summary with match level and overall assessment",
+  "compatibilityBreakdown": [
+    {
+      "category": "Technical Skills",
+      "score": number (1-10),
+      "weight": number (percentage),
+      "feedback": "specific assessment"
+    },
+    {
+      "category": "Experience Level",
+      "score": number (1-10),
+      "weight": number (percentage),
+      "feedback": "specific assessment"
+    },
+    {
+      "category": "Industry Knowledge",
+      "score": number (1-10),
+      "weight": number (percentage),
+      "feedback": "specific assessment"
+    },
+    {
+      "category": "Soft Skills",
+      "score": number (1-10),
+      "weight": number (percentage),
+      "feedback": "specific assessment"
+    }
+  ],
+  "keywordAnalysis": [
+    {
+      "keyword": "specific skill/term",
+      "importance": "High|Medium|Low",
+      "present": "Yes|No|Partial",
+      "context": "where found or why missing"
+    }
+  ],
+  "priorityRecommendations": [
+    {
+      "title": "Priority recommendation title",
+      "priority": number (1-4),
+      "actionItems": ["specific action 1", "specific action 2"],
+      "example": "Example implementation text"
+    }
+  ],
   "skillsGapAnalysis": [
     {
       "category": "Technical Skills",
       "missing": ["skill1", "skill2"],
-      "suggestions": ["Learn X", "Practice Y"]
+      "suggestions": ["Learn X through Y", "Gain experience in Z"]
     }
   ],
   "atsOptimization": ["tip1", "tip2", "tip3"],
   "interviewPrep": ["prep1", "prep2", "prep3"]
 }
 
-Focus on:
-1. Compatibility scoring based on skills, experience, and requirements match
-2. Identify specific keywords from job description that are present/missing in CV
-3. Provide actionable recommendations for improvement
-4. Skills gap analysis by category (technical, soft skills, experience)
-5. ATS optimization tips
-6. Interview preparation suggestions based on gaps identified
-
-Be specific and actionable in your recommendations.
+Analysis Guidelines:
+1. Executive Summary: Include overall compatibility percentage, match level (excellent/good/moderate/needs improvement), brief strengths/gaps summary, and position context
+2. Compatibility Breakdown: Ensure weights add to 100%. Score categories: Technical Skills (30%), Experience Level (25%), Industry Knowledge (25%), Soft Skills (20%)
+3. Keyword Analysis: Focus on both technical and soft skills. Mark importance based on job requirements frequency/emphasis
+4. Priority Recommendations: Order by impact. Include specific, actionable steps with examples
+5. Be specific and actionable in all feedback
+6. Consider ATS compatibility and industry standards
+7. Focus on both content and formatting improvements
 `;
 
-    console.log('Calling OpenAI API...');
+    console.log('Calling OpenAI API with enhanced prompt...');
 
     // Call OpenAI API with retry logic
     let openAIResponse;
@@ -193,7 +255,7 @@ Be specific and actionable in your recommendations.
             messages: [
               {
                 role: 'system',
-                content: 'You are an expert CV analyst. Always respond with valid JSON only, no additional text or formatting. Never use markdown code blocks.'
+                content: 'You are an expert CV consultant. Always respond with valid JSON only, no additional text or formatting. Never use markdown code blocks.'
               },
               {
                 role: 'user',
@@ -201,7 +263,7 @@ Be specific and actionable in your recommendations.
               }
             ],
             temperature: 0.3,
-            max_tokens: 2000,
+            max_tokens: 3000,
           }),
         });
 
@@ -249,7 +311,7 @@ Be specific and actionable in your recommendations.
       console.error('Failed to update credits:', creditUpdateError);
     }
 
-    console.log('AI analysis completed successfully');
+    console.log('Comprehensive AI analysis completed successfully');
 
     return new Response(
       JSON.stringify({

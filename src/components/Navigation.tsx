@@ -65,14 +65,17 @@ const Navigation = () => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  className={`flex items-center px-3 py-2 text-sm font-medium transition-colors relative ${
                     isActive(item.path)
-                      ? 'text-apricot bg-citrus/20'
-                      : 'text-blueberry dark:text-apple-core hover:text-apricot hover:bg-apple-core/30 dark:hover:bg-citrus/20'
+                      ? 'text-apricot'
+                      : 'text-blueberry dark:text-apple-core hover:text-apricot'
                   }`}
                 >
                   <Icon className="h-4 w-4 mr-2" />
                   {item.label}
+                  {isActive(item.path) && (
+                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-apricot"></div>
+                  )}
                 </Link>
               );
             })}
@@ -84,14 +87,17 @@ const Navigation = () => {
                 {isAdmin && (
                   <Link
                     to="/admin"
-                    className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    className={`flex items-center px-3 py-2 text-sm font-medium transition-colors relative ${
                       isActive('/admin')
-                        ? 'text-apricot bg-citrus/20'
-                        : 'text-blueberry dark:text-apple-core hover:text-apricot hover:bg-apple-core/30 dark:hover:bg-citrus/20'
+                        ? 'text-apricot'
+                        : 'text-blueberry dark:text-apple-core hover:text-apricot'
                     }`}
                   >
                     <Shield className="h-4 w-4 mr-2" />
                     Admin
+                    {isActive('/admin') && (
+                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-apricot"></div>
+                    )}
                   </Link>
                 )}
                 <span className="text-sm text-blueberry dark:text-apple-core">
@@ -100,14 +106,17 @@ const Navigation = () => {
                 <div className="relative">
                   <button
                     onClick={() => setShowProfileMenu(!showProfileMenu)}
-                    className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    className={`flex items-center px-3 py-2 text-sm font-medium transition-colors relative ${
                       isActive('/profile')
-                        ? 'text-apricot bg-citrus/20'
-                        : 'text-blueberry dark:text-apple-core hover:text-apricot hover:bg-apple-core/30 dark:hover:bg-citrus/20'
+                        ? 'text-apricot'
+                        : 'text-blueberry dark:text-apple-core hover:text-apricot'
                     }`}
                   >
                     <User className="h-4 w-4 mr-2" />
                     Profile
+                    {isActive('/profile') && (
+                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-apricot"></div>
+                    )}
                   </button>
                   
                   {showProfileMenu && (
