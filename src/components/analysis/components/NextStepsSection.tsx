@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { FileEdit, Search, RotateCcw, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import ConfirmationDialog from '@/components/ui/confirmation-dialog';
@@ -58,45 +57,31 @@ const NextStepsSection: React.FC<NextStepsSectionProps> = ({ onStartNew }) => {
         <CardContent>
           <div className="grid md:grid-cols-3 gap-4">
             {/* Revise CV Option */}
-            <div className="space-y-3">
-              <Button
-                onClick={handleReviseCV}
-                variant="outline"
-                className="w-full h-auto p-4 flex flex-col items-center space-y-2 hover:bg-blue-50 dark:hover:bg-blue-900/20"
-              >
-                <FileEdit className="h-6 w-6 text-blue-600" />
-                <span className="font-medium">Let us Revise Your CV</span>
-              </Button>
-            </div>
+            <Button
+              onClick={handleReviseCV}
+              className="w-full h-20 flex flex-col items-center justify-center space-y-2 bg-citrus hover:bg-citrus/90 text-blueberry"
+            >
+              <FileEdit className="h-6 w-6" />
+              <span className="font-medium">Let us Revise Your CV</span>
+            </Button>
 
             {/* ATS Optimization Option */}
-            <div className="space-y-3">
-              <Button
-                onClick={handleOptimizeATS}
-                variant="outline"
-                className="w-full h-auto p-4 flex flex-col items-center space-y-2 hover:bg-green-50 dark:hover:bg-green-900/20"
-              >
-                <Search className="h-6 w-6 text-green-600" />
-                <span className="font-medium">Optimize your CV for Applicant Tracking System (ATS)</span>
-              </Button>
-            </div>
+            <Button
+              onClick={handleOptimizeATS}
+              className="w-full h-20 flex flex-col items-center justify-center space-y-2 bg-apple-core hover:bg-apple-core/90 text-blueberry"
+            >
+              <Search className="h-6 w-6" />
+              <span className="font-medium text-center">Optimize for Applicant Tracking System (ATS)</span>
+            </Button>
 
             {/* Analyze Another Role Option */}
-            <div className="space-y-3">
-              <Button
-                onClick={handleAnalyzeAnother}
-                variant="default"
-                className="w-full h-auto p-4 flex flex-col items-center space-y-2 bg-apricot hover:bg-apricot/90"
-              >
-                <RotateCcw className="h-6 w-6" />
-                <span className="font-medium">Analyse another Role</span>
-              </Button>
-              <Alert className="bg-apricot/10 border-apricot/30">
-                <AlertDescription className="text-xs text-apricot">
-                  ✨ Start a new analysis
-                </AlertDescription>
-              </Alert>
-            </div>
+            <Button
+              onClick={handleAnalyzeAnother}
+              className="w-full h-20 flex flex-col items-center justify-center space-y-2 bg-apricot hover:bg-apricot/90 text-white"
+            >
+              <RotateCcw className="h-6 w-6" />
+              <span className="font-medium">Analyse Another Role</span>
+            </Button>
           </div>
         </CardContent>
       </Card>

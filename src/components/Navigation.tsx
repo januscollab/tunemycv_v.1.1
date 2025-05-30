@@ -1,6 +1,7 @@
+
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, FileText, Target, BookOpen, User, Shield, LogOut } from 'lucide-react';
+import { Menu, X, FileText, Target, BookOpen, User, Shield, LogOut, Phone } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import ThemeToggle from './ThemeToggle';
@@ -20,6 +21,7 @@ const Navigation = () => {
     { path: '/', label: 'Home', icon: Target },
     { path: '/analyze', label: 'Analyze CV', icon: FileText },
     { path: '/resources', label: 'Resources', icon: BookOpen },
+    { path: '/contact', label: 'Contact', icon: Phone },
   ];
 
   const getUserDisplayName = () => {

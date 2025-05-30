@@ -53,45 +53,34 @@ const EnhancedKeywordAnalysis: React.FC<EnhancedKeywordAnalysisProps> = ({ keywo
 
   return (
     <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center">
-          <div className="bg-blue-500 text-white px-3 py-1 rounded text-sm font-medium mr-3">
-            Enhanced Keyword Analysis
-          </div>
+      <div className="flex items-center mb-4">
+        <div className="bg-apricot text-white px-3 py-1 rounded text-sm font-medium">
+          Enhanced Keyword Analysis
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-blueberry/70 hover:text-blueberry"
-          onClick={() => window.open('/help#ats-keywords', '_blank')}
-        >
-          <ExternalLink className="h-4 w-4 mr-1" />
-          Learn about Applicant Tracking System (ATS)
-        </Button>
       </div>
 
       {/* Summary Stats */}
       <div className="grid grid-cols-3 gap-4 mb-6">
-        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 text-center">
-          <div className="text-2xl font-bold text-blue-600">{matchedKeywords}</div>
-          <div className="text-sm text-blue-700 dark:text-blue-400">Found</div>
+        <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-3 text-center">
+          <div className="text-2xl font-bold text-green-600">{matchedKeywords}</div>
+          <div className="text-sm text-green-700 dark:text-green-400">Found</div>
         </div>
         <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-3 text-center">
           <div className="text-2xl font-bold text-red-600">{totalKeywords - matchedKeywords}</div>
           <div className="text-sm text-red-700 dark:text-red-400">Missing</div>
         </div>
-        <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-3 text-center">
-          <div className="text-2xl font-bold text-green-600">{keywordMatchPercentage}%</div>
-          <div className="text-sm text-green-700 dark:text-green-400">Match Rate</div>
+        <div className="bg-citrus/20 dark:bg-citrus/10 rounded-lg p-3 text-center">
+          <div className="text-2xl font-bold text-blueberry dark:text-citrus">{keywordMatchPercentage}%</div>
+          <div className="text-sm text-blueberry/70 dark:text-citrus/80">Match Rate</div>
         </div>
       </div>
 
       {/* Display limit notice */}
       {keywords.length > 20 && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+        <div className="bg-citrus/10 border border-citrus/30 rounded-lg p-3 mb-4">
           <div className="flex items-center">
-            <Info className="h-4 w-4 text-blue-600 mr-2" />
-            <span className="text-sm text-blue-800">
+            <Info className="h-4 w-4 text-blueberry mr-2" />
+            <span className="text-sm text-blueberry dark:text-apple-core">
               Showing top 20 keywords (prioritized by importance and missing status). 
               Total keywords analyzed: {keywords.length}
             </span>
@@ -149,6 +138,19 @@ const EnhancedKeywordAnalysis: React.FC<EnhancedKeywordAnalysisProps> = ({ keywo
           </p>
         </div>
       )}
+
+      {/* ATS Information Link - Moved to bottom */}
+      <div className="mt-6 pt-4 border-t border-apple-core/20 dark:border-citrus/20">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-blueberry/70 hover:text-apricot p-0 h-auto"
+          onClick={() => window.open('/help#ats-keywords', '_blank')}
+        >
+          <ExternalLink className="h-4 w-4 mr-1" />
+          Learn about Applicant Tracking System (ATS)
+        </Button>
+      </div>
     </div>
   );
 };

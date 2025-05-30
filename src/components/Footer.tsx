@@ -55,9 +55,9 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <a href="mailto:hello@tunemycv.com" className="hover:text-citrus transition-colors">
+                <Link to="/contact" className="hover:text-citrus transition-colors">
                   Contact Us
-                </a>
+                </Link>
               </li>
               <li>
                 <Link to="/help#getting-started" className="hover:text-citrus transition-colors">
