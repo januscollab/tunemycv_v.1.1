@@ -12,6 +12,7 @@ import AnalyzeButton from '@/components/analyze/AnalyzeButton';
 import { useAnalysis } from '@/hooks/useAnalysis';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { Upload, FileText, X, Check } from 'lucide-react';
 
 interface UploadedFile {
   file: File;
@@ -28,7 +29,6 @@ const AnalyzeCV = () => {
     jobDescription?: UploadedFile;
   }>({});
   const [jobTitle, setJobTitle] = useState('');
-  const [showPreview, setShowPreview] = useState<string | null>(null);
 
   const { analyzing, analysisResult, setAnalysisResult, performAnalysis } = useAnalysis();
 
@@ -132,11 +132,6 @@ const AnalyzeCV = () => {
     });
   };
 
-  const togglePreview = (type: 'cv' | 'job_description') => {
-    const previewKey = type === 'cv' ? 'cv' : 'jobDescription';
-    setShowPreview(showPreview === previewKey ? null : previewKey);
-  };
-
   const handleAnalysis = () => {
     performAnalysis(uploadedFiles, jobTitle, true, userCredits);
   };
@@ -149,7 +144,17 @@ const AnalyzeCV = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-apple-core/20 via-white to-citrus/10 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
+    <div className={`min-h-screen bg-gradient-to-br from-apple-core/20 via-white to-citrus/10 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5 ${analyzing ? 'pointer-events-none' : ''}`}>
+      {analyzing && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+          <div className="bg-white dark:bg-blueberry/90 rounded-lg p-8 text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-apricot mx-auto mb-4"></div>
+            <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-2">Analyzing Your CV</h3>
+            <p className="text-blueberry/70 dark:text-apple-core/80">Please wait while we perform comprehensive analysis...</p>
+          </div>
+        </div>
+      )}
+      
       <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Main Analysis Section */}
         <div className="lg:col-span-3">
@@ -170,6 +175,7 @@ const AnalyzeCV = () => {
                 onChange={(e) => setJobTitle(e.target.value)}
                 placeholder="e.g., Senior Software Engineer (auto-extracted from job description)"
                 className="w-full px-3 py-2 border border-apple-core/30 dark:border-citrus/30 rounded-md focus:outline-none focus:ring-2 focus:ring-apricot focus:border-transparent bg-white dark:bg-blueberry/10 text-blueberry dark:text-apple-core"
+                disabled={analyzing}
               />
               <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mt-2">
                 Job title will be automatically extracted from the job description if not provided.
@@ -180,7 +186,7 @@ const AnalyzeCV = () => {
             <CVSelector
               onCVSelect={handleCVSelect}
               selectedCV={uploadedFiles.cv}
-              uploading={uploading}
+              uploading={uploading || analyzing}
             />
 
             {/* Job Description Upload */}
@@ -191,28 +197,30 @@ const AnalyzeCV = () => {
               <div className="space-y-4">
                 {!uploadedFiles.jobDescription ? (
                   <>
+                    {/* File Upload Option */}
                     <div className="border-2 border-dashed border-apple-core/30 dark:border-citrus/30 rounded-lg p-6 text-center">
+                      <Upload className="mx-auto h-8 w-8 text-blueberry/60 dark:text-apple-core/60 mb-2" />
                       <label className="cursor-pointer">
-                        <span className="text-apricot hover:text-apricot/80 font-medium">Click to upload</span>
-                        <span className="text-blueberry/70 dark:text-apple-core/70"> or drag and drop your job description file</span>
+                        <span className="text-apricot hover:text-apricot/80 font-medium">Upload Job Description</span>
+                        <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mt-1">PDF, DOCX, TXT - max 5MB</p>
                         <input
                           type="file"
                           className="hidden"
                           accept=".pdf,.docx,.txt"
                           onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0], 'job_description')}
-                          disabled={uploading}
+                          disabled={uploading || analyzing}
                         />
                       </label>
                     </div>
                     
                     <div className="text-center text-blueberry/60 dark:text-apple-core/60">or</div>
                     
-                    <JobDescriptionTextInput onSubmit={handleJobDescriptionText} disabled={uploading} />
+                    <JobDescriptionTextInput onSubmit={handleJobDescriptionText} disabled={uploading || analyzing} />
                   </>
                 ) : (
                   <div className="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
                     <div className="flex items-center space-x-3">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <Check className="h-5 w-5 text-green-600" />
                       <div>
                         <p className="font-medium text-green-900">{uploadedFiles.jobDescription.file.name}</p>
                         <p className="text-sm text-green-700">Job description ready</p>
@@ -221,8 +229,9 @@ const AnalyzeCV = () => {
                     <button
                       onClick={() => removeFile('jobDescription')}
                       className="p-2 text-red-600 hover:bg-red-100 rounded-md"
+                      disabled={analyzing}
                     >
-                      ×
+                      <X className="h-4 w-4" />
                     </button>
                   </div>
                 )}

@@ -75,10 +75,11 @@ const FileUploadWithSave: React.FC<FileUploadWithSaveProps> = ({
           
           {isAtLimit && (
             <div className="text-sm text-red-600 dark:text-red-400">
-              You've reached the maximum of {maxCVCount} saved CVs. 
-              <Link href="/profile" className="text-apricot hover:text-apricot/80 ml-1">
-                Manage your CVs
-              </Link> to make space for new ones.
+              You've reached the maximum of {maxCVCount} saved CVs.{' '}
+              <a href="/profile" className="text-apricot hover:text-apricot/80 underline">
+                Manage your CVs in your Profile
+              </a>{' '}
+              to make space for new ones.
             </div>
           )}
           

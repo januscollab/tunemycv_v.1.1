@@ -54,6 +54,23 @@ const AnalysisHistoryTab: React.FC = () => {
     setSelectedAnalysis(analysis);
   };
 
+  const handleDeleteAnalysis = async (analysisId: string) => {
+    try {
+      const { error } = await supabase
+        .from('analysis_results')
+        .delete()
+        .eq('id', analysisId)
+        .eq('user_id', user?.id);
+
+      if (error) throw error;
+
+      setAnalyses(prev => prev.filter(analysis => analysis.id !== analysisId));
+      toast({ title: 'Success', description: 'Analysis deleted successfully' });
+    } catch (error) {
+      toast({ title: 'Error', description: 'Failed to delete analysis', variant: 'destructive' });
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -75,6 +92,7 @@ const AnalysisHistoryTab: React.FC = () => {
               key={analysis.id}
               analysis={analysis}
               onViewDetails={handleViewDetails}
+              onDelete={handleDeleteAnalysis}
             />
           ))}
         </div>

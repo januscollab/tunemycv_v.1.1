@@ -1,4 +1,3 @@
-
 import { extractCompanyFromText } from '@/utils/analysisUtils';
 
 interface UploadedFile {
@@ -25,8 +24,7 @@ export const performComprehensiveAnalysis = async (
   const commonWords = ['the', 'and', 'for', 'are', 'but', 'not', 'you', 'all', 'can', 'had', 'her', 'was', 'one', 'our', 'out', 'day', 'get', 'has', 'him', 'his', 'how', 'its', 'may', 'new', 'now', 'old', 'see', 'two', 'who', 'boy', 'did', 'she', 'use', 'her', 'way', 'many', 'than', 'them', 'well', 'were', 'will', 'with', 'have', 'this', 'that', 'from', 'they', 'know', 'want', 'been', 'good', 'much', 'some', 'time', 'very', 'when', 'come', 'here', 'just', 'like', 'long', 'make', 'over', 'such', 'take', 'than', 'them', 'well', 'were'];
   
   const keyTerms = [...new Set(jobWords)]
-    .filter(word => !commonWords.includes(word) && word.length > 2)
-    .slice(0, 100); // Increased from previous limit
+    .filter(word => !commonWords.includes(word) && word.length > 2);
 
   // More sophisticated matching with variations
   const matchingTerms = keyTerms.filter(term => {
@@ -77,19 +75,22 @@ export const performComprehensiveAnalysis = async (
 
   const compatibilityScore = Math.min(100, baseScore + bonusScore);
 
+  // Format job title properly
+  const formattedJobTitle = finalJobTitle.replace(/^for:\s*/i, '').trim();
+
   return {
     user_id: userId,
     cv_upload_id: cvUpload.id,
     job_description_upload_id: jobUpload.id,
-    job_title: finalJobTitle,
+    job_title: formattedJobTitle,
     company_name: extractedCompany,
     compatibility_score: compatibilityScore,
-    keywords_found: matchingTerms, // Return all matching terms
-    keywords_missing: missingTerms, // Return all missing terms
+    keywords_found: matchingTerms,
+    keywords_missing: missingTerms,
     strengths: generateEnhancedStrengths(matchingTerms, compatibilityScore, cvText),
     weaknesses: generateEnhancedWeaknesses(missingTerms, compatibilityScore, cvText),
-    recommendations: generateEnhancedRecommendations(missingTerms, compatibilityScore, finalJobTitle),
-    executive_summary: generateEnhancedExecutiveSummary(compatibilityScore, finalJobTitle, matchingTerms.length, missingTerms.length)
+    recommendations: generateEnhancedRecommendations(missingTerms, compatibilityScore, formattedJobTitle),
+    executive_summary: generateEnhancedExecutiveSummary(compatibilityScore, formattedJobTitle, matchingTerms.length, missingTerms.length)
   };
 };
 

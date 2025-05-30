@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Eye, Calendar, Building } from 'lucide-react';
+import { Eye, Calendar, Building, Trash2 } from 'lucide-react';
 
 interface AnalysisResult {
   id: string;
@@ -17,9 +17,17 @@ interface AnalysisResult {
 interface AnalysisListItemProps {
   analysis: AnalysisResult;
   onViewDetails: (analysis: AnalysisResult) => void;
+  onDelete: (analysisId: string) => void;
 }
 
-const AnalysisListItem: React.FC<AnalysisListItemProps> = ({ analysis, onViewDetails }) => {
+const AnalysisListItem: React.FC<AnalysisListItemProps> = ({ analysis, onViewDetails, onDelete }) => {
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (window.confirm('Are you sure you want to delete this analysis?')) {
+      onDelete(analysis.id);
+    }
+  };
+
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
       <div className="flex justify-between items-start">
@@ -42,13 +50,22 @@ const AnalysisListItem: React.FC<AnalysisListItemProps> = ({ analysis, onViewDet
           </div>
         </div>
         
-        <button
-          onClick={() => onViewDetails(analysis)}
-          className="flex items-center px-3 py-2 text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-md transition-colors"
-        >
-          <Eye className="h-4 w-4 mr-1" />
-          View Details
-        </button>
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => onViewDetails(analysis)}
+            className="flex items-center px-3 py-2 text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-md transition-colors"
+          >
+            <Eye className="h-4 w-4 mr-1" />
+            View Details
+          </button>
+          <button
+            onClick={handleDelete}
+            className="flex items-center px-3 py-2 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors"
+          >
+            <Trash2 className="h-4 w-4 mr-1" />
+            Delete
+          </button>
+        </div>
       </div>
     </div>
   );

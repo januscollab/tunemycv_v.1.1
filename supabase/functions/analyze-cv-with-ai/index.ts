@@ -1,4 +1,3 @@
-
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
@@ -149,7 +148,7 @@ serve(async (req) => {
       );
     }
 
-    // Enhanced comprehensive AI prompt - removed keyword limits
+    // Enhanced comprehensive AI prompt - removed keyword limits and improved formatting
     const prompt = `
 You are an expert CV analysis consultant with deep expertise in recruitment, ATS systems, and career development. Analyze this CV against the job description and provide a comprehensive evaluation report.
 
@@ -168,6 +167,8 @@ CRITICAL INSTRUCTIONS:
 - Consider industry standards, ATS compatibility, and market expectations.
 - Return ALL relevant keywords found and missing - do not limit the number of keywords.
 - Provide comprehensive keyword analysis covering technical skills, soft skills, industry terms, and job-specific terminology.
+- Format job title properly by removing any "For:" prefix and make it user-readable.
+- Extract and return company name from the job description.
 
 Required JSON structure:
 {
@@ -272,20 +273,23 @@ Required JSON structure:
     "Prepare STAR method examples for key competencies",
     "Research interviewer backgrounds and company culture"
   ],
-  "recommendations": ["Overall comprehensive recommendation 1", "Overall comprehensive recommendation 2", "Overall comprehensive recommendation 3", "Overall comprehensive recommendation 4", "Overall comprehensive recommendation 5"]
+  "recommendations": ["Overall comprehensive recommendation 1", "Overall comprehensive recommendation 2", "Overall comprehensive recommendation 3", "Overall comprehensive recommendation 4", "Overall comprehensive recommendation 5"],
+  "companyName": "Extract company name from job description if available"
 }
 
 Analysis Guidelines:
-1. **Comprehensive Keyword Analysis**: Include ALL relevant keywords from the job description - technical skills, soft skills, industry terminology, tools, frameworks, methodologies, certifications, etc. Do not limit the number.
-2. **Executive Summary**: Include specific compatibility percentage, clear match level assessment, concise strengths/gaps summary, and role-specific context
-3. **Compatibility Breakdown**: Ensure weights total 100%. Provide detailed, actionable feedback for each category
-4. **Priority Recommendations**: Order by potential impact. Include specific, measurable action items with practical examples
-5. **Skills Gap Analysis**: Identify ALL missing skills across multiple categories and provide concrete learning pathways
-6. **ATS Optimization**: Focus on comprehensive formatting and keyword optimization strategies
-7. **Interview Prep**: Provide role-specific preparation strategies with actionable steps
-8. **Be comprehensive and actionable**: Provide detailed analysis covering all aspects. Tailor all feedback to the specific role and industry
-9. **Consider career level**: Adjust expectations and recommendations based on seniority level indicated in job description
-10. **Industry context**: Factor in industry-specific requirements and current market standards
+1. **Job Title Formatting**: Remove any "For:" prefix and ensure the title is clean and user-readable
+2. **Company Extraction**: Extract the company name from the job description content and include it in the response
+3. **Comprehensive Keyword Analysis**: Include ALL relevant keywords from the job description - technical skills, soft skills, industry terminology, tools, frameworks, methodologies, certifications, etc. Do not limit the number.
+4. **Executive Summary**: Include specific compatibility percentage, clear match level assessment, concise strengths/gaps summary, and role-specific context
+5. **Compatibility Breakdown**: Ensure weights total 100%. Provide detailed, actionable feedback for each category
+6. **Priority Recommendations**: Order by potential impact. Include specific, measurable action items with practical examples
+7. **Skills Gap Analysis**: Identify ALL missing skills across multiple categories and provide concrete learning pathways
+8. **ATS Optimization**: Focus on comprehensive formatting and keyword optimization strategies
+9. **Interview Prep**: Provide role-specific preparation strategies with actionable steps
+10. **Be comprehensive and actionable**: Provide detailed analysis covering all aspects. Tailor all feedback to the specific role and industry
+11. **Consider career level**: Adjust expectations and recommendations based on seniority level indicated in job description
+12. **Industry context**: Factor in industry-specific requirements and current market standards
 
 Ensure all feedback is professional, constructive, and focused on helping the candidate significantly improve their application success rate.
 `;
@@ -310,7 +314,7 @@ Ensure all feedback is professional, constructive, and focused on helping the ca
             messages: [
               {
                 role: 'system',
-                content: 'You are an expert CV consultant and career advisor. Always respond with valid JSON only, no additional text or formatting. Never use markdown code blocks. Provide comprehensive, actionable analysis with complete keyword coverage.'
+                content: 'You are an expert CV consultant and career advisor. Always respond with valid JSON only, no additional text or formatting. Never use markdown code blocks. Provide comprehensive, actionable analysis with complete keyword coverage. Format job titles properly and extract company names from job descriptions.'
               },
               {
                 role: 'user',
