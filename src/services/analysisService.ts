@@ -61,7 +61,7 @@ export const performAIAnalysis = async (
   finalJobTitle: string,
   userId: string
 ) => {
-  console.log('Attempting comprehensive AI analysis...');
+  console.log('Attempting enhanced comprehensive AI analysis...');
   
   const { data: aiResult, error: aiError } = await supabase.functions.invoke('analyze-cv-with-ai', {
     body: {
@@ -72,22 +72,22 @@ export const performAIAnalysis = async (
     }
   });
 
-  console.log('AI analysis response:', aiResult);
+  console.log('Enhanced AI analysis response:', aiResult);
 
   if (aiError) {
-    console.error('AI analysis error:', aiError);
+    console.error('Enhanced AI analysis error:', aiError);
     throw aiError;
   }
 
   if (!aiResult?.success || !aiResult?.analysis) {
-    throw new Error('AI analysis returned invalid results');
+    throw new Error('Enhanced AI analysis returned invalid results');
   }
 
   return aiResult;
 };
 
 export const saveAnalysisResults = async (analysisData: any) => {
-  console.log('Saving analysis results to database...');
+  console.log('Saving enhanced analysis results to database...');
   
   const { data: analysisResult, error: analysisError } = await supabase
     .from('analysis_results')
@@ -96,7 +96,7 @@ export const saveAnalysisResults = async (analysisData: any) => {
     .single();
 
   if (analysisError) {
-    console.error('Analysis save error:', analysisError);
+    console.error('Enhanced analysis save error:', analysisError);
     throw analysisError;
   }
 
