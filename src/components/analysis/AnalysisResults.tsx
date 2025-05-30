@@ -1,7 +1,12 @@
 import React from 'react';
-import { ArrowLeft, Download, BarChart3, CheckCircle, XCircle, TrendingUp, Star, AlertCircle, Target, BookOpen, Users, Award, Lightbulb, Info } from 'lucide-react';
-import { Progress } from '@/components/ui/progress';
+import { ArrowLeft, Download, CheckCircle } from 'lucide-react';
 import jsPDF from 'jspdf';
+import ExecutiveSummarySection from './ExecutiveSummarySection';
+import CompatibilityBreakdownSection from './CompatibilityBreakdownSection';
+import EnhancedKeywordAnalysis from './EnhancedKeywordAnalysis';
+import SkillsGapAnalysis from './SkillsGapAnalysis';
+import ATSOptimizationSection from './ATSOptimizationSection';
+import InterviewPrepSection from './InterviewPrepSection';
 
 interface AnalysisResultsProps {
   result: any;
@@ -15,18 +20,15 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
     return 'text-red-600';
   };
 
-  const getScoreBgColor = (score: number) => {
-    if (score >= 70) return 'bg-green-50 border-green-200';
-    if (score >= 40) return 'bg-yellow-50 border-yellow-200';
-    return 'bg-red-50 border-red-200';
-  };
-
   const getMatchLevel = (score: number) => {
     if (score >= 80) return 'Excellent Match';
     if (score >= 70) return 'Good Match';
     if (score >= 50) return 'Moderate to Good Match';
     return 'Needs Improvement';
   };
+
+  // Check if we have enhanced data structure
+  const hasEnhancedData = result.executiveSummary || result.compatibilityBreakdown || result.keywordAnalysis;
 
   const downloadPDF = () => {
     const doc = new jsPDF();
@@ -77,8 +79,8 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
 
     doc.setFontSize(12);
     doc.setFont('helvetica', 'normal');
-    if (result.job_title) {
-      doc.text(`Job Title: ${result.job_title}`, margin, currentY);
+    if (result.job_title || result.position) {
+      doc.text(`Job Title: ${result.job_title || result.position}`, margin, currentY);
       currentY += lineHeight;
     }
     if (result.company_name && result.company_name !== 'Company') {
@@ -96,11 +98,12 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
 
     doc.setFontSize(24);
     doc.setFont('helvetica', 'bold');
-    doc.text(`${result.compatibility_score}%`, margin, currentY);
+    doc.text(`${result.compatibility_score || result.compatibilityScore}%`, margin, currentY);
     currentY += 15;
 
     // Executive Summary
-    if (result.executive_summary) {
+    const summaryText = result.executive_summary || result.executiveSummary?.overview;
+    if (summaryText) {
       doc.setFontSize(14);
       doc.setFont('helvetica', 'bold');
       doc.text('EXECUTIVE SUMMARY', margin, currentY);
@@ -108,85 +111,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
 
       doc.setFontSize(12);
       doc.setFont('helvetica', 'normal');
-      currentY = addWrappedText(result.executive_summary, margin, currentY, pageWidth - 2 * margin);
-      currentY += 10;
-    }
-
-    // Check if we need a new page
-    if (currentY > 250) {
-      doc.addPage();
-      currentY = margin;
-    }
-
-    // Strengths
-    if (result.strengths && result.strengths.length > 0) {
-      doc.setFontSize(14);
-      doc.setFont('helvetica', 'bold');
-      doc.text('STRENGTHS', margin, currentY);
-      currentY += 10;
-
-      doc.setFontSize(12);
-      doc.setFont('helvetica', 'normal');
-      result.strengths.forEach((strength: string, index: number) => {
-        if (currentY > 270) {
-          doc.addPage();
-          currentY = margin;
-        }
-        currentY = addWrappedText(`${index + 1}. ${strength}`, margin, currentY, pageWidth - 2 * margin);
-        currentY += 5;
-      });
-      currentY += 10;
-    }
-
-    // Check if we need a new page
-    if (currentY > 250) {
-      doc.addPage();
-      currentY = margin;
-    }
-
-    // Areas for Improvement
-    if (result.weaknesses && result.weaknesses.length > 0) {
-      doc.setFontSize(14);
-      doc.setFont('helvetica', 'bold');
-      doc.text('AREAS FOR IMPROVEMENT', margin, currentY);
-      currentY += 10;
-
-      doc.setFontSize(12);
-      doc.setFont('helvetica', 'normal');
-      result.weaknesses.forEach((weakness: string, index: number) => {
-        if (currentY > 270) {
-          doc.addPage();
-          currentY = margin;
-        }
-        currentY = addWrappedText(`${index + 1}. ${weakness}`, margin, currentY, pageWidth - 2 * margin);
-        currentY += 5;
-      });
-      currentY += 10;
-    }
-
-    // Check if we need a new page
-    if (currentY > 250) {
-      doc.addPage();
-      currentY = margin;
-    }
-
-    // Recommendations
-    if (result.recommendations && result.recommendations.length > 0) {
-      doc.setFontSize(14);
-      doc.setFont('helvetica', 'bold');
-      doc.text('RECOMMENDATIONS', margin, currentY);
-      currentY += 10;
-
-      doc.setFontSize(12);
-      doc.setFont('helvetica', 'normal');
-      result.recommendations.forEach((rec: string, index: number) => {
-        if (currentY > 270) {
-          doc.addPage();
-          currentY = margin;
-        }
-        currentY = addWrappedText(`${index + 1}. ${rec}`, margin, currentY, pageWidth - 2 * margin);
-        currentY += 5;
-      });
+      currentY = addWrappedText(summaryText, margin, currentY, pageWidth - 2 * margin);
       currentY += 10;
     }
 
@@ -229,6 +154,66 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
       }
     }
 
+    // Strengths
+    if (result.strengths && result.strengths.length > 0) {
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.text('STRENGTHS', margin, currentY);
+      currentY += 10;
+
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'normal');
+      result.strengths.forEach((strength: string, index: number) => {
+        if (currentY > 270) {
+          doc.addPage();
+          currentY = margin;
+        }
+        currentY = addWrappedText(`${index + 1}. ${strength}`, margin, currentY, pageWidth - 2 * margin);
+        currentY += 5;
+      });
+      currentY += 10;
+    }
+
+    // Areas for Improvement
+    if (result.weaknesses && result.weaknesses.length > 0) {
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.text('AREAS FOR IMPROVEMENT', margin, currentY);
+      currentY += 10;
+
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'normal');
+      result.weaknesses.forEach((weakness: string, index: number) => {
+        if (currentY > 270) {
+          doc.addPage();
+          currentY = margin;
+        }
+        currentY = addWrappedText(`${index + 1}. ${weakness}`, margin, currentY, pageWidth - 2 * margin);
+        currentY += 5;
+      });
+      currentY += 10;
+    }
+
+    // Recommendations
+    if (result.recommendations && result.recommendations.length > 0) {
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.text('RECOMMENDATIONS', margin, currentY);
+      currentY += 10;
+
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'normal');
+      result.recommendations.forEach((rec: string, index: number) => {
+        if (currentY > 270) {
+          doc.addPage();
+          currentY = margin;
+        }
+        currentY = addWrappedText(`${index + 1}. ${rec}`, margin, currentY, pageWidth - 2 * margin);
+        currentY += 5;
+      });
+      currentY += 10;
+    }
+
     // Footer
     const pageCount = doc.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
@@ -240,7 +225,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
     }
 
     // Save the PDF
-    const fileName = `CV_Analysis_Report_${result.job_title || 'Report'}_${new Date().toISOString().split('T')[0]}.pdf`;
+    const fileName = `CV_Analysis_Report_${result.job_title || result.position || 'Report'}_${new Date().toISOString().split('T')[0]}.pdf`;
     doc.save(fileName);
   };
 
@@ -275,7 +260,10 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
             <h2 className="text-lg font-semibold text-green-800">Analysis Complete!</h2>
           </div>
           <p className="text-green-700">
-            We've analyzed your CV against the job description and prepared a detailed compatibility report with personalized recommendations.
+            {hasEnhancedData 
+              ? "We've completed an enhanced AI-powered analysis of your CV with detailed insights and actionable recommendations."
+              : "We've analyzed your CV against the job description and prepared a detailed compatibility report with personalized recommendations."
+            }
           </p>
         </div>
 
@@ -288,73 +276,139 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
               <div className="flex items-center justify-center mb-4">
                 <div className="relative w-32 h-32 bg-blue-500 rounded-full flex items-center justify-center">
                   <div className="text-white text-center">
-                    <div className="text-3xl font-bold">{(result.compatibility_score / 10).toFixed(1)}</div>
+                    <div className="text-3xl font-bold">{((result.compatibility_score || result.compatibilityScore) / 10).toFixed(1)}</div>
                     <div className="text-sm">/10</div>
                   </div>
                 </div>
               </div>
               
               <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mb-2">Compatibility Score</h3>
-              <p className="text-blueberry/70 dark:text-apple-core/80 mb-4">{getMatchLevel(result.compatibility_score)}</p>
+              <p className="text-blueberry/70 dark:text-apple-core/80 mb-4">{getMatchLevel(result.compatibility_score || result.compatibilityScore)}</p>
               
-              {result.job_title && (
+              {(result.job_title || result.position) && (
                 <p className="text-sm text-blueberry/60 dark:text-apple-core/60">
-                  for the {result.job_title} position
+                  for the {result.job_title || result.position} position
                 </p>
               )}
             </div>
           </div>
 
-          {/* Right Column - Executive Summary */}
+          {/* Right Column - Enhanced or Legacy Summary */}
           <div className="lg:col-span-2">
-            <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
-              <h2 className="text-2xl font-semibold text-blueberry dark:text-citrus mb-4">Executive Summary</h2>
-              <p className="text-blueberry/80 dark:text-apple-core leading-relaxed mb-6">
-                {result.executive_summary}
-              </p>
+            {hasEnhancedData && result.executiveSummary ? (
+              <ExecutiveSummarySection executiveSummary={result.executiveSummary} />
+            ) : (
+              // Legacy summary format
+              <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
+                <h2 className="text-2xl font-semibold text-blueberry dark:text-citrus mb-4">Executive Summary</h2>
+                <p className="text-blueberry/80 dark:text-apple-core leading-relaxed mb-6">
+                  {result.executive_summary}
+                </p>
 
-              {/* Key Strengths and Improvement Areas */}
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <h3 className="font-semibold text-green-600 mb-3">Key Strengths</h3>
-                  {result.strengths && result.strengths.length > 0 ? (
-                    <ul className="space-y-2">
-                      {result.strengths.slice(0, 4).map((strength: string, index: number) => (
-                        <li key={index} className="flex items-start text-sm">
-                          <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 mr-2 flex-shrink-0"></div>
-                          <span className="text-blueberry/80 dark:text-apple-core">{strength}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="text-blueberry/60 dark:text-apple-core/60 text-sm">No specific strengths identified.</p>
-                  )}
-                </div>
+                {/* Legacy strengths and weaknesses */}
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <h3 className="font-semibold text-green-600 mb-3">Key Strengths</h3>
+                    {result.strengths && result.strengths.length > 0 ? (
+                      <ul className="space-y-2">
+                        {result.strengths.slice(0, 4).map((strength: string, index: number) => (
+                          <li key={index} className="flex items-start text-sm">
+                            <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 mr-2 flex-shrink-0"></div>
+                            <span className="text-blueberry/80 dark:text-apple-core">{strength}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-blueberry/60 dark:text-apple-core/60 text-sm">No specific strengths identified.</p>
+                    )}
+                  </div>
 
-                <div>
-                  <h3 className="font-semibold text-red-600 mb-3">Key Improvement Areas</h3>
-                  {result.weaknesses && result.weaknesses.length > 0 ? (
-                    <ul className="space-y-2">
-                      {result.weaknesses.slice(0, 4).map((weakness: string, index: number) => (
-                        <li key={index} className="flex items-start text-sm">
-                          <div className="w-1.5 h-1.5 bg-red-500 rounded-full mt-2 mr-2 flex-shrink-0"></div>
-                          <span className="text-blueberry/80 dark:text-apple-core">{weakness}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="text-blueberry/60 dark:text-apple-core/60 text-sm">No specific areas for improvement identified.</p>
-                  )}
+                  <div>
+                    <h3 className="font-semibold text-red-600 mb-3">Key Improvement Areas</h3>
+                    {result.weaknesses && result.weaknesses.length > 0 ? (
+                      <ul className="space-y-2">
+                        {result.weaknesses.slice(0, 4).map((weakness: string, index: number) => (
+                          <li key={index} className="flex items-start text-sm">
+                            <div className="w-1.5 h-1.5 bg-red-500 rounded-full mt-2 mr-2 flex-shrink-0"></div>
+                            <span className="text-blueberry/80 dark:text-apple-core">{weakness}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-blueberry/60 dark:text-apple-core/60 text-sm">No specific areas for improvement identified.</p>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
 
-        {/* Two Column Layout for Detailed Sections */}
-        <div className="grid lg:grid-cols-2 gap-8 mb-8">
+        {/* Enhanced Analysis Sections */}
+        {hasEnhancedData ? (
+          <div className="space-y-8">
+            {/* Compatibility Breakdown */}
+            {result.compatibilityBreakdown && (
+              <CompatibilityBreakdownSection compatibilityBreakdown={result.compatibilityBreakdown} />
+            )}
+
+            {/* Enhanced Keyword Analysis */}
+            {result.keywordAnalysis && (
+              <EnhancedKeywordAnalysis keywordAnalysis={result.keywordAnalysis} />
+            )}
+
+            {/* Skills Gap Analysis */}
+            {result.skillsGapAnalysis && (
+              <SkillsGapAnalysis skillsGapAnalysis={result.skillsGapAnalysis} />
+            )}
+
+            {/* ATS Optimization */}
+            {result.atsOptimization && (
+              <ATSOptimizationSection atsOptimization={result.atsOptimization} />
+            )}
+
+            {/* Interview Preparation */}
+            {result.interviewPrep && (
+              <InterviewPrepSection interviewPrep={result.interviewPrep} />
+            )}
+
+            {/* Priority Recommendations */}
+            {result.priorityRecommendations && result.priorityRecommendations.length > 0 && (
+              <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
+                <div className="flex items-center mb-6">
+                  <div className="bg-blue-500 text-white px-3 py-1 rounded text-sm font-medium mr-3">
+                    Priority Recommendations
+                  </div>
+                </div>
+                <div className="grid md:grid-cols-2 gap-6">
+                  {result.priorityRecommendations.map((rec: any, index: number) => (
+                    <div key={index} className="border border-apple-core/10 dark:border-citrus/10 rounded-lg p-4">
+                      <div className="flex items-start mb-3">
+                        <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold mr-3 mt-0.5 flex-shrink-0">
+                          {index + 1}
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-blueberry dark:text-citrus mb-2">{rec.title}</h3>
+                          <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mb-3">{rec.description}</p>
+                          {rec.sampleText && (
+                            <div className="bg-green-50 dark:bg-green-900/20 rounded p-3">
+                              <h4 className="text-xs font-medium text-green-800 dark:text-green-300 mb-1">Sample Text:</h4>
+                              <p className="text-xs text-green-700 dark:text-green-400 italic">"{rec.sampleText}"</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          // Legacy format sections for backward compatibility
+          <div className="grid lg:grid-cols-2 gap-8 mb-8">
           {/* Compatibility Breakdown */}
-          {result.compatibilityBreakdown && result.compatibilityBreakdown.length > 0 && (
+          {result.compatibilityBreakdown && (
             <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
               <div className="flex items-center mb-4">
                 <div className="bg-blue-500 text-white px-3 py-1 rounded text-sm font-medium mr-3">
@@ -365,31 +419,24 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
                 Your compatibility score is calculated based on several weighted factors:
               </p>
               
-              <div className="space-y-4">
-                {result.compatibilityBreakdown.map((category: any, index: number) => (
-                  <div key={index}>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-medium text-blueberry dark:text-citrus text-sm">{category.category}</span>
-                      <div className="flex items-center space-x-2">
-                        <span className="text-sm font-bold text-blue-600">{category.score}/10</span>
-                        <span className="text-xs text-blueberry/60 dark:text-apple-core/60">Weight: {category.weight}%</span>
-                      </div>
+              {result.compatibilityBreakdown.map((category: any, index: number) => (
+                <div key={index}>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-medium text-blueberry dark:text-citrus text-sm">{category.category}</span>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm font-bold text-blue-600">{category.score}/10</span>
+                      <span className="text-xs text-blueberry/60 dark:text-apple-core/60">Weight: {category.weight}%</span>
                     </div>
-                    <div className="bg-gray-200 rounded-full h-2 mb-2">
-                      <div 
-                        className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${(category.score / 10) * 100}%` }}
-                      ></div>
-                    </div>
-                    <p className="text-xs text-blueberry/70 dark:text-apple-core/80">{category.feedback}</p>
                   </div>
-                ))}
-              </div>
+                  <Progress value={category.score * 10} className="mb-2" />
+                  <p className="text-xs text-blueberry/70 dark:text-apple-core/80">{category.feedback}</p>
+                </div>
+              ))}
 
               {/* Overall Score Summary */}
               <div className="mt-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
                 <div className="flex items-center mb-2">
-                  <Info className="h-4 w-4 text-blue-600 mr-2" />
+                  {/* <Info className="h-4 w-4 text-blue-600 mr-2" /> */}
                   <span className="text-sm font-medium text-blue-800 dark:text-blue-300">
                     Overall Score: {(result.compatibility_score / 10).toFixed(1)}/10
                   </span>
@@ -463,7 +510,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
                 {result.keywords_missing && result.keywords_missing.length > 0 && (
                   <div>
                     <h4 className="text-sm font-medium text-red-600 mb-2 flex items-center">
-                      <XCircle className="h-4 w-4 mr-1" />
+                      {/* <XCircle className="h-4 w-4 mr-1" /> */}
                       Missing Keywords ({result.keywords_missing.length})
                     </h4>
                     <div className="flex flex-wrap gap-2">
@@ -482,7 +529,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
             {result.keywords_missing && result.keywords_missing.length > 0 && (
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mt-4">
                 <div className="flex items-center mb-1">
-                  <AlertCircle className="h-4 w-4 text-yellow-600 mr-2" />
+                  {/* <AlertCircle className="h-4 w-4 text-yellow-600 mr-2" /> */}
                   <span className="text-sm font-medium text-yellow-800">Missing Key Terms</span>
                 </div>
                 <p className="text-xs text-yellow-700">
@@ -491,125 +538,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
               </div>
             )}
           </div>
-        </div>
-
-        {/* Priority Recommendations */}
-        {result.priorityRecommendations && result.priorityRecommendations.length > 0 && (
-          <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 mb-8 border border-apple-core/20 dark:border-citrus/20">
-            <div className="flex items-center mb-6">
-              <div className="bg-blue-500 text-white px-3 py-1 rounded text-sm font-medium mr-3">
-                Priority Recommendations
-              </div>
-            </div>
-            <div className="grid md:grid-cols-2 gap-6">
-              {result.priorityRecommendations.map((rec: any, index: number) => (
-                <div key={index} className="border border-apple-core/10 dark:border-citrus/10 rounded-lg p-4">
-                  <div className="flex items-start mb-3">
-                    <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold mr-3 mt-0.5 flex-shrink-0">
-                      {rec.priority}
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-blueberry dark:text-citrus mb-2">{rec.title}</h3>
-                      <div className="mb-3">
-                        <ul className="space-y-1">
-                          {rec.actionItems && rec.actionItems.map((item: string, itemIndex: number) => (
-                            <li key={itemIndex} className="flex items-start text-sm text-blueberry/70 dark:text-apple-core/80">
-                              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 mr-2 flex-shrink-0"></div>
-                              {item}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                      {rec.example && (
-                        <div className="bg-green-50 dark:bg-green-900/20 rounded p-3">
-                          <h4 className="text-xs font-medium text-green-800 dark:text-green-300 mb-1">Example:</h4>
-                          <p className="text-xs text-green-700 dark:text-green-400 italic">"{rec.example}"</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         )}
-
-        {/* Additional Sections in smaller cards */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
-          {/* Skills Gap Analysis */}
-          {result.skillsGapAnalysis && result.skillsGapAnalysis.length > 0 && (
-            <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
-              <div className="flex items-center mb-4">
-                <BookOpen className="h-5 w-5 text-apricot mr-2" />
-                <h2 className="text-lg font-semibold text-blueberry dark:text-citrus">Skills Gap Analysis</h2>
-              </div>
-              <div className="space-y-4">
-                {result.skillsGapAnalysis.map((gap: any, index: number) => (
-                  <div key={index}>
-                    <h3 className="font-medium text-blueberry dark:text-citrus mb-2 text-sm">{gap.category}</h3>
-                    {gap.missing && gap.missing.length > 0 && (
-                      <div className="mb-2">
-                        <div className="flex flex-wrap gap-1">
-                          {gap.missing.map((skill: string, skillIndex: number) => (
-                            <span key={skillIndex} className="bg-red-100 text-red-800 px-2 py-1 rounded text-xs">
-                              {skill}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    {gap.suggestions && gap.suggestions.length > 0 && (
-                      <ul className="space-y-1">
-                        {gap.suggestions.slice(0, 2).map((suggestion: string, suggestionIndex: number) => (
-                          <li key={suggestionIndex} className="text-xs text-blueberry/70 dark:text-apple-core/80 flex items-start">
-                            <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-1.5 mr-2 flex-shrink-0"></div>
-                            {suggestion}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* ATS Optimization */}
-          {result.atsOptimization && result.atsOptimization.length > 0 && (
-            <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
-              <div className="flex items-center mb-4">
-                <Award className="h-5 w-5 text-apricot mr-2" />
-                <h2 className="text-lg font-semibold text-blueberry dark:text-citrus">ATS Optimization</h2>
-              </div>
-              <ul className="space-y-2">
-                {result.atsOptimization.slice(0, 4).map((tip: string, index: number) => (
-                  <li key={index} className="flex items-start text-sm text-blueberry/80 dark:text-apple-core">
-                    <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 mr-2 flex-shrink-0" />
-                    {tip}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* Interview Preparation */}
-          {result.interviewPrep && result.interviewPrep.length > 0 && (
-            <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
-              <div className="flex items-center mb-4">
-                <Users className="h-5 w-5 text-apricot mr-2" />
-                <h2 className="text-lg font-semibold text-blueberry dark:text-citrus">Interview Preparation</h2>
-              </div>
-              <ul className="space-y-2">
-                {result.interviewPrep.slice(0, 4).map((tip: string, index: number) => (
-                  <li key={index} className="flex items-start text-sm text-blueberry/80 dark:text-apple-core">
-                    <TrendingUp className="h-4 w-4 text-blue-500 mt-0.5 mr-2 flex-shrink-0" />
-                    {tip}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
       </div>
     </div>
   );
