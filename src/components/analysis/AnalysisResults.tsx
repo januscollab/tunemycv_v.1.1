@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { CheckCircle } from 'lucide-react';
 import ExecutiveSummarySection from './ExecutiveSummarySection';
@@ -12,6 +13,8 @@ import LegacySummarySection from './components/LegacySummarySection';
 import LegacyCompatibilitySection from './components/LegacyCompatibilitySection';
 import LegacyKeywordSection from './components/LegacyKeywordSection';
 import PriorityRecommendationsSection from './components/PriorityRecommendationsSection';
+import PersonalizedMatchMessage from './components/PersonalizedMatchMessage';
+import NextStepsSection from './components/NextStepsSection';
 import PDFGenerator from './utils/PDFGenerator';
 
 interface AnalysisResultsProps {
@@ -87,6 +90,14 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
           </div>
         </div>
 
+        {/* Personalized Match Message */}
+        <PersonalizedMatchMessage
+          score={compatibilityScore}
+          jobTitle={position}
+          companyName={companyName}
+          getMatchLevel={getMatchLevel}
+        />
+
         {/* Enhanced Analysis Sections */}
         {hasEnhancedData ? (
           <div className="space-y-8">
@@ -119,6 +130,11 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
             <LegacyKeywordSection result={result} />
           </div>
         )}
+
+        {/* Next Steps Section */}
+        <div className="mt-12">
+          <NextStepsSection onStartNew={onStartNew} />
+        </div>
       </div>
     </div>
   );
