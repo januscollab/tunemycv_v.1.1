@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -8,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useToast } from '@/hooks/use-toast';
-import { Mail, MessageCircle, HelpCircle, CreditCard, FileText, Search, Zap } from 'lucide-react';
+import { Mail, MessageCircle, HelpCircle, CreditCard, FileText, Search, Zap, User } from 'lucide-react';
 
 const HelpCentre = () => {
   const { toast } = useToast();
