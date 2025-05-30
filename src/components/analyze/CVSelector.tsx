@@ -1,10 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
-import { FileText, Upload, Check } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { validateFile, extractTextFromFile, formatFileSize } from '@/utils/fileUtils';
+import { validateFile, extractTextFromFile } from '@/utils/fileUtils';
+import SavedCVList from './upload/SavedCVList';
+import FileUploadArea from './upload/FileUploadArea';
+import UploadedFileDisplay from './upload/UploadedFileDisplay';
 
 interface UploadedFile {
   file: File;
@@ -99,69 +101,29 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
         Choose from your saved CVs or upload a new one
       </p>
 
-      {/* Saved CVs */}
-      {!loading && savedCVs.length > 0 && (
-        <div className="mb-6">
-          <h4 className="text-sm font-medium text-blueberry dark:text-citrus mb-3">Saved CVs</h4>
-          <div className="space-y-2">
-            {savedCVs.map((cv) => (
-              <div
-                key={cv.id}
-                onClick={() => handleSavedCVSelect(cv)}
-                className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer transition-colors ${
-                  selectedCVId === cv.id
-                    ? 'border-apricot bg-apricot/10'
-                    : 'border-apple-core/20 dark:border-citrus/20 hover:border-apricot hover:bg-apricot/5'
-                }`}
-              >
-                <div className="flex items-center space-x-3">
-                  <FileText className="h-5 w-5 text-apricot" />
-                  <div>
-                    <p className="font-medium text-blueberry dark:text-citrus">{cv.file_name}</p>
-                    <p className="text-xs text-blueberry/70 dark:text-apple-core/80">
-                      {formatFileSize(cv.file_size)} • {new Date(cv.created_at).toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
-                {selectedCVId === cv.id && (
-                  <Check className="h-5 w-5 text-apricot" />
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
+      <SavedCVList
+        savedCVs={savedCVs}
+        selectedCVId={selectedCVId}
+        onCVSelect={handleSavedCVSelect}
+      />
+
+      {savedCVs.length > 0 && (
+        <div className="text-center text-blueberry/60 dark:text-apple-core/60 mb-4">or</div>
       )}
 
-      {/* Upload New CV */}
-      <div className="text-center text-blueberry/60 dark:text-apple-core/60 mb-4">
-        {savedCVs.length > 0 ? 'or' : ''}
-      </div>
-
-      <div className="border-2 border-dashed border-apple-core/30 dark:border-citrus/30 rounded-lg p-6 text-center">
-        <Upload className="mx-auto h-8 w-8 text-blueberry/60 dark:text-apple-core/60 mb-2" />
-        <label className="cursor-pointer">
-          <span className="text-apricot hover:text-apricot/80 font-medium">Upload a new CV</span>
-          <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mt-1">PDF or DOCX, max 5MB</p>
-          <input
-            type="file"
-            className="hidden"
-            accept=".pdf,.docx"
-            onChange={(e) => e.target.files?.[0] && handleNewFileUpload(e.target.files[0])}
-            disabled={uploading}
-          />
-        </label>
-      </div>
+      <FileUploadArea
+        onFileSelect={handleNewFileUpload}
+        uploading={uploading}
+        accept=".pdf,.docx"
+        maxSize="5MB"
+        label="Upload a new CV"
+      />
 
       {selectedCV && !selectedCVId && (
-        <div className="mt-4 flex items-center justify-between p-3 bg-apricot/10 border border-apricot/30 rounded-lg">
-          <div className="flex items-center space-x-3">
-            <Check className="h-5 w-5 text-apricot" />
-            <div>
-              <p className="font-medium text-blueberry dark:text-citrus">{selectedCV.file.name}</p>
-              <p className="text-xs text-blueberry/70 dark:text-apple-core/80">New upload ready for analysis</p>
-            </div>
-          </div>
-        </div>
+        <UploadedFileDisplay
+          uploadedFile={selectedCV}
+          title="New upload ready for analysis"
+        />
       )}
     </div>
   );

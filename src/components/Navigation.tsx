@@ -1,33 +1,20 @@
-
 import React, { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, FileText, Target, BookOpen, User, Shield, LogOut } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
 import ThemeToggle from './ThemeToggle';
+import NavigationLogo from './navigation/NavigationLogo';
+import UserProfileDropdown from './navigation/UserProfileDropdown';
+import AuthButtons from './navigation/AuthButtons';
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
   const { user } = useAuth();
   const { isAdmin } = useAdminAuth();
 
   const isActive = (path: string) => location.pathname === path;
-
-  const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut();
-      toast.success('Logged out successfully');
-      navigate('/');
-      setShowProfileMenu(false);
-    } catch (error) {
-      toast.error('Error logging out');
-    }
-  };
 
   const navItems = [
     { path: '/', label: 'Home', icon: Target },
@@ -39,7 +26,6 @@ const Navigation = () => {
     if (user?.user_metadata?.first_name) {
       return user.user_metadata.first_name;
     }
-    // Fallback to email username if no first name
     return user?.email?.split('@')[0] || 'User';
   };
 
@@ -47,15 +33,7 @@ const Navigation = () => {
     <nav className="bg-white dark:bg-blueberry shadow-sm border-b border-apple-core/30 dark:border-citrus/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
-          <div className="flex items-center">
-            <Link to="/" className="flex items-center">
-              <img 
-                src="/lovable-uploads/7aefb742-801d-4494-af3e-defd30462f1c.png" 
-                alt="TuneMyCV Logo" 
-                className="h-8 w-auto mr-2"
-              />
-            </Link>
-          </div>
+          <NavigationLogo />
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
@@ -100,52 +78,13 @@ const Navigation = () => {
                     )}
                   </Link>
                 )}
-                <span className="text-sm text-blueberry dark:text-apple-core">
-                  Welcome, {getUserDisplayName()}
-                </span>
-                <div className="relative">
-                  <button
-                    onClick={() => setShowProfileMenu(!showProfileMenu)}
-                    className={`flex items-center px-3 py-2 text-sm font-medium transition-colors relative ${
-                      isActive('/profile')
-                        ? 'text-apricot'
-                        : 'text-blueberry dark:text-apple-core hover:text-apricot'
-                    }`}
-                  >
-                    <User className="h-4 w-4 mr-2" />
-                    Profile
-                    {isActive('/profile') && (
-                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-apricot"></div>
-                    )}
-                  </button>
-                  
-                  {showProfileMenu && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-blueberry rounded-md shadow-lg py-1 border border-apple-core/30 dark:border-citrus/20">
-                      <Link
-                        to="/profile"
-                        onClick={() => setShowProfileMenu(false)}
-                        className="block px-4 py-2 text-sm text-blueberry dark:text-apple-core hover:bg-apple-core/30 dark:hover:bg-citrus/20 hover:text-apricot"
-                      >
-                        View Profile
-                      </Link>
-                      <button
-                        onClick={handleLogout}
-                        className="block w-full text-left px-4 py-2 text-sm text-blueberry dark:text-apple-core hover:bg-apple-core/30 dark:hover:bg-citrus/20 hover:text-apricot"
-                      >
-                        <LogOut className="h-4 w-4 inline mr-2" />
-                        Logout
-                      </button>
-                    </div>
-                  )}
-                </div>
+                <UserProfileDropdown 
+                  userDisplayName={getUserDisplayName()}
+                  isActive={isActive}
+                />
               </div>
             ) : (
-              <Link
-                to="/auth"
-                className="bg-apricot text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-apricot/90 transition-colors"
-              >
-                Sign In
-              </Link>
+              <AuthButtons />
             )}
           </div>
 
@@ -217,13 +156,6 @@ const Navigation = () => {
                     <User className="h-5 w-5 mr-3" />
                     Profile
                   </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="flex items-center w-full px-3 py-2 rounded-md text-base font-medium text-blueberry dark:text-apple-core hover:text-apricot hover:bg-apple-core/30 dark:hover:bg-citrus/20 transition-colors"
-                  >
-                    <LogOut className="h-5 w-5 mr-3" />
-                    Logout
-                  </button>
                 </>
               ) : (
                 <Link
