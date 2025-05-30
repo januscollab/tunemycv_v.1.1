@@ -1,7 +1,6 @@
 
 import React from 'react';
-import { ArrowLeft, Download, CheckCircle } from 'lucide-react';
-import jsPDF from 'jspdf';
+import { CheckCircle } from 'lucide-react';
 import ExecutiveSummarySection from './ExecutiveSummarySection';
 import CompatibilityBreakdownSection from './CompatibilityBreakdownSection';
 import EnhancedKeywordAnalysis from './EnhancedKeywordAnalysis';
@@ -32,6 +31,11 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
   // Check if we have enhanced data structure
   const hasEnhancedData = result.executiveSummary || result.compatibilityBreakdown || result.keywordAnalysis;
 
+  // Extract company and position information
+  const companyName = result.companyName || result.company_name || 'the Company';
+  const position = result.position || result.job_title || 'the Position';
+  const compatibilityScore = result.compatibilityScore || result.compatibility_score || 0;
+
   const downloadPDF = () => {
     const pdfGenerator = new PDFGenerator();
     pdfGenerator.generatePDF(result);
@@ -42,7 +46,11 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
       <div className="max-w-6xl mx-auto px-4 py-8">
         <AnalysisHeader onStartNew={onStartNew} onDownloadPDF={downloadPDF} />
 
-        <h1 className="text-3xl font-bold text-blueberry dark:text-citrus mb-8">CV Analysis Results</h1>
+        {/* Dynamic heading based on company and position */}
+        <h1 className="text-3xl font-bold text-blueberry dark:text-citrus mb-2">
+          {companyName} - {position}
+        </h1>
+        <p className="text-blueberry/70 dark:text-apple-core/80 mb-8">CV Analysis Results</p>
 
         {/* Success Alert */}
         <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-8">
@@ -52,8 +60,8 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
           </div>
           <p className="text-green-700">
             {hasEnhancedData 
-              ? "We've completed an enhanced AI-powered analysis of your CV with detailed insights and actionable recommendations."
-              : "We've analyzed your CV against the job description and prepared a detailed compatibility report with personalized recommendations."
+              ? `We've completed an enhanced AI-powered analysis of your CV for the ${position} position at ${companyName} with detailed insights and actionable recommendations.`
+              : `We've analyzed your CV against the ${position} job description and prepared a detailed compatibility report with personalized recommendations.`
             }
           </p>
         </div>
@@ -63,8 +71,9 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
           {/* Left Column - Score Display */}
           <div className="lg:col-span-1">
             <AnalysisScoreCard 
-              score={result.compatibility_score || result.compatibilityScore}
-              jobTitle={result.job_title || result.position}
+              score={compatibilityScore}
+              jobTitle={position}
+              companyName={companyName}
               getMatchLevel={getMatchLevel}
             />
           </div>
@@ -82,28 +91,34 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
         {/* Enhanced Analysis Sections */}
         {hasEnhancedData ? (
           <div className="space-y-8">
+            {/* Priority Recommendations - Show first as it's most actionable */}
+            {result.priorityRecommendations && result.priorityRecommendations.length > 0 && (
+              <PriorityRecommendationsSection recommendations={result.priorityRecommendations} />
+            )}
+
+            {/* Compatibility Breakdown */}
             {result.compatibilityBreakdown && (
               <CompatibilityBreakdownSection compatibilityBreakdown={result.compatibilityBreakdown} />
             )}
 
+            {/* Keyword Analysis */}
             {result.keywordAnalysis && (
               <EnhancedKeywordAnalysis keywordAnalysis={result.keywordAnalysis} />
             )}
 
+            {/* Skills Gap Analysis */}
             {result.skillsGapAnalysis && (
               <SkillsGapAnalysis skillsGapAnalysis={result.skillsGapAnalysis} />
             )}
 
+            {/* ATS Optimization */}
             {result.atsOptimization && (
               <ATSOptimizationSection atsOptimization={result.atsOptimization} />
             )}
 
+            {/* Interview Preparation */}
             {result.interviewPrep && (
               <InterviewPrepSection interviewPrep={result.interviewPrep} />
-            )}
-
-            {result.priorityRecommendations && result.priorityRecommendations.length > 0 && (
-              <PriorityRecommendationsSection recommendations={result.priorityRecommendations} />
             )}
           </div>
         ) : (
