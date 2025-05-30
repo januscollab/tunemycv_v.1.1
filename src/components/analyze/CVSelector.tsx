@@ -23,6 +23,26 @@ interface CVSelectorProps {
 const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploading }) => {
   const [activeTab, setActiveTab] = useState<'upload' | 'saved'>('saved');
 
+  // Mock saved CVs data - in real app this would come from props or API
+  const mockSavedCVs = [
+    {
+      id: '1',
+      file_name: 'John_Doe_Resume_2024.pdf',
+      file_size: 245760,
+      created_at: '2024-01-15T10:30:00Z',
+      extracted_text: 'Senior Software Engineer with 5+ years of experience...',
+      file_type: 'application/pdf'
+    },
+    {
+      id: '2', 
+      file_name: 'Software_Developer_CV.docx',
+      file_size: 189440,
+      created_at: '2024-01-10T14:20:00Z',
+      extracted_text: 'Full-stack developer experienced in React, Node.js...',
+      file_type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    }
+  ];
+
   const handleCVSelect = (cv: any) => {
     // Convert CV data to UploadedFile format
     const uploadedFile: UploadedFile = {
@@ -33,10 +53,40 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
     onCVSelect(uploadedFile);
   };
 
-  const handleFileSelect = (file: File, shouldSave: boolean) => {
-    // This will be handled by FileUploadWithSave internally
-    // The component should extract text and create the UploadedFile format
-    console.log('File selected:', file, 'Should save:', shouldSave);
+  const handleFileSelect = async (file: File, shouldSave: boolean) => {
+    try {
+      // Extract text from file (this would normally be done by a service)
+      const extractedText = await extractTextFromFile(file);
+      
+      const uploadedFile: UploadedFile = {
+        file: file,
+        extractedText: extractedText,
+        type: 'cv'
+      };
+      
+      // If shouldSave is true, here you would save the CV to the backend
+      if (shouldSave) {
+        console.log('Saving CV to backend...', file.name);
+        // saveCVToBackend(file, extractedText);
+      }
+      
+      onCVSelect(uploadedFile);
+    } catch (error) {
+      console.error('Error processing file:', error);
+    }
+  };
+
+  // Mock text extraction function - in real app this would call a service
+  const extractTextFromFile = async (file: File): Promise<string> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        // This is a simplified extraction - real app would use proper PDF/DOCX parsing
+        const text = e.target?.result as string;
+        resolve(text || `Extracted text from ${file.name}...`);
+      };
+      reader.readAsText(file);
+    });
   };
 
   return (
@@ -103,11 +153,27 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
 
             {/* Tab Content */}
             {activeTab === 'saved' ? (
-              <SavedCVList 
-                savedCVs={[]} 
-                selectedCVId={null} 
-                onCVSelect={handleCVSelect} 
-              />
+              mockSavedCVs.length > 0 ? (
+                <SavedCVList 
+                  savedCVs={mockSavedCVs} 
+                  selectedCVId={null} 
+                  onCVSelect={handleCVSelect} 
+                />
+              ) : (
+                <div className="text-center py-8">
+                  <FileText className="h-12 w-12 text-blueberry/40 dark:text-apple-core/40 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-blueberry dark:text-citrus mb-2">No Saved CVs</h3>
+                  <p className="text-blueberry/70 dark:text-apple-core/80 mb-4">
+                    You haven't saved any CVs yet. Upload a CV and choose to save it for future use.
+                  </p>
+                  <Button 
+                    onClick={() => setActiveTab('upload')}
+                    className="bg-apricot hover:bg-apricot/90"
+                  >
+                    Upload Your First CV
+                  </Button>
+                </div>
+              )
             ) : (
               <FileUploadWithSave 
                 onFileSelect={handleFileSelect}
@@ -115,7 +181,7 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
                 accept=".pdf,.docx,.txt"
                 maxSize="5MB"
                 label="Upload your CV"
-                currentCVCount={0}
+                currentCVCount={mockSavedCVs.length}
                 maxCVCount={5}
               />
             )}
