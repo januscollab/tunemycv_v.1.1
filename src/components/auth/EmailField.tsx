@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import SecureInput from '@/components/security/SecureInput';
 
 interface EmailFieldProps {
   email: string;
@@ -14,7 +14,7 @@ const EmailField: React.FC<EmailFieldProps> = ({ email, onChange }) => {
       <Label htmlFor="email" className="text-blueberry">
         Email address
       </Label>
-      <Input
+      <SecureInput
         id="email"
         name="email"
         type="email"
@@ -24,6 +24,7 @@ const EmailField: React.FC<EmailFieldProps> = ({ email, onChange }) => {
         onChange={onChange}
         className="mt-1"
         maxLength={254}
+        placeholder="Enter your email address"
       />
     </div>
   );

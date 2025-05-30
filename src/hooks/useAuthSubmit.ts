@@ -1,9 +1,9 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { useAuthValidation } from './useAuthValidation';
+import { useSecureAuth } from './useSecureAuth';
+import { useSecureFormValidation } from './useSecureFormValidation';
 
 interface FormData {
   firstName: string;
@@ -18,59 +18,52 @@ type AuthMode = 'login' | 'register' | 'forgot-password';
 
 export const useAuthSubmit = (mode: AuthMode, formData: FormData, setMode: (mode: AuthMode) => void) => {
   const [loading, setLoading] = useState(false);
-  const { signIn, signUp, resetPassword } = useAuth();
+  const { secureSignIn, secureSignUp, securePasswordReset } = useSecureAuth();
+  const { validateForm } = useSecureFormValidation();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { validateForm } = useAuthValidation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateForm(formData, mode)) return;
+    
+    // Validate and sanitize form data
+    const validation = validateForm(formData, mode);
+    if (!validation.isValid || !validation.sanitizedData) {
+      return;
+    }
 
+    const sanitizedData = validation.sanitizedData;
     setLoading(true);
 
     try {
       if (mode === 'login') {
-        const { error } = await signIn(formData.email, formData.password);
-        if (error) {
-          if (error.message.includes('Invalid login credentials')) {
-            toast({ title: 'Error', description: 'Invalid email or password', variant: 'destructive' });
-          } else {
-            toast({ title: 'Error', description: error.message, variant: 'destructive' });
-          }
-        } else {
-          toast({ title: 'Success', description: 'Welcome back!' });
+        const result = await secureSignIn(sanitizedData.email!, formData.password);
+        if (result.success) {
           navigate('/');
         }
       } else if (mode === 'register') {
-        const { error } = await signUp(formData.email, formData.password, formData.firstName, formData.lastName);
-        if (error) {
-          if (error.message.includes('User already registered')) {
-            toast({ title: 'Error', description: 'An account with this email already exists', variant: 'destructive' });
-          } else {
-            toast({ title: 'Error', description: error.message, variant: 'destructive' });
-          }
-        } else {
-          toast({ 
-            title: 'Success', 
-            description: 'Account created! Please check your email for verification.' 
-          });
+        const result = await secureSignUp(
+          sanitizedData.email!, 
+          formData.password, 
+          sanitizedData.firstName!, 
+          sanitizedData.lastName!
+        );
+        if (result.success) {
           setMode('login');
         }
       } else if (mode === 'forgot-password') {
-        const { error } = await resetPassword(formData.email);
-        if (error) {
-          toast({ title: 'Error', description: error.message, variant: 'destructive' });
-        } else {
-          toast({ 
-            title: 'Success', 
-            description: 'Password reset email sent! Check your inbox.' 
-          });
+        const result = await securePasswordReset(sanitizedData.email!);
+        if (result.success) {
           setMode('login');
         }
       }
     } catch (error) {
-      toast({ title: 'Error', description: 'An unexpected error occurred', variant: 'destructive' });
+      console.error('Authentication error:', error);
+      toast({ 
+        title: 'Error', 
+        description: 'An unexpected error occurred. Please try again.', 
+        variant: 'destructive' 
+      });
     } finally {
       setLoading(false);
     }
