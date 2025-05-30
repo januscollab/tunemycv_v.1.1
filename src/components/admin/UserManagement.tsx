@@ -30,7 +30,7 @@ const UserManagement = () => {
 
   const loadUsers = async () => {
     try {
-      // Get users with their profiles, credits, and analysis data
+      // Get all users from auth.users via profiles table
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
         .select(`
@@ -39,26 +39,38 @@ const UserManagement = () => {
           first_name,
           last_name,
           created_at
-        `);
+        `)
+        .order('created_at', { ascending: false });
 
       if (profilesError) throw profilesError;
+
+      if (!profilesData || profilesData.length === 0) {
+        console.log('No profiles found');
+        setUsers([]);
+        setLoading(false);
+        return;
+      }
 
       // Get credits for all users
       const { data: creditsData, error: creditsError } = await supabase
         .from('user_credits')
         .select('user_id, credits');
 
-      if (creditsError) throw creditsError;
+      if (creditsError) {
+        console.error('Credits error:', creditsError);
+      }
 
       // Get analysis counts and last analysis for all users
       const { data: analysesData, error: analysesError } = await supabase
         .from('analysis_results')
         .select('user_id, created_at');
 
-      if (analysesError) throw analysesError;
+      if (analysesError) {
+        console.error('Analyses error:', analysesError);
+      }
 
       // Combine the data
-      const usersWithStats = profilesData?.map(profile => {
+      const usersWithStats = profilesData.map(profile => {
         const userCredits = creditsData?.find(c => c.user_id === profile.id);
         const userAnalyses = analysesData?.filter(a => a.user_id === profile.id) || [];
         const lastAnalysis = userAnalyses.length > 0 
@@ -75,8 +87,9 @@ const UserManagement = () => {
           total_analyses: userAnalyses.length,
           last_analysis: lastAnalysis ? new Date(lastAnalysis).toISOString() : ''
         };
-      }) || [];
+      });
 
+      console.log('Loaded users:', usersWithStats.length);
       setUsers(usersWithStats);
     } catch (error) {
       console.error('Error loading users:', error);

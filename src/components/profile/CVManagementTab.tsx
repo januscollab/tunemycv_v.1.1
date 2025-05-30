@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { FileText, Upload, Trash2, Download, Plus, Check, X } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -20,6 +19,8 @@ const CVManagementTab: React.FC = () => {
   const [cvs, setCvs] = useState<CVUpload[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingName, setEditingName] = useState('');
 
   useEffect(() => {
     if (user) {
@@ -108,6 +109,44 @@ const CVManagementTab: React.FC = () => {
     }
   };
 
+  const startEditing = (cv: CVUpload) => {
+    setEditingId(cv.id);
+    setEditingName(cv.file_name);
+  };
+
+  const saveEdit = async (cvId: string) => {
+    if (!editingName.trim()) {
+      toast({ title: 'Error', description: 'CV name cannot be empty', variant: 'destructive' });
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('uploads')
+        .update({ file_name: editingName.trim() })
+        .eq('id', cvId)
+        .eq('user_id', user?.id);
+
+      if (error) throw error;
+
+      setCvs(prev => prev.map(cv => 
+        cv.id === cvId ? { ...cv, file_name: editingName.trim() } : cv
+      ));
+      
+      setEditingId(null);
+      setEditingName('');
+      toast({ title: 'Success', description: 'CV name updated successfully' });
+    } catch (error) {
+      console.error('Error updating CV name:', error);
+      toast({ title: 'Error', description: 'Failed to update CV name', variant: 'destructive' });
+    }
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditingName('');
+  };
+
   if (loading) {
     return (
       <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6">
@@ -161,16 +200,51 @@ const CVManagementTab: React.FC = () => {
           {cvs.map((cv) => (
             <div key={cv.id} className="border border-apple-core/20 dark:border-citrus/20 rounded-lg p-4">
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-3 flex-1">
                   <FileText className="h-8 w-8 text-apricot" />
-                  <div>
-                    <h3 className="font-medium text-blueberry dark:text-citrus">{cv.file_name}</h3>
-                    <p className="text-sm text-blueberry/70 dark:text-apple-core/80">
-                      {formatFileSize(cv.file_size)} • {new Date(cv.created_at).toLocaleDateString()}
-                    </p>
+                  <div className="flex-1">
+                    {editingId === cv.id ? (
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="text"
+                          value={editingName}
+                          onChange={(e) => setEditingName(e.target.value)}
+                          className="flex-1 px-2 py-1 border border-apple-core/30 dark:border-citrus/30 rounded text-blueberry dark:text-citrus bg-white dark:bg-blueberry/10"
+                          onKeyPress={(e) => e.key === 'Enter' && saveEdit(cv.id)}
+                        />
+                        <button
+                          onClick={() => saveEdit(cv.id)}
+                          className="p-1 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded"
+                        >
+                          <Check className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={cancelEdit}
+                          className="p-1 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <h3 className="font-medium text-blueberry dark:text-citrus">{cv.file_name}</h3>
+                        <p className="text-sm text-blueberry/70 dark:text-apple-core/80">
+                          {formatFileSize(cv.file_size)} • {new Date(cv.created_at).toLocaleDateString()}
+                        </p>
+                      </>
+                    )}
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
+                  {editingId !== cv.id && (
+                    <button
+                      onClick={() => startEditing(cv)}
+                      className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md transition-colors"
+                      title="Edit CV name"
+                    >
+                      <Plus className="h-4 w-4 rotate-45" />
+                    </button>
+                  )}
                   <button
                     onClick={() => deleteCV(cv.id)}
                     className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
