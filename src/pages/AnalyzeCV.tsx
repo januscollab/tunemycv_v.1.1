@@ -1,12 +1,17 @@
 
 import React, { useState } from 'react';
-import { Upload, FileText, Briefcase, Check, X, Eye, BarChart3, Download, Zap, CreditCard } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { validateFile, extractTextFromFile, formatFileSize } from '@/utils/fileUtils';
+import { validateFile, extractTextFromFile } from '@/utils/fileUtils';
+import { extractJobTitleFromText } from '@/utils/analysisUtils';
 import AnalysisResults from '@/components/analysis/AnalysisResults';
+import FileUploadSection from '@/components/analyze/FileUploadSection';
+import JobDescriptionTextInput from '@/components/analyze/JobDescriptionTextInput';
+import CreditsPanel from '@/components/analyze/CreditsPanel';
+import AnalyzeButton from '@/components/analyze/AnalyzeButton';
+import { useAnalysis } from '@/hooks/useAnalysis';
 import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 interface UploadedFile {
   file: File;
@@ -18,15 +23,15 @@ const AnalyzeCV = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [uploading, setUploading] = useState(false);
-  const [analyzing, setAnalyzing] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<{
     cv?: UploadedFile;
     jobDescription?: UploadedFile;
   }>({});
   const [jobTitle, setJobTitle] = useState('');
   const [showPreview, setShowPreview] = useState<string | null>(null);
-  const [analysisResult, setAnalysisResult] = useState<any>(null);
   const [useAI, setUseAI] = useState(true);
+
+  const { analyzing, analysisResult, setAnalysisResult, performAnalysis } = useAnalysis();
 
   // Fetch user credits
   const { data: userCredits } = useQuery({
@@ -122,222 +127,13 @@ const AnalyzeCV = () => {
     });
   };
 
-  const performAnalysis = async () => {
-    if (!uploadedFiles.cv || !uploadedFiles.jobDescription) {
-      toast({ title: 'Error', description: 'Please upload both CV and job description', variant: 'destructive' });
-      return;
-    }
-
-    try {
-      setAnalyzing(true);
-
-      // Extract job title if not provided
-      const finalJobTitle = jobTitle || extractJobTitleFromText(uploadedFiles.jobDescription.extractedText);
-
-      // Save files to database first
-      const { data: cvUpload, error: cvError } = await supabase
-        .from('uploads')
-        .insert({
-          user_id: user?.id,
-          file_name: uploadedFiles.cv.file.name,
-          file_type: uploadedFiles.cv.file.type,
-          file_size: uploadedFiles.cv.file.size,
-          upload_type: 'cv',
-          extracted_text: uploadedFiles.cv.extractedText,
-          job_title: finalJobTitle
-        })
-        .select()
-        .single();
-
-      if (cvError) throw cvError;
-
-      const { data: jobUpload, error: jobError } = await supabase
-        .from('uploads')
-        .insert({
-          user_id: user?.id,
-          file_name: uploadedFiles.jobDescription.file.name,
-          file_type: uploadedFiles.jobDescription.file.type,
-          file_size: uploadedFiles.jobDescription.file.size,
-          upload_type: 'job_description',
-          extracted_text: uploadedFiles.jobDescription.extractedText,
-          job_title: finalJobTitle
-        })
-        .select()
-        .single();
-
-      if (jobError) throw jobError;
-
-      let analysisData;
-
-      // Try AI analysis first if enabled and user has credits
-      if (useAI && userCredits?.credits && userCredits.credits > 0) {
-        try {
-          console.log('Attempting AI analysis...');
-          const { data: aiResult, error: aiError } = await supabase.functions.invoke('analyze-cv-with-ai', {
-            body: {
-              cvText: uploadedFiles.cv.extractedText,
-              jobDescriptionText: uploadedFiles.jobDescription.extractedText,
-              jobTitle: finalJobTitle,
-              userId: user?.id
-            }
-          });
-
-          if (aiError) throw aiError;
-
-          if (aiResult?.success) {
-            console.log('AI analysis successful');
-            const aiAnalysis = aiResult.analysis;
-            
-            analysisData = {
-              user_id: user?.id,
-              cv_upload_id: cvUpload.id,
-              job_description_upload_id: jobUpload.id,
-              job_title: finalJobTitle,
-              company_name: extractCompanyFromText(uploadedFiles.jobDescription.extractedText),
-              compatibility_score: aiAnalysis.compatibilityScore,
-              keywords_found: aiAnalysis.keywordsFound,
-              keywords_missing: aiAnalysis.keywordsMissing,
-              strengths: aiAnalysis.strengths,
-              weaknesses: aiAnalysis.weaknesses,
-              recommendations: aiAnalysis.recommendations,
-              executive_summary: aiAnalysis.executiveSummary,
-              analysis_type: 'ai',
-              skills_gap_analysis: aiAnalysis.skillsGapAnalysis,
-              ats_optimization: aiAnalysis.atsOptimization,
-              interview_prep: aiAnalysis.interviewPrep
-            };
-
-            toast({ 
-              title: 'AI Analysis Complete!', 
-              description: `Advanced analysis completed. ${aiResult.creditsRemaining} credits remaining.` 
-            });
-          } else {
-            throw new Error('AI analysis failed');
-          }
-        } catch (aiError) {
-          console.log('AI analysis failed, falling back to basic analysis:', aiError);
-          toast({ 
-            title: 'AI Analysis Unavailable', 
-            description: 'Using basic analysis instead.',
-            variant: 'destructive' 
-          });
-          
-          // Fall back to basic analysis
-          analysisData = await performBasicAnalysis(cvUpload, jobUpload, finalJobTitle);
-        }
-      } else {
-        // Use basic analysis
-        analysisData = await performBasicAnalysis(cvUpload, jobUpload, finalJobTitle);
-      }
-
-      // Save analysis results
-      const { data: analysisResult, error: analysisError } = await supabase
-        .from('analysis_results')
-        .insert(analysisData)
-        .select()
-        .single();
-
-      if (analysisError) throw analysisError;
-
-      setAnalysisResult(analysisResult);
-      toast({ title: 'Success', description: 'Analysis completed successfully!' });
-
-    } catch (error) {
-      console.error('Analysis error:', error);
-      toast({ title: 'Error', description: 'Failed to analyze CV', variant: 'destructive' });
-    } finally {
-      setAnalyzing(false);
-    }
+  const togglePreview = (type: 'cv' | 'job_description') => {
+    const previewKey = type === 'cv' ? 'cv' : 'jobDescription';
+    setShowPreview(showPreview === previewKey ? null : previewKey);
   };
 
-  const performBasicAnalysis = async (cvUpload: any, jobUpload: any, finalJobTitle: string) => {
-    const cvText = uploadedFiles.cv!.extractedText.toLowerCase();
-    const jobText = uploadedFiles.jobDescription!.extractedText.toLowerCase();
-
-    const jobWords = jobText.split(/\W+/).filter(word => word.length > 3);
-    const keyTerms = [...new Set(jobWords)].slice(0, 20);
-
-    const matchingTerms = keyTerms.filter(term => cvText.includes(term));
-    const missingTerms = keyTerms.filter(term => !cvText.includes(term));
-
-    const compatibilityScore = Math.round((matchingTerms.length / keyTerms.length) * 100);
-
-    const extractedCompany = extractCompanyFromText(uploadedFiles.jobDescription!.extractedText);
-
-    return {
-      user_id: user?.id,
-      cv_upload_id: cvUpload.id,
-      job_description_upload_id: jobUpload.id,
-      job_title: finalJobTitle,
-      company_name: extractedCompany,
-      compatibility_score: compatibilityScore,
-      keywords_found: matchingTerms.slice(0, 10),
-      keywords_missing: missingTerms.slice(0, 10),
-      strengths: generateStrengths(matchingTerms, compatibilityScore),
-      weaknesses: generateWeaknesses(missingTerms, compatibilityScore),
-      recommendations: generateRecommendations(missingTerms, compatibilityScore),
-      executive_summary: generateExecutiveSummary(compatibilityScore, finalJobTitle),
-      analysis_type: 'basic'
-    };
-  };
-
-  const extractJobTitleFromText = (text: string): string => {
-    const lines = text.split('\n').filter(line => line.trim());
-    for (const line of lines.slice(0, 10)) {
-      if (line.toLowerCase().includes('position') || 
-          line.toLowerCase().includes('role') || 
-          line.toLowerCase().includes('job title')) {
-        return line.trim();
-      }
-    }
-    return lines[0]?.trim() || 'Position';
-  };
-
-  const extractCompanyFromText = (text: string): string => {
-    const lines = text.split('\n').filter(line => line.trim());
-    for (const line of lines.slice(0, 5)) {
-      if (line.toLowerCase().includes('company') || 
-          line.toLowerCase().includes('corporation') || 
-          line.toLowerCase().includes('inc') ||
-          line.toLowerCase().includes('ltd')) {
-        return line.trim();
-      }
-    }
-    return 'Company';
-  };
-
-  const generateStrengths = (matchingTerms: string[], score: number): string[] => {
-    const strengths = [];
-    if (score >= 70) strengths.push('Strong keyword alignment with job requirements');
-    if (matchingTerms.length >= 5) strengths.push('Good technical skill coverage');
-    if (score >= 60) strengths.push('Relevant experience highlighted');
-    return strengths.slice(0, 3);
-  };
-
-  const generateWeaknesses = (missingTerms: string[], score: number): string[] => {
-    const weaknesses = [];
-    if (score < 50) weaknesses.push('Low keyword match with job requirements');
-    if (missingTerms.length >= 10) weaknesses.push('Missing key technical skills');
-    if (score < 30) weaknesses.push('Limited alignment with job description');
-    return weaknesses.slice(0, 3);
-  };
-
-  const generateRecommendations = (missingTerms: string[], score: number): string[] => {
-    const recommendations = [];
-    if (score < 70) recommendations.push('Include more relevant keywords from the job description');
-    if (missingTerms.length >= 5) recommendations.push(`Consider adding experience with: ${missingTerms.slice(0, 3).join(', ')}`);
-    recommendations.push('Tailor your CV more specifically to this role');
-    return recommendations.slice(0, 3);
-  };
-
-  const generateExecutiveSummary = (score: number, jobTitle: string): string => {
-    if (score >= 70) {
-      return `Your CV shows strong alignment with the ${jobTitle} position. You have good keyword coverage and relevant experience that matches the job requirements.`;
-    } else if (score >= 40) {
-      return `Your CV has moderate alignment with the ${jobTitle} position. There are areas for improvement to better match the job requirements.`;
-    } else {
-      return `Your CV currently has limited alignment with the ${jobTitle} position. Significant improvements are needed to match the job requirements.`;
-    }
+  const handleAnalysis = () => {
+    performAnalysis(uploadedFiles, jobTitle, useAI, userCredits);
   };
 
   const canAnalyze = uploadedFiles.cv && uploadedFiles.jobDescription;
@@ -376,51 +172,15 @@ const AnalyzeCV = () => {
             </div>
 
             {/* CV Upload */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Upload Your CV</h3>
-              <p className="text-sm text-gray-600 mb-4">Supported formats: PDF, DOCX (Max 5MB)</p>
-              
-              {!uploadedFiles.cv ? (
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                  <FileText className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                  <label className="cursor-pointer">
-                    <span className="text-blue-600 hover:text-blue-700 font-medium">Click to upload</span>
-                    <span className="text-gray-600"> or drag and drop your CV</span>
-                    <input
-                      type="file"
-                      className="hidden"
-                      accept=".pdf,.docx"
-                      onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0], 'cv')}
-                      disabled={uploading}
-                    />
-                  </label>
-                </div>
-              ) : (
-                <div className="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <Check className="h-5 w-5 text-green-600" />
-                    <div>
-                      <p className="font-medium text-green-900">{uploadedFiles.cv.file.name}</p>
-                      <p className="text-sm text-green-700">{formatFileSize(uploadedFiles.cv.file.size)}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => setShowPreview(showPreview === 'cv' ? null : 'cv')}
-                      className="p-2 text-green-600 hover:bg-green-100 rounded-md"
-                    >
-                      <Eye className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => removeFile('cv')}
-                      className="p-2 text-red-600 hover:bg-red-100 rounded-md"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
+            <FileUploadSection
+              type="cv"
+              uploadedFile={uploadedFiles.cv}
+              onFileUpload={handleFileUpload}
+              onRemoveFile={() => removeFile('cv')}
+              onTogglePreview={() => togglePreview('cv')}
+              showPreview={showPreview === 'cv'}
+              uploading={uploading}
+            />
 
             {/* Job Description Upload */}
             <div className="bg-white rounded-lg shadow p-6">
@@ -430,206 +190,55 @@ const AnalyzeCV = () => {
               <div className="space-y-4">
                 {!uploadedFiles.jobDescription ? (
                   <>
-                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                      <Briefcase className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                      <label className="cursor-pointer">
-                        <span className="text-blue-600 hover:text-blue-700 font-medium">Click to upload</span>
-                        <span className="text-gray-600"> job description file</span>
-                        <input
-                          type="file"
-                          className="hidden"
-                          accept=".pdf,.docx,.txt"
-                          onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0], 'job_description')}
-                          disabled={uploading}
-                        />
-                      </label>
-                    </div>
+                    <FileUploadSection
+                      type="job_description"
+                      uploadedFile={uploadedFiles.jobDescription}
+                      onFileUpload={handleFileUpload}
+                      onRemoveFile={() => removeFile('jobDescription')}
+                      onTogglePreview={() => togglePreview('job_description')}
+                      showPreview={showPreview === 'jobDescription'}
+                      uploading={uploading}
+                    />
                     
                     <div className="text-center text-gray-500">or</div>
                     
                     <JobDescriptionTextInput onSubmit={handleJobDescriptionText} disabled={uploading} />
                   </>
                 ) : (
-                  <div className="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
-                    <div className="flex items-center space-x-3">
-                      <Check className="h-5 w-5 text-green-600" />
-                      <div>
-                        <p className="font-medium text-green-900">{uploadedFiles.jobDescription.file.name}</p>
-                        <p className="text-sm text-green-700">{formatFileSize(uploadedFiles.jobDescription.file.size)}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => setShowPreview(showPreview === 'jobDescription' ? null : 'jobDescription')}
-                        className="p-2 text-green-600 hover:bg-green-100 rounded-md"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => removeFile('jobDescription')}
-                        className="p-2 text-red-600 hover:bg-red-100 rounded-md"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </div>
+                  <FileUploadSection
+                    type="job_description"
+                    uploadedFile={uploadedFiles.jobDescription}
+                    onFileUpload={handleFileUpload}
+                    onRemoveFile={() => removeFile('jobDescription')}
+                    onTogglePreview={() => togglePreview('job_description')}
+                    showPreview={showPreview === 'jobDescription'}
+                    uploading={uploading}
+                  />
                 )}
               </div>
             </div>
-
-            {/* Preview */}
-            {showPreview && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Preview: {showPreview === 'cv' ? 'CV' : 'Job Description'}
-                </h3>
-                <div className="bg-gray-50 rounded-md p-4 max-h-64 overflow-y-auto">
-                  <pre className="whitespace-pre-wrap text-sm text-gray-700">
-                    {showPreview === 'cv' ? uploadedFiles.cv?.extractedText : uploadedFiles.jobDescription?.extractedText}
-                  </pre>
-                </div>
-              </div>
-            )}
 
             {/* Analyze Button */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <button
-                onClick={performAnalysis}
-                disabled={!canAnalyze || analyzing}
-                className={`w-full py-3 px-4 rounded-md font-medium transition-colors ${
-                  canAnalyze && !analyzing
-                    ? 'bg-blue-600 text-white hover:bg-blue-700'
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                }`}
-              >
-                {analyzing ? (
-                  <div className="flex items-center justify-center space-x-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    <span>
-                      {useAI && hasCreditsForAI ? 'Running AI Analysis...' : 'Analyzing CV...'}
-                    </span>
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-center space-x-2">
-                    {useAI && hasCreditsForAI ? (
-                      <>
-                        <Zap className="h-4 w-4" />
-                        <span>Analyze with AI (1 credit)</span>
-                      </>
-                    ) : (
-                      <>
-                        <BarChart3 className="h-4 w-4" />
-                        <span>Analyze CV Compatibility</span>
-                      </>
-                    )}
-                  </div>
-                )}
-              </button>
-              {!canAnalyze && (
-                <p className="text-sm text-gray-500 text-center mt-2">
-                  Please upload both CV and job description to proceed
-                </p>
-              )}
-            </div>
+            <AnalyzeButton
+              onAnalyze={handleAnalysis}
+              canAnalyze={!!canAnalyze}
+              analyzing={analyzing}
+              useAI={useAI}
+              hasCreditsForAI={hasCreditsForAI}
+            />
           </div>
         </div>
 
         {/* Credits and Analysis Type Panel */}
         <div className="lg:col-span-1">
-          <div className="bg-white rounded-lg shadow p-6 sticky top-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Analysis Options</h3>
-            
-            {/* Credits Display */}
-            <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <div className="flex items-center justify-center space-x-2 mb-2">
-                <CreditCard className="h-5 w-5 text-blue-600" />
-                <span className="text-blue-900 font-medium">
-                  Credits: {userCredits?.credits || 0}
-                </span>
-              </div>
-            </div>
-            
-            {/* Analysis Type Selection */}
-            <div className="space-y-4">
-              <label className="flex items-start space-x-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
-                <input
-                  type="radio"
-                  checked={useAI && hasCreditsForAI}
-                  onChange={() => setUseAI(true)}
-                  disabled={!hasCreditsForAI}
-                  className="text-blue-600 mt-0.5"
-                />
-                <div className="flex-1">
-                  <div className="flex items-center space-x-2">
-                    <Zap className="h-4 w-4 text-yellow-500" />
-                    <span className={`font-medium ${hasCreditsForAI ? 'text-gray-900' : 'text-gray-400'}`}>
-                      AI Analysis
-                    </span>
-                  </div>
-                  <p className="text-sm text-gray-600 mt-1">
-                    Advanced AI-powered analysis with detailed insights (1 credit)
-                  </p>
-                </div>
-              </label>
-              
-              <label className="flex items-start space-x-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
-                <input
-                  type="radio"
-                  checked={!useAI || !hasCreditsForAI}
-                  onChange={() => setUseAI(false)}
-                  className="text-blue-600 mt-0.5"
-                />
-                <div className="flex-1">
-                  <div className="flex items-center space-x-2">
-                    <BarChart3 className="h-4 w-4 text-blue-500" />
-                    <span className="font-medium text-gray-900">Basic Analysis</span>
-                  </div>
-                  <p className="text-sm text-gray-600 mt-1">
-                    Quick keyword matching and compatibility score (Free)
-                  </p>
-                </div>
-              </label>
-            </div>
-            
-            {!hasCreditsForAI && (
-              <div className="mt-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
-                <p className="text-sm text-orange-700">
-                  No credits available for AI analysis. Using basic analysis.
-                </p>
-              </div>
-            )}
-          </div>
+          <CreditsPanel
+            credits={userCredits?.credits || 0}
+            useAI={useAI}
+            setUseAI={setUseAI}
+            hasCreditsForAI={hasCreditsForAI}
+          />
         </div>
       </div>
-    </div>
-  );
-};
-
-// Job Description Text Input Component
-const JobDescriptionTextInput: React.FC<{ onSubmit: (text: string) => void; disabled: boolean }> = ({ onSubmit, disabled }) => {
-  const [text, setText] = useState('');
-
-  const handleSubmit = () => {
-    onSubmit(text);
-    setText('');
-  };
-
-  return (
-    <div>
-      <textarea
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        placeholder="Paste the job description here..."
-        rows={8}
-        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-      />
-      <button
-        onClick={handleSubmit}
-        disabled={!text.trim() || disabled}
-        className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
-      >
-        Add Job Description
-      </button>
     </div>
   );
 };
