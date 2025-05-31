@@ -159,24 +159,99 @@ const validateEnhancedAnalysisResult = (result: any): EnhancedAIAnalysisResult =
   return result as EnhancedAIAnalysisResult;
 };
 
+// Function to log analysis interaction
+const logAnalysisInteraction = async (
+  supabase: any,
+  data: {
+    userId: string;
+    cvUploadId?: string;
+    jobDescriptionUploadId?: string;
+    prompt: string;
+    response: string;
+    model: string;
+    processingTime: number;
+    tokensUsed?: number;
+    status: 'success' | 'error';
+    errorMessage?: string;
+    responseMetadata?: any;
+    analysisResultId?: string;
+  }
+) => {
+  try {
+    const { error } = await supabase
+      .from('analysis_logs')
+      .insert({
+        user_id: data.userId,
+        cv_upload_id: data.cvUploadId,
+        job_description_upload_id: data.jobDescriptionUploadId,
+        openai_model: data.model,
+        prompt_text: data.prompt,
+        response_text: data.response,
+        response_metadata: data.responseMetadata || {},
+        processing_time_ms: data.processingTime,
+        tokens_used: data.tokensUsed,
+        status: data.status,
+        error_message: data.errorMessage,
+        analysis_result_id: data.analysisResultId
+      });
+
+    if (error) {
+      console.error('Failed to log analysis interaction:', error);
+    } else {
+      console.log('Analysis interaction logged successfully');
+    }
+  } catch (error) {
+    console.error('Error logging analysis interaction:', error);
+  }
+};
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
-  try {
-    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    
-    if (!openAIApiKey) {
-      throw new Error('OpenAI API key not configured');
-    }
+  const startTime = Date.now();
+  const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+  const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+  const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+  
+  if (!openAIApiKey) {
+    throw new Error('OpenAI API key not configured');
+  }
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    const { cvText, jobDescriptionText, jobTitle, userId }: AnalysisRequest = await req.json();
+  const supabase = createClient(supabaseUrl, supabaseServiceKey);
+  let requestData: AnalysisRequest;
+  let prompt = '';
+  let aiResponse = '';
+  let tokensUsed = 0;
+  let cvUploadId: string | undefined;
+  let jobDescriptionUploadId: string | undefined;
+
+  try {
+    requestData = await req.json();
+    const { cvText, jobDescriptionText, jobTitle, userId } = requestData;
 
     console.log('Starting enhanced AI analysis for user:', userId);
+
+    // Get upload IDs for logging
+    const { data: cvUploads } = await supabase
+      .from('uploads')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('upload_type', 'cv')
+      .order('created_at', { ascending: false })
+      .limit(1);
+
+    const { data: jobUploads } = await supabase
+      .from('uploads')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('upload_type', 'job_description')
+      .order('created_at', { ascending: false })
+      .limit(1);
+
+    cvUploadId = cvUploads?.[0]?.id;
+    jobDescriptionUploadId = jobUploads?.[0]?.id;
 
     // Check and deduct user credits
     const { data: userCredits, error: creditsError } = await supabase
@@ -192,8 +267,8 @@ serve(async (req) => {
       );
     }
 
-    // Simplified comprehensive AI prompt focused on core analysis
-    const prompt = `
+    // Create comprehensive AI prompt
+    prompt = `
 You are a senior career consultant and CV optimization expert. Analyze the CV against the job description and provide detailed insights.
 
 CRITICAL REQUIREMENTS:
@@ -317,12 +392,13 @@ INSTRUCTIONS:
 - MAINTAIN PROFESSIONAL TONE while being honest about gaps
 `;
 
-    console.log('Calling OpenAI API with simplified prompt...');
+    console.log('Calling OpenAI API with comprehensive prompt...');
 
     // Call OpenAI API with retry logic
     let openAIResponse;
     let attempts = 0;
     const maxAttempts = 2;
+    const model = 'gpt-4o';
 
     while (attempts < maxAttempts) {
       try {
@@ -333,7 +409,7 @@ INSTRUCTIONS:
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            model: 'gpt-4o',
+            model,
             messages: [
               {
                 role: 'system',
@@ -369,18 +445,35 @@ INSTRUCTIONS:
     }
 
     const openAIData = await openAIResponse.json();
-    const aiResponseText = openAIData.choices[0].message.content;
+    aiResponse = openAIData.choices[0].message.content;
+    tokensUsed = openAIData.usage?.total_tokens || 0;
     
-    console.log('Enhanced OpenAI response received, length:', aiResponseText.length);
+    console.log('Enhanced OpenAI response received, length:', aiResponse.length);
 
     // Parse and validate AI response
     let analysisResult: EnhancedAIAnalysisResult;
     try {
-      const parsedResult = cleanAndParseJSON(aiResponseText);
+      const parsedResult = cleanAndParseJSON(aiResponse);
       analysisResult = validateEnhancedAnalysisResult(parsedResult);
       console.log('AI response successfully parsed and validated');
     } catch (parseError) {
       console.error('Failed to parse/validate AI response:', parseError);
+      
+      // Log the failed attempt
+      await logAnalysisInteraction(supabase, {
+        userId,
+        cvUploadId,
+        jobDescriptionUploadId,
+        prompt,
+        response: aiResponse,
+        model,
+        processingTime: Date.now() - startTime,
+        tokensUsed,
+        status: 'error',
+        errorMessage: `Parse error: ${parseError.message}`,
+        responseMetadata: { parseError: true, rawResponse: aiResponse.substring(0, 1000) }
+      });
+      
       throw new Error(`Invalid AI response format: ${parseError.message}`);
     }
 
@@ -393,6 +486,24 @@ INSTRUCTIONS:
     if (creditUpdateError) {
       console.error('Failed to update credits:', creditUpdateError);
     }
+
+    // Log successful analysis
+    await logAnalysisInteraction(supabase, {
+      userId,
+      cvUploadId,
+      jobDescriptionUploadId,
+      prompt,
+      response: aiResponse,
+      model,
+      processingTime: Date.now() - startTime,
+      tokensUsed,
+      status: 'success',
+      responseMetadata: {
+        compatibilityScore: analysisResult.compatibilityScore,
+        companyName: analysisResult.companyName,
+        keywordMatchPercentage: analysisResult.keywordAnalysis?.keywordMatchPercentage || 0
+      }
+    });
 
     console.log('Enhanced AI analysis completed successfully');
 
@@ -407,6 +518,24 @@ INSTRUCTIONS:
 
   } catch (error) {
     console.error('Error in enhanced AI analysis:', error);
+    
+    // Log the error
+    if (requestData?.userId) {
+      await logAnalysisInteraction(supabase, {
+        userId: requestData.userId,
+        cvUploadId,
+        jobDescriptionUploadId,
+        prompt,
+        response: aiResponse || 'No response received',
+        model: 'gpt-4o',
+        processingTime: Date.now() - startTime,
+        tokensUsed,
+        status: 'error',
+        errorMessage: error.message,
+        responseMetadata: { errorType: error.constructor.name }
+      });
+    }
+    
     return new Response(
       JSON.stringify({ 
         error: error.message,

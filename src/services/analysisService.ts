@@ -100,5 +100,20 @@ export const saveAnalysisResults = async (analysisData: any) => {
     throw analysisError;
   }
 
+  // Update analysis logs with the analysis result ID
+  if (analysisResult?.id && analysisData.user_id) {
+    const { error: logUpdateError } = await supabase
+      .from('analysis_logs')
+      .update({ analysis_result_id: analysisResult.id })
+      .eq('user_id', analysisData.user_id)
+      .is('analysis_result_id', null)
+      .order('created_at', { ascending: false })
+      .limit(1);
+
+    if (logUpdateError) {
+      console.error('Failed to link analysis log to result:', logUpdateError);
+    }
+  }
+
   return analysisResult;
 };
