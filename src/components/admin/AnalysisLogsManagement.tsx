@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Search, Eye, FileText, Clock, AlertCircle, CheckCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -40,6 +39,13 @@ const AnalysisLogsManagement = () => {
 
   const loadLogs = async () => {
     try {
+      // Ensure user is authenticated before making admin queries
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({ title: 'Error', description: 'Authentication required', variant: 'destructive' });
+        return;
+      }
+
       const { data, error } = await supabase
         .from('analysis_logs_with_details')
         .select('*')
