@@ -38,7 +38,8 @@ const ExecutiveSummarySection: React.FC<ExecutiveSummarySectionProps> = ({ execu
         </div>
       )}
 
-      <div className="space-y-6">
+      {/* Strengths and Weaknesses Side by Side */}
+      <div className="grid md:grid-cols-2 gap-6">
         {/* Strengths */}
         {strengths.length > 0 && (
           <div>
@@ -88,17 +89,17 @@ const ExecutiveSummarySection: React.FC<ExecutiveSummarySectionProps> = ({ execu
             </div>
           </div>
         )}
-
-        {/* Empty State */}
-        {strengths.length === 0 && weaknesses.length === 0 && (
-          <div className="text-center py-8">
-            <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-blueberry/60 dark:text-apple-core/60">
-              No detailed analysis available. Please try again with a more comprehensive job description.
-            </p>
-          </div>
-        )}
       </div>
+
+      {/* Empty State */}
+      {strengths.length === 0 && weaknesses.length === 0 && (
+        <div className="text-center py-8">
+          <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <p className="text-blueberry/60 dark:text-apple-core/60">
+            No detailed analysis available. Please try again with a more comprehensive job description.
+          </p>
+        </div>
+      )}
     </div>
   );
 };

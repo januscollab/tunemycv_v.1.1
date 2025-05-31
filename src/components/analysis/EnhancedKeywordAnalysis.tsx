@@ -20,7 +20,7 @@ interface EnhancedKeywordAnalysisProps {
 }
 
 const EnhancedKeywordAnalysis: React.FC<EnhancedKeywordAnalysisProps> = ({ keywordAnalysis }) => {
-  const [showAllKeywords, setShowAllKeywords] = useState(false);
+  const [showAllKeywords, setShowAllKeywords] = useState(true);
 
   if (!keywordAnalysis) return null;
 
@@ -40,7 +40,7 @@ const EnhancedKeywordAnalysis: React.FC<EnhancedKeywordAnalysisProps> = ({ keywo
     return 0;
   });
 
-  // Show first 10 keywords by default, all when expanded
+  // Show first 10 keywords when collapsed, all when expanded
   const displayKeywords = showAllKeywords ? sortedKeywords : sortedKeywords.slice(0, 10);
   const hasMoreKeywords = sortedKeywords.length > 10;
 

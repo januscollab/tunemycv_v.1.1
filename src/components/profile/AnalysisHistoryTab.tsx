@@ -7,6 +7,7 @@ import AnalysisHistoryHeader from './analysis/AnalysisHistoryHeader';
 import EmptyAnalysisState from './analysis/EmptyAnalysisState';
 import AnalysisListItem from './analysis/AnalysisListItem';
 import AnalysisDetailModal from './analysis/AnalysisDetailModal';
+import UpcomingFeatureModal from './analysis/UpcomingFeatureModal';
 
 interface AnalysisResult {
   id: string;
@@ -18,6 +19,7 @@ interface AnalysisResult {
   strengths: string[];
   weaknesses: string[];
   recommendations: string[];
+  credit_cost?: number;
 }
 
 const AnalysisHistoryTab: React.FC = () => {
@@ -26,6 +28,13 @@ const AnalysisHistoryTab: React.FC = () => {
   const [analyses, setAnalyses] = useState<AnalysisResult[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedAnalysis, setSelectedAnalysis] = useState<AnalysisResult | null>(null);
+  const [upcomingFeatureModal, setUpcomingFeatureModal] = useState<{
+    isOpen: boolean;
+    featureType: 'cover-letter' | 'interview-prep' | null;
+  }>({
+    isOpen: false,
+    featureType: null
+  });
 
   useEffect(() => {
     if (user) {
@@ -35,14 +44,25 @@ const AnalysisHistoryTab: React.FC = () => {
 
   const loadAnalysisHistory = async () => {
     try {
+      // Fetch analysis results with credit cost from analysis_logs
       const { data, error } = await supabase
         .from('analysis_results')
-        .select('*')
+        .select(`
+          *,
+          analysis_logs!inner(cost_estimate)
+        `)
         .eq('user_id', user?.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setAnalyses(data || []);
+      
+      // Transform data to include credit cost
+      const transformedData = (data || []).map(analysis => ({
+        ...analysis,
+        credit_cost: analysis.analysis_logs?.[0]?.cost_estimate ? Math.ceil(analysis.analysis_logs[0].cost_estimate) : undefined
+      }));
+      
+      setAnalyses(transformedData);
     } catch (error) {
       toast({ title: 'Error', description: 'Failed to load analysis history', variant: 'destructive' });
     } finally {
@@ -71,6 +91,27 @@ const AnalysisHistoryTab: React.FC = () => {
     }
   };
 
+  const handleCreateCoverLetter = (analysis: AnalysisResult) => {
+    setUpcomingFeatureModal({
+      isOpen: true,
+      featureType: 'cover-letter'
+    });
+  };
+
+  const handleInterviewPrep = (analysis: AnalysisResult) => {
+    setUpcomingFeatureModal({
+      isOpen: true,
+      featureType: 'interview-prep'
+    });
+  };
+
+  const closeUpcomingFeatureModal = () => {
+    setUpcomingFeatureModal({
+      isOpen: false,
+      featureType: null
+    });
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -93,6 +134,8 @@ const AnalysisHistoryTab: React.FC = () => {
               analysis={analysis}
               onViewDetails={handleViewDetails}
               onDelete={handleDeleteAnalysis}
+              onCreateCoverLetter={handleCreateCoverLetter}
+              onInterviewPrep={handleInterviewPrep}
             />
           ))}
         </div>
@@ -101,6 +144,12 @@ const AnalysisHistoryTab: React.FC = () => {
       <AnalysisDetailModal
         analysis={selectedAnalysis}
         onClose={() => setSelectedAnalysis(null)}
+      />
+
+      <UpcomingFeatureModal
+        isOpen={upcomingFeatureModal.isOpen}
+        onClose={closeUpcomingFeatureModal}
+        featureType={upcomingFeatureModal.featureType}
       />
     </div>
   );

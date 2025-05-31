@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { User, History, FileText, Settings, Lock } from 'lucide-react';
+import { User, History, Upload, CreditCard, Settings } from 'lucide-react';
 
 interface ProfileNavigationProps {
   activeTab: string;
@@ -11,30 +11,31 @@ const ProfileNavigation: React.FC<ProfileNavigationProps> = ({ activeTab, onTabC
   const tabs = [
     { id: 'personal', label: 'Personal Info', icon: User },
     { id: 'history', label: 'Analysis History', icon: History },
-    { id: 'files', label: 'My Files', icon: FileText },
-    { id: 'password', label: 'Password', icon: Lock },
+    { id: 'files', label: 'File Management', icon: Upload },
+    { id: 'password', label: 'Billing History', icon: CreditCard },
     { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
   return (
-    <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 mb-6">
-      <nav className="flex space-x-8 overflow-x-auto">
-        {tabs.map((tab) => (
+    <nav className="space-y-1">
+      {tabs.map((tab) => {
+        const Icon = tab.icon;
+        return (
           <button
             key={tab.id}
             onClick={() => onTabChange(tab.id)}
-            className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors ${
+            className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
               activeTab === tab.id
-                ? 'bg-apricot text-white'
-                : 'text-blueberry dark:text-apple-core hover:bg-apple-core/20 dark:hover:bg-citrus/20'
+                ? 'bg-blue-100 text-blue-700 border-r-2 border-blue-700'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
             }`}
           >
-            <tab.icon className="h-4 w-4" />
-            <span>{tab.label}</span>
+            <Icon className="h-5 w-5 mr-3" />
+            {tab.label}
           </button>
-        ))}
-      </nav>
-    </div>
+        );
+      })}
+    </nav>
   );
 };
 
