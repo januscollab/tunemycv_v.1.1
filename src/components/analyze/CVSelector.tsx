@@ -23,22 +23,6 @@ interface CVSelectorProps {
 const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploading }) => {
   const [activeTab, setActiveTab] = useState<'upload' | 'saved'>('saved');
 
-  const handleCVSelect = (cv: any) => {
-    // Convert CV data to UploadedFile format
-    const uploadedFile: UploadedFile = {
-      file: new File([cv.extracted_text || ''], cv.file_name, { type: cv.file_type }),
-      extractedText: cv.extracted_text || '',
-      type: 'cv'
-    };
-    onCVSelect(uploadedFile);
-  };
-
-  const handleFileSelect = (file: File, shouldSave: boolean) => {
-    // This will be handled by FileUploadWithSave internally
-    // The component should extract text and create the UploadedFile format
-    console.log('File selected:', file, 'Should save:', shouldSave);
-  };
-
   return (
     <Card className="bg-white dark:bg-blueberry/20 border border-apple-core/20 dark:border-citrus/20">
       <CardHeader>
@@ -103,21 +87,9 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
 
             {/* Tab Content */}
             {activeTab === 'saved' ? (
-              <SavedCVList 
-                savedCVs={[]} 
-                selectedCVId={null} 
-                onCVSelect={handleCVSelect} 
-              />
+              <SavedCVList onCVSelect={onCVSelect} uploading={uploading} />
             ) : (
-              <FileUploadWithSave 
-                onFileSelect={handleFileSelect}
-                uploading={uploading}
-                accept=".pdf,.docx,.txt"
-                maxSize="5MB"
-                label="Upload your CV"
-                currentCVCount={0}
-                maxCVCount={5}
-              />
+              <FileUploadWithSave onCVSelect={onCVSelect} uploading={uploading} />
             )}
           </div>
         )}
