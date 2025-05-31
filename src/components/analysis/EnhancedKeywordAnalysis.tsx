@@ -1,6 +1,6 @@
 
-import React from 'react';
-import { CheckCircle, XCircle, AlertCircle, Info, ExternalLink } from 'lucide-react';
+import React, { useState } from 'react';
+import { CheckCircle, XCircle, AlertCircle, Info, ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface EnhancedKeywordAnalysisProps {
@@ -20,23 +20,26 @@ interface EnhancedKeywordAnalysisProps {
 }
 
 const EnhancedKeywordAnalysis: React.FC<EnhancedKeywordAnalysisProps> = ({ keywordAnalysis }) => {
+  const [showAllKeywords, setShowAllKeywords] = useState(false);
+
   if (!keywordAnalysis) return null;
 
   const { totalKeywords, matchedKeywords, keywordMatchPercentage, keywords } = keywordAnalysis;
 
-  // Display up to 20 keywords, prioritizing high importance and missing keywords
-  const displayKeywords = keywords
-    .sort((a, b) => {
-      // Sort by: importance (high first), then missing keywords first
-      const importanceOrder = { high: 3, medium: 2, low: 1 };
-      const importanceA = importanceOrder[a.importance];
-      const importanceB = importanceOrder[b.importance];
-      
-      if (importanceA !== importanceB) return importanceB - importanceA;
-      if (a.found !== b.found) return a.found ? 1 : -1;
-      return 0;
-    })
-    .slice(0, 20);
+  // Sort keywords by: importance (high first), then missing keywords first
+  const sortedKeywords = keywords.sort((a, b) => {
+    const importanceOrder = { high: 3, medium: 2, low: 1 };
+    const importanceA = importanceOrder[a.importance];
+    const importanceB = importanceOrder[b.importance];
+    
+    if (importanceA !== importanceB) return importanceB - importanceA;
+    if (a.found !== b.found) return a.found ? 1 : -1;
+    return 0;
+  });
+
+  // Show first 10 keywords by default, all when expanded
+  const displayKeywords = showAllKeywords ? sortedKeywords : sortedKeywords.slice(0, 10);
+  const hasMoreKeywords = sortedKeywords.length > 10;
 
   const getImportanceColor = (importance: string) => {
     switch (importance) {
@@ -75,18 +78,15 @@ const EnhancedKeywordAnalysis: React.FC<EnhancedKeywordAnalysisProps> = ({ keywo
         </div>
       </div>
 
-      {/* Display limit notice */}
-      {keywords.length > 20 && (
-        <div className="bg-citrus/10 border border-citrus/30 rounded-lg p-3 mb-4">
-          <div className="flex items-center">
-            <Info className="h-4 w-4 text-blueberry mr-2" />
-            <span className="text-sm text-blueberry dark:text-apple-core">
-              Showing top 20 keywords (prioritized by importance and missing status). 
-              Total keywords analyzed: {keywords.length}
-            </span>
-          </div>
+      {/* Total keywords info */}
+      <div className="bg-citrus/10 border border-citrus/30 rounded-lg p-3 mb-4">
+        <div className="flex items-center">
+          <Info className="h-4 w-4 text-blueberry mr-2" />
+          <span className="text-sm text-blueberry dark:text-apple-core">
+            Total keywords analyzed: {keywords.length} (showing {showAllKeywords ? 'all' : `first ${Math.min(10, keywords.length)}`} keywords, prioritized by importance and missing status)
+          </span>
         </div>
-      )}
+      </div>
 
       {/* Detailed Keyword List */}
       <div className="space-y-3">
@@ -124,6 +124,30 @@ const EnhancedKeywordAnalysis: React.FC<EnhancedKeywordAnalysisProps> = ({ keywo
           </div>
         ))}
       </div>
+
+      {/* Show More/Less Button */}
+      {hasMoreKeywords && (
+        <div className="mt-4 text-center">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowAllKeywords(!showAllKeywords)}
+            className="text-apricot hover:text-apricot/80"
+          >
+            {showAllKeywords ? (
+              <>
+                <ChevronUp className="h-4 w-4 mr-1" />
+                Show Less Keywords
+              </>
+            ) : (
+              <>
+                <ChevronDown className="h-4 w-4 mr-1" />
+                Show All {keywords.length} Keywords
+              </>
+            )}
+          </Button>
+        </div>
+      )}
 
       {/* Match Rate Alert */}
       {keywordMatchPercentage < 60 && (
