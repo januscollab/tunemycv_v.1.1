@@ -18,13 +18,13 @@ const ProfileTabContent: React.FC<ProfileTabContentProps> = ({ activeTab, credit
       case 'personal':
         return <PersonalInfoTab credits={credits} memberSince={memberSince} />;
       case 'history':
-        return <AnalysisHistoryTab />;
+        return <AnalysisHistoryTab credits={credits} memberSince={memberSince} />;
       case 'files':
-        return <CVManagementTab />;
+        return <CVManagementTab credits={credits} memberSince={memberSince} />;
       case 'password':
-        return <BillingHistoryTab />;
+        return <BillingHistoryTab credits={credits} memberSince={memberSince} />;
       case 'settings':
-        return <SettingsTab />;
+        return <SettingsTab credits={credits} memberSince={memberSince} />;
       default:
         return <PersonalInfoTab credits={credits} memberSince={memberSince} />;
     }
