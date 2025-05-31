@@ -148,6 +148,33 @@ const validateEnhancedAnalysisResult = (result: any): EnhancedAIAnalysisResult =
     result.compatibilityScore = parseInt(result.compatibilityScore) || 0;
   }
   
+  // Score validation - check against breakdown scores
+  if (result.compatibilityBreakdown) {
+    const breakdown = result.compatibilityBreakdown;
+    const scores = [
+      breakdown.technicalSkills?.score,
+      breakdown.experience?.score,
+      breakdown.education?.score,
+      breakdown.softSkills?.score,
+      breakdown.industryKnowledge?.score
+    ].filter(score => score !== undefined && score !== null);
+
+    if (scores.length > 0) {
+      const averageBreakdown = scores.reduce((sum, score) => sum + score, 0) / scores.length;
+      const scoreDifference = Math.abs(result.compatibilityScore - averageBreakdown);
+      
+      // If overall score is 0 but breakdown average is >0, or difference is >20 points
+      if ((result.compatibilityScore === 0 && averageBreakdown > 0) || scoreDifference > 20) {
+        console.warn('Score validation failed, using breakdown average:', {
+          original: result.compatibilityScore,
+          calculated: Math.round(averageBreakdown)
+        });
+        result.compatibilityScore = Math.round(averageBreakdown);
+        result.scoreAdjusted = true;
+      }
+    }
+  }
+  
   // Set defaults for missing nested structures
   if (!result.executiveSummary.strengths) result.executiveSummary.strengths = [];
   if (!result.executiveSummary.weaknesses) result.executiveSummary.weaknesses = [];
@@ -192,7 +219,7 @@ serve(async (req) => {
       );
     }
 
-    // Simplified comprehensive AI prompt focused on core analysis
+    // Enhanced comprehensive AI prompt with score validation instructions
     const prompt = `
 You are a senior career consultant and CV optimization expert. Analyze the CV against the job description and provide detailed insights.
 
@@ -201,6 +228,9 @@ CRITICAL REQUIREMENTS:
 2. Be thorough and comprehensive - this is professional career consulting
 3. Respond ONLY with valid JSON in the exact structure below
 4. Extract 15-25+ relevant keywords from the job description
+5. ENSURE SCORE CONSISTENCY: The overall compatibilityScore MUST be within 10 points of the average of the 5 breakdown scores
+6. NEVER assign 0% unless the CV is completely irrelevant (no matching skills, experience, or keywords)
+7. Calculate scores based on actual content alignment, not arbitrary numbers
 
 CV TO ANALYZE:
 ${cvText}
@@ -210,13 +240,19 @@ ${jobDescriptionText}
 
 POSITION: ${jobTitle || 'Not specified'}
 
+SCORE VALIDATION RULES:
+- Overall score should reflect the average of breakdown scores (±10 points maximum)
+- If CV has ANY relevant experience/skills, minimum score should be 20%
+- 0% scores are only for completely irrelevant CVs
+- Explain score reasoning in the overview
+
 RESPOND WITH ANALYSIS IN THIS EXACT JSON STRUCTURE:
 {
   "compatibilityScore": 0-100,
   "companyName": "Company name from job description",
   "position": "Job title",
   "executiveSummary": {
-    "overview": "3-4 sentence overview of compatibility",
+    "overview": "3-4 sentence overview explaining the compatibilityScore reasoning",
     "strengths": [
       {
         "title": "Strength title",
@@ -313,11 +349,12 @@ INSTRUCTIONS:
 - RESPOND ONLY WITH VALID JSON
 - PROVIDE 3-7 ITEMS for strengths, weaknesses, recommendations, critical gaps, and development areas
 - EXTRACT 15-25+ KEYWORDS with strategic importance
+- ENSURE SCORE CONSISTENCY between overall and breakdown scores
 - FOCUS ON ACTIONABLE INSIGHTS with specific evidence
 - MAINTAIN PROFESSIONAL TONE while being honest about gaps
 `;
 
-    console.log('Calling OpenAI API with simplified prompt...');
+    console.log('Calling OpenAI API with enhanced validation prompt...');
 
     // Call OpenAI API with retry logic
     let openAIResponse;
@@ -337,7 +374,7 @@ INSTRUCTIONS:
             messages: [
               {
                 role: 'system',
-                content: 'You are a senior career consultant providing comprehensive CV analysis. Always respond with valid JSON only, no additional text.'
+                content: 'You are a senior career consultant providing comprehensive CV analysis. Always respond with valid JSON only. Ensure score consistency: overall score must align with breakdown averages within 10 points. Never use 0% unless CV is completely irrelevant.'
               },
               {
                 role: 'user',

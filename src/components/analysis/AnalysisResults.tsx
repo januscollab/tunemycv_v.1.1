@@ -27,7 +27,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
     if (score >= 80) return 'Excellent Match';
     if (score >= 70) return 'Good Match';
     if (score >= 50) return 'Moderate to Good Match';
-    return 'Needs Improvement';
+    return 'Unlikely a good candidate fit';
   };
 
   // Check if we have enhanced data structure
@@ -37,6 +37,9 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
   const companyName = result.companyName || result.company_name || 'the Company';
   const position = result.position || result.job_title || 'the Position';
   const compatibilityScore = result.compatibilityScore || result.compatibility_score || 0;
+
+  // Generate unique transaction ID for troubleshooting
+  const transactionId = result.id || `TXN-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
   const downloadPDF = () => {
     const pdfGenerator = new PDFGenerator();
@@ -130,6 +133,15 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
             <LegacyKeywordSection result={result} />
           </div>
         )}
+
+        {/* Report Note */}
+        <div className="mt-12 mb-8 bg-apple-core/10 dark:bg-citrus/10 rounded-lg p-4 border border-apple-core/20 dark:border-citrus/20">
+          <p className="text-sm text-blueberry/70 dark:text-apple-core/80 text-center">
+            <strong>Note:</strong> While our AI models are well-trained, occasional errors may occur. If you believe there's an error in your report, 
+            please contact us at <a href="mailto:hello@tunemycv.com" className="text-apricot hover:underline">hello@tunemycv.com</a> and 
+            quote transaction ID: <span className="font-mono font-semibold">{transactionId}</span> for investigation.
+          </p>
+        </div>
 
         {/* Next Steps Section */}
         <div className="mt-12">

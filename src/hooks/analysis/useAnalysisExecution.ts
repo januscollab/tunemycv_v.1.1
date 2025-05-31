@@ -3,6 +3,7 @@ import { useToast } from '@/hooks/use-toast';
 import { extractJobTitleFromText, extractCompanyFromText } from '@/utils/analysisUtils';
 import { saveFilesToDatabase, performAIAnalysis, saveAnalysisResults } from '@/services/analysisService';
 import { performComprehensiveAnalysis } from '@/utils/analysisEngine';
+import { useScoreValidation } from './useScoreValidation';
 
 interface UploadedFile {
   file: File;
@@ -13,6 +14,7 @@ interface UploadedFile {
 export const useAnalysisExecution = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { validateAndCorrectScore } = useScoreValidation();
 
   const executeAnalysis = async (
     uploadedFiles: { cv?: UploadedFile; jobDescription?: UploadedFile },
@@ -44,26 +46,26 @@ export const useAnalysisExecution = () => {
         
         console.log('Enhanced AI-powered comprehensive analysis successful');
         
-        // Preserve the full enhanced structure from AI response
-        const enhancedAnalysis = aiResult.analysis;
+        // Validate and correct the score if needed
+        const validatedAnalysis = await validateAndCorrectScore(aiResult.analysis, user?.id!);
         
         // Add necessary metadata for database storage while preserving enhanced structure
         analysisResult = {
-          ...enhancedAnalysis,
+          ...validatedAnalysis,
           user_id: user?.id,
           cv_upload_id: cvUpload.id,
           job_description_upload_id: jobUpload.id,
           // Keep legacy fields for backward compatibility
-          job_title: enhancedAnalysis.position || finalJobTitle,
-          company_name: enhancedAnalysis.companyName || extractedCompany,
-          compatibility_score: enhancedAnalysis.compatibilityScore,
-          executive_summary: enhancedAnalysis.executiveSummary?.overview || 'Enhanced AI analysis completed successfully.',
+          job_title: validatedAnalysis.position || finalJobTitle,
+          company_name: validatedAnalysis.companyName || extractedCompany,
+          compatibility_score: validatedAnalysis.compatibilityScore,
+          executive_summary: validatedAnalysis.executiveSummary?.overview || 'Enhanced AI analysis completed successfully.',
           // Extract simple arrays for legacy database fields
-          keywords_found: enhancedAnalysis.keywordAnalysis?.keywords?.filter((k: any) => k.found).map((k: any) => k.keyword) || [],
-          keywords_missing: enhancedAnalysis.keywordAnalysis?.keywords?.filter((k: any) => !k.found).map((k: any) => k.keyword) || [],
-          strengths: enhancedAnalysis.executiveSummary?.strengths?.map((s: any) => s.title || s) || [],
-          weaknesses: enhancedAnalysis.executiveSummary?.weaknesses?.map((w: any) => w.title || w) || [],
-          recommendations: enhancedAnalysis.priorityRecommendations?.map((r: any) => r.title || r) || []
+          keywords_found: validatedAnalysis.keywordAnalysis?.keywords?.filter((k: any) => k.found).map((k: any) => k.keyword) || [],
+          keywords_missing: validatedAnalysis.keywordAnalysis?.keywords?.filter((k: any) => !k.found).map((k: any) => k.keyword) || [],
+          strengths: validatedAnalysis.executiveSummary?.strengths?.map((s: any) => s.title || s) || [],
+          weaknesses: validatedAnalysis.executiveSummary?.weaknesses?.map((w: any) => w.title || w) || [],
+          recommendations: validatedAnalysis.priorityRecommendations?.map((r: any) => r.title || r) || []
         };
 
         toast({ 
