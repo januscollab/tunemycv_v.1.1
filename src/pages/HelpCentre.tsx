@@ -1,5 +1,5 @@
+
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useToast } from '@/hooks/use-toast';
-import { Mail, MessageCircle, HelpCircle, CreditCard, FileText, Search, Zap, User } from 'lucide-react';
+import { Mail, MessageCircle, HelpCircle, CreditCard, FileText, Search, Zap } from 'lucide-react';
 
 const HelpCentre = () => {
   const { toast } = useToast();
@@ -42,11 +42,7 @@ const HelpCentre = () => {
       faqs: [
         {
           question: "How do I analyze my CV?",
-          answer: (
-            <>
-              Simply go to our <Link to="/analyze" className="text-apricot hover:text-apricot/80 underline">Analyze CV page</Link>, upload your CV and paste the job description you're applying for. Our AI will analyze compatibility and provide detailed recommendations.
-            </>
-          )
+          answer: "Simply upload your CV and paste the job description you're applying for. Our AI will analyze compatibility and provide detailed recommendations."
         },
         {
           question: "What file formats are supported?",
@@ -55,22 +51,6 @@ const HelpCentre = () => {
         {
           question: "How accurate is the analysis?",
           answer: "Our AI-powered analysis uses advanced natural language processing to provide detailed insights with industry-standard accuracy."
-        },
-        {
-          question: "How do I create an account?",
-          answer: (
-            <>
-              You can create an account by visiting our <Link to="/auth" className="text-apricot hover:text-apricot/80 underline">Sign In page</Link> and selecting 'Create Account'. We support both email/password registration and social login options.
-            </>
-          )
-        },
-        {
-          question: "Where can I find my analysis history?",
-          answer: (
-            <>
-              All your previous analyses are saved in your <Link to="/profile?tab=history" className="text-apricot hover:text-apricot/80 underline">Profile under Analysis History</Link>. You can view, download, and re-analyze previous results anytime.
-            </>
-          )
         }
       ]
     },
@@ -88,23 +68,7 @@ const HelpCentre = () => {
         },
         {
           question: "Can I save my analysis results?",
-          answer: (
-            <>
-              Yes, all analysis results are automatically saved to your <Link to="/profile" className="text-apricot hover:text-apricot/80 underline">profile</Link> and can be accessed anytime from your dashboard.
-            </>
-          )
-        },
-        {
-          question: "How do I manage my saved CVs?",
-          answer: (
-            <>
-              You can upload, view, edit, and delete your saved CVs from the <Link to="/profile?tab=files" className="text-apricot hover:text-apricot/80 underline">My Files section</Link> in your profile. You can save up to 5 CVs for quick access during analysis.
-            </>
-          )
-        },
-        {
-          question: "Can I download my analysis results?",
-          answer: "Yes, you can download your analysis results as a PDF report from your analysis history. This includes all insights, recommendations, and compatibility scores."
+          answer: "Yes, all analysis results are automatically saved to your profile and can be accessed anytime from your dashboard."
         }
       ]
     },
@@ -118,19 +82,11 @@ const HelpCentre = () => {
         },
         {
           question: "How do I optimize my CV for Applicant Tracking System (ATS)?",
-          answer: "Use standard formatting, include relevant keywords from the job description, avoid graphics or unusual fonts, and structure your CV with clear sections. Our analysis provides specific ATS optimization recommendations."
+          answer: "Use standard formatting, include relevant keywords from the job description, avoid graphics or unusual fonts, and structure your CV with clear sections."
         },
         {
           question: "Why are keywords important?",
           answer: "Keywords help Applicant Tracking Systems (ATS) and recruiters quickly identify if your experience matches job requirements. Missing key terms can result in your CV being filtered out."
-        },
-        {
-          question: "How does TuneMyCV help with ATS optimization?",
-          answer: (
-            <>
-              Our <Link to="/analyze" className="text-apricot hover:text-apricot/80 underline">CV analysis tool</Link> identifies missing keywords, suggests formatting improvements, and provides ATS-friendly recommendations to increase your chances of passing initial screening.
-            </>
-          )
         }
       ]
     },
@@ -148,15 +104,7 @@ const HelpCentre = () => {
         },
         {
           question: "How can I get more credits?",
-          answer: (
-            <>
-              You can purchase additional credits through your <Link to="/profile" className="text-apricot hover:text-apricot/80 underline">profile page</Link>. We offer various packages to suit your needs.
-            </>
-          )
-        },
-        {
-          question: "Do credits expire?",
-          answer: "No, your credits never expire. You can use them whenever you need to analyze a CV, regardless of when you purchased them."
+          answer: "You can purchase additional credits through your profile page. We offer various packages to suit your needs."
         }
       ]
     },
@@ -175,52 +123,6 @@ const HelpCentre = () => {
         {
           question: "Can I use the service on mobile devices?",
           answer: "Yes, our platform is fully responsive and works on all devices including smartphones and tablets."
-        },
-        {
-          question: "How do I reset my password?",
-          answer: (
-            <>
-              You can reset your password from the <Link to="/auth" className="text-apricot hover:text-apricot/80 underline">Sign In page</Link> by clicking 'Forgot Password'. You can also change your password anytime from your <Link to="/profile?tab=password" className="text-apricot hover:text-apricot/80 underline">profile settings</Link>.
-            </>
-          )
-        },
-        {
-          question: "How do I contact support?",
-          answer: (
-            <>
-              You can contact our support team using the contact form on this page, or visit our <Link to="/contact" className="text-apricot hover:text-apricot/80 underline">Contact Us page</Link>. We typically respond within 24 hours.
-            </>
-          )
-        }
-      ]
-    },
-    {
-      title: "Account Management",
-      icon: <User className="h-5 w-5" />,
-      faqs: [
-        {
-          question: "How do I update my personal information?",
-          answer: (
-            <>
-              You can update your personal information, including name and email, from the <Link to="/profile?tab=personal" className="text-apricot hover:text-apricot/80 underline">Personal Info section</Link> in your profile.
-            </>
-          )
-        },
-        {
-          question: "How do I delete my account?",
-          answer: (
-            <>
-              Account deletion can be requested from your <Link to="/profile?tab=settings" className="text-apricot hover:text-apricot/80 underline">profile settings</Link>. Please note that this action is permanent and will delete all your saved CVs and analysis history.
-            </>
-          )
-        },
-        {
-          question: "Can I change my email address?",
-          answer: (
-            <>
-              Yes, you can update your email address from the <Link to="/profile?tab=personal" className="text-apricot hover:text-apricot/80 underline">Personal Info section</Link> in your profile. You'll need to verify the new email address.
-            </>
-          )
         }
       ]
     }
