@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Mail } from 'lucide-react';
 
 const Footer = () => {
   return (
@@ -9,10 +10,25 @@ const Footer = () => {
         <div className="grid md:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="md:col-span-2">
-            <h3 className="text-xl font-bold mb-4">TuneMyCV</h3>
+            <div className="mb-4">
+              <img 
+                src="/lovable-uploads/7aefb742-801d-4494-af3e-defd30462f1c.png" 
+                alt="TuneMyCV" 
+                className="h-8 w-auto"
+              />
+            </div>
             <p className="text-apple-core/80 mb-4">
               AI-powered CV analysis that helps you optimize your resume for Applicant Tracking Systems (ATS) and land your dream job.
             </p>
+            <div className="mb-4">
+              <a 
+                href="mailto:hello@tunemycv.com"
+                className="flex items-center text-apple-core/80 hover:text-citrus transition-colors"
+              >
+                <Mail className="h-4 w-4 mr-2" />
+                hello@tunemycv.com
+              </a>
+            </div>
             <p className="text-sm text-apple-core/60">
               © 2024 TuneMyCV. All rights reserved.
             </p>
@@ -60,13 +76,18 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/help#getting-started" className="hover:text-citrus transition-colors">
-                  Getting Started
+                <Link to="/analyze" className="hover:text-citrus transition-colors">
+                  Get Started
                 </Link>
               </li>
               <li>
                 <Link to="/help#ats-keywords" className="hover:text-citrus transition-colors">
                   What is Applicant Tracking System (ATS)?
+                </Link>
+              </li>
+              <li>
+                <Link to="/privacy-policy" className="hover:text-citrus transition-colors">
+                  Privacy Policy
                 </Link>
               </li>
             </ul>
