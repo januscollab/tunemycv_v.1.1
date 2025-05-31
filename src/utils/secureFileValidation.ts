@@ -2,7 +2,7 @@
 import { validateFile, formatFileSize } from '@/utils/fileUtils';
 import { sanitizeFileName, isAllowedFileType, isValidFileSize } from '@/utils/inputSanitization';
 
-export interface FileValidationResult {
+interface FileValidationResult {
   isValid: boolean;
   errors: string[];
   sanitizedName?: string;
