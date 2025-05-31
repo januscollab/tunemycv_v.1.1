@@ -1,3 +1,4 @@
+
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { extractJobTitleFromText, extractCompanyFromText } from '@/utils/analysisUtils';
@@ -27,6 +28,13 @@ export const useAnalysisExecution = () => {
       throw new Error('Please upload both CV and job description');
     }
 
+    console.log('=== ANALYSIS EXECUTION START ===');
+    console.log('useAnalysisExecution: CV file name:', uploadedFiles.cv.file.name);
+    console.log('useAnalysisExecution: CV extracted text length:', uploadedFiles.cv.extractedText?.length || 0);
+    console.log('useAnalysisExecution: Job description text length:', uploadedFiles.jobDescription.extractedText?.length || 0);
+    console.log('useAnalysisExecution: First 300 chars of CV text:', uploadedFiles.cv.extractedText?.substring(0, 300) || 'NO CV TEXT');
+    console.log('useAnalysisExecution: First 300 chars of JD text:', uploadedFiles.jobDescription.extractedText?.substring(0, 300) || 'NO JD TEXT');
+
     console.log('Starting enhanced comprehensive CV analysis with quality validation...');
 
     const finalJobTitle = jobTitle || extractJobTitleFromText(uploadedFiles.jobDescription.extractedText);
@@ -47,6 +55,7 @@ export const useAnalysisExecution = () => {
     // Always try enhanced AI analysis if user has credits, otherwise use comprehensive local analysis
     if (hasCreditsForAI) {
       try {
+        console.log('useAnalysisExecution: Calling performAIAnalysis with CV text length:', uploadedFiles.cv.extractedText.length);
         const aiResult = await performAIAnalysis(uploadedFiles, finalJobTitle, user?.id!);
         
         console.log('Enhanced AI-powered comprehensive analysis successful');
@@ -151,6 +160,7 @@ export const useAnalysisExecution = () => {
     };
 
     console.log('Enhanced comprehensive analysis with quality validation completed successfully:', finalResult);
+    console.log('=== ANALYSIS EXECUTION END ===');
     return finalResult;
   };
 

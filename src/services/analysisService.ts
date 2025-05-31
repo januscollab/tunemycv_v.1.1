@@ -13,7 +13,9 @@ export const saveFilesToDatabase = async (
   finalJobTitle: string,
   userId: string
 ) => {
-  console.log('Saving files to database...');
+  console.log('analysisService: Saving files to database...');
+  console.log('analysisService: CV text length before save:', uploadedFiles.cv!.extractedText?.length || 0);
+  console.log('analysisService: JD text length before save:', uploadedFiles.jobDescription!.extractedText?.length || 0);
   
   const { data: cvUpload, error: cvError } = await supabase
     .from('uploads')
@@ -53,6 +55,10 @@ export const saveFilesToDatabase = async (
     throw jobError;
   }
 
+  console.log('analysisService: Files saved successfully');
+  console.log('analysisService: CV upload ID:', cvUpload.id);
+  console.log('analysisService: JD upload ID:', jobUpload.id);
+
   return { cvUpload, jobUpload };
 };
 
@@ -61,7 +67,13 @@ export const performAIAnalysis = async (
   finalJobTitle: string,
   userId: string
 ) => {
-  console.log('Attempting enhanced comprehensive AI analysis...');
+  console.log('analysisService: Attempting enhanced comprehensive AI analysis...');
+  console.log('analysisService: About to call edge function with:');
+  console.log('analysisService: - CV text length:', uploadedFiles.cv!.extractedText?.length || 0);
+  console.log('analysisService: - JD text length:', uploadedFiles.jobDescription!.extractedText?.length || 0);
+  console.log('analysisService: - Job title:', finalJobTitle);
+  console.log('analysisService: - User ID:', userId);
+  console.log('analysisService: - First 500 chars of CV:', uploadedFiles.cv!.extractedText?.substring(0, 500) || 'NO CV TEXT');
   
   const { data: aiResult, error: aiError } = await supabase.functions.invoke('analyze-cv-with-ai', {
     body: {
@@ -72,22 +84,24 @@ export const performAIAnalysis = async (
     }
   });
 
-  console.log('Enhanced AI analysis response:', aiResult);
+  console.log('analysisService: Enhanced AI analysis response:', aiResult);
 
   if (aiError) {
-    console.error('Enhanced AI analysis error:', aiError);
+    console.error('analysisService: Enhanced AI analysis error:', aiError);
     throw aiError;
   }
 
   if (!aiResult?.success || !aiResult?.analysis) {
+    console.error('analysisService: AI analysis returned invalid results:', aiResult);
     throw new Error('Enhanced AI analysis returned invalid results');
   }
 
+  console.log('analysisService: AI analysis successful, compatibility score:', aiResult.analysis.compatibilityScore);
   return aiResult;
 };
 
 export const saveAnalysisResults = async (analysisData: any) => {
-  console.log('Saving enhanced analysis results to database...');
+  console.log('analysisService: Saving enhanced analysis results to database...');
   
   const { data: analysisResult, error: analysisError } = await supabase
     .from('analysis_results')
@@ -96,9 +110,10 @@ export const saveAnalysisResults = async (analysisData: any) => {
     .single();
 
   if (analysisError) {
-    console.error('Enhanced analysis save error:', analysisError);
+    console.error('analysisService: Enhanced analysis save error:', analysisError);
     throw analysisError;
   }
 
+  console.log('analysisService: Analysis results saved successfully');
   return analysisResult;
 };

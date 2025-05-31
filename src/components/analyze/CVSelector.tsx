@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { FileText, Upload, Check } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -57,7 +58,10 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
     }
 
     try {
+      console.log('CVSelector: Starting file upload for:', file.name, 'Size:', file.size);
       const extractedText = await extractTextFromFile(file);
+      console.log('CVSelector: Extracted text length:', extractedText.length);
+      console.log('CVSelector: First 200 chars of extracted text:', extractedText.substring(0, 200));
       
       const uploadedFile: UploadedFile = {
         file,
@@ -65,16 +69,22 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
         type: 'cv'
       };
 
+      console.log('CVSelector: Calling onCVSelect with uploadedFile');
       onCVSelect(uploadedFile);
       setShowFileUpload(false);
       toast({ title: 'Success', description: 'CV uploaded successfully!' });
     } catch (error) {
+      console.error('CVSelector: Error processing CV file:', error);
       toast({ title: 'Error', description: 'Failed to process CV file', variant: 'destructive' });
     }
   };
 
   const handleSavedCVSelect = (savedCV: CVUpload) => {
-    // Create a File object from saved CV data (don't save as new copy)
+    console.log('CVSelector: Selecting saved CV:', savedCV.file_name);
+    console.log('CVSelector: Saved CV extracted text length:', savedCV.extracted_text?.length || 0);
+    console.log('CVSelector: First 200 chars of saved CV text:', savedCV.extracted_text?.substring(0, 200) || 'No text');
+    
+    // Create a File object from saved CV data
     const textFile = new File([savedCV.extracted_text], savedCV.file_name, { 
       type: savedCV.file_type || 'application/pdf' 
     });
@@ -85,9 +95,10 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
       type: 'cv'
     };
 
+    console.log('CVSelector: Calling onCVSelect with saved CV uploadedFile');
     onCVSelect(uploadedFile);
-    // Convert ID to string to match state type - this is the fix for the TypeScript error
-    setSelectedCVId(String(savedCV.id));
+    // Ensure the ID is converted to string to fix TypeScript error
+    setSelectedCVId(savedCV.id.toString());
     toast({ 
       title: 'Success', 
       description: `Using saved CV: ${savedCV.file_name}` 
@@ -147,6 +158,7 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
           </div>
           <button
             onClick={() => {
+              console.log('CVSelector: Clearing selected CV');
               onCVSelect(undefined as any);
               setShowFileUpload(false);
               setSelectedCVId(null);
