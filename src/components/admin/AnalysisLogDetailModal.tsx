@@ -60,7 +60,7 @@ const AnalysisLogDetailModal: React.FC<AnalysisLogDetailModalProps> = ({ log, on
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b">
+        <div className="flex items-center justify-between p-6 border-b flex-shrink-0">
           <h2 className="text-xl font-semibold text-gray-900">Analysis Log Details</h2>
           <button
             onClick={onClose}
@@ -71,7 +71,7 @@ const AnalysisLogDetailModal: React.FC<AnalysisLogDetailModalProps> = ({ log, on
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex border-b">
+        <div className="flex border-b flex-shrink-0">
           <button
             onClick={() => setActiveTab('overview')}
             className={`px-6 py-3 font-medium text-sm transition-colors ${
@@ -107,10 +107,10 @@ const AnalysisLogDetailModal: React.FC<AnalysisLogDetailModalProps> = ({ log, on
           </button>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-hidden">
+        {/* Content - Made scrollable */}
+        <div className="flex-1 overflow-y-auto">
           {activeTab === 'overview' && (
-            <div className="p-6 space-y-6 overflow-y-auto max-h-[60vh]">
+            <div className="p-6 space-y-6">
               {/* User Information */}
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="bg-gray-50 rounded-lg p-4">
@@ -119,8 +119,8 @@ const AnalysisLogDetailModal: React.FC<AnalysisLogDetailModalProps> = ({ log, on
                     User Information
                   </h3>
                   <div className="space-y-2 text-sm">
-                    <div><span className="font-medium">Name:</span> {log.first_name} {log.last_name}</div>
-                    <div><span className="font-medium">Email:</span> {log.user_email}</div>
+                    <div><span className="font-medium">Name:</span> {log.first_name || 'N/A'} {log.last_name || ''}</div>
+                    <div><span className="font-medium">Email:</span> {log.user_email || 'N/A'}</div>
                     <div><span className="font-medium">CV File:</span> {log.cv_file_name || 'N/A'}</div>
                     <div><span className="font-medium">Job Description:</span> {log.job_description_file_name || 'N/A'}</div>
                   </div>
@@ -132,9 +132,9 @@ const AnalysisLogDetailModal: React.FC<AnalysisLogDetailModalProps> = ({ log, on
                     Job Analysis
                   </h3>
                   <div className="space-y-2 text-sm">
-                    <div><span className="font-medium">Job Title:</span> {log.job_title || 'N/A'}</div>
-                    <div><span className="font-medium">Company:</span> {log.company_name || 'N/A'}</div>
-                    <div><span className="font-medium">Compatibility Score:</span> {log.compatibility_score || 'N/A'}%</div>
+                    <div><span className="font-medium">Job Title:</span> {log.job_title || 'Not specified'}</div>
+                    <div><span className="font-medium">Company:</span> {log.company_name || 'Not specified'}</div>
+                    <div><span className="font-medium">Compatibility Score:</span> {log.compatibility_score ? `${log.compatibility_score}%` : 'Not available'}</div>
                     <div>
                       <span className="font-medium">Status:</span>
                       <span className={`ml-2 px-2 py-1 rounded text-xs ${
@@ -173,7 +173,7 @@ const AnalysisLogDetailModal: React.FC<AnalysisLogDetailModalProps> = ({ log, on
 
           {activeTab === 'prompt' && (
             <div className="p-6 h-full flex flex-col">
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-4 flex-shrink-0">
                 <h3 className="font-semibold text-gray-900">OpenAI Prompt</h3>
                 <div className="flex space-x-2">
                   <button
@@ -202,7 +202,7 @@ const AnalysisLogDetailModal: React.FC<AnalysisLogDetailModalProps> = ({ log, on
 
           {activeTab === 'response' && (
             <div className="p-6 h-full flex flex-col">
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-4 flex-shrink-0">
                 <h3 className="font-semibold text-gray-900">OpenAI Response</h3>
                 <div className="flex space-x-2">
                   <button
@@ -231,7 +231,7 @@ const AnalysisLogDetailModal: React.FC<AnalysisLogDetailModalProps> = ({ log, on
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end p-6 border-t bg-gray-50">
+        <div className="flex justify-end p-6 border-t bg-gray-50 flex-shrink-0">
           <button
             onClick={onClose}
             className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"

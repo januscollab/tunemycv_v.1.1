@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Upload, FileText, Check, X, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -40,7 +40,7 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
   const [fileUploading, setFileUploading] = useState(false);
 
   // Fetch saved CVs from database
-  const { data: savedCVs = [], isLoading } = useQuery({
+  const { data: savedCVs = [], isLoading, refetch } = useQuery({
     queryKey: ['saved-cvs', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
@@ -60,7 +60,7 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
   const handleSavedCVSelect = (cv: CVUpload) => {
     setSelectedCVId(cv.id);
     
-    // Convert CV to UploadedFile format
+    // Convert CV to UploadedFile format - this is from saved CVs, not a new upload
     const textFile = new File([cv.extracted_text], cv.file_name, { type: 'application/pdf' });
     const uploadedFile: UploadedFile = {
       file: textFile,
@@ -104,6 +104,8 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
           toast({ title: 'Warning', description: 'CV uploaded but not saved for future use', variant: 'destructive' });
         } else {
           toast({ title: 'Success', description: 'CV uploaded and saved for future use!' });
+          // Refetch saved CVs to update the list
+          refetch();
         }
       } else {
         toast({ title: 'Success', description: 'CV uploaded successfully!' });
@@ -126,7 +128,10 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
   return (
     <Card className="bg-white dark:bg-blueberry/20 border border-apple-core/20 dark:border-citrus/20">
       <CardHeader>
-        <CardTitle className="text-lg font-semibold text-blueberry dark:text-citrus">Your CV</CardTitle>
+        <CardTitle className="text-lg font-semibold text-blueberry dark:text-citrus flex items-center">
+          <FileText className="h-5 w-5 text-apricot mr-2" />
+          Your CV
+        </CardTitle>
         <p className="text-sm text-blueberry/70 dark:text-apple-core/80">
           Upload a new CV or select from your saved CVs. 
           <Link 

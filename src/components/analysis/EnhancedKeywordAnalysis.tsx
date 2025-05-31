@@ -26,6 +26,9 @@ const EnhancedKeywordAnalysis: React.FC<EnhancedKeywordAnalysisProps> = ({ keywo
 
   const { totalKeywords, matchedKeywords, keywordMatchPercentage, keywords } = keywordAnalysis;
 
+  // Calculate missing keywords for display
+  const missingKeywords = totalKeywords - matchedKeywords;
+
   // Sort keywords by: importance (high first), then missing keywords first
   const sortedKeywords = keywords.sort((a, b) => {
     const importanceOrder = { high: 3, medium: 2, low: 1 };
@@ -56,10 +59,9 @@ const EnhancedKeywordAnalysis: React.FC<EnhancedKeywordAnalysisProps> = ({ keywo
 
   return (
     <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
-      <div className="flex items-center mb-4">
-        <div className="bg-apricot text-white px-3 py-1 rounded text-sm font-medium">
-          Enhanced Keyword Analysis
-        </div>
+      <div className="flex items-center mb-6">
+        <CheckCircle className="h-5 w-5 text-apricot mr-2" />
+        <h2 className="text-lg font-semibold text-blueberry dark:text-citrus">Enhanced Keyword Analysis</h2>
       </div>
 
       {/* Summary Stats */}
@@ -69,7 +71,7 @@ const EnhancedKeywordAnalysis: React.FC<EnhancedKeywordAnalysisProps> = ({ keywo
           <div className="text-sm text-green-700 dark:text-green-400">Found</div>
         </div>
         <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-3 text-center">
-          <div className="text-2xl font-bold text-red-600">{totalKeywords - matchedKeywords}</div>
+          <div className="text-2xl font-bold text-red-600">{missingKeywords}</div>
           <div className="text-sm text-red-700 dark:text-red-400">Missing</div>
         </div>
         <div className="bg-citrus/20 dark:bg-citrus/10 rounded-lg p-3 text-center">
@@ -83,7 +85,7 @@ const EnhancedKeywordAnalysis: React.FC<EnhancedKeywordAnalysisProps> = ({ keywo
         <div className="flex items-center">
           <Info className="h-4 w-4 text-blueberry mr-2" />
           <span className="text-sm text-blueberry dark:text-apple-core">
-            Total keywords analyzed: {keywords.length} (showing {showAllKeywords ? 'all' : `first ${Math.min(10, keywords.length)}`} keywords, prioritized by importance and missing status)
+            Total keywords analyzed: {totalKeywords} (showing {showAllKeywords ? 'all' : `first ${Math.min(10, keywords.length)}`} keywords, prioritized by importance and missing status)
           </span>
         </div>
       </div>
@@ -104,6 +106,11 @@ const EnhancedKeywordAnalysis: React.FC<EnhancedKeywordAnalysisProps> = ({ keywo
               {keyword.context && (
                 <div className="text-xs text-blueberry/60 dark:text-apple-core/60 mt-1">
                   {keyword.context}
+                </div>
+              )}
+              {keyword.found && keyword.occurrences > 0 && (
+                <div className="text-xs text-green-600 mt-1">
+                  Found {keyword.occurrences} time{keyword.occurrences !== 1 ? 's' : ''}
                 </div>
               )}
             </div>
