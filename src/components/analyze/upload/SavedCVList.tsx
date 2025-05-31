@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { FileText, Check } from 'lucide-react';
+import { FileText, Check, Upload } from 'lucide-react';
 import { formatFileSize } from '@/utils/fileUtils';
 
 interface CVUpload {
@@ -11,12 +11,6 @@ interface CVUpload {
   extracted_text: string;
 }
 
-interface UploadedFile {
-  file: File;
-  extractedText: string;
-  type: 'cv' | 'job_description';
-}
-
 interface SavedCVListProps {
   savedCVs: CVUpload[];
   selectedCVId: string | null;
@@ -24,12 +18,25 @@ interface SavedCVListProps {
 }
 
 const SavedCVList: React.FC<SavedCVListProps> = ({ savedCVs, selectedCVId, onCVSelect }) => {
-  if (savedCVs.length === 0) return null;
+  if (savedCVs.length === 0) {
+    return (
+      <div className="text-center py-8 border-2 border-dashed border-apple-core/30 dark:border-citrus/30 rounded-lg">
+        <FileText className="mx-auto h-12 w-12 text-blueberry/40 dark:text-apple-core/40 mb-4" />
+        <h3 className="text-lg font-medium text-blueberry dark:text-citrus mb-2">No saved CVs</h3>
+        <p className="text-blueberry/70 dark:text-apple-core/80 mb-4">
+          You haven't uploaded any CVs yet. Upload your first CV to get started.
+        </p>
+        <p className="text-sm text-blueberry/60 dark:text-apple-core/60">
+          Switch to the "Upload New" tab to add your CV.
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <div className="mb-6">
-      <h4 className="text-sm font-medium text-blueberry dark:text-citrus mb-3">Saved CVs</h4>
-      <div className="space-y-2">
+    <div>
+      <h4 className="text-sm font-medium text-blueberry dark:text-citrus mb-3">Select a saved CV</h4>
+      <div className="space-y-2 max-h-64 overflow-y-auto">
         {savedCVs.map((cv) => (
           <div
             key={cv.id}
@@ -41,16 +48,16 @@ const SavedCVList: React.FC<SavedCVListProps> = ({ savedCVs, selectedCVId, onCVS
             }`}
           >
             <div className="flex items-center space-x-3">
-              <FileText className="h-5 w-5 text-apricot" />
-              <div>
-                <p className="font-medium text-blueberry dark:text-citrus">{cv.file_name}</p>
+              <FileText className="h-5 w-5 text-apricot flex-shrink-0" />
+              <div className="min-w-0 flex-1">
+                <p className="font-medium text-blueberry dark:text-citrus truncate">{cv.file_name}</p>
                 <p className="text-xs text-blueberry/70 dark:text-apple-core/80">
                   {formatFileSize(cv.file_size)} • {new Date(cv.created_at).toLocaleDateString()}
                 </p>
               </div>
             </div>
             {selectedCVId === cv.id && (
-              <Check className="h-5 w-5 text-apricot" />
+              <Check className="h-5 w-5 text-apricot flex-shrink-0" />
             )}
           </div>
         ))}
