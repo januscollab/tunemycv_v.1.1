@@ -62,6 +62,11 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
       const extractedText = await extractTextFromFile(file);
       console.log('CVSelector: Extracted text length:', extractedText.length);
       console.log('CVSelector: First 200 chars of extracted text:', extractedText.substring(0, 200));
+      console.log('CVSelector: CRITICAL - CV text that will be passed to analysis:', {
+        hasText: !!extractedText,
+        textLength: extractedText?.length || 0,
+        textPreview: extractedText?.substring(0, 100) || 'NO TEXT'
+      });
       
       const uploadedFile: UploadedFile = {
         file,
@@ -83,6 +88,11 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
     console.log('CVSelector: Selecting saved CV:', savedCV.file_name);
     console.log('CVSelector: Saved CV extracted text length:', savedCV.extracted_text?.length || 0);
     console.log('CVSelector: First 200 chars of saved CV text:', savedCV.extracted_text?.substring(0, 200) || 'No text');
+    console.log('CVSelector: CRITICAL - Saved CV text that will be passed to analysis:', {
+      hasText: !!savedCV.extracted_text,
+      textLength: savedCV.extracted_text?.length || 0,
+      textPreview: savedCV.extracted_text?.substring(0, 100) || 'NO TEXT'
+    });
     
     // Create a File object from saved CV data
     const textFile = new File([savedCV.extracted_text], savedCV.file_name, { 
@@ -97,8 +107,8 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
 
     console.log('CVSelector: Calling onCVSelect with saved CV uploadedFile');
     onCVSelect(uploadedFile);
-    // Ensure the ID is converted to string to fix TypeScript error
-    setSelectedCVId(savedCV.id.toString());
+    // Fix the TypeScript error by explicitly converting to string
+    setSelectedCVId(String(savedCV.id));
     toast({ 
       title: 'Success', 
       description: `Using saved CV: ${savedCV.file_name}` 
