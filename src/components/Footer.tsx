@@ -81,11 +81,6 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/help#ats-keywords" className="hover:text-citrus transition-colors">
-                  What is Applicant Tracking System (ATS)?
-                </Link>
-              </li>
-              <li>
                 <Link to="/privacy-policy" className="hover:text-citrus transition-colors">
                   Privacy Policy
                 </Link>

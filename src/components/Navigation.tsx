@@ -4,6 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, FileText, Target, BookOpen, User, Shield } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
+import { useProfileData } from '@/hooks/useProfileData';
 import ThemeToggle from './ThemeToggle';
 import NavigationLogo from './navigation/NavigationLogo';
 import UserProfileDropdown from './navigation/UserProfileDropdown';
@@ -14,6 +15,7 @@ const Navigation = () => {
   const location = useLocation();
   const { user } = useAuth();
   const { isAdmin } = useAdminAuth();
+  const { getUserDisplayName } = useProfileData();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -22,13 +24,6 @@ const Navigation = () => {
     { path: '/analyze', label: 'Analyze CV', icon: FileText },
     { path: '/resources', label: 'Resources', icon: BookOpen },
   ];
-
-  const getUserDisplayName = () => {
-    if (user?.user_metadata?.first_name) {
-      return user.user_metadata.first_name;
-    }
-    return 'Jobseeker';
-  };
 
   return (
     <nav className="bg-white dark:bg-blueberry shadow-sm border-b border-apple-core/30 dark:border-citrus/20">
@@ -77,12 +72,6 @@ const Navigation = () => {
                     )}
                   </Link>
                 )}
-                <Link
-                  to="/profile"
-                  className="text-sm text-blueberry dark:text-apple-core hover:text-apricot transition-colors"
-                >
-                  Welcome, {getUserDisplayName()}
-                </Link>
                 <UserProfileDropdown 
                   userDisplayName={getUserDisplayName()}
                   isActive={isActive}
@@ -132,13 +121,9 @@ const Navigation = () => {
               
               {user ? (
                 <>
-                  <Link
-                    to="/profile"
-                    onClick={() => setIsOpen(false)}
-                    className="px-3 py-2 text-sm text-blueberry dark:text-apple-core"
-                  >
+                  <div className="px-3 py-2 text-sm text-blueberry dark:text-apple-core">
                     Welcome, {getUserDisplayName()}
-                  </Link>
+                  </div>
                   {isAdmin && (
                     <Link
                       to="/admin"
