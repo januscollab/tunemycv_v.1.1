@@ -1,9 +1,10 @@
 
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, FileText, Target, BookOpen, User, Shield, LogOut, Phone } from 'lucide-react';
+import { Menu, X, FileText, Target, BookOpen, User, Shield } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
+import { useProfileData } from '@/hooks/useProfileData';
 import ThemeToggle from './ThemeToggle';
 import NavigationLogo from './navigation/NavigationLogo';
 import UserProfileDropdown from './navigation/UserProfileDropdown';
@@ -14,6 +15,7 @@ const Navigation = () => {
   const location = useLocation();
   const { user } = useAuth();
   const { isAdmin } = useAdminAuth();
+  const { getUserDisplayName } = useProfileData();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -21,15 +23,7 @@ const Navigation = () => {
     { path: '/', label: 'Home', icon: Target },
     { path: '/analyze', label: 'Analyze CV', icon: FileText },
     { path: '/resources', label: 'Resources', icon: BookOpen },
-    { path: '/contact', label: 'Contact', icon: Phone },
   ];
-
-  const getUserDisplayName = () => {
-    if (user?.user_metadata?.first_name) {
-      return user.user_metadata.first_name;
-    }
-    return user?.email?.split('@')[0] || 'User';
-  };
 
   return (
     <nav className="bg-white dark:bg-blueberry shadow-sm border-b border-apple-core/30 dark:border-citrus/20">
@@ -60,8 +54,6 @@ const Navigation = () => {
               );
             })}
             
-            <ThemeToggle />
-            
             {user ? (
               <div className="flex items-center space-x-4">
                 {isAdmin && (
@@ -88,6 +80,8 @@ const Navigation = () => {
             ) : (
               <AuthButtons />
             )}
+            
+            <ThemeToggle />
           </div>
 
           {/* Mobile menu button */}
@@ -127,11 +121,9 @@ const Navigation = () => {
               
               {user ? (
                 <>
-                  {user && (
-                    <div className="px-3 py-2 text-sm text-blueberry dark:text-apple-core">
-                      Welcome, {getUserDisplayName()}
-                    </div>
-                  )}
+                  <div className="px-3 py-2 text-sm text-blueberry dark:text-apple-core">
+                    Welcome, {getUserDisplayName()}
+                  </div>
                   {isAdmin && (
                     <Link
                       to="/admin"
