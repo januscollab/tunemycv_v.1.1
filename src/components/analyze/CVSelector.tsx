@@ -7,6 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { validateFile, extractTextFromFile } from '@/utils/fileUtils';
 import FileUploadWithSave from './upload/FileUploadWithSave';
 import SavedCVList from './upload/SavedCVList';
 
@@ -32,8 +34,10 @@ interface CVSelectorProps {
 
 const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploading }) => {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<'upload' | 'saved'>('saved');
   const [selectedCVId, setSelectedCVId] = useState<string | null>(null);
+  const [fileUploading, setFileUploading] = useState(false);
 
   // Fetch saved CVs from database
   const { data: savedCVs = [], isLoading } = useQuery({
@@ -65,6 +69,58 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
     };
     
     onCVSelect(uploadedFile);
+  };
+
+  const handleFileUpload = async (file: File, shouldSave: boolean) => {
+    const cvTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    
+    const errors = validateFile(file, cvTypes, maxSize);
+    
+    if (errors.length > 0) {
+      toast({ title: 'Upload Error', description: errors.join('. '), variant: 'destructive' });
+      return;
+    }
+
+    try {
+      setFileUploading(true);
+      const extractedText = await extractTextFromFile(file);
+      
+      // Save to database if requested
+      if (shouldSave && user?.id) {
+        const { error: saveError } = await supabase
+          .from('uploads')
+          .insert({
+            user_id: user.id,
+            file_name: file.name,
+            file_type: file.type,
+            file_size: file.size,
+            upload_type: 'cv',
+            extracted_text: extractedText
+          });
+
+        if (saveError) {
+          console.error('Error saving CV:', saveError);
+          toast({ title: 'Warning', description: 'CV uploaded but not saved for future use', variant: 'destructive' });
+        } else {
+          toast({ title: 'Success', description: 'CV uploaded and saved for future use!' });
+        }
+      } else {
+        toast({ title: 'Success', description: 'CV uploaded successfully!' });
+      }
+
+      const uploadedFile: UploadedFile = {
+        file,
+        extractedText,
+        type: 'cv'
+      };
+
+      onCVSelect(uploadedFile);
+    } catch (error) {
+      toast({ title: 'Error', description: 'Failed to process CV file', variant: 'destructive' });
+    } finally {
+      setFileUploading(false);
+    }
   };
 
   return (
@@ -139,7 +195,15 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
                 onCVSelect={handleSavedCVSelect}
               />
             ) : (
-              <FileUploadWithSave onCVSelect={onCVSelect} uploading={uploading} />
+              <FileUploadWithSave 
+                onFileSelect={handleFileUpload}
+                uploading={fileUploading || uploading}
+                accept=".pdf,.docx,.txt"
+                maxSize="5MB"
+                label="Upload your CV"
+                currentCVCount={savedCVs.length}
+                maxCVCount={10}
+              />
             )}
           </div>
         )}
