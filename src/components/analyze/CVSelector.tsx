@@ -86,7 +86,7 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
     };
 
     onCVSelect(uploadedFile);
-    // Convert ID to string to match state type
+    // Convert ID to string to match state type - this is the fix for the TypeScript error
     setSelectedCVId(String(savedCV.id));
     toast({ 
       title: 'Success', 
