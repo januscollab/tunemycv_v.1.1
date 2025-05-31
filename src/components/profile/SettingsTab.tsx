@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Bell, Shield, Trash2, Save } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -11,7 +10,12 @@ interface UserSettings {
   privacy_level: string;
 }
 
-const SettingsTab: React.FC = () => {
+interface SettingsTabProps {
+  credits: number;
+  memberSince: string;
+}
+
+const SettingsTab: React.FC<SettingsTabProps> = ({ credits, memberSince }) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);

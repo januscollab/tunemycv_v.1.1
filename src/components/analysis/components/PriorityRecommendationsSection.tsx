@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Lightbulb } from 'lucide-react';
 
 interface PriorityRecommendationsSectionProps {
   recommendations: any[];
@@ -9,9 +10,8 @@ const PriorityRecommendationsSection: React.FC<PriorityRecommendationsSectionPro
   return (
     <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
       <div className="flex items-center mb-6">
-        <div className="bg-apricot text-white px-3 py-1 rounded text-sm font-medium mr-3">
-          Priority Recommendations
-        </div>
+        <Lightbulb className="h-5 w-5 text-apricot mr-2" />
+        <h2 className="text-lg font-semibold text-blueberry dark:text-citrus">Priority Recommendations</h2>
       </div>
       <div className="grid md:grid-cols-2 gap-6">
         {recommendations.map((rec: any, index: number) => (

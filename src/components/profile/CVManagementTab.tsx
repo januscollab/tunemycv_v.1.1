@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { FileText, Upload, Trash2, Edit, Plus, Check, X } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -15,7 +14,12 @@ interface CVUpload {
   extracted_text: string;
 }
 
-const CVManagementTab: React.FC = () => {
+interface CVManagementTabProps {
+  credits: number;
+  memberSince: string;
+}
+
+const CVManagementTab: React.FC<CVManagementTabProps> = ({ credits, memberSince }) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [cvs, setCvs] = useState<CVUpload[]>([]);
