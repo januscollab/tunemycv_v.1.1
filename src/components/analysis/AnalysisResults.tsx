@@ -5,7 +5,6 @@ import ExecutiveSummarySection from './ExecutiveSummarySection';
 import CompatibilityBreakdownSection from './CompatibilityBreakdownSection';
 import EnhancedKeywordAnalysis from './EnhancedKeywordAnalysis';
 import SkillsGapAnalysis from './SkillsGapAnalysis';
-import CompanyIntelligenceSection from './CompanyIntelligenceSection';
 import ATSOptimizationSection from './ATSOptimizationSection';
 import InterviewPrepSection from './InterviewPrepSection';
 import AnalysisHeader from './components/AnalysisHeader';
@@ -53,10 +52,9 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
         <AnalysisHeader onStartNew={onStartNew} onDownloadPDF={downloadPDF} />
 
         {/* Dynamic heading based on company and position */}
-        <h1 className="text-3xl font-bold text-blueberry dark:text-citrus mb-2">
+        <h1 className="text-3xl font-bold text-blueberry dark:text-citrus mb-8">
           {companyName} - {position}
         </h1>
-        <p className="text-blueberry/70 dark:text-apple-core/80 mb-8">CV Analysis Results</p>
 
         {/* Success Alert */}
         <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-8">
@@ -110,11 +108,6 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
               <PriorityRecommendationsSection recommendations={result.priorityRecommendations} />
             )}
 
-            {/* Company Intelligence Section */}
-            {result.companyIntelligence && (
-              <CompanyIntelligenceSection companyIntelligence={result.companyIntelligence} />
-            )}
-
             {/* Side-by-side sections: Compatibility Breakdown and Keyword Analysis */}
             <div className="grid lg:grid-cols-2 gap-8">
               {/* Compatibility Breakdown */}
@@ -140,18 +133,18 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
           </div>
         )}
 
-        {/* Report Note */}
+        {/* Next Steps Section */}
+        <div className="mt-12">
+          <NextStepsSection onStartNew={onStartNew} />
+        </div>
+
+        {/* Report Note - Moved above footer */}
         <div className="mt-12 mb-8 bg-apple-core/10 dark:bg-citrus/10 rounded-lg p-4 border border-apple-core/20 dark:border-citrus/20">
           <p className="text-sm text-blueberry/70 dark:text-apple-core/80 text-center">
             <strong>Note:</strong> While our AI models are well-trained, occasional errors may occur. If you believe there's an error in your report, 
             please contact us at <a href="mailto:hello@tunemycv.com" className="text-apricot hover:underline">hello@tunemycv.com</a> and 
             quote transaction ID: <span className="font-mono font-semibold">{transactionId}</span> for investigation.
           </p>
-        </div>
-
-        {/* Next Steps Section */}
-        <div className="mt-12">
-          <NextStepsSection onStartNew={onStartNew} />
         </div>
       </div>
     </div>
