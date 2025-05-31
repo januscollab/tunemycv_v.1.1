@@ -2,7 +2,12 @@
 import React from 'react';
 import { CreditCard, Clock } from 'lucide-react';
 
-const BillingHistoryTab: React.FC = () => {
+interface BillingHistoryTabProps {
+  credits: number;
+  memberSince: string;
+}
+
+const BillingHistoryTab: React.FC<BillingHistoryTabProps> = ({ credits, memberSince }) => {
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
