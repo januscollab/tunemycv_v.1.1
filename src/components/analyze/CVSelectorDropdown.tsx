@@ -1,24 +1,29 @@
 
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp, FileText, Check } from 'lucide-react';
-import { CVUpload } from '@/types/cv';
+
+interface CVUpload {
+  id: string;
+  file_name: string;
+  file_size: number;
+  created_at: string;
+  extracted_text: string;
+}
 
 interface CVSelectorDropdownProps {
   savedCVs: CVUpload[];
   selectedCVId: string | null;
   onCVSelect: (cv: CVUpload) => void;
-  disabled?: boolean;
 }
 
 const CVSelectorDropdown: React.FC<CVSelectorDropdownProps> = ({ 
   savedCVs, 
   selectedCVId, 
-  onCVSelect,
-  disabled = false
+  onCVSelect 
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   
-  const selectedCV = savedCVs.find(cv => String(cv.id) === selectedCVId);
+  const selectedCV = savedCVs.find(cv => cv.id === selectedCVId);
 
   if (savedCVs.length === 0) return null;
 
@@ -27,11 +32,8 @@ const CVSelectorDropdown: React.FC<CVSelectorDropdownProps> = ({
       <h4 className="text-sm font-medium text-blueberry dark:text-citrus mb-3">Saved CVs</h4>
       <div className="relative">
         <button
-          onClick={() => !disabled && setIsOpen(!isOpen)}
-          disabled={disabled}
-          className={`w-full flex items-center justify-between p-3 border border-apple-core/30 dark:border-citrus/30 rounded-lg bg-white dark:bg-blueberry/10 hover:border-apricot transition-colors ${
-            disabled ? 'opacity-50 cursor-not-allowed' : ''
-          }`}
+          onClick={() => setIsOpen(!isOpen)}
+          className="w-full flex items-center justify-between p-3 border border-apple-core/30 dark:border-citrus/30 rounded-lg bg-white dark:bg-blueberry/10 hover:border-apricot transition-colors"
         >
           <div className="flex items-center space-x-3">
             <FileText className="h-5 w-5 text-apricot" />
@@ -46,7 +48,7 @@ const CVSelectorDropdown: React.FC<CVSelectorDropdownProps> = ({
           )}
         </button>
 
-        {isOpen && !disabled && (
+        {isOpen && (
           <div className="absolute z-10 w-full mt-1 bg-white dark:bg-blueberry border border-apple-core/30 dark:border-citrus/30 rounded-lg shadow-lg max-h-60 overflow-y-auto">
             {savedCVs.map((cv) => (
               <button
@@ -56,7 +58,7 @@ const CVSelectorDropdown: React.FC<CVSelectorDropdownProps> = ({
                   setIsOpen(false);
                 }}
                 className={`w-full flex items-center justify-between p-3 text-left hover:bg-apple-core/10 dark:hover:bg-citrus/10 transition-colors ${
-                  String(cv.id) === selectedCVId ? 'bg-apricot/10' : ''
+                  selectedCVId === cv.id ? 'bg-apricot/10' : ''
                 }`}
               >
                 <div className="flex items-center space-x-3">
@@ -68,7 +70,7 @@ const CVSelectorDropdown: React.FC<CVSelectorDropdownProps> = ({
                     </p>
                   </div>
                 </div>
-                {String(cv.id) === selectedCVId && (
+                {selectedCVId === cv.id && (
                   <Check className="h-4 w-4 text-apricot" />
                 )}
               </button>

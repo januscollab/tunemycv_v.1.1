@@ -1,19 +1,29 @@
 
 import React, { useState } from 'react';
-import { FileText, Upload, Check } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Upload, FileText, Check, X, Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
-import { validateFile, extractTextFromFile } from '@/utils/fileUtils';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import CVSelectorDropdown from './CVSelectorDropdown';
-import FileUploadArea from './upload/FileUploadArea';
-import { CVUpload } from '@/types/cv';
+import { useToast } from '@/hooks/use-toast';
+import { validateFile, extractTextFromFile } from '@/utils/fileUtils';
+import FileUploadWithSave from './upload/FileUploadWithSave';
+import SavedCVList from './upload/SavedCVList';
 
 interface UploadedFile {
   file: File;
   extractedText: string;
   type: 'cv' | 'job_description';
+}
+
+interface CVUpload {
+  id: string;
+  file_name: string;
+  file_size: number;
+  created_at: string;
+  extracted_text: string;
 }
 
 interface CVSelectorProps {
@@ -25,20 +35,18 @@ interface CVSelectorProps {
 const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploading }) => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [showFileUpload, setShowFileUpload] = useState(false);
+  const [activeTab, setActiveTab] = useState<'upload' | 'saved'>('saved');
   const [selectedCVId, setSelectedCVId] = useState<string | null>(null);
+  const [fileUploading, setFileUploading] = useState(false);
 
-  const cvTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-  const maxSize = 5 * 1024 * 1024; // 5MB
-
-  // Fetch saved CVs
-  const { data: savedCVs = [] } = useQuery({
+  // Fetch saved CVs from database
+  const { data: savedCVs = [], isLoading } = useQuery({
     queryKey: ['saved-cvs', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
       const { data, error } = await supabase
         .from('uploads')
-        .select('*')
+        .select('id, file_name, file_size, created_at, extracted_text')
         .eq('user_id', user.id)
         .eq('upload_type', 'cv')
         .order('created_at', { ascending: false });
@@ -49,7 +57,24 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
     enabled: !!user?.id,
   });
 
-  const handleFileUpload = async (file: File) => {
+  const handleSavedCVSelect = (cv: CVUpload) => {
+    setSelectedCVId(cv.id);
+    
+    // Convert CV to UploadedFile format
+    const textFile = new File([cv.extracted_text], cv.file_name, { type: 'application/pdf' });
+    const uploadedFile: UploadedFile = {
+      file: textFile,
+      extractedText: cv.extracted_text,
+      type: 'cv'
+    };
+    
+    onCVSelect(uploadedFile);
+  };
+
+  const handleFileUpload = async (file: File, shouldSave: boolean) => {
+    const cvTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    
     const errors = validateFile(file, cvTypes, maxSize);
     
     if (errors.length > 0) {
@@ -58,129 +83,132 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
     }
 
     try {
-      console.log('CVSelector: Starting file upload for:', file.name, 'Size:', file.size);
+      setFileUploading(true);
       const extractedText = await extractTextFromFile(file);
-      console.log('CVSelector: Extracted text length:', extractedText.length);
-      console.log('CVSelector: First 200 chars of extracted text:', extractedText.substring(0, 200));
-      console.log('CVSelector: CRITICAL - CV text that will be passed to analysis:', {
-        hasText: !!extractedText,
-        textLength: extractedText?.length || 0,
-        textPreview: extractedText?.substring(0, 100) || 'NO TEXT'
-      });
       
+      // Save to database if requested
+      if (shouldSave && user?.id) {
+        const { error: saveError } = await supabase
+          .from('uploads')
+          .insert({
+            user_id: user.id,
+            file_name: file.name,
+            file_type: file.type,
+            file_size: file.size,
+            upload_type: 'cv',
+            extracted_text: extractedText
+          });
+
+        if (saveError) {
+          console.error('Error saving CV:', saveError);
+          toast({ title: 'Warning', description: 'CV uploaded but not saved for future use', variant: 'destructive' });
+        } else {
+          toast({ title: 'Success', description: 'CV uploaded and saved for future use!' });
+        }
+      } else {
+        toast({ title: 'Success', description: 'CV uploaded successfully!' });
+      }
+
       const uploadedFile: UploadedFile = {
         file,
         extractedText,
         type: 'cv'
       };
 
-      console.log('CVSelector: Calling onCVSelect with uploadedFile');
       onCVSelect(uploadedFile);
-      setShowFileUpload(false);
-      toast({ title: 'Success', description: 'CV uploaded successfully!' });
     } catch (error) {
-      console.error('CVSelector: Error processing CV file:', error);
       toast({ title: 'Error', description: 'Failed to process CV file', variant: 'destructive' });
+    } finally {
+      setFileUploading(false);
     }
   };
 
-  const handleSavedCVSelect = (savedCV: CVUpload) => {
-    console.log('CVSelector: Selecting saved CV:', savedCV.file_name);
-    console.log('CVSelector: Saved CV extracted text length:', savedCV.extracted_text?.length || 0);
-    console.log('CVSelector: First 200 chars of saved CV text:', savedCV.extracted_text?.substring(0, 200) || 'No text');
-    console.log('CVSelector: CRITICAL - Saved CV text that will be passed to analysis:', {
-      hasText: !!savedCV.extracted_text,
-      textLength: savedCV.extracted_text?.length || 0,
-      textPreview: savedCV.extracted_text?.substring(0, 100) || 'NO TEXT'
-    });
-    
-    // Create a File object from saved CV data
-    const textFile = new File([savedCV.extracted_text], savedCV.file_name, { 
-      type: savedCV.file_type || 'application/pdf' 
-    });
-    
-    const uploadedFile: UploadedFile = {
-      file: textFile,
-      extractedText: savedCV.extracted_text,
-      type: 'cv'
-    };
-
-    console.log('CVSelector: Calling onCVSelect with saved CV uploadedFile');
-    onCVSelect(uploadedFile);
-    // Fix the TypeScript error by explicitly converting to string
-    setSelectedCVId(String(savedCV.id));
-    toast({ 
-      title: 'Success', 
-      description: `Using saved CV: ${savedCV.file_name}` 
-    });
-  };
-
   return (
-    <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
-      <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-4">Select Your CV</h3>
-      <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mb-4">
-        Choose from your saved CVs or upload a new one
-      </p>
-
-      {!selectedCV ? (
-        <div className="space-y-4">
-          {/* Saved CVs Dropdown */}
-          {user && (
-            <CVSelectorDropdown 
-              savedCVs={savedCVs}
-              selectedCVId={selectedCVId}
-              onCVSelect={handleSavedCVSelect} 
-              disabled={uploading} 
-            />
-          )}
-
-          {/* Upload New CV Option */}
-          <div className="text-center">
-            <div className="text-blueberry/60 dark:text-apple-core/60 mb-2">or</div>
-            {!showFileUpload ? (
+    <Card className="bg-white dark:bg-blueberry/20 border border-apple-core/20 dark:border-citrus/20">
+      <CardHeader>
+        <CardTitle className="text-lg font-semibold text-blueberry dark:text-citrus">Your CV</CardTitle>
+        <p className="text-sm text-blueberry/70 dark:text-apple-core/80">
+          Upload a new CV or select from your saved CVs. 
+          <Link 
+            to="/profile?tab=files" 
+            className="text-apricot hover:text-apricot/80 ml-1 underline"
+          >
+            Manage your CVs in your Profile
+          </Link>
+        </p>
+      </CardHeader>
+      <CardContent>
+        {selectedCV ? (
+          <div className="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
+            <div className="flex items-center space-x-3">
+              <Check className="h-5 w-5 text-green-600" />
+              <div>
+                <p className="font-medium text-green-900">{selectedCV.file.name}</p>
+                <p className="text-sm text-green-700">CV ready for analysis</p>
+              </div>
+            </div>
+            <button
+              onClick={() => {
+                window.location.reload(); // Simple way to reset without complex state management
+              }}
+              className="p-2 text-red-600 hover:bg-red-100 rounded-md"
+              disabled={uploading}
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {/* Tab Navigation */}
+            <div className="flex space-x-1 bg-apple-core/20 dark:bg-citrus/20 rounded-lg p-1">
               <button
-                onClick={() => setShowFileUpload(true)}
-                disabled={uploading}
-                className="w-full bg-apricot text-white py-3 px-4 rounded-lg hover:bg-apricot/90 transition-colors disabled:opacity-50 flex items-center justify-center"
+                onClick={() => setActiveTab('saved')}
+                className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                  activeTab === 'saved'
+                    ? 'bg-white dark:bg-blueberry/40 text-blueberry dark:text-citrus shadow-sm'
+                    : 'text-blueberry/70 dark:text-apple-core/70 hover:text-blueberry dark:hover:text-citrus'
+                }`}
+                disabled={uploading || isLoading}
               >
-                <Upload className="h-5 w-5 mr-2" />
-                Upload New CV
+                <FileText className="h-4 w-4 mx-auto mb-1" />
+                Saved CVs ({savedCVs.length})
               </button>
+              <button
+                onClick={() => setActiveTab('upload')}
+                className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                  activeTab === 'upload'
+                    ? 'bg-white dark:bg-blueberry/40 text-blueberry dark:text-citrus shadow-sm'
+                    : 'text-blueberry/70 dark:text-apple-core/70 hover:text-blueberry dark:hover:text-citrus'
+                }`}
+                disabled={uploading || isLoading}
+              >
+                <Plus className="h-4 w-4 mx-auto mb-1" />
+                Upload New
+              </button>
+            </div>
+
+            {/* Tab Content */}
+            {activeTab === 'saved' ? (
+              <SavedCVList 
+                savedCVs={savedCVs}
+                selectedCVId={selectedCVId}
+                onCVSelect={handleSavedCVSelect}
+              />
             ) : (
-              <FileUploadArea
+              <FileUploadWithSave 
                 onFileSelect={handleFileUpload}
-                acceptedTypes={cvTypes}
-                maxSize={maxSize}
-                label="Upload CV (PDF, DOCX)"
-                disabled={uploading}
+                uploading={fileUploading || uploading}
+                accept=".pdf,.docx,.txt"
+                maxSize="5MB"
+                label="Upload your CV"
+                currentCVCount={savedCVs.length}
+                maxCVCount={10}
               />
             )}
           </div>
-        </div>
-      ) : (
-        <div className="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
-          <div className="flex items-center space-x-3">
-            <Check className="h-5 w-5 text-green-600" />
-            <div>
-              <p className="font-medium text-green-900">{selectedCV.file.name}</p>
-              <p className="text-sm text-green-700">CV ready for analysis</p>
-            </div>
-          </div>
-          <button
-            onClick={() => {
-              console.log('CVSelector: Clearing selected CV');
-              onCVSelect(undefined as any);
-              setShowFileUpload(false);
-              setSelectedCVId(null);
-            }}
-            className="p-2 text-red-600 hover:bg-red-100 rounded-md"
-            disabled={uploading}
-          >
-            <FileText className="h-4 w-4" />
-          </button>
-        </div>
-      )}
-    </div>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 

@@ -2,7 +2,14 @@
 import React from 'react';
 import { FileText, Check, Upload } from 'lucide-react';
 import { formatFileSize } from '@/utils/fileUtils';
-import { CVUpload } from '@/types/cv';
+
+interface CVUpload {
+  id: string;
+  file_name: string;
+  file_size: number;
+  created_at: string;
+  extracted_text: string;
+}
 
 interface SavedCVListProps {
   savedCVs: CVUpload[];
@@ -35,7 +42,7 @@ const SavedCVList: React.FC<SavedCVListProps> = ({ savedCVs, selectedCVId, onCVS
             key={cv.id}
             onClick={() => onCVSelect(cv)}
             className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer transition-colors ${
-              String(cv.id) === selectedCVId
+              selectedCVId === cv.id
                 ? 'border-apricot bg-apricot/10'
                 : 'border-apple-core/20 dark:border-citrus/20 hover:border-apricot hover:bg-apricot/5'
             }`}
@@ -49,7 +56,7 @@ const SavedCVList: React.FC<SavedCVListProps> = ({ savedCVs, selectedCVId, onCVS
                 </p>
               </div>
             </div>
-            {String(cv.id) === selectedCVId && (
+            {selectedCVId === cv.id && (
               <Check className="h-5 w-5 text-apricot flex-shrink-0" />
             )}
           </div>
