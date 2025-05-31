@@ -1,13 +1,54 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Users, CreditCard, FileText } from 'lucide-react';
 import UserManagement from '@/components/admin/UserManagement';
 import CreditManagement from '@/components/admin/CreditManagement';
 import AnalysisLogsManagement from '@/components/admin/AnalysisLogsManagement';
 import AdminNavigation from '@/components/admin/AdminNavigation';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('users');
+  const [loading, setLoading] = useState(true);
+  const [hasAdminAccess, setHasAdminAccess] = useState(false);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    checkAdminAccess();
+  }, []);
+
+  const checkAdminAccess = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({ title: 'Error', description: 'Authentication required', variant: 'destructive' });
+        setLoading(false);
+        return;
+      }
+
+      // Check if user has admin role
+      const { data: hasRole, error } = await supabase.rpc('has_role', {
+        _user_id: user.id,
+        _role: 'admin'
+      });
+
+      if (error) {
+        console.error('Error checking admin role:', error);
+        toast({ title: 'Error', description: 'Failed to verify admin access', variant: 'destructive' });
+      } else {
+        setHasAdminAccess(hasRole);
+        if (!hasRole) {
+          toast({ title: 'Access Denied', description: 'Admin privileges required', variant: 'destructive' });
+        }
+      }
+    } catch (error) {
+      console.error('Error in checkAdminAccess:', error);
+      toast({ title: 'Error', description: 'Failed to verify access', variant: 'destructive' });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const renderContent = () => {
     switch (activeTab) {
@@ -21,6 +62,25 @@ const AdminDashboard = () => {
         return <UserManagement />;
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-apple-core/10 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (!hasAdminAccess) {
+    return (
+      <div className="min-h-screen bg-apple-core/10 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
+          <p className="text-gray-600">You need admin privileges to access this dashboard.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-apple-core/10">
