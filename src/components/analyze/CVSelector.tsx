@@ -4,6 +4,8 @@ import { FileText, Upload, Check } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { validateFile, extractTextFromFile } from '@/utils/fileUtils';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import CVSelectorDropdown from './CVSelectorDropdown';
 import FileUploadArea from './upload/FileUploadArea';
 
@@ -26,6 +28,24 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
 
   const cvTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
   const maxSize = 5 * 1024 * 1024; // 5MB
+
+  // Fetch saved CVs
+  const { data: savedCVs = [] } = useQuery({
+    queryKey: ['saved-cvs', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      const { data, error } = await supabase
+        .from('uploads')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('upload_type', 'cv')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!user?.id,
+  });
 
   const handleFileUpload = async (file: File) => {
     const errors = validateFile(file, cvTypes, maxSize);
@@ -82,7 +102,12 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
         <div className="space-y-4">
           {/* Saved CVs Dropdown */}
           {user && (
-            <CVSelectorDropdown onCVSelect={handleSavedCVSelect} disabled={uploading} />
+            <CVSelectorDropdown 
+              savedCVs={savedCVs}
+              selectedCVId={null}
+              onCVSelect={handleSavedCVSelect} 
+              disabled={uploading} 
+            />
           )}
 
           {/* Upload New CV Option */}

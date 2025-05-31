@@ -14,12 +14,14 @@ interface CVSelectorDropdownProps {
   savedCVs: CVUpload[];
   selectedCVId: string | null;
   onCVSelect: (cv: CVUpload) => void;
+  disabled?: boolean;
 }
 
 const CVSelectorDropdown: React.FC<CVSelectorDropdownProps> = ({ 
   savedCVs, 
   selectedCVId, 
-  onCVSelect 
+  onCVSelect,
+  disabled = false
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   
@@ -32,8 +34,11 @@ const CVSelectorDropdown: React.FC<CVSelectorDropdownProps> = ({
       <h4 className="text-sm font-medium text-blueberry dark:text-citrus mb-3">Saved CVs</h4>
       <div className="relative">
         <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="w-full flex items-center justify-between p-3 border border-apple-core/30 dark:border-citrus/30 rounded-lg bg-white dark:bg-blueberry/10 hover:border-apricot transition-colors"
+          onClick={() => !disabled && setIsOpen(!isOpen)}
+          disabled={disabled}
+          className={`w-full flex items-center justify-between p-3 border border-apple-core/30 dark:border-citrus/30 rounded-lg bg-white dark:bg-blueberry/10 hover:border-apricot transition-colors ${
+            disabled ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
         >
           <div className="flex items-center space-x-3">
             <FileText className="h-5 w-5 text-apricot" />
@@ -48,7 +53,7 @@ const CVSelectorDropdown: React.FC<CVSelectorDropdownProps> = ({
           )}
         </button>
 
-        {isOpen && (
+        {isOpen && !disabled && (
           <div className="absolute z-10 w-full mt-1 bg-white dark:bg-blueberry border border-apple-core/30 dark:border-citrus/30 rounded-lg shadow-lg max-h-60 overflow-y-auto">
             {savedCVs.map((cv) => (
               <button
