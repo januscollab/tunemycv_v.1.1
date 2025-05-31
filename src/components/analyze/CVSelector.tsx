@@ -1,12 +1,9 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Upload, FileText, Check, X, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
 import CVSelectorDropdown from './CVSelectorDropdown';
 import FileUploadWithSave from './upload/FileUploadWithSave';
 import SavedCVList from './upload/SavedCVList';
@@ -17,15 +14,6 @@ interface UploadedFile {
   type: 'cv' | 'job_description';
 }
 
-interface CVUpload {
-  id: string;
-  file_name: string;
-  file_size: number;
-  created_at: string;
-  extracted_text: string;
-  file_type: string;
-}
-
 interface CVSelectorProps {
   onCVSelect: (uploadedFile: UploadedFile) => void;
   selectedCV?: UploadedFile;
@@ -33,42 +21,29 @@ interface CVSelectorProps {
 }
 
 const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploading }) => {
-  const { user } = useAuth();
-  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<'upload' | 'saved'>('saved');
-  const [savedCVs, setSavedCVs] = useState<CVUpload[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (user) {
-      loadSavedCVs();
+  // Mock saved CVs data - in real app this would come from props or API
+  const mockSavedCVs = [
+    {
+      id: '1',
+      file_name: 'John_Doe_Resume_2024.pdf',
+      file_size: 245760,
+      created_at: '2024-01-15T10:30:00Z',
+      extracted_text: 'Senior Software Engineer with 5+ years of experience...',
+      file_type: 'application/pdf'
+    },
+    {
+      id: '2', 
+      file_name: 'Software_Developer_CV.docx',
+      file_size: 189440,
+      created_at: '2024-01-10T14:20:00Z',
+      extracted_text: 'Full-stack developer experienced in React, Node.js...',
+      file_type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
     }
-  }, [user]);
+  ];
 
-  const loadSavedCVs = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('uploads')
-        .select('id, file_name, file_size, created_at, extracted_text, file_type')
-        .eq('user_id', user?.id)
-        .eq('upload_type', 'cv')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setSavedCVs(data || []);
-    } catch (error) {
-      console.error('Error loading saved CVs:', error);
-      toast({ 
-        title: 'Error', 
-        description: 'Failed to load saved CVs', 
-        variant: 'destructive' 
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleCVSelect = (cv: CVUpload) => {
+  const handleCVSelect = (cv: any) => {
     // Convert CV data to UploadedFile format
     const uploadedFile: UploadedFile = {
       file: new File([cv.extracted_text || ''], cv.file_name, { type: cv.file_type }),
@@ -89,22 +64,15 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
         type: 'cv'
       };
       
-      // If shouldSave is true, save the CV to the backend
+      // If shouldSave is true, here you would save the CV to the backend
       if (shouldSave) {
         console.log('Saving CV to backend...', file.name);
-        await saveCVToBackend(file, extractedText);
-        // Reload saved CVs after saving
-        await loadSavedCVs();
+        // saveCVToBackend(file, extractedText);
       }
       
       onCVSelect(uploadedFile);
     } catch (error) {
       console.error('Error processing file:', error);
-      toast({ 
-        title: 'Error', 
-        description: 'Failed to process file', 
-        variant: 'destructive' 
-      });
     }
   };
 
@@ -120,44 +88,6 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
       reader.readAsText(file);
     });
   };
-
-  const saveCVToBackend = async (file: File, extractedText: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('uploads')
-        .insert({
-          user_id: user?.id,
-          file_name: file.name,
-          file_type: file.type,
-          file_size: file.size,
-          upload_type: 'cv',
-          extracted_text: extractedText
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    } catch (error) {
-      console.error('Error saving CV:', error);
-      throw error;
-    }
-  };
-
-  if (loading) {
-    return (
-      <Card className="bg-white dark:bg-blueberry/20 border border-apple-core/20 dark:border-citrus/20">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold text-blueberry dark:text-citrus">Your CV</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-apricot"></div>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
 
   return (
     <Card className="bg-white dark:bg-blueberry/20 border border-apple-core/20 dark:border-citrus/20">
@@ -223,9 +153,9 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
 
             {/* Tab Content */}
             {activeTab === 'saved' ? (
-              savedCVs.length > 0 ? (
+              mockSavedCVs.length > 0 ? (
                 <SavedCVList 
-                  savedCVs={savedCVs} 
+                  savedCVs={mockSavedCVs} 
                   selectedCVId={null} 
                   onCVSelect={handleCVSelect} 
                 />
@@ -251,7 +181,7 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
                 accept=".pdf,.docx,.txt"
                 maxSize="5MB"
                 label="Upload your CV"
-                currentCVCount={savedCVs.length}
+                currentCVCount={mockSavedCVs.length}
                 maxCVCount={5}
               />
             )}
