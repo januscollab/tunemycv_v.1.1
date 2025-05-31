@@ -60,7 +60,7 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
   const handleSavedCVSelect = (cv: CVUpload) => {
     setSelectedCVId(cv.id);
     
-    // Convert CV to UploadedFile format - this is from saved CVs, not a new upload
+    // Convert CV to UploadedFile format - DO NOT re-save existing CVs
     const textFile = new File([cv.extracted_text], cv.file_name, { type: 'application/pdf' });
     const uploadedFile: UploadedFile = {
       file: textFile,
@@ -69,6 +69,7 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
     };
     
     onCVSelect(uploadedFile);
+    toast({ title: 'Success', description: 'CV selected from saved CVs!' });
   };
 
   const handleFileUpload = async (file: File, shouldSave: boolean) => {
@@ -82,12 +83,18 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
       return;
     }
 
+    // Check if we're at the 5 CV limit when trying to save
+    if (shouldSave && savedCVs.length >= 5) {
+      toast({ title: 'Limit Reached', description: 'You can save up to 5 CVs. Please delete one first.', variant: 'destructive' });
+      return;
+    }
+
     try {
       setFileUploading(true);
       const extractedText = await extractTextFromFile(file);
       
-      // Save to database if requested
-      if (shouldSave && user?.id) {
+      // Only save to database if user explicitly requested it AND we're under the limit
+      if (shouldSave && user?.id && savedCVs.length < 5) {
         const { error: saveError } = await supabase
           .from('uploads')
           .insert({
@@ -107,8 +114,8 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
           // Refetch saved CVs to update the list
           refetch();
         }
-      } else {
-        toast({ title: 'Success', description: 'CV uploaded successfully!' });
+      } else if (!shouldSave) {
+        toast({ title: 'Success', description: 'CV uploaded for one-time use!' });
       }
 
       const uploadedFile: UploadedFile = {

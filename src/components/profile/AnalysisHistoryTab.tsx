@@ -48,22 +48,22 @@ const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ credits, member
 
   const loadAnalysisHistory = async () => {
     try {
-      // Fetch analysis results with credit cost from analysis_logs
+      // Changed from inner join to left join to include all analysis results
       const { data, error } = await supabase
         .from('analysis_results')
         .select(`
           *,
-          analysis_logs!inner(cost_estimate)
+          analysis_logs(cost_estimate)
         `)
         .eq('user_id', user?.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
       
-      // Transform data to include credit cost
+      // Transform data to include credit cost, handling null values gracefully
       const transformedData = (data || []).map(analysis => ({
         ...analysis,
-        credit_cost: analysis.analysis_logs?.[0]?.cost_estimate ? Math.ceil(analysis.analysis_logs[0].cost_estimate) : undefined
+        credit_cost: analysis.analysis_logs?.[0]?.cost_estimate ? Math.ceil(analysis.analysis_logs[0].cost_estimate) : 1
       }));
       
       setAnalyses(transformedData);
