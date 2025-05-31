@@ -86,8 +86,8 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
     };
 
     onCVSelect(uploadedFile);
-    // Ensure we convert the ID to string to match the expected type
-    setSelectedCVId(savedCV.id ? savedCV.id.toString() : null);
+    // Convert the ID to string to match the expected type
+    setSelectedCVId(savedCV.id.toString());
     toast({ 
       title: 'Success', 
       description: `Using saved CV: ${savedCV.file_name}` 
