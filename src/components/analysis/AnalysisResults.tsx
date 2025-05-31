@@ -5,6 +5,7 @@ import ExecutiveSummarySection from './ExecutiveSummarySection';
 import CompatibilityBreakdownSection from './CompatibilityBreakdownSection';
 import EnhancedKeywordAnalysis from './EnhancedKeywordAnalysis';
 import SkillsGapAnalysis from './SkillsGapAnalysis';
+import CompanyIntelligenceSection from './CompanyIntelligenceSection';
 import ATSOptimizationSection from './ATSOptimizationSection';
 import InterviewPrepSection from './InterviewPrepSection';
 import AnalysisHeader from './components/AnalysisHeader';
@@ -65,7 +66,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
           </div>
           <p className="text-green-700">
             {hasEnhancedData 
-              ? `We've completed an enhanced AI-powered analysis of your CV for the ${position} position at ${companyName} with detailed insights and actionable recommendations.`
+              ? `We've completed an enhanced AI-powered analysis of your CV for the ${position} position at ${companyName} with detailed company intelligence and actionable recommendations.`
               : `We've analyzed your CV against the ${position} job description and prepared a detailed compatibility report with personalized recommendations.`
             }
           </p>
@@ -107,6 +108,11 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
             {/* Priority Recommendations - Show first as it's most actionable */}
             {result.priorityRecommendations && result.priorityRecommendations.length > 0 && (
               <PriorityRecommendationsSection recommendations={result.priorityRecommendations} />
+            )}
+
+            {/* Company Intelligence Section */}
+            {result.companyIntelligence && (
+              <CompanyIntelligenceSection companyIntelligence={result.companyIntelligence} />
             )}
 
             {/* Side-by-side sections: Compatibility Breakdown and Keyword Analysis */}

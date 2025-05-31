@@ -25,6 +25,7 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
   const { user } = useAuth();
   const { toast } = useToast();
   const [showFileUpload, setShowFileUpload] = useState(false);
+  const [selectedCVId, setSelectedCVId] = useState<string | null>(null);
 
   const cvTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
   const maxSize = 5 * 1024 * 1024; // 5MB
@@ -85,6 +86,7 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
     };
 
     onCVSelect(uploadedFile);
+    setSelectedCVId(savedCV.id);
     toast({ 
       title: 'Success', 
       description: `Using saved CV: ${savedCV.file_name}` 
@@ -104,7 +106,7 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
           {user && (
             <CVSelectorDropdown 
               savedCVs={savedCVs}
-              selectedCVId={null}
+              selectedCVId={selectedCVId}
               onCVSelect={handleSavedCVSelect} 
               disabled={uploading} 
             />
@@ -146,6 +148,7 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
             onClick={() => {
               onCVSelect(undefined as any);
               setShowFileUpload(false);
+              setSelectedCVId(null);
             }}
             className="p-2 text-red-600 hover:bg-red-100 rounded-md"
             disabled={uploading}

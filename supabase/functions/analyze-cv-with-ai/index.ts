@@ -25,12 +25,14 @@ interface EnhancedAIAnalysisResult {
       title: string;
       description: string;
       relevance: number;
+      evidence: string;
     }>;
     weaknesses: Array<{
       title: string;
       description: string;
       impact: number;
       recommendation: string;
+      evidence: string;
     }>;
   };
   compatibilityBreakdown: {
@@ -84,6 +86,7 @@ interface EnhancedAIAnalysisResult {
     priority: 'high' | 'medium' | 'low';
     impact: string;
     sampleText: string;
+    specificAction: string;
   }>;
   skillsGapAnalysis: {
     criticalGaps: Array<{
@@ -98,6 +101,18 @@ interface EnhancedAIAnalysisResult {
       relevance: string;
       actionPlan: string;
     }>;
+  };
+  companyIntelligence: {
+    candidateCompanies: Array<{
+      name: string;
+      industry: string;
+      relevance: number;
+      marketPosition: string;
+      industryContext: string;
+    }>;
+    industryProgression: string;
+    marketKnowledge: string;
+    competitiveAdvantage: string;
   };
 }
 
@@ -134,7 +149,7 @@ const validateEnhancedAnalysisResult = (result: any): EnhancedAIAnalysisResult =
   const requiredFields = [
     'compatibilityScore', 'companyName', 'position', 'executiveSummary',
     'compatibilityBreakdown', 'keywordAnalysis', 'priorityRecommendations',
-    'skillsGapAnalysis'
+    'skillsGapAnalysis', 'companyIntelligence'
   ];
   
   for (const field of requiredFields) {
@@ -182,6 +197,12 @@ const validateEnhancedAnalysisResult = (result: any): EnhancedAIAnalysisResult =
   if (!result.priorityRecommendations) result.priorityRecommendations = [];
   if (!result.skillsGapAnalysis.criticalGaps) result.skillsGapAnalysis.criticalGaps = [];
   if (!result.skillsGapAnalysis.developmentAreas) result.skillsGapAnalysis.developmentAreas = [];
+  if (!result.companyIntelligence) result.companyIntelligence = {
+    candidateCompanies: [],
+    industryProgression: '',
+    marketKnowledge: '',
+    competitiveAdvantage: ''
+  };
   
   return result as EnhancedAIAnalysisResult;
 };
@@ -203,7 +224,7 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const { cvText, jobDescriptionText, jobTitle, userId }: AnalysisRequest = await req.json();
 
-    console.log('Starting enhanced AI analysis for user:', userId);
+    console.log('Starting enhanced AI analysis with company intelligence for user:', userId);
 
     // Check and deduct user credits
     const { data: userCredits, error: creditsError } = await supabase
@@ -219,18 +240,18 @@ serve(async (req) => {
       );
     }
 
-    // Enhanced comprehensive AI prompt with score validation instructions
+    // Enhanced comprehensive AI prompt with company and industry intelligence
     const prompt = `
-You are a senior career consultant and CV optimization expert. Analyze the CV against the job description and provide detailed insights.
+You are a senior career consultant and CV optimization expert with deep knowledge of companies and industries. Analyze the CV against the job description with comprehensive company and industry intelligence.
 
 CRITICAL REQUIREMENTS:
-1. Provide 3-7 detailed items for each analysis section
-2. Be thorough and comprehensive - this is professional career consulting
-3. Respond ONLY with valid JSON in the exact structure below
-4. Extract 15-25+ relevant keywords from the job description
-5. ENSURE SCORE CONSISTENCY: The overall compatibilityScore MUST be within 10 points of the average of the 5 breakdown scores
-6. NEVER assign 0% unless the CV is completely irrelevant (no matching skills, experience, or keywords)
-7. Calculate scores based on actual content alignment, not arbitrary numbers
+1. Extract and analyze EVERY company mentioned in the CV with industry context
+2. Provide evidence-based analysis - cite specific CV content for ALL claims
+3. NEVER make generic recommendations - all advice must be specific and actionable
+4. Research industry context and company market positions
+5. Ensure score consistency: overall score within 10 points of breakdown average
+6. Flag any contradictions between your analysis and CV content
+7. Minimum 20% score unless CV is completely irrelevant
 
 CV TO ANALYZE:
 ${cvText}
@@ -240,121 +261,145 @@ ${jobDescriptionText}
 
 POSITION: ${jobTitle || 'Not specified'}
 
-SCORE VALIDATION RULES:
-- Overall score should reflect the average of breakdown scores (±10 points maximum)
-- If CV has ANY relevant experience/skills, minimum score should be 20%
-- 0% scores are only for completely irrelevant CVs
-- Explain score reasoning in the overview
+COMPANY & INDUSTRY ANALYSIS REQUIREMENTS:
+1. Extract ALL companies from CV with years of experience at each
+2. Research each company's industry, market position, and relevance
+3. Analyze industry progression and transferable knowledge
+4. Assess market knowledge depth and competitive intelligence
+5. Evaluate professional network implications
+6. Consider industry evolution and emerging trends
 
-RESPOND WITH ANALYSIS IN THIS EXACT JSON STRUCTURE:
+EVIDENCE REQUIREMENTS:
+- Every strength must include specific CV quotes as evidence
+- Every weakness must cite exact missing elements from CV
+- All recommendations must be based on actual gaps, not assumptions
+- Industry claims must reference specific company experiences
+
+RESPONSE STRUCTURE - JSON ONLY:
 {
   "compatibilityScore": 0-100,
   "companyName": "Company name from job description",
   "position": "Job title",
   "executiveSummary": {
-    "overview": "3-4 sentence overview explaining the compatibilityScore reasoning",
+    "overview": "Evidence-based overview explaining score with specific CV references",
     "strengths": [
       {
-        "title": "Strength title",
-        "description": "Detailed 2-3 sentence explanation with specific examples",
-        "relevance": 0-100
+        "title": "Specific strength based on CV evidence",
+        "description": "Detailed explanation with company/industry context",
+        "relevance": 0-100,
+        "evidence": "Exact quote or reference from CV supporting this claim"
       }
     ],
     "weaknesses": [
       {
-        "title": "Weakness/gap title",
-        "description": "Detailed explanation with evidence",
+        "title": "Specific gap identified in CV",
+        "description": "Explanation with evidence of what's missing",
         "impact": 0-100,
-        "recommendation": "Specific actionable strategy to address"
+        "recommendation": "Specific, actionable strategy (not generic advice)",
+        "evidence": "Specific CV content showing this gap"
       }
     ]
   },
   "compatibilityBreakdown": {
     "technicalSkills": {
       "score": 0-100,
-      "present": ["Technical skills found in CV"],
-      "missing": ["Required technical skills missing"],
-      "analysis": "Detailed analysis of technical alignment"
+      "present": ["Skills with company/context where used"],
+      "missing": ["Specific technical requirements from job description"],
+      "analysis": "Company-contextualized technical skills assessment"
     },
     "experience": {
       "score": 0-100,
-      "relevantExperience": ["Relevant experience from CV"],
-      "missingExperience": ["Required experience missing"],
-      "analysis": "Analysis of experience match"
+      "relevantExperience": ["Experience with company/industry context"],
+      "missingExperience": ["Specific experience gaps from job description"],
+      "analysis": "Industry-weighted experience analysis"
     },
     "education": {
       "score": 0-100,
-      "relevantQualifications": ["Relevant qualifications"],
-      "missingQualifications": ["Missing qualifications"],
-      "analysis": "Educational background analysis"
+      "relevantQualifications": ["Qualifications with relevance context"],
+      "missingQualifications": ["Specific educational requirements missing"],
+      "analysis": "Educational background with industry requirements"
     },
     "softSkills": {
       "score": 0-100,
-      "present": ["Soft skills demonstrated"],
-      "missing": ["Required soft skills missing"],
-      "analysis": "Soft skills assessment"
+      "present": ["Soft skills with evidence from CV"],
+      "missing": ["Soft skills required but not demonstrated"],
+      "analysis": "Soft skills assessment with company culture fit"
     },
     "industryKnowledge": {
       "score": 0-100,
-      "present": ["Industry knowledge areas"],
-      "missing": ["Missing industry knowledge"],
-      "analysis": "Industry expertise analysis"
+      "present": ["Industry knowledge areas with company evidence"],
+      "missing": ["Industry knowledge gaps for target role"],
+      "analysis": "Deep industry knowledge assessment based on company progression"
     }
   },
   "keywordAnalysis": {
-    "totalKeywords": 15-25,
-    "matchedKeywords": 0-25,
+    "totalKeywords": 20-30,
+    "matchedKeywords": 0-30,
     "keywordMatchPercentage": 0-100,
     "keywords": [
       {
-        "keyword": "Keyword from job description",
+        "keyword": "Specific keyword from job description",
         "found": true/false,
         "importance": "high/medium/low",
         "occurrences": 0,
-        "context": "Context and importance",
-        "suggestion": "How to incorporate/optimize"
+        "context": "Industry/company context for this keyword",
+        "suggestion": "Specific way to incorporate based on candidate's background"
       }
     ]
   },
   "priorityRecommendations": [
     {
-      "title": "Recommendation title",
-      "description": "Comprehensive explanation and rationale",
+      "title": "Specific, actionable recommendation",
+      "description": "Detailed explanation based on analysis",
       "priority": "high/medium/low",
-      "impact": "Expected impact description",
-      "sampleText": "Ready-to-use text example"
+      "impact": "Specific expected outcome",
+      "sampleText": "Industry-specific text example",
+      "specificAction": "Exact steps to implement this recommendation"
     }
   ],
   "skillsGapAnalysis": {
     "criticalGaps": [
       {
-        "skill": "Critical skill missing",
+        "skill": "Specific skill missing with evidence",
         "importance": "high/medium/low",
-        "description": "Why this skill is essential",
-        "bridgingStrategy": "How to acquire this skill"
+        "description": "Why this matters for this specific role/company",
+        "bridgingStrategy": "Specific strategy based on candidate's background"
       }
     ],
     "developmentAreas": [
       {
-        "area": "Development area",
-        "description": "Development opportunity explanation",
-        "relevance": "Relevance to role success",
-        "actionPlan": "Specific development plan"
+        "area": "Specific development area",
+        "description": "Context-specific development opportunity",
+        "relevance": "Direct relevance to role and industry",
+        "actionPlan": "Specific development plan with timeline"
       }
     ]
+  },
+  "companyIntelligence": {
+    "candidateCompanies": [
+      {
+        "name": "Company name from CV",
+        "industry": "Specific industry classification",
+        "relevance": 0-100,
+        "marketPosition": "Market position and reputation",
+        "industryContext": "How this experience relates to target role"
+      }
+    ],
+    "industryProgression": "Analysis of candidate's industry journey and trajectory",
+    "marketKnowledge": "Assessment of market knowledge depth across industries",
+    "competitiveAdvantage": "Unique advantages from company/industry background"
   }
 }
 
-INSTRUCTIONS:
-- RESPOND ONLY WITH VALID JSON
-- PROVIDE 3-7 ITEMS for strengths, weaknesses, recommendations, critical gaps, and development areas
-- EXTRACT 15-25+ KEYWORDS with strategic importance
-- ENSURE SCORE CONSISTENCY between overall and breakdown scores
-- FOCUS ON ACTIONABLE INSIGHTS with specific evidence
-- MAINTAIN PROFESSIONAL TONE while being honest about gaps
+QUALITY CHECKS:
+1. NO generic advice like "take courses" or "attend conferences"
+2. ALL recommendations must be specific to the candidate's background
+3. Evidence field must contain actual CV content
+4. Industry analysis must reference specific companies
+5. Score must reflect actual content analysis, not assumptions
 `;
 
-    console.log('Calling OpenAI API with enhanced validation prompt...');
+    console.log('Calling OpenAI API with enhanced company intelligence prompt...');
 
     // Call OpenAI API with retry logic
     let openAIResponse;
@@ -374,15 +419,15 @@ INSTRUCTIONS:
             messages: [
               {
                 role: 'system',
-                content: 'You are a senior career consultant providing comprehensive CV analysis. Always respond with valid JSON only. Ensure score consistency: overall score must align with breakdown averages within 10 points. Never use 0% unless CV is completely irrelevant.'
+                content: 'You are a senior career consultant with deep company and industry intelligence. Provide evidence-based analysis only. Every claim must be supported by specific CV content. Never give generic advice. Research companies and industries thoroughly.'
               },
               {
                 role: 'user',
                 content: prompt
               }
             ],
-            temperature: 0.2,
-            max_tokens: 6000,
+            temperature: 0.1,
+            max_tokens: 8000,
             response_format: { type: "json_object" }
           }),
         });
@@ -408,14 +453,14 @@ INSTRUCTIONS:
     const openAIData = await openAIResponse.json();
     const aiResponseText = openAIData.choices[0].message.content;
     
-    console.log('Enhanced OpenAI response received, length:', aiResponseText.length);
+    console.log('Enhanced OpenAI response with company intelligence received, length:', aiResponseText.length);
 
     // Parse and validate AI response
     let analysisResult: EnhancedAIAnalysisResult;
     try {
       const parsedResult = cleanAndParseJSON(aiResponseText);
       analysisResult = validateEnhancedAnalysisResult(parsedResult);
-      console.log('AI response successfully parsed and validated');
+      console.log('AI response successfully parsed and validated with company intelligence');
     } catch (parseError) {
       console.error('Failed to parse/validate AI response:', parseError);
       throw new Error(`Invalid AI response format: ${parseError.message}`);
@@ -431,7 +476,7 @@ INSTRUCTIONS:
       console.error('Failed to update credits:', creditUpdateError);
     }
 
-    console.log('Enhanced AI analysis completed successfully');
+    console.log('Enhanced AI analysis with company intelligence completed successfully');
 
     return new Response(
       JSON.stringify({
