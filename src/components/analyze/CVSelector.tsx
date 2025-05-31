@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { FileText, Upload, Check } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -86,8 +85,8 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
     };
 
     onCVSelect(uploadedFile);
-    // Convert the ID to string to match the expected type
-    setSelectedCVId(savedCV.id.toString());
+    // Convert the ID to string - handle both string and number types from database
+    setSelectedCVId(String(savedCV.id));
     toast({ 
       title: 'Success', 
       description: `Using saved CV: ${savedCV.file_name}` 

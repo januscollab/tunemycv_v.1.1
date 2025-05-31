@@ -7,6 +7,7 @@ import EnhancedKeywordAnalysis from './EnhancedKeywordAnalysis';
 import SkillsGapAnalysis from './SkillsGapAnalysis';
 import ATSOptimizationSection from './ATSOptimizationSection';
 import InterviewPrepSection from './InterviewPrepSection';
+import QualityAssurance from './QualityAssurance';
 import AnalysisHeader from './components/AnalysisHeader';
 import AnalysisScoreCard from './components/AnalysisScoreCard';
 import LegacySummarySection from './components/LegacySummarySection';
@@ -55,6 +56,20 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
         <h1 className="text-3xl font-bold text-blueberry dark:text-citrus mb-8">
           {companyName} - {position}
         </h1>
+
+        {/* Quality Assurance Section - Show if quality flags exist */}
+        {result.qualityFlags && result.confidenceScore !== undefined && (
+          <QualityAssurance
+            qualityFlags={result.qualityFlags}
+            confidenceScore={result.confidenceScore}
+            contentAnalysis={result.contentAnalysis || {
+              totalExperienceYears: 0,
+              experienceLevel: 'entry',
+              industryExposure: [],
+              companyExperience: []
+            }}
+          />
+        )}
 
         {/* Success Alert */}
         <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-8">

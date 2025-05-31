@@ -1,6 +1,7 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { extractJobTitleFromText, extractCompanyFromText } from '@/utils/analysisUtils';
+import { analyzeCVContent, validateAnalysisResult } from '@/utils/contentValidation';
 import { saveFilesToDatabase, performAIAnalysis, saveAnalysisResults } from '@/services/analysisService';
 import { performComprehensiveAnalysis } from '@/utils/analysisEngine';
 import { useScoreValidation } from './useScoreValidation';
@@ -26,10 +27,14 @@ export const useAnalysisExecution = () => {
       throw new Error('Please upload both CV and job description');
     }
 
-    console.log('Starting enhanced comprehensive CV analysis...');
+    console.log('Starting enhanced comprehensive CV analysis with quality validation...');
 
     const finalJobTitle = jobTitle || extractJobTitleFromText(uploadedFiles.jobDescription.extractedText);
     const extractedCompany = extractCompanyFromText(uploadedFiles.jobDescription.extractedText);
+
+    // Pre-analyze CV content for validation
+    const cvContentAnalysis = analyzeCVContent(uploadedFiles.cv.extractedText);
+    console.log('CV content analysis completed:', cvContentAnalysis);
 
     // Save files to database first
     const { cvUpload, jobUpload } = await saveFilesToDatabase(uploadedFiles, finalJobTitle, user?.id!);
@@ -49,12 +54,21 @@ export const useAnalysisExecution = () => {
         // Validate and correct the score if needed
         const validatedAnalysis = await validateAndCorrectScore(aiResult.analysis, user?.id!);
         
+        // Perform quality validation
+        const qualityValidation = validateAnalysisResult(validatedAnalysis, cvContentAnalysis);
+        
+        console.log('Quality validation completed:', qualityValidation);
+        
         // Add necessary metadata for database storage while preserving enhanced structure
         analysisResult = {
           ...validatedAnalysis,
           user_id: user?.id,
           cv_upload_id: cvUpload.id,
           job_description_upload_id: jobUpload.id,
+          // Add quality assurance data
+          qualityFlags: qualityValidation.qualityFlags,
+          confidenceScore: qualityValidation.confidenceScore,
+          contentAnalysis: qualityValidation.contentAnalysis,
           // Keep legacy fields for backward compatibility
           job_title: validatedAnalysis.position || finalJobTitle,
           company_name: validatedAnalysis.companyName || extractedCompany,
@@ -68,15 +82,29 @@ export const useAnalysisExecution = () => {
           recommendations: validatedAnalysis.priorityRecommendations?.map((r: any) => r.title || r) || []
         };
 
-        toast({ 
-          title: 'Enhanced Analysis Complete!', 
-          description: `Comprehensive AI-powered analysis with detailed insights completed. ${aiResult.creditsRemaining || 0} credits remaining.` 
-        });
+        // Show quality warning if confidence is low
+        if (qualityValidation.confidenceScore < 70) {
+          toast({ 
+            title: 'Analysis Complete with Quality Concerns', 
+            description: `Analysis completed but may contain inaccuracies (${qualityValidation.confidenceScore}% confidence). Please review carefully.`,
+            variant: 'default'
+          });
+        } else {
+          toast({ 
+            title: 'Enhanced Analysis Complete!', 
+            description: `High-quality AI analysis completed (${qualityValidation.confidenceScore}% confidence). ${aiResult.creditsRemaining || 0} credits remaining.` 
+          });
+        }
       } catch (aiError) {
         console.error('Enhanced AI analysis failed, falling back to comprehensive algorithmic analysis:', aiError);
         
         // Fall back to comprehensive local analysis
         analysisResult = await performComprehensiveAnalysis(cvUpload, jobUpload, finalJobTitle, extractedCompany, uploadedFiles, user?.id!);
+        
+        // Add basic content analysis for consistency
+        analysisResult.contentAnalysis = cvContentAnalysis;
+        analysisResult.qualityFlags = ['Using algorithmic analysis due to AI service unavailability'];
+        analysisResult.confidenceScore = 75; // Default confidence for algorithmic analysis
         
         toast({ 
           title: 'Analysis Complete!', 
@@ -88,6 +116,11 @@ export const useAnalysisExecution = () => {
       
       // Use comprehensive local analysis
       analysisResult = await performComprehensiveAnalysis(cvUpload, jobUpload, finalJobTitle, extractedCompany, uploadedFiles, user?.id!);
+      
+      // Add basic content analysis for consistency
+      analysisResult.contentAnalysis = cvContentAnalysis;
+      analysisResult.qualityFlags = [];
+      analysisResult.confidenceScore = 75; // Default confidence for algorithmic analysis
       
       toast({ 
         title: 'Analysis Complete!', 
@@ -117,7 +150,7 @@ export const useAnalysisExecution = () => {
       ...analysisResult // Include all enhanced data for frontend
     };
 
-    console.log('Enhanced comprehensive analysis completed successfully:', finalResult);
+    console.log('Enhanced comprehensive analysis with quality validation completed successfully:', finalResult);
     return finalResult;
   };
 

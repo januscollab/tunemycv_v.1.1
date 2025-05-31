@@ -224,7 +224,7 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const { cvText, jobDescriptionText, jobTitle, userId }: AnalysisRequest = await req.json();
 
-    console.log('Starting enhanced AI analysis with company intelligence for user:', userId);
+    console.log('Starting enhanced AI analysis with quality validation for user:', userId);
 
     // Check and deduct user credits
     const { data: userCredits, error: creditsError } = await supabase
@@ -240,18 +240,19 @@ serve(async (req) => {
       );
     }
 
-    // Enhanced comprehensive AI prompt with company and industry intelligence
+    // Enhanced comprehensive AI prompt with strict quality requirements
     const prompt = `
-You are a senior career consultant and CV optimization expert with deep knowledge of companies and industries. Analyze the CV against the job description with comprehensive company and industry intelligence.
+You are a senior career consultant with 20+ years of experience and deep knowledge of companies and industries. You must provide EVIDENCE-BASED analysis with ZERO contradictions.
 
-CRITICAL REQUIREMENTS:
-1. Extract and analyze EVERY company mentioned in the CV with industry context
-2. Provide evidence-based analysis - cite specific CV content for ALL claims
-3. NEVER make generic recommendations - all advice must be specific and actionable
-4. Research industry context and company market positions
-5. Ensure score consistency: overall score within 10 points of breakdown average
-6. Flag any contradictions between your analysis and CV content
+STRICT QUALITY REQUIREMENTS:
+1. READ THE ENTIRE CV THOROUGHLY before making ANY claims
+2. EVERY strength/weakness MUST include EXACT CV quotes as evidence
+3. NEVER contradict CV content (e.g., don't claim "lacks telecom experience" if CV shows telecom roles)
+4. NEVER give generic advice like "take courses" or "attend conferences"
+5. ALL recommendations must be SPECIFIC to the candidate's actual background
+6. Flag ANY contradictions between your analysis and CV content
 7. Minimum 20% score unless CV is completely irrelevant
+8. Ensure overall score aligns with breakdown scores (within 15 points)
 
 CV TO ANALYZE:
 ${cvText}
@@ -261,19 +262,14 @@ ${jobDescriptionText}
 
 POSITION: ${jobTitle || 'Not specified'}
 
-COMPANY & INDUSTRY ANALYSIS REQUIREMENTS:
-1. Extract ALL companies from CV with years of experience at each
-2. Research each company's industry, market position, and relevance
-3. Analyze industry progression and transferable knowledge
-4. Assess market knowledge depth and competitive intelligence
-5. Evaluate professional network implications
-6. Consider industry evolution and emerging trends
-
-EVIDENCE REQUIREMENTS:
-- Every strength must include specific CV quotes as evidence
-- Every weakness must cite exact missing elements from CV
-- All recommendations must be based on actual gaps, not assumptions
-- Industry claims must reference specific company experiences
+EVIDENCE VALIDATION CHECKLIST:
+✓ Every strength claim backed by CV quote
+✓ Every weakness verified against CV content
+✓ No contradictions with listed experience
+✓ No generic recommendations
+✓ Industry experience accurately assessed
+✓ Company background properly evaluated
+✓ Score reflects actual content analysis
 
 RESPONSE STRUCTURE - JSON ONLY:
 {
@@ -281,55 +277,55 @@ RESPONSE STRUCTURE - JSON ONLY:
   "companyName": "Company name from job description",
   "position": "Job title",
   "executiveSummary": {
-    "overview": "Evidence-based overview explaining score with specific CV references",
+    "overview": "Evidence-based overview with CV references explaining score",
     "strengths": [
       {
-        "title": "Specific strength based on CV evidence",
+        "title": "Specific strength with evidence",
         "description": "Detailed explanation with company/industry context",
         "relevance": 0-100,
-        "evidence": "Exact quote or reference from CV supporting this claim"
+        "evidence": "EXACT QUOTE from CV proving this strength - MANDATORY"
       }
     ],
     "weaknesses": [
       {
-        "title": "Specific gap identified in CV",
-        "description": "Explanation with evidence of what's missing",
+        "title": "Verified weakness based on CV gaps",
+        "description": "Evidence-based explanation of missing elements",
         "impact": 0-100,
-        "recommendation": "Specific, actionable strategy (not generic advice)",
-        "evidence": "Specific CV content showing this gap"
+        "recommendation": "Specific action based on candidate's background",
+        "evidence": "Specific CV content showing this gap - MANDATORY"
       }
     ]
   },
   "compatibilityBreakdown": {
     "technicalSkills": {
       "score": 0-100,
-      "present": ["Skills with company/context where used"],
-      "missing": ["Specific technical requirements from job description"],
-      "analysis": "Company-contextualized technical skills assessment"
+      "present": ["Skills with CV evidence"],
+      "missing": ["Required skills not found in CV"],
+      "analysis": "Evidence-based technical assessment"
     },
     "experience": {
       "score": 0-100,
-      "relevantExperience": ["Experience with company/industry context"],
-      "missingExperience": ["Specific experience gaps from job description"],
-      "analysis": "Industry-weighted experience analysis"
+      "relevantExperience": ["Experience with CV context"],
+      "missingExperience": ["Required experience not in CV"],
+      "analysis": "Detailed experience evaluation with evidence"
     },
     "education": {
       "score": 0-100,
-      "relevantQualifications": ["Qualifications with relevance context"],
-      "missingQualifications": ["Specific educational requirements missing"],
-      "analysis": "Educational background with industry requirements"
+      "relevantQualifications": ["Education from CV"],
+      "missingQualifications": ["Required education not listed"],
+      "analysis": "Educational background assessment"
     },
     "softSkills": {
       "score": 0-100,
-      "present": ["Soft skills with evidence from CV"],
-      "missing": ["Soft skills required but not demonstrated"],
-      "analysis": "Soft skills assessment with company culture fit"
+      "present": ["Soft skills demonstrated in CV"],
+      "missing": ["Soft skills not evidenced"],
+      "analysis": "Soft skills evaluation with CV evidence"
     },
     "industryKnowledge": {
       "score": 0-100,
-      "present": ["Industry knowledge areas with company evidence"],
-      "missing": ["Industry knowledge gaps for target role"],
-      "analysis": "Deep industry knowledge assessment based on company progression"
+      "present": ["Industry knowledge with CV proof"],
+      "missing": ["Industry gaps not covered in CV"],
+      "analysis": "Industry knowledge assessment with company evidence"
     }
   },
   "keywordAnalysis": {
@@ -338,68 +334,68 @@ RESPONSE STRUCTURE - JSON ONLY:
     "keywordMatchPercentage": 0-100,
     "keywords": [
       {
-        "keyword": "Specific keyword from job description",
+        "keyword": "Specific job requirement keyword",
         "found": true/false,
         "importance": "high/medium/low",
         "occurrences": 0,
-        "context": "Industry/company context for this keyword",
-        "suggestion": "Specific way to incorporate based on candidate's background"
+        "context": "Where/how it appears in CV or job description",
+        "suggestion": "Specific integration strategy based on candidate's experience"
       }
     ]
   },
   "priorityRecommendations": [
     {
-      "title": "Specific, actionable recommendation",
-      "description": "Detailed explanation based on analysis",
+      "title": "Specific actionable recommendation",
+      "description": "Detailed explanation based on CV analysis",
       "priority": "high/medium/low",
-      "impact": "Specific expected outcome",
-      "sampleText": "Industry-specific text example",
-      "specificAction": "Exact steps to implement this recommendation"
+      "impact": "Expected outcome with evidence",
+      "sampleText": "CV-specific text example",
+      "specificAction": "Exact implementation steps"
     }
   ],
   "skillsGapAnalysis": {
     "criticalGaps": [
       {
-        "skill": "Specific skill missing with evidence",
+        "skill": "Missing skill verified against CV",
         "importance": "high/medium/low",
-        "description": "Why this matters for this specific role/company",
-        "bridgingStrategy": "Specific strategy based on candidate's background"
+        "description": "Why critical for this specific role",
+        "bridgingStrategy": "Specific strategy using candidate's background"
       }
     ],
     "developmentAreas": [
       {
-        "area": "Specific development area",
-        "description": "Context-specific development opportunity",
-        "relevance": "Direct relevance to role and industry",
-        "actionPlan": "Specific development plan with timeline"
+        "area": "Development area based on CV analysis",
+        "description": "Context-specific opportunity",
+        "relevance": "Direct relevance to role",
+        "actionPlan": "Specific plan with timeline"
       }
     ]
   },
   "companyIntelligence": {
     "candidateCompanies": [
       {
-        "name": "Company name from CV",
-        "industry": "Specific industry classification",
+        "name": "Company from CV",
+        "industry": "Industry classification",
         "relevance": 0-100,
-        "marketPosition": "Market position and reputation",
-        "industryContext": "How this experience relates to target role"
+        "marketPosition": "Market position assessment",
+        "industryContext": "Relevance to target role"
       }
     ],
-    "industryProgression": "Analysis of candidate's industry journey and trajectory",
-    "marketKnowledge": "Assessment of market knowledge depth across industries",
-    "competitiveAdvantage": "Unique advantages from company/industry background"
+    "industryProgression": "Candidate's industry journey analysis",
+    "marketKnowledge": "Market knowledge depth assessment",
+    "competitiveAdvantage": "Unique advantages from background"
   }
 }
 
-QUALITY CHECKS:
-1. NO generic advice like "take courses" or "attend conferences"
-2. ALL recommendations must be specific to the candidate's background
-3. Evidence field must contain actual CV content
-4. Industry analysis must reference specific companies
-5. Score must reflect actual content analysis, not assumptions
+FINAL VALIDATION:
+- Does every strength have CV evidence?
+- Are there any contradictions with CV content?
+- Is advice specific to this candidate?
+- Does score reflect breakdown averages?
+- Are all claims backed by CV content?
 `;
 
-    console.log('Calling OpenAI API with enhanced company intelligence prompt...');
+    console.log('Calling OpenAI API with enhanced quality validation prompt...');
 
     // Call OpenAI API with retry logic
     let openAIResponse;
@@ -419,7 +415,7 @@ QUALITY CHECKS:
             messages: [
               {
                 role: 'system',
-                content: 'You are a senior career consultant with deep company and industry intelligence. Provide evidence-based analysis only. Every claim must be supported by specific CV content. Never give generic advice. Research companies and industries thoroughly.'
+                content: 'You are a senior career consultant with deep industry knowledge. Provide ONLY evidence-based analysis with exact CV quotes. NEVER contradict CV content. NEVER give generic advice. Every claim must be supported by specific CV evidence.'
               },
               {
                 role: 'user',
@@ -453,14 +449,14 @@ QUALITY CHECKS:
     const openAIData = await openAIResponse.json();
     const aiResponseText = openAIData.choices[0].message.content;
     
-    console.log('Enhanced OpenAI response with company intelligence received, length:', aiResponseText.length);
+    console.log('Enhanced OpenAI response with quality validation received, length:', aiResponseText.length);
 
     // Parse and validate AI response
     let analysisResult: EnhancedAIAnalysisResult;
     try {
       const parsedResult = cleanAndParseJSON(aiResponseText);
       analysisResult = validateEnhancedAnalysisResult(parsedResult);
-      console.log('AI response successfully parsed and validated with company intelligence');
+      console.log('AI response successfully parsed and validated with quality checks');
     } catch (parseError) {
       console.error('Failed to parse/validate AI response:', parseError);
       throw new Error(`Invalid AI response format: ${parseError.message}`);
@@ -476,7 +472,7 @@ QUALITY CHECKS:
       console.error('Failed to update credits:', creditUpdateError);
     }
 
-    console.log('Enhanced AI analysis with company intelligence completed successfully');
+    console.log('Enhanced AI analysis with quality validation completed successfully');
 
     return new Response(
       JSON.stringify({
