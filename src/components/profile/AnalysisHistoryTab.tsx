@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -22,7 +21,12 @@ interface AnalysisResult {
   credit_cost?: number;
 }
 
-const AnalysisHistoryTab: React.FC = () => {
+interface AnalysisHistoryTabProps {
+  credits: number;
+  memberSince: string;
+}
+
+const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ credits, memberSince }) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [analyses, setAnalyses] = useState<AnalysisResult[]>([]);

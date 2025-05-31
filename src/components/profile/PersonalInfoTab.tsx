@@ -1,11 +1,15 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { User, Mail, Lock, Save } from 'lucide-react';
 
-const PersonalInfoTab: React.FC = () => {
+interface PersonalInfoTabProps {
+  credits: number;
+  memberSince: string;
+}
+
+const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince }) => {
   const { user, updatePassword } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
