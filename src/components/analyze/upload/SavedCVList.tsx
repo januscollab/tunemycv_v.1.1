@@ -4,7 +4,7 @@ import { FileText, Check, Upload } from 'lucide-react';
 import { formatFileSize } from '@/utils/fileUtils';
 
 interface CVUpload {
-  id: string;
+  id: number | string; // Handle both UUID types from database
   file_name: string;
   file_size: number;
   created_at: string;
@@ -42,7 +42,7 @@ const SavedCVList: React.FC<SavedCVListProps> = ({ savedCVs, selectedCVId, onCVS
             key={cv.id}
             onClick={() => onCVSelect(cv)}
             className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer transition-colors ${
-              selectedCVId === cv.id
+              String(cv.id) === selectedCVId
                 ? 'border-apricot bg-apricot/10'
                 : 'border-apple-core/20 dark:border-citrus/20 hover:border-apricot hover:bg-apricot/5'
             }`}
@@ -56,7 +56,7 @@ const SavedCVList: React.FC<SavedCVListProps> = ({ savedCVs, selectedCVId, onCVS
                 </p>
               </div>
             </div>
-            {selectedCVId === cv.id && (
+            {String(cv.id) === selectedCVId && (
               <Check className="h-5 w-5 text-apricot flex-shrink-0" />
             )}
           </div>

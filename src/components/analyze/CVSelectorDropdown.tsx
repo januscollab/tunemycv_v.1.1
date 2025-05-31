@@ -3,11 +3,12 @@ import React, { useState } from 'react';
 import { ChevronDown, ChevronUp, FileText, Check } from 'lucide-react';
 
 interface CVUpload {
-  id: string;
+  id: number | string; // Handle both UUID types from database
   file_name: string;
   file_size: number;
   created_at: string;
   extracted_text: string;
+  file_type?: string;
 }
 
 interface CVSelectorDropdownProps {
@@ -25,7 +26,7 @@ const CVSelectorDropdown: React.FC<CVSelectorDropdownProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   
-  const selectedCV = savedCVs.find(cv => cv.id === selectedCVId);
+  const selectedCV = savedCVs.find(cv => String(cv.id) === selectedCVId);
 
   if (savedCVs.length === 0) return null;
 
@@ -63,7 +64,7 @@ const CVSelectorDropdown: React.FC<CVSelectorDropdownProps> = ({
                   setIsOpen(false);
                 }}
                 className={`w-full flex items-center justify-between p-3 text-left hover:bg-apple-core/10 dark:hover:bg-citrus/10 transition-colors ${
-                  selectedCVId === cv.id ? 'bg-apricot/10' : ''
+                  String(cv.id) === selectedCVId ? 'bg-apricot/10' : ''
                 }`}
               >
                 <div className="flex items-center space-x-3">
@@ -75,7 +76,7 @@ const CVSelectorDropdown: React.FC<CVSelectorDropdownProps> = ({
                     </p>
                   </div>
                 </div>
-                {selectedCVId === cv.id && (
+                {String(cv.id) === selectedCVId && (
                   <Check className="h-4 w-4 text-apricot" />
                 )}
               </button>
