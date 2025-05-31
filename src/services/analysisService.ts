@@ -15,6 +15,12 @@ export const saveFilesToDatabase = async (
 ) => {
   console.log('Saving files to database...');
   
+  // Ensure user is authenticated before proceeding
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    throw new Error('User must be authenticated to save files');
+  }
+  
   const { data: cvUpload, error: cvError } = await supabase
     .from('uploads')
     .insert({
@@ -63,6 +69,12 @@ export const performAIAnalysis = async (
 ) => {
   console.log('Attempting enhanced comprehensive AI analysis...');
   
+  // Ensure user is authenticated before proceeding
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    throw new Error('User must be authenticated to perform analysis');
+  }
+  
   const { data: aiResult, error: aiError } = await supabase.functions.invoke('analyze-cv-with-ai', {
     body: {
       cvText: uploadedFiles.cv!.extractedText,
@@ -88,6 +100,12 @@ export const performAIAnalysis = async (
 
 export const saveAnalysisResults = async (analysisData: any) => {
   console.log('Saving enhanced analysis results to database...');
+  
+  // Ensure user is authenticated before proceeding
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    throw new Error('User must be authenticated to save analysis results');
+  }
   
   const { data: analysisResult, error: analysisError } = await supabase
     .from('analysis_results')
@@ -117,3 +135,4 @@ export const saveAnalysisResults = async (analysisData: any) => {
 
   return analysisResult;
 };
+
