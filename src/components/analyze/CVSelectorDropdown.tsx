@@ -1,15 +1,7 @@
 
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp, FileText, Check } from 'lucide-react';
-
-interface CVUpload {
-  id: number | string; // Handle both UUID types from database
-  file_name: string;
-  file_size: number;
-  created_at: string;
-  extracted_text: string;
-  file_type?: string;
-}
+import { CVUpload } from '@/types/cv';
 
 interface CVSelectorDropdownProps {
   savedCVs: CVUpload[];

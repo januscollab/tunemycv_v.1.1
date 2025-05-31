@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import CVSelectorDropdown from './CVSelectorDropdown';
 import FileUploadArea from './upload/FileUploadArea';
+import { CVUpload } from '@/types/cv';
 
 interface UploadedFile {
   file: File;
@@ -72,7 +73,7 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
     }
   };
 
-  const handleSavedCVSelect = (savedCV: any) => {
+  const handleSavedCVSelect = (savedCV: CVUpload) => {
     // Create a File object from saved CV data (don't save as new copy)
     const textFile = new File([savedCV.extracted_text], savedCV.file_name, { 
       type: savedCV.file_type || 'application/pdf' 

@@ -2,14 +2,7 @@
 import React from 'react';
 import { FileText, Check, Upload } from 'lucide-react';
 import { formatFileSize } from '@/utils/fileUtils';
-
-interface CVUpload {
-  id: number | string; // Handle both UUID types from database
-  file_name: string;
-  file_size: number;
-  created_at: string;
-  extracted_text: string;
-}
+import { CVUpload } from '@/types/cv';
 
 interface SavedCVListProps {
   savedCVs: CVUpload[];
