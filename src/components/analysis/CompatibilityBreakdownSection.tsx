@@ -66,7 +66,7 @@ const CompatibilityBreakdownSection: React.FC<CompatibilityBreakdownProps> = ({ 
   return (
     <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
       <div className="flex items-center mb-6">
-        <div className="bg-blue-500 text-white px-3 py-1 rounded text-sm font-medium mr-3">
+        <div className="bg-apricot text-white px-3 py-1 rounded text-sm font-medium mr-3">
           Compatibility Breakdown
         </div>
       </div>

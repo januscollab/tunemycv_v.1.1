@@ -38,6 +38,9 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
   const position = result.position || result.job_title || 'the Position';
   const compatibilityScore = result.compatibilityScore || result.compatibility_score || 0;
 
+  // Extract transaction ID from result
+  const transactionId = result.id || result.analysis_id || 'N/A';
+
   const downloadPDF = () => {
     const pdfGenerator = new PDFGenerator();
     pdfGenerator.generatePDF(result);
@@ -49,10 +52,9 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
         <AnalysisHeader onStartNew={onStartNew} onDownloadPDF={downloadPDF} />
 
         {/* Dynamic heading based on company and position */}
-        <h1 className="text-3xl font-bold text-blueberry dark:text-citrus mb-2">
+        <h1 className="text-3xl font-bold text-blueberry dark:text-citrus mb-8">
           {companyName} - {position}
         </h1>
-        <p className="text-blueberry/70 dark:text-apple-core/80 mb-8">CV Analysis Results</p>
 
         {/* Success Alert */}
         <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-8">
@@ -130,6 +132,18 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
             <LegacyKeywordSection result={result} />
           </div>
         )}
+
+        {/* Transaction ID Note */}
+        <div className="mt-12 mb-8 bg-gray-50 dark:bg-blueberry/10 border border-gray-200 dark:border-citrus/20 rounded-lg p-4">
+          <p className="text-sm text-blueberry/70 dark:text-apple-core/80 text-center">
+            <strong>Note:</strong> While our AI models are well-trained, occasional errors may occur. 
+            If you believe there's an error in your report, please contact us at{' '}
+            <a href="mailto:hello@tunemycv.com" className="text-apricot hover:text-apricot/80 underline">
+              hello@tunemycv.com
+            </a>{' '}
+            and quote transaction ID: <span className="font-mono text-blueberry dark:text-citrus">{transactionId}</span> for investigation.
+          </p>
+        </div>
 
         {/* Next Steps Section */}
         <div className="mt-12">

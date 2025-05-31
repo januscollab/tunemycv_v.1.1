@@ -202,7 +202,7 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
                 maxSize="5MB"
                 label="Upload your CV"
                 currentCVCount={savedCVs.length}
-                maxCVCount={10}
+                maxCVCount={5}
               />
             )}
           </div>

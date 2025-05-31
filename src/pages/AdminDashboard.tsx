@@ -1,8 +1,9 @@
 
 import React, { useState } from 'react';
-import { Users, CreditCard } from 'lucide-react';
+import { Users, CreditCard, FileText } from 'lucide-react';
 import UserManagement from '@/components/admin/UserManagement';
 import CreditManagement from '@/components/admin/CreditManagement';
+import AnalysisLogsManagement from '@/components/admin/AnalysisLogsManagement';
 import AdminNavigation from '@/components/admin/AdminNavigation';
 
 const AdminDashboard = () => {
@@ -14,6 +15,8 @@ const AdminDashboard = () => {
         return <UserManagement />;
       case 'credits':
         return <CreditManagement />;
+      case 'logs':
+        return <AnalysisLogsManagement />;
       default:
         return <UserManagement />;
     }
@@ -48,6 +51,17 @@ const AdminDashboard = () => {
               >
                 <CreditCard className="h-5 w-5 mr-3 text-apricot" />
                 Credit Management
+              </button>
+              <button
+                onClick={() => setActiveTab('logs')}
+                className={`w-full flex items-center px-3 py-2 text-left rounded-md transition-colors ${
+                  activeTab === 'logs'
+                    ? 'bg-citrus/20 text-blueberry border border-citrus/30'
+                    : 'text-blueberry/70 hover:bg-apple-core/20'
+                }`}
+              >
+                <FileText className="h-5 w-5 mr-3 text-apricot" />
+                Analysis Logs
               </button>
             </nav>
           </div>

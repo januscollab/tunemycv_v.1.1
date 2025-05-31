@@ -9,6 +9,82 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      analysis_logs: {
+        Row: {
+          analysis_result_id: string | null
+          cost_estimate: number | null
+          created_at: string
+          cv_upload_id: string | null
+          error_message: string | null
+          id: string
+          job_description_upload_id: string | null
+          openai_model: string
+          processing_time_ms: number | null
+          prompt_text: string
+          response_metadata: Json | null
+          response_text: string
+          status: string
+          tokens_used: number | null
+          user_id: string
+        }
+        Insert: {
+          analysis_result_id?: string | null
+          cost_estimate?: number | null
+          created_at?: string
+          cv_upload_id?: string | null
+          error_message?: string | null
+          id?: string
+          job_description_upload_id?: string | null
+          openai_model?: string
+          processing_time_ms?: number | null
+          prompt_text: string
+          response_metadata?: Json | null
+          response_text: string
+          status?: string
+          tokens_used?: number | null
+          user_id: string
+        }
+        Update: {
+          analysis_result_id?: string | null
+          cost_estimate?: number | null
+          created_at?: string
+          cv_upload_id?: string | null
+          error_message?: string | null
+          id?: string
+          job_description_upload_id?: string | null
+          openai_model?: string
+          processing_time_ms?: number | null
+          prompt_text?: string
+          response_metadata?: Json | null
+          response_text?: string
+          status?: string
+          tokens_used?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analysis_logs_analysis_result_id_fkey"
+            columns: ["analysis_result_id"]
+            isOneToOne: false
+            referencedRelation: "analysis_results"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analysis_logs_cv_upload_id_fkey"
+            columns: ["cv_upload_id"]
+            isOneToOne: false
+            referencedRelation: "uploads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analysis_logs_job_description_upload_id_fkey"
+            columns: ["job_description_upload_id"]
+            isOneToOne: false
+            referencedRelation: "uploads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       analysis_results: {
         Row: {
           company_name: string | null
@@ -215,7 +291,56 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      analysis_logs_with_details: {
+        Row: {
+          analysis_result_id: string | null
+          company_name: string | null
+          compatibility_score: number | null
+          cost_estimate: number | null
+          created_at: string | null
+          cv_file_name: string | null
+          cv_upload_id: string | null
+          error_message: string | null
+          first_name: string | null
+          id: string | null
+          job_description_file_name: string | null
+          job_description_upload_id: string | null
+          job_title: string | null
+          last_name: string | null
+          openai_model: string | null
+          processing_time_ms: number | null
+          prompt_text: string | null
+          response_metadata: Json | null
+          response_text: string | null
+          status: string | null
+          tokens_used: number | null
+          user_email: string | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analysis_logs_analysis_result_id_fkey"
+            columns: ["analysis_result_id"]
+            isOneToOne: false
+            referencedRelation: "analysis_results"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analysis_logs_cv_upload_id_fkey"
+            columns: ["cv_upload_id"]
+            isOneToOne: false
+            referencedRelation: "uploads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analysis_logs_job_description_upload_id_fkey"
+            columns: ["job_description_upload_id"]
+            isOneToOne: false
+            referencedRelation: "uploads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       has_role: {

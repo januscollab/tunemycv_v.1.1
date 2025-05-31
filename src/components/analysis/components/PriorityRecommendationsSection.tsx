@@ -9,7 +9,7 @@ const PriorityRecommendationsSection: React.FC<PriorityRecommendationsSectionPro
   return (
     <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
       <div className="flex items-center mb-6">
-        <div className="bg-blue-500 text-white px-3 py-1 rounded text-sm font-medium mr-3">
+        <div className="bg-apricot text-white px-3 py-1 rounded text-sm font-medium mr-3">
           Priority Recommendations
         </div>
       </div>
@@ -17,7 +17,7 @@ const PriorityRecommendationsSection: React.FC<PriorityRecommendationsSectionPro
         {recommendations.map((rec: any, index: number) => (
           <div key={index} className="border border-apple-core/10 dark:border-citrus/10 rounded-lg p-4">
             <div className="flex items-start mb-3">
-              <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold mr-3 mt-0.5 flex-shrink-0">
+              <div className="w-6 h-6 bg-apricot text-white rounded-full flex items-center justify-center text-xs font-bold mr-3 mt-0.5 flex-shrink-0">
                 {index + 1}
               </div>
               <div className="flex-1">
