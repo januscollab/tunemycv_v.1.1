@@ -3,13 +3,8 @@ import React, { useState } from 'react';
 import { Upload, X, Check } from 'lucide-react';
 import { validateFile, extractTextFromFile } from '@/utils/fileUtils';
 import { useToast } from '@/hooks/use-toast';
+import { UploadedFile } from '@/types/fileTypes';
 import JobDescriptionTextInput from './JobDescriptionTextInput';
-
-interface UploadedFile {
-  file: File;
-  extractedText: string;
-  type: 'job_description';
-}
 
 interface JobDescriptionUploadProps {
   onJobDescriptionSet: (file: UploadedFile) => void;

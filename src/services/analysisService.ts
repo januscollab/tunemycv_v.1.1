@@ -1,12 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { extractJobTitleFromText, extractCompanyFromText } from '@/utils/analysisUtils';
-
-interface UploadedFile {
-  file: File;
-  extractedText: string;
-  type: 'cv' | 'job_description';
-}
+import { UploadedFile } from '@/types/fileTypes';
 
 interface SaveFilesOptions {
   saveCV: boolean;

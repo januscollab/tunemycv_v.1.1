@@ -2,12 +2,7 @@
 import { useToast } from '@/hooks/use-toast';
 import { useAnalysisState } from './useAnalysisState';
 import { useAnalysisExecution } from './analysis/useAnalysisExecution';
-
-interface UploadedFile {
-  file: File;
-  extractedText: string;
-  type: 'cv' | 'job_description';
-}
+import { UploadedFile } from '@/types/fileTypes';
 
 interface AnalysisOptions {
   saveCV: boolean;

@@ -3,12 +3,7 @@ import { useToast } from '@/hooks/use-toast';
 import { extractJobTitleFromText, extractCompanyFromText } from '@/utils/analysisUtils';
 import { saveFilesToDatabase, performAIAnalysis, saveAnalysisResults } from '@/services/analysisService';
 import { performComprehensiveAnalysis } from '@/utils/analysisEngine';
-
-interface UploadedFile {
-  file: File;
-  extractedText: string;
-  type: 'cv' | 'job_description';
-}
+import { UploadedFile } from '@/types/fileTypes';
 
 interface AnalysisOptions {
   saveCV: boolean;

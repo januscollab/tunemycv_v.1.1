@@ -15,12 +15,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { FileText } from 'lucide-react';
 import EmbeddedAuth from '@/components/auth/EmbeddedAuth';
 import ServiceExplanation from '@/components/common/ServiceExplanation';
-
-interface UploadedFile {
-  file: File;
-  extractedText: string;
-  type: 'cv' | 'job_description';
-}
+import { UploadedFile } from '@/types/fileTypes';
 
 const AnalyzeCV = () => {
   const { user } = useAuth();
