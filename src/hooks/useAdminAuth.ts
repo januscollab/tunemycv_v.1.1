@@ -1,15 +1,10 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useDevAuth } from '@/contexts/DevAuthContext';
-import { featureFlags } from '@/config/featureFlags';
 import { supabase } from '@/integrations/supabase/client';
 
 export const useAdminAuth = () => {
-  // Use dev auth if feature flags are enabled, otherwise use regular auth
-  const authHook = (featureFlags.DEV_BYPASS_AUTH || featureFlags.DEV_AUTO_LOGIN) ? useDevAuth : useAuth;
-  const { user } = authHook();
-  
+  const { user } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 

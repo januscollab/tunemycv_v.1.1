@@ -3,8 +3,6 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, FileText, BookOpen, User, Shield, TrendingUp, Edit, Home } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useDevAuth } from '@/contexts/DevAuthContext';
-import { featureFlags } from '@/config/featureFlags';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { useProfileData } from '@/hooks/useProfileData';
 import ThemeToggle from './ThemeToggle';
@@ -15,11 +13,7 @@ import AuthButtons from './navigation/AuthButtons';
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
-  
-  // Use dev auth if feature flags are enabled, otherwise use regular auth
-  const authHook = (featureFlags.DEV_BYPASS_AUTH || featureFlags.DEV_AUTO_LOGIN) ? useDevAuth : useAuth;
-  const { user } = authHook();
-  
+  const { user } = useAuth();
   const { isAdmin } = useAdminAuth();
   const { getUserDisplayName } = useProfileData();
 

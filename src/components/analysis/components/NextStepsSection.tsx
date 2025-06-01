@@ -1,113 +1,69 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileEdit, Search, RotateCcw, Info } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import ConfirmationDialog from '@/components/ui/confirmation-dialog';
+import { RefreshCw, FileText, TrendingUp } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface NextStepsSectionProps {
   onStartNew: () => void;
 }
 
 const NextStepsSection: React.FC<NextStepsSectionProps> = ({ onStartNew }) => {
-  const { toast } = useToast();
-  const [showReviseDialog, setShowReviseDialog] = useState(false);
-  const [showATSDialog, setShowATSDialog] = useState(false);
-
-  const handleReviseCV = () => {
-    setShowReviseDialog(true);
-  };
-
-  const handleOptimizeATS = () => {
-    setShowATSDialog(true);
-  };
-
-  const handleConfirmRevise = () => {
-    setShowReviseDialog(false);
-    toast({
-      title: "Feature Coming Soon",
-      description: "CV Revision feature is currently in development.",
-      duration: 5000,
-    });
-  };
-
-  const handleConfirmATS = () => {
-    setShowATSDialog(false);
-    toast({
-      title: "Feature Coming Soon", 
-      description: "Applicant Tracking System (ATS) Optimization feature is currently in development.",
-      duration: 5000,
-    });
-  };
-
-  const handleAnalyzeAnother = () => {
-    onStartNew();
-  };
-
   return (
-    <>
-      <Card className="bg-white dark:bg-blueberry/20 border border-apple-core/20 dark:border-citrus/20">
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold text-blueberry dark:text-citrus flex items-center">
-            <Info className="h-5 w-5 mr-2" />
-            What's Next?
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid md:grid-cols-3 gap-4">
-            {/* Revise CV Option */}
-            <Button
-              onClick={handleReviseCV}
-              className="w-full h-20 flex flex-col items-center justify-center space-y-2 bg-citrus hover:bg-citrus/90 text-blueberry"
+    <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-8 border border-apple-core/20 dark:border-citrus/20">
+      <h3 className="text-2xl font-semibold text-blueberry dark:text-citrus mb-6">
+        What's Next?
+      </h3>
+      
+      <div className="grid md:grid-cols-3 gap-6">
+        <div className="text-center">
+          <Button 
+            onClick={onStartNew}
+            variant="outline" 
+            size="lg" 
+            className="w-full mb-3 h-12"
+          >
+            <RefreshCw className="h-5 w-5 mr-2" />
+            Analyze Another CV
+          </Button>
+          <p className="text-sm text-blueberry/70 dark:text-apple-core/80">
+            Compare different positions or update your analysis with a revised CV.
+          </p>
+        </div>
+
+        <div className="text-center">
+          <Link to="/cover-letter">
+            <Button 
+              variant="default" 
+              size="lg" 
+              className="w-full mb-3 h-12 bg-apricot hover:bg-apricot/90"
             >
-              <FileEdit className="h-6 w-6" />
-              <span className="font-medium">Let us Revise Your CV</span>
+              <FileText className="h-5 w-5 mr-2" />
+              Generate Cover Letter
             </Button>
+          </Link>
+          <p className="text-sm text-blueberry/70 dark:text-apple-core/80">
+            Create a personalized cover letter based on this analysis.
+          </p>
+        </div>
 
-            {/* ATS Optimization Option */}
-            <Button
-              onClick={handleOptimizeATS}
-              className="w-full h-20 flex flex-col items-center justify-center space-y-2 bg-apple-core hover:bg-apple-core/90 text-blueberry"
+        <div className="text-center">
+          <Link to="/next-steps">
+            <Button 
+              variant="outline" 
+              size="lg" 
+              className="w-full mb-3 h-12"
             >
-              <Search className="h-6 w-6" />
-              <span className="font-medium text-center">Optimize for Applicant Tracking System (ATS)</span>
+              <TrendingUp className="h-5 w-5 mr-2" />
+              Career Guidance
             </Button>
-
-            {/* Analyze Another Role Option */}
-            <Button
-              onClick={handleAnalyzeAnother}
-              className="w-full h-20 flex flex-col items-center justify-center space-y-2 bg-apricot hover:bg-apricot/90 text-white"
-            >
-              <RotateCcw className="h-6 w-6" />
-              <span className="font-medium">Analyse Another Role</span>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Revise CV Confirmation Dialog */}
-      <ConfirmationDialog
-        open={showReviseDialog}
-        onOpenChange={setShowReviseDialog}
-        title="CV Revision Service"
-        description="Our AI will revise your CV to better match the job requirements, improving formatting, content, and keyword optimization."
-        creditCost={1}
-        onConfirm={handleConfirmRevise}
-        onCancel={() => setShowReviseDialog(false)}
-      />
-
-      {/* ATS Optimization Confirmation Dialog */}
-      <ConfirmationDialog
-        open={showATSDialog}
-        onOpenChange={setShowATSDialog}
-        title="Applicant Tracking System (ATS) Optimization"
-        description="We'll optimize your CV to pass through Applicant Tracking Systems used by most companies during initial screening."
-        creditCost={1}
-        onConfirm={handleConfirmATS}
-        onCancel={() => setShowATSDialog(false)}
-      />
-    </>
+          </Link>
+          <p className="text-sm text-blueberry/70 dark:text-apple-core/80">
+            Get personalized career advice and interview preparation tips.
+          </p>
+        </div>
+      </div>
+    </div>
   );
 };
 
