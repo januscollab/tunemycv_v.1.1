@@ -4,7 +4,6 @@ import { Edit3, Save, RotateCcw, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import DownloadOptions from './DownloadOptions';
 
 interface EditableCoverLetterProps {
   content: string;
@@ -52,7 +51,6 @@ const EditableCoverLetter: React.FC<EditableCoverLetterProps> = ({ content, onSa
   };
 
   const characterCount = editedContent.length;
-  const fileName = `cover-letter-${new Date().toISOString().split('T')[0]}`;
 
   return (
     <div className="space-y-4">
@@ -75,29 +73,24 @@ const EditableCoverLetter: React.FC<EditableCoverLetterProps> = ({ content, onSa
           )}
         </div>
 
-        <div className="flex items-center space-x-2">
-          {isEditing && (
-            <>
-              <span className="text-sm text-gray-500">
-                {characterCount} characters
-              </span>
-              {hasUnsavedChanges && (
-                <>
-                  <Button variant="outline" size="sm" onClick={handleCancel}>
-                    Cancel
-                  </Button>
-                  <Button size="sm" onClick={handleSave}>
-                    <Save className="h-4 w-4 mr-1" />
-                    Save Changes
-                  </Button>
-                </>
-              )}
-            </>
-          )}
-          {!isEditing && (
-            <DownloadOptions content={editedContent} fileName={fileName} />
-          )}
-        </div>
+        {isEditing && (
+          <div className="flex items-center space-x-2">
+            <span className="text-sm text-gray-500">
+              {characterCount} characters
+            </span>
+            {hasUnsavedChanges && (
+              <>
+                <Button variant="outline" size="sm" onClick={handleCancel}>
+                  Cancel
+                </Button>
+                <Button size="sm" onClick={handleSave}>
+                  <Save className="h-4 w-4 mr-1" />
+                  Save Changes
+                </Button>
+              </>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
