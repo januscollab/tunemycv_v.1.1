@@ -25,19 +25,56 @@ interface RegenerateCoverLetterParams {
   length: string;
 }
 
+interface GeneratedLetter {
+  id: string;
+  content: string;
+  job_title: string;
+  company_name: string;
+  regeneration_count?: number;
+}
+
 export const useCoverLetter = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isRegenerating, setIsRegenerating] = useState(false);
+  const [generatedLetter, setGeneratedLetter] = useState<GeneratedLetter | null>(null);
   const { toast } = useToast();
 
-  const generateCoverLetter = async (params: GenerateCoverLetterParams) => {
+  const generateCoverLetter = async (analysisResultId: string, tone: string, additionalInfo: string = '') => {
     setIsGenerating(true);
     try {
+      // Get analysis data
+      const { data: analysisData, error: analysisError } = await supabase
+        .from('analysis_results')
+        .select('*')
+        .eq('id', analysisResultId)
+        .single();
+
+      if (analysisError) throw analysisError;
+
+      // Generate cover letter using analysis data
       const { data, error } = await supabase.functions.invoke('generate-cover-letter', {
-        body: params
+        body: {
+          jobTitle: analysisData.job_title,
+          companyName: analysisData.company_name,
+          jobDescription: analysisData.job_description_extracted_text,
+          cvText: analysisData.cv_extracted_text,
+          tone: tone,
+          length: 'medium',
+          analysisResultId: analysisResultId
+        }
       });
 
       if (error) throw error;
+
+      const newLetter: GeneratedLetter = {
+        id: data.id,
+        content: data.content,
+        job_title: analysisData.job_title,
+        company_name: analysisData.company_name,
+        regeneration_count: 0
+      };
+
+      setGeneratedLetter(newLetter);
 
       toast({
         title: 'Cover Letter Generated!',
@@ -58,60 +95,14 @@ export const useCoverLetter = () => {
     }
   };
 
-  const generateFromAnalysis = async (params: GenerateFromAnalysisParams) => {
-    setIsGenerating(true);
-    try {
-      // Get analysis data
-      const { data: analysisData, error: analysisError } = await supabase
-        .from('analysis_results')
-        .select('*')
-        .eq('id', params.analysisResultId)
-        .single();
-
-      if (analysisError) throw analysisError;
-
-      // Generate cover letter using analysis data
-      const { data, error } = await supabase.functions.invoke('generate-cover-letter', {
-        body: {
-          jobTitle: analysisData.job_title,
-          companyName: analysisData.company_name,
-          jobDescription: analysisData.job_description_extracted_text,
-          cvText: analysisData.cv_extracted_text,
-          tone: params.tone,
-          length: params.length,
-          analysisResultId: params.analysisResultId
-        }
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: 'Cover Letter Generated!',
-        description: 'Your cover letter has been created from your analysis.',
-      });
-
-      return data;
-    } catch (error: any) {
-      console.error('Cover letter generation from analysis error:', error);
-      toast({
-        title: 'Generation Failed',
-        description: error.message || 'Failed to generate cover letter from analysis. Please try again.',
-        variant: 'destructive',
-      });
-      throw error;
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
-  const regenerateCoverLetter = async (params: RegenerateCoverLetterParams) => {
+  const regenerateCoverLetter = async (coverLetterId: string, tone: string, additionalInfo: string = '') => {
     setIsRegenerating(true);
     try {
       // Get the original cover letter data
       const { data: originalData, error: fetchError } = await supabase
         .from('cover_letters')
         .select('*')
-        .eq('id', params.coverLetterId)
+        .eq('id', coverLetterId)
         .single();
 
       if (fetchError) throw fetchError;
@@ -137,8 +128,8 @@ export const useCoverLetter = () => {
         body: {
           jobTitle: originalData.job_title,
           companyName: originalData.company_name,
-          tone: params.tone,
-          length: params.length,
+          tone: tone,
+          length: 'medium',
           analysisResultId: originalData.analysis_result_id
         }
       });
@@ -148,23 +139,33 @@ export const useCoverLetter = () => {
       // Safely handle generation_parameters - ensure it's an object and cast to Json
       const existingParams = originalData.generation_parameters || {};
       const updatedParams = typeof existingParams === 'object' && existingParams !== null 
-        ? { ...existingParams as Record<string, any>, length: params.length, tone: params.tone }
-        : { length: params.length, tone: params.tone };
+        ? { ...existingParams as Record<string, any>, length: 'medium', tone: tone }
+        : { length: 'medium', tone: tone };
 
       // Update the original cover letter with new content and increment regeneration count
       const { error: updateError } = await supabase
         .from('cover_letters')
         .update({
           content: data.content,
-          template_id: params.tone,
+          template_id: tone,
           generation_parameters: updatedParams as any,
           regeneration_count: originalData.regeneration_count + 1,
           credits_used: originalData.credits_used + (isFreeregeneration ? 0 : 1),
           updated_at: new Date().toISOString()
         })
-        .eq('id', params.coverLetterId);
+        .eq('id', coverLetterId);
 
       if (updateError) throw updateError;
+
+      const updatedLetter: GeneratedLetter = {
+        id: coverLetterId,
+        content: data.content,
+        job_title: originalData.job_title,
+        company_name: originalData.company_name,
+        regeneration_count: originalData.regeneration_count + 1
+      };
+
+      setGeneratedLetter(updatedLetter);
 
       toast({
         title: 'Cover Letter Regenerated!',
@@ -175,7 +176,7 @@ export const useCoverLetter = () => {
 
       return { 
         content: data.content, 
-        id: params.coverLetterId,
+        id: coverLetterId,
         regeneration_count: originalData.regeneration_count + 1
       };
     } catch (error: any) {
@@ -188,6 +189,39 @@ export const useCoverLetter = () => {
       throw error;
     } finally {
       setIsRegenerating(false);
+    }
+  };
+
+  const downloadCoverLetter = async (coverLetterId: string) => {
+    try {
+      if (!generatedLetter) {
+        throw new Error('No cover letter to download');
+      }
+
+      // Create a simple text file download
+      const content = generatedLetter.content;
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `cover-letter-${generatedLetter.job_title}-${generatedLetter.company_name}.txt`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast({
+        title: 'Download Complete',
+        description: 'Cover letter has been downloaded.',
+      });
+    } catch (error: any) {
+      console.error('Download error:', error);
+      toast({
+        title: 'Download Failed',
+        description: error.message || 'Failed to download cover letter.',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -224,10 +258,12 @@ export const useCoverLetter = () => {
 
   return {
     generateCoverLetter,
-    generateFromAnalysis,
     regenerateCoverLetter,
+    downloadCoverLetter,
     getCoverLetters,
     deleteCoverLetter,
+    generating: isGenerating,
+    generatedLetter,
     isGenerating,
     isRegenerating
   };
