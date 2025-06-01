@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -58,11 +59,7 @@ const App: React.FC = () => {
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/auth" element={<Auth />} />
-                  <Route path="/analyze" element={
-                    <ProtectedRoute>
-                      <AnalyzeCV />
-                    </ProtectedRoute>
-                  } />
+                  <Route path="/analyze" element={<AnalyzeCV />} />
                   <Route path="/next-steps" element={
                     <ProtectedRoute>
                       <NextSteps />

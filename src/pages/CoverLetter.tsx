@@ -187,20 +187,28 @@ const CoverLetter = () => {
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-apple-core/20 via-white to-citrus/10 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
-        <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <ServiceExplanation
-            title={coverLetterExplanation.title}
-            subtitle={coverLetterExplanation.subtitle}
-            benefits={coverLetterExplanation.benefits}
-            features={coverLetterExplanation.features}
-            icon={<FileText className="h-8 w-8 text-apricot" />}
-            compact={true}
-          />
-          <EmbeddedAuth
-            title="Login to Get Started"
-            description="Cover letter generation requires an account to ensure personalized results and save your work."
-            icon={<FileText className="h-6 w-6 text-apricot mr-2" />}
-          />
+        <div className="max-w-7xl mx-auto px-4 py-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-[600px]">
+            <div className="flex items-center">
+              <ServiceExplanation
+                title={coverLetterExplanation.title}
+                subtitle={coverLetterExplanation.subtitle}
+                benefits={coverLetterExplanation.benefits}
+                features={coverLetterExplanation.features}
+                icon={<FileText className="h-8 w-8 text-apricot" />}
+                compact={true}
+              />
+            </div>
+            <div className="flex items-center">
+              <div className="w-full">
+                <EmbeddedAuth
+                  title="Login to Get Started"
+                  description="Cover letter generation requires an account to ensure personalized results and save your work."
+                  icon={<FileText className="h-6 w-6 text-apricot mr-2" />}
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
