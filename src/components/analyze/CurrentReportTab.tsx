@@ -20,6 +20,7 @@ const CurrentReportTab: React.FC<CurrentReportTabProps> = ({
           </h3>
           <p className="text-blueberry/70 dark:text-apple-core/80 mb-6">
             You haven't generated any analysis yet, or no analysis is currently selected from your history.
+            Use the CV Analysis tab to create a new analysis or select one from your Analysis History.
           </p>
           <button
             onClick={onStartNew}
@@ -34,6 +35,24 @@ const CurrentReportTab: React.FC<CurrentReportTabProps> = ({
 
   return (
     <div>
+      <div className="mb-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mb-1">
+              Analysis Report
+            </h3>
+            <p className="text-sm text-blueberry/70 dark:text-apple-core/80">
+              {analysisResult.id ? 'Viewing analysis from history' : 'Current analysis results'}
+            </p>
+          </div>
+          <button
+            onClick={onStartNew}
+            className="bg-blueberry/10 hover:bg-blueberry/20 text-blueberry dark:bg-citrus/10 dark:hover:bg-citrus/20 dark:text-citrus px-4 py-2 rounded-md text-sm font-medium transition-colors"
+          >
+            Start New Analysis
+          </button>
+        </div>
+      </div>
       <AnalysisResults result={analysisResult} onStartNew={onStartNew} />
     </div>
   );

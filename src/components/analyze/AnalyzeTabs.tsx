@@ -46,18 +46,38 @@ const AnalyzeTabs: React.FC<AnalyzeTabsProps> = ({
     setActiveTab('report');
   };
 
+  const handleStartNew = () => {
+    setSelectedHistoryAnalysis(null);
+    onStartNew();
+    setActiveTab('analysis');
+  };
+
   const getCurrentReportData = () => {
+    // Priority: Selected history analysis > Current analysis result
     if (selectedHistoryAnalysis) {
       return selectedHistoryAnalysis;
     }
     return analysisResult;
   };
 
+  // Auto-switch to report tab when new analysis is completed
+  React.useEffect(() => {
+    if (analysisResult && !analyzing && activeTab === 'analysis') {
+      setSelectedHistoryAnalysis(null); // Clear any previously selected history
+      setActiveTab('report');
+    }
+  }, [analysisResult, analyzing, activeTab]);
+
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
       <TabsList className="grid w-full grid-cols-3">
         <TabsTrigger value="analysis">CV Analysis</TabsTrigger>
-        <TabsTrigger value="report">Current Report</TabsTrigger>
+        <TabsTrigger value="report" className="relative">
+          Current Report
+          {(getCurrentReportData()) && (
+            <span className="absolute -top-1 -right-1 h-3 w-3 bg-apricot rounded-full"></span>
+          )}
+        </TabsTrigger>
         <TabsTrigger value="history">Analysis History</TabsTrigger>
       </TabsList>
 
@@ -79,11 +99,7 @@ const AnalyzeTabs: React.FC<AnalyzeTabsProps> = ({
       <TabsContent value="report" className="mt-6">
         <CurrentReportTab
           analysisResult={getCurrentReportData()}
-          onStartNew={() => {
-            setSelectedHistoryAnalysis(null);
-            onStartNew();
-            setActiveTab('analysis');
-          }}
+          onStartNew={handleStartNew}
         />
       </TabsContent>
 
