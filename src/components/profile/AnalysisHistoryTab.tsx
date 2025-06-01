@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -19,6 +20,8 @@ interface AnalysisResult {
   weaknesses: string[];
   recommendations: string[];
   credit_cost?: number;
+  cv_file_name?: string; // New field from database enhancement
+  cv_file_size?: number; // New field from database enhancement
 }
 
 interface AnalysisHistoryTabProps {
@@ -48,7 +51,7 @@ const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ credits, member
 
   const loadAnalysisHistory = async () => {
     try {
-      // Changed from inner join to left join to include all analysis results
+      // Updated query to use new CV metadata fields and left join for cost estimate
       const { data, error } = await supabase
         .from('analysis_results')
         .select(`

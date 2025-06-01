@@ -8,12 +8,20 @@ interface UploadedFile {
   type: 'cv' | 'job_description';
 }
 
+interface SaveFilesOptions {
+  saveCV: boolean;
+  saveJobDescription: boolean;
+  cvSource: 'new' | 'saved';
+  existingCVId?: string;
+}
+
 export const saveFilesToDatabase = async (
   uploadedFiles: { cv?: UploadedFile; jobDescription?: UploadedFile },
   finalJobTitle: string,
-  userId: string
+  userId: string,
+  options: SaveFilesOptions
 ) => {
-  console.log('Saving files to database...');
+  console.log('Saving files to database with options:', options);
   
   // Ensure user is authenticated before proceeding
   const { data: { user } } = await supabase.auth.getUser();
@@ -21,42 +29,65 @@ export const saveFilesToDatabase = async (
     throw new Error('User must be authenticated to save files');
   }
   
-  const { data: cvUpload, error: cvError } = await supabase
-    .from('uploads')
-    .insert({
-      user_id: userId,
-      file_name: uploadedFiles.cv!.file.name,
-      file_type: uploadedFiles.cv!.file.type,
-      file_size: uploadedFiles.cv!.file.size,
-      upload_type: 'cv',
-      extracted_text: uploadedFiles.cv!.extractedText,
-      job_title: finalJobTitle
-    })
-    .select()
-    .single();
+  let cvUpload = null;
+  let jobUpload = null;
 
-  if (cvError) {
-    console.error('CV upload error:', cvError);
-    throw cvError;
+  // Handle CV saving based on source and user preference
+  if (options.cvSource === 'saved' && options.existingCVId) {
+    // Use existing saved CV
+    const { data: existingCV, error: cvFetchError } = await supabase
+      .from('uploads')
+      .select('*')
+      .eq('id', options.existingCVId)
+      .eq('user_id', userId)
+      .single();
+
+    if (cvFetchError) throw cvFetchError;
+    cvUpload = existingCV;
+  } else if (options.saveCV && uploadedFiles.cv) {
+    // Save new CV if user chose to save it
+    const { data, error: cvError } = await supabase
+      .from('uploads')
+      .insert({
+        user_id: userId,
+        file_name: uploadedFiles.cv.file.name,
+        file_type: uploadedFiles.cv.file.type,
+        file_size: uploadedFiles.cv.file.size,
+        upload_type: 'cv',
+        extracted_text: uploadedFiles.cv.extractedText,
+        job_title: finalJobTitle
+      })
+      .select()
+      .single();
+
+    if (cvError) {
+      console.error('CV upload error:', cvError);
+      throw cvError;
+    }
+    cvUpload = data;
   }
 
-  const { data: jobUpload, error: jobError } = await supabase
-    .from('uploads')
-    .insert({
-      user_id: userId,
-      file_name: uploadedFiles.jobDescription!.file.name,
-      file_type: uploadedFiles.jobDescription!.file.type,
-      file_size: uploadedFiles.jobDescription!.file.size,
-      upload_type: 'job_description',
-      extracted_text: uploadedFiles.jobDescription!.extractedText,
-      job_title: finalJobTitle
-    })
-    .select()
-    .single();
+  // Handle job description saving
+  if (options.saveJobDescription && uploadedFiles.jobDescription) {
+    const { data, error: jobError } = await supabase
+      .from('uploads')
+      .insert({
+        user_id: userId,
+        file_name: uploadedFiles.jobDescription.file.name,
+        file_type: uploadedFiles.jobDescription.file.type,
+        file_size: uploadedFiles.jobDescription.file.size,
+        upload_type: 'job_description',
+        extracted_text: uploadedFiles.jobDescription.extractedText,
+        job_title: finalJobTitle
+      })
+      .select()
+      .single();
 
-  if (jobError) {
-    console.error('Job description upload error:', jobError);
-    throw jobError;
+    if (jobError) {
+      console.error('Job description upload error:', jobError);
+      throw jobError;
+    }
+    jobUpload = data;
   }
 
   return { cvUpload, jobUpload };
@@ -135,4 +166,3 @@ export const saveAnalysisResults = async (analysisData: any) => {
 
   return analysisResult;
 };
-

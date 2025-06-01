@@ -90,7 +90,10 @@ export type Database = {
           company_name: string | null
           compatibility_score: number
           created_at: string | null
-          cv_upload_id: string
+          cv_extracted_text: string | null
+          cv_file_name: string | null
+          cv_file_size: number | null
+          cv_upload_id: string | null
           executive_summary: string | null
           id: string
           job_description_upload_id: string
@@ -106,7 +109,10 @@ export type Database = {
           company_name?: string | null
           compatibility_score: number
           created_at?: string | null
-          cv_upload_id: string
+          cv_extracted_text?: string | null
+          cv_file_name?: string | null
+          cv_file_size?: number | null
+          cv_upload_id?: string | null
           executive_summary?: string | null
           id?: string
           job_description_upload_id: string
@@ -122,7 +128,10 @@ export type Database = {
           company_name?: string | null
           compatibility_score?: number
           created_at?: string | null
-          cv_upload_id?: string
+          cv_extracted_text?: string | null
+          cv_file_name?: string | null
+          cv_file_size?: number | null
+          cv_upload_id?: string | null
           executive_summary?: string | null
           id?: string
           job_description_upload_id?: string
