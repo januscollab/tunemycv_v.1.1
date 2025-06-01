@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -5,14 +6,14 @@ import { validateFile, extractTextFromFile } from '@/utils/fileUtils';
 import { extractJobTitleFromText } from '@/utils/analysisUtils';
 import AnalysisResults from '@/components/analysis/AnalysisResults';
 import CVSelector from '@/components/analyze/CVSelector';
-import JobDescriptionTextInput from '@/components/analyze/JobDescriptionTextInput';
+import JobDescriptionUpload from '@/components/analyze/JobDescriptionUpload';
 import CreditsPanel from '@/components/analyze/CreditsPanel';
 import AnalyzeButton from '@/components/analyze/AnalyzeButton';
 import { useAnalysis } from '@/hooks/useAnalysis';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Upload, FileText, X, Check } from 'lucide-react';
-import AuthSidebar from '@/components/auth/AuthSidebar';
+import { FileText } from 'lucide-react';
+import EmbeddedAuth from '@/components/auth/EmbeddedAuth';
 import ServiceExplanation from '@/components/common/ServiceExplanation';
 
 interface UploadedFile {
@@ -80,9 +81,6 @@ const AnalyzeCV = () => {
     enabled: !!user?.id,
   });
 
-  const jobDescTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
-  const maxSize = 5 * 1024 * 1024; // 5MB
-
   const handleCVSelect = (uploadedFile: UploadedFile) => {
     setUploadedFiles(prev => ({
       ...prev,
@@ -91,56 +89,7 @@ const AnalyzeCV = () => {
     toast({ title: 'Success', description: 'CV selected successfully!' });
   };
 
-  const handleFileUpload = async (file: File, type: 'job_description') => {
-    const errors = validateFile(file, jobDescTypes, maxSize);
-    
-    if (errors.length > 0) {
-      toast({ title: 'Upload Error', description: errors.join('. '), variant: 'destructive' });
-      return;
-    }
-
-    try {
-      setUploading(true);
-      const extractedText = await extractTextFromFile(file);
-      
-      const uploadedFile: UploadedFile = {
-        file,
-        extractedText,
-        type
-      };
-
-      setUploadedFiles(prev => ({
-        ...prev,
-        jobDescription: uploadedFile
-      }));
-
-      // Auto-extract job title from job description
-      if (!jobTitle) {
-        const extractedJobTitle = extractJobTitleFromText(extractedText);
-        setJobTitle(extractedJobTitle);
-      }
-
-      toast({ title: 'Success', description: 'Job description uploaded successfully!' });
-    } catch (error) {
-      toast({ title: 'Error', description: 'Failed to process file', variant: 'destructive' });
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const handleJobDescriptionText = (text: string) => {
-    if (!text.trim()) {
-      toast({ title: 'Error', description: 'Please enter job description text', variant: 'destructive' });
-      return;
-    }
-
-    const textFile = new File([text], 'job-description.txt', { type: 'text/plain' });
-    const uploadedFile: UploadedFile = {
-      file: textFile,
-      extractedText: text,
-      type: 'job_description'
-    };
-
+  const handleJobDescriptionSet = (uploadedFile: UploadedFile) => {
     setUploadedFiles(prev => ({
       ...prev,
       jobDescription: uploadedFile
@@ -148,19 +97,9 @@ const AnalyzeCV = () => {
 
     // Auto-extract job title from job description
     if (!jobTitle) {
-      const extractedJobTitle = extractJobTitleFromText(text);
+      const extractedJobTitle = extractJobTitleFromText(uploadedFile.extractedText);
       setJobTitle(extractedJobTitle);
     }
-
-    toast({ title: 'Success', description: 'Job description added successfully!' });
-  };
-
-  const removeFile = (type: 'cv' | 'jobDescription') => {
-    setUploadedFiles(prev => {
-      const updated = { ...prev };
-      delete updated[type];
-      return updated;
-    });
   };
 
   const handleAnalysis = () => {
@@ -196,17 +135,12 @@ const AnalyzeCV = () => {
       benefits: [
         'Advanced AI-powered analysis that evaluates your CV against specific job requirements',
         'Detailed compatibility scoring to understand how well you match the role',
-        'Keyword optimization recommendations to improve ATS (Applicant Tracking System) compatibility',
-        'Personalized suggestions to strengthen weak areas and highlight your best qualifications',
-        'Professional insights based on industry best practices and hiring manager preferences',
-        'Comprehensive feedback to help you stand out from other candidates'
+        'Keyword optimization recommendations to improve ATS (Applicant Tracking System) compatibility'
       ],
       features: [
         'Upload your CV in PDF, DOCX, or TXT format for instant analysis',
         'Paste or upload the job description you\'re targeting',
-        'Our AI analyzes compatibility, keywords, and alignment between your experience and the role',
-        'Receive detailed recommendations, compatibility scores, and actionable next steps',
-        'Download your analysis report and implement suggested improvements'
+        'Our AI analyzes compatibility, keywords, and alignment between your experience and the role'
       ]
     };
 
@@ -219,8 +153,9 @@ const AnalyzeCV = () => {
             benefits={analyzeExplanation.benefits}
             features={analyzeExplanation.features}
             icon={<FileText className="h-8 w-8 text-apricot" />}
+            compact={true}
           />
-          <AuthSidebar
+          <EmbeddedAuth
             title="Get Started"
             description="CV analysis requires an account to ensure personalized results and save your analysis history."
             icon={<FileText className="h-6 w-6 text-apricot mr-2" />}
@@ -283,48 +218,11 @@ const AnalyzeCV = () => {
               <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-4">Job Description</h3>
               <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mb-4">Upload a file (PDF, DOCX, TXT) or paste the text directly</p>
               
-              <div className="space-y-4">
-                {!uploadedFiles.jobDescription ? (
-                  <>
-                    {/* File Upload Option */}
-                    <div className="border-2 border-dashed border-apple-core/30 dark:border-citrus/30 rounded-lg p-6 text-center">
-                      <Upload className="mx-auto h-8 w-8 text-blueberry/60 dark:text-apple-core/60 mb-2" />
-                      <label className="cursor-pointer">
-                        <span className="text-apricot hover:text-apricot/80 font-medium">Upload Job Description</span>
-                        <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mt-1">PDF, DOCX, TXT - max 5MB</p>
-                        <input
-                          type="file"
-                          className="hidden"
-                          accept=".pdf,.docx,.txt"
-                          onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0], 'job_description')}
-                          disabled={uploading || analyzing}
-                        />
-                      </label>
-                    </div>
-                    
-                    <div className="text-center text-blueberry/60 dark:text-apple-core/60">or</div>
-                    
-                    <JobDescriptionTextInput onSubmit={handleJobDescriptionText} disabled={uploading || analyzing} />
-                  </>
-                ) : (
-                  <div className="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
-                    <div className="flex items-center space-x-3">
-                      <Check className="h-5 w-5 text-green-600" />
-                      <div>
-                        <p className="font-medium text-green-900">{uploadedFiles.jobDescription.file.name}</p>
-                        <p className="text-sm text-green-700">Job description ready</p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => removeFile('jobDescription')}
-                      className="p-2 text-red-600 hover:bg-red-100 rounded-md"
-                      disabled={analyzing}
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </div>
-                )}
-              </div>
+              <JobDescriptionUpload
+                onJobDescriptionSet={handleJobDescriptionSet}
+                uploadedFile={uploadedFiles.jobDescription}
+                disabled={uploading || analyzing}
+              />
             </div>
 
             {/* Analyze Button */}

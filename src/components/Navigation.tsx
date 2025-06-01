@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, FileText, BookOpen, User, Shield, TrendingUp, Edit } from 'lucide-react';
+import { Menu, X, FileText, BookOpen, User, Shield, TrendingUp, Edit, Home } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { useProfileData } from '@/hooks/useProfileData';
@@ -19,23 +19,22 @@ const Navigation = () => {
 
   const isActive = (path: string) => location.pathname === path;
 
-  const baseNavItems = [
+  // Different navigation items based on auth state
+  const loggedInNavItems = [
     { path: '/analyze', label: 'Analyze CV', icon: FileText },
     { path: '/cover-letter', label: 'Cover Letter', icon: Edit },
-  ];
-
-  // Add conditional navigation items based on auth state
-  const conditionalNavItems = user 
-    ? [
-        { path: '/next-steps', label: 'Next Steps', icon: TrendingUp }
-      ]
-    : [];
-
-  const navItems = [
-    ...baseNavItems,
-    ...conditionalNavItems,
+    { path: '/next-steps', label: 'Next Steps', icon: TrendingUp },
     { path: '/resources', label: 'Resources', icon: BookOpen },
   ];
+
+  const loggedOutNavItems = [
+    { path: '/', label: 'Home', icon: Home },
+    { path: '/analyze', label: 'Analyze CV', icon: FileText },
+    { path: '/cover-letter', label: 'Cover Letter', icon: Edit },
+    { path: '/resources', label: 'Resources', icon: BookOpen },
+  ];
+
+  const navItems = user ? loggedInNavItems : loggedOutNavItems;
 
   return (
     <nav className="bg-white dark:bg-blueberry shadow-sm border-b border-apple-core/30 dark:border-citrus/20">

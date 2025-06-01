@@ -9,6 +9,7 @@ interface ServiceExplanationProps {
   benefits: string[];
   features: string[];
   icon?: React.ReactNode;
+  compact?: boolean;
 }
 
 const ServiceExplanation: React.FC<ServiceExplanationProps> = ({
@@ -16,7 +17,8 @@ const ServiceExplanation: React.FC<ServiceExplanationProps> = ({
   subtitle,
   benefits,
   features,
-  icon
+  icon,
+  compact = false
 }) => {
   return (
     <div className="lg:col-span-2 space-y-6">
@@ -38,7 +40,7 @@ const ServiceExplanation: React.FC<ServiceExplanationProps> = ({
           <div>
             <h3 className="text-base font-semibold text-blueberry dark:text-citrus mb-2">Key Benefits</h3>
             <ul className="space-y-1">
-              {benefits.map((benefit, index) => (
+              {(compact ? benefits.slice(0, 3) : benefits).map((benefit, index) => (
                 <li key={index} className="flex items-start space-x-2">
                   <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
                   <span className="text-sm text-blueberry/80 dark:text-apple-core/80">{benefit}</span>
@@ -50,7 +52,7 @@ const ServiceExplanation: React.FC<ServiceExplanationProps> = ({
           <div>
             <h3 className="text-base font-semibold text-blueberry dark:text-citrus mb-2">How It Works</h3>
             <div className="space-y-2">
-              {features.map((feature, index) => (
+              {(compact ? features.slice(0, 3) : features).map((feature, index) => (
                 <div key={index} className="flex items-start space-x-2">
                   <div className="bg-apricot text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium flex-shrink-0">
                     {index + 1}

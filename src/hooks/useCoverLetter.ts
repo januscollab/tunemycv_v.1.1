@@ -13,6 +13,12 @@ interface GenerateCoverLetterParams {
   analysisResultId?: string;
 }
 
+interface GenerateFromAnalysisParams {
+  analysisResultId: string;
+  tone: string;
+  length: string;
+}
+
 interface RegenerateCoverLetterParams {
   coverLetterId: string;
   tone: string;
@@ -44,6 +50,52 @@ export const useCoverLetter = () => {
       toast({
         title: 'Generation Failed',
         description: error.message || 'Failed to generate cover letter. Please try again.',
+        variant: 'destructive',
+      });
+      throw error;
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const generateFromAnalysis = async (params: GenerateFromAnalysisParams) => {
+    setIsGenerating(true);
+    try {
+      // Get analysis data
+      const { data: analysisData, error: analysisError } = await supabase
+        .from('analysis_results')
+        .select('*')
+        .eq('id', params.analysisResultId)
+        .single();
+
+      if (analysisError) throw analysisError;
+
+      // Generate cover letter using analysis data
+      const { data, error } = await supabase.functions.invoke('generate-cover-letter', {
+        body: {
+          jobTitle: analysisData.job_title,
+          companyName: analysisData.company_name,
+          jobDescription: analysisData.job_description_extracted_text,
+          cvText: analysisData.cv_extracted_text,
+          tone: params.tone,
+          length: params.length,
+          analysisResultId: params.analysisResultId
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: 'Cover Letter Generated!',
+        description: 'Your cover letter has been created from your analysis.',
+      });
+
+      return data;
+    } catch (error: any) {
+      console.error('Cover letter generation from analysis error:', error);
+      toast({
+        title: 'Generation Failed',
+        description: error.message || 'Failed to generate cover letter from analysis. Please try again.',
         variant: 'destructive',
       });
       throw error;
@@ -172,6 +224,7 @@ export const useCoverLetter = () => {
 
   return {
     generateCoverLetter,
+    generateFromAnalysis,
     regenerateCoverLetter,
     getCoverLetters,
     deleteCoverLetter,
