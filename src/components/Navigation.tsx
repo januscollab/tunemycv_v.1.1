@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, FileText, Target, BookOpen, User, Shield } from 'lucide-react';
+import { Menu, X, FileText, Target, BookOpen, User, Shield, TrendingUp, Edit } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { useProfileData } from '@/hooks/useProfileData';
@@ -19,9 +19,19 @@ const Navigation = () => {
 
   const isActive = (path: string) => location.pathname === path;
 
-  const navItems = [
+  const baseNavItems = [
     { path: '/', label: 'Home', icon: Target },
     { path: '/analyze', label: 'Analyze CV', icon: FileText },
+  ];
+
+  // Add conditional navigation items based on auth state
+  const conditionalNavItems = user 
+    ? [{ path: '/next-steps', label: 'Next Steps', icon: TrendingUp }]
+    : [{ path: '/cover-letter', label: 'Create Cover Letter', icon: Edit }];
+
+  const navItems = [
+    ...baseNavItems,
+    ...conditionalNavItems,
     { path: '/resources', label: 'Resources', icon: BookOpen },
   ];
 
@@ -121,9 +131,6 @@ const Navigation = () => {
               
               {user ? (
                 <>
-                  <div className="px-3 py-2 text-sm text-blueberry dark:text-apple-core">
-                    Welcome, {getUserDisplayName()}
-                  </div>
                   {isAdmin && (
                     <Link
                       to="/admin"

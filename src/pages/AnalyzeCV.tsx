@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -163,7 +162,15 @@ const AnalyzeCV = () => {
   };
 
   const handleAnalysis = () => {
-    performAnalysis(uploadedFiles, jobTitle, true, userCredits);
+    // Create options object with default values for temporary analysis
+    const options = {
+      saveCV: false, // Default to not saving CV for temporary analysis
+      saveJobDescription: false, // Default to not saving job description for temporary analysis
+      cvSource: 'new' as const, // Since we're using uploaded CV
+      existingCVId: undefined
+    };
+
+    performAnalysis(uploadedFiles, jobTitle, true, userCredits, options);
   };
 
   const handleStartNew = () => {

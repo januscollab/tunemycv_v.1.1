@@ -9,6 +9,13 @@ interface UploadedFile {
   type: 'cv' | 'job_description';
 }
 
+interface AnalysisOptions {
+  saveCV: boolean;
+  saveJobDescription: boolean;
+  cvSource: 'new' | 'saved';
+  existingCVId?: string;
+}
+
 export const useAnalysis = () => {
   const { toast } = useToast();
   const { analyzing, setAnalyzing, analysisResult, setAnalysisResult } = useAnalysisState();
@@ -18,11 +25,12 @@ export const useAnalysis = () => {
     uploadedFiles: { cv?: UploadedFile; jobDescription?: UploadedFile },
     jobTitle: string,
     useComprehensive: boolean,
-    userCredits: any
+    userCredits: any,
+    options: AnalysisOptions
   ) => {
     try {
       setAnalyzing(true);
-      const result = await executeAnalysis(uploadedFiles, jobTitle, useComprehensive, userCredits);
+      const result = await executeAnalysis(uploadedFiles, jobTitle, useComprehensive, userCredits, options);
       setAnalysisResult(result);
     } catch (error) {
       console.error('Analysis error:', error);

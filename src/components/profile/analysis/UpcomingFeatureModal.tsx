@@ -18,7 +18,7 @@ const UpcomingFeatureModal: React.FC<UpcomingFeatureModalProps> = ({ isOpen, onC
           title: 'Create Cover Letter',
           icon: <FileText className="h-6 w-6 text-blue-600" />,
           cost: 1,
-          description: 'Generate a personalized cover letter tailored to this specific job posting using AI analysis of your CV and the job requirements.',
+          description: 'Create a tailored cover letter that aligns your experience with the role — crafted from your CV and the job description for maximum impact.',
           features: [
             'Personalized content based on your CV',
             'Job-specific customization',
@@ -31,7 +31,7 @@ const UpcomingFeatureModal: React.FC<UpcomingFeatureModalProps> = ({ isOpen, onC
           title: 'Interview Preparation',
           icon: <MessageSquare className="h-6 w-6 text-green-600" />,
           cost: 2,
-          description: 'Get comprehensive interview preparation including likely questions, suggested answers, and tips based on your CV analysis.',
+          description: 'Prepare with confidence — our bespoke analysis of the company, latest news, and interview focus areas so you walk into your interview informed and confident.',
           features: [
             'Predicted interview questions',
             'Personalized answer suggestions',

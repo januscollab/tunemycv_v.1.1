@@ -27,12 +27,6 @@ const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({ userDisplayNa
     <div className="flex items-center space-x-4">
       <Link
         to="/profile"
-        className="text-sm text-blueberry dark:text-apple-core hover:text-apricot transition-colors"
-      >
-        Welcome, {userDisplayName}
-      </Link>
-      <Link
-        to="/profile"
         className={`flex items-center px-3 py-2 text-sm font-medium transition-colors relative ${
           isActive('/profile')
             ? 'text-apricot'

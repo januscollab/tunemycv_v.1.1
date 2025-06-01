@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -20,6 +19,8 @@ import HelpCentre from "./pages/HelpCentre";
 import ContactUs from "./pages/ContactUs";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
+import NextSteps from "./pages/NextSteps";
+import CoverLetter from "./pages/CoverLetter";
 
 // Component to handle scroll to top on route change
 const ScrollToTop = () => {
@@ -62,6 +63,11 @@ const App: React.FC = () => {
                       <AnalyzeCV />
                     </ProtectedRoute>
                   } />
+                  <Route path="/next-steps" element={
+                    <ProtectedRoute>
+                      <NextSteps />
+                    </ProtectedRoute>
+                  } />
                   <Route path="/resources" element={<Resources />} />
                   <Route path="/help" element={<HelpCentre />} />
                   <Route path="/contact" element={<ContactUs />} />
@@ -76,6 +82,7 @@ const App: React.FC = () => {
                       <AdminDashboard />
                     </AdminRoute>
                   } />
+                  <Route path="/cover-letter" element={<CoverLetter />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>

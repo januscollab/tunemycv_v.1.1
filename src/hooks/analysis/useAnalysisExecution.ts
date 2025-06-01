@@ -10,6 +10,13 @@ interface UploadedFile {
   type: 'cv' | 'job_description';
 }
 
+interface AnalysisOptions {
+  saveCV: boolean;
+  saveJobDescription: boolean;
+  cvSource: 'new' | 'saved';
+  existingCVId?: string;
+}
+
 export const useAnalysisExecution = () => {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -18,21 +25,27 @@ export const useAnalysisExecution = () => {
     uploadedFiles: { cv?: UploadedFile; jobDescription?: UploadedFile },
     jobTitle: string,
     useComprehensive: boolean,
-    userCredits: any
+    userCredits: any,
+    options: AnalysisOptions
   ) => {
     if (!uploadedFiles.cv || !uploadedFiles.jobDescription) {
       throw new Error('Please upload both CV and job description');
     }
 
-    console.log('Starting enhanced comprehensive CV analysis...');
+    console.log('Starting enhanced comprehensive CV analysis with options:', options);
 
     const finalJobTitle = jobTitle || extractJobTitleFromText(uploadedFiles.jobDescription.extractedText);
     const extractedCompany = extractCompanyFromText(uploadedFiles.jobDescription.extractedText);
 
-    // Save files to database first
-    const { cvUpload, jobUpload } = await saveFilesToDatabase(uploadedFiles, finalJobTitle, user?.id!);
+    // Save files to database based on user preferences
+    const { cvUpload, jobUpload } = await saveFilesToDatabase(
+      uploadedFiles, 
+      finalJobTitle, 
+      user?.id!, 
+      options
+    );
 
-    console.log('Files uploaded successfully, starting enhanced comprehensive analysis...');
+    console.log('Files handled successfully, starting enhanced comprehensive analysis...');
 
     let analysisResult;
     const hasCreditsForAI = userCredits?.credits && userCredits.credits > 0;
@@ -51,8 +64,15 @@ export const useAnalysisExecution = () => {
         analysisResult = {
           ...enhancedAnalysis,
           user_id: user?.id,
-          cv_upload_id: cvUpload.id,
-          job_description_upload_id: jobUpload.id,
+          cv_upload_id: cvUpload?.id || null, // Can be null for temporary analyses
+          job_description_upload_id: jobUpload?.id || null, // Can be null for temporary analyses
+          // Store CV metadata directly in analysis for decoupling
+          cv_file_name: uploadedFiles.cv.file.name,
+          cv_file_size: uploadedFiles.cv.file.size,
+          cv_extracted_text: uploadedFiles.cv.extractedText,
+          // Store job description metadata directly for temporary analyses
+          job_description_file_name: uploadedFiles.jobDescription.file.name,
+          job_description_extracted_text: uploadedFiles.jobDescription.extractedText,
           // Keep legacy fields for backward compatibility
           job_title: enhancedAnalysis.position || finalJobTitle,
           company_name: enhancedAnalysis.companyName || extractedCompany,
@@ -74,7 +94,31 @@ export const useAnalysisExecution = () => {
         console.error('Enhanced AI analysis failed, falling back to comprehensive algorithmic analysis:', aiError);
         
         // Fall back to comprehensive local analysis
-        analysisResult = await performComprehensiveAnalysis(cvUpload, jobUpload, finalJobTitle, extractedCompany, uploadedFiles, user?.id!);
+        analysisResult = await performComprehensiveAnalysis(
+          cvUpload || { 
+            id: 'temp', 
+            file_name: uploadedFiles.cv.file.name,
+            extracted_text: uploadedFiles.cv.extractedText 
+          }, 
+          jobUpload || { 
+            id: 'temp', 
+            file_name: uploadedFiles.jobDescription.file.name,
+            extracted_text: uploadedFiles.jobDescription.extractedText 
+          }, 
+          finalJobTitle, 
+          extractedCompany, 
+          uploadedFiles, 
+          user?.id!
+        );
+        
+        // Add metadata for decoupling and temporary analyses
+        analysisResult.cv_file_name = uploadedFiles.cv.file.name;
+        analysisResult.cv_file_size = uploadedFiles.cv.file.size;
+        analysisResult.cv_extracted_text = uploadedFiles.cv.extractedText;
+        analysisResult.job_description_file_name = uploadedFiles.jobDescription.file.name;
+        analysisResult.job_description_extracted_text = uploadedFiles.jobDescription.extractedText;
+        analysisResult.cv_upload_id = cvUpload?.id || null;
+        analysisResult.job_description_upload_id = jobUpload?.id || null;
         
         toast({ 
           title: 'Analysis Complete!', 
@@ -85,7 +129,31 @@ export const useAnalysisExecution = () => {
       console.log('No credits available, using comprehensive algorithmic analysis');
       
       // Use comprehensive local analysis
-      analysisResult = await performComprehensiveAnalysis(cvUpload, jobUpload, finalJobTitle, extractedCompany, uploadedFiles, user?.id!);
+      analysisResult = await performComprehensiveAnalysis(
+        cvUpload || { 
+          id: 'temp', 
+          file_name: uploadedFiles.cv.file.name,
+          extracted_text: uploadedFiles.cv.extractedText 
+        }, 
+        jobUpload || { 
+          id: 'temp', 
+          file_name: uploadedFiles.jobDescription.file.name,
+          extracted_text: uploadedFiles.jobDescription.extractedText 
+        }, 
+        finalJobTitle, 
+        extractedCompany, 
+        uploadedFiles, 
+        user?.id!
+      );
+      
+      // Add metadata for decoupling and temporary analyses
+      analysisResult.cv_file_name = uploadedFiles.cv.file.name;
+      analysisResult.cv_file_size = uploadedFiles.cv.file.size;
+      analysisResult.cv_extracted_text = uploadedFiles.cv.extractedText;
+      analysisResult.job_description_file_name = uploadedFiles.jobDescription.file.name;
+      analysisResult.job_description_extracted_text = uploadedFiles.jobDescription.extractedText;
+      analysisResult.cv_upload_id = cvUpload?.id || null;
+      analysisResult.job_description_upload_id = jobUpload?.id || null;
       
       toast({ 
         title: 'Analysis Complete!', 
@@ -98,6 +166,11 @@ export const useAnalysisExecution = () => {
       user_id: analysisResult.user_id,
       cv_upload_id: analysisResult.cv_upload_id,
       job_description_upload_id: analysisResult.job_description_upload_id,
+      cv_file_name: analysisResult.cv_file_name,
+      cv_file_size: analysisResult.cv_file_size,
+      cv_extracted_text: analysisResult.cv_extracted_text,
+      job_description_file_name: analysisResult.job_description_file_name,
+      job_description_extracted_text: analysisResult.job_description_extracted_text,
       job_title: analysisResult.job_title,
       company_name: analysisResult.company_name,
       compatibility_score: analysisResult.compatibility_score,
