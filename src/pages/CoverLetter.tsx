@@ -115,25 +115,36 @@ const CoverLetter = () => {
             <TabsContent value="generate" className="mt-6">
               <div className="space-y-6">
                 <AnalysisSelector
-                  selectedAnalysis={selectedAnalysis}
+                  selectedAnalysisId={selectedAnalysis}
                   onAnalysisSelect={setSelectedAnalysis}
                 />
                 
-                <AdvancedGenerationOptions
-                  selectedAnalysis={selectedAnalysis}
-                  onGenerate={generateCoverLetter}
-                  isGenerating={isGenerating}
-                  hasCreditsForAI={hasCreditsForAI}
-                />
+                <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
+                  <p className="text-sm text-blueberry/70 dark:text-apple-core/80">
+                    Advanced generation options will be available once an analysis is selected.
+                  </p>
+                </div>
               </div>
             </TabsContent>
 
             <TabsContent value="edit" className="mt-6">
-              <EditableCoverLetter
-                coverLetterData={coverLetterData}
-                onUpdate={updateCoverLetter}
-                selectedAnalysis={selectedAnalysis}
-              />
+              {coverLetterData ? (
+                <EditableCoverLetter
+                  content={coverLetterData.content || ''}
+                  onSave={(newContent) => updateCoverLetter(coverLetterData.id, newContent)}
+                />
+              ) : (
+                <div className="text-center py-12">
+                  <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-8 border border-apple-core/20 dark:border-citrus/20">
+                    <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mb-4">
+                      No Cover Letter Available
+                    </h3>
+                    <p className="text-blueberry/70 dark:text-apple-core/80 mb-6">
+                      Generate a cover letter first to edit and download it.
+                    </p>
+                  </div>
+                </div>
+              )}
             </TabsContent>
           </Tabs>
         </div>

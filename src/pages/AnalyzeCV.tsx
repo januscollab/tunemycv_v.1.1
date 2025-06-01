@@ -133,7 +133,7 @@ const AnalyzeCV = () => {
     setJobTitle('');
   };
 
-  const canAnalyze = uploadedFiles.jobDescription;
+  const canAnalyze = !!uploadedFiles.jobDescription;
   const hasCreditsForAI = userCredits?.credits && userCredits.credits > 0;
 
   // Logged-out user experience

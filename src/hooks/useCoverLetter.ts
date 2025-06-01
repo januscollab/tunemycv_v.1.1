@@ -36,6 +36,8 @@ interface RegenerateCoverLetterParams {
 export const useCoverLetter = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isRegenerating, setIsRegenerating] = useState(false);
+  const [selectedAnalysis, setSelectedAnalysis] = useState<string>('');
+  const [coverLetterData, setCoverLetterData] = useState<any>(null);
   const { toast } = useToast();
 
   const generateCoverLetter = async (params: GenerateCoverLetterParams) => {
@@ -46,6 +48,8 @@ export const useCoverLetter = () => {
       });
 
       if (error) throw error;
+
+      setCoverLetterData(data);
 
       toast({
         title: 'Cover Letter Generated!',
@@ -96,6 +100,8 @@ export const useCoverLetter = () => {
       });
 
       if (error) throw error;
+
+      setCoverLetterData(data);
 
       toast({
         title: 'Cover Letter Generated!',
@@ -182,6 +188,12 @@ export const useCoverLetter = () => {
 
       if (updateError) throw updateError;
 
+      setCoverLetterData({ 
+        content: data.content, 
+        id: params.coverLetterId,
+        regeneration_count: originalData.regeneration_count + 1
+      });
+
       toast({
         title: 'Cover Letter Regenerated!',
         description: isFreeregeneration 
@@ -235,6 +247,8 @@ export const useCoverLetter = () => {
       throw error;
     }
 
+    setCoverLetterData(prev => prev ? { ...prev, content } : null);
+
     toast({
       title: 'Cover Letter Updated',
       description: 'Your changes have been saved successfully.',
@@ -259,6 +273,9 @@ export const useCoverLetter = () => {
   };
 
   return {
+    selectedAnalysis,
+    setSelectedAnalysis,
+    coverLetterData,
     generateCoverLetter,
     generateFromAnalysis,
     regenerateCoverLetter,
