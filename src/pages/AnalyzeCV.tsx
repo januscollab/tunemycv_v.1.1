@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -205,8 +204,8 @@ const AnalyzeCV = () => {
         {/* Main Analysis Section */}
         <div className="lg:col-span-3">
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-blueberry dark:text-citrus mb-4">
-              <FileText className="h-10 w-10 text-apricot inline mr-3" />
+            <h1 className="text-4xl font-bold text-blueberry dark:text-citrus mb-4 flex items-center justify-center">
+              <FileText className="h-10 w-10 text-apricot mr-3" />
               Analyze Your CV
             </h1>
             <p className="text-xl text-blueberry/80 dark:text-apple-core max-w-2xl mx-auto">
