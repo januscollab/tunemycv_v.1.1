@@ -13,8 +13,8 @@ export const featureFlags: FeatureFlags = {
   // Auto-login with a test user in development
   DEV_AUTO_LOGIN: isDevelopment && import.meta.env.VITE_DEV_AUTO_LOGIN === 'true',
   
-  // Show debug information in development - manually enabled
-  DEV_SHOW_DEBUG_INFO: true,
+  // Show debug information in development
+  DEV_SHOW_DEBUG_INFO: isDevelopment && import.meta.env.VITE_DEV_DEBUG === 'true',
 };
 
 export const getFeatureFlag = (flag: keyof FeatureFlags): boolean => {
