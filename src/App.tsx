@@ -5,11 +5,12 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { AuthProvider } from "./contexts/AuthContext";
+import { AuthWrapper } from "./contexts/AuthWrapper";
 import Navigation from "./components/Navigation";
 import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/admin/AdminRoute";
+import DevAuthDebugPanel from "./components/debug/DevAuthDebugPanel";
 import Index from "./pages/Index";
 import AnalyzeCV from "./pages/AnalyzeCV";
 import Resources from "./pages/Resources";
@@ -52,7 +53,7 @@ const App: React.FC = () => {
         <Sonner />
         <BrowserRouter>
           <ScrollToTop />
-          <AuthProvider>
+          <AuthWrapper>
             <div className="min-h-screen flex flex-col">
               <Navigation />
               <main className="flex-1">
@@ -85,8 +86,9 @@ const App: React.FC = () => {
                 </Routes>
               </main>
               <Footer />
+              <DevAuthDebugPanel />
             </div>
-          </AuthProvider>
+          </AuthWrapper>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
