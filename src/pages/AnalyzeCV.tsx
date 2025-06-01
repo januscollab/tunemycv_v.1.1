@@ -11,10 +11,11 @@ import AnalyzeButton from '@/components/analyze/AnalyzeButton';
 import { useAnalysis } from '@/hooks/useAnalysis';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { FileText } from 'lucide-react';
+import { FileText, History, Eye } from 'lucide-react';
 import EmbeddedAuth from '@/components/auth/EmbeddedAuth';
 import ServiceExplanation from '@/components/common/ServiceExplanation';
 import { UploadedFile } from '@/types/fileTypes';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const AnalyzeCV = () => {
   const { user } = useAuth();
@@ -26,6 +27,7 @@ const AnalyzeCV = () => {
   }>({});
   const [jobTitle, setJobTitle] = useState('');
   const [currentLoadingMessage, setCurrentLoadingMessage] = useState('');
+  const [activeTab, setActiveTab] = useState('analysis');
 
   const { analyzing, analysisResult, setAnalysisResult, performAnalysis } = useAnalysis();
 
@@ -57,6 +59,13 @@ const AnalyzeCV = () => {
       return () => clearInterval(interval);
     }
   }, [analyzing]);
+
+  // Switch to current report tab when analysis completes
+  React.useEffect(() => {
+    if (analysisResult && !analyzing) {
+      setActiveTab('report');
+    }
+  }, [analysisResult, analyzing]);
 
   // Fetch user credits
   const { data: userCredits } = useQuery({
@@ -130,14 +139,11 @@ const AnalyzeCV = () => {
     setAnalysisResult(null);
     setUploadedFiles({});
     setJobTitle('');
+    setActiveTab('analysis');
   };
 
   const canAnalyze = uploadedFiles.jobDescription; // Only job description is required now
   const hasCreditsForAI = userCredits?.credits && userCredits.credits > 0;
-
-  if (analysisResult) {
-    return <AnalysisResults result={analysisResult} onStartNew={handleStartNew} />;
-  }
 
   // Logged-out user experience
   if (!user) {
@@ -201,87 +207,148 @@ const AnalyzeCV = () => {
         </div>
       )}
       
-      <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 lg:grid-cols-4 gap-8">
-        {/* Main Analysis Section */}
-        <div className="lg:col-span-3">
-          <div className="text-left mb-12">
-            <div className="flex items-center mb-4">
-              <FileText className="h-10 w-10 text-apricot mr-3" />
-              <h1 className="text-4xl font-bold text-blueberry dark:text-citrus">
-                Analyze Your CV
-              </h1>
-            </div>
-            <p className="text-xl text-blueberry/80 dark:text-apple-core max-w-2xl">
-              Upload your CV and job description to get comprehensive compatibility analysis with actionable recommendations.
-            </p>
+      <div className="max-w-7xl mx-auto px-4 py-12">
+        {/* Header Section - Aligned with Cover Letter page */}
+        <div className="mb-8">
+          <div className="flex items-center mb-4">
+            <FileText className="h-10 w-10 text-apricot mr-3" />
+            <h1 className="text-4xl font-bold text-blueberry dark:text-citrus">
+              Analyze Your CV
+            </h1>
           </div>
-
-          <div className="space-y-6">
-            {/* Job Title */}
-            <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
-              <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-4">Job Title</h3>
-              <input
-                type="text"
-                value={jobTitle}
-                onChange={(e) => setJobTitle(e.target.value)}
-                placeholder="e.g., Senior Software Engineer (auto-extracted from job description)"
-                className="w-full px-3 py-2 border border-apple-core/30 dark:border-citrus/30 rounded-md focus:outline-none focus:ring-2 focus:ring-apricot focus:border-transparent bg-white dark:bg-blueberry/10 text-blueberry dark:text-apple-core"
-                disabled={analyzing}
-              />
-              <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mt-2">
-                Job title will be automatically extracted from the job description if not provided.
-              </p>
-            </div>
-
-            {/* Job Description Input - Required */}
-            <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
-              <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-4">
-                Job Description <span className="text-red-500">*</span>
-              </h3>
-              <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mb-4">
-                Upload a file (PDF, DOCX, TXT) or paste the text directly
-              </p>
-              
-              <JobDescriptionInput
-                onJobDescriptionSet={handleJobDescriptionSet}
-                uploadedFile={uploadedFiles.jobDescription}
-                disabled={uploading || analyzing}
-              />
-            </div>
-
-            {/* CV Selection - Optional */}
-            <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
-              <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-4">
-                Your CV <span className="text-sm font-normal text-blueberry/70 dark:text-apple-core/80">(Optional)</span>
-              </h3>
-              <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mb-4">
-                Upload your CV for comprehensive analysis. Without a CV, we'll provide general insights about the job requirements.
-              </p>
-              
-              <CVSelector
-                onCVSelect={handleCVSelect}
-                selectedCV={uploadedFiles.cv}
-                uploading={uploading || analyzing}
-              />
-            </div>
-
-            {/* Analyze Button */}
-            <AnalyzeButton
-              onAnalyze={handleAnalysis}
-              canAnalyze={!!canAnalyze}
-              analyzing={analyzing}
-              hasCreditsForAI={hasCreditsForAI}
-            />
-          </div>
+          <p className="text-xl text-blueberry/80 dark:text-apple-core max-w-3xl">
+            Upload your CV and job description to get comprehensive compatibility analysis with actionable recommendations.
+          </p>
         </div>
 
-        {/* Credits Panel */}
-        <div className="lg:col-span-1">
-          <CreditsPanel
-            credits={userCredits?.credits || 0}
-            hasCreditsForAI={hasCreditsForAI}
-          />
-        </div>
+        {/* Tabs Navigation */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-3 mb-8">
+            <TabsTrigger value="analysis" className="flex items-center space-x-2">
+              <FileText className="h-4 w-4" />
+              <span>CV Analysis</span>
+            </TabsTrigger>
+            <TabsTrigger value="report" className="flex items-center space-x-2" disabled={!analysisResult}>
+              <Eye className="h-4 w-4" />
+              <span>Current Report</span>
+            </TabsTrigger>
+            <TabsTrigger value="history" className="flex items-center space-x-2">
+              <History className="h-4 w-4" />
+              <span>Analysis History</span>
+            </TabsTrigger>
+          </TabsList>
+
+          {/* CV Analysis Tab */}
+          <TabsContent value="analysis" className="mt-0">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+              {/* Main Analysis Section */}
+              <div className="lg:col-span-3">
+                <div className="space-y-6">
+                  {/* Job Title */}
+                  <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
+                    <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-4">Job Title</h3>
+                    <input
+                      type="text"
+                      value={jobTitle}
+                      onChange={(e) => setJobTitle(e.target.value)}
+                      placeholder="e.g., Senior Software Engineer (auto-extracted from job description)"
+                      className="w-full px-3 py-2 border border-apple-core/30 dark:border-citrus/30 rounded-md focus:outline-none focus:ring-2 focus:ring-apricot focus:border-transparent bg-white dark:bg-blueberry/10 text-blueberry dark:text-apple-core"
+                      disabled={analyzing}
+                    />
+                    <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mt-2">
+                      Job title will be automatically extracted from the job description if not provided.
+                    </p>
+                  </div>
+
+                  {/* Job Description Input - Required */}
+                  <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
+                    <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-4">
+                      Job Description <span className="text-red-500">*</span>
+                    </h3>
+                    <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mb-4">
+                      Upload a file (PDF, DOCX, TXT) or paste the text directly
+                    </p>
+                    
+                    <JobDescriptionInput
+                      onJobDescriptionSet={handleJobDescriptionSet}
+                      uploadedFile={uploadedFiles.jobDescription}
+                      disabled={uploading || analyzing}
+                    />
+                  </div>
+
+                  {/* CV Selection - Optional */}
+                  <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
+                    <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-4">
+                      Your CV <span className="text-sm font-normal text-blueberry/70 dark:text-apple-core/80">(Optional)</span>
+                    </h3>
+                    <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mb-4">
+                      Upload your CV for comprehensive analysis. Without a CV, we'll provide general insights about the job requirements.
+                    </p>
+                    
+                    <CVSelector
+                      onCVSelect={handleCVSelect}
+                      selectedCV={uploadedFiles.cv}
+                      uploading={uploading || analyzing}
+                    />
+                  </div>
+
+                  {/* Analyze Button */}
+                  <AnalyzeButton
+                    onAnalyze={handleAnalysis}
+                    canAnalyze={!!canAnalyze}
+                    analyzing={analyzing}
+                    hasCreditsForAI={hasCreditsForAI}
+                  />
+                </div>
+              </div>
+
+              {/* Credits Panel */}
+              <div className="lg:col-span-1">
+                <CreditsPanel
+                  credits={userCredits?.credits || 0}
+                  hasCreditsForAI={hasCreditsForAI}
+                />
+              </div>
+            </div>
+          </TabsContent>
+
+          {/* Current Report Tab */}
+          <TabsContent value="report" className="mt-0">
+            {analysisResult ? (
+              <AnalysisResults result={analysisResult} onStartNew={handleStartNew} />
+            ) : (
+              <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-12 border border-apple-core/20 dark:border-citrus/20 text-center">
+                <Eye className="h-16 w-16 text-blueberry/30 dark:text-apple-core/50 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mb-2">No Report Available</h3>
+                <p className="text-blueberry/70 dark:text-apple-core/80 mb-6">
+                  Complete a CV analysis to view your report here.
+                </p>
+                <button
+                  onClick={() => setActiveTab('analysis')}
+                  className="bg-apricot hover:bg-apricot/90 text-white px-6 py-2 rounded-md transition-colors"
+                >
+                  Start Analysis
+                </button>
+              </div>
+            )}
+          </TabsContent>
+
+          {/* Analysis History Tab */}
+          <TabsContent value="history" className="mt-0">
+            <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-12 border border-apple-core/20 dark:border-citrus/20 text-center">
+              <History className="h-16 w-16 text-blueberry/30 dark:text-apple-core/50 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mb-2">Analysis History</h3>
+              <p className="text-blueberry/70 dark:text-apple-core/80 mb-4">
+                Coming soon! This feature will allow you to view and manage your previous CV analyses.
+              </p>
+              <div className="inline-flex items-center px-4 py-2 bg-blueberry/10 dark:bg-apple-core/10 rounded-md">
+                <span className="text-sm text-blueberry/70 dark:text-apple-core/80">
+                  🚧 Feature in development
+                </span>
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
