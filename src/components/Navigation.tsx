@@ -26,8 +26,11 @@ const Navigation = () => {
 
   // Add conditional navigation items based on auth state
   const conditionalNavItems = user 
-    ? [{ path: '/next-steps', label: 'Next Steps', icon: TrendingUp }]
-    : [{ path: '/cover-letter', label: 'Create Cover Letter', icon: Edit }];
+    ? [
+        { path: '/cover-letter', label: 'Cover Letter', icon: Edit },
+        { path: '/next-steps', label: 'Next Steps', icon: TrendingUp }
+      ]
+    : [];
 
   const navItems = [
     ...baseNavItems,
