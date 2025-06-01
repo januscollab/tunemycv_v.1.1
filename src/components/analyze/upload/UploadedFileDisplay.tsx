@@ -1,12 +1,7 @@
 
 import React from 'react';
 import { Check } from 'lucide-react';
-
-interface UploadedFile {
-  file: File;
-  extractedText: string;
-  type: 'cv' | 'job_description';
-}
+import { UploadedFile } from '@/types/fileTypes';
 
 interface UploadedFileDisplayProps {
   uploadedFile: UploadedFile;

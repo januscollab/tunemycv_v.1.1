@@ -1,23 +1,20 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { validateFile, extractTextFromFile } from '@/utils/fileUtils';
 import { extractJobTitleFromText } from '@/utils/analysisUtils';
 import AnalysisResults from '@/components/analysis/AnalysisResults';
 import CVSelector from '@/components/analyze/CVSelector';
-import JobDescriptionTextInput from '@/components/analyze/JobDescriptionTextInput';
+import JobDescriptionInput from '@/components/analyze/JobDescriptionInput';
 import CreditsPanel from '@/components/analyze/CreditsPanel';
 import AnalyzeButton from '@/components/analyze/AnalyzeButton';
 import { useAnalysis } from '@/hooks/useAnalysis';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Upload, FileText, X, Check } from 'lucide-react';
-
-interface UploadedFile {
-  file: File;
-  extractedText: string;
-  type: 'cv' | 'job_description';
-}
+import { FileText } from 'lucide-react';
+import EmbeddedAuth from '@/components/auth/EmbeddedAuth';
+import ServiceExplanation from '@/components/common/ServiceExplanation';
+import { UploadedFile } from '@/types/fileTypes';
 
 const AnalyzeCV = () => {
   const { user } = useAuth();
@@ -78,9 +75,6 @@ const AnalyzeCV = () => {
     enabled: !!user?.id,
   });
 
-  const jobDescTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
-  const maxSize = 5 * 1024 * 1024; // 5MB
-
   const handleCVSelect = (uploadedFile: UploadedFile) => {
     setUploadedFiles(prev => ({
       ...prev,
@@ -89,56 +83,7 @@ const AnalyzeCV = () => {
     toast({ title: 'Success', description: 'CV selected successfully!' });
   };
 
-  const handleFileUpload = async (file: File, type: 'job_description') => {
-    const errors = validateFile(file, jobDescTypes, maxSize);
-    
-    if (errors.length > 0) {
-      toast({ title: 'Upload Error', description: errors.join('. '), variant: 'destructive' });
-      return;
-    }
-
-    try {
-      setUploading(true);
-      const extractedText = await extractTextFromFile(file);
-      
-      const uploadedFile: UploadedFile = {
-        file,
-        extractedText,
-        type
-      };
-
-      setUploadedFiles(prev => ({
-        ...prev,
-        jobDescription: uploadedFile
-      }));
-
-      // Auto-extract job title from job description
-      if (!jobTitle) {
-        const extractedJobTitle = extractJobTitleFromText(extractedText);
-        setJobTitle(extractedJobTitle);
-      }
-
-      toast({ title: 'Success', description: 'Job description uploaded successfully!' });
-    } catch (error) {
-      toast({ title: 'Error', description: 'Failed to process file', variant: 'destructive' });
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const handleJobDescriptionText = (text: string) => {
-    if (!text.trim()) {
-      toast({ title: 'Error', description: 'Please enter job description text', variant: 'destructive' });
-      return;
-    }
-
-    const textFile = new File([text], 'job-description.txt', { type: 'text/plain' });
-    const uploadedFile: UploadedFile = {
-      file: textFile,
-      extractedText: text,
-      type: 'job_description'
-    };
-
+  const handleJobDescriptionSet = (uploadedFile: UploadedFile) => {
     setUploadedFiles(prev => ({
       ...prev,
       jobDescription: uploadedFile
@@ -146,27 +91,35 @@ const AnalyzeCV = () => {
 
     // Auto-extract job title from job description
     if (!jobTitle) {
-      const extractedJobTitle = extractJobTitleFromText(text);
+      const extractedJobTitle = extractJobTitleFromText(uploadedFile.extractedText);
       setJobTitle(extractedJobTitle);
     }
-
-    toast({ title: 'Success', description: 'Job description added successfully!' });
-  };
-
-  const removeFile = (type: 'cv' | 'jobDescription') => {
-    setUploadedFiles(prev => {
-      const updated = { ...prev };
-      delete updated[type];
-      return updated;
-    });
   };
 
   const handleAnalysis = () => {
+    // Validate that we have at least a job description
+    if (!uploadedFiles.jobDescription) {
+      toast({ 
+        title: 'Missing Information', 
+        description: 'Please provide a job description to analyze.', 
+        variant: 'destructive' 
+      });
+      return;
+    }
+
+    // Show warning if no CV is uploaded
+    if (!uploadedFiles.cv) {
+      toast({ 
+        title: 'No CV Uploaded', 
+        description: 'Analysis will be performed on job description only. Upload a CV for comprehensive analysis.', 
+      });
+    }
+
     // Create options object with default values for temporary analysis
     const options = {
-      saveCV: false, // Default to not saving CV for temporary analysis
-      saveJobDescription: false, // Default to not saving job description for temporary analysis
-      cvSource: 'new' as const, // Since we're using uploaded CV
+      saveCV: false,
+      saveJobDescription: false,
+      cvSource: 'new' as const,
       existingCVId: undefined
     };
 
@@ -179,11 +132,59 @@ const AnalyzeCV = () => {
     setJobTitle('');
   };
 
-  const canAnalyze = uploadedFiles.cv && uploadedFiles.jobDescription;
+  const canAnalyze = uploadedFiles.jobDescription; // Only job description is required now
   const hasCreditsForAI = userCredits?.credits && userCredits.credits > 0;
 
   if (analysisResult) {
     return <AnalysisResults result={analysisResult} onStartNew={handleStartNew} />;
+  }
+
+  // Logged-out user experience
+  if (!user) {
+    const analyzeExplanation = {
+      title: 'Analyze Your CV',
+      subtitle: 'Get comprehensive compatibility analysis with actionable recommendations to improve your job application success.',
+      benefits: [
+        'Advanced AI-powered analysis that evaluates your CV against specific job requirements',
+        'Detailed compatibility scoring to understand how well you match the role',
+        'Keyword optimization recommendations to improve ATS compatibility'
+      ],
+      features: [
+        'Upload your CV in PDF, DOCX, or TXT format for instant analysis',
+        'Paste or upload the job description you\'re targeting',
+        'Our AI analyzes compatibility, keywords, and alignment between your experience and the role'
+      ]
+    };
+
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-apple-core/20 via-white to-citrus/10 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
+        <div className="max-w-7xl mx-auto px-4 py-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-[600px]">
+            <div className="flex items-start">
+              <ServiceExplanation
+                title={analyzeExplanation.title}
+                subtitle={analyzeExplanation.subtitle}
+                benefits={analyzeExplanation.benefits}
+                features={analyzeExplanation.features}
+                icon={<FileText className="h-8 w-8 text-apricot mr-2" />}
+                compact={true}
+              />
+            </div>
+            <div className="flex flex-col justify-end">
+              <div className="flex justify-center">
+                <div className="w-full max-w-sm">
+                  <EmbeddedAuth
+                    title="Login to Get Started"
+                    description="CV analysis requires an account to ensure personalized results and save your analysis history."
+                    icon={<FileText className="h-6 w-6 text-apricot mr-2" />}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -204,7 +205,10 @@ const AnalyzeCV = () => {
         {/* Main Analysis Section */}
         <div className="lg:col-span-3">
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-blueberry dark:text-citrus mb-4">Analyze Your CV</h1>
+            <h1 className="text-4xl font-bold text-blueberry dark:text-citrus mb-4">
+              <FileText className="h-10 w-10 text-apricot inline mr-3" />
+              Analyze Your CV
+            </h1>
             <p className="text-xl text-blueberry/80 dark:text-apple-core max-w-2xl mx-auto">
               Upload your CV and job description to get comprehensive compatibility analysis with actionable recommendations.
             </p>
@@ -227,60 +231,36 @@ const AnalyzeCV = () => {
               </p>
             </div>
 
-            {/* CV Selection */}
-            <CVSelector
-              onCVSelect={handleCVSelect}
-              selectedCV={uploadedFiles.cv}
-              uploading={uploading || analyzing}
-            />
-
-            {/* Job Description Upload */}
+            {/* Job Description Input - Required */}
             <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
-              <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-4">Job Description</h3>
-              <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mb-4">Upload a file (PDF, DOCX, TXT) or paste the text directly</p>
+              <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-4">
+                Job Description <span className="text-red-500">*</span>
+              </h3>
+              <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mb-4">
+                Upload a file (PDF, DOCX, TXT) or paste the text directly
+              </p>
               
-              <div className="space-y-4">
-                {!uploadedFiles.jobDescription ? (
-                  <>
-                    {/* File Upload Option */}
-                    <div className="border-2 border-dashed border-apple-core/30 dark:border-citrus/30 rounded-lg p-6 text-center">
-                      <Upload className="mx-auto h-8 w-8 text-blueberry/60 dark:text-apple-core/60 mb-2" />
-                      <label className="cursor-pointer">
-                        <span className="text-apricot hover:text-apricot/80 font-medium">Upload Job Description</span>
-                        <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mt-1">PDF, DOCX, TXT - max 5MB</p>
-                        <input
-                          type="file"
-                          className="hidden"
-                          accept=".pdf,.docx,.txt"
-                          onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0], 'job_description')}
-                          disabled={uploading || analyzing}
-                        />
-                      </label>
-                    </div>
-                    
-                    <div className="text-center text-blueberry/60 dark:text-apple-core/60">or</div>
-                    
-                    <JobDescriptionTextInput onSubmit={handleJobDescriptionText} disabled={uploading || analyzing} />
-                  </>
-                ) : (
-                  <div className="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
-                    <div className="flex items-center space-x-3">
-                      <Check className="h-5 w-5 text-green-600" />
-                      <div>
-                        <p className="font-medium text-green-900">{uploadedFiles.jobDescription.file.name}</p>
-                        <p className="text-sm text-green-700">Job description ready</p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => removeFile('jobDescription')}
-                      className="p-2 text-red-600 hover:bg-red-100 rounded-md"
-                      disabled={analyzing}
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </div>
-                )}
-              </div>
+              <JobDescriptionInput
+                onJobDescriptionSet={handleJobDescriptionSet}
+                uploadedFile={uploadedFiles.jobDescription}
+                disabled={uploading || analyzing}
+              />
+            </div>
+
+            {/* CV Selection - Optional */}
+            <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
+              <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-4">
+                Your CV <span className="text-sm font-normal text-blueberry/70 dark:text-apple-core/80">(Optional)</span>
+              </h3>
+              <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mb-4">
+                Upload your CV for comprehensive analysis. Without a CV, we'll provide general insights about the job requirements.
+              </p>
+              
+              <CVSelector
+                onCVSelect={handleCVSelect}
+                selectedCV={uploadedFiles.cv}
+                uploading={uploading || analyzing}
+              />
             </div>
 
             {/* Analyze Button */}

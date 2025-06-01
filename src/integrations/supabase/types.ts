@@ -13,12 +13,14 @@ export type Database = {
         Row: {
           analysis_result_id: string | null
           cost_estimate: number | null
+          cover_letter_id: string | null
           created_at: string
           cv_upload_id: string | null
           error_message: string | null
           id: string
           job_description_upload_id: string | null
           openai_model: string
+          operation_type: string | null
           processing_time_ms: number | null
           prompt_text: string
           response_metadata: Json | null
@@ -30,12 +32,14 @@ export type Database = {
         Insert: {
           analysis_result_id?: string | null
           cost_estimate?: number | null
+          cover_letter_id?: string | null
           created_at?: string
           cv_upload_id?: string | null
           error_message?: string | null
           id?: string
           job_description_upload_id?: string | null
           openai_model?: string
+          operation_type?: string | null
           processing_time_ms?: number | null
           prompt_text: string
           response_metadata?: Json | null
@@ -47,12 +51,14 @@ export type Database = {
         Update: {
           analysis_result_id?: string | null
           cost_estimate?: number | null
+          cover_letter_id?: string | null
           created_at?: string
           cv_upload_id?: string | null
           error_message?: string | null
           id?: string
           job_description_upload_id?: string | null
           openai_model?: string
+          operation_type?: string | null
           processing_time_ms?: number | null
           prompt_text?: string
           response_metadata?: Json | null
@@ -67,6 +73,13 @@ export type Database = {
             columns: ["analysis_result_id"]
             isOneToOne: false
             referencedRelation: "analysis_results"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analysis_logs_cover_letter_id_fkey"
+            columns: ["cover_letter_id"]
+            isOneToOne: false
+            referencedRelation: "cover_letters"
             referencedColumns: ["id"]
           },
           {
@@ -166,6 +179,98 @@ export type Database = {
           },
         ]
       }
+      cover_letter_templates: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          template_prompt: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id: string
+          is_active?: boolean | null
+          name: string
+          template_prompt: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          template_prompt?: string
+        }
+        Relationships: []
+      }
+      cover_letters: {
+        Row: {
+          analysis_result_id: string | null
+          company_name: string
+          content: string
+          created_at: string | null
+          credits_used: number | null
+          custom_hook_opener: string | null
+          generation_parameters: Json | null
+          id: string
+          include_linkedin_url: boolean | null
+          job_title: string
+          personal_values: string | null
+          regeneration_count: number | null
+          template_id: string | null
+          updated_at: string | null
+          user_id: string
+          work_experience_highlights: string | null
+        }
+        Insert: {
+          analysis_result_id?: string | null
+          company_name: string
+          content: string
+          created_at?: string | null
+          credits_used?: number | null
+          custom_hook_opener?: string | null
+          generation_parameters?: Json | null
+          id?: string
+          include_linkedin_url?: boolean | null
+          job_title: string
+          personal_values?: string | null
+          regeneration_count?: number | null
+          template_id?: string | null
+          updated_at?: string | null
+          user_id: string
+          work_experience_highlights?: string | null
+        }
+        Update: {
+          analysis_result_id?: string | null
+          company_name?: string
+          content?: string
+          created_at?: string | null
+          credits_used?: number | null
+          custom_hook_opener?: string | null
+          generation_parameters?: Json | null
+          id?: string
+          include_linkedin_url?: boolean | null
+          job_title?: string
+          personal_values?: string | null
+          regeneration_count?: number | null
+          template_id?: string | null
+          updated_at?: string | null
+          user_id?: string
+          work_experience_highlights?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cover_letters_analysis_result_id_fkey"
+            columns: ["analysis_result_id"]
+            isOneToOne: false
+            referencedRelation: "analysis_results"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string | null
@@ -173,6 +278,7 @@ export type Database = {
           first_name: string | null
           id: string
           last_name: string | null
+          linkedin_url: string | null
           updated_at: string | null
         }
         Insert: {
@@ -181,6 +287,7 @@ export type Database = {
           first_name?: string | null
           id: string
           last_name?: string | null
+          linkedin_url?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -189,6 +296,7 @@ export type Database = {
           first_name?: string | null
           id?: string
           last_name?: string | null
+          linkedin_url?: string | null
           updated_at?: string | null
         }
         Relationships: []
