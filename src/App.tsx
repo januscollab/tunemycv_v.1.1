@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -20,6 +19,7 @@ import HelpCentre from "./pages/HelpCentre";
 import ContactUs from "./pages/ContactUs";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
+import NextSteps from "./pages/NextSteps";
 
 // Component to handle scroll to top on route change
 const ScrollToTop = () => {
@@ -60,6 +60,11 @@ const App: React.FC = () => {
                   <Route path="/analyze" element={
                     <ProtectedRoute>
                       <AnalyzeCV />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/next-steps" element={
+                    <ProtectedRoute>
+                      <NextSteps />
                     </ProtectedRoute>
                   } />
                   <Route path="/resources" element={<Resources />} />
