@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FileText, Sparkles, Trash2, RefreshCw, Clock, FileUp, Search, AlertCircle, Eye } from 'lucide-react';
@@ -353,71 +352,78 @@ const CoverLetter = () => {
               </TabsList>
 
               <TabsContent value="create">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center">
-                      <Sparkles className="h-5 w-5 text-apricot mr-2" />
-                      Generate Cover Letter
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    {/* Validation Errors */}
-                    {validationErrors.length > 0 && (
-                      <Alert variant="destructive">
-                        <AlertCircle className="h-4 w-4" />
-                        <AlertDescription>
-                          <ul className="list-disc list-inside space-y-1">
-                            {validationErrors.map((error, index) => (
-                              <li key={index}>{error}</li>
-                            ))}
-                          </ul>
-                        </AlertDescription>
-                      </Alert>
-                    )}
+                <div className="space-y-6">
+                  {/* Validation Errors */}
+                  {validationErrors.length > 0 && (
+                    <Alert variant="destructive">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertDescription>
+                        <ul className="list-disc list-inside space-y-1">
+                          {validationErrors.map((error, index) => (
+                            <li key={index}>{error}</li>
+                          ))}
+                        </ul>
+                      </AlertDescription>
+                    </Alert>
+                  )}
 
-                    {/* Generation Method Selection */}
-                    <div className="space-y-4">
-                      <Label className="text-base font-medium">How would you like to generate your cover letter?</Label>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <button
-                          onClick={() => setGenerationMethod('input')}
-                          className={`p-4 border rounded-lg text-left transition-colors ${
-                            generationMethod === 'input'
-                              ? 'border-apricot bg-apricot/5'
-                              : 'border-gray-200 hover:border-gray-300'
-                          }`}
-                        >
-                          <div className="flex items-center mb-2">
-                            <FileUp className="h-5 w-5 text-apricot mr-2" />
-                            <span className="font-medium">Generate from Input</span>
-                          </div>
-                          <p className="text-sm text-gray-600">
-                            Enter job details manually to create a cover letter
-                          </p>
-                        </button>
-                        
-                        <button
-                          onClick={() => setGenerationMethod('analysis')}
-                          className={`p-4 border rounded-lg text-left transition-colors ${
-                            generationMethod === 'analysis'
-                              ? 'border-apricot bg-apricot/5'
-                              : 'border-gray-200 hover:border-gray-300'
-                          }`}
-                        >
-                          <div className="flex items-center mb-2">
-                            <Search className="h-5 w-5 text-apricot mr-2" />
-                            <span className="font-medium">Generate from Analysis</span>
-                          </div>
-                          <p className="text-sm text-gray-600">
-                            Use your previous CV analysis results
-                          </p>
-                        </button>
+                  {/* Panel 1: Title and Generation Method Selection */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center">
+                        <Sparkles className="h-5 w-5 text-apricot mr-2" />
+                        Generate Cover Letter
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div>
+                        <Label className="text-base font-medium">How would you like to generate your cover letter?</Label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                          <button
+                            onClick={() => setGenerationMethod('input')}
+                            className={`p-4 border rounded-lg text-left transition-colors ${
+                              generationMethod === 'input'
+                                ? 'border-apricot bg-apricot/5'
+                                : 'border-gray-200 hover:border-gray-300'
+                            }`}
+                          >
+                            <div className="flex items-center mb-2">
+                              <FileUp className="h-5 w-5 text-apricot mr-2" />
+                              <span className="font-medium">Generate from Input</span>
+                            </div>
+                            <p className="text-sm text-gray-600">
+                              Enter job details manually to create a cover letter
+                            </p>
+                          </button>
+                          
+                          <button
+                            onClick={() => setGenerationMethod('analysis')}
+                            className={`p-4 border rounded-lg text-left transition-colors ${
+                              generationMethod === 'analysis'
+                                ? 'border-apricot bg-apricot/5'
+                                : 'border-gray-200 hover:border-gray-300'
+                            }`}
+                          >
+                            <div className="flex items-center mb-2">
+                              <Search className="h-5 w-5 text-apricot mr-2" />
+                              <span className="font-medium">Generate from Analysis</span>
+                            </div>
+                            <p className="text-sm text-gray-600">
+                              Use your previous CV analysis results
+                            </p>
+                          </button>
+                        </div>
                       </div>
-                    </div>
+                    </CardContent>
+                  </Card>
 
-                    {/* Conditional Form Content */}
-                    {generationMethod === 'input' ? (
-                      <div className="space-y-4">
+                  {/* Panel 2: Job Details (only shown for input method) */}
+                  {generationMethod === 'input' && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Job Details</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
                             <Label htmlFor="jobTitle">Job Title *</Label>
@@ -455,9 +461,17 @@ const CoverLetter = () => {
                             Job description is required for optimal cover letter generation
                           </p>
                         </div>
-                      </div>
-                    ) : (
-                      <div className="space-y-4">
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Panel 3: Analysis Selection (only shown for analysis method) */}
+                  {generationMethod === 'analysis' && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Select Analysis</CardTitle>
+                      </CardHeader>
+                      <CardContent>
                         <div>
                           <Label>Select Analysis *</Label>
                           <AnalysisSelector
@@ -469,65 +483,81 @@ const CoverLetter = () => {
                             <p className="text-sm text-red-600 mt-1">Please select an analysis to continue</p>
                           )}
                         </div>
-                      </div>
-                    )}
+                      </CardContent>
+                    </Card>
+                  )}
 
-                    {/* Advanced Generation Options */}
-                    <AdvancedGenerationOptions
-                      value={advancedOptions}
-                      onChange={setAdvancedOptions}
-                    />
+                  {/* Panel 4: Settings and Options */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Generation Settings</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      {/* Advanced Generation Options */}
+                      <AdvancedGenerationOptions
+                        value={advancedOptions}
+                        onChange={setAdvancedOptions}
+                      />
 
-                    {/* Common Options */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="tone">Tone</Label>
-                        <Select value={formData.tone} onValueChange={(value) => handleInputChange('tone', value)}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {toneOptions.map((option) => (
-                              <SelectItem key={option.value} value={option.value}>
-                                {option.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                      {/* Tone and Length */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="tone">Tone</Label>
+                          <Select value={formData.tone} onValueChange={(value) => handleInputChange('tone', value)}>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {toneOptions.map((option) => (
+                                <SelectItem key={option.value} value={option.value}>
+                                  {option.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label htmlFor="length">Length</Label>
+                          <Select value={formData.length} onValueChange={(value) => handleInputChange('length', value)}>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {lengthOptions.map((option) => (
+                                <SelectItem key={option.value} value={option.value}>
+                                  {option.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </div>
-                      <div>
-                        <Label htmlFor="length">Length</Label>
-                        <Select value={formData.length} onValueChange={(value) => handleInputChange('length', value)}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {lengthOptions.map((option) => (
-                              <SelectItem key={option.value} value={option.value}>
-                                {option.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
+                    </CardContent>
+                  </Card>
 
-                    <Button
-                      onClick={handleGenerate}
-                      disabled={!canGenerate || isGenerating || credits < 1}
-                      className="w-full bg-apricot hover:bg-apricot/90 text-white font-medium"
-                    >
-                      {isGenerating ? (
-                        <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                          Generating...
-                        </>
-                      ) : (
-                        'Generate Cover Letter (1 Credit)'
-                      )}
-                    </Button>
-                  </CardContent>
-                </Card>
+                  {/* Panel 5: Generate Button */}
+                  <Card>
+                    <CardContent className="pt-6">
+                      <Button
+                        onClick={handleGenerate}
+                        disabled={!canGenerate || isGenerating || credits < 1}
+                        className="w-full bg-apricot hover:bg-apricot/90 text-white font-medium"
+                      >
+                        {isGenerating ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                            Generating...
+                          </>
+                        ) : (
+                          'Generate Cover Letter'
+                        )}
+                      </Button>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 text-center mt-2">
+                        1 credit will be used to generate your personalized cover letter
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
               </TabsContent>
 
               <TabsContent value="result">
