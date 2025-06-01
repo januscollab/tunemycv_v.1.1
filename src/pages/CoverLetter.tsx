@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FileText, Sparkles, Settings, Download, Trash2, RefreshCw } from 'lucide-react';
+import { FileText, Sparkles, Download, Trash2, RefreshCw, Clock } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCoverLetter } from '@/hooks/useCoverLetter';
 import { useUserData } from '@/hooks/useUserData';
@@ -24,13 +24,20 @@ const CoverLetter = () => {
     companyName: '',
     jobDescription: '',
     tone: 'professional',
-    length: 'short'
+    length: 'concise'
   });
   
   const [coverLetters, setCoverLetters] = useState<any[]>([]);
   const [selectedCoverLetter, setSelectedCoverLetter] = useState<any>(null);
   const [activeTab, setActiveTab] = useState('create');
   const [loadingHistory, setLoadingHistory] = useState(false);
+
+  const lengthOptions = [
+    { value: 'short', label: 'Short (150-200 words)', description: 'Brief and to the point' },
+    { value: 'concise', label: 'Concise (250-300 words)', description: 'Balanced length' },
+    { value: 'standard', label: 'Standard (350-400 words)', description: 'Comprehensive coverage' },
+    { value: 'detailed', label: 'Detailed (450-500 words)', description: 'In-depth presentation' }
+  ];
 
   useEffect(() => {
     if (user && activeTab === 'history') {
@@ -88,7 +95,11 @@ const CoverLetter = () => {
         length
       });
 
-      setSelectedCoverLetter(prev => ({ ...prev, content: result.content }));
+      setSelectedCoverLetter(prev => ({ 
+        ...prev, 
+        content: result.content,
+        regeneration_count: result.regeneration_count 
+      }));
       loadCoverLetterHistory();
     } catch (error) {
       console.error('Regeneration failed:', error);
@@ -107,6 +118,11 @@ const CoverLetter = () => {
     }
   };
 
+  const handleViewCoverLetter = (coverLetter: any) => {
+    setSelectedCoverLetter(coverLetter);
+    setActiveTab('result');
+  };
+
   const downloadCoverLetter = (content: string, fileName: string) => {
     const blob = new Blob([content], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
@@ -117,6 +133,15 @@ const CoverLetter = () => {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString() + ' at ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  const getRemainingFreeRegenerations = (regenerationCount: number) => {
+    return Math.max(0, 5 - regenerationCount);
   };
 
   if (!user) {
@@ -238,9 +263,11 @@ const CoverLetter = () => {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="short">Short (200-250 words)</SelectItem>
-                        <SelectItem value="medium">Medium (300-400 words)</SelectItem>
-                        <SelectItem value="long">Long (400-500 words)</SelectItem>
+                        {lengthOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
@@ -272,7 +299,20 @@ const CoverLetter = () => {
               <Card>
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle>{selectedCoverLetter.job_title} at {selectedCoverLetter.company_name}</CardTitle>
+                    <div>
+                      <CardTitle>{selectedCoverLetter.job_title} at {selectedCoverLetter.company_name}</CardTitle>
+                      <div className="flex items-center gap-4 mt-2 text-sm text-gray-600 dark:text-gray-400">
+                        <div className="flex items-center gap-1">
+                          <Clock className="h-4 w-4" />
+                          Generated {formatDate(selectedCoverLetter.created_at)}
+                        </div>
+                        {selectedCoverLetter.regeneration_count > 0 && (
+                          <Badge variant="outline" className="text-xs">
+                            Iteration {selectedCoverLetter.regeneration_count + 1}
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
                     <div className="flex items-center space-x-2">
                       <Button
                         variant="outline"
@@ -316,34 +356,44 @@ const CoverLetter = () => {
                         value={formData.length}
                         onValueChange={(value) => handleInputChange('length', value)}
                       >
-                        <SelectTrigger className="w-32">
+                        <SelectTrigger className="w-40">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="short">Short</SelectItem>
-                          <SelectItem value="medium">Medium</SelectItem>
-                          <SelectItem value="long">Long</SelectItem>
+                          {lengthOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label.split(' ')[0]}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </div>
                     
-                    <Button
-                      variant="outline"
-                      onClick={() => handleRegenerate(selectedCoverLetter.id, formData.tone, formData.length)}
-                      disabled={isRegenerating}
-                    >
-                      {isRegenerating ? (
-                        <>
-                          <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                          Regenerating...
-                        </>
-                      ) : (
-                        <>
-                          <RefreshCw className="h-4 w-4 mr-2" />
-                          Regenerate
-                        </>
-                      )}
-                    </Button>
+                    <div className="flex flex-col items-end">
+                      <Button
+                        variant="outline"
+                        onClick={() => handleRegenerate(selectedCoverLetter.id, formData.tone, formData.length)}
+                        disabled={isRegenerating}
+                      >
+                        {isRegenerating ? (
+                          <>
+                            <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                            Regenerating...
+                          </>
+                        ) : (
+                          <>
+                            <RefreshCw className="h-4 w-4 mr-2" />
+                            Regenerate
+                          </>
+                        )}
+                      </Button>
+                      <div className="text-xs text-gray-500 mt-1">
+                        {getRemainingFreeRegenerations(selectedCoverLetter.regeneration_count || 0) > 0 
+                          ? `${getRemainingFreeRegenerations(selectedCoverLetter.regeneration_count || 0)} free regenerations left`
+                          : 'Additional regenerations: 1 credit each'
+                        }
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -382,17 +432,30 @@ const CoverLetter = () => {
                         className="border rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                       >
                         <div className="flex items-center justify-between">
-                          <div>
-                            <h3 className="font-medium">{coverLetter.job_title} at {coverLetter.company_name}</h3>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                              Created {new Date(coverLetter.created_at).toLocaleDateString()}
-                            </p>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="font-medium">{coverLetter.job_title} at {coverLetter.company_name}</h3>
+                              {coverLetter.regeneration_count > 0 && (
+                                <Badge variant="outline" className="text-xs">
+                                  v{coverLetter.regeneration_count + 1}
+                                </Badge>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                              <div className="flex items-center gap-1">
+                                <Clock className="h-3 w-3" />
+                                {formatDate(coverLetter.created_at)}
+                              </div>
+                              {coverLetter.updated_at !== coverLetter.created_at && (
+                                <div>Updated {formatDate(coverLetter.updated_at)}</div>
+                              )}
+                            </div>
                           </div>
                           <div className="flex items-center space-x-2">
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => setSelectedCoverLetter(coverLetter)}
+                              onClick={() => handleViewCoverLetter(coverLetter)}
                             >
                               View
                             </Button>

@@ -65,9 +65,9 @@ export const useCoverLetter = () => {
       if (fetchError) throw fetchError;
 
       // Check regeneration count for credit calculation
-      const isFreRegeneration = originalData.regeneration_count < 5;
+      const isFreeregeneration = originalData.regeneration_count < 5;
       
-      if (!isFreRegeneration) {
+      if (!isFreeregeneration) {
         // Check credits for paid regeneration
         const { data: creditsData } = await supabase
           .from('user_credits')
@@ -105,7 +105,7 @@ export const useCoverLetter = () => {
             tone: params.tone
           },
           regeneration_count: originalData.regeneration_count + 1,
-          credits_used: originalData.credits_used + (isFreRegeneration ? 0 : 1),
+          credits_used: originalData.credits_used + (isFreeregeneration ? 0 : 1),
           updated_at: new Date().toISOString()
         })
         .eq('id', params.coverLetterId);
@@ -114,12 +114,16 @@ export const useCoverLetter = () => {
 
       toast({
         title: 'Cover Letter Regenerated!',
-        description: isFreRegeneration 
+        description: isFreeregeneration 
           ? 'Your cover letter has been regenerated (free regeneration).'
           : 'Your cover letter has been regenerated (1 credit used).',
       });
 
-      return { ...data, id: params.coverLetterId };
+      return { 
+        content: data.content, 
+        id: params.coverLetterId,
+        regeneration_count: originalData.regeneration_count + 1
+      };
     } catch (error: any) {
       console.error('Cover letter regeneration error:', error);
       toast({

@@ -66,18 +66,23 @@ serve(async (req) => {
 
     const templatePrompt = templateData?.template_prompt || 'Write a professional cover letter with a formal tone.'
 
-    // Build the prompt
+    // Build the prompt with enhanced length instructions
     let lengthInstruction = ''
     switch (length) {
       case 'short':
-        lengthInstruction = 'Keep the cover letter concise and to the point, around 200-250 words.'
+        lengthInstruction = 'Keep the cover letter brief and impactful, around 150-200 words. Focus on the most essential points.'
         break
-      case 'medium':
-        lengthInstruction = 'Write a medium-length cover letter, around 300-400 words.'
+      case 'concise':
+        lengthInstruction = 'Write a concise cover letter, around 250-300 words. Balance brevity with comprehensive coverage.'
         break
-      case 'long':
-        lengthInstruction = 'Write a comprehensive cover letter, around 400-500 words.'
+      case 'standard':
+        lengthInstruction = 'Write a standard-length cover letter, around 350-400 words. Provide thorough coverage of qualifications.'
         break
+      case 'detailed':
+        lengthInstruction = 'Write a detailed cover letter, around 450-500 words. Include comprehensive examples and thorough explanations.'
+        break
+      default:
+        lengthInstruction = 'Write a concise cover letter, around 250-300 words.'
     }
 
     const systemPrompt = `You are an expert cover letter writer. ${templatePrompt} ${lengthInstruction}
@@ -85,11 +90,12 @@ serve(async (req) => {
 The cover letter should:
 - Be tailored specifically to the job and company
 - Highlight relevant experience and skills
-- Show enthusiasm for the role
+- Show genuine enthusiasm for the role
 - Include a professional opening and closing
 - Be well-structured with clear paragraphs
+- Match the requested length and tone precisely
 
-Format the response as a complete, ready-to-send cover letter.`
+Format the response as a complete, ready-to-send cover letter with proper formatting.`
 
     const userPrompt = `Write a cover letter for the following position:
 
@@ -98,7 +104,7 @@ Company: ${companyName}
 ${jobDescription ? `Job Description: ${jobDescription}` : ''}
 ${cvText ? `My CV/Resume content: ${cvText}` : ''}
 
-Please create a compelling cover letter that matches my background to this specific role.`
+Please create a compelling cover letter that matches my background to this specific role and demonstrates why I'm the ideal candidate.`
 
     const startTime = Date.now()
 
