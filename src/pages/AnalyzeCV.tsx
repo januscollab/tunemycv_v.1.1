@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -151,7 +152,7 @@ const AnalyzeCV = () => {
             compact={true}
           />
           <EmbeddedAuth
-            title="Get Started"
+            title="Login to Get Started"
             description="CV analysis requires an account to ensure personalized results and save your analysis history."
             icon={<FileText className="h-6 w-6 text-apricot mr-2" />}
           />
