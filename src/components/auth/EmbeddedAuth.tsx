@@ -32,15 +32,15 @@ const EmbeddedAuth: React.FC<EmbeddedAuthProps> = ({ title, description, icon })
   const isAnyLoading = loading || oauthLoading;
 
   return (
-    <Card className="sticky top-6">
-      <CardHeader>
-        <CardTitle className="flex items-center justify-center">
-          {icon || <User className="h-6 w-6 text-apricot mr-2" />}
+    <Card className="max-w-sm w-full">
+      <CardHeader className="py-3 px-4">
+        <CardTitle className="flex items-center justify-center text-lg">
+          {icon || <User className="h-5 w-5 text-apricot mr-2" />}
           {title}
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <p className="text-blueberry/80 dark:text-apple-core/80 text-center text-sm mb-4">
+      <CardContent className="space-y-3 px-4 pb-4">
+        <p className="text-blueberry/80 dark:text-apple-core/80 text-center text-xs mb-3">
           {description}
         </p>
         
