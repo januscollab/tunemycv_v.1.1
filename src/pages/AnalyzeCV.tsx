@@ -221,28 +221,29 @@ const AnalyzeCV = () => {
           </p>
         </div>
 
-        {/* Tabs Navigation */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-8">
-            <TabsTrigger value="analysis" className="flex items-center space-x-2">
-              <FileText className="h-4 w-4" />
-              <span>CV Analysis</span>
-            </TabsTrigger>
-            <TabsTrigger value="report" className="flex items-center space-x-2" disabled={!analysisResult}>
-              <Eye className="h-4 w-4" />
-              <span>Current Report</span>
-            </TabsTrigger>
-            <TabsTrigger value="history" className="flex items-center space-x-2">
-              <History className="h-4 w-4" />
-              <span>Analysis History</span>
-            </TabsTrigger>
-          </TabsList>
+        {/* Main Content Grid - matching Cover Letter page structure */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* Main Content Section */}
+          <div className="lg:col-span-3">
+            {/* Tabs Navigation - positioned within content area */}
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-3 mb-8">
+                <TabsTrigger value="analysis" className="flex items-center space-x-2">
+                  <FileText className="h-4 w-4" />
+                  <span>CV Analysis</span>
+                </TabsTrigger>
+                <TabsTrigger value="report" className="flex items-center space-x-2" disabled={!analysisResult}>
+                  <Eye className="h-4 w-4" />
+                  <span>Current Report</span>
+                </TabsTrigger>
+                <TabsTrigger value="history" className="flex items-center space-x-2">
+                  <History className="h-4 w-4" />
+                  <span>Analysis History</span>
+                </TabsTrigger>
+              </TabsList>
 
-          {/* CV Analysis Tab */}
-          <TabsContent value="analysis" className="mt-0">
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-              {/* Main Analysis Section */}
-              <div className="lg:col-span-3">
+              {/* CV Analysis Tab */}
+              <TabsContent value="analysis" className="mt-0">
                 <div className="space-y-6">
                   {/* Job Title */}
                   <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
@@ -300,55 +301,55 @@ const AnalyzeCV = () => {
                     hasCreditsForAI={hasCreditsForAI}
                   />
                 </div>
-              </div>
+              </TabsContent>
 
-              {/* Credits Panel */}
-              <div className="lg:col-span-1">
-                <CreditsPanel
-                  credits={userCredits?.credits || 0}
-                  hasCreditsForAI={hasCreditsForAI}
-                />
-              </div>
-            </div>
-          </TabsContent>
+              {/* Current Report Tab */}
+              <TabsContent value="report" className="mt-0">
+                {analysisResult ? (
+                  <AnalysisResults result={analysisResult} onStartNew={handleStartNew} />
+                ) : (
+                  <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-12 border border-apple-core/20 dark:border-citrus/20 text-center">
+                    <Eye className="h-16 w-16 text-blueberry/30 dark:text-apple-core/50 mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mb-2">No Report Available</h3>
+                    <p className="text-blueberry/70 dark:text-apple-core/80 mb-6">
+                      Complete a CV analysis to view your report here.
+                    </p>
+                    <button
+                      onClick={() => setActiveTab('analysis')}
+                      className="bg-apricot hover:bg-apricot/90 text-white px-6 py-2 rounded-md transition-colors"
+                    >
+                      Start Analysis
+                    </button>
+                  </div>
+                )}
+              </TabsContent>
 
-          {/* Current Report Tab */}
-          <TabsContent value="report" className="mt-0">
-            {analysisResult ? (
-              <AnalysisResults result={analysisResult} onStartNew={handleStartNew} />
-            ) : (
-              <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-12 border border-apple-core/20 dark:border-citrus/20 text-center">
-                <Eye className="h-16 w-16 text-blueberry/30 dark:text-apple-core/50 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mb-2">No Report Available</h3>
-                <p className="text-blueberry/70 dark:text-apple-core/80 mb-6">
-                  Complete a CV analysis to view your report here.
-                </p>
-                <button
-                  onClick={() => setActiveTab('analysis')}
-                  className="bg-apricot hover:bg-apricot/90 text-white px-6 py-2 rounded-md transition-colors"
-                >
-                  Start Analysis
-                </button>
-              </div>
-            )}
-          </TabsContent>
+              {/* Analysis History Tab */}
+              <TabsContent value="history" className="mt-0">
+                <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-12 border border-apple-core/20 dark:border-citrus/20 text-center">
+                  <History className="h-16 w-16 text-blueberry/30 dark:text-apple-core/50 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mb-2">Analysis History</h3>
+                  <p className="text-blueberry/70 dark:text-apple-core/80 mb-4">
+                    Coming soon! This feature will allow you to view and manage your previous CV analyses.
+                  </p>
+                  <div className="inline-flex items-center px-4 py-2 bg-blueberry/10 dark:bg-apple-core/10 rounded-md">
+                    <span className="text-sm text-blueberry/70 dark:text-apple-core/80">
+                      🚧 Feature in development
+                    </span>
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </div>
 
-          {/* Analysis History Tab */}
-          <TabsContent value="history" className="mt-0">
-            <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-12 border border-apple-core/20 dark:border-citrus/20 text-center">
-              <History className="h-16 w-16 text-blueberry/30 dark:text-apple-core/50 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mb-2">Analysis History</h3>
-              <p className="text-blueberry/70 dark:text-apple-core/80 mb-4">
-                Coming soon! This feature will allow you to view and manage your previous CV analyses.
-              </p>
-              <div className="inline-flex items-center px-4 py-2 bg-blueberry/10 dark:bg-apple-core/10 rounded-md">
-                <span className="text-sm text-blueberry/70 dark:text-apple-core/80">
-                  🚧 Feature in development
-                </span>
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
+          {/* Credits Panel - matching Cover Letter page positioning */}
+          <div className="lg:col-span-1">
+            <CreditsPanel
+              credits={userCredits?.credits || 0}
+              hasCreditsForAI={hasCreditsForAI}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
