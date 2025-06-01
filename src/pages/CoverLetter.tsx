@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { FileText } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AnalysisSelector from '@/components/cover-letter/AnalysisSelector';
-import AdvancedGenerationOptions from '@/components/cover-letter/AdvancedGenerationOptions';
+import CoverLetterGenerationForm from '@/components/cover-letter/CoverLetterGenerationForm';
 import EditableCoverLetter from '@/components/cover-letter/EditableCoverLetter';
 import CreditsPanel from '@/components/analyze/CreditsPanel';
 import { useCoverLetter } from '@/hooks/useCoverLetter';
@@ -21,7 +21,6 @@ const CoverLetter = () => {
     setSelectedAnalysis,
     coverLetterData,
     isGenerating,
-    generateCoverLetter,
     updateCoverLetter
   } = useCoverLetter();
 
@@ -43,6 +42,10 @@ const CoverLetter = () => {
   });
 
   const hasCreditsForAI = userCredits?.credits && userCredits.credits > 0;
+
+  const handleGenerated = () => {
+    setActiveTab('edit');
+  };
 
   if (!user) {
     const coverLetterExplanation = {
@@ -117,13 +120,22 @@ const CoverLetter = () => {
                 <AnalysisSelector
                   selectedAnalysisId={selectedAnalysis}
                   onAnalysisSelect={setSelectedAnalysis}
+                  disabled={isGenerating}
                 />
                 
-                <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
-                  <p className="text-sm text-blueberry/70 dark:text-apple-core/80">
-                    Advanced generation options will be available once an analysis is selected.
-                  </p>
-                </div>
+                {selectedAnalysis ? (
+                  <CoverLetterGenerationForm
+                    selectedAnalysisId={selectedAnalysis}
+                    hasCreditsForAI={hasCreditsForAI}
+                    onGenerated={handleGenerated}
+                  />
+                ) : (
+                  <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
+                    <p className="text-sm text-blueberry/70 dark:text-apple-core/80">
+                      Select an analysis from your history to continue with cover letter generation.
+                    </p>
+                  </div>
+                )}
               </div>
             </TabsContent>
 
