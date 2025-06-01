@@ -1,6 +1,7 @@
 
 import React from 'react';
 import PersonalInfoTab from './PersonalInfoTab';
+import AnalysisHistoryTab from './AnalysisHistoryTab';
 import CVManagementTab from './CVManagementTab';
 import BillingHistoryTab from './BillingHistoryTab';
 import SettingsTab from './SettingsTab';
@@ -16,6 +17,8 @@ const ProfileTabContent: React.FC<ProfileTabContentProps> = ({ activeTab, credit
     switch (activeTab) {
       case 'personal':
         return <PersonalInfoTab credits={credits} memberSince={memberSince} />;
+      case 'history':
+        return <AnalysisHistoryTab credits={credits} memberSince={memberSince} />;
       case 'files':
         return <CVManagementTab credits={credits} memberSince={memberSince} />;
       case 'password':

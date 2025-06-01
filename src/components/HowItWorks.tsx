@@ -31,36 +31,36 @@ const HowItWorks = () => {
   ];
 
   return (
-    <section id="how-it-works" className="py-12 md:py-20 px-4 bg-white dark:bg-gray-900">
+    <section id="how-it-works" className="py-20 px-4 bg-white dark:bg-gray-900">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-8 md:mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-blueberry dark:text-citrus mb-4">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl font-bold text-blueberry dark:text-citrus mb-4">
             How TuneMyCV Works
           </h2>
-          <p className="text-lg md:text-xl text-blueberry/80 dark:text-apple-core max-w-3xl mx-auto px-4">
+          <p className="text-xl text-blueberry/80 dark:text-apple-core max-w-3xl mx-auto">
             Transform your CV in four simple steps and increase your chances of landing your dream job
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {steps.map((step, index) => (
             <div key={index} className="text-center">
-              <div className="bg-gradient-to-br from-citrus/20 to-apricot/20 rounded-lg overflow-hidden mb-4 md:mb-6 border border-citrus/30">
+              <div className="bg-gradient-to-br from-citrus/20 to-apricot/20 rounded-lg overflow-hidden mb-6 border border-citrus/30">
                 <img 
                   src={step.image} 
                   alt={step.title}
-                  className="w-full h-32 md:h-48 object-cover"
+                  className="w-full h-48 object-cover"
                 />
-                <div className="p-3 md:p-4">
-                  <div className="bg-gradient-to-br from-citrus/20 to-apricot/20 rounded-full w-12 h-12 md:w-16 md:h-16 flex items-center justify-center mx-auto mb-3 md:mb-4 border border-citrus/30">
-                    <step.icon className="h-6 w-6 md:h-8 md:w-8 text-apricot" />
+                <div className="p-4">
+                  <div className="bg-gradient-to-br from-citrus/20 to-apricot/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 border border-citrus/30">
+                    <step.icon className="h-8 w-8 text-apricot" />
                   </div>
                 </div>
               </div>
-              <h3 className="text-lg md:text-xl font-semibold text-blueberry dark:text-citrus mb-3 md:mb-4">
+              <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mb-4">
                 {step.title}
               </h3>
-              <p className="text-sm md:text-base text-blueberry/70 dark:text-apple-core/80 leading-relaxed px-2">
+              <p className="text-blueberry/70 dark:text-apple-core/80 leading-relaxed">
                 {step.description}
               </p>
             </div>

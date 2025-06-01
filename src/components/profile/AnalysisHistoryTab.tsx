@@ -3,11 +3,11 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import AnalysisHistoryHeader from '@/components/profile/analysis/AnalysisHistoryHeader';
-import EmptyAnalysisState from '@/components/profile/analysis/EmptyAnalysisState';
-import AnalysisListItem from '@/components/profile/analysis/AnalysisListItem';
-import AnalysisDetailModal from '@/components/profile/analysis/AnalysisDetailModal';
-import UpcomingFeatureModal from '@/components/profile/analysis/UpcomingFeatureModal';
+import AnalysisHistoryHeader from './analysis/AnalysisHistoryHeader';
+import EmptyAnalysisState from './analysis/EmptyAnalysisState';
+import AnalysisListItem from './analysis/AnalysisListItem';
+import AnalysisDetailModal from './analysis/AnalysisDetailModal';
+import UpcomingFeatureModal from './analysis/UpcomingFeatureModal';
 
 interface AnalysisResult {
   id: string;
@@ -20,15 +20,16 @@ interface AnalysisResult {
   weaknesses: string[];
   recommendations: string[];
   credit_cost?: number;
-  cv_file_name?: string;
-  cv_file_size?: number;
+  cv_file_name?: string; // New field from database enhancement
+  cv_file_size?: number; // New field from database enhancement
 }
 
 interface AnalysisHistoryTabProps {
-  onAnalysisSelect: (analysis: AnalysisResult) => void;
+  credits: number;
+  memberSince: string;
 }
 
-const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ onAnalysisSelect }) => {
+const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ credits, memberSince }) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [analyses, setAnalyses] = useState<AnalysisResult[]>([]);
@@ -50,6 +51,7 @@ const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ onAnalysisSelec
 
   const loadAnalysisHistory = async () => {
     try {
+      // Updated query to use new CV metadata fields and left join for cost estimate
       const { data, error } = await supabase
         .from('analysis_results')
         .select(`
@@ -61,6 +63,7 @@ const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ onAnalysisSelec
 
       if (error) throw error;
       
+      // Transform data to include credit cost, handling null values gracefully
       const transformedData = (data || []).map(analysis => ({
         ...analysis,
         credit_cost: analysis.analysis_logs?.[0]?.cost_estimate ? Math.ceil(analysis.analysis_logs[0].cost_estimate) : 1
@@ -76,10 +79,6 @@ const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ onAnalysisSelec
 
   const handleViewDetails = (analysis: AnalysisResult) => {
     setSelectedAnalysis(analysis);
-  };
-
-  const handleViewReport = (analysis: AnalysisResult) => {
-    onAnalysisSelect(analysis);
   };
 
   const handleDeleteAnalysis = async (analysisId: string) => {
@@ -137,21 +136,14 @@ const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ onAnalysisSelec
       ) : (
         <div className="space-y-4">
           {analyses.map((analysis) => (
-            <div key={analysis.id} className="relative">
-              <AnalysisListItem
-                analysis={analysis}
-                onViewDetails={handleViewDetails}
-                onDelete={handleDeleteAnalysis}
-                onCreateCoverLetter={handleCreateCoverLetter}
-                onInterviewPrep={handleInterviewPrep}
-              />
-              <button
-                onClick={() => handleViewReport(analysis)}
-                className="absolute top-4 right-4 bg-apricot hover:bg-apricot/90 text-white px-3 py-1 rounded-md text-sm font-medium transition-colors"
-              >
-                View Report
-              </button>
-            </div>
+            <AnalysisListItem
+              key={analysis.id}
+              analysis={analysis}
+              onViewDetails={handleViewDetails}
+              onDelete={handleDeleteAnalysis}
+              onCreateCoverLetter={handleCreateCoverLetter}
+              onInterviewPrep={handleInterviewPrep}
+            />
           ))}
         </div>
       )}

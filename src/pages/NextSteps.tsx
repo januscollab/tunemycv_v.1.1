@@ -1,15 +1,10 @@
 
 import React from 'react';
 import { useUserData } from '@/hooks/useUserData';
-import AnalysisHistoryTab from '@/components/analyze/tabs/AnalysisHistoryTab';
+import AnalysisHistoryTab from '@/components/profile/AnalysisHistoryTab';
 
 const NextSteps = () => {
   const { credits, memberSince } = useUserData();
-
-  const handleAnalysisSelect = (analysis: any) => {
-    // Handle analysis selection if needed
-    console.log('Analysis selected:', analysis);
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-apple-core/10 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5 py-8">
@@ -21,7 +16,7 @@ const NextSteps = () => {
           </p>
         </div>
         
-        <AnalysisHistoryTab onAnalysisSelect={handleAnalysisSelect} />
+        <AnalysisHistoryTab credits={credits} memberSince={memberSince} />
       </div>
     </div>
   );

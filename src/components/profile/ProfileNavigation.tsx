@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { User, Upload, CreditCard, Settings } from 'lucide-react';
+import { User, History, Upload, CreditCard, Settings } from 'lucide-react';
 
 interface ProfileNavigationProps {
   activeTab: string;
@@ -10,6 +10,7 @@ interface ProfileNavigationProps {
 const ProfileNavigation: React.FC<ProfileNavigationProps> = ({ activeTab, onTabChange }) => {
   const tabs = [
     { id: 'personal', label: 'Personal Info', icon: User },
+    { id: 'history', label: 'Document History', icon: History },
     { id: 'files', label: 'File Management', icon: Upload },
     { id: 'password', label: 'Billing History', icon: CreditCard },
     { id: 'settings', label: 'Settings', icon: Settings },
