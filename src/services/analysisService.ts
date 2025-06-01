@@ -138,9 +138,30 @@ export const saveAnalysisResults = async (analysisData: any) => {
     throw new Error('User must be authenticated to save analysis results');
   }
   
+  // Prepare data for insertion - handle nullable upload IDs for temporary analyses
+  const insertData = {
+    user_id: analysisData.user_id,
+    cv_upload_id: analysisData.cv_upload_id || null, // Can be null for temporary CV
+    job_description_upload_id: analysisData.job_description_upload_id || null, // Now nullable for temporary analyses
+    cv_file_name: analysisData.cv_file_name,
+    cv_file_size: analysisData.cv_file_size,
+    cv_extracted_text: analysisData.cv_extracted_text,
+    job_description_file_name: analysisData.job_description_file_name,
+    job_description_extracted_text: analysisData.job_description_extracted_text,
+    job_title: analysisData.job_title,
+    company_name: analysisData.company_name,
+    compatibility_score: analysisData.compatibility_score,
+    keywords_found: analysisData.keywords_found,
+    keywords_missing: analysisData.keywords_missing,
+    strengths: analysisData.strengths,
+    weaknesses: analysisData.weaknesses,
+    recommendations: analysisData.recommendations,
+    executive_summary: analysisData.executive_summary
+  };
+
   const { data: analysisResult, error: analysisError } = await supabase
     .from('analysis_results')
-    .insert(analysisData)
+    .insert(insertData)
     .select()
     .single();
 

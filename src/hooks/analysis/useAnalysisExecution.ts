@@ -65,11 +65,14 @@ export const useAnalysisExecution = () => {
           ...enhancedAnalysis,
           user_id: user?.id,
           cv_upload_id: cvUpload?.id || null, // Can be null for temporary analyses
-          job_description_upload_id: jobUpload?.id || null,
+          job_description_upload_id: jobUpload?.id || null, // Can be null for temporary analyses
           // Store CV metadata directly in analysis for decoupling
           cv_file_name: uploadedFiles.cv.file.name,
           cv_file_size: uploadedFiles.cv.file.size,
           cv_extracted_text: uploadedFiles.cv.extractedText,
+          // Store job description metadata directly for temporary analyses
+          job_description_file_name: uploadedFiles.jobDescription.file.name,
+          job_description_extracted_text: uploadedFiles.jobDescription.extractedText,
           // Keep legacy fields for backward compatibility
           job_title: enhancedAnalysis.position || finalJobTitle,
           company_name: enhancedAnalysis.companyName || extractedCompany,
@@ -108,10 +111,12 @@ export const useAnalysisExecution = () => {
           user?.id!
         );
         
-        // Add CV metadata for decoupling
+        // Add metadata for decoupling and temporary analyses
         analysisResult.cv_file_name = uploadedFiles.cv.file.name;
         analysisResult.cv_file_size = uploadedFiles.cv.file.size;
         analysisResult.cv_extracted_text = uploadedFiles.cv.extractedText;
+        analysisResult.job_description_file_name = uploadedFiles.jobDescription.file.name;
+        analysisResult.job_description_extracted_text = uploadedFiles.jobDescription.extractedText;
         analysisResult.cv_upload_id = cvUpload?.id || null;
         analysisResult.job_description_upload_id = jobUpload?.id || null;
         
@@ -141,10 +146,12 @@ export const useAnalysisExecution = () => {
         user?.id!
       );
       
-      // Add CV metadata for decoupling
+      // Add metadata for decoupling and temporary analyses
       analysisResult.cv_file_name = uploadedFiles.cv.file.name;
       analysisResult.cv_file_size = uploadedFiles.cv.file.size;
       analysisResult.cv_extracted_text = uploadedFiles.cv.extractedText;
+      analysisResult.job_description_file_name = uploadedFiles.jobDescription.file.name;
+      analysisResult.job_description_extracted_text = uploadedFiles.jobDescription.extractedText;
       analysisResult.cv_upload_id = cvUpload?.id || null;
       analysisResult.job_description_upload_id = jobUpload?.id || null;
       
@@ -162,6 +169,8 @@ export const useAnalysisExecution = () => {
       cv_file_name: analysisResult.cv_file_name,
       cv_file_size: analysisResult.cv_file_size,
       cv_extracted_text: analysisResult.cv_extracted_text,
+      job_description_file_name: analysisResult.job_description_file_name,
+      job_description_extracted_text: analysisResult.job_description_extracted_text,
       job_title: analysisResult.job_title,
       company_name: analysisResult.company_name,
       compatibility_score: analysisResult.compatibility_score,

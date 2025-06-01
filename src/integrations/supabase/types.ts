@@ -96,7 +96,9 @@ export type Database = {
           cv_upload_id: string | null
           executive_summary: string | null
           id: string
-          job_description_upload_id: string
+          job_description_extracted_text: string | null
+          job_description_file_name: string | null
+          job_description_upload_id: string | null
           job_title: string | null
           keywords_found: Json | null
           keywords_missing: Json | null
@@ -115,7 +117,9 @@ export type Database = {
           cv_upload_id?: string | null
           executive_summary?: string | null
           id?: string
-          job_description_upload_id: string
+          job_description_extracted_text?: string | null
+          job_description_file_name?: string | null
+          job_description_upload_id?: string | null
           job_title?: string | null
           keywords_found?: Json | null
           keywords_missing?: Json | null
@@ -134,7 +138,9 @@ export type Database = {
           cv_upload_id?: string | null
           executive_summary?: string | null
           id?: string
-          job_description_upload_id?: string
+          job_description_extracted_text?: string | null
+          job_description_file_name?: string | null
+          job_description_upload_id?: string | null
           job_title?: string | null
           keywords_found?: Json | null
           keywords_missing?: Json | null
