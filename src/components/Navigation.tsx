@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, FileText, Target, BookOpen, User, Shield, TrendingUp, Edit } from 'lucide-react';
@@ -22,12 +21,12 @@ const Navigation = () => {
   const baseNavItems = [
     { path: '/', label: 'Home', icon: Target },
     { path: '/analyze', label: 'Analyze CV', icon: FileText },
+    { path: '/cover-letter', label: 'Cover Letter', icon: Edit },
   ];
 
   // Add conditional navigation items based on auth state
   const conditionalNavItems = user 
     ? [
-        { path: '/cover-letter', label: 'Cover Letter', icon: Edit },
         { path: '/next-steps', label: 'Next Steps', icon: TrendingUp }
       ]
     : [];

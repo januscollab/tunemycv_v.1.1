@@ -12,6 +12,8 @@ import { useAnalysis } from '@/hooks/useAnalysis';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Upload, FileText, X, Check } from 'lucide-react';
+import AuthSidebar from '@/components/auth/AuthSidebar';
+import ServiceExplanation from '@/components/common/ServiceExplanation';
 
 interface UploadedFile {
   file: File;
@@ -184,6 +186,48 @@ const AnalyzeCV = () => {
 
   if (analysisResult) {
     return <AnalysisResults result={analysisResult} onStartNew={handleStartNew} />;
+  }
+
+  // Logged-out user experience
+  if (!user) {
+    const analyzeExplanation = {
+      title: 'Analyze Your CV',
+      subtitle: 'Get comprehensive compatibility analysis with actionable recommendations to improve your job application success.',
+      benefits: [
+        'Advanced AI-powered analysis that evaluates your CV against specific job requirements',
+        'Detailed compatibility scoring to understand how well you match the role',
+        'Keyword optimization recommendations to improve ATS (Applicant Tracking System) compatibility',
+        'Personalized suggestions to strengthen weak areas and highlight your best qualifications',
+        'Professional insights based on industry best practices and hiring manager preferences',
+        'Comprehensive feedback to help you stand out from other candidates'
+      ],
+      features: [
+        'Upload your CV in PDF, DOCX, or TXT format for instant analysis',
+        'Paste or upload the job description you\'re targeting',
+        'Our AI analyzes compatibility, keywords, and alignment between your experience and the role',
+        'Receive detailed recommendations, compatibility scores, and actionable next steps',
+        'Download your analysis report and implement suggested improvements'
+      ]
+    };
+
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-apple-core/20 via-white to-citrus/10 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
+        <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <ServiceExplanation
+            title={analyzeExplanation.title}
+            subtitle={analyzeExplanation.subtitle}
+            benefits={analyzeExplanation.benefits}
+            features={analyzeExplanation.features}
+            icon={<FileText className="h-8 w-8 text-apricot" />}
+          />
+          <AuthSidebar
+            title="Get Started"
+            description="CV analysis requires an account to ensure personalized results and save your analysis history."
+            icon={<FileText className="h-6 w-6 text-apricot mr-2" />}
+          />
+        </div>
+      </div>
+    );
   }
 
   return (

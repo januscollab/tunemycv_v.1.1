@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FileText, Sparkles, Download, Trash2, RefreshCw, Clock } from 'lucide-react';
@@ -13,6 +12,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import AuthSidebar from '@/components/auth/AuthSidebar';
+import ServiceExplanation from '@/components/common/ServiceExplanation';
 
 const CoverLetter = () => {
   const { user } = useAuth();
@@ -31,6 +32,8 @@ const CoverLetter = () => {
   const [selectedCoverLetter, setSelectedCoverLetter] = useState<any>(null);
   const [activeTab, setActiveTab] = useState('create');
   const [loadingHistory, setLoadingHistory] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [showSavePrompt, setShowSavePrompt] = useState(false);
 
   const lengthOptions = [
     { value: 'short', label: 'Short (150-200 words)', description: 'Brief and to the point' },
@@ -59,10 +62,13 @@ const CoverLetter = () => {
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    if (selectedCoverLetter && !hasUnsavedChanges) {
+      setHasUnsavedChanges(true);
+    }
   };
 
   const handleGenerate = async () => {
-    if (!formData.jobTitle || !formData.companyName) {
+    if (!formData.jobTitle || !formData.companyName || !formData.jobDescription) {
       return;
     }
 
@@ -70,13 +76,14 @@ const CoverLetter = () => {
       const result = await generateCoverLetter({
         jobTitle: formData.jobTitle,
         companyName: formData.companyName,
-        jobDescription: formData.jobDescription || undefined,
+        jobDescription: formData.jobDescription,
         tone: formData.tone,
         length: formData.length
       });
 
-      setSelectedCoverLetter(result.coverLetter);
+      setSelectedCoverLetter({ ...result.coverLetter, isUnsaved: true });
       setActiveTab('result');
+      setHasUnsavedChanges(true);
       
       // Refresh history if it was loaded
       if (coverLetters.length > 0) {
@@ -84,6 +91,14 @@ const CoverLetter = () => {
       }
     } catch (error) {
       console.error('Generation failed:', error);
+    }
+  };
+
+  const handleSaveCoverLetter = () => {
+    if (selectedCoverLetter) {
+      setSelectedCoverLetter(prev => ({ ...prev, isUnsaved: false }));
+      setHasUnsavedChanges(false);
+      loadCoverLetterHistory();
     }
   };
 
@@ -145,44 +160,69 @@ const CoverLetter = () => {
   };
 
   if (!user) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-apple-core/10 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5 py-8">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-blueberry dark:text-citrus mb-4">Create Cover Letter</h1>
-            <p className="text-xl text-blueberry/80 dark:text-apple-core max-w-2xl mx-auto">
-              Sign in to generate personalized cover letters that align your experience with any role.
-            </p>
-          </div>
+    const coverLetterExplanation = {
+      title: 'Generate Cover Letter',
+      subtitle: 'Create tailored cover letters that highlight your strengths and align perfectly with specific job requirements.',
+      benefits: [
+        'AI-powered cover letter generation that matches your experience to the job requirements',
+        'Multiple tone options (professional, conversational, confident, enthusiastic) to match company culture',
+        'Customizable length options from brief to detailed presentations',
+        'Tailored content that highlights your most relevant qualifications for each specific role',
+        'Professional formatting and structure that hiring managers expect to see',
+        'Save time while creating personalized, compelling cover letters for every application'
+      ],
+      features: [
+        'Enter the job title and company name for personalized addressing',
+        'Paste the complete job description for maximum relevance and keyword optimization',
+        'Choose your preferred tone and length to match the role and company culture',
+        'Our AI analyzes the job requirements and crafts a compelling narrative of your fit',
+        'Review, edit, and save your cover letter for future use or immediate application'
+      ]
+    };
 
-          <Card className="max-w-md mx-auto">
-            <CardHeader>
-              <CardTitle className="flex items-center justify-center">
-                <FileText className="h-6 w-6 text-apricot mr-2" />
-                Authentication Required
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-blueberry/80 dark:text-apple-core/80">
-                Cover letter generation requires an account to ensure personalized results and save your work.
-              </p>
-              <Link to="/auth">
-                <Button className="w-full bg-apricot hover:bg-apricot/90">
-                  Sign In to Get Started
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-apple-core/10 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
+        <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <ServiceExplanation
+            title={coverLetterExplanation.title}
+            subtitle={coverLetterExplanation.subtitle}
+            benefits={coverLetterExplanation.benefits}
+            features={coverLetterExplanation.features}
+            icon={<FileText className="h-8 w-8 text-apricot" />}
+          />
+          <AuthSidebar
+            title="Get Started"
+            description="Cover letter generation requires an account to ensure personalized results and save your work."
+            icon={<FileText className="h-6 w-6 text-apricot mr-2" />}
+          />
         </div>
       </div>
     );
   }
 
+  const handleTabChange = (newTab: string) => {
+    if (hasUnsavedChanges && newTab !== activeTab) {
+      setShowSavePrompt(true);
+      return;
+    }
+    setActiveTab(newTab);
+  };
+
+  const confirmTabChange = (save: boolean) => {
+    if (save) {
+      handleSaveCoverLetter();
+    } else {
+      setHasUnsavedChanges(false);
+    }
+    setShowSavePrompt(false);
+    setActiveTab('create');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-apple-core/10 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5 py-8">
       <div className="max-w-6xl mx-auto px-4">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-blueberry dark:text-citrus mb-4">Create Cover Letter</h1>
+          <h1 className="text-4xl font-bold text-blueberry dark:text-citrus mb-4">Generate Cover Letter</h1>
           <div className="flex items-center justify-between">
             <p className="text-xl text-blueberry/80 dark:text-apple-core max-w-2xl">
               Generate tailored cover letters that highlight your strengths and align with specific job requirements.
@@ -193,7 +233,24 @@ const CoverLetter = () => {
           </div>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        {showSavePrompt && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md">
+              <h3 className="text-lg font-semibold mb-4">Unsaved Changes</h3>
+              <p className="mb-6">You have unsaved changes. Would you like to save before continuing?</p>
+              <div className="flex space-x-4">
+                <Button onClick={() => confirmTabChange(true)} className="bg-apricot hover:bg-apricot/90">
+                  Save & Continue
+                </Button>
+                <Button variant="outline" onClick={() => confirmTabChange(false)}>
+                  Don't Save
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="create">Create New</TabsTrigger>
             <TabsTrigger value="result">Current Result</TabsTrigger>
@@ -231,14 +288,18 @@ const CoverLetter = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="jobDescription">Job Description (Optional)</Label>
+                  <Label htmlFor="jobDescription">Job Description *</Label>
                   <Textarea
                     id="jobDescription"
-                    placeholder="Paste the job description here for more tailored results..."
+                    placeholder="Paste the complete job description here for the most tailored results..."
                     value={formData.jobDescription}
                     onChange={(e) => handleInputChange('jobDescription', e.target.value)}
-                    rows={4}
+                    rows={6}
+                    required
                   />
+                  <p className="text-sm text-blueberry/70 dark:text-apple-core/70 mt-1">
+                    Job description is required for optimal cover letter generation
+                  </p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -275,7 +336,7 @@ const CoverLetter = () => {
 
                 <Button 
                   onClick={handleGenerate}
-                  disabled={!formData.jobTitle || !formData.companyName || isGenerating || credits < 1}
+                  disabled={!formData.jobTitle || !formData.companyName || !formData.jobDescription || isGenerating || credits < 1}
                   className="w-full bg-apricot hover:bg-apricot/90"
                 >
                   {isGenerating ? (
@@ -311,9 +372,24 @@ const CoverLetter = () => {
                             Iteration {selectedCoverLetter.regeneration_count + 1}
                           </Badge>
                         )}
+                        {selectedCoverLetter.isUnsaved && (
+                          <Badge variant="outline" className="text-orange-600 border-orange-600">
+                            Unsaved
+                          </Badge>
+                        )}
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
+                      {selectedCoverLetter.isUnsaved && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={handleSaveCoverLetter}
+                          className="bg-green-50 border-green-300 text-green-700 hover:bg-green-100"
+                        >
+                          Save Cover Letter
+                        </Button>
+                      )}
                       <Button
                         variant="outline"
                         size="sm"
@@ -383,7 +459,7 @@ const CoverLetter = () => {
                         ) : (
                           <>
                             <RefreshCw className="h-4 w-4 mr-2" />
-                            Regenerate
+                            Regenerate (1 Credit)
                           </>
                         )}
                       </Button>
