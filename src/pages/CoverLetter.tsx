@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FileText, Sparkles, Download, Trash2, RefreshCw, Clock, FileUp, Search } from 'lucide-react';
+import { FileText, Sparkles, Download, Trash2, RefreshCw, Clock, FileUp, Search, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCoverLetter } from '@/hooks/useCoverLetter';
 import { useUserData } from '@/hooks/useUserData';
@@ -12,6 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import EmbeddedAuth from '@/components/auth/EmbeddedAuth';
 import ServiceExplanation from '@/components/common/ServiceExplanation';
 import CreditsPanel from '@/components/analyze/CreditsPanel';
@@ -38,6 +39,7 @@ const CoverLetter = () => {
   const [showSavePrompt, setShowSavePrompt] = useState(false);
   const [generationMethod, setGenerationMethod] = useState<'input' | 'analysis'>('input');
   const [selectedAnalysisId, setSelectedAnalysisId] = useState<string>('');
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   const lengthOptions = [
     { value: 'short', label: 'Short (150-200 words)', description: 'Brief and to the point' },
@@ -72,19 +74,50 @@ const CoverLetter = () => {
     }
   };
 
+  const validateForm = () => {
+    const errors: string[] = [];
+    
+    if (generationMethod === 'input') {
+      if (!formData.jobTitle.trim()) {
+        errors.push('Job title is required');
+      }
+      if (!formData.companyName.trim()) {
+        errors.push('Company name is required');
+      }
+      if (!formData.jobDescription.trim()) {
+        errors.push('Job description is required');
+      }
+    } else {
+      if (!selectedAnalysisId) {
+        errors.push('Please select an analysis to generate from');
+      }
+    }
+
+    if (credits < 1) {
+      errors.push('Insufficient credits. You need at least 1 credit to generate a cover letter.');
+    }
+
+    setValidationErrors(errors);
+    return errors.length === 0;
+  };
+
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (selectedCoverLetter && !hasUnsavedChanges) {
       setHasUnsavedChanges(true);
     }
+    // Clear validation errors when user starts typing
+    if (validationErrors.length > 0) {
+      setValidationErrors([]);
+    }
   };
 
   const handleGenerate = async () => {
-    if (generationMethod === 'input') {
-      if (!formData.jobTitle || !formData.companyName || !formData.jobDescription) {
-        return;
-      }
+    if (!validateForm()) {
+      return;
+    }
 
+    if (generationMethod === 'input') {
       try {
         const result = await generateCoverLetter({
           jobTitle: formData.jobTitle,
@@ -105,10 +138,6 @@ const CoverLetter = () => {
         console.error('Generation failed:', error);
       }
     } else {
-      if (!selectedAnalysisId) {
-        return;
-      }
-
       try {
         const result = await generateFromAnalysis({
           analysisResultId: selectedAnalysisId,
@@ -265,17 +294,17 @@ const CoverLetter = () => {
     <div className="min-h-screen bg-gradient-to-br from-apple-core/10 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5 py-8">
       <div className="max-w-7xl mx-auto px-4">
         <div className="mb-8">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-4xl font-bold text-blueberry dark:text-citrus mb-4 flex items-center">
-                <FileText className="h-8 w-8 text-apricot mr-3" />
+              <h1 className="text-3xl sm:text-4xl font-bold text-blueberry dark:text-citrus mb-4 flex items-center">
+                <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-apricot mr-3" />
                 Generate Cover Letter
               </h1>
-              <p className="text-xl text-blueberry/80 dark:text-apple-core max-w-2xl">
+              <p className="text-lg sm:text-xl text-blueberry/80 dark:text-apple-core max-w-2xl">
                 Generate tailored cover letters that highlight your strengths and align with specific job requirements.
               </p>
             </div>
-            <Badge variant="outline" className="text-apricot border-apricot text-lg px-4 py-2">
+            <Badge variant="outline" className="text-apricot border-apricot text-base sm:text-lg px-3 py-2 self-start sm:self-auto">
               {credits} Credits Available
             </Badge>
           </div>
@@ -298,7 +327,7 @@ const CoverLetter = () => {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
           {/* Main Content */}
           <div className="lg:col-span-3">
             <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
@@ -317,6 +346,20 @@ const CoverLetter = () => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-6">
+                    {/* Validation Errors */}
+                    {validationErrors.length > 0 && (
+                      <Alert variant="destructive">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertDescription>
+                          <ul className="list-disc list-inside space-y-1">
+                            {validationErrors.map((error, index) => (
+                              <li key={index}>{error}</li>
+                            ))}
+                          </ul>
+                        </AlertDescription>
+                      </Alert>
+                    )}
+
                     {/* Generation Method Selection */}
                     <div className="space-y-4">
                       <Label className="text-base font-medium">How would you like to generate your cover letter?</Label>
@@ -368,6 +411,7 @@ const CoverLetter = () => {
                               placeholder="e.g., Marketing Manager"
                               value={formData.jobTitle}
                               onChange={(e) => handleInputChange('jobTitle', e.target.value)}
+                              className={validationErrors.includes('Job title is required') ? 'border-red-500' : ''}
                             />
                           </div>
                           <div>
@@ -377,6 +421,7 @@ const CoverLetter = () => {
                               placeholder="e.g., TechCorp"
                               value={formData.companyName}
                               onChange={(e) => handleInputChange('companyName', e.target.value)}
+                              className={validationErrors.includes('Company name is required') ? 'border-red-500' : ''}
                             />
                           </div>
                         </div>
@@ -389,7 +434,7 @@ const CoverLetter = () => {
                             value={formData.jobDescription}
                             onChange={(e) => handleInputChange('jobDescription', e.target.value)}
                             rows={6}
-                            required
+                            className={validationErrors.includes('Job description is required') ? 'border-red-500' : ''}
                           />
                           <p className="text-sm text-blueberry/70 dark:text-apple-core/70 mt-1">
                             Job description is required for optimal cover letter generation
@@ -405,6 +450,9 @@ const CoverLetter = () => {
                             selectedAnalysisId={selectedAnalysisId}
                             disabled={isGenerating}
                           />
+                          {validationErrors.includes('Please select an analysis to generate from') && (
+                            <p className="text-sm text-red-600 mt-1">Please select an analysis to continue</p>
+                          )}
                         </div>
                       </div>
                     )}
@@ -443,9 +491,28 @@ const CoverLetter = () => {
                       </div>
                     </div>
 
+                    {/* Credit Cost Display */}
+                    <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                            Generation Cost: 1 Credit
+                          </p>
+                          <p className="text-xs text-blue-700 dark:text-blue-300">
+                            You have {credits} credits available
+                          </p>
+                        </div>
+                        {credits < 1 && (
+                          <Badge variant="destructive" className="text-xs">
+                            Insufficient Credits
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+
                     <Button
                       onClick={handleGenerate}
-                      disabled={!canGenerate || isGenerating}
+                      disabled={!canGenerate || isGenerating || credits < 1}
                       className="w-full bg-apricot hover:bg-apricot/90 text-white font-medium"
                     >
                       {isGenerating ? (
