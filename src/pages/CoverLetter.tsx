@@ -1,6 +1,7 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FileText, Sparkles, Download, Trash2, RefreshCw, Clock, FileUp, Search, AlertCircle } from 'lucide-react';
+import { FileText, Sparkles, Trash2, RefreshCw, Clock, FileUp, Search, AlertCircle, Eye } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCoverLetter } from '@/hooks/useCoverLetter';
 import { useUserData } from '@/hooks/useUserData';
@@ -17,11 +18,14 @@ import EmbeddedAuth from '@/components/auth/EmbeddedAuth';
 import ServiceExplanation from '@/components/common/ServiceExplanation';
 import CreditsPanel from '@/components/analyze/CreditsPanel';
 import AnalysisSelector from '@/components/cover-letter/AnalysisSelector';
+import AdvancedGenerationOptions from '@/components/cover-letter/AdvancedGenerationOptions';
+import DownloadOptions from '@/components/cover-letter/DownloadOptions';
+import EditableCoverLetter from '@/components/cover-letter/EditableCoverLetter';
 
 const CoverLetter = () => {
   const { user } = useAuth();
   const { credits } = useUserData();
-  const { generateCoverLetter, generateFromAnalysis, regenerateCoverLetter, getCoverLetters, deleteCoverLetter, isGenerating, isRegenerating } = useCoverLetter();
+  const { generateCoverLetter, generateFromAnalysis, regenerateCoverLetter, getCoverLetters, deleteCoverLetter, updateCoverLetter, isGenerating, isRegenerating } = useCoverLetter();
   
   const [formData, setFormData] = useState({
     jobTitle: '',
@@ -29,6 +33,13 @@ const CoverLetter = () => {
     jobDescription: '',
     tone: 'professional',
     length: 'concise'
+  });
+
+  const [advancedOptions, setAdvancedOptions] = useState({
+    workExperienceHighlights: '',
+    customHookOpener: '',
+    personalValues: '',
+    includeLinkedInUrl: false
   });
   
   const [coverLetters, setCoverLetters] = useState<any[]>([]);
@@ -117,14 +128,19 @@ const CoverLetter = () => {
       return;
     }
 
+    const generationParams = {
+      tone: formData.tone,
+      length: formData.length,
+      ...advancedOptions
+    };
+
     if (generationMethod === 'input') {
       try {
         const result = await generateCoverLetter({
           jobTitle: formData.jobTitle,
           companyName: formData.companyName,
           jobDescription: formData.jobDescription,
-          tone: formData.tone,
-          length: formData.length
+          ...generationParams
         });
 
         setSelectedCoverLetter({ ...result.coverLetter, isUnsaved: true });
@@ -141,8 +157,7 @@ const CoverLetter = () => {
       try {
         const result = await generateFromAnalysis({
           analysisResultId: selectedAnalysisId,
-          tone: formData.tone,
-          length: formData.length
+          ...generationParams
         });
 
         setSelectedCoverLetter({ ...result.coverLetter, isUnsaved: true });
@@ -163,6 +178,18 @@ const CoverLetter = () => {
       setSelectedCoverLetter(prev => ({ ...prev, isUnsaved: false }));
       setHasUnsavedChanges(false);
       loadCoverLetterHistory();
+    }
+  };
+
+  const handleUpdateCoverLetter = async (newContent: string) => {
+    if (selectedCoverLetter) {
+      try {
+        await updateCoverLetter(selectedCoverLetter.id, newContent);
+        setSelectedCoverLetter(prev => ({ ...prev, content: newContent }));
+        loadCoverLetterHistory();
+      } catch (error) {
+        console.error('Update failed:', error);
+      }
     }
   };
 
@@ -200,18 +227,6 @@ const CoverLetter = () => {
   const handleViewCoverLetter = (coverLetter: any) => {
     setSelectedCoverLetter(coverLetter);
     setActiveTab('result');
-  };
-
-  const downloadCoverLetter = (content: string, fileName: string) => {
-    const blob = new Blob([content], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${fileName}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
   };
 
   const formatDate = (dateString: string) => {
@@ -457,6 +472,12 @@ const CoverLetter = () => {
                       </div>
                     )}
 
+                    {/* Advanced Generation Options */}
+                    <AdvancedGenerationOptions
+                      value={advancedOptions}
+                      onChange={setAdvancedOptions}
+                    />
+
                     {/* Common Options */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
@@ -488,25 +509,6 @@ const CoverLetter = () => {
                             ))}
                           </SelectContent>
                         </Select>
-                      </div>
-                    </div>
-
-                    {/* Credit Cost Display */}
-                    <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                            Generation Cost: 1 Credit
-                          </p>
-                          <p className="text-xs text-blue-700 dark:text-blue-300">
-                            You have {credits} credits available
-                          </p>
-                        </div>
-                        {credits < 1 && (
-                          <Badge variant="destructive" className="text-xs">
-                            Insufficient Credits
-                          </Badge>
-                        )}
                       </div>
                     </div>
 
@@ -563,26 +565,18 @@ const CoverLetter = () => {
                               Save Cover Letter
                             </Button>
                           )}
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => downloadCoverLetter(
-                              selectedCoverLetter.content,
-                              `Cover_Letter_${selectedCoverLetter.company_name}_${selectedCoverLetter.job_title}`
-                            )}
-                          >
-                            <Download className="h-4 w-4 mr-1" />
-                            Download
-                          </Button>
+                          <DownloadOptions
+                            content={selectedCoverLetter.content}
+                            fileName={`Cover_Letter_${selectedCoverLetter.company_name}_${selectedCoverLetter.job_title}`}
+                          />
                         </div>
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                      <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-                        <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed">
-                          {selectedCoverLetter.content}
-                        </pre>
-                      </div>
+                      <EditableCoverLetter
+                        content={selectedCoverLetter.content}
+                        onSave={handleUpdateCoverLetter}
+                      />
                       
                       <div className="flex items-center justify-between pt-4 border-t">
                         <div className="flex items-center space-x-4">
@@ -650,8 +644,11 @@ const CoverLetter = () => {
                   <Card>
                     <CardContent className="text-center py-8">
                       <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                      <p className="text-gray-600 dark:text-gray-400">
-                        No cover letter generated yet. Create one in the "Generate New" tab.
+                      <p className="text-gray-600 dark:text-gray-400 mb-2">
+                        No cover letter generated yet.
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        Create one in the "Generate New" tab or view previous letters in "Document History".
                       </p>
                     </CardContent>
                   </Card>
@@ -706,24 +703,20 @@ const CoverLetter = () => {
                                   size="sm"
                                   onClick={() => handleViewCoverLetter(coverLetter)}
                                 >
+                                  <Eye className="h-4 w-4 mr-1" />
                                   View
                                 </Button>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => downloadCoverLetter(
-                                    coverLetter.content,
-                                    `Cover_Letter_${coverLetter.company_name}_${coverLetter.job_title}`
-                                  )}
-                                >
-                                  <Download className="h-4 w-4" />
-                                </Button>
+                                <DownloadOptions
+                                  content={coverLetter.content}
+                                  fileName={`Cover_Letter_${coverLetter.company_name}_${coverLetter.job_title}`}
+                                />
                                 <Button
                                   variant="outline"
                                   size="sm"
                                   onClick={() => handleDelete(coverLetter.id)}
                                 >
-                                  <Trash2 className="h-4 w-4" />
+                                  <Trash2 className="h-4 w-4 mr-1" />
+                                  Delete
                                 </Button>
                               </div>
                             </div>

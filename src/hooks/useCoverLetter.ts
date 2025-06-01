@@ -11,12 +11,20 @@ interface GenerateCoverLetterParams {
   tone: string;
   length: string;
   analysisResultId?: string;
+  workExperienceHighlights?: string;
+  customHookOpener?: string;
+  personalValues?: string;
+  includeLinkedInUrl?: boolean;
 }
 
 interface GenerateFromAnalysisParams {
   analysisResultId: string;
   tone: string;
   length: string;
+  workExperienceHighlights?: string;
+  customHookOpener?: string;
+  personalValues?: string;
+  includeLinkedInUrl?: boolean;
 }
 
 interface RegenerateCoverLetterParams {
@@ -79,7 +87,11 @@ export const useCoverLetter = () => {
           cvText: analysisData.cv_extracted_text,
           tone: params.tone,
           length: params.length,
-          analysisResultId: params.analysisResultId
+          analysisResultId: params.analysisResultId,
+          workExperienceHighlights: params.workExperienceHighlights,
+          customHookOpener: params.customHookOpener,
+          personalValues: params.personalValues,
+          includeLinkedInUrl: params.includeLinkedInUrl
         }
       });
 
@@ -139,7 +151,11 @@ export const useCoverLetter = () => {
           companyName: originalData.company_name,
           tone: params.tone,
           length: params.length,
-          analysisResultId: originalData.analysis_result_id
+          analysisResultId: originalData.analysis_result_id,
+          workExperienceHighlights: originalData.work_experience_highlights,
+          customHookOpener: originalData.custom_hook_opener,
+          personalValues: originalData.personal_values,
+          includeLinkedInUrl: originalData.include_linkedin_url
         }
       });
 
@@ -205,6 +221,26 @@ export const useCoverLetter = () => {
     return data;
   };
 
+  const updateCoverLetter = async (id: string, content: string) => {
+    const { error } = await supabase
+      .from('cover_letters')
+      .update({ 
+        content,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error updating cover letter:', error);
+      throw error;
+    }
+
+    toast({
+      title: 'Cover Letter Updated',
+      description: 'Your changes have been saved successfully.',
+    });
+  };
+
   const deleteCoverLetter = async (id: string) => {
     const { error } = await supabase
       .from('cover_letters')
@@ -227,6 +263,7 @@ export const useCoverLetter = () => {
     generateFromAnalysis,
     regenerateCoverLetter,
     getCoverLetters,
+    updateCoverLetter,
     deleteCoverLetter,
     isGenerating,
     isRegenerating

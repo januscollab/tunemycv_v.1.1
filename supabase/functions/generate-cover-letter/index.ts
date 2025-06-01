@@ -15,6 +15,10 @@ interface CoverLetterRequest {
   tone: string
   length: string
   analysisResultId?: string
+  workExperienceHighlights?: string
+  customHookOpener?: string
+  personalValues?: string
+  includeLinkedInUrl?: boolean
 }
 
 serve(async (req) => {
@@ -41,7 +45,19 @@ serve(async (req) => {
       )
     }
 
-    const { jobTitle, companyName, jobDescription, cvText, tone, length, analysisResultId }: CoverLetterRequest = await req.json()
+    const { 
+      jobTitle, 
+      companyName, 
+      jobDescription, 
+      cvText, 
+      tone, 
+      length, 
+      analysisResultId,
+      workExperienceHighlights,
+      customHookOpener,
+      personalValues,
+      includeLinkedInUrl
+    }: CoverLetterRequest = await req.json()
 
     // Check user credits
     const { data: creditsData, error: creditsError } = await supabaseClient
@@ -55,6 +71,18 @@ serve(async (req) => {
         JSON.stringify({ error: 'Insufficient credits' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
+    }
+
+    // Get LinkedIn URL if needed
+    let linkedInUrl = ''
+    if (includeLinkedInUrl) {
+      const { data: profileData } = await supabaseClient
+        .from('profiles')
+        .select('linkedin_url')
+        .eq('id', user.id)
+        .single()
+      
+      linkedInUrl = profileData?.linkedin_url || ''
     }
 
     // Get template prompt
@@ -85,6 +113,21 @@ serve(async (req) => {
         lengthInstruction = 'Write a concise cover letter, around 250-300 words.'
     }
 
+    // Build advanced options text
+    let advancedOptionsText = ''
+    if (workExperienceHighlights) {
+      advancedOptionsText += `\nKey work experience highlights to emphasize: ${workExperienceHighlights}`
+    }
+    if (customHookOpener) {
+      advancedOptionsText += `\nCustom opening approach: ${customHookOpener}`
+    }
+    if (personalValues) {
+      advancedOptionsText += `\nPersonal values and motivations: ${personalValues}`
+    }
+    if (linkedInUrl) {
+      advancedOptionsText += `\nInclude LinkedIn profile: ${linkedInUrl}`
+    }
+
     const systemPrompt = `You are an expert cover letter writer. ${templatePrompt} ${lengthInstruction}
 
 The cover letter should:
@@ -94,6 +137,7 @@ The cover letter should:
 - Include a professional opening and closing
 - Be well-structured with clear paragraphs
 - Match the requested length and tone precisely
+${advancedOptionsText ? `\nAdditional personalization requirements:${advancedOptionsText}` : ''}
 
 Format the response as a complete, ready-to-send cover letter with proper formatting.`
 
@@ -157,7 +201,11 @@ Please create a compelling cover letter that matches my background to this speci
           hasJobDescription: !!jobDescription,
           hasCvText: !!cvText
         },
-        credits_used: 1
+        credits_used: 1,
+        work_experience_highlights: workExperienceHighlights || null,
+        custom_hook_opener: customHookOpener || null,
+        personal_values: personalValues || null,
+        include_linkedin_url: includeLinkedInUrl || false
       })
       .select()
       .single()

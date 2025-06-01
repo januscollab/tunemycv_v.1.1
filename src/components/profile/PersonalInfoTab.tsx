@@ -1,8 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { User, Mail, Lock, Save } from 'lucide-react';
+import { User, Mail, Lock, Save, Linkedin } from 'lucide-react';
 
 interface PersonalInfoTabProps {
   credits: number;
@@ -16,7 +17,8 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
   const [profile, setProfile] = useState({
     first_name: '',
     last_name: '',
-    email: ''
+    email: '',
+    linkedin_url: ''
   });
   const [passwords, setPasswords] = useState({
     current: '',
@@ -44,13 +46,15 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
         setProfile({
           first_name: data.first_name || '',
           last_name: data.last_name || '',
-          email: data.email || user?.email || ''
+          email: data.email || user?.email || '',
+          linkedin_url: data.linkedin_url || ''
         });
       } else {
         setProfile({
           first_name: '',
           last_name: '',
-          email: user?.email || ''
+          email: user?.email || '',
+          linkedin_url: ''
         });
       }
     } catch (error) {
@@ -70,6 +74,7 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
           first_name: profile.first_name,
           last_name: profile.last_name,
           email: profile.email,
+          linkedin_url: profile.linkedin_url,
           updated_at: new Date().toISOString()
         });
 
@@ -182,6 +187,21 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
               onChange={(e) => setProfile({ ...profile, email: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="Enter your email address"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="linkedinUrl" className="block text-sm font-medium text-gray-700 mb-1">
+              <Linkedin className="h-4 w-4 inline mr-1" />
+              LinkedIn Profile URL
+            </label>
+            <input
+              id="linkedinUrl"
+              type="url"
+              value={profile.linkedin_url}
+              onChange={(e) => setProfile({ ...profile, linkedin_url: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="https://linkedin.com/in/yourprofile"
             />
           </div>
 

@@ -213,13 +213,17 @@ export type Database = {
           content: string
           created_at: string | null
           credits_used: number | null
+          custom_hook_opener: string | null
           generation_parameters: Json | null
           id: string
+          include_linkedin_url: boolean | null
           job_title: string
+          personal_values: string | null
           regeneration_count: number | null
           template_id: string | null
           updated_at: string | null
           user_id: string
+          work_experience_highlights: string | null
         }
         Insert: {
           analysis_result_id?: string | null
@@ -227,13 +231,17 @@ export type Database = {
           content: string
           created_at?: string | null
           credits_used?: number | null
+          custom_hook_opener?: string | null
           generation_parameters?: Json | null
           id?: string
+          include_linkedin_url?: boolean | null
           job_title: string
+          personal_values?: string | null
           regeneration_count?: number | null
           template_id?: string | null
           updated_at?: string | null
           user_id: string
+          work_experience_highlights?: string | null
         }
         Update: {
           analysis_result_id?: string | null
@@ -241,13 +249,17 @@ export type Database = {
           content?: string
           created_at?: string | null
           credits_used?: number | null
+          custom_hook_opener?: string | null
           generation_parameters?: Json | null
           id?: string
+          include_linkedin_url?: boolean | null
           job_title?: string
+          personal_values?: string | null
           regeneration_count?: number | null
           template_id?: string | null
           updated_at?: string | null
           user_id?: string
+          work_experience_highlights?: string | null
         }
         Relationships: [
           {
@@ -266,6 +278,7 @@ export type Database = {
           first_name: string | null
           id: string
           last_name: string | null
+          linkedin_url: string | null
           updated_at: string | null
         }
         Insert: {
@@ -274,6 +287,7 @@ export type Database = {
           first_name?: string | null
           id: string
           last_name?: string | null
+          linkedin_url?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -282,6 +296,7 @@ export type Database = {
           first_name?: string | null
           id?: string
           last_name?: string | null
+          linkedin_url?: string | null
           updated_at?: string | null
         }
         Relationships: []
