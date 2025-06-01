@@ -22,12 +22,12 @@ const ServiceExplanation: React.FC<ServiceExplanationProps> = ({
 }) => {
   return (
     <div className="lg:col-span-2 space-y-6">
-      <div className="text-center mb-8">
-        <div className="flex items-center justify-center mb-4">
-          {icon || <Sparkles className="h-8 w-8 text-apricot" />}
+      <div className="text-left mb-8">
+        <div className="flex items-center mb-4">
+          {icon || <Sparkles className="h-8 w-8 text-apricot mr-3" />}
+          <h1 className="text-4xl font-bold text-blueberry dark:text-citrus">{title}</h1>
         </div>
-        <h1 className="text-4xl font-bold text-blueberry dark:text-citrus mb-4">{title}</h1>
-        <p className="text-xl text-blueberry/80 dark:text-apple-core max-w-2xl mx-auto">
+        <p className="text-xl text-blueberry/80 dark:text-apple-core max-w-2xl">
           {subtitle}
         </p>
       </div>

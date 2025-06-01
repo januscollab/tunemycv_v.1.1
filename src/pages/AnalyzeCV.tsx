@@ -166,7 +166,7 @@ const AnalyzeCV = () => {
                 subtitle={analyzeExplanation.subtitle}
                 benefits={analyzeExplanation.benefits}
                 features={analyzeExplanation.features}
-                icon={<FileText className="h-8 w-8 text-apricot mr-2" />}
+                icon={<FileText className="h-8 w-8 text-apricot" />}
                 compact={true}
               />
             </div>
@@ -204,12 +204,14 @@ const AnalyzeCV = () => {
       <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Main Analysis Section */}
         <div className="lg:col-span-3">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-blueberry dark:text-citrus mb-4">
-              <FileText className="h-10 w-10 text-apricot inline mr-3" />
-              Analyze Your CV
-            </h1>
-            <p className="text-xl text-blueberry/80 dark:text-apple-core max-w-2xl mx-auto">
+          <div className="text-left mb-12">
+            <div className="flex items-center mb-4">
+              <FileText className="h-10 w-10 text-apricot mr-3" />
+              <h1 className="text-4xl font-bold text-blueberry dark:text-citrus">
+                Analyze Your CV
+              </h1>
+            </div>
+            <p className="text-xl text-blueberry/80 dark:text-apple-core max-w-2xl">
               Upload your CV and job description to get comprehensive compatibility analysis with actionable recommendations.
             </p>
           </div>

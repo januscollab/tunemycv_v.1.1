@@ -20,6 +20,7 @@ import AnalysisSelector from '@/components/cover-letter/AnalysisSelector';
 import AdvancedGenerationOptions from '@/components/cover-letter/AdvancedGenerationOptions';
 import DownloadOptions from '@/components/cover-letter/DownloadOptions';
 import EditableCoverLetter from '@/components/cover-letter/EditableCoverLetter';
+import NoAnalysisModal from '@/components/cover-letter/NoAnalysisModal';
 
 const CoverLetter = () => {
   const { user } = useAuth();
@@ -50,6 +51,7 @@ const CoverLetter = () => {
   const [generationMethod, setGenerationMethod] = useState<'input' | 'analysis'>('input');
   const [selectedAnalysisId, setSelectedAnalysisId] = useState<string>('');
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [showNoAnalysisModal, setShowNoAnalysisModal] = useState(false);
 
   const lengthOptions = [
     { value: 'short', label: 'Short (150-200 words)', description: 'Brief and to the point' },
@@ -120,6 +122,19 @@ const CoverLetter = () => {
     if (validationErrors.length > 0) {
       setValidationErrors([]);
     }
+  };
+
+  const handleGenerationMethodChange = (method: 'input' | 'analysis') => {
+    if (method === 'analysis' && coverLetters.length === 0) {
+      // Check if user has any analysis history
+      setShowNoAnalysisModal(true);
+      return;
+    }
+    setGenerationMethod(method);
+  };
+
+  const handleUseManualInput = () => {
+    setGenerationMethod('input');
   };
 
   const handleGenerate = async () => {
@@ -267,7 +282,7 @@ const CoverLetter = () => {
                 subtitle={coverLetterExplanation.subtitle}
                 benefits={coverLetterExplanation.benefits}
                 features={coverLetterExplanation.features}
-                icon={<FileText className="h-8 w-8 text-apricot mr-2" />}
+                icon={<FileText className="h-8 w-8 text-apricot" />}
                 compact={true}
               />
             </div>
@@ -323,6 +338,12 @@ const CoverLetter = () => {
             </Badge>
           </div>
         </div>
+
+        <NoAnalysisModal
+          isOpen={showNoAnalysisModal}
+          onClose={() => setShowNoAnalysisModal(false)}
+          onUseManualInput={handleUseManualInput}
+        />
 
         {showSavePrompt && (
           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
@@ -380,7 +401,7 @@ const CoverLetter = () => {
                         <Label className="text-base font-medium">How would you like to generate your cover letter?</Label>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                           <button
-                            onClick={() => setGenerationMethod('input')}
+                            onClick={() => handleGenerationMethodChange('input')}
                             className={`p-4 border rounded-lg text-left transition-colors ${
                               generationMethod === 'input'
                                 ? 'border-apricot bg-apricot/5'
@@ -397,7 +418,7 @@ const CoverLetter = () => {
                           </button>
                           
                           <button
-                            onClick={() => setGenerationMethod('analysis')}
+                            onClick={() => handleGenerationMethodChange('analysis')}
                             className={`p-4 border rounded-lg text-left transition-colors ${
                               generationMethod === 'analysis'
                                 ? 'border-apricot bg-apricot/5'
@@ -553,7 +574,7 @@ const CoverLetter = () => {
                         )}
                       </Button>
                       <p className="text-sm text-gray-600 dark:text-gray-400 text-center mt-2">
-                        1 credit will be used to generate your personalized cover letter
+                        Our AI uses the information you've provided to instantly generate a tailored cover letter for your chosen role, helping you to stand out.
                       </p>
                     </CardContent>
                   </Card>

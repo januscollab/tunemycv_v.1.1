@@ -51,7 +51,7 @@ const AdvancedGenerationOptions: React.FC<AdvancedGenerationOptionsProps> = ({ v
         {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
       </CollapsibleTrigger>
       
-      <CollapsibleContent className="mt-4 space-y-4 p-4 bg-gray-50/50 dark:bg-gray-800/50 rounded-lg border">
+      <CollapsibleContent className="mt-4 space-y-3 p-4 bg-gray-50/50 dark:bg-gray-800/50 rounded-lg border">
         <div>
           <Label htmlFor="workHighlights" className="text-sm font-medium">
             Key Work Experience Highlights
@@ -61,7 +61,7 @@ const AdvancedGenerationOptions: React.FC<AdvancedGenerationOptionsProps> = ({ v
             placeholder="Mention specific achievements, metrics, or experiences you want emphasized in your cover letter..."
             value={value.workExperienceHighlights}
             onChange={(e) => handleChange('workExperienceHighlights', e.target.value)}
-            rows={3}
+            rows={2}
             className="mt-1"
           />
         </div>
