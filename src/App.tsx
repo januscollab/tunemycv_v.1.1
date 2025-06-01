@@ -20,6 +20,7 @@ import ContactUs from "./pages/ContactUs";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
 import NextSteps from "./pages/NextSteps";
+import CoverLetter from "./pages/CoverLetter";
 
 // Component to handle scroll to top on route change
 const ScrollToTop = () => {
@@ -81,6 +82,7 @@ const App: React.FC = () => {
                       <AdminDashboard />
                     </AdminRoute>
                   } />
+                  <Route path="/cover-letter" element={<CoverLetter />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>

@@ -41,6 +41,10 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
   // Extract transaction ID from result
   const transactionId = result.id || result.analysis_id || 'N/A';
 
+  // Extract analysis date and credits used
+  const analysisDate = result.created_at ? new Date(result.created_at).toLocaleDateString() : new Date().toLocaleDateString();
+  const creditsUsed = result.credits_used || 1;
+
   const downloadPDF = () => {
     const pdfGenerator = new PDFGenerator();
     pdfGenerator.generatePDF(result);
@@ -52,9 +56,19 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
         <AnalysisHeader onStartNew={onStartNew} onDownloadPDF={downloadPDF} />
 
         {/* Dynamic heading based on company and position */}
-        <h1 className="text-3xl font-bold text-blueberry dark:text-citrus mb-8">
-          {companyName} - {position}
-        </h1>
+        <div className="mb-4">
+          <h1 className="text-3xl font-bold text-blueberry dark:text-citrus mb-2">
+            {companyName} - {position}
+          </h1>
+          {/* Match score and credits beside the date */}
+          <div className="flex items-center space-x-4 text-sm text-blueberry/70 dark:text-apple-core/70">
+            <span>Analyzed on {analysisDate}</span>
+            <span>•</span>
+            <span>Match Score: {compatibilityScore}%</span>
+            <span>•</span>
+            <span>Credits Used: {creditsUsed}</span>
+          </div>
+        </div>
 
         {/* Success Alert */}
         <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-8">
