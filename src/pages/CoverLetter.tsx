@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FileText, Sparkles, Download, Trash2, RefreshCw, Clock } from 'lucide-react';
@@ -13,8 +12,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import AuthSidebar from '@/components/auth/AuthSidebar';
+import EmbeddedAuth from '@/components/auth/EmbeddedAuth';
 import ServiceExplanation from '@/components/common/ServiceExplanation';
+import FloatingActionBar from '@/components/common/FloatingActionBar';
 
 const CoverLetter = () => {
   const { user } = useAuth();
@@ -94,7 +94,6 @@ const CoverLetter = () => {
       setActiveTab('result');
       setHasUnsavedChanges(true);
       
-      // Refresh history if it was loaded
       if (coverLetters.length > 0) {
         loadCoverLetterHistory();
       }
@@ -168,35 +167,36 @@ const CoverLetter = () => {
     return Math.max(0, 5 - regenerationCount);
   };
 
+  const canGenerate = formData.jobTitle && formData.companyName && formData.jobDescription;
+
   if (!user) {
     const coverLetterExplanation = {
       title: 'Generate Cover Letter',
       subtitle: 'Create tailored cover letters that highlight your strengths and align perfectly with specific job requirements.',
       benefits: [
         'AI-powered cover letter generation that matches your experience to the job requirements',
-        'Multiple tone options to match company culture',
-        'Customizable length options from brief to detailed presentations',
+        'Multiple tone and length options to match company culture',
         'Tailored content that highlights your most relevant qualifications'
       ],
       features: [
         'Enter the job title and company name for personalized addressing',
         'Paste the complete job description for maximum relevance and keyword optimization',
-        'Choose your preferred tone and length to match the role and company culture',
-        'Our AI analyzes the job requirements and crafts a compelling narrative of your fit'
+        'Choose your preferred tone and length to match the role and company culture'
       ]
     };
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-apple-core/10 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
-        <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 lg:grid-cols-2 gap-8">
           <ServiceExplanation
             title={coverLetterExplanation.title}
             subtitle={coverLetterExplanation.subtitle}
             benefits={coverLetterExplanation.benefits}
             features={coverLetterExplanation.features}
             icon={<FileText className="h-8 w-8 text-apricot" />}
+            compact={true}
           />
-          <AuthSidebar
+          <EmbeddedAuth
             title="Get Started"
             description="Cover letter generation requires an account to ensure personalized results and save your work."
             icon={<FileText className="h-6 w-6 text-apricot mr-2" />}
@@ -340,24 +340,6 @@ const CoverLetter = () => {
                     </Select>
                   </div>
                 </div>
-
-                <Button 
-                  onClick={handleGenerate}
-                  disabled={!formData.jobTitle || !formData.companyName || !formData.jobDescription || isGenerating || credits < 1}
-                  className="w-full bg-apricot hover:bg-apricot/90 text-lg py-3"
-                >
-                  {isGenerating ? (
-                    <>
-                      <Sparkles className="h-4 w-4 mr-2 animate-spin" />
-                      Generating Cover Letter...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="h-4 w-4 mr-2" />
-                      Generate Cover Letter (1 Credit)
-                    </>
-                  )}
-                </Button>
               </CardContent>
             </Card>
           </TabsContent>
@@ -570,6 +552,18 @@ const CoverLetter = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Floating Action Bar for Cover Letter Generation */}
+      {activeTab === 'create' && (
+        <FloatingActionBar
+          credits={credits}
+          actionText="Generate Cover Letter"
+          onAction={handleGenerate}
+          disabled={!canGenerate || isGenerating}
+          loading={isGenerating}
+          creditCost={1}
+        />
+      )}
     </div>
   );
 };

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -15,6 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { FileText } from 'lucide-react';
 import EmbeddedAuth from '@/components/auth/EmbeddedAuth';
 import ServiceExplanation from '@/components/common/ServiceExplanation';
+import FloatingActionBar from '@/components/common/FloatingActionBar';
 import { UploadedFile } from '@/types/fileTypes';
 
 const AnalyzeCV = () => {
@@ -100,9 +100,9 @@ const AnalyzeCV = () => {
   const handleAnalysis = () => {
     // Create options object with default values for temporary analysis
     const options = {
-      saveCV: false, // Default to not saving CV for temporary analysis
-      saveJobDescription: false, // Default to not saving job description for temporary analysis
-      cvSource: 'new' as const, // Since we're using uploaded CV
+      saveCV: false,
+      saveJobDescription: false,
+      cvSource: 'new' as const,
       existingCVId: undefined
     };
 
@@ -130,7 +130,7 @@ const AnalyzeCV = () => {
       benefits: [
         'Advanced AI-powered analysis that evaluates your CV against specific job requirements',
         'Detailed compatibility scoring to understand how well you match the role',
-        'Keyword optimization recommendations to improve ATS (Applicant Tracking System) compatibility'
+        'Keyword optimization recommendations to improve ATS compatibility'
       ],
       features: [
         'Upload your CV in PDF, DOCX, or TXT format for instant analysis',
@@ -141,7 +141,7 @@ const AnalyzeCV = () => {
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-apple-core/20 via-white to-citrus/10 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
-        <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 lg:grid-cols-2 gap-8">
           <ServiceExplanation
             title={analyzeExplanation.title}
             subtitle={analyzeExplanation.subtitle}
@@ -238,6 +238,16 @@ const AnalyzeCV = () => {
           />
         </div>
       </div>
+
+      {/* Floating Action Bar for Analysis */}
+      <FloatingActionBar
+        credits={userCredits?.credits || 0}
+        actionText="Analyze CV"
+        onAction={handleAnalysis}
+        disabled={!canAnalyze || analyzing}
+        loading={analyzing}
+        creditCost={hasCreditsForAI ? 1 : 0}
+      />
     </div>
   );
 };
