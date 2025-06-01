@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FileText, Sparkles, Trash2, RefreshCw, Clock, FileUp, Search, AlertCircle, Eye } from 'lucide-react';
@@ -325,11 +326,13 @@ const CoverLetter = () => {
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-3xl sm:text-4xl font-bold text-blueberry dark:text-citrus mb-4 flex items-center">
-                <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-apricot mr-3" />
-                Generate Cover Letter
-              </h1>
-              <p className="text-lg sm:text-xl text-blueberry/80 dark:text-apple-core max-w-2xl">
+              <div className="flex items-center mb-4">
+                <FileText className="h-10 w-10 text-apricot mr-3" />
+                <h1 className="text-4xl font-bold text-blueberry dark:text-citrus">
+                  Generate Cover Letter
+                </h1>
+              </div>
+              <p className="text-xl text-blueberry/80 dark:text-apple-core max-w-3xl">
                 Generate tailored cover letters that highlight your strengths and align with specific job requirements.
               </p>
             </div>
@@ -574,7 +577,7 @@ const CoverLetter = () => {
                         )}
                       </Button>
                       <p className="text-sm text-gray-600 dark:text-gray-400 text-center mt-2">
-                        Our AI uses the information you've provided to instantly generate a tailored cover letter for your chosen role, helping you to stand out.
+                        Our AI uses the info above to generate a tailored cover letter, to help you stand out.
                       </p>
                     </CardContent>
                   </Card>

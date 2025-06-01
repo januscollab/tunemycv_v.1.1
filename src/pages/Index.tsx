@@ -1,4 +1,3 @@
-
 import { ArrowRight, CheckCircle, TrendingUp, Users, Star, Upload } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -46,7 +45,7 @@ const Index = () => {
           ) : (
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link
-                to="/auth"
+                to="/analyze"
                 className="bg-apricot text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-apricot/90 transition-colors inline-flex items-center shadow-lg"
               >
                 Get Started Free
@@ -166,7 +165,7 @@ const Index = () => {
               Start optimizing your CV today and take the first step towards landing your dream job.
             </p>
             <Link
-              to="/auth"
+              to="/analyze"
               className="bg-apricot text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-apricot/90 transition-colors inline-flex items-center shadow-lg"
             >
               <Users className="mr-2 h-5 w-5" />
