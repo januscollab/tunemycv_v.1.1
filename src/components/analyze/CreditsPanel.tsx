@@ -19,8 +19,8 @@ const CreditsPanel: React.FC<CreditsPanelProps> = ({
       {/* Credits Display */}
       <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
         <div className="flex items-center justify-center space-x-2 mb-2">
-          <CreditCard className="h-5 w-5 text-blue-600" />
-          <span className="text-blue-900 font-medium">
+          <CreditCard className="h-6 w-6 text-blue-600" />
+          <span className="text-blue-900 font-bold text-lg">
             Credits: {credits || 0}
           </span>
         </div>
@@ -42,7 +42,7 @@ const CreditsPanel: React.FC<CreditsPanelProps> = ({
                 : "Enhanced algorithmic analysis with comprehensive feedback (Free)"
               }
             </p>
-            <div className="text-xs font-medium text-blue-600 mt-1">
+            <div className="text-sm font-bold text-blue-600 mt-2 bg-blue-100 px-2 py-1 rounded inline-block">
               Cost: {hasCreditsForAI ? "1 Credit" : "Free"}
             </div>
           </div>
@@ -60,7 +60,7 @@ const CreditsPanel: React.FC<CreditsPanelProps> = ({
         <p className="text-xs text-gray-500 mt-1 text-center">
           Create a tailored cover letter that aligns your experience with the role — crafted from your CV and the job description for maximum impact.
         </p>
-        <div className="text-xs font-medium text-blue-600 text-center mt-1">
+        <div className="text-sm font-bold text-blue-600 text-center mt-2 bg-blue-100 px-2 py-1 rounded inline-block">
           Cost: 1 Credit
         </div>
       </div>

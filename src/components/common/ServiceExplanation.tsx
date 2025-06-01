@@ -32,30 +32,30 @@ const ServiceExplanation: React.FC<ServiceExplanationProps> = ({
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl text-blueberry dark:text-citrus">Why Use Our Service?</CardTitle>
+          <CardTitle className="text-xl text-blueberry dark:text-citrus">Why Use Our Service?</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-4">
           <div>
-            <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-3">Key Benefits</h3>
-            <ul className="space-y-2">
+            <h3 className="text-base font-semibold text-blueberry dark:text-citrus mb-2">Key Benefits</h3>
+            <ul className="space-y-1">
               {benefits.map((benefit, index) => (
-                <li key={index} className="flex items-start space-x-3">
-                  <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                  <span className="text-blueberry/80 dark:text-apple-core/80">{benefit}</span>
+                <li key={index} className="flex items-start space-x-2">
+                  <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                  <span className="text-sm text-blueberry/80 dark:text-apple-core/80">{benefit}</span>
                 </li>
               ))}
             </ul>
           </div>
 
           <div>
-            <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-3">How It Works</h3>
-            <div className="space-y-3">
+            <h3 className="text-base font-semibold text-blueberry dark:text-citrus mb-2">How It Works</h3>
+            <div className="space-y-2">
               {features.map((feature, index) => (
-                <div key={index} className="flex items-start space-x-3">
-                  <div className="bg-apricot text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium flex-shrink-0">
+                <div key={index} className="flex items-start space-x-2">
+                  <div className="bg-apricot text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium flex-shrink-0">
                     {index + 1}
                   </div>
-                  <span className="text-blueberry/80 dark:text-apple-core/80">{feature}</span>
+                  <span className="text-sm text-blueberry/80 dark:text-apple-core/80">{feature}</span>
                 </div>
               ))}
             </div>

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FileText, Sparkles, Download, Trash2, RefreshCw, Clock } from 'lucide-react';
@@ -40,6 +41,14 @@ const CoverLetter = () => {
     { value: 'concise', label: 'Concise (250-300 words)', description: 'Balanced length' },
     { value: 'standard', label: 'Standard (350-400 words)', description: 'Comprehensive coverage' },
     { value: 'detailed', label: 'Detailed (450-500 words)', description: 'In-depth presentation' }
+  ];
+
+  const toneOptions = [
+    { value: 'professional', label: 'Professional' },
+    { value: 'conversational', label: 'Conversational' },
+    { value: 'confident', label: 'Confident' },
+    { value: 'enthusiastic', label: 'Enthusiastic' },
+    { value: 'friendly', label: 'Friendly' }
   ];
 
   useEffect(() => {
@@ -165,18 +174,15 @@ const CoverLetter = () => {
       subtitle: 'Create tailored cover letters that highlight your strengths and align perfectly with specific job requirements.',
       benefits: [
         'AI-powered cover letter generation that matches your experience to the job requirements',
-        'Multiple tone options (professional, conversational, confident, enthusiastic) to match company culture',
+        'Multiple tone options to match company culture',
         'Customizable length options from brief to detailed presentations',
-        'Tailored content that highlights your most relevant qualifications for each specific role',
-        'Professional formatting and structure that hiring managers expect to see',
-        'Save time while creating personalized, compelling cover letters for every application'
+        'Tailored content that highlights your most relevant qualifications'
       ],
       features: [
         'Enter the job title and company name for personalized addressing',
         'Paste the complete job description for maximum relevance and keyword optimization',
         'Choose your preferred tone and length to match the role and company culture',
-        'Our AI analyzes the job requirements and crafts a compelling narrative of your fit',
-        'Review, edit, and save your cover letter for future use or immediate application'
+        'Our AI analyzes the job requirements and crafts a compelling narrative of your fit'
       ]
     };
 
@@ -227,7 +233,7 @@ const CoverLetter = () => {
             <p className="text-xl text-blueberry/80 dark:text-apple-core max-w-2xl">
               Generate tailored cover letters that highlight your strengths and align with specific job requirements.
             </p>
-            <Badge variant="outline" className="text-apricot border-apricot">
+            <Badge variant="outline" className="text-apricot border-apricot text-lg px-4 py-2">
               {credits} Credits Available
             </Badge>
           </div>
@@ -254,7 +260,7 @@ const CoverLetter = () => {
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="create">Create New</TabsTrigger>
             <TabsTrigger value="result">Current Result</TabsTrigger>
-            <TabsTrigger value="history">My Cover Letters</TabsTrigger>
+            <TabsTrigger value="history">Document History</TabsTrigger>
           </TabsList>
 
           <TabsContent value="create">
@@ -310,10 +316,11 @@ const CoverLetter = () => {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="professional">Professional</SelectItem>
-                        <SelectItem value="conversational">Conversational</SelectItem>
-                        <SelectItem value="confident">Confident</SelectItem>
-                        <SelectItem value="enthusiastic">Enthusiastic</SelectItem>
+                        {toneOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
@@ -337,7 +344,7 @@ const CoverLetter = () => {
                 <Button 
                   onClick={handleGenerate}
                   disabled={!formData.jobTitle || !formData.companyName || !formData.jobDescription || isGenerating || credits < 1}
-                  className="w-full bg-apricot hover:bg-apricot/90"
+                  className="w-full bg-apricot hover:bg-apricot/90 text-lg py-3"
                 >
                   {isGenerating ? (
                     <>
@@ -488,7 +495,7 @@ const CoverLetter = () => {
           <TabsContent value="history">
             <Card>
               <CardHeader>
-                <CardTitle>My Cover Letters</CardTitle>
+                <CardTitle>Document History</CardTitle>
               </CardHeader>
               <CardContent>
                 {loadingHistory ? (
