@@ -2,11 +2,10 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { validateFile, extractTextFromFile } from '@/utils/fileUtils';
 import { extractJobTitleFromText } from '@/utils/analysisUtils';
 import AnalysisResults from '@/components/analysis/AnalysisResults';
 import CVSelector from '@/components/analyze/CVSelector';
-import JobDescriptionUpload from '@/components/analyze/JobDescriptionUpload';
+import JobDescriptionInput from '@/components/analyze/JobDescriptionInput';
 import CreditsPanel from '@/components/analyze/CreditsPanel';
 import AnalyzeButton from '@/components/analyze/AnalyzeButton';
 import { useAnalysis } from '@/hooks/useAnalysis';
@@ -98,6 +97,24 @@ const AnalyzeCV = () => {
   };
 
   const handleAnalysis = () => {
+    // Validate that we have at least a job description
+    if (!uploadedFiles.jobDescription) {
+      toast({ 
+        title: 'Missing Information', 
+        description: 'Please provide a job description to analyze.', 
+        variant: 'destructive' 
+      });
+      return;
+    }
+
+    // Show warning if no CV is uploaded
+    if (!uploadedFiles.cv) {
+      toast({ 
+        title: 'No CV Uploaded', 
+        description: 'Analysis will be performed on job description only. Upload a CV for comprehensive analysis.', 
+      });
+    }
+
     // Create options object with default values for temporary analysis
     const options = {
       saveCV: false,
@@ -115,7 +132,7 @@ const AnalyzeCV = () => {
     setJobTitle('');
   };
 
-  const canAnalyze = uploadedFiles.cv && uploadedFiles.jobDescription;
+  const canAnalyze = uploadedFiles.jobDescription; // Only job description is required now
   const hasCreditsForAI = userCredits?.credits && userCredits.credits > 0;
 
   if (analysisResult) {
@@ -153,13 +170,15 @@ const AnalyzeCV = () => {
                 compact={true}
               />
             </div>
-            <div className="flex items-end justify-center">
-              <div className="w-full max-w-sm">
-                <EmbeddedAuth
-                  title="Login to Get Started"
-                  description="CV analysis requires an account to ensure personalized results and save your analysis history."
-                  icon={<FileText className="h-6 w-6 text-apricot mr-2" />}
-                />
+            <div className="flex flex-col justify-end">
+              <div className="flex justify-center">
+                <div className="w-full max-w-sm">
+                  <EmbeddedAuth
+                    title="Login to Get Started"
+                    description="CV analysis requires an account to ensure personalized results and save your analysis history."
+                    icon={<FileText className="h-6 w-6 text-apricot mr-2" />}
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -186,7 +205,10 @@ const AnalyzeCV = () => {
         {/* Main Analysis Section */}
         <div className="lg:col-span-3">
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-blueberry dark:text-citrus mb-4">Analyze Your CV</h1>
+            <h1 className="text-4xl font-bold text-blueberry dark:text-citrus mb-4">
+              <FileText className="h-10 w-10 text-apricot inline mr-3" />
+              Analyze Your CV
+            </h1>
             <p className="text-xl text-blueberry/80 dark:text-apple-core max-w-2xl mx-auto">
               Upload your CV and job description to get comprehensive compatibility analysis with actionable recommendations.
             </p>
@@ -209,22 +231,35 @@ const AnalyzeCV = () => {
               </p>
             </div>
 
-            {/* CV Selection */}
-            <CVSelector
-              onCVSelect={handleCVSelect}
-              selectedCV={uploadedFiles.cv}
-              uploading={uploading || analyzing}
-            />
-
-            {/* Job Description Upload */}
+            {/* Job Description Input - Required */}
             <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
-              <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-4">Job Description</h3>
-              <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mb-4">Upload a file (PDF, DOCX, TXT) or paste the text directly</p>
+              <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-4">
+                Job Description <span className="text-red-500">*</span>
+              </h3>
+              <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mb-4">
+                Upload a file (PDF, DOCX, TXT) or paste the text directly
+              </p>
               
-              <JobDescriptionUpload
+              <JobDescriptionInput
                 onJobDescriptionSet={handleJobDescriptionSet}
                 uploadedFile={uploadedFiles.jobDescription}
                 disabled={uploading || analyzing}
+              />
+            </div>
+
+            {/* CV Selection - Optional */}
+            <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
+              <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-4">
+                Your CV <span className="text-sm font-normal text-blueberry/70 dark:text-apple-core/80">(Optional)</span>
+              </h3>
+              <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mb-4">
+                Upload your CV for comprehensive analysis. Without a CV, we'll provide general insights about the job requirements.
+              </p>
+              
+              <CVSelector
+                onCVSelect={handleCVSelect}
+                selectedCV={uploadedFiles.cv}
+                uploading={uploading || analyzing}
               />
             </div>
 
