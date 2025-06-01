@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -157,8 +158,8 @@ const AnalyzeCV = () => {
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-apple-core/20 via-white to-citrus/10 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
-        <div className="max-w-7xl mx-auto px-4 py-12">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-[600px]">
+        <div className="max-w-7xl mx-auto px-4 py-8 md:py-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 min-h-[600px]">
             <div className="flex items-start">
               <ServiceExplanation
                 title={analyzeExplanation.title}
@@ -189,53 +190,53 @@ const AnalyzeCV = () => {
   return (
     <div className={`min-h-screen bg-gradient-to-br from-apple-core/20 via-white to-citrus/10 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5 ${analyzing ? 'pointer-events-none' : ''}`}>
       {analyzing && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-          <div className="bg-white dark:bg-blueberry/90 rounded-lg p-8 text-center max-w-md">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-apricot mx-auto mb-4"></div>
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-blueberry/90 rounded-lg p-6 md:p-8 text-center max-w-md w-full">
+            <div className="animate-spin rounded-full h-10 w-10 md:h-12 md:w-12 border-b-2 border-apricot mx-auto mb-4"></div>
             <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-2">Analyzing Your CV</h3>
-            <p className="text-blueberry/70 dark:text-apple-core/80 min-h-[2rem] transition-opacity duration-500">
+            <p className="text-blueberry/70 dark:text-apple-core/80 min-h-[2rem] transition-opacity duration-500 text-sm md:text-base">
               {currentLoadingMessage}
             </p>
           </div>
         </div>
       )}
       
-      <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <div className="max-w-7xl mx-auto px-4 py-8 md:py-12 grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
         {/* Main Analysis Section */}
         <div className="lg:col-span-3">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-blueberry dark:text-citrus mb-4 flex items-center justify-center">
-              <FileText className="h-10 w-10 text-apricot mr-3" />
+          <div className="text-center mb-8 md:mb-12">
+            <h1 className="text-3xl md:text-4xl font-bold text-blueberry dark:text-citrus mb-4 flex items-center justify-center">
+              <FileText className="h-8 w-8 md:h-10 md:w-10 text-apricot mr-3" />
               Analyze Your CV
             </h1>
-            <p className="text-xl text-blueberry/80 dark:text-apple-core max-w-2xl mx-auto">
+            <p className="text-lg md:text-xl text-blueberry/80 dark:text-apple-core max-w-2xl mx-auto px-4">
               Upload your CV and job description to get comprehensive compatibility analysis with actionable recommendations.
             </p>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-4 md:space-y-6">
             {/* Job Title */}
-            <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
+            <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-4 md:p-6 border border-apple-core/20 dark:border-citrus/20">
               <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-4">Job Title</h3>
               <input
                 type="text"
                 value={jobTitle}
                 onChange={(e) => setJobTitle(e.target.value)}
                 placeholder="e.g., Senior Software Engineer (auto-extracted from job description)"
-                className="w-full px-3 py-2 border border-apple-core/30 dark:border-citrus/30 rounded-md focus:outline-none focus:ring-2 focus:ring-apricot focus:border-transparent bg-white dark:bg-blueberry/10 text-blueberry dark:text-apple-core"
+                className="w-full px-3 py-2 border border-apple-core/30 dark:border-citrus/30 rounded-md focus:outline-none focus:ring-2 focus:ring-apricot focus:border-transparent bg-white dark:bg-blueberry/10 text-blueberry dark:text-apple-core text-sm md:text-base"
                 disabled={analyzing}
               />
-              <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mt-2">
+              <p className="text-xs md:text-sm text-blueberry/70 dark:text-apple-core/80 mt-2">
                 Job title will be automatically extracted from the job description if not provided.
               </p>
             </div>
 
             {/* Job Description Input - Required */}
-            <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
+            <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-4 md:p-6 border border-apple-core/20 dark:border-citrus/20">
               <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-4">
                 Job Description <span className="text-red-500">*</span>
               </h3>
-              <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mb-4">
+              <p className="text-xs md:text-sm text-blueberry/70 dark:text-apple-core/80 mb-4">
                 Upload a file (PDF, DOCX, TXT) or paste the text directly
               </p>
               
@@ -247,11 +248,11 @@ const AnalyzeCV = () => {
             </div>
 
             {/* CV Selection - Optional */}
-            <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
+            <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-4 md:p-6 border border-apple-core/20 dark:border-citrus/20">
               <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-4">
                 Your CV <span className="text-sm font-normal text-blueberry/70 dark:text-apple-core/80">(Optional)</span>
               </h3>
-              <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mb-4">
+              <p className="text-xs md:text-sm text-blueberry/70 dark:text-apple-core/80 mb-4">
                 Upload your CV for comprehensive analysis. Without a CV, we'll provide general insights about the job requirements.
               </p>
               

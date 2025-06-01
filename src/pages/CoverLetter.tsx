@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FileText, Sparkles, Download, Trash2, RefreshCw, Clock, FileUp, Search, AlertCircle } from 'lucide-react';
@@ -245,8 +246,8 @@ const CoverLetter = () => {
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-apple-core/20 via-white to-citrus/10 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
-        <div className="max-w-7xl mx-auto px-4 py-12">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-[600px]">
+        <div className="max-w-7xl mx-auto px-4 py-8 md:py-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 min-h-[600px]">
             <div className="flex items-start">
               <ServiceExplanation
                 title={coverLetterExplanation.title}
@@ -291,31 +292,31 @@ const CoverLetter = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-apple-core/10 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-apple-core/10 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5 py-6 md:py-8">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="mb-8">
+        <div className="mb-6 md:mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-3xl sm:text-4xl font-bold text-blueberry dark:text-citrus mb-4 flex items-center">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-blueberry dark:text-citrus mb-4 flex items-center">
                 <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-apricot mr-3" />
                 Generate Cover Letter
               </h1>
-              <p className="text-lg sm:text-xl text-blueberry/80 dark:text-apple-core max-w-2xl">
+              <p className="text-base sm:text-lg md:text-xl text-blueberry/80 dark:text-apple-core max-w-2xl">
                 Generate tailored cover letters that highlight your strengths and align with specific job requirements.
               </p>
             </div>
-            <Badge variant="outline" className="text-apricot border-apricot text-base sm:text-lg px-3 py-2 self-start sm:self-auto">
+            <Badge variant="outline" className="text-apricot border-apricot text-sm sm:text-base md:text-lg px-3 py-2 self-start sm:self-auto">
               {credits} Credits Available
             </Badge>
           </div>
         </div>
 
         {showSavePrompt && (
-          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md">
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full">
               <h3 className="text-lg font-semibold mb-4">Unsaved Changes</h3>
               <p className="mb-6">You have unsaved changes. Would you like to save before continuing?</p>
-              <div className="flex space-x-4">
+              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
                 <Button onClick={() => confirmTabChange(true)} className="bg-apricot hover:bg-apricot/90">
                   Save & Continue
                 </Button>
@@ -332,20 +333,20 @@ const CoverLetter = () => {
           <div className="lg:col-span-3">
             <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
               <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="create">Generate New</TabsTrigger>
-                <TabsTrigger value="result">Current Result</TabsTrigger>
-                <TabsTrigger value="history">Document History</TabsTrigger>
+                <TabsTrigger value="create" className="text-xs sm:text-sm">Generate New</TabsTrigger>
+                <TabsTrigger value="result" className="text-xs sm:text-sm">Current Result</TabsTrigger>
+                <TabsTrigger value="history" className="text-xs sm:text-sm">Document History</TabsTrigger>
               </TabsList>
 
               <TabsContent value="create">
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center">
-                      <Sparkles className="h-5 w-5 text-apricot mr-2" />
+                    <CardTitle className="flex items-center text-lg md:text-xl">
+                      <Sparkles className="h-4 w-4 md:h-5 md:w-5 text-apricot mr-2" />
                       Generate Cover Letter
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-6">
+                  <CardContent className="space-y-4 md:space-y-6">
                     {/* Validation Errors */}
                     {validationErrors.length > 0 && (
                       <Alert variant="destructive">
@@ -353,7 +354,7 @@ const CoverLetter = () => {
                         <AlertDescription>
                           <ul className="list-disc list-inside space-y-1">
                             {validationErrors.map((error, index) => (
-                              <li key={index}>{error}</li>
+                              <li key={index} className="text-sm">{error}</li>
                             ))}
                           </ul>
                         </AlertDescription>
@@ -362,38 +363,38 @@ const CoverLetter = () => {
 
                     {/* Generation Method Selection */}
                     <div className="space-y-4">
-                      <Label className="text-base font-medium">How would you like to generate your cover letter?</Label>
+                      <Label className="text-sm md:text-base font-medium">How would you like to generate your cover letter?</Label>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <button
                           onClick={() => setGenerationMethod('input')}
-                          className={`p-4 border rounded-lg text-left transition-colors ${
+                          className={`p-3 md:p-4 border rounded-lg text-left transition-colors ${
                             generationMethod === 'input'
                               ? 'border-apricot bg-apricot/5'
                               : 'border-gray-200 hover:border-gray-300'
                           }`}
                         >
                           <div className="flex items-center mb-2">
-                            <FileUp className="h-5 w-5 text-apricot mr-2" />
-                            <span className="font-medium">Generate from Input</span>
+                            <FileUp className="h-4 w-4 md:h-5 md:w-5 text-apricot mr-2" />
+                            <span className="font-medium text-sm md:text-base">Generate from Input</span>
                           </div>
-                          <p className="text-sm text-gray-600">
+                          <p className="text-xs md:text-sm text-gray-600">
                             Enter job details manually to create a cover letter
                           </p>
                         </button>
                         
                         <button
                           onClick={() => setGenerationMethod('analysis')}
-                          className={`p-4 border rounded-lg text-left transition-colors ${
+                          className={`p-3 md:p-4 border rounded-lg text-left transition-colors ${
                             generationMethod === 'analysis'
                               ? 'border-apricot bg-apricot/5'
                               : 'border-gray-200 hover:border-gray-300'
                           }`}
                         >
                           <div className="flex items-center mb-2">
-                            <Search className="h-5 w-5 text-apricot mr-2" />
-                            <span className="font-medium">Generate from Analysis</span>
+                            <Search className="h-4 w-4 md:h-5 md:w-5 text-apricot mr-2" />
+                            <span className="font-medium text-sm md:text-base">Generate from Analysis</span>
                           </div>
-                          <p className="text-sm text-gray-600">
+                          <p className="text-xs md:text-sm text-gray-600">
                             Use your previous CV analysis results
                           </p>
                         </button>
@@ -405,38 +406,38 @@ const CoverLetter = () => {
                       <div className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <Label htmlFor="jobTitle">Job Title *</Label>
+                            <Label htmlFor="jobTitle" className="text-sm md:text-base">Job Title *</Label>
                             <Input
                               id="jobTitle"
                               placeholder="e.g., Marketing Manager"
                               value={formData.jobTitle}
                               onChange={(e) => handleInputChange('jobTitle', e.target.value)}
-                              className={validationErrors.includes('Job title is required') ? 'border-red-500' : ''}
+                              className={`text-sm md:text-base ${validationErrors.includes('Job title is required') ? 'border-red-500' : ''}`}
                             />
                           </div>
                           <div>
-                            <Label htmlFor="companyName">Company Name *</Label>
+                            <Label htmlFor="companyName" className="text-sm md:text-base">Company Name *</Label>
                             <Input
                               id="companyName"
                               placeholder="e.g., TechCorp"
                               value={formData.companyName}
                               onChange={(e) => handleInputChange('companyName', e.target.value)}
-                              className={validationErrors.includes('Company name is required') ? 'border-red-500' : ''}
+                              className={`text-sm md:text-base ${validationErrors.includes('Company name is required') ? 'border-red-500' : ''}`}
                             />
                           </div>
                         </div>
 
                         <div>
-                          <Label htmlFor="jobDescription">Job Description *</Label>
+                          <Label htmlFor="jobDescription" className="text-sm md:text-base">Job Description *</Label>
                           <Textarea
                             id="jobDescription"
                             placeholder="Paste the complete job description here for the most tailored results..."
                             value={formData.jobDescription}
                             onChange={(e) => handleInputChange('jobDescription', e.target.value)}
                             rows={6}
-                            className={validationErrors.includes('Job description is required') ? 'border-red-500' : ''}
+                            className={`text-sm md:text-base ${validationErrors.includes('Job description is required') ? 'border-red-500' : ''}`}
                           />
-                          <p className="text-sm text-blueberry/70 dark:text-apple-core/70 mt-1">
+                          <p className="text-xs md:text-sm text-blueberry/70 dark:text-apple-core/70 mt-1">
                             Job description is required for optimal cover letter generation
                           </p>
                         </div>
@@ -444,14 +445,14 @@ const CoverLetter = () => {
                     ) : (
                       <div className="space-y-4">
                         <div>
-                          <Label>Select Analysis *</Label>
+                          <Label className="text-sm md:text-base">Select Analysis *</Label>
                           <AnalysisSelector
                             onAnalysisSelect={setSelectedAnalysisId}
                             selectedAnalysisId={selectedAnalysisId}
                             disabled={isGenerating}
                           />
                           {validationErrors.includes('Please select an analysis to generate from') && (
-                            <p className="text-sm text-red-600 mt-1">Please select an analysis to continue</p>
+                            <p className="text-xs md:text-sm text-red-600 mt-1">Please select an analysis to continue</p>
                           )}
                         </div>
                       </div>
@@ -460,14 +461,14 @@ const CoverLetter = () => {
                     {/* Common Options */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="tone">Tone</Label>
+                        <Label htmlFor="tone" className="text-sm md:text-base">Tone</Label>
                         <Select value={formData.tone} onValueChange={(value) => handleInputChange('tone', value)}>
-                          <SelectTrigger>
+                          <SelectTrigger className="text-sm md:text-base">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
                             {toneOptions.map((option) => (
-                              <SelectItem key={option.value} value={option.value}>
+                              <SelectItem key={option.value} value={option.value} className="text-sm md:text-base">
                                 {option.label}
                               </SelectItem>
                             ))}
@@ -475,14 +476,14 @@ const CoverLetter = () => {
                         </Select>
                       </div>
                       <div>
-                        <Label htmlFor="length">Length</Label>
+                        <Label htmlFor="length" className="text-sm md:text-base">Length</Label>
                         <Select value={formData.length} onValueChange={(value) => handleInputChange('length', value)}>
-                          <SelectTrigger>
+                          <SelectTrigger className="text-sm md:text-base">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
                             {lengthOptions.map((option) => (
-                              <SelectItem key={option.value} value={option.value}>
+                              <SelectItem key={option.value} value={option.value} className="text-sm md:text-base">
                                 {option.label}
                               </SelectItem>
                             ))}
@@ -492,10 +493,10 @@ const CoverLetter = () => {
                     </div>
 
                     {/* Credit Cost Display */}
-                    <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+                    <div className="bg-blue-50 dark:bg-blue-900/20 p-3 md:p-4 rounded-lg border border-blue-200 dark:border-blue-800">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                          <p className="text-xs md:text-sm font-medium text-blue-900 dark:text-blue-100">
                             Generation Cost: 1 Credit
                           </p>
                           <p className="text-xs text-blue-700 dark:text-blue-300">
@@ -513,7 +514,7 @@ const CoverLetter = () => {
                     <Button
                       onClick={handleGenerate}
                       disabled={!canGenerate || isGenerating || credits < 1}
-                      className="w-full bg-apricot hover:bg-apricot/90 text-white font-medium"
+                      className="w-full bg-apricot hover:bg-apricot/90 text-white font-medium text-sm md:text-base"
                     >
                       {isGenerating ? (
                         <>
@@ -531,14 +532,14 @@ const CoverLetter = () => {
               <TabsContent value="result">
                 {selectedCoverLetter ? (
                   <Card>
-                    <CardHeader>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <CardTitle>{selectedCoverLetter.job_title} at {selectedCoverLetter.company_name}</CardTitle>
-                          <div className="flex items-center gap-4 mt-2 text-sm text-gray-600 dark:text-gray-400">
+                    <CardHeader className="pb-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          <CardTitle className="text-lg md:text-xl truncate">{selectedCoverLetter.job_title} at {selectedCoverLetter.company_name}</CardTitle>
+                          <div className="flex flex-wrap items-center gap-2 md:gap-4 mt-2 text-xs md:text-sm text-gray-600 dark:text-gray-400">
                             <div className="flex items-center gap-1">
-                              <Clock className="h-4 w-4" />
-                              Generated {formatDate(selectedCoverLetter.created_at)}
+                              <Clock className="h-3 w-3 md:h-4 md:w-4" />
+                              <span className="hidden sm:inline">Generated </span>{formatDate(selectedCoverLetter.created_at)}
                             </div>
                             {selectedCoverLetter.regeneration_count > 0 && (
                               <Badge variant="outline" className="text-xs">
@@ -546,19 +547,19 @@ const CoverLetter = () => {
                               </Badge>
                             )}
                             {selectedCoverLetter.isUnsaved && (
-                              <Badge variant="outline" className="text-orange-600 border-orange-600">
+                              <Badge variant="outline" className="text-orange-600 border-orange-600 text-xs">
                                 Unsaved
                               </Badge>
                             )}
                           </div>
                         </div>
-                        <div className="flex items-center space-x-2">
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
                           {selectedCoverLetter.isUnsaved && (
                             <Button
                               variant="outline"
                               size="sm"
                               onClick={handleSaveCoverLetter}
-                              className="bg-green-50 border-green-300 text-green-700 hover:bg-green-100"
+                              className="bg-green-50 border-green-300 text-green-700 hover:bg-green-100 text-xs md:text-sm"
                             >
                               Save Cover Letter
                             </Button>
@@ -570,27 +571,28 @@ const CoverLetter = () => {
                               selectedCoverLetter.content,
                               `Cover_Letter_${selectedCoverLetter.company_name}_${selectedCoverLetter.job_title}`
                             )}
+                            className="text-xs md:text-sm"
                           >
-                            <Download className="h-4 w-4 mr-1" />
+                            <Download className="h-3 w-3 md:h-4 md:w-4 mr-1" />
                             Download
                           </Button>
                         </div>
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                      <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-                        <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed">
+                      <div className="bg-gray-50 dark:bg-gray-800 p-3 md:p-4 rounded-lg">
+                        <pre className="whitespace-pre-wrap font-sans text-xs md:text-sm leading-relaxed">
                           {selectedCoverLetter.content}
                         </pre>
                       </div>
                       
-                      <div className="flex items-center justify-between pt-4 border-t">
-                        <div className="flex items-center space-x-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-4 border-t gap-4">
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
                           <Select
                             value={formData.tone}
                             onValueChange={(value) => handleInputChange('tone', value)}
                           >
-                            <SelectTrigger className="w-32">
+                            <SelectTrigger className="w-full sm:w-32 text-sm">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -605,7 +607,7 @@ const CoverLetter = () => {
                             value={formData.length}
                             onValueChange={(value) => handleInputChange('length', value)}
                           >
-                            <SelectTrigger className="w-40">
+                            <SelectTrigger className="w-full sm:w-40 text-sm">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -618,25 +620,26 @@ const CoverLetter = () => {
                           </Select>
                         </div>
                         
-                        <div className="flex flex-col items-end">
+                        <div className="flex flex-col items-stretch sm:items-end">
                           <Button
                             variant="outline"
                             onClick={() => handleRegenerate(selectedCoverLetter.id, formData.tone, formData.length)}
                             disabled={isRegenerating}
+                            className="text-xs md:text-sm"
                           >
                             {isRegenerating ? (
                               <>
-                                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                                <RefreshCw className="h-3 w-3 md:h-4 md:w-4 mr-2 animate-spin" />
                                 Regenerating...
                               </>
                             ) : (
                               <>
-                                <RefreshCw className="h-4 w-4 mr-2" />
+                                <RefreshCw className="h-3 w-3 md:h-4 md:w-4 mr-2" />
                                 Regenerate (1 Credit)
                               </>
                             )}
                           </Button>
-                          <div className="text-xs text-gray-500 mt-1">
+                          <div className="text-xs text-gray-500 mt-1 text-center sm:text-right">
                             {getRemainingFreeRegenerations(selectedCoverLetter.regeneration_count || 0) > 0 
                               ? `${getRemainingFreeRegenerations(selectedCoverLetter.regeneration_count || 0)} free regenerations left`
                               : 'Additional regenerations: 1 credit each'
@@ -649,8 +652,8 @@ const CoverLetter = () => {
                 ) : (
                   <Card>
                     <CardContent className="text-center py-8">
-                      <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                      <p className="text-gray-600 dark:text-gray-400">
+                      <FileText className="h-8 w-8 md:h-12 md:w-12 text-gray-400 mx-auto mb-4" />
+                      <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base">
                         No cover letter generated yet. Create one in the "Generate New" tab.
                       </p>
                     </CardContent>
@@ -661,15 +664,15 @@ const CoverLetter = () => {
               <TabsContent value="history">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Document History</CardTitle>
+                    <CardTitle className="text-lg md:text-xl">Document History</CardTitle>
                   </CardHeader>
                   <CardContent>
                     {loadingHistory ? (
-                      <div className="text-center py-8">Loading...</div>
+                      <div className="text-center py-8 text-sm md:text-base">Loading...</div>
                     ) : coverLetters.length === 0 ? (
                       <div className="text-center py-8">
-                        <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                        <p className="text-gray-600 dark:text-gray-400">
+                        <FileText className="h-8 w-8 md:h-12 md:w-12 text-gray-400 mx-auto mb-4" />
+                        <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base">
                           No cover letters created yet.
                         </p>
                       </div>
@@ -678,19 +681,19 @@ const CoverLetter = () => {
                         {coverLetters.map((coverLetter) => (
                           <div
                             key={coverLetter.id}
-                            className="border rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                            className="border rounded-lg p-3 md:p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                           >
-                            <div className="flex items-center justify-between">
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <h3 className="font-medium">{coverLetter.job_title} at {coverLetter.company_name}</h3>
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                              <div className="flex-1 min-w-0">
+                                <div className="flex flex-wrap items-center gap-2 mb-1">
+                                  <h3 className="font-medium text-sm md:text-base truncate">{coverLetter.job_title} at {coverLetter.company_name}</h3>
                                   {coverLetter.regeneration_count > 0 && (
                                     <Badge variant="outline" className="text-xs">
                                       v{coverLetter.regeneration_count + 1}
                                     </Badge>
                                   )}
                                 </div>
-                                <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                                <div className="flex flex-wrap items-center gap-2 md:gap-4 text-xs md:text-sm text-gray-600 dark:text-gray-400">
                                   <div className="flex items-center gap-1">
                                     <Clock className="h-3 w-3" />
                                     {formatDate(coverLetter.created_at)}
@@ -705,6 +708,7 @@ const CoverLetter = () => {
                                   variant="outline"
                                   size="sm"
                                   onClick={() => handleViewCoverLetter(coverLetter)}
+                                  className="text-xs md:text-sm"
                                 >
                                   View
                                 </Button>
@@ -715,15 +719,17 @@ const CoverLetter = () => {
                                     coverLetter.content,
                                     `Cover_Letter_${coverLetter.company_name}_${coverLetter.job_title}`
                                   )}
+                                  className="text-xs md:text-sm"
                                 >
-                                  <Download className="h-4 w-4" />
+                                  <Download className="h-3 w-3 md:h-4 md:w-4" />
                                 </Button>
                                 <Button
                                   variant="outline"
                                   size="sm"
                                   onClick={() => handleDelete(coverLetter.id)}
+                                  className="text-xs md:text-sm"
                                 >
-                                  <Trash2 className="h-4 w-4" />
+                                  <Trash2 className="h-3 w-3 md:h-4 md:w-4" />
                                 </Button>
                               </div>
                             </div>

@@ -1,8 +1,11 @@
 
 import React from 'react';
 import { Star, Quote } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Testimonials = () => {
+  const isMobile = useIsMobile();
+  
   const testimonials = [
     {
       name: "Sarah Johnson",
@@ -54,31 +57,34 @@ const Testimonials = () => {
     }
   ];
 
+  // Show only first 3 testimonials on mobile
+  const displayedTestimonials = isMobile ? testimonials.slice(0, 3) : testimonials;
+
   return (
-    <section className="py-20 px-4 bg-gradient-to-br from-apple-core/20 via-white to-citrus/10 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
+    <section className="py-12 md:py-20 px-4 bg-gradient-to-br from-apple-core/20 via-white to-citrus/10 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-blueberry dark:text-citrus mb-4">
+        <div className="text-center mb-8 md:mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold text-blueberry dark:text-citrus mb-4">
             What Our Users Say
           </h2>
-          <p className="text-xl text-blueberry/80 dark:text-apple-core max-w-3xl mx-auto">
+          <p className="text-lg md:text-xl text-blueberry/80 dark:text-apple-core max-w-3xl mx-auto px-4">
             Join thousands of professionals who have transformed their careers with TuneMyCV
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {testimonials.map((testimonial, index) => (
-            <div key={index} className="bg-white dark:bg-blueberry/20 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow border border-apple-core/20 dark:border-citrus/20">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+          {displayedTestimonials.map((testimonial, index) => (
+            <div key={index} className="bg-white dark:bg-blueberry/20 rounded-xl shadow-lg p-4 md:p-6 hover:shadow-xl transition-shadow border border-apple-core/20 dark:border-citrus/20">
               <div className="flex items-center mb-4">
-                <Quote className="h-8 w-8 text-citrus mr-3" />
+                <Quote className="h-6 w-6 md:h-8 md:w-8 text-citrus mr-3" />
                 <div className="flex space-x-1">
                   {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-citrus text-citrus" />
+                    <Star key={i} className="h-3 w-3 md:h-4 md:w-4 fill-citrus text-citrus" />
                   ))}
                 </div>
               </div>
               
-              <p className="text-blueberry/80 dark:text-apple-core/90 mb-6 leading-relaxed">
+              <p className="text-blueberry/80 dark:text-apple-core/90 mb-4 md:mb-6 leading-relaxed text-sm md:text-base">
                 "{testimonial.content}"
               </p>
               
@@ -86,17 +92,25 @@ const Testimonials = () => {
                 <img 
                   src={testimonial.avatar}
                   alt={testimonial.name}
-                  className="w-12 h-12 rounded-full mr-4 border-2 border-apple-core/30 dark:border-citrus/30"
+                  className="w-10 h-10 md:w-12 md:h-12 rounded-full mr-3 md:mr-4 border-2 border-apple-core/30 dark:border-citrus/30"
                 />
                 <div>
-                  <h4 className="font-semibold text-blueberry dark:text-citrus">{testimonial.name}</h4>
-                  <p className="text-sm text-blueberry/70 dark:text-apple-core/80">{testimonial.role}</p>
-                  <p className="text-sm text-apricot font-medium">{testimonial.company}</p>
+                  <h4 className="font-semibold text-blueberry dark:text-citrus text-sm md:text-base">{testimonial.name}</h4>
+                  <p className="text-xs md:text-sm text-blueberry/70 dark:text-apple-core/80">{testimonial.role}</p>
+                  <p className="text-xs md:text-sm text-apricot font-medium">{testimonial.company}</p>
                 </div>
               </div>
             </div>
           ))}
         </div>
+        
+        {isMobile && (
+          <div className="text-center mt-6">
+            <p className="text-sm text-blueberry/70 dark:text-apple-core/70">
+              View our full collection of testimonials on desktop
+            </p>
+          </div>
+        )}
       </div>
     </section>
   );
