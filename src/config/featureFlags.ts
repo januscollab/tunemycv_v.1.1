@@ -21,7 +21,7 @@ export const featureFlags: FeatureFlags = {
   DEV_DEFAULT_USER_EMAIL: 'alanmahon@gmail.com',
 };
 
-export const getFeatureFlag = (flag: keyof FeatureFlags): boolean => {
+export const getFeatureFlag = (flag: keyof FeatureFlags): boolean | string => {
   return featureFlags[flag];
 };
 
