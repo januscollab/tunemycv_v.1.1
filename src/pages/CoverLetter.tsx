@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FileText, Sparkles, Download, Trash2, RefreshCw, Clock } from 'lucide-react';
+import { FileText, Sparkles, Download, Trash2, RefreshCw, Clock, FileUp, Search } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCoverLetter } from '@/hooks/useCoverLetter';
 import { useUserData } from '@/hooks/useUserData';
@@ -16,11 +15,12 @@ import { Badge } from '@/components/ui/badge';
 import EmbeddedAuth from '@/components/auth/EmbeddedAuth';
 import ServiceExplanation from '@/components/common/ServiceExplanation';
 import CreditsPanel from '@/components/analyze/CreditsPanel';
+import AnalysisSelector from '@/components/cover-letter/AnalysisSelector';
 
 const CoverLetter = () => {
   const { user } = useAuth();
   const { credits } = useUserData();
-  const { generateCoverLetter, regenerateCoverLetter, getCoverLetters, deleteCoverLetter, isGenerating, isRegenerating } = useCoverLetter();
+  const { generateCoverLetter, generateFromAnalysis, regenerateCoverLetter, getCoverLetters, deleteCoverLetter, isGenerating, isRegenerating } = useCoverLetter();
   
   const [formData, setFormData] = useState({
     jobTitle: '',
@@ -36,6 +36,8 @@ const CoverLetter = () => {
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showSavePrompt, setShowSavePrompt] = useState(false);
+  const [generationMethod, setGenerationMethod] = useState<'input' | 'analysis'>('input');
+  const [selectedAnalysisId, setSelectedAnalysisId] = useState<string>('');
 
   const lengthOptions = [
     { value: 'short', label: 'Short (150-200 words)', description: 'Brief and to the point' },
@@ -78,28 +80,52 @@ const CoverLetter = () => {
   };
 
   const handleGenerate = async () => {
-    if (!formData.jobTitle || !formData.companyName || !formData.jobDescription) {
-      return;
-    }
-
-    try {
-      const result = await generateCoverLetter({
-        jobTitle: formData.jobTitle,
-        companyName: formData.companyName,
-        jobDescription: formData.jobDescription,
-        tone: formData.tone,
-        length: formData.length
-      });
-
-      setSelectedCoverLetter({ ...result.coverLetter, isUnsaved: true });
-      setActiveTab('result');
-      setHasUnsavedChanges(true);
-      
-      if (coverLetters.length > 0) {
-        loadCoverLetterHistory();
+    if (generationMethod === 'input') {
+      if (!formData.jobTitle || !formData.companyName || !formData.jobDescription) {
+        return;
       }
-    } catch (error) {
-      console.error('Generation failed:', error);
+
+      try {
+        const result = await generateCoverLetter({
+          jobTitle: formData.jobTitle,
+          companyName: formData.companyName,
+          jobDescription: formData.jobDescription,
+          tone: formData.tone,
+          length: formData.length
+        });
+
+        setSelectedCoverLetter({ ...result.coverLetter, isUnsaved: true });
+        setActiveTab('result');
+        setHasUnsavedChanges(true);
+        
+        if (coverLetters.length > 0) {
+          loadCoverLetterHistory();
+        }
+      } catch (error) {
+        console.error('Generation failed:', error);
+      }
+    } else {
+      if (!selectedAnalysisId) {
+        return;
+      }
+
+      try {
+        const result = await generateFromAnalysis({
+          analysisResultId: selectedAnalysisId,
+          tone: formData.tone,
+          length: formData.length
+        });
+
+        setSelectedCoverLetter({ ...result.coverLetter, isUnsaved: true });
+        setActiveTab('result');
+        setHasUnsavedChanges(true);
+        
+        if (coverLetters.length > 0) {
+          loadCoverLetterHistory();
+        }
+      } catch (error) {
+        console.error('Generation from analysis failed:', error);
+      }
     }
   };
 
@@ -168,7 +194,9 @@ const CoverLetter = () => {
     return Math.max(0, 5 - regenerationCount);
   };
 
-  const canGenerate = formData.jobTitle && formData.companyName && formData.jobDescription;
+  const canGenerate = generationMethod === 'input' 
+    ? (formData.jobTitle && formData.companyName && formData.jobDescription)
+    : selectedAnalysisId;
 
   if (!user) {
     const coverLetterExplanation = {
@@ -289,42 +317,99 @@ const CoverLetter = () => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="jobTitle">Job Title *</Label>
-                        <Input
-                          id="jobTitle"
-                          placeholder="e.g., Marketing Manager"
-                          value={formData.jobTitle}
-                          onChange={(e) => handleInputChange('jobTitle', e.target.value)}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="companyName">Company Name *</Label>
-                        <Input
-                          id="companyName"
-                          placeholder="e.g., TechCorp"
-                          value={formData.companyName}
-                          onChange={(e) => handleInputChange('companyName', e.target.value)}
-                        />
+                    {/* Generation Method Selection */}
+                    <div className="space-y-4">
+                      <Label className="text-base font-medium">How would you like to generate your cover letter?</Label>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <button
+                          onClick={() => setGenerationMethod('input')}
+                          className={`p-4 border rounded-lg text-left transition-colors ${
+                            generationMethod === 'input'
+                              ? 'border-apricot bg-apricot/5'
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                        >
+                          <div className="flex items-center mb-2">
+                            <FileUp className="h-5 w-5 text-apricot mr-2" />
+                            <span className="font-medium">Generate from Input</span>
+                          </div>
+                          <p className="text-sm text-gray-600">
+                            Enter job details manually to create a cover letter
+                          </p>
+                        </button>
+                        
+                        <button
+                          onClick={() => setGenerationMethod('analysis')}
+                          className={`p-4 border rounded-lg text-left transition-colors ${
+                            generationMethod === 'analysis'
+                              ? 'border-apricot bg-apricot/5'
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                        >
+                          <div className="flex items-center mb-2">
+                            <Search className="h-5 w-5 text-apricot mr-2" />
+                            <span className="font-medium">Generate from Analysis</span>
+                          </div>
+                          <p className="text-sm text-gray-600">
+                            Use your previous CV analysis results
+                          </p>
+                        </button>
                       </div>
                     </div>
 
-                    <div>
-                      <Label htmlFor="jobDescription">Job Description *</Label>
-                      <Textarea
-                        id="jobDescription"
-                        placeholder="Paste the complete job description here for the most tailored results..."
-                        value={formData.jobDescription}
-                        onChange={(e) => handleInputChange('jobDescription', e.target.value)}
-                        rows={6}
-                        required
-                      />
-                      <p className="text-sm text-blueberry/70 dark:text-apple-core/70 mt-1">
-                        Job description is required for optimal cover letter generation
-                      </p>
-                    </div>
+                    {/* Conditional Form Content */}
+                    {generationMethod === 'input' ? (
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor="jobTitle">Job Title *</Label>
+                            <Input
+                              id="jobTitle"
+                              placeholder="e.g., Marketing Manager"
+                              value={formData.jobTitle}
+                              onChange={(e) => handleInputChange('jobTitle', e.target.value)}
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="companyName">Company Name *</Label>
+                            <Input
+                              id="companyName"
+                              placeholder="e.g., TechCorp"
+                              value={formData.companyName}
+                              onChange={(e) => handleInputChange('companyName', e.target.value)}
+                            />
+                          </div>
+                        </div>
 
+                        <div>
+                          <Label htmlFor="jobDescription">Job Description *</Label>
+                          <Textarea
+                            id="jobDescription"
+                            placeholder="Paste the complete job description here for the most tailored results..."
+                            value={formData.jobDescription}
+                            onChange={(e) => handleInputChange('jobDescription', e.target.value)}
+                            rows={6}
+                            required
+                          />
+                          <p className="text-sm text-blueberry/70 dark:text-apple-core/70 mt-1">
+                            Job description is required for optimal cover letter generation
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        <div>
+                          <Label>Select Analysis *</Label>
+                          <AnalysisSelector
+                            onAnalysisSelect={setSelectedAnalysisId}
+                            selectedAnalysisId={selectedAnalysisId}
+                            disabled={isGenerating}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Common Options */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="tone">Tone</Label>
