@@ -15,7 +15,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { FileText } from 'lucide-react';
 import EmbeddedAuth from '@/components/auth/EmbeddedAuth';
 import ServiceExplanation from '@/components/common/ServiceExplanation';
-import FloatingActionBar from '@/components/common/FloatingActionBar';
 import { UploadedFile } from '@/types/fileTypes';
 
 const AnalyzeCV = () => {
@@ -144,18 +143,18 @@ const AnalyzeCV = () => {
       <div className="min-h-screen bg-gradient-to-br from-apple-core/20 via-white to-citrus/10 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
         <div className="max-w-7xl mx-auto px-4 py-12">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-[600px]">
-            <div className="flex items-center">
+            <div className="flex items-start">
               <ServiceExplanation
                 title={analyzeExplanation.title}
                 subtitle={analyzeExplanation.subtitle}
                 benefits={analyzeExplanation.benefits}
                 features={analyzeExplanation.features}
-                icon={<FileText className="h-8 w-8 text-apricot" />}
+                icon={<FileText className="h-8 w-8 text-apricot mr-2" />}
                 compact={true}
               />
             </div>
-            <div className="flex items-center">
-              <div className="w-full">
+            <div className="flex items-end justify-center">
+              <div className="w-full max-w-sm">
                 <EmbeddedAuth
                   title="Login to Get Started"
                   description="CV analysis requires an account to ensure personalized results and save your analysis history."
@@ -247,16 +246,6 @@ const AnalyzeCV = () => {
           />
         </div>
       </div>
-
-      {/* Floating Action Bar for Analysis */}
-      <FloatingActionBar
-        credits={userCredits?.credits || 0}
-        actionText="Analyze CV"
-        onAction={handleAnalysis}
-        disabled={!canAnalyze || analyzing}
-        loading={analyzing}
-        creditCost={hasCreditsForAI ? 1 : 0}
-      />
     </div>
   );
 };
