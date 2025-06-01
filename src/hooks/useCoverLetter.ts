@@ -93,10 +93,10 @@ export const useCoverLetter = () => {
 
       if (error) throw error;
 
-      // Safely handle generation_parameters - ensure it's an object
+      // Safely handle generation_parameters - ensure it's an object and cast to Json
       const existingParams = originalData.generation_parameters || {};
       const updatedParams = typeof existingParams === 'object' && existingParams !== null 
-        ? { ...existingParams, length: params.length, tone: params.tone }
+        ? { ...existingParams as Record<string, any>, length: params.length, tone: params.tone }
         : { length: params.length, tone: params.tone };
 
       // Update the original cover letter with new content and increment regeneration count
@@ -105,7 +105,7 @@ export const useCoverLetter = () => {
         .update({
           content: data.content,
           template_id: params.tone,
-          generation_parameters: updatedParams,
+          generation_parameters: updatedParams as any,
           regeneration_count: originalData.regeneration_count + 1,
           credits_used: originalData.credits_used + (isFreeregeneration ? 0 : 1),
           updated_at: new Date().toISOString()
