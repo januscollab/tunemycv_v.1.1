@@ -3,11 +3,7 @@ import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { extractJobTitleFromText } from '@/utils/analysisUtils';
-import AnalysisResults from '@/components/analysis/AnalysisResults';
-import CVSelector from '@/components/analyze/CVSelector';
-import JobDescriptionInput from '@/components/analyze/JobDescriptionInput';
 import CreditsPanel from '@/components/analyze/CreditsPanel';
-import AnalyzeButton from '@/components/analyze/AnalyzeButton';
 import { useAnalysis } from '@/hooks/useAnalysis';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -124,10 +120,12 @@ const AnalyzeCV = () => {
       existingCVId: undefined
     };
 
+    console.log('Starting analysis with files:', uploadedFiles);
     performAnalysis(uploadedFiles, jobTitle, true, userCredits, options);
   };
 
   const handleStartNew = () => {
+    console.log('Resetting analysis state');
     setAnalysisResult(null);
     setUploadedFiles({});
     setJobTitle('');

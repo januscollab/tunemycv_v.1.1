@@ -42,11 +42,13 @@ const AnalyzeTabs: React.FC<AnalyzeTabsProps> = ({
   const [selectedHistoryAnalysis, setSelectedHistoryAnalysis] = useState<any>(null);
 
   const handleViewAnalysis = (analysis: any) => {
+    console.log('Viewing analysis from history:', analysis);
     setSelectedHistoryAnalysis(analysis);
     setActiveTab('report');
   };
 
   const handleStartNew = () => {
+    console.log('Starting new analysis');
     setSelectedHistoryAnalysis(null);
     onStartNew();
     setActiveTab('analysis');
@@ -63,10 +65,20 @@ const AnalyzeTabs: React.FC<AnalyzeTabsProps> = ({
   // Auto-switch to report tab when new analysis is completed
   React.useEffect(() => {
     if (analysisResult && !analyzing && activeTab === 'analysis') {
+      console.log('Auto-switching to report tab after analysis completion');
       setSelectedHistoryAnalysis(null); // Clear any previously selected history
       setActiveTab('report');
     }
   }, [analysisResult, analyzing, activeTab]);
+
+  // Clear selected history when starting new analysis
+  React.useEffect(() => {
+    if (analyzing) {
+      setSelectedHistoryAnalysis(null);
+    }
+  }, [analyzing]);
+
+  const hasReportData = getCurrentReportData();
 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -74,8 +86,8 @@ const AnalyzeTabs: React.FC<AnalyzeTabsProps> = ({
         <TabsTrigger value="analysis">CV Analysis</TabsTrigger>
         <TabsTrigger value="report" className="relative">
           Current Report
-          {(getCurrentReportData()) && (
-            <span className="absolute -top-1 -right-1 h-3 w-3 bg-apricot rounded-full"></span>
+          {hasReportData && (
+            <span className="absolute -top-1 -right-1 h-3 w-3 bg-apricot rounded-full animate-pulse"></span>
           )}
         </TabsTrigger>
         <TabsTrigger value="history">Analysis History</TabsTrigger>

@@ -5,7 +5,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import AnalysisHistoryHeader from '@/components/profile/analysis/AnalysisHistoryHeader';
 import EmptyAnalysisState from '@/components/profile/analysis/EmptyAnalysisState';
-import AnalysisListItem from '@/components/profile/analysis/AnalysisListItem';
 import AnalysisDetailModal from '@/components/profile/analysis/AnalysisDetailModal';
 import UpcomingFeatureModal from '@/components/profile/analysis/UpcomingFeatureModal';
 
@@ -52,7 +51,6 @@ const AnalysisHistoryTabReplica: React.FC<AnalysisHistoryTabReplicaProps> = ({
 
   const loadAnalysisHistory = async () => {
     try {
-      // Updated query to use new CV metadata fields and left join for cost estimate
       const { data, error } = await supabase
         .from('analysis_results')
         .select(`
@@ -64,7 +62,6 @@ const AnalysisHistoryTabReplica: React.FC<AnalysisHistoryTabReplicaProps> = ({
 
       if (error) throw error;
       
-      // Transform data to include credit cost, handling null values gracefully
       const transformedData = (data || []).map(analysis => ({
         ...analysis,
         credit_cost: analysis.analysis_logs?.[0]?.cost_estimate ? Math.ceil(analysis.analysis_logs[0].cost_estimate) : 1
@@ -72,6 +69,7 @@ const AnalysisHistoryTabReplica: React.FC<AnalysisHistoryTabReplicaProps> = ({
       
       setAnalyses(transformedData);
     } catch (error) {
+      console.error('Error loading analysis history:', error);
       toast({ title: 'Error', description: 'Failed to load analysis history', variant: 'destructive' });
     } finally {
       setLoading(false);
@@ -83,7 +81,6 @@ const AnalysisHistoryTabReplica: React.FC<AnalysisHistoryTabReplicaProps> = ({
   };
 
   const handleViewAnalysis = (analysis: AnalysisResult) => {
-    // Pass the analysis to the parent component to show in Current Report tab
     onViewAnalysis(analysis);
   };
 
@@ -100,6 +97,7 @@ const AnalysisHistoryTabReplica: React.FC<AnalysisHistoryTabReplicaProps> = ({
       setAnalyses(prev => prev.filter(analysis => analysis.id !== analysisId));
       toast({ title: 'Success', description: 'Analysis deleted successfully' });
     } catch (error) {
+      console.error('Error deleting analysis:', error);
       toast({ title: 'Error', description: 'Failed to delete analysis', variant: 'destructive' });
     }
   };
@@ -173,10 +171,22 @@ const AnalysisHistoryTabReplica: React.FC<AnalysisHistoryTabReplicaProps> = ({
                       <span>{analysis.company_name || 'Company not specified'}</span>
                       <span className="mx-2">•</span>
                       <span>{new Date(analysis.created_at).toLocaleDateString()}</span>
+                      {analysis.cv_file_name && (
+                        <>
+                          <span className="mx-2">•</span>
+                          <span>CV: {analysis.cv_file_name}</span>
+                        </>
+                      )}
                     </div>
+
+                    {analysis.executive_summary && (
+                      <p className="text-sm text-blueberry/80 dark:text-apple-core/90 line-clamp-2">
+                        {analysis.executive_summary}
+                      </p>
+                    )}
                   </div>
                   
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 ml-4">
                     <button
                       onClick={() => handleViewAnalysis(analysis)}
                       className="bg-apricot hover:bg-apricot/90 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
