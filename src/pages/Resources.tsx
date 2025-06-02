@@ -82,7 +82,7 @@ const Resources = () => {
       <section className="py-10 px-4">
         <div className="max-w-4xl mx-auto">
           {/* Category Filter */}
-          <div className="flex flex-wrap justify-center gap-4 mb-12">
+          <div className="flex flex-wrap justify-center gap-4 mb-6">
             {categories.map(category => (
               <button
                 key={category}

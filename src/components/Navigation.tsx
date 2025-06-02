@@ -40,9 +40,9 @@ const Navigation = () => {
     <nav className="bg-white dark:bg-earth border-b border-border">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
-          {/* Logo positioned between left edge and menu start */}
+          {/* Logo positioned halfway between left edge and menu start */}
           <div className="flex items-center">
-            <div className="ml-[10%]">
+            <div className="ml-[5%]">
               <NavigationLogo />
             </div>
           </div>

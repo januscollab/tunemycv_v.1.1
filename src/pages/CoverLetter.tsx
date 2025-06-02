@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FileText, Sparkles, Trash2, RefreshCw, Clock, FileUp, Search, AlertCircle, Eye } from 'lucide-react';
+import { FileText, Sparkles, Trash2, RefreshCw, Clock, FileUp, Search, AlertCircle, Eye, Edit } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCoverLetter } from '@/hooks/useCoverLetter';
 import { useUserData } from '@/hooks/useUserData';
@@ -304,15 +304,17 @@ const CoverLetter = () => {
         <div className="mb-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <div className="flex items-center mb-3">
-                <FileText className="h-8 w-8 text-zapier-orange mr-3" />
-                <h1 className="text-3xl font-bold text-earth dark:text-white">
-                  Generate Cover Letter
-                </h1>
+              <div className="flex items-start mb-3">
+                <Edit className="h-8 w-8 text-zapier-orange mr-3 flex-shrink-0" />
+                <div>
+                  <h1 className="text-3xl font-bold text-earth dark:text-white">
+                    Generate Cover Letter
+                  </h1>
+                  <p className="text-lg font-normal text-earth/70 dark:text-white/70 max-w-2xl mt-2">
+                    Create tailored cover letters that highlight your strengths and align perfectly with specific job requirements.
+                  </p>
+                </div>
               </div>
-              <p className="text-lg font-normal text-earth/70 dark:text-white/70 max-w-2xl">
-                Generate tailored cover letters that highlight your strengths and align with specific job requirements.
-              </p>
             </div>
           </div>
         </div>
