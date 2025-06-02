@@ -24,7 +24,11 @@ const CoverLetter = () => {
     tone: 'professional',
     length: 'medium',
     focusAreas: [],
-    customInstructions: ''
+    customInstructions: '',
+    workExperienceHighlights: '',
+    customHookOpener: '',
+    personalValues: '',
+    includeLinkedInUrl: false
   });
 
   // Get pre-selected analysis from navigation state
@@ -66,7 +70,15 @@ const CoverLetter = () => {
   const handleGenerate = async () => {
     if (!selectedAnalysisId) return;
     
-    const result = await generateFromAnalysis({ analysisId: selectedAnalysisId });
+    const result = await generateFromAnalysis({ 
+      analysisResultId: selectedAnalysisId,
+      tone: advancedOptions.tone,
+      length: advancedOptions.length,
+      workExperienceHighlights: advancedOptions.workExperienceHighlights,
+      customHookOpener: advancedOptions.customHookOpener,
+      personalValues: advancedOptions.personalValues,
+      includeLinkedInUrl: advancedOptions.includeLinkedInUrl
+    });
     if (result) {
       setActiveTab('current');
     }

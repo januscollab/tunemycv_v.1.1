@@ -1,7 +1,8 @@
-
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useQuery } from '@tanstack/react-query';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface GenerateCoverLetterParams {
   jobTitle: string;
@@ -19,8 +20,8 @@ interface GenerateCoverLetterParams {
 
 interface GenerateFromAnalysisParams {
   analysisResultId: string;
-  tone: string;
-  length: string;
+  tone?: string;
+  length?: string;
   workExperienceHighlights?: string;
   customHookOpener?: string;
   personalValues?: string;
@@ -34,6 +35,7 @@ interface RegenerateCoverLetterParams {
 }
 
 export const useCoverLetter = () => {
+  const { user } = useAuth();
   const [isGenerating, setIsGenerating] = useState(false);
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [analyses, setAnalyses] = useState<any[]>([]);
@@ -46,6 +48,24 @@ export const useCoverLetter = () => {
   const [hasGenerated, setHasGenerated] = useState(false);
   const [showNoAnalysisModal, setShowNoAnalysisModal] = useState(false);
   const { toast } = useToast();
+
+  // Fetch saved cover letters
+  const { data: savedCoverLetters, refetch: refetchSavedLetters } = useQuery({
+    queryKey: ['cover-letters', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      
+      const { data, error } = await supabase
+        .from('cover_letters')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+  });
 
   const resetForm = () => {
     setSelectedAnalysisId('');
@@ -107,8 +127,8 @@ export const useCoverLetter = () => {
           companyName: analysisData.company_name,
           jobDescription: analysisData.job_description_extracted_text,
           cvText: analysisData.cv_extracted_text,
-          tone: params.tone,
-          length: params.length,
+          tone: params.tone || 'professional',
+          length: params.length || 'medium',
           analysisResultId: params.analysisResultId,
           workExperienceHighlights: params.workExperienceHighlights,
           customHookOpener: params.customHookOpener,
@@ -307,6 +327,8 @@ export const useCoverLetter = () => {
     hasGenerated,
     showNoAnalysisModal,
     setShowNoAnalysisModal,
-    resetForm
+    resetForm,
+    savedCoverLetters,
+    refetchSavedLetters
   };
 };
