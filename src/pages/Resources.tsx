@@ -1,11 +1,11 @@
 
 import React from 'react';
-import { FileText, Users, BookOpen, Target, TrendingUp, CheckCircle, Lightbulb, Briefcase, Star } from 'lucide-react';
+import { FileText, Users, BookOpen, Target, TrendingUp, CheckCircle } from 'lucide-react';
 
 const Resources = () => {
   const resources = [
     {
-      title: "CV Mistakes to Avoid in 2025",
+      title: "10 Common CV Mistakes to Avoid in 2025",
       description: "Learn about the most frequent errors that can cost you job opportunities and how to fix them.",
       icon: FileText,
       link: "#",
@@ -19,7 +19,7 @@ const Resources = () => {
       category: "Technical"
     },
     {
-      title: "Industry CV Templates",
+      title: "Industry-Specific CV Templates",
       description: "Download professionally designed CV templates tailored to your industry.",
       icon: BookOpen,
       link: "#",
@@ -45,27 +45,6 @@ const Resources = () => {
       icon: CheckCircle,
       link: "#",
       category: "Social Media"
-    },
-    {
-      title: "Cover Letter Writing Guide",
-      description: "Create compelling cover letters that get you noticed by hiring managers.",
-      icon: Lightbulb,
-      link: "#",
-      category: "CV Tips"
-    },
-    {
-      title: "Remote Work Job Search",
-      description: "Strategies for finding and landing remote positions in today's market.",
-      icon: Briefcase,
-      link: "#",
-      category: "Career"
-    },
-    {
-      title: "Skills Assessment Tools",
-      description: "Evaluate and showcase your technical and soft skills effectively.",
-      icon: Star,
-      link: "#",
-      category: "Technical"
     }
   ];
 
@@ -120,35 +99,31 @@ const Resources = () => {
           </div>
 
           {/* Resources Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredResources.map((resource, index) => (
-              <div key={index} className="bg-white dark:bg-blueberry/20 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all border border-apple-core/20 dark:border-citrus/20 hover:border-zapier-orange/50 h-[200px] flex flex-col">
-                <div className="flex items-start space-x-4 mb-4">
-                  <div className="bg-apricot/20 rounded-full w-12 h-12 flex items-center justify-center flex-shrink-0">
-                    <resource.icon className="h-6 w-6 text-apricot" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-2 line-clamp-2">
-                      {resource.title}
-                    </h3>
-                    <span className="inline-block bg-citrus/20 text-citrus px-3 py-1 rounded-full text-sm font-medium">
-                      {resource.category}
-                    </span>
-                  </div>
+              <div key={index} className="bg-white dark:bg-blueberry/20 rounded-xl shadow-lg p-4 hover:shadow-xl transition-all border border-apple-core/20 dark:border-citrus/20 hover:border-zapier-orange/50" style={{ height: '144px' }}>
+                <div className="bg-apricot/20 rounded-full w-10 h-10 flex items-center justify-center mb-3">
+                  <resource.icon className="h-5 w-5 text-apricot" />
                 </div>
                 
-                <div className="flex-1 flex flex-col justify-between">
-                  <p className="text-blueberry/70 dark:text-apple-core/80 leading-relaxed text-sm line-clamp-3 mb-3">
+                <div className="mb-2">
+                  <span className="inline-block bg-citrus/20 text-citrus px-2 py-1 rounded-full text-xs font-medium mb-2">
+                    {resource.category}
+                  </span>
+                  <h3 className="text-base font-semibold text-blueberry dark:text-citrus mb-1 line-clamp-1">
+                    {resource.title}
+                  </h3>
+                  <p className="text-blueberry/70 dark:text-apple-core/80 leading-relaxed text-xs line-clamp-2">
                     {resource.description}
                   </p>
-                  
-                  <a 
-                    href={resource.link}
-                    className="inline-flex items-center text-apricot font-medium hover:text-zapier-orange transition-colors text-sm self-start"
-                  >
-                    Read More →
-                  </a>
                 </div>
+                
+                <a 
+                  href={resource.link}
+                  className="inline-flex items-center text-apricot font-medium hover:text-zapier-orange transition-colors text-sm"
+                >
+                  Read More →
+                </a>
               </div>
             ))}
           </div>

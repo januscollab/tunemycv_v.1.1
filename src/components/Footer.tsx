@@ -11,13 +11,9 @@ const Footer = () => {
           <div className="md:col-span-1">
             <div className="flex items-center mb-4">
               <img 
-                src="/lovable-uploads/footer-logo.png" 
+                src="/lovable-uploads/7aefb742-801d-4494-af3e-defd30462f1c.png" 
                 alt="TuneMyCV Logo" 
                 className="h-8 w-auto mr-2"
-                onError={(e) => {
-                  // Fallback to original logo if new one fails to load
-                  e.currentTarget.src = "/lovable-uploads/7aefb742-801d-4494-af3e-defd30462f1c.png";
-                }}
               />
             </div>
             <p className="text-white/80 leading-relaxed">
