@@ -23,8 +23,6 @@ const CoverLetter = () => {
   const [advancedOptions, setAdvancedOptions] = useState({
     tone: 'professional',
     length: 'medium',
-    focusAreas: [],
-    customInstructions: '',
     workExperienceHighlights: '',
     customHookOpener: '',
     personalValues: '',
@@ -146,7 +144,7 @@ const CoverLetter = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-6xl mx-auto px-4">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-earth dark:text-white mb-4">
             Generate Cover Letter
@@ -158,7 +156,7 @@ const CoverLetter = () => {
 
         <div className="flex gap-6">
           {/* Main Content */}
-          <div className="flex-1" style={{ width: '80%' }}>
+          <div className="flex-1">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-3 mb-6">
                 <TabsTrigger value="generate" className="flex items-center space-x-2">
@@ -255,7 +253,7 @@ const CoverLetter = () => {
           </div>
 
           {/* Credits Panel */}
-          <div className="w-[180px]">
+          <div className="w-[200px]">
             <CreditsPanel credits={credits} hasCreditsForAI={hasCreditsForAI} />
           </div>
         </div>
