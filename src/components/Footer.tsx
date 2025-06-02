@@ -1,92 +1,92 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Mail } from 'lucide-react';
 
 const Footer = () => {
   return (
-    <footer className="bg-blueberry dark:bg-blueberry/90 text-white py-12">
-      <div className="max-w-6xl mx-auto px-4">
+    <footer className="bg-earth text-white py-12 px-4">
+      <div className="max-w-6xl mx-auto">
         <div className="grid md:grid-cols-4 gap-8">
-          {/* Company Info */}
-          <div className="md:col-span-2">
-            <div className="mb-4">
+          {/* Logo and Description */}
+          <div className="md:col-span-1">
+            <div className="flex items-center mb-4">
               <img 
                 src="/lovable-uploads/7aefb742-801d-4494-af3e-defd30462f1c.png" 
-                alt="TuneMyCV" 
-                className="h-8 w-auto"
+                alt="TuneMyCV Logo" 
+                className="h-8 w-auto mr-2"
               />
             </div>
-            <p className="text-apple-core/80 mb-4">
-              AI-powered CV analysis that helps you optimize your resume for Applicant Tracking Systems (ATS) and land your dream job.
-            </p>
-            <div className="mb-4">
-              <a 
-                href="mailto:hello@tunemycv.com"
-                className="flex items-center text-apple-core/80 hover:text-citrus transition-colors"
-              >
-                <Mail className="h-4 w-4 mr-2" />
-                hello@tunemycv.com
-              </a>
-            </div>
-            <p className="text-sm text-apple-core/60">
-              © 2024 TuneMyCV. All rights reserved.
+            <p className="text-white/80 leading-relaxed">
+              Optimize your CV with AI-powered insights and accelerate your career journey.
             </p>
           </div>
 
-          {/* Quick Links */}
+          {/* Product Links */}
           <div>
-            <h4 className="font-semibold mb-4">Quick Links</h4>
-            <ul className="space-y-2 text-apple-core/80">
+            <h3 className="font-semibold mb-4 text-zapier-orange">Product</h3>
+            <ul className="space-y-2">
               <li>
-                <Link to="/analyze" className="hover:text-citrus transition-colors">
-                  Analyze CV
+                <Link to="/analyze" className="text-white/80 hover:text-zapier-orange transition-colors">
+                  CV Analysis
                 </Link>
               </li>
               <li>
-                <Link to="/resources" className="hover:text-citrus transition-colors">
-                  Resources
+                <Link to="/cover-letter" className="text-white/80 hover:text-zapier-orange transition-colors">
+                  Cover Letter Generator
                 </Link>
               </li>
               <li>
-                <Link to="/help" className="hover:text-citrus transition-colors">
-                  Help Centre
+                <Link to="/resources" className="text-white/80 hover:text-zapier-orange transition-colors">
+                  Career Resources
                 </Link>
               </li>
               <li>
-                <Link to="/profile" className="hover:text-citrus transition-colors">
-                  Profile
+                <Link to="/next-steps" className="text-white/80 hover:text-zapier-orange transition-colors">
+                  Next Steps
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Support */}
+          {/* Support Links */}
           <div>
-            <h4 className="font-semibold mb-4">Support</h4>
-            <ul className="space-y-2 text-apple-core/80">
+            <h3 className="font-semibold mb-4 text-zapier-orange">Support</h3>
+            <ul className="space-y-2">
               <li>
-                <Link to="/help" className="hover:text-citrus transition-colors">
+                <Link to="/help-centre" className="text-white/80 hover:text-zapier-orange transition-colors">
                   Help Centre
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className="hover:text-citrus transition-colors">
+                <Link to="/contact-us" className="text-white/80 hover:text-zapier-orange transition-colors">
                   Contact Us
                 </Link>
               </li>
+            </ul>
+          </div>
+
+          {/* Legal Links */}
+          <div>
+            <h3 className="font-semibold mb-4 text-zapier-orange">Legal</h3>
+            <ul className="space-y-2">
               <li>
-                <Link to="/analyze" className="hover:text-citrus transition-colors">
-                  Get Started
-                </Link>
-              </li>
-              <li>
-                <Link to="/privacy-policy" className="hover:text-citrus transition-colors">
+                <Link to="/privacy-policy" className="text-white/80 hover:text-zapier-orange transition-colors">
                   Privacy Policy
                 </Link>
               </li>
+              <li>
+                <a href="#" className="text-white/80 hover:text-zapier-orange transition-colors">
+                  Terms of Service
+                </a>
+              </li>
             </ul>
           </div>
+        </div>
+
+        <div className="border-t border-white/20 mt-8 pt-8 text-center">
+          <p className="text-white/60">
+            © 2024 TuneMyCV. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>

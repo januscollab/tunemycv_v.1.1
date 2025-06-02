@@ -28,17 +28,17 @@ const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({ userDisplayNa
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center px-3 py-2 text-sm font-medium transition-colors relative ${
+        className={`flex items-center px-3 py-2 text-sm font-semibold transition-colors relative ${
           isActive('/profile')
-            ? 'text-apricot'
-            : 'text-blueberry dark:text-apple-core hover:text-apricot'
+            ? 'text-zapier-orange'
+            : 'text-earth hover:text-zapier-orange'
         }`}
       >
         <User className="h-4 w-4 mr-2" />
         Profile
         <ChevronDown className="h-4 w-4 ml-1" />
         {isActive('/profile') && (
-          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-apricot"></div>
+          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-zapier-orange"></div>
         )}
       </button>
 
@@ -48,11 +48,11 @@ const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({ userDisplayNa
             className="fixed inset-0 z-10" 
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-20">
+          <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-border rounded-lg shadow-lg z-20">
             <Link
               to="/profile"
               onClick={() => setIsOpen(false)}
-              className="block px-4 py-2 text-sm text-blueberry dark:text-apple-core hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              className="block px-4 py-3 text-sm text-earth hover:bg-cream/50 transition-colors"
             >
               <User className="h-4 w-4 mr-2 inline" />
               Profile Settings
@@ -62,7 +62,7 @@ const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({ userDisplayNa
                 setIsOpen(false);
                 handleLogout();
               }}
-              className="w-full text-left px-4 py-2 text-sm text-blueberry dark:text-apple-core hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border-t border-gray-200 dark:border-gray-700"
+              className="w-full text-left px-4 py-3 text-sm text-earth hover:bg-cream/50 transition-colors border-t border-border"
             >
               <LogOut className="h-4 w-4 mr-2 inline" />
               Logout

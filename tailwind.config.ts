@@ -20,63 +20,64 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				sans: ['Inter', 'system-ui', 'sans-serif'],
+				sans: ['Poppins', 'system-ui', 'sans-serif'],
+				display: ['Playfair Display', 'serif'],
 			},
 			colors: {
-				// Custom palette from the image
-				blueberry: '#6B7A8F',
-				apricot: '#F7882F',
-				citrus: '#F7C32E',
-				'apple-core': '#DCC7AA',
+				// Zapier color palette
+				earth: '#3A3A3A',
+				'zapier-orange': '#FF4A00',
+				cream: '#F5F5DC',
+				'almost-white': '#FAFAFA',
 				
-				border: 'hsl(var(--border))',
-				input: 'hsl(var(--input))',
-				ring: 'hsl(var(--ring))',
-				background: 'hsl(var(--background))',
-				foreground: 'hsl(var(--foreground))',
+				border: '#E5E5E5',
+				input: '#F5F5F5',
+				ring: '#FF4A00',
+				background: '#FAFAFA',
+				foreground: '#3A3A3A',
 				primary: {
-					DEFAULT: '#F7882F', // Apricot as primary
+					DEFAULT: '#FF4A00',
 					foreground: '#FFFFFF'
 				},
 				secondary: {
-					DEFAULT: '#DCC7AA', // Apple core as secondary
-					foreground: '#6B7A8F' // Blueberry text
+					DEFAULT: '#F5F5DC',
+					foreground: '#3A3A3A'
 				},
 				destructive: {
-					DEFAULT: 'hsl(var(--destructive))',
-					foreground: 'hsl(var(--destructive-foreground))'
+					DEFAULT: '#DC2626',
+					foreground: '#FFFFFF'
 				},
 				muted: {
-					DEFAULT: '#DCC7AA', // Apple core for muted
-					foreground: '#6B7A8F' // Blueberry for muted text
+					DEFAULT: '#F5F5F5',
+					foreground: '#6B7280'
 				},
 				accent: {
-					DEFAULT: '#F7C32E', // Citrus for accents
-					foreground: '#6B7A8F'
+					DEFAULT: '#F5F5DC',
+					foreground: '#3A3A3A'
 				},
 				popover: {
-					DEFAULT: 'hsl(var(--popover))',
-					foreground: 'hsl(var(--popover-foreground))'
+					DEFAULT: '#FFFFFF',
+					foreground: '#3A3A3A'
 				},
 				card: {
-					DEFAULT: 'hsl(var(--card))',
-					foreground: 'hsl(var(--card-foreground))'
+					DEFAULT: '#FFFFFF',
+					foreground: '#3A3A3A'
 				},
 				sidebar: {
-					DEFAULT: 'hsl(var(--sidebar-background))',
-					foreground: 'hsl(var(--sidebar-foreground))',
-					primary: 'hsl(var(--sidebar-primary))',
-					'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-					accent: 'hsl(var(--sidebar-accent))',
-					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
-					border: 'hsl(var(--sidebar-border))',
-					ring: 'hsl(var(--sidebar-ring))'
+					DEFAULT: '#FAFAFA',
+					foreground: '#3A3A3A',
+					primary: '#FF4A00',
+					'primary-foreground': '#FFFFFF',
+					accent: '#F5F5F5',
+					'accent-foreground': '#3A3A3A',
+					border: '#E5E5E5',
+					ring: '#FF4A00'
 				}
 			},
 			borderRadius: {
-				lg: 'var(--radius)',
-				md: 'calc(var(--radius) - 2px)',
-				sm: 'calc(var(--radius) - 4px)'
+				lg: '8px',
+				md: '6px',
+				sm: '4px'
 			},
 			keyframes: {
 				'accordion-down': {

@@ -39,23 +39,23 @@ const AuthHeader: React.FC<AuthHeaderProps> = ({ mode, fromAnalyze }) => {
 
   return (
     <div className="text-center">
-      <Link to="/" className="inline-flex items-center text-apricot hover:text-apricot/80 mb-4">
+      <Link to="/" className="inline-flex items-center text-zapier-orange hover:text-zapier-orange/80 mb-6">
         <ArrowLeft className="h-4 w-4 mr-2" />
         Back to Home
       </Link>
       
       {fromAnalyze && (
-        <div className="bg-citrus/10 border border-citrus/30 rounded-md p-4 mb-6">
-          <div className="text-sm text-blueberry">
+        <div className="bg-cream border border-cream rounded-lg p-4 mb-8">
+          <div className="text-sm text-earth">
             <strong>Login Required:</strong> You need to sign in to analyze your CV and access personalized insights.
           </div>
         </div>
       )}
       
-      <h2 className="text-3xl font-bold text-blueberry">
+      <h2 className="text-4xl font-bold text-earth font-display">
         {getTitle()}
       </h2>
-      <p className="mt-2 text-blueberry/70">
+      <p className="mt-3 text-earth/70 font-normal text-lg">
         {getSubtitle()}
       </p>
     </div>

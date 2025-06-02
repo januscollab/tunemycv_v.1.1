@@ -14,15 +14,15 @@ interface AuthSidebarProps {
 const AuthSidebar: React.FC<AuthSidebarProps> = ({ title, description, icon }) => {
   return (
     <div className="lg:col-span-1">
-      <Card className="sticky top-6">
+      <Card className="sticky top-6 border border-gray-200 dark:border-gray-700">
         <CardHeader>
-          <CardTitle className="flex items-center justify-center">
+          <CardTitle className="flex items-center justify-center text-xl font-semibold">
             {icon || <User className="h-6 w-6 text-apricot mr-2" />}
             {title}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-blueberry/80 dark:text-apple-core/80 text-center">
+          <p className="text-blueberry/80 dark:text-apple-core/80 text-center font-normal">
             {description}
           </p>
           <Link to="/auth">

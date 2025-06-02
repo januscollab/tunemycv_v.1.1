@@ -43,11 +43,11 @@ const Auth = () => {
   return (
     <>
       <OAuthCallback onLoadingChange={setOauthLoading} />
-      <div className="min-h-screen bg-gradient-to-br from-apple-core/20 via-white to-citrus/10 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-background flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
           <AuthHeader mode={mode} fromAnalyze={fromAnalyze} />
 
-          <div className="bg-white rounded-lg shadow-lg p-8 border border-apple-core/30">
+          <div className="bg-white rounded-lg border border-border p-8">
             {mode !== 'forgot-password' && (
               <SocialAuthButtons isAnyLoading={isAnyLoading} />
             )}

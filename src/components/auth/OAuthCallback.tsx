@@ -15,25 +15,63 @@ const OAuthCallback: React.FC<OAuthCallbackProps> = ({ onLoadingChange }) => {
 
   useEffect(() => {
     const handleOAuthCallback = async () => {
-      // Check if we're in an OAuth callback (tokens in URL hash)
+      // Check if we're in an OAuth callback (tokens in URL hash or query params)
       const hashParams = new URLSearchParams(window.location.hash.substring(1));
-      const accessToken = hashParams.get('access_token');
-      const refreshToken = hashParams.get('refresh_token');
+      const searchParams = new URLSearchParams(window.location.search);
       
-      if (accessToken && refreshToken) {
-        console.log('OAuth callback detected, processing tokens...');
+      const accessToken = hashParams.get('access_token') || searchParams.get('access_token');
+      const refreshToken = hashParams.get('refresh_token') || searchParams.get('refresh_token');
+      const authCode = searchParams.get('code');
+      const error = searchParams.get('error');
+      const errorDescription = searchParams.get('error_description');
+      
+      // Handle OAuth errors first
+      if (error) {
+        console.error('OAuth error:', error, errorDescription);
+        
+        let errorMessage = 'Authentication failed. Please try again.';
+        if (error === 'access_denied') {
+          errorMessage = 'Sign-in was cancelled. Please try again if you want to continue.';
+        } else if (errorDescription) {
+          errorMessage = decodeURIComponent(errorDescription);
+        }
+        
+        toast({ 
+          title: 'Authentication Error', 
+          description: errorMessage, 
+          variant: 'destructive' 
+        });
+        
+        // Clean up the URL
+        const cleanUrl = window.location.origin + window.location.pathname;
+        window.history.replaceState({}, document.title, cleanUrl);
+        return;
+      }
+      
+      if (accessToken || authCode) {
+        console.log('OAuth callback detected, processing authentication...');
+        console.log('Current URL:', window.location.href);
         setOauthLoading(true);
         onLoadingChange(true);
         
         try {
-          // Let Supabase handle the session from the URL
+          // For PKCE flow, Supabase will automatically handle the code exchange
           const { data, error } = await supabase.auth.getSession();
           
           if (error) {
             console.error('Error getting session from OAuth callback:', error);
+            
+            // Provide more specific error messages
+            let errorMessage = 'Failed to complete sign-in. Please try again.';
+            if (error.message?.includes('Invalid login credentials')) {
+              errorMessage = 'Authentication failed. Please check your account and try again.';
+            } else if (error.message?.includes('Email not confirmed')) {
+              errorMessage = 'Please confirm your email address before signing in.';
+            }
+            
             toast({ 
               title: 'Authentication Error', 
-              description: 'Failed to complete sign-in. Please try again.', 
+              description: errorMessage, 
               variant: 'destructive' 
             });
           } else if (data.session) {
@@ -43,11 +81,40 @@ const OAuthCallback: React.FC<OAuthCallbackProps> = ({ onLoadingChange }) => {
               description: 'Successfully signed in!' 
             });
             
-            // Clean up the URL by removing the hash
-            window.history.replaceState({}, document.title, window.location.pathname);
+            // Clean up the URL by removing hash and query parameters
+            const cleanUrl = window.location.origin + window.location.pathname;
+            window.history.replaceState({}, document.title, cleanUrl);
             
             // Redirect to home page
             navigate('/');
+          } else {
+            // Session might still be establishing, wait a moment
+            console.log('Session not immediately available, retrying...');
+            setTimeout(async () => {
+              const { data: retryData, error: retryError } = await supabase.auth.getSession();
+              if (retryError) {
+                console.error('Retry session error:', retryError);
+                toast({ 
+                  title: 'Authentication Error', 
+                  description: 'Failed to establish session. Please try signing in again.', 
+                  variant: 'destructive' 
+                });
+              } else if (retryData.session) {
+                console.log('Session established on retry');
+                toast({ 
+                  title: 'Success', 
+                  description: 'Successfully signed in!' 
+                });
+                navigate('/');
+              } else {
+                console.log('No session available after retry');
+                toast({ 
+                  title: 'Authentication Error', 
+                  description: 'Unable to complete sign-in. Please try again.', 
+                  variant: 'destructive' 
+                });
+              }
+            }, 1500);
           }
         } catch (error) {
           console.error('Unexpected error during OAuth callback:', error);
