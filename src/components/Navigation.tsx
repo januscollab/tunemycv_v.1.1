@@ -38,60 +38,64 @@ const Navigation = () => {
 
   return (
     <nav className="bg-white border-b border-border">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          {/* Logo - Far Left */}
           <NavigationLogo />
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`flex items-center px-3 py-2 text-sm font-semibold transition-colors relative ${
-                    isActive(item.path)
-                      ? 'text-zapier-orange'
-                      : 'text-earth hover:text-zapier-orange'
-                  }`}
-                >
-                  <Icon className="h-4 w-4 mr-2" />
-                  {item.label}
-                  {isActive(item.path) && (
-                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-zapier-orange"></div>
-                  )}
-                </Link>
-              );
-            })}
-            
-            {user ? (
-              <div className="flex items-center space-x-4">
-                {isAdmin && (
+          {/* Desktop Navigation - Centered */}
+          <div className="hidden md:flex flex-1 justify-center">
+            <div className="flex items-center space-x-8 max-w-4xl">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                return (
                   <Link
-                    to="/admin"
+                    key={item.path}
+                    to={item.path}
                     className={`flex items-center px-3 py-2 text-sm font-semibold transition-colors relative ${
-                      isActive('/admin')
+                      isActive(item.path)
                         ? 'text-zapier-orange'
                         : 'text-earth hover:text-zapier-orange'
                     }`}
                   >
-                    <Shield className="h-4 w-4 mr-2" />
-                    Admin
-                    {isActive('/admin') && (
+                    <Icon className="h-4 w-4 mr-2 text-zapier-orange" />
+                    {item.label}
+                    {isActive(item.path) && (
                       <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-zapier-orange"></div>
                     )}
                   </Link>
-                )}
-                <UserProfileDropdown 
-                  userDisplayName={getUserDisplayName()}
-                  isActive={isActive}
-                />
-              </div>
+                );
+              })}
+              
+              {user && isAdmin && (
+                <Link
+                  to="/admin"
+                  className={`flex items-center px-3 py-2 text-sm font-semibold transition-colors relative ${
+                    isActive('/admin')
+                      ? 'text-zapier-orange'
+                      : 'text-earth hover:text-zapier-orange'
+                  }`}
+                >
+                  <Shield className="h-4 w-4 mr-2 text-zapier-orange" />
+                  Admin
+                  {isActive('/admin') && (
+                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-zapier-orange"></div>
+                  )}
+                </Link>
+              )}
+            </div>
+          </div>
+
+          {/* Right Side - Auth & Theme */}
+          <div className="hidden md:flex items-center space-x-4">
+            {user ? (
+              <UserProfileDropdown 
+                userDisplayName={getUserDisplayName()}
+                isActive={isActive}
+              />
             ) : (
               <AuthButtons />
             )}
-            
             <ThemeToggle />
           </div>
 
@@ -124,7 +128,7 @@ const Navigation = () => {
                         : 'text-earth hover:text-zapier-orange hover:bg-cream/30'
                     }`}
                   >
-                    <Icon className="h-4 w-4 mr-3" />
+                    <Icon className="h-4 w-4 mr-3 text-zapier-orange" />
                     {item.label}
                   </Link>
                 );
@@ -142,7 +146,7 @@ const Navigation = () => {
                           : 'text-earth hover:text-zapier-orange hover:bg-cream/30'
                       }`}
                     >
-                      <Shield className="h-4 w-4 mr-3" />
+                      <Shield className="h-4 w-4 mr-3 text-zapier-orange" />
                       Admin
                     </Link>
                   )}
@@ -155,7 +159,7 @@ const Navigation = () => {
                         : 'text-earth hover:text-zapier-orange hover:bg-cream/30'
                     }`}
                   >
-                    <User className="h-4 w-4 mr-3" />
+                    <User className="h-4 w-4 mr-3 text-zapier-orange" />
                     Profile
                   </Link>
                 </>
