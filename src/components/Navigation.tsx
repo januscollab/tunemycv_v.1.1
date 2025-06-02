@@ -37,13 +37,13 @@ const Navigation = () => {
   const navItems = user ? loggedInNavItems : loggedOutNavItems;
 
   return (
-    <nav className="bg-white dark:bg-blueberry shadow-sm border-b border-apple-core/30 dark:border-citrus/20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
+    <nav className="bg-white dark:bg-blueberry shadow-sm border-b border-apple-core/20 dark:border-citrus/20">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-14">
           <NavigationLogo />
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-6">
             {navItems.map((item) => {
               const Icon = item.icon;
               return (
@@ -66,7 +66,7 @@ const Navigation = () => {
             })}
             
             {user ? (
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-3">
                 {isAdmin && (
                   <Link
                     to="/admin"
@@ -110,7 +110,7 @@ const Navigation = () => {
         {/* Mobile Navigation */}
         {isOpen && (
           <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-apple-core/30 dark:border-citrus/20">
+            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-apple-core/20 dark:border-citrus/20">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 return (
@@ -118,13 +118,13 @@ const Navigation = () => {
                     key={item.path}
                     to={item.path}
                     onClick={() => setIsOpen(false)}
-                    className={`flex items-center px-3 py-2 rounded-md text-base font-medium transition-colors ${
+                    className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                       isActive(item.path)
-                        ? 'text-apricot bg-citrus/20'
-                        : 'text-blueberry dark:text-apple-core hover:text-apricot hover:bg-apple-core/30 dark:hover:bg-citrus/20'
+                        ? 'text-apricot bg-citrus/10'
+                        : 'text-blueberry dark:text-apple-core hover:text-apricot hover:bg-apple-core/10 dark:hover:bg-citrus/10'
                     }`}
                   >
-                    <Icon className="h-5 w-5 mr-3" />
+                    <Icon className="h-4 w-4 mr-3" />
                     {item.label}
                   </Link>
                 );
@@ -136,26 +136,26 @@ const Navigation = () => {
                     <Link
                       to="/admin"
                       onClick={() => setIsOpen(false)}
-                      className={`flex items-center px-3 py-2 rounded-md text-base font-medium transition-colors ${
+                      className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                         isActive('/admin')
-                          ? 'text-apricot bg-citrus/20'
-                          : 'text-blueberry dark:text-apple-core hover:text-apricot hover:bg-apple-core/30 dark:hover:bg-citrus/20'
+                          ? 'text-apricot bg-citrus/10'
+                          : 'text-blueberry dark:text-apple-core hover:text-apricot hover:bg-apple-core/10 dark:hover:bg-citrus/10'
                       }`}
                     >
-                      <Shield className="h-5 w-5 mr-3" />
+                      <Shield className="h-4 w-4 mr-3" />
                       Admin
                     </Link>
                   )}
                   <Link
                     to="/profile"
                     onClick={() => setIsOpen(false)}
-                    className={`flex items-center px-3 py-2 rounded-md text-base font-medium transition-colors ${
+                    className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                       isActive('/profile')
-                        ? 'text-apricot bg-citrus/20'
-                        : 'text-blueberry dark:text-apple-core hover:text-apricot hover:bg-apple-core/30 dark:hover:bg-citrus/20'
+                        ? 'text-apricot bg-citrus/10'
+                        : 'text-blueberry dark:text-apple-core hover:text-apricot hover:bg-apple-core/10 dark:hover:bg-citrus/10'
                     }`}
                   >
-                    <User className="h-5 w-5 mr-3" />
+                    <User className="h-4 w-4 mr-3" />
                     Profile
                   </Link>
                 </>
@@ -163,7 +163,7 @@ const Navigation = () => {
                 <Link
                   to="/auth"
                   onClick={() => setIsOpen(false)}
-                  className="block px-3 py-2 bg-apricot text-white rounded-md text-base font-medium hover:bg-apricot/90 transition-colors"
+                  className="block px-3 py-2 bg-apricot text-white rounded-md text-sm font-medium hover:bg-apricot/90 transition-colors"
                 >
                   Sign In
                 </Link>

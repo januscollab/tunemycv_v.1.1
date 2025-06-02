@@ -16,12 +16,12 @@ const AnalyzeButton: React.FC<AnalyzeButtonProps> = ({
   hasCreditsForAI
 }) => {
   return (
-    <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
+    <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-5 border border-apple-core/20 dark:border-citrus/20">
       <div className="text-center">
         <button
           onClick={onAnalyze}
           disabled={!canAnalyze || analyzing}
-          className={`w-full py-4 px-6 rounded-lg font-semibold text-lg transition-colors ${
+          className={`w-full py-3 px-5 rounded-lg font-semibold text-base transition-colors ${
             canAnalyze && !analyzing
               ? 'bg-apricot text-white hover:bg-apricot/90'
               : 'bg-gray-300 text-gray-500 cursor-not-allowed'
@@ -29,18 +29,18 @@ const AnalyzeButton: React.FC<AnalyzeButtonProps> = ({
         >
           {analyzing ? (
             <div className="flex items-center justify-center space-x-2">
-              <Loader2 className="h-5 w-5 animate-spin" />
+              <Loader2 className="h-4 w-4 animate-spin" />
               <span>Analyzing CV...</span>
             </div>
           ) : (
             <div className="flex items-center justify-center space-x-2">
-              <BarChart3 className="h-5 w-5" />
+              <BarChart3 className="h-4 w-4" />
               <span>Start Comprehensive Analysis</span>
             </div>
           )}
         </button>
         
-        <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mt-3">
+        <p className="text-xs text-blueberry/60 dark:text-apple-core/70 mt-3">
           {hasCreditsForAI 
             ? "Get detailed AI-powered insights and recommendations"
             : "Receive comprehensive analysis with actionable feedback"
@@ -48,7 +48,7 @@ const AnalyzeButton: React.FC<AnalyzeButtonProps> = ({
         </p>
         
         {!canAnalyze && !analyzing && (
-          <p className="text-sm text-red-600 mt-2">
+          <p className="text-xs text-red-600 mt-2">
             Please upload both CV and job description to continue
           </p>
         )}
