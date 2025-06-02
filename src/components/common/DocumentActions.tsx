@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Eye, Trash2, Edit, FileText, MessageSquare, Download } from 'lucide-react';
+import { Eye, Trash2, Edit, FileText, MessageSquare } from 'lucide-react';
 import DownloadMenu from '@/components/ui/download-menu';
 
 interface DocumentActionsProps {

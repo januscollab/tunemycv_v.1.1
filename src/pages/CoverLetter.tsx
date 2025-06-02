@@ -20,6 +20,12 @@ const CoverLetter = () => {
   const [activeTab, setActiveTab] = useState('generate');
   const [selectedAnalysisId, setSelectedAnalysisId] = useState<string>('');
   const [isEditMode, setIsEditMode] = useState(false);
+  const [advancedOptions, setAdvancedOptions] = useState({
+    tone: 'professional',
+    length: 'medium',
+    focusAreas: [],
+    customInstructions: ''
+  });
 
   // Get pre-selected analysis from navigation state
   useEffect(() => {
@@ -32,10 +38,7 @@ const CoverLetter = () => {
   const {
     coverLetter,
     isGenerating,
-    error,
-    advancedOptions,
-    setAdvancedOptions,
-    generateCoverLetter,
+    generateFromAnalysis,
     savedCoverLetters,
     refetchSavedLetters
   } = useCoverLetter();
@@ -63,7 +66,7 @@ const CoverLetter = () => {
   const handleGenerate = async () => {
     if (!selectedAnalysisId) return;
     
-    const result = await generateCoverLetter(selectedAnalysisId, advancedOptions);
+    const result = await generateFromAnalysis({ analysisId: selectedAnalysisId });
     if (result) {
       setActiveTab('current');
     }
@@ -143,7 +146,7 @@ const CoverLetter = () => {
 
         <div className="flex gap-6">
           {/* Main Content */}
-          <div className="flex-1">
+          <div className="flex-1" style={{ width: '80%' }}>
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-3 mb-6">
                 <TabsTrigger value="generate" className="flex items-center space-x-2">
@@ -240,16 +243,10 @@ const CoverLetter = () => {
           </div>
 
           {/* Credits Panel */}
-          <div className="w-[220px]">
+          <div className="w-[180px]">
             <CreditsPanel credits={credits} hasCreditsForAI={hasCreditsForAI} />
           </div>
         </div>
-
-        {error && (
-          <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-red-600">{error}</p>
-          </div>
-        )}
       </div>
     </div>
   );

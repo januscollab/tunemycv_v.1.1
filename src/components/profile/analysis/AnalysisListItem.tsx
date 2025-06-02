@@ -33,33 +33,22 @@ const AnalysisListItem: React.FC<AnalysisListItemProps> = ({
   onInterviewPrep,
   onDownload 
 }) => {
-  const handleDelete = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleDelete = () => {
     if (window.confirm('Are you sure you want to delete this analysis?')) {
       onDelete(analysis.id);
     }
   };
 
-  const handleCoverLetter = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleCoverLetter = () => {
     onCreateCoverLetter(analysis);
   };
 
-  const handleInterviewPrep = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleInterviewPrep = () => {
     onInterviewPrep(analysis);
   };
 
-  const handleView = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleView = () => {
     onViewDetails(analysis);
-  };
-
-  const handleDownload = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (onDownload) {
-      onDownload(analysis);
-    }
   };
 
   const generatePdfContent = () => {

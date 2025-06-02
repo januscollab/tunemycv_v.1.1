@@ -21,6 +21,7 @@ const AnalyzeCV = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('analyze');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   
   const {
     selectedCVId,
@@ -39,7 +40,7 @@ const AnalyzeCV = () => {
     setAnalysisResult
   } = useAnalysisState();
 
-  const { executeAnalysis, isAnalyzing } = useAnalysisExecution();
+  const { executeAnalysis } = useAnalysisExecution();
 
   // Fetch user credits
   const { data: userCredits } = useQuery({
@@ -81,19 +82,26 @@ const AnalyzeCV = () => {
   const hasCreditsForAI = credits > 0;
 
   const handleAnalyze = async () => {
-    const result = await executeAnalysis({
-      selectedCVId,
-      selectedFile,
-      jobDescriptionFile,
-      jobDescriptionText,
-      inputMethod,
-      jobDescription
-    });
+    setIsAnalyzing(true);
+    try {
+      const result = await executeAnalysis({
+        selectedCVId,
+        selectedFile,
+        jobDescriptionFile,
+        jobDescriptionText,
+        inputMethod,
+        jobDescription
+      });
 
-    if (result) {
-      setAnalysisResult(result);
-      setActiveTab('results');
-      refetchHistory();
+      if (result) {
+        setAnalysisResult(result);
+        setActiveTab('results');
+        refetchHistory();
+      }
+    } catch (error) {
+      console.error('Analysis failed:', error);
+    } finally {
+      setIsAnalyzing(false);
     }
   };
 
@@ -207,12 +215,12 @@ const AnalyzeCV = () => {
 
         <div className="flex gap-6">
           {/* Main Content */}
-          <div className="flex-1">
+          <div className="flex-1" style={{ width: '80%' }}>
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-3 mb-6">
                 <TabsTrigger value="analyze" className="flex items-center space-x-2">
                   <Plus className="h-4 w-4" />
-                  <span>Analyze New</span>
+                  <span>Generate New</span>
                 </TabsTrigger>
                 <TabsTrigger value="results" className="flex items-center space-x-2" disabled={!analysisResult}>
                   <FileText className="h-4 w-4" />
@@ -227,7 +235,7 @@ const AnalyzeCV = () => {
               <TabsContent value="analyze" className="space-y-6">
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
                   <CVSelector
-                    selectedCVId={selectedCVId}
+                    selectedCV={selectedCVId}
                     onCVSelect={setSelectedCVId}
                     selectedFile={selectedFile}
                     onFileSelect={setSelectedFile}
@@ -236,8 +244,6 @@ const AnalyzeCV = () => {
 
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
                   <JobDescriptionInput
-                    jobDescription={jobDescription}
-                    setJobDescription={setJobDescription}
                     jobDescriptionFile={jobDescriptionFile}
                     setJobDescriptionFile={setJobDescriptionFile}
                     jobDescriptionText={jobDescriptionText}
@@ -250,8 +256,8 @@ const AnalyzeCV = () => {
                 <div className="flex justify-center">
                   <AnalyzeButton
                     onAnalyze={handleAnalyze}
-                    isAnalyzing={isAnalyzing}
-                    disabled={!hasCreditsForAI || (!selectedCVId && !selectedFile) || (!jobDescriptionFile && !jobDescriptionText)}
+                    analyzing={isAnalyzing}
+                    disabled={(!selectedCVId && !selectedFile) || (!jobDescriptionFile && !jobDescriptionText)}
                     credits={credits}
                   />
                 </div>
@@ -259,7 +265,7 @@ const AnalyzeCV = () => {
 
               <TabsContent value="results">
                 {analysisResult && (
-                  <AnalysisResults analysisResult={analysisResult} />
+                  <AnalysisResults analysis={analysisResult} />
                 )}
               </TabsContent>
 
@@ -285,7 +291,7 @@ const AnalyzeCV = () => {
           </div>
 
           {/* Credits Panel */}
-          <div className="w-[220px]">
+          <div className="w-[180px]">
             <CreditsPanel credits={credits} hasCreditsForAI={hasCreditsForAI} />
           </div>
         </div>

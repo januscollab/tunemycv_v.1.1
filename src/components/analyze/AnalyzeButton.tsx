@@ -4,17 +4,20 @@ import { BarChart3, Loader2 } from 'lucide-react';
 
 interface AnalyzeButtonProps {
   onAnalyze: () => void;
-  canAnalyze: boolean;
   analyzing: boolean;
-  hasCreditsForAI: boolean;
+  disabled: boolean;
+  credits: number;
 }
 
 const AnalyzeButton: React.FC<AnalyzeButtonProps> = ({
   onAnalyze,
-  canAnalyze,
   analyzing,
-  hasCreditsForAI
+  disabled,
+  credits
 }) => {
+  const hasCreditsForAI = credits > 0;
+  const canAnalyze = !disabled && hasCreditsForAI;
+
   return (
     <div className="bg-white dark:bg-earth/10 rounded-lg shadow-sm p-5 border border-gray-200 dark:border-gray-700">
       <div className="text-center">
