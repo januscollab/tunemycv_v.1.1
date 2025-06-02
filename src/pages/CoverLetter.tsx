@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FileText, Sparkles, Trash2, RefreshCw, Clock, FileUp, Search, AlertCircle, Eye, Edit, Download } from 'lucide-react';
+import { FileText, Sparkles, Trash2, RefreshCw, Clock, FileUp, Search, AlertCircle, Eye, Edit, Download, History } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCoverLetter } from '@/hooks/useCoverLetter';
 import { useUserData } from '@/hooks/useUserData';
@@ -276,9 +276,10 @@ const CoverLetter = () => {
     ? (formData.jobTitle && formData.companyName && formData.jobDescription)
     : selectedAnalysisId;
 
-  if (!user) {
-    return <CoverLetterLoggedOut />;
-  }
+    const handleEditCoverLetter = (coverLetter: any) => {
+        setSelectedCoverLetter(coverLetter);
+        setActiveTab('result');
+    };
 
   const handleTabChange = (newTab: string) => {
     if (hasUnsavedChanges && newTab !== activeTab) {
@@ -300,7 +301,7 @@ const CoverLetter = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5 py-6">
-      <div className="max-w-5xl mx-auto px-4">
+      <div className="max-w-4xl mx-auto px-4">
         <div className="mb-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
@@ -347,9 +348,18 @@ const CoverLetter = () => {
           <div className="lg:col-span-3">
             <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
               <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="create">Generate New</TabsTrigger>
-                <TabsTrigger value="result">Current Result</TabsTrigger>
-                <TabsTrigger value="history">Document History</TabsTrigger>
+                <TabsTrigger value="create" className="flex items-center space-x-2 text-sm">
+                  <Sparkles className="h-4 w-4" />
+                  <span>Generate New</span>
+                </TabsTrigger>
+                <TabsTrigger value="result" className="flex items-center space-x-2 text-sm">
+                  <Eye className="h-4 w-4" />
+                  <span>Current Result</span>
+                </TabsTrigger>
+                <TabsTrigger value="history" className="flex items-center space-x-2 text-sm">
+                  <History className="h-4 w-4" />
+                  <span>History</span>
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="create">
@@ -623,6 +633,7 @@ const CoverLetter = () => {
                               <SelectItem value="conversational">Conversational</SelectItem>
                               <SelectItem value="confident">Confident</SelectItem>
                               <SelectItem value="enthusiastic">Enthusiastic</SelectItem>
+                              <SelectItem value="friendly">Friendly</SelectItem>
                             </SelectContent>
                           </Select>
                           
@@ -630,13 +641,13 @@ const CoverLetter = () => {
                             value={formData.length}
                             onValueChange={(value) => handleInputChange('length', value)}
                           >
-                            <SelectTrigger className="w-40">
+                            <SelectTrigger className="w-48">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
                               {lengthOptions.map((option) => (
                                 <SelectItem key={option.value} value={option.value}>
-                                  {option.label.split(' ')[0]}
+                                  {option.label}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -689,7 +700,7 @@ const CoverLetter = () => {
               <TabsContent value="history">
                 <Card className="border border-gray-200 dark:border-gray-700">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-xl font-semibold">Document History</CardTitle>
+                    <CardTitle className="text-xl font-semibold">History</CardTitle>
                   </CardHeader>
                   <CardContent className="pt-0">
                     {loadingHistory ? (
@@ -737,16 +748,21 @@ const CoverLetter = () => {
                                   View
                                 </button>
                                 <button
+                                  onClick={() => handleEditCoverLetter(coverLetter)}
                                   className="flex items-center text-sm text-gray-600 hover:text-zapier-orange transition-colors"
                                 >
                                   <Edit className="h-4 w-4 mr-1" />
                                   Edit
                                 </button>
-                                <button
-                                  className="text-sm text-gray-600 hover:text-zapier-orange transition-colors"
-                                >
-                                  <Download className="h-4 w-4" />
-                                </button>
+                                <DownloadOptions
+                                  content={coverLetter.content}
+                                  fileName={`Cover_Letter_${coverLetter.company_name}_${coverLetter.job_title}`}
+                                  triggerComponent={
+                                    <button className="text-sm text-gray-600 hover:text-zapier-orange transition-colors">
+                                      <Download className="h-4 w-4" />
+                                    </button>
+                                  }
+                                />
                                 <button
                                   onClick={() => handleDelete(coverLetter.id)}
                                   className="text-sm text-red-600 hover:text-zapier-orange transition-colors"
@@ -772,13 +788,6 @@ const CoverLetter = () => {
               hasCreditsForAI={credits > 0}
             />
           </div>
-        </div>
-        
-        {/* Bottom CTA */}
-        <div className="text-center mt-16">
-          <button className="bg-zapier-orange text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange/90 transition-colors">
-            Create Your Perfect Cover Letter
-          </button>
         </div>
       </div>
     </div>

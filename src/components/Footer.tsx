@@ -4,40 +4,39 @@ import { Link } from 'react-router-dom';
 
 const Footer = () => {
   return (
-    <footer className="bg-earth text-white py-12 px-4">
-      <div className="max-w-6xl mx-auto">
-        <div className="grid md:grid-cols-4 gap-8">
-          {/* Logo and Description */}
-          <div className="md:col-span-1">
+    <footer className="bg-earth dark:bg-gray-900 text-white py-12">
+      <div className="max-w-6xl mx-auto px-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="col-span-1 md:col-span-2">
             <div className="flex items-center mb-4">
               <img 
-                src="/lovable-uploads/7aefb742-801d-4494-af3e-defd30462f1c.png" 
-                alt="TuneMyCV Logo" 
-                className="h-8 w-auto mr-2"
+                src="/lovable-uploads/9c0fa345-67f1-4945-aec9-6e428b4de6b2.png" 
+                alt="TuneMyCV" 
+                className="h-8 w-auto"
               />
             </div>
-            <p className="text-white/80 leading-relaxed">
-              Optimize your CV with AI-powered insights and accelerate your career journey.
+            <p className="text-white/80 mb-4 max-w-md">
+              AI-powered CV analysis and optimization to help you land your dream job. 
+              Get personalized feedback and improve your chances with every application.
             </p>
           </div>
-
-          {/* Product Links */}
+          
           <div>
-            <h3 className="font-semibold mb-4 text-zapier-orange">Product</h3>
+            <h3 className="font-semibold mb-4">Quick Links</h3>
             <ul className="space-y-2">
               <li>
                 <Link to="/analyze" className="text-white/80 hover:text-zapier-orange transition-colors">
-                  CV Analysis
+                  Analyze CV
                 </Link>
               </li>
               <li>
                 <Link to="/cover-letter" className="text-white/80 hover:text-zapier-orange transition-colors">
-                  Cover Letter Generator
+                  Cover Letter
                 </Link>
               </li>
               <li>
                 <Link to="/resources" className="text-white/80 hover:text-zapier-orange transition-colors">
-                  Career Resources
+                  Resources
                 </Link>
               </li>
               <li>
@@ -47,10 +46,9 @@ const Footer = () => {
               </li>
             </ul>
           </div>
-
-          {/* Support Links */}
+          
           <div>
-            <h3 className="font-semibold mb-4 text-zapier-orange">Support</h3>
+            <h3 className="font-semibold mb-4">Support</h3>
             <ul className="space-y-2">
               <li>
                 <Link to="/help-centre" className="text-white/80 hover:text-zapier-orange transition-colors">
@@ -58,31 +56,19 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/contact-us" className="text-white/80 hover:text-zapier-orange transition-colors">
+                <Link to="/contact" className="text-white/80 hover:text-zapier-orange transition-colors">
                   Contact Us
                 </Link>
               </li>
-            </ul>
-          </div>
-
-          {/* Legal Links */}
-          <div>
-            <h3 className="font-semibold mb-4 text-zapier-orange">Legal</h3>
-            <ul className="space-y-2">
               <li>
                 <Link to="/privacy-policy" className="text-white/80 hover:text-zapier-orange transition-colors">
                   Privacy Policy
                 </Link>
               </li>
-              <li>
-                <a href="#" className="text-white/80 hover:text-zapier-orange transition-colors">
-                  Terms of Service
-                </a>
-              </li>
             </ul>
           </div>
         </div>
-
+        
         <div className="border-t border-white/20 mt-8 pt-8 text-center">
           <p className="text-white/60">
             © 2024 TuneMyCV. All rights reserved.
