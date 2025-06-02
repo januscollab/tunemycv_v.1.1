@@ -633,6 +633,7 @@ const CoverLetter = () => {
                               <SelectItem value="conversational">Conversational</SelectItem>
                               <SelectItem value="confident">Confident</SelectItem>
                               <SelectItem value="enthusiastic">Enthusiastic</SelectItem>
+                              <SelectItem value="friendly">Friendly</SelectItem>
                             </SelectContent>
                           </Select>
                           
@@ -640,13 +641,13 @@ const CoverLetter = () => {
                             value={formData.length}
                             onValueChange={(value) => handleInputChange('length', value)}
                           >
-                            <SelectTrigger className="w-40">
+                            <SelectTrigger className="w-48">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
                               {lengthOptions.map((option) => (
                                 <SelectItem key={option.value} value={option.value}>
-                                  {option.label.split(' ')[0]}
+                                  {option.label}
                                 </SelectItem>
                               ))}
                             </SelectContent>

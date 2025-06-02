@@ -30,8 +30,8 @@ const Navigation = () => {
   const navItems = [
     { path: '/analyze', label: 'Analyze CV' },
     { path: '/cover-letter', label: 'Cover Letter' },
-    { path: '/resources', label: 'Resources' },
     { path: '/next-steps', label: 'Next Steps' },
+    { path: '/resources', label: 'Resources' },
   ];
 
   const isActive = (path: string) => {
