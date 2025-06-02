@@ -1,5 +1,5 @@
 
-import { ArrowRight, CheckCircle, TrendingUp, Users, Star, Upload, FileText, Edit } from 'lucide-react';
+import { ArrowRight, CheckCircle, TrendingUp, Users, Star, Upload } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import HowItWorks from '@/components/HowItWorks';
@@ -44,73 +44,21 @@ const Index = () => {
               </Link>
             </div>
           ) : (
-            <>
-              {/* Analyze Your CV Section for Logged Out Users */}
-              <div className="mb-12 bg-white rounded-lg border border-border p-8">
-                <div className="flex flex-col md:flex-row items-center text-left">
-                  <img 
-                    src="/lovable-uploads/9c0fa345-67f1-4945-aec9-6e428b4de6b2.png" 
-                    alt="TuneMyCV Logo" 
-                    className="h-16 w-auto mb-4 md:mb-0 md:mr-6 flex-shrink-0"
-                  />
-                  <div className="flex-1">
-                    <h2 className="text-3xl font-bold text-earth mb-4 font-display">Analyze Your CV</h2>
-                    <p className="text-lg text-earth/70 mb-6 font-normal">
-                      Get comprehensive compatibility analysis with actionable recommendations to improve your job application success.
-                    </p>
-                    <Link
-                      to="/analyze"
-                      className="bg-zapier-orange text-white px-6 py-3 rounded-lg font-semibold hover:bg-zapier-orange/90 transition-colors inline-flex items-center"
-                    >
-                      <FileText className="mr-2 h-5 w-5" />
-                      Start Analysis
-                      <ArrowRight className="ml-2 h-5 w-5" />
-                    </Link>
-                  </div>
-                </div>
-              </div>
-
-              {/* Generate Cover Letter Section for Logged Out Users */}
-              <div className="mb-12 bg-white rounded-lg border border-border p-8">
-                <div className="flex flex-col md:flex-row items-center text-left">
-                  <img 
-                    src="/lovable-uploads/9c0fa345-67f1-4945-aec9-6e428b4de6b2.png" 
-                    alt="TuneMyCV Logo" 
-                    className="h-16 w-auto mb-4 md:mb-0 md:mr-6 flex-shrink-0"
-                  />
-                  <div className="flex-1">
-                    <h2 className="text-3xl font-bold text-earth mb-4 font-display">Generate Cover Letter</h2>
-                    <p className="text-lg text-earth/70 mb-6 font-normal">
-                      Create tailored cover letters that highlight your strengths and align perfectly with specific job requirements.
-                    </p>
-                    <Link
-                      to="/cover-letter"
-                      className="bg-zapier-orange text-white px-6 py-3 rounded-lg font-semibold hover:bg-zapier-orange/90 transition-colors inline-flex items-center"
-                    >
-                      <Edit className="mr-2 h-5 w-5" />
-                      Create Cover Letter
-                      <ArrowRight className="ml-2 h-5 w-5" />
-                    </Link>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <Link
-                  to="/analyze"
-                  className="bg-zapier-orange text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange/90 transition-colors inline-flex items-center"
-                >
-                  Get Started Free
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-                <button
-                  onClick={scrollToHowItWorks}
-                  className="border-2 border-earth text-earth px-8 py-4 rounded-lg text-lg font-semibold hover:bg-earth hover:text-white transition-colors"
-                >
-                  Learn More
-                </button>
-              </div>
-            </>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Link
+                to="/analyze"
+                className="bg-zapier-orange text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange/90 transition-colors inline-flex items-center"
+              >
+                Get Started Free
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+              <button
+                onClick={scrollToHowItWorks}
+                className="border-2 border-earth text-earth px-8 py-4 rounded-lg text-lg font-semibold hover:bg-earth hover:text-white transition-colors"
+              >
+                Learn More
+              </button>
+            </div>
           )}
         </div>
       </section>

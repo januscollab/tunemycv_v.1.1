@@ -18,7 +18,7 @@ const ProfileContainer: React.FC<ProfileContainerProps> = ({
   memberSince 
 }) => {
   return (
-    <div className="w-full">
+    <div className="max-w-6xl mx-auto px-4">
       <ProfileHeader credits={credits} memberSince={memberSince} />
       <ProfileNavigation activeTab={activeTab} onTabChange={onTabChange} />
       <ProfileTabContent activeTab={activeTab} credits={credits} memberSince={memberSince} />

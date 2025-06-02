@@ -34,7 +34,7 @@ const ThemeToggle = () => {
       variant="ghost"
       size="icon"
       onClick={toggleTheme}
-      className="text-earth dark:text-white hover:text-zapier-orange transition-colors"
+      className="text-blueberry dark:text-white hover:text-apricot transition-colors"
     >
       {isDark ? (
         <Sun className="h-5 w-5" />
