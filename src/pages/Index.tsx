@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, CheckCircle, FileText, Users, TrendingUp, Sparkles } from 'lucide-react';
@@ -204,7 +205,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Footer */}
+      {/* Footer - ONLY ONE FOOTER SHOULD REMAIN */}
       <Footer />
     </div>
   );

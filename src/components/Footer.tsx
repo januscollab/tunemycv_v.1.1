@@ -10,7 +10,7 @@ const Footer = () => {
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center mb-4">
               <img 
-                src="https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=200&h=60&fit=crop&crop=center" 
+                src="/lovable-uploads/9c0fa345-67f1-4945-aec9-6e428b4de6b2.png" 
                 alt="TuneMyCV" 
                 className="h-8 w-auto"
               />
