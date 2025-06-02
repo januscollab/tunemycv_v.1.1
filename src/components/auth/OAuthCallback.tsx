@@ -22,9 +22,35 @@ const OAuthCallback: React.FC<OAuthCallbackProps> = ({ onLoadingChange }) => {
       const accessToken = hashParams.get('access_token') || searchParams.get('access_token');
       const refreshToken = hashParams.get('refresh_token') || searchParams.get('refresh_token');
       const authCode = searchParams.get('code');
+      const error = searchParams.get('error');
+      const errorDescription = searchParams.get('error_description');
+      
+      // Handle OAuth errors first
+      if (error) {
+        console.error('OAuth error:', error, errorDescription);
+        
+        let errorMessage = 'Authentication failed. Please try again.';
+        if (error === 'access_denied') {
+          errorMessage = 'Sign-in was cancelled. Please try again if you want to continue.';
+        } else if (errorDescription) {
+          errorMessage = decodeURIComponent(errorDescription);
+        }
+        
+        toast({ 
+          title: 'Authentication Error', 
+          description: errorMessage, 
+          variant: 'destructive' 
+        });
+        
+        // Clean up the URL
+        const cleanUrl = window.location.origin + window.location.pathname;
+        window.history.replaceState({}, document.title, cleanUrl);
+        return;
+      }
       
       if (accessToken || authCode) {
         console.log('OAuth callback detected, processing authentication...');
+        console.log('Current URL:', window.location.href);
         setOauthLoading(true);
         onLoadingChange(true);
         
@@ -34,9 +60,18 @@ const OAuthCallback: React.FC<OAuthCallbackProps> = ({ onLoadingChange }) => {
           
           if (error) {
             console.error('Error getting session from OAuth callback:', error);
+            
+            // Provide more specific error messages
+            let errorMessage = 'Failed to complete sign-in. Please try again.';
+            if (error.message?.includes('Invalid login credentials')) {
+              errorMessage = 'Authentication failed. Please check your account and try again.';
+            } else if (error.message?.includes('Email not confirmed')) {
+              errorMessage = 'Please confirm your email address before signing in.';
+            }
+            
             toast({ 
               title: 'Authentication Error', 
-              description: 'Failed to complete sign-in. Please try again.', 
+              description: errorMessage, 
               variant: 'destructive' 
             });
           } else if (data.session) {
@@ -54,16 +89,32 @@ const OAuthCallback: React.FC<OAuthCallbackProps> = ({ onLoadingChange }) => {
             navigate('/');
           } else {
             // Session might still be establishing, wait a moment
+            console.log('Session not immediately available, retrying...');
             setTimeout(async () => {
-              const { data: retryData } = await supabase.auth.getSession();
-              if (retryData.session) {
+              const { data: retryData, error: retryError } = await supabase.auth.getSession();
+              if (retryError) {
+                console.error('Retry session error:', retryError);
+                toast({ 
+                  title: 'Authentication Error', 
+                  description: 'Failed to establish session. Please try signing in again.', 
+                  variant: 'destructive' 
+                });
+              } else if (retryData.session) {
+                console.log('Session established on retry');
                 toast({ 
                   title: 'Success', 
                   description: 'Successfully signed in!' 
                 });
                 navigate('/');
+              } else {
+                console.log('No session available after retry');
+                toast({ 
+                  title: 'Authentication Error', 
+                  description: 'Unable to complete sign-in. Please try again.', 
+                  variant: 'destructive' 
+                });
               }
-            }, 1000);
+            }, 1500);
           }
         } catch (error) {
           console.error('Unexpected error during OAuth callback:', error);
