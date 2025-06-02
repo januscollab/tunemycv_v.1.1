@@ -5,7 +5,6 @@ import { ArrowRight, CheckCircle, FileText, Users, TrendingUp, Sparkles, Message
 import { useAuth } from '@/contexts/AuthContext';
 import HowItWorks from '@/components/HowItWorks';
 import Testimonials from '@/components/Testimonials';
-import Footer from '@/components/Footer';
 
 const Index = () => {
   const { user } = useAuth();
@@ -152,9 +151,6 @@ const Index = () => {
           </Link>
         </div>
       </section>
-
-      {/* Footer */}
-      <Footer />
     </div>
   );
 };
