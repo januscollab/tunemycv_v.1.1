@@ -58,11 +58,11 @@ const Testimonials = () => {
     <section className="py-20 px-4 bg-gradient-to-br from-apple-core/20 via-white to-citrus/10 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-5xl md:text-6xl font-bold text-earth dark:text-citrus mb-4 leading-tight font-display">
+          <h2 className="text-4xl font-bold text-blueberry dark:text-citrus mb-4">
             What Our Users Say
           </h2>
           <p className="text-xl text-blueberry/80 dark:text-apple-core max-w-3xl mx-auto">
-            Join thousands of professionals who have transformed their careers with TuneMyCV
+            Join thousands of professionals who have transformed their careers with <span className="text-zapier-orange">Tune</span>MyCV
           </p>
         </div>
 

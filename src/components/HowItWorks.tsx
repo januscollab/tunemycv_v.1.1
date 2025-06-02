@@ -18,8 +18,8 @@ const HowItWorks = () => {
     },
     {
       icon: Target,
-      title: "Get Recommendations",
-      description: "Receive detailed, actionable feedback including keyword optimization, formatting suggestions, and content improvements.",
+      title: "Apply and Prep",
+      description: "",
       image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=300&h=200&fit=crop&crop=center"
     },
     {
@@ -31,14 +31,14 @@ const HowItWorks = () => {
   ];
 
   return (
-    <section id="how-it-works" className="py-20 px-4 bg-white dark:bg-gray-900">
+    <section id="how-it-works" className="py-10 px-4 bg-white dark:bg-gray-900">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-blueberry dark:text-citrus mb-4">
-            How TuneMyCV Works
+            How <span className="text-zapier-orange">Tune</span>MyCV Works
           </h2>
           <p className="text-xl text-blueberry/80 dark:text-apple-core max-w-3xl mx-auto">
-            Transform your CV in four simple steps and increase your chances of landing your dream job
+            Transform your CV and Interview Prep and increase your chances of landing your dream job
           </p>
         </div>
 
@@ -60,9 +60,11 @@ const HowItWorks = () => {
               <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mb-4">
                 {step.title}
               </h3>
-              <p className="text-blueberry/70 dark:text-apple-core/80 leading-relaxed">
-                {step.description}
-              </p>
+              {step.description && (
+                <p className="text-blueberry/70 dark:text-apple-core/80 leading-relaxed">
+                  {step.description}
+                </p>
+              )}
             </div>
           ))}
         </div>
