@@ -15,18 +15,21 @@ const OAuthCallback: React.FC<OAuthCallbackProps> = ({ onLoadingChange }) => {
 
   useEffect(() => {
     const handleOAuthCallback = async () => {
-      // Check if we're in an OAuth callback (tokens in URL hash)
+      // Check if we're in an OAuth callback (tokens in URL hash or query params)
       const hashParams = new URLSearchParams(window.location.hash.substring(1));
-      const accessToken = hashParams.get('access_token');
-      const refreshToken = hashParams.get('refresh_token');
+      const searchParams = new URLSearchParams(window.location.search);
       
-      if (accessToken && refreshToken) {
-        console.log('OAuth callback detected, processing tokens...');
+      const accessToken = hashParams.get('access_token') || searchParams.get('access_token');
+      const refreshToken = hashParams.get('refresh_token') || searchParams.get('refresh_token');
+      const authCode = searchParams.get('code');
+      
+      if (accessToken || authCode) {
+        console.log('OAuth callback detected, processing authentication...');
         setOauthLoading(true);
         onLoadingChange(true);
         
         try {
-          // Let Supabase handle the session from the URL
+          // For PKCE flow, Supabase will automatically handle the code exchange
           const { data, error } = await supabase.auth.getSession();
           
           if (error) {
@@ -43,11 +46,24 @@ const OAuthCallback: React.FC<OAuthCallbackProps> = ({ onLoadingChange }) => {
               description: 'Successfully signed in!' 
             });
             
-            // Clean up the URL by removing the hash
-            window.history.replaceState({}, document.title, window.location.pathname);
+            // Clean up the URL by removing hash and query parameters
+            const cleanUrl = window.location.origin + window.location.pathname;
+            window.history.replaceState({}, document.title, cleanUrl);
             
             // Redirect to home page
             navigate('/');
+          } else {
+            // Session might still be establishing, wait a moment
+            setTimeout(async () => {
+              const { data: retryData } = await supabase.auth.getSession();
+              if (retryData.session) {
+                toast({ 
+                  title: 'Success', 
+                  description: 'Successfully signed in!' 
+                });
+                navigate('/');
+              }
+            }, 1000);
           }
         } catch (error) {
           console.error('Unexpected error during OAuth callback:', error);
