@@ -58,7 +58,7 @@ const Testimonials = () => {
     <section className="py-20 px-4 bg-gradient-to-br from-apple-core/20 via-white to-citrus/10 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-blueberry dark:text-citrus mb-4">
+          <h2 className="text-5xl md:text-6xl font-bold text-earth dark:text-citrus mb-4 leading-tight font-display">
             What Our Users Say
           </h2>
           <p className="text-xl text-blueberry/80 dark:text-apple-core max-w-3xl mx-auto">
@@ -68,7 +68,12 @@ const Testimonials = () => {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {testimonials.map((testimonial, index) => (
-            <div key={index} className="bg-white dark:bg-blueberry/20 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow border border-apple-core/20 dark:border-citrus/20">
+            <div 
+              key={index} 
+              className={`bg-white dark:bg-blueberry/20 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow border border-apple-core/20 dark:border-citrus/20 ${
+                index >= 2 ? 'hidden md:block' : ''
+              } ${index >= 3 ? 'lg:block' : ''}`}
+            >
               <div className="flex items-center mb-4">
                 <Quote className="h-8 w-8 text-citrus mr-3" />
                 <div className="flex space-x-1">

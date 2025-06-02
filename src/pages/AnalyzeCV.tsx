@@ -147,8 +147,8 @@ const AnalyzeCV = () => {
   // Logged-out user experience
   if (!user) {
     const analyzeExplanation = {
-      title: 'Analyze Your CV',
-      subtitle: 'Get comprehensive compatibility analysis with actionable recommendations to improve your job application success.',
+      title: '',
+      subtitle: '',
       benefits: [
         'Advanced AI-powered analysis that evaluates your CV against specific job requirements',
         'Detailed compatibility scoring to understand how well you match the role',
@@ -164,8 +164,8 @@ const AnalyzeCV = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
         <div className="max-w-5xl mx-auto px-4 py-12">
-          <div className="flex items-center mb-8">
-            <FileText className="h-12 w-12 text-zapier-orange mr-6" />
+          <div className="flex items-start mb-8">
+            <FileText className="h-12 w-12 text-zapier-orange mr-6 mt-2" />
             <div>
               <h1 className="text-4xl md:text-5xl font-bold text-earth dark:text-white mb-4">
                 Analyze Your CV
@@ -206,6 +206,7 @@ const AnalyzeCV = () => {
 
   return (
     <div className={`min-h-screen bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5 ${analyzing ? 'pointer-events-none' : ''}`}>
+      {/* ... keep existing code (loading overlay) */}
       {analyzing && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
           <div className="bg-white dark:bg-blueberry/90 rounded-lg p-6 text-center max-w-md">
@@ -221,15 +222,17 @@ const AnalyzeCV = () => {
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Header Section */}
         <div className="mb-6">
-          <div className="flex items-center mb-3">
-            <FileText className="h-8 w-8 text-zapier-orange mr-3" />
-            <h1 className="text-3xl font-bold text-earth dark:text-white">
-              Analyze Your CV
-            </h1>
+          <div className="flex items-start mb-3">
+            <FileText className="h-8 w-8 text-zapier-orange mr-3 mt-1" />
+            <div>
+              <h1 className="text-3xl font-bold text-earth dark:text-white">
+                Analyze Your CV
+              </h1>
+              <p className="text-lg text-earth/70 dark:text-white/70 max-w-2xl mt-1">
+                Upload your CV and job description to get comprehensive compatibility analysis with actionable recommendations.
+              </p>
+            </div>
           </div>
-          <p className="text-lg text-earth/70 dark:text-white/70 max-w-2xl">
-            Upload your CV and job description to get comprehensive compatibility analysis with actionable recommendations.
-          </p>
         </div>
 
         {/* Main Content Grid */}

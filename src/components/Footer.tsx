@@ -11,7 +11,7 @@ const Footer = () => {
           <div className="md:col-span-1">
             <div className="flex items-center mb-4">
               <img 
-                src="/lovable-uploads/9c0fa345-67f1-4945-aec9-6e428b4de6b2.png" 
+                src="/lovable-uploads/3a4313a6-1ceb-4eea-93eb-0619b6452a30.png" 
                 alt="TuneMyCV Logo" 
                 className="h-8 w-auto mr-2"
               />
