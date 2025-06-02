@@ -76,7 +76,7 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="bg-white dark:bg-earth/10 rounded-2xl p-8 hover:shadow-lg transition-shadow border border-earth/10 dark:border-white/10">
               <div className="bg-zapier-orange/10 rounded-full w-16 h-16 flex items-center justify-center mb-6">
                 <FileText className="h-8 w-8 text-zapier-orange" />
@@ -124,22 +124,6 @@ const Index = () => {
                 Prepare Now <ArrowRight className="ml-1 h-4 w-4" />
               </Link>
             </div>
-
-            <div className="bg-white dark:bg-earth/10 rounded-2xl p-8 hover:shadow-lg transition-shadow border border-earth/10 dark:border-white/10">
-              <div className="bg-zapier-orange/10 rounded-full w-16 h-16 flex items-center justify-center mb-6">
-                <TrendingUp className="h-8 w-8 text-zapier-orange" />
-              </div>
-              <h3 className="text-2xl font-bold text-earth dark:text-white mb-4">Career Resources</h3>
-              <p className="text-earth/70 dark:text-white/70 leading-relaxed mb-6">
-                Access expert guides, templates, and tools to accelerate your job search and career advancement.
-              </p>
-              <Link
-                to="/resources"
-                className="text-zapier-orange font-semibold hover:text-zapier-orange/80 transition-colors inline-flex items-center"
-              >
-                Explore Resources <ArrowRight className="ml-1 h-4 w-4" />
-              </Link>
-            </div>
           </div>
         </div>
       </section>
@@ -157,7 +141,7 @@ const Index = () => {
             Ready to Transform Your Career?
           </h2>
           <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            Join thousands of professionals who have already improved their job prospects with TuneMyCV
+            Join thousands of professionals who have already improved their job prospects with <span className="text-zapier-orange">Tune</span>MyCV
           </p>
           <Link
             to={user ? "/analyze" : "/auth"}

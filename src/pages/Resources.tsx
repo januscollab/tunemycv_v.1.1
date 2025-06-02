@@ -6,48 +6,75 @@ const Resources = () => {
   const resources = [
     {
       title: "10 Common CV Mistakes to Avoid in 2025",
+      description: "Learn the most frequent errors job seekers make on their CVs and how to avoid them to increase your chances of landing interviews.",
       link: "#",
       category: "CV Tips"
     },
     {
       title: "ATS Optimization Guide",
+      description: "Comprehensive guide to making your CV pass through Applicant Tracking Systems with the right keywords and formatting.",
       link: "#",
       category: "Technical"
     },
     {
       title: "Industry-Specific CV Templates",
+      description: "Professional CV templates tailored for different industries including tech, finance, healthcare, and creative fields.",
       link: "#",
       category: "Templates"
     },
     {
       title: "Interview Preparation Toolkit",
+      description: "Essential tools and strategies to help you prepare for any interview, from research techniques to common questions.",
       link: "#",
       category: "Interview"
     },
     {
       title: "Salary Negotiation Strategies",
+      description: "Master the art of salary negotiation with proven techniques and scripts to maximize your earning potential.",
       link: "#",
       category: "Career"
     },
     {
       title: "LinkedIn Profile Optimization",
+      description: "Step-by-step guide to creating a compelling LinkedIn profile that attracts recruiters and networking opportunities.",
       link: "#",
       category: "Social Media"
     },
     {
       title: "Complete CV Optimization Guide",
+      description: "The ultimate guide to transforming your CV from average to outstanding with detailed examples and templates.",
       link: "#",
       category: "CV Tips"
     },
     {
       title: "Interview Success Masterclass",
+      description: "Advanced interview techniques covering body language, storytelling, and how to handle difficult questions.",
       link: "#",
       category: "Interview"
     },
     {
       title: "Salary Negotiation Blueprint",
+      description: "Detailed blueprint for negotiating not just salary but benefits, remote work, and career advancement opportunities.",
       link: "#",
       category: "Career"
+    }
+  ];
+
+  const topResources = [
+    {
+      title: "CV Analysis Best Practices",
+      description: "Essential guide to understanding what makes a CV effective in today's job market.",
+      link: "#"
+    },
+    {
+      title: "Cover Letter Writing Guide",
+      description: "Create compelling cover letters that complement your CV and showcase your personality.",
+      link: "#"
+    },
+    {
+      title: "Job Search Strategy Framework",
+      description: "Systematic approach to job searching that saves time and increases success rates.",
+      link: "#"
     }
   ];
 
@@ -81,9 +108,48 @@ const Resources = () => {
         </div>
       </section>
 
+      {/* Our Top 3 Resources */}
+      <section className="py-12 px-4 bg-white dark:bg-gray-800">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-earth dark:text-white mb-4">
+              Our Top 3 Resources
+            </h2>
+            <p className="text-xl text-earth/70 dark:text-white/70">
+              Start with these essential guides that have helped thousands of job seekers
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {topResources.map((resource, index) => (
+              <div key={index} className="bg-gradient-to-br from-zapier-orange/10 to-orange-100 rounded-xl p-6 hover:shadow-lg transition-shadow border border-zapier-orange/20">
+                <div className="flex items-center mb-4">
+                  <div className="bg-zapier-orange text-white rounded-full w-8 h-8 flex items-center justify-center text-lg font-bold mr-3">
+                    {index + 1}
+                  </div>
+                  <CheckCircle className="h-5 w-5 text-zapier-orange" />
+                </div>
+                <h3 className="text-xl font-semibold text-earth dark:text-white mb-3">
+                  {resource.title}
+                </h3>
+                <p className="text-earth/70 dark:text-white/70 mb-4 text-sm leading-relaxed">
+                  {resource.description}
+                </p>
+                <a 
+                  href={resource.link}
+                  className="inline-flex items-center text-zapier-orange font-medium hover:text-zapier-orange/80 transition-colors text-sm"
+                >
+                  Read More →
+                </a>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Resources Section */}
       <section className="py-12 px-4">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-5xl mx-auto" style={{ width: '80%' }}>
           {/* Category Filter */}
           <div className="flex flex-wrap justify-center gap-4 mb-8">
             {categories.map(category => (
@@ -104,22 +170,28 @@ const Resources = () => {
           {/* Resources Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredResources.map((resource, index) => (
-              <div key={index} className="bg-white dark:bg-blueberry/20 rounded-xl shadow-lg p-8 hover:shadow-xl transition-all border border-apple-core/20 dark:border-citrus/20 hover:border-zapier-orange/50 h-60">
-                <div className="flex flex-col items-center text-center h-full">
-                  <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mb-4 line-clamp-2 flex-grow">
+              <div key={index} className="bg-white dark:bg-blueberry/20 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all border border-apple-core/20 dark:border-citrus/20 hover:border-zapier-orange/50">
+                <div className="flex flex-col h-full">
+                  <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-3 line-clamp-2">
                     {resource.title}
                   </h3>
                   
-                  <span className="inline-block bg-orange-100 text-orange-600 px-4 py-2 rounded-full text-sm font-medium mb-6">
-                    {resource.category}
-                  </span>
+                  <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mb-4 flex-grow leading-relaxed">
+                    {resource.description}
+                  </p>
                   
-                  <a 
-                    href={resource.link}
-                    className="inline-flex items-center text-apricot font-medium hover:text-zapier-orange transition-colors text-sm mt-auto"
-                  >
-                    Read More →
-                  </a>
+                  <div className="flex justify-between items-center mt-auto">
+                    <span className="inline-block bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-medium">
+                      {resource.category}
+                    </span>
+                    
+                    <a 
+                      href={resource.link}
+                      className="inline-flex items-center text-apricot font-medium hover:text-zapier-orange transition-colors text-sm"
+                    >
+                      Read More →
+                    </a>
+                  </div>
                 </div>
               </div>
             ))}
