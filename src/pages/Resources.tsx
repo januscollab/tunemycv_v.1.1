@@ -80,7 +80,7 @@ const Resources = () => {
 
       {/* Resources Section */}
       <section className="py-20 px-4">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-4xl mx-auto">
           {/* Category Filter */}
           <div className="flex flex-wrap justify-center gap-4 mb-12">
             {categories.map(category => (
@@ -131,10 +131,10 @@ const Resources = () => {
       </section>
 
       {/* Newsletter Section */}
-      <section className="py-20 px-4 bg-gradient-to-br from-blueberry via-blueberry/90 to-blueberry/80 text-white">
+      <section className="py-20 px-4 bg-cream/30">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-6 text-citrus">Stay Updated</h2>
-          <p className="text-xl mb-8 text-white/90">
+          <h2 className="text-4xl font-bold mb-6 text-earth">Stay Updated</h2>
+          <p className="text-xl mb-8 text-earth/70">
             Get the latest career tips, CV trends, and job market insights delivered to your inbox
           </p>
           
@@ -142,14 +142,14 @@ const Resources = () => {
             <input
               type="email"
               placeholder="Enter your email"
-              className="flex-1 px-4 py-3 rounded-lg text-blueberry focus:outline-none focus:ring-2 focus:ring-citrus"
+              className="flex-1 px-4 py-3 rounded-lg text-earth focus:outline-none focus:ring-2 focus:ring-zapier-orange"
             />
-            <button className="bg-apricot text-white px-6 py-3 rounded-lg font-semibold hover:bg-apricot/90 transition-colors">
+            <button className="bg-zapier-orange text-white px-6 py-3 rounded-lg font-semibold hover:bg-zapier-orange/90 transition-colors">
               Subscribe
             </button>
           </div>
           
-          <p className="text-sm text-white/70 mt-4">
+          <p className="text-sm text-earth/60 mt-4">
             No spam, unsubscribe at any time
           </p>
         </div>

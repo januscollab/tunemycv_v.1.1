@@ -25,9 +25,9 @@ const CoverLetterLoggedOut = () => {
       <div className="max-w-5xl mx-auto px-4 py-12">
         <div className="mb-8">
           <div className="flex items-start">
+            <Edit className="h-12 w-12 text-zapier-orange mr-6 mt-0" />
             <div>
-              <h1 className="text-4xl md:text-5xl font-bold text-earth dark:text-white mb-4 flex items-start">
-                <Edit className="h-12 w-12 text-zapier-orange mr-6 mt-2" />
+              <h1 className="text-4xl md:text-5xl font-bold text-earth dark:text-white mb-4">
                 Generate Cover Letter
               </h1>
               <p className="text-xl text-earth/70 dark:text-white/70 max-w-3xl font-normal">
