@@ -9,6 +9,7 @@ import CreditsPanel from '@/components/analyze/CreditsPanel';
 import AnalyzeButton from '@/components/analyze/AnalyzeButton';
 import InterviewPrepAnalysisSelector from '@/components/analyze/InterviewPrepAnalysisSelector';
 import InterviewPrepModal from '@/components/analyze/InterviewPrepModal';
+import InterviewPrepLoggedOut from '@/components/analyze/InterviewPrepLoggedOut';
 import AnalysisSelector from '@/components/cover-letter/AnalysisSelector';
 import { useAnalysis } from '@/hooks/useAnalysis';
 import { useQuery } from '@tanstack/react-query';
@@ -269,6 +270,11 @@ const AnalyzeCV = () => {
   const canAnalyze = !!uploadedFiles.jobDescription; // Fixed: properly check if job description exists
   const hasCreditsForAI = userCredits?.credits && userCredits.credits > 0;
 
+  // Special case: Show Interview Prep logged-out experience if user is not authenticated and on interview-prep tab
+  if (!user && activeTab === 'interview-prep') {
+    return <InterviewPrepLoggedOut />;
+  }
+
   // Logged-out user experience
   if (!user) {
     const analyzeExplanation = {
@@ -442,204 +448,195 @@ const AnalyzeCV = () => {
               {/* Interview Prep Tab */}
               <TabsContent value="interview-prep" className="mt-0">
                 <div className="space-y-6">
-                  {preloadedAnalysis ? (
-                    <InterviewPrepAnalysisSelector
-                      selectedAnalysis={preloadedAnalysis}
-                      onDeselect={handleDeselectAnalysis}
-                    />
-                  ) : (
-                    <div className="space-y-6">
-                      {/* Generation Method Selection */}
-                      <Card>
-                        <CardHeader>
-                          <CardTitle className="text-xl font-bold text-blueberry dark:text-citrus">
-                            Generate Interview Prep Notes
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <button
-                              onClick={() => setInterviewPrepMethod('input')}
-                              className={`p-4 border-2 rounded-lg transition-all ${
-                                interviewPrepMethod === 'input'
-                                  ? 'border-zapier-orange bg-zapier-orange/10'
-                                  : 'border-gray-200 hover:border-zapier-orange/50'
-                              }`}
-                            >
-                              <div className="flex items-center space-x-3">
-                                <div className={`w-4 h-4 rounded-full border-2 ${
-                                  interviewPrepMethod === 'input' ? 'border-zapier-orange bg-zapier-orange' : 'border-gray-300'
-                                }`}></div>
-                                <div className="text-left">
-                                  <h3 className="font-semibold text-blueberry dark:text-citrus">Generate From Input</h3>
-                                  <p className="text-sm text-blueberry/70 dark:text-apple-core/80">Enter job details manually</p>
-                                </div>
-                              </div>
-                            </button>
-
-                            <button
-                              onClick={() => setInterviewPrepMethod('analysis')}
-                              className={`p-4 border-2 rounded-lg transition-all ${
-                                interviewPrepMethod === 'analysis'
-                                  ? 'border-zapier-orange bg-zapier-orange/10'
-                                  : 'border-gray-200 hover:border-zapier-orange/50'
-                              }`}
-                            >
-                              <div className="flex items-center space-x-3">
-                                <div className={`w-4 h-4 rounded-full border-2 ${
-                                  interviewPrepMethod === 'analysis' ? 'border-zapier-orange bg-zapier-orange' : 'border-gray-300'
-                                }`}></div>
-                                <div className="text-left">
-                                  <h3 className="font-semibold text-blueberry dark:text-citrus">Generate from Existing Analysis</h3>
-                                  <p className="text-sm text-blueberry/70 dark:text-apple-core/80">Use a previous CV analysis</p>
-                                </div>
-                              </div>
-                            </button>
-                          </div>
-                        </CardContent>
-                      </Card>
-
-                      {/* Job Details Section */}
-                      {interviewPrepMethod === 'input' && (
-                        <Card>
-                          <CardHeader>
-                            <CardTitle className="text-lg font-semibold text-blueberry dark:text-citrus flex items-center">
-                              <Building className="h-5 w-5 text-zapier-orange mr-2" />
-                              Job Details
-                            </CardTitle>
-                          </CardHeader>
-                          <CardContent className="space-y-4">
-                            {/* Job Description Input */}
-                            <div>
-                              <label className="block text-sm font-medium text-blueberry dark:text-citrus mb-1">
-                                Job Description <span className="text-red-500">*</span>
-                              </label>
-                              <p className="text-xs text-blueberry/60 dark:text-apple-core/70 mb-3">
-                                Upload a file (PDF, DOCX, TXT) or paste the text directly
-                              </p>
-                              <JobDescriptionInput
-                                onJobDescriptionSet={handleInterviewJobDescriptionSet}
-                                uploadedFile={interviewJobDescription}
-                                disabled={false}
-                              />
-                            </div>
-                            
-                            {/* Job Title */}
-                            <div>
-                              <label className="block text-sm font-medium text-blueberry dark:text-citrus mb-1">
-                                Job Title <span className="text-red-500">*</span>
-                              </label>
-                              <input
-                                type="text"
-                                value={interviewJobTitle}
-                                onChange={(e) => setInterviewJobTitle(e.target.value)}
-                                placeholder="e.g., Senior Software Engineer (auto-extracted from job description)"
-                                className="w-full px-3 py-2 border border-apple-core/30 dark:border-citrus/30 rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange focus:border-transparent bg-white dark:bg-blueberry/10 text-blueberry dark:text-apple-core"
-                              />
-                            </div>
-                            
-                            {/* Company Name */}
-                            <div>
-                              <label className="block text-sm font-medium text-blueberry dark:text-citrus mb-1">
-                                Company Name <span className="text-red-500">*</span>
-                              </label>
-                              <input
-                                type="text"
-                                value={interviewCompanyName}
-                                onChange={(e) => setInterviewCompanyName(e.target.value)}
-                                placeholder="e.g., Tech Corp Inc."
-                                className="w-full px-3 py-2 border border-apple-core/30 dark:border-citrus/30 rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange focus:border-transparent bg-white dark:bg-blueberry/10 text-blueberry dark:text-apple-core"
-                              />
-                            </div>
-                          </CardContent>
-                        </Card>
-                      )}
-
-                      {/* Select Analysis Section */}
-                      {interviewPrepMethod === 'analysis' && (
-                        <Card>
-                          <CardHeader>
-                            <CardTitle className="text-lg font-semibold text-blueberry dark:text-citrus flex items-center">
-                              <Target className="h-5 w-5 text-zapier-orange mr-2" />
-                              Select Analysis
-                            </CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            <AnalysisSelector
-                              onAnalysisSelect={setSelectedAnalysisId}
-                              selectedAnalysisId={selectedAnalysisId}
-                            />
-                          </CardContent>
-                        </Card>
-                      )}
-
-                      {/* What should we include Section */}
-                      <Card>
-                        <CardHeader>
-                          <CardTitle className="text-lg font-semibold text-blueberry dark:text-citrus flex items-center">
-                            <CheckCircle className="h-5 w-5 text-zapier-orange mr-2" />
-                            What should we include
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="flex items-center space-x-3">
-                              <Checkbox
-                                id="companyProfile"
-                                checked={interviewPrepIncludes.companyProfile}
-                                onCheckedChange={(checked) => handleInterviewPrepIncludeChange('companyProfile', checked as boolean)}
-                              />
-                              <label htmlFor="companyProfile" className="text-sm font-medium text-blueberry dark:text-citrus cursor-pointer">
-                                Company Profile
-                              </label>
-                            </div>
-                            <div className="flex items-center space-x-3">
-                              <Checkbox
-                                id="recentPressReleases"
-                                checked={interviewPrepIncludes.recentPressReleases}
-                                onCheckedChange={(checked) => handleInterviewPrepIncludeChange('recentPressReleases', checked as boolean)}
-                              />
-                              <label htmlFor="recentPressReleases" className="text-sm font-medium text-blueberry dark:text-citrus cursor-pointer">
-                                Recent Press Releases
-                              </label>
-                            </div>
-                            <div className="flex items-center space-x-3">
-                              <Checkbox
-                                id="interviewTips"
-                                checked={interviewPrepIncludes.interviewTips}
-                                onCheckedChange={(checked) => handleInterviewPrepIncludeChange('interviewTips', checked as boolean)}
-                              />
-                              <label htmlFor="interviewTips" className="text-sm font-medium text-blueberry dark:text-citrus cursor-pointer">
-                                Interview Tips
-                              </label>
-                            </div>
-                            <div className="flex items-center space-x-3">
-                              <Checkbox
-                                id="getNoticedQuestions"
-                                checked={interviewPrepIncludes.getNoticedQuestions}
-                                onCheckedChange={(checked) => handleInterviewPrepIncludeChange('getNoticedQuestions', checked as boolean)}
-                              />
-                              <label htmlFor="getNoticedQuestions" className="text-sm font-medium text-blueberry dark:text-citrus cursor-pointer">
-                                Get Noticed Questions
-                              </label>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-
-                      {/* Generate Button */}
-                      <div className="flex justify-center">
-                        <Button
-                          onClick={handleGenerateInterviewPrep}
-                          className="bg-zapier-orange hover:bg-zapier-orange/90 text-white px-8 py-3 text-lg font-semibold flex items-center space-x-2"
-                          size="lg"
+                  {/* Generation Method Selection */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-xl font-bold text-blueberry dark:text-citrus">
+                        Generate Interview Prep Notes
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <button
+                          onClick={() => setInterviewPrepMethod('input')}
+                          className={`p-4 border-2 rounded-lg transition-all ${
+                            interviewPrepMethod === 'input'
+                              ? 'border-zapier-orange bg-zapier-orange/10'
+                              : 'border-gray-200 hover:border-zapier-orange/50'
+                          }`}
                         >
-                          <MessageSquare className="h-5 w-5" />
-                          <span>Generate Interview Prep Notes</span>
-                        </Button>
+                          <div className="flex items-center space-x-3">
+                            <div className={`w-4 h-4 rounded-full border-2 ${
+                              interviewPrepMethod === 'input' ? 'border-zapier-orange bg-zapier-orange' : 'border-gray-300'
+                            }`}></div>
+                            <div className="text-left">
+                              <h3 className="font-semibold text-blueberry dark:text-citrus">Generate From Input</h3>
+                              <p className="text-sm text-blueberry/70 dark:text-apple-core/80">Enter job details manually</p>
+                            </div>
+                          </div>
+                        </button>
+
+                        <button
+                          onClick={() => setInterviewPrepMethod('analysis')}
+                          className={`p-4 border-2 rounded-lg transition-all ${
+                            interviewPrepMethod === 'analysis'
+                              ? 'border-zapier-orange bg-zapier-orange/10'
+                              : 'border-gray-200 hover:border-zapier-orange/50'
+                          }`}
+                        >
+                          <div className="flex items-center space-x-3">
+                            <div className={`w-4 h-4 rounded-full border-2 ${
+                              interviewPrepMethod === 'analysis' ? 'border-zapier-orange bg-zapier-orange' : 'border-gray-300'
+                            }`}></div>
+                            <div className="text-left">
+                              <h3 className="font-semibold text-blueberry dark:text-citrus">Generate from Existing Analysis</h3>
+                              <p className="text-sm text-blueberry/70 dark:text-apple-core/80">Use a previous CV analysis</p>
+                            </div>
+                          </div>
+                        </button>
                       </div>
-                    </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Job Details Section */}
+                  {interviewPrepMethod === 'input' && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-lg font-semibold text-blueberry dark:text-citrus flex items-center">
+                          <Building className="h-5 w-5 text-zapier-orange mr-2" />
+                          Job Details
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        {/* Job Description Input */}
+                        <div>
+                          <label className="block text-sm font-medium text-blueberry dark:text-citrus mb-1">
+                            Job Description <span className="text-red-500">*</span>
+                          </label>
+                          <p className="text-xs text-blueberry/60 dark:text-apple-core/70 mb-3">
+                            Upload a file (PDF, DOCX, TXT) or paste the text directly
+                          </p>
+                          <JobDescriptionInput
+                            onJobDescriptionSet={handleInterviewJobDescriptionSet}
+                            uploadedFile={interviewJobDescription}
+                            disabled={false}
+                          />
+                        </div>
+                        
+                        {/* Job Title */}
+                        <div>
+                          <label className="block text-sm font-medium text-blueberry dark:text-citrus mb-1">
+                            Job Title <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={interviewJobTitle}
+                            onChange={(e) => setInterviewJobTitle(e.target.value)}
+                            placeholder="e.g., Senior Software Engineer (auto-extracted from job description)"
+                            className="w-full px-3 py-2 border border-apple-core/30 dark:border-citrus/30 rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange focus:border-transparent bg-white dark:bg-blueberry/10 text-blueberry dark:text-apple-core"
+                          />
+                        </div>
+                        
+                        {/* Company Name */}
+                        <div>
+                          <label className="block text-sm font-medium text-blueberry dark:text-citrus mb-1">
+                            Company Name <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={interviewCompanyName}
+                            onChange={(e) => setInterviewCompanyName(e.target.value)}
+                            placeholder="e.g., Tech Corp Inc."
+                            className="w-full px-3 py-2 border border-apple-core/30 dark:border-citrus/30 rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange focus:border-transparent bg-white dark:bg-blueberry/10 text-blueberry dark:text-apple-core"
+                          />
+                        </div>
+                      </CardContent>
+                    </Card>
                   )}
+
+                  {/* Select Analysis Section */}
+                  {interviewPrepMethod === 'analysis' && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-lg font-semibold text-blueberry dark:text-citrus flex items-center">
+                          <Target className="h-5 w-5 text-zapier-orange mr-2" />
+                          Select Analysis
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <AnalysisSelector
+                          onAnalysisSelect={setSelectedAnalysisId}
+                          selectedAnalysisId={selectedAnalysisId}
+                        />
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* What should we include Section */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg font-semibold text-blueberry dark:text-citrus flex items-center">
+                        <CheckCircle className="h-5 w-5 text-zapier-orange mr-2" />
+                        What should we include
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="flex items-center space-x-3">
+                          <Checkbox
+                            id="companyProfile"
+                            checked={interviewPrepIncludes.companyProfile}
+                            onCheckedChange={(checked) => handleInterviewPrepIncludeChange('companyProfile', checked as boolean)}
+                          />
+                          <label htmlFor="companyProfile" className="text-sm font-medium text-blueberry dark:text-citrus cursor-pointer">
+                            Company Profile
+                          </label>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                          <Checkbox
+                            id="recentPressReleases"
+                            checked={interviewPrepIncludes.recentPressReleases}
+                            onCheckedChange={(checked) => handleInterviewPrepIncludeChange('recentPressReleases', checked as boolean)}
+                          />
+                          <label htmlFor="recentPressReleases" className="text-sm font-medium text-blueberry dark:text-citrus cursor-pointer">
+                            Recent Press Releases
+                          </label>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                          <Checkbox
+                            id="interviewTips"
+                            checked={interviewPrepIncludes.interviewTips}
+                            onCheckedChange={(checked) => handleInterviewPrepIncludeChange('interviewTips', checked as boolean)}
+                          />
+                          <label htmlFor="interviewTips" className="text-sm font-medium text-blueberry dark:text-citrus cursor-pointer">
+                            Interview Tips
+                          </label>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                          <Checkbox
+                            id="getNoticedQuestions"
+                            checked={interviewPrepIncludes.getNoticedQuestions}
+                            onCheckedChange={(checked) => handleInterviewPrepIncludeChange('getNoticedQuestions', checked as boolean)}
+                          />
+                          <label htmlFor="getNoticedQuestions" className="text-sm font-medium text-blueberry dark:text-citrus cursor-pointer">
+                            Get Noticed Questions
+                          </label>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Generate Button */}
+                  <div className="flex justify-center">
+                    <Button
+                      onClick={handleGenerateInterviewPrep}
+                      className="bg-zapier-orange hover:bg-zapier-orange/90 text-white px-8 py-3 text-lg font-semibold flex items-center space-x-2"
+                      size="lg"
+                    >
+                      <MessageSquare className="h-5 w-5" />
+                      <span>Generate Interview Prep Notes</span>
+                    </Button>
+                  </div>
                 </div>
               </TabsContent>
 
