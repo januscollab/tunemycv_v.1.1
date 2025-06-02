@@ -16,25 +16,16 @@ import { useAnalysisState } from '@/hooks/useAnalysisState';
 import { useAnalysisExecution } from '@/hooks/analysis/useAnalysisExecution';
 import EmbeddedAuth from '@/components/auth/EmbeddedAuth';
 import ServiceExplanation from '@/components/common/ServiceExplanation';
+import { UploadedFile } from '@/types/fileTypes';
 
 const AnalyzeCV = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('analyze');
+  const [selectedCVFile, setSelectedCVFile] = useState<UploadedFile | null>(null);
+  const [jobDescriptionFile, setJobDescriptionFile] = useState<UploadedFile | null>(null);
   
   const {
-    selectedCVId,
-    setSelectedCVId,
-    jobDescription,
-    setJobDescription,
-    selectedFile,
-    setSelectedFile,
-    jobDescriptionFile,
-    setJobDescriptionFile,
-    jobDescriptionText,
-    setJobDescriptionText,
-    inputMethod,
-    setInputMethod,
     analysisResult,
     setAnalysisResult
   } = useAnalysisState();
@@ -80,14 +71,24 @@ const AnalyzeCV = () => {
   const credits = userCredits?.credits || 0;
   const hasCreditsForAI = credits > 0;
 
+  const handleCVSelect = (uploadedFile: UploadedFile) => {
+    setSelectedCVFile(uploadedFile);
+  };
+
+  const handleJobDescriptionSet = (uploadedFile: UploadedFile) => {
+    setJobDescriptionFile(uploadedFile);
+  };
+
   const handleAnalyze = async () => {
+    if (!selectedCVFile || !jobDescriptionFile) return;
+    
     const result = await executeAnalysis({
-      selectedCVId,
-      selectedFile,
-      jobDescriptionFile,
-      jobDescriptionText,
-      inputMethod,
-      jobDescription
+      selectedCVId: null,
+      selectedFile: selectedCVFile,
+      jobDescriptionFile: jobDescriptionFile,
+      jobDescriptionText: jobDescriptionFile.extractedText,
+      inputMethod: 'upload',
+      jobDescription: jobDescriptionFile.extractedText
     });
 
     if (result) {
@@ -195,7 +196,7 @@ const AnalyzeCV = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-[80%] mx-auto px-4">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-earth dark:text-white mb-4">
             Analyze Your CV
@@ -227,32 +228,26 @@ const AnalyzeCV = () => {
               <TabsContent value="analyze" className="space-y-6">
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
                   <CVSelector
-                    selectedCVId={selectedCVId}
-                    onCVSelect={setSelectedCVId}
-                    selectedFile={selectedFile}
-                    onFileSelect={setSelectedFile}
+                    onCVSelect={handleCVSelect}
+                    selectedCV={selectedCVFile}
+                    uploading={isAnalyzing}
                   />
                 </div>
 
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
                   <JobDescriptionInput
-                    jobDescription={jobDescription}
-                    setJobDescription={setJobDescription}
-                    jobDescriptionFile={jobDescriptionFile}
-                    setJobDescriptionFile={setJobDescriptionFile}
-                    jobDescriptionText={jobDescriptionText}
-                    setJobDescriptionText={setJobDescriptionText}
-                    inputMethod={inputMethod}
-                    setInputMethod={setInputMethod}
+                    onJobDescriptionSet={handleJobDescriptionSet}
+                    uploadedFile={jobDescriptionFile}
+                    disabled={isAnalyzing}
                   />
                 </div>
 
                 <div className="flex justify-center">
                   <AnalyzeButton
                     onAnalyze={handleAnalyze}
-                    isAnalyzing={isAnalyzing}
-                    disabled={!hasCreditsForAI || (!selectedCVId && !selectedFile) || (!jobDescriptionFile && !jobDescriptionText)}
-                    credits={credits}
+                    canAnalyze={!!selectedCVFile && !!jobDescriptionFile && hasCreditsForAI}
+                    analyzing={isAnalyzing}
+                    hasCreditsForAI={hasCreditsForAI}
                   />
                 </div>
               </TabsContent>
