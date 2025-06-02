@@ -82,14 +82,20 @@ const AnalyzeCV = () => {
   const handleAnalyze = async () => {
     if (!selectedCVFile || !jobDescriptionFile) return;
     
-    const result = await executeAnalysis({
-      selectedCVId: null,
-      selectedFile: selectedCVFile,
-      jobDescriptionFile: jobDescriptionFile,
-      jobDescriptionText: jobDescriptionFile.extractedText,
-      inputMethod: 'upload',
-      jobDescription: jobDescriptionFile.extractedText
-    });
+    const result = await executeAnalysis(
+      {
+        cv: selectedCVFile,
+        jobDescription: jobDescriptionFile
+      },
+      '',
+      false,
+      userCredits,
+      {
+        saveCV: false,
+        saveJobDescription: false,
+        cvSource: 'new'
+      }
+    );
 
     if (result) {
       setAnalysisResult(result);
@@ -254,7 +260,7 @@ const AnalyzeCV = () => {
 
               <TabsContent value="results">
                 {analysisResult && (
-                  <AnalysisResults analysisResult={analysisResult} />
+                  <AnalysisResults result={analysisResult} onStartNew={() => setActiveTab('analyze')} />
                 )}
               </TabsContent>
 
