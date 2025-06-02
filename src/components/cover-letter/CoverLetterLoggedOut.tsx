@@ -23,15 +23,17 @@ const CoverLetterLoggedOut = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
       <div className="max-w-5xl mx-auto px-4 py-12">
-        <div className="flex items-start mb-8">
-          <Edit className="h-12 w-12 text-zapier-orange mr-6 mt-2" />
-          <div>
-            <h1 className="text-4xl md:text-5xl font-bold text-earth dark:text-white mb-4">
-              Generate Cover Letter
-            </h1>
-            <p className="text-xl text-earth/70 dark:text-white/70 max-w-3xl font-normal">
-              Create professional, personalized cover letters in minutes using AI technology tailored to your target job.
-            </p>
+        <div className="mb-8">
+          <div className="flex items-start">
+            <div>
+              <h1 className="text-4xl md:text-5xl font-bold text-earth dark:text-white mb-4 flex items-start">
+                <Edit className="h-12 w-12 text-zapier-orange mr-6 mt-2" />
+                Generate Cover Letter
+              </h1>
+              <p className="text-xl text-earth/70 dark:text-white/70 max-w-3xl font-normal">
+                Generate tailored cover letters that highlight your strengths and align with specific job requirements.
+              </p>
+            </div>
           </div>
         </div>
         
@@ -56,6 +58,22 @@ const CoverLetterLoggedOut = () => {
                 />
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* CTA Section */}
+        <div className="mt-16 text-center">
+          <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-8 border border-apple-core/20 dark:border-citrus/20">
+            <h3 className="text-2xl font-bold text-earth dark:text-white mb-4">
+              Ready to Create Your Perfect Cover Letter?
+            </h3>
+            <p className="text-lg text-earth/70 dark:text-white/70 mb-6">
+              Join thousands of job seekers who have successfully landed interviews with our AI-powered cover letters.
+            </p>
+            <button className="bg-zapier-orange text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange/90 transition-colors inline-flex items-center">
+              <Edit className="mr-2 h-5 w-5 text-white" />
+              Start AI Cover Letter Generator
+            </button>
           </div>
         </div>
       </div>

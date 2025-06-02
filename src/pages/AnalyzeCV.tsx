@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -206,7 +207,7 @@ const AnalyzeCV = () => {
 
   return (
     <div className={`min-h-screen bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5 ${analyzing ? 'pointer-events-none' : ''}`}>
-      {/* ... keep existing code (loading overlay) */}
+      {/* Loading overlay */}
       {analyzing && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
           <div className="bg-white dark:bg-blueberry/90 rounded-lg p-6 text-center max-w-md">
@@ -294,11 +295,8 @@ const AnalyzeCV = () => {
                   {/* CV Selection - Optional */}
                   <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-5 border border-apple-core/20 dark:border-citrus/20">
                     <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-3">
-                      Your CV <span className="text-sm font-normal text-blueberry/60 dark:text-apple-core/70">(Optional)</span>
+                      Your CV
                     </h3>
-                    <p className="text-xs text-blueberry/60 dark:text-apple-core/70 mb-3">
-                      Upload your CV for comprehensive analysis. Without a CV, we'll provide general insights about the job requirements.
-                    </p>
                     
                     <CVSelector
                       onCVSelect={handleCVSelect}
@@ -308,12 +306,25 @@ const AnalyzeCV = () => {
                   </div>
 
                   {/* Analyze Button */}
-                  <AnalyzeButton
-                    onAnalyze={handleAnalysis}
-                    canAnalyze={!!canAnalyze}
-                    analyzing={analyzing}
-                    hasCreditsForAI={hasCreditsForAI}
-                  />
+                  <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-5 border border-apple-core/20 dark:border-citrus/20">
+                    <button
+                      onClick={handleAnalysis}
+                      disabled={!canAnalyze || analyzing}
+                      className={`w-full py-4 px-6 rounded-lg text-lg font-semibold transition-colors ${
+                        canAnalyze && !analyzing && hasCreditsForAI
+                          ? 'bg-zapier-orange text-white hover:bg-zapier-orange/90'
+                          : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      }`}
+                    >
+                      {analyzing ? 'Analyzing...' : 'Start AI Analysis of CV'}
+                    </button>
+                    
+                    {!hasCreditsForAI && (
+                      <p className="text-sm text-red-500 mt-2 text-center">
+                        You need AI credits to perform analysis. Check the credits panel for options.
+                      </p>
+                    )}
+                  </div>
                 </div>
               </TabsContent>
 
