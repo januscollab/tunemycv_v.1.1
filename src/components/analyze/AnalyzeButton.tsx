@@ -16,7 +16,7 @@ const AnalyzeButton: React.FC<AnalyzeButtonProps> = ({
   hasCreditsForAI
 }) => {
   return (
-    <div className="bg-white dark:bg-earth/10 rounded-lg shadow-sm p-5 border border-apple-core/20 dark:border-citrus/20">
+    <div className="bg-white dark:bg-earth/10 rounded-lg shadow-sm p-5 border border-gray-200 dark:border-gray-700">
       <div className="text-center">
         <button
           onClick={onAnalyze}
@@ -34,7 +34,7 @@ const AnalyzeButton: React.FC<AnalyzeButtonProps> = ({
             </div>
           ) : (
             <div className="flex items-center justify-center space-x-2">
-              <BarChart3 className="h-4 w-4 text-zapier-orange" />
+              <BarChart3 className="h-4 w-4" />
               <span>Start AI Analysis of CV</span>
             </div>
           )}

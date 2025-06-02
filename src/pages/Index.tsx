@@ -31,7 +31,7 @@ const Index = () => {
                 Analyze Your CV
                 <ArrowRight className="ml-2 h-5 w-5 text-white" />
               </Link>
-              <Link to="/cover-letter" className="border-2 border-earth text-earth px-8 py-4 rounded-lg text-lg font-semibold hover:bg-earth hover:text-white transition-colors">
+              <Link to="/cover-letter" className="border-2 border-zapier-orange text-zapier-orange px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange hover:text-white transition-colors">
                 Generate Cover Letter
               </Link>
             </div>
@@ -41,7 +41,7 @@ const Index = () => {
                 Get Started Free
                 <ArrowRight className="ml-2 h-5 w-5 text-white" />
               </Link>
-              <button onClick={scrollToHowItWorks} className="border-2 border-earth text-earth px-8 py-4 rounded-lg text-lg font-semibold hover:bg-earth hover:text-white transition-colors">
+              <button onClick={scrollToHowItWorks} className="border-2 border-zapier-orange text-zapier-orange px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange hover:text-white transition-colors">
                 Learn More
               </button>
             </div>

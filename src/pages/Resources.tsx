@@ -72,7 +72,7 @@ const Resources = () => {
           <h1 className="text-5xl font-bold text-blueberry dark:text-citrus mb-6">
             Career Resources
           </h1>
-          <p className="text-xl text-blueberry/80 dark:text-apple-core mb-8">
+          <p className="text-xl text-blueberry/80 dark:text-apple-core mb-4">
             Expert guides, templates, and tools to accelerate your job search and career growth
           </p>
         </div>
@@ -101,26 +101,26 @@ const Resources = () => {
           {/* Resources Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredResources.map((resource, index) => (
-              <div key={index} className="bg-white dark:bg-blueberry/20 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow border border-apple-core/20 dark:border-citrus/20">
-                <div className="bg-apricot/20 rounded-full w-16 h-16 flex items-center justify-center mb-6">
-                  <resource.icon className="h-8 w-8 text-apricot" />
+              <div key={index} className="bg-white dark:bg-blueberry/20 rounded-xl shadow-lg p-4 hover:shadow-xl transition-shadow border border-apple-core/20 dark:border-citrus/20" style={{ height: '240px' }}>
+                <div className="bg-apricot/20 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+                  <resource.icon className="h-6 w-6 text-apricot" />
                 </div>
                 
-                <div className="mb-4">
-                  <span className="inline-block bg-citrus/20 text-citrus px-3 py-1 rounded-full text-sm font-medium mb-3">
+                <div className="mb-3">
+                  <span className="inline-block bg-citrus/20 text-citrus px-2 py-1 rounded-full text-xs font-medium mb-2">
                     {resource.category}
                   </span>
-                  <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mb-3">
+                  <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-2">
                     {resource.title}
                   </h3>
-                  <p className="text-blueberry/70 dark:text-apple-core/80 leading-relaxed">
+                  <p className="text-blueberry/70 dark:text-apple-core/80 leading-relaxed text-sm">
                     {resource.description}
                   </p>
                 </div>
                 
                 <a 
                   href={resource.link}
-                  className="inline-flex items-center text-apricot font-medium hover:text-apricot/80 transition-colors"
+                  className="inline-flex items-center text-apricot font-medium hover:text-zapier-orange transition-colors"
                 >
                   Read More →
                 </a>
