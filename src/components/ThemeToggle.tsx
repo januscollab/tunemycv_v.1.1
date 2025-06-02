@@ -34,12 +34,12 @@ const ThemeToggle = () => {
       variant="ghost"
       size="icon"
       onClick={toggleTheme}
-      className="text-blueberry dark:text-white hover:text-apricot transition-colors"
+      className="text-earth dark:text-white hover:text-zapier-orange transition-colors"
     >
       {isDark ? (
-        <Sun className="h-5 w-5" />
+        <Sun className="h-5 w-5 text-zapier-orange" />
       ) : (
-        <Moon className="h-5 w-5" />
+        <Moon className="h-5 w-5 text-zapier-orange" />
       )}
     </Button>
   );

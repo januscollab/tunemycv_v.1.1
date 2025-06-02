@@ -13,36 +13,76 @@ const SocialAuthButtons: React.FC<SocialAuthButtonsProps> = ({ isAnyLoading }) =
   const { toast } = useToast();
 
   const getRedirectUrl = () => {
-    // Check if we're on production domain
-    if (window.location.hostname === 'www.tunemycv.com' || window.location.hostname === 'tunemycv.com') {
+    const origin = window.location.origin;
+    console.log('Current origin:', origin);
+    
+    // Handle production domains
+    if (origin.includes('tunemycv.com')) {
       return 'https://www.tunemycv.com/auth';
     }
-    // Check if we're on a Lovable preview domain
-    if (window.location.hostname.includes('.lovable.app')) {
-      return `${window.location.origin}/auth`;
+    
+    // Handle Lovable preview domains (both .lovable.app and .lovableproject.com)
+    if (origin.includes('.lovable.app') || origin.includes('.lovableproject.com')) {
+      return `${origin}/auth`;
     }
-    // Default to localhost for development
-    return 'http://localhost:3000/auth';
+    
+    // Handle localhost and other development environments
+    if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+      return `${origin}/auth`;
+    }
+    
+    // Default fallback
+    return `${origin}/auth`;
   };
 
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
     try {
-      console.log('Google OAuth redirect URL:', getRedirectUrl());
+      const redirectUrl = getRedirectUrl();
+      console.log('Google OAuth redirect URL:', redirectUrl);
+      console.log('Current domain:', window.location.hostname);
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: getRedirectUrl()
+          redirectTo: redirectUrl,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          }
         }
       });
-      if (error) throw error;
+      
+      if (error) {
+        console.error('Google OAuth error:', error);
+        
+        // Provide specific error messages for common issues
+        if (error.message?.includes('refused to connect') || error.message?.includes('X-Frame-Options')) {
+          toast({ 
+            title: 'Configuration Error', 
+            description: 'Google OAuth is not configured for this domain. Please check the Google Cloud Console configuration.', 
+            variant: 'destructive' 
+          });
+        } else {
+          toast({ 
+            title: 'Error', 
+            description: error.message || 'Failed to sign in with Google', 
+            variant: 'destructive' 
+          });
+        }
+        throw error;
+      }
     } catch (error: any) {
       console.error('Google sign-in error:', error);
-      toast({ 
-        title: 'Error', 
-        description: error.message || 'Failed to sign in with Google', 
-        variant: 'destructive' 
-      });
+      
+      // Only show toast if we haven't already shown one
+      if (!error.message?.includes('refused to connect')) {
+        toast({ 
+          title: 'Error', 
+          description: 'Failed to initiate Google sign-in. Please try again or contact support.', 
+          variant: 'destructive' 
+        });
+      }
     } finally {
       setGoogleLoading(false);
     }
@@ -51,19 +91,30 @@ const SocialAuthButtons: React.FC<SocialAuthButtonsProps> = ({ isAnyLoading }) =
   const handleLinkedInSignIn = async () => {
     setLinkedinLoading(true);
     try {
-      console.log('LinkedIn OAuth redirect URL:', getRedirectUrl());
+      const redirectUrl = getRedirectUrl();
+      console.log('LinkedIn OAuth redirect URL:', redirectUrl);
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'linkedin_oidc',
         options: {
-          redirectTo: getRedirectUrl()
+          redirectTo: redirectUrl
         }
       });
-      if (error) throw error;
+      
+      if (error) {
+        console.error('LinkedIn OAuth error:', error);
+        toast({ 
+          title: 'Error', 
+          description: error.message || 'Failed to sign in with LinkedIn', 
+          variant: 'destructive' 
+        });
+        throw error;
+      }
     } catch (error: any) {
       console.error('LinkedIn sign-in error:', error);
       toast({ 
         title: 'Error', 
-        description: error.message || 'Failed to sign in with LinkedIn', 
+        description: 'Failed to initiate LinkedIn sign-in. Please try again.', 
         variant: 'destructive' 
       });
     } finally {
@@ -73,6 +124,15 @@ const SocialAuthButtons: React.FC<SocialAuthButtonsProps> = ({ isAnyLoading }) =
 
   return (
     <div className="mb-6 space-y-3">
+      {/* Development notice for OAuth configuration */}
+      {(window.location.hostname.includes('lovableproject.com') || window.location.hostname.includes('lovable.app')) && (
+        <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mb-4">
+          <p className="text-sm text-blue-800">
+            <strong>Note:</strong> If Google sign-in doesn't work, the current domain needs to be added to your Google Cloud Console OAuth configuration.
+          </p>
+        </div>
+      )}
+
       {/* Google Sign In Button */}
       <button
         onClick={handleGoogleSignIn}

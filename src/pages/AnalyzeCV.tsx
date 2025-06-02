@@ -16,6 +16,7 @@ import EmbeddedAuth from '@/components/auth/EmbeddedAuth';
 import ServiceExplanation from '@/components/common/ServiceExplanation';
 import { UploadedFile } from '@/types/fileTypes';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import AnalysisHistoryTab from '@/components/profile/AnalysisHistoryTab';
 
 const AnalyzeCV = () => {
   const { user } = useAuth();
@@ -148,8 +149,8 @@ const AnalyzeCV = () => {
   // Logged-out user experience
   if (!user) {
     const analyzeExplanation = {
-      title: 'Analyze Your CV',
-      subtitle: 'Get comprehensive compatibility analysis with actionable recommendations to improve your job application success.',
+      title: '',
+      subtitle: '',
       benefits: [
         'Advanced AI-powered analysis that evaluates your CV against specific job requirements',
         'Detailed compatibility scoring to understand how well you match the role',
@@ -163,16 +164,28 @@ const AnalyzeCV = () => {
     };
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-apple-core/20 via-white to-citrus/10 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
-        <div className="max-w-7xl mx-auto px-4 py-12">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-[600px]">
+      <div className="min-h-screen bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
+        <div className="max-w-5xl mx-auto px-4 py-12">
+          <div className="flex items-start mb-8">
+            <FileText className="h-12 w-12 text-zapier-orange mr-6 mt-2" />
+            <div>
+              <h1 className="text-4xl md:text-5xl font-bold text-earth dark:text-white mb-4">
+                Analyze Your CV
+              </h1>
+              <p className="text-xl text-earth/70 dark:text-white/70 max-w-3xl font-normal">
+                Get comprehensive compatibility analysis with actionable recommendations to improve your job application success.
+              </p>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-[500px] mt-12">
             <div className="flex items-start">
               <ServiceExplanation
                 title={analyzeExplanation.title}
                 subtitle={analyzeExplanation.subtitle}
                 benefits={analyzeExplanation.benefits}
                 features={analyzeExplanation.features}
-                icon={<FileText className="h-8 w-8 text-apricot" />}
+                icon={<FileText className="h-8 w-8 text-zapier-orange" />}
                 compact={true}
               />
             </div>
@@ -182,11 +195,18 @@ const AnalyzeCV = () => {
                   <EmbeddedAuth
                     title="Login to Get Started"
                     description="CV analysis requires an account to ensure personalized results and save your analysis history."
-                    icon={<FileText className="h-6 w-6 text-apricot mr-2" />}
+                    icon={<FileText className="h-6 w-6 text-zapier-orange mr-2" />}
                   />
                 </div>
               </div>
             </div>
+          </div>
+          
+          {/* Bottom CTA */}
+          <div className="text-center mt-16">
+            <button className="bg-zapier-orange text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange/90 transition-colors">
+              Get Started with CV Analysis
+            </button>
           </div>
         </div>
       </div>
@@ -194,49 +214,52 @@ const AnalyzeCV = () => {
   }
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-apple-core/20 via-white to-citrus/10 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5 ${analyzing ? 'pointer-events-none' : ''}`}>
+    <div className={`min-h-screen bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5 ${analyzing ? 'pointer-events-none' : ''}`}>
+      {/* Loading overlay */}
       {analyzing && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-          <div className="bg-white dark:bg-blueberry/90 rounded-lg p-8 text-center max-w-md">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-apricot mx-auto mb-4"></div>
+          <div className="bg-white dark:bg-blueberry/90 rounded-lg p-6 text-center max-w-md">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-apricot mx-auto mb-4"></div>
             <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-2">Analyzing Your CV</h3>
-            <p className="text-blueberry/70 dark:text-apple-core/80 min-h-[2rem] transition-opacity duration-500">
+            <p className="text-blueberry/70 dark:text-apple-core/80 min-h-[1.5rem] transition-opacity duration-500 text-sm">
               {currentLoadingMessage}
             </p>
           </div>
         </div>
       )}
       
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        {/* Header Section - Aligned with Cover Letter page */}
-        <div className="mb-8">
-          <div className="flex items-center mb-4">
-            <FileText className="h-10 w-10 text-apricot mr-3" />
-            <h1 className="text-4xl font-bold text-blueberry dark:text-citrus">
-              Analyze Your CV
-            </h1>
+      <div className="max-w-5xl mx-auto px-4 py-8">
+        {/* Header Section */}
+        <div className="mb-6">
+          <div className="flex items-start mb-3">
+            <FileText className="h-8 w-8 text-zapier-orange mr-3 mt-1" />
+            <div>
+              <h1 className="text-3xl font-bold text-earth dark:text-white">
+                Analyze Your CV
+              </h1>
+              <p className="text-lg text-earth/70 dark:text-white/70 max-w-2xl mt-1">
+                Upload your CV and job description to get comprehensive compatibility analysis with actionable recommendations.
+              </p>
+            </div>
           </div>
-          <p className="text-xl text-blueberry/80 dark:text-apple-core max-w-3xl">
-            Upload your CV and job description to get comprehensive compatibility analysis with actionable recommendations.
-          </p>
         </div>
 
-        {/* Main Content Grid - matching Cover Letter page structure */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Main Content Section */}
           <div className="lg:col-span-3">
-            {/* Tabs Navigation - positioned within content area */}
+            {/* Tabs Navigation */}
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-3 mb-8">
-                <TabsTrigger value="analysis" className="flex items-center space-x-2">
+              <TabsList className="grid w-full grid-cols-3 mb-6">
+                <TabsTrigger value="analysis" className="flex items-center space-x-2 text-sm">
                   <FileText className="h-4 w-4" />
                   <span>CV Analysis</span>
                 </TabsTrigger>
-                <TabsTrigger value="report" className="flex items-center space-x-2" disabled={!analysisResult}>
+                <TabsTrigger value="report" className="flex items-center space-x-2 text-sm" disabled={!analysisResult}>
                   <Eye className="h-4 w-4" />
                   <span>Current Report</span>
                 </TabsTrigger>
-                <TabsTrigger value="history" className="flex items-center space-x-2">
+                <TabsTrigger value="history" className="flex items-center space-x-2 text-sm">
                   <History className="h-4 w-4" />
                   <span>Analysis History</span>
                 </TabsTrigger>
@@ -244,29 +267,29 @@ const AnalyzeCV = () => {
 
               {/* CV Analysis Tab */}
               <TabsContent value="analysis" className="mt-0">
-                <div className="space-y-6">
+                <div className="space-y-5">
                   {/* Job Title */}
-                  <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
-                    <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-4">Job Title</h3>
+                  <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-5 border border-apple-core/20 dark:border-citrus/20">
+                    <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-3">Job Title</h3>
                     <input
                       type="text"
                       value={jobTitle}
                       onChange={(e) => setJobTitle(e.target.value)}
                       placeholder="e.g., Senior Software Engineer (auto-extracted from job description)"
-                      className="w-full px-3 py-2 border border-apple-core/30 dark:border-citrus/30 rounded-md focus:outline-none focus:ring-2 focus:ring-apricot focus:border-transparent bg-white dark:bg-blueberry/10 text-blueberry dark:text-apple-core"
+                      className="w-full px-3 py-2 border border-apple-core/30 dark:border-citrus/30 rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange focus:border-transparent bg-white dark:bg-blueberry/10 text-blueberry dark:text-apple-core text-sm hover:border-zapier-orange/50 transition-colors"
                       disabled={analyzing}
                     />
-                    <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mt-2">
+                    <p className="text-xs text-blueberry/60 dark:text-apple-core/70 mt-2">
                       Job title will be automatically extracted from the job description if not provided.
                     </p>
                   </div>
 
                   {/* Job Description Input - Required */}
-                  <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
-                    <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-4">
+                  <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-5 border border-apple-core/20 dark:border-citrus/20">
+                    <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-3">
                       Job Description <span className="text-red-500">*</span>
                     </h3>
-                    <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mb-4">
+                    <p className="text-xs text-blueberry/60 dark:text-apple-core/70 mb-3">
                       Upload a file (PDF, DOCX, TXT) or paste the text directly
                     </p>
                     
@@ -278,13 +301,10 @@ const AnalyzeCV = () => {
                   </div>
 
                   {/* CV Selection - Optional */}
-                  <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
-                    <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-4">
-                      Your CV <span className="text-sm font-normal text-blueberry/70 dark:text-apple-core/80">(Optional)</span>
+                  <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-5 border border-apple-core/20 dark:border-citrus/20">
+                    <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-3">
+                      Your CV
                     </h3>
-                    <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mb-4">
-                      Upload your CV for comprehensive analysis. Without a CV, we'll provide general insights about the job requirements.
-                    </p>
                     
                     <CVSelector
                       onCVSelect={handleCVSelect}
@@ -294,12 +314,25 @@ const AnalyzeCV = () => {
                   </div>
 
                   {/* Analyze Button */}
-                  <AnalyzeButton
-                    onAnalyze={handleAnalysis}
-                    canAnalyze={!!canAnalyze}
-                    analyzing={analyzing}
-                    hasCreditsForAI={hasCreditsForAI}
-                  />
+                  <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-5 border border-apple-core/20 dark:border-citrus/20">
+                    <button
+                      onClick={handleAnalysis}
+                      disabled={!canAnalyze || analyzing}
+                      className={`w-full py-4 px-6 rounded-lg text-lg font-semibold transition-colors ${
+                        canAnalyze && !analyzing && hasCreditsForAI
+                          ? 'bg-zapier-orange text-white hover:bg-zapier-orange/90'
+                          : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      }`}
+                    >
+                      {analyzing ? 'Analyzing...' : 'Start AI Analysis of CV'}
+                    </button>
+                    
+                    {!hasCreditsForAI && (
+                      <p className="text-sm text-red-500 mt-2 text-center">
+                        You need AI credits to perform analysis. Check the credits panel for options.
+                      </p>
+                    )}
+                  </div>
                 </div>
               </TabsContent>
 
@@ -308,15 +341,15 @@ const AnalyzeCV = () => {
                 {analysisResult ? (
                   <AnalysisResults result={analysisResult} onStartNew={handleStartNew} />
                 ) : (
-                  <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-12 border border-apple-core/20 dark:border-citrus/20 text-center">
-                    <Eye className="h-16 w-16 text-blueberry/30 dark:text-apple-core/50 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mb-2">No Report Available</h3>
-                    <p className="text-blueberry/70 dark:text-apple-core/80 mb-6">
+                  <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-8 border border-apple-core/20 dark:border-citrus/20 text-center">
+                    <Eye className="h-12 w-12 text-blueberry/30 dark:text-apple-core/50 mx-auto mb-3" />
+                    <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-2">No Report Available</h3>
+                    <p className="text-blueberry/60 dark:text-apple-core/70 mb-4 text-sm">
                       Complete a CV analysis to view your report here.
                     </p>
                     <button
                       onClick={() => setActiveTab('analysis')}
-                      className="bg-apricot hover:bg-apricot/90 text-white px-6 py-2 rounded-md transition-colors"
+                      className="bg-zapier-orange hover:bg-zapier-orange/90 text-white px-4 py-2 rounded-md transition-colors text-sm"
                     >
                       Start Analysis
                     </button>
@@ -326,29 +359,25 @@ const AnalyzeCV = () => {
 
               {/* Analysis History Tab */}
               <TabsContent value="history" className="mt-0">
-                <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-12 border border-apple-core/20 dark:border-citrus/20 text-center">
-                  <History className="h-16 w-16 text-blueberry/30 dark:text-apple-core/50 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mb-2">Analysis History</h3>
-                  <p className="text-blueberry/70 dark:text-apple-core/80 mb-4">
-                    Coming soon! This feature will allow you to view and manage your previous CV analyses.
-                  </p>
-                  <div className="inline-flex items-center px-4 py-2 bg-blueberry/10 dark:bg-apple-core/10 rounded-md">
-                    <span className="text-sm text-blueberry/70 dark:text-apple-core/80">
-                      🚧 Feature in development
-                    </span>
-                  </div>
-                </div>
+                <AnalysisHistoryTab credits={userCredits?.credits || 0} memberSince="" />
               </TabsContent>
             </Tabs>
           </div>
 
-          {/* Credits Panel - matching Cover Letter page positioning */}
+          {/* Credits Panel - Reduced Width */}
           <div className="lg:col-span-1">
             <CreditsPanel
               credits={userCredits?.credits || 0}
               hasCreditsForAI={hasCreditsForAI}
             />
           </div>
+        </div>
+        
+        {/* Bottom CTA */}
+        <div className="text-center mt-16">
+          <button className="bg-zapier-orange text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange/90 transition-colors">
+            Start Your CV Analysis Today
+          </button>
         </div>
       </div>
     </div>

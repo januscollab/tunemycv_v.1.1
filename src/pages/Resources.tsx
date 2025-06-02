@@ -72,25 +72,25 @@ const Resources = () => {
           <h1 className="text-5xl font-bold text-blueberry dark:text-citrus mb-6">
             Career Resources
           </h1>
-          <p className="text-xl text-blueberry/80 dark:text-apple-core mb-8">
+          <p className="text-xl text-blueberry/80 dark:text-apple-core mb-4">
             Expert guides, templates, and tools to accelerate your job search and career growth
           </p>
         </div>
       </section>
 
       {/* Resources Section */}
-      <section className="py-20 px-4">
-        <div className="max-w-7xl mx-auto">
+      <section className="py-10 px-4">
+        <div className="max-w-4xl mx-auto">
           {/* Category Filter */}
-          <div className="flex flex-wrap justify-center gap-4 mb-12">
+          <div className="flex flex-wrap justify-center gap-4 mb-6">
             {categories.map(category => (
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
                 className={`px-6 py-2 rounded-full font-medium transition-colors ${
                   selectedCategory === category
-                    ? 'bg-apricot text-white'
-                    : 'bg-white dark:bg-blueberry/20 text-blueberry dark:text-apple-core border border-apple-core/30 dark:border-citrus/20 hover:border-apricot hover:text-apricot'
+                    ? 'bg-zapier-orange text-white'
+                    : 'bg-white dark:bg-blueberry/20 text-blueberry dark:text-apple-core border border-apple-core/30 dark:border-citrus/20 hover:border-zapier-orange hover:text-zapier-orange'
                 }`}
               >
                 {category}
@@ -101,26 +101,26 @@ const Resources = () => {
           {/* Resources Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredResources.map((resource, index) => (
-              <div key={index} className="bg-white dark:bg-blueberry/20 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow border border-apple-core/20 dark:border-citrus/20">
-                <div className="bg-apricot/20 rounded-full w-16 h-16 flex items-center justify-center mb-6">
-                  <resource.icon className="h-8 w-8 text-apricot" />
+              <div key={index} className="bg-white dark:bg-blueberry/20 rounded-xl shadow-lg p-4 hover:shadow-xl transition-all border border-apple-core/20 dark:border-citrus/20 hover:border-zapier-orange/50" style={{ height: '144px' }}>
+                <div className="bg-apricot/20 rounded-full w-10 h-10 flex items-center justify-center mb-3">
+                  <resource.icon className="h-5 w-5 text-apricot" />
                 </div>
                 
-                <div className="mb-4">
-                  <span className="inline-block bg-citrus/20 text-citrus px-3 py-1 rounded-full text-sm font-medium mb-3">
+                <div className="mb-2">
+                  <span className="inline-block bg-citrus/20 text-citrus px-2 py-1 rounded-full text-xs font-medium mb-2">
                     {resource.category}
                   </span>
-                  <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mb-3">
+                  <h3 className="text-base font-semibold text-blueberry dark:text-citrus mb-1 line-clamp-1">
                     {resource.title}
                   </h3>
-                  <p className="text-blueberry/70 dark:text-apple-core/80 leading-relaxed">
+                  <p className="text-blueberry/70 dark:text-apple-core/80 leading-relaxed text-xs line-clamp-2">
                     {resource.description}
                   </p>
                 </div>
                 
                 <a 
                   href={resource.link}
-                  className="inline-flex items-center text-apricot font-medium hover:text-apricot/80 transition-colors"
+                  className="inline-flex items-center text-apricot font-medium hover:text-zapier-orange transition-colors text-sm"
                 >
                   Read More →
                 </a>
@@ -131,10 +131,10 @@ const Resources = () => {
       </section>
 
       {/* Newsletter Section */}
-      <section className="py-20 px-4 bg-gradient-to-br from-blueberry via-blueberry/90 to-blueberry/80 text-white">
+      <section className="py-20 px-4 bg-cream/30">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-6 text-citrus">Stay Updated</h2>
-          <p className="text-xl mb-8 text-white/90">
+          <h2 className="text-4xl font-bold mb-6 text-earth">Stay Updated</h2>
+          <p className="text-xl mb-8 text-earth/70">
             Get the latest career tips, CV trends, and job market insights delivered to your inbox
           </p>
           
@@ -142,14 +142,14 @@ const Resources = () => {
             <input
               type="email"
               placeholder="Enter your email"
-              className="flex-1 px-4 py-3 rounded-lg text-blueberry focus:outline-none focus:ring-2 focus:ring-citrus"
+              className="flex-1 px-4 py-3 rounded-lg text-earth focus:outline-none focus:ring-2 focus:ring-zapier-orange border border-gray-200 hover:border-zapier-orange/50 transition-colors"
             />
-            <button className="bg-apricot text-white px-6 py-3 rounded-lg font-semibold hover:bg-apricot/90 transition-colors">
+            <button className="bg-zapier-orange text-white px-6 py-3 rounded-lg font-semibold hover:bg-zapier-orange/90 transition-colors">
               Subscribe
             </button>
           </div>
           
-          <p className="text-sm text-white/70 mt-4">
+          <p className="text-sm text-earth/60 mt-4">
             No spam, unsubscribe at any time
           </p>
         </div>
