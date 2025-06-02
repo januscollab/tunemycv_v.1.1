@@ -46,12 +46,12 @@ const AdvancedGenerationOptions: React.FC<AdvancedGenerationOptionsProps> = ({ v
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-      <CollapsibleTrigger className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+      <CollapsibleTrigger className="w-full flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
         <span className="font-medium text-left">Advanced Generation Options (Optional)</span>
         {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
       </CollapsibleTrigger>
       
-      <CollapsibleContent className="mt-4 space-y-4 p-4 bg-gray-50/50 dark:bg-gray-800/50 rounded-lg border">
+      <CollapsibleContent className="mt-4 space-y-2 p-3 bg-gray-50/50 dark:bg-gray-800/50 rounded-lg border">
         <div>
           <Label htmlFor="workHighlights" className="text-sm font-medium">
             Key Work Experience Highlights
@@ -61,7 +61,7 @@ const AdvancedGenerationOptions: React.FC<AdvancedGenerationOptionsProps> = ({ v
             placeholder="Mention specific achievements, metrics, or experiences you want emphasized in your cover letter..."
             value={value.workExperienceHighlights}
             onChange={(e) => handleChange('workExperienceHighlights', e.target.value)}
-            rows={3}
+            rows={1}
             className="mt-1"
           />
         </div>
@@ -75,7 +75,7 @@ const AdvancedGenerationOptions: React.FC<AdvancedGenerationOptionsProps> = ({ v
             placeholder="Write a personalized opening line or mention how you discovered the company/role..."
             value={value.customHookOpener}
             onChange={(e) => handleChange('customHookOpener', e.target.value)}
-            rows={2}
+            rows={1}
             className="mt-1"
           />
         </div>
@@ -89,12 +89,12 @@ const AdvancedGenerationOptions: React.FC<AdvancedGenerationOptionsProps> = ({ v
             placeholder="Describe what motivates you professionally or values that align with the company culture..."
             value={value.personalValues}
             onChange={(e) => handleChange('personalValues', e.target.value)}
-            rows={2}
+            rows={1}
             className="mt-1"
           />
         </div>
 
-        <div className="flex items-center space-x-2 pt-2">
+        <div className="flex items-center space-x-2 pt-1">
           <Checkbox
             id="includeLinkedIn"
             checked={value.includeLinkedInUrl}

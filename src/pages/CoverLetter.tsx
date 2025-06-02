@@ -20,6 +20,7 @@ import AnalysisSelector from '@/components/cover-letter/AnalysisSelector';
 import AdvancedGenerationOptions from '@/components/cover-letter/AdvancedGenerationOptions';
 import DownloadOptions from '@/components/cover-letter/DownloadOptions';
 import EditableCoverLetter from '@/components/cover-letter/EditableCoverLetter';
+import NoAnalysisModal from '@/components/cover-letter/NoAnalysisModal';
 
 const CoverLetter = () => {
   const { user } = useAuth();
@@ -50,6 +51,7 @@ const CoverLetter = () => {
   const [generationMethod, setGenerationMethod] = useState<'input' | 'analysis'>('input');
   const [selectedAnalysisId, setSelectedAnalysisId] = useState<string>('');
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [showNoAnalysisModal, setShowNoAnalysisModal] = useState(false);
 
   const lengthOptions = [
     { value: 'short', label: 'Short (150-200 words)', description: 'Brief and to the point' },
@@ -120,6 +122,15 @@ const CoverLetter = () => {
     if (validationErrors.length > 0) {
       setValidationErrors([]);
     }
+  };
+
+  const handleGenerationMethodChange = (method: 'input' | 'analysis') => {
+    // Remove the incorrect check - let AnalysisSelector handle the empty state
+    setGenerationMethod(method);
+  };
+
+  const handleUseManualInput = () => {
+    setGenerationMethod('input');
   };
 
   const handleGenerate = async () => {
@@ -267,7 +278,7 @@ const CoverLetter = () => {
                 subtitle={coverLetterExplanation.subtitle}
                 benefits={coverLetterExplanation.benefits}
                 features={coverLetterExplanation.features}
-                icon={<FileText className="h-8 w-8 text-apricot mr-2" />}
+                icon={<FileText className="h-8 w-8 text-apricot" />}
                 compact={true}
               />
             </div>
@@ -310,19 +321,24 @@ const CoverLetter = () => {
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-3xl sm:text-4xl font-bold text-blueberry dark:text-citrus mb-4 flex items-center">
-                <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-apricot mr-3" />
-                Generate Cover Letter
-              </h1>
-              <p className="text-lg sm:text-xl text-blueberry/80 dark:text-apple-core max-w-2xl">
+              <div className="flex items-center mb-4">
+                <FileText className="h-10 w-10 text-apricot mr-3" />
+                <h1 className="text-4xl font-bold text-blueberry dark:text-citrus">
+                  Generate Cover Letter
+                </h1>
+              </div>
+              <p className="text-xl text-blueberry/80 dark:text-apple-core max-w-3xl">
                 Generate tailored cover letters that highlight your strengths and align with specific job requirements.
               </p>
             </div>
-            <Badge variant="outline" className="text-apricot border-apricot text-base sm:text-lg px-3 py-2 self-start sm:self-auto">
-              {credits} Credits Available
-            </Badge>
           </div>
         </div>
+
+        <NoAnalysisModal
+          isOpen={showNoAnalysisModal}
+          onClose={() => setShowNoAnalysisModal(false)}
+          onUseManualInput={handleUseManualInput}
+        />
 
         {showSavePrompt && (
           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
@@ -380,7 +396,7 @@ const CoverLetter = () => {
                         <Label className="text-base font-medium">How would you like to generate your cover letter?</Label>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                           <button
-                            onClick={() => setGenerationMethod('input')}
+                            onClick={() => handleGenerationMethodChange('input')}
                             className={`p-4 border rounded-lg text-left transition-colors ${
                               generationMethod === 'input'
                                 ? 'border-apricot bg-apricot/5'
@@ -397,7 +413,7 @@ const CoverLetter = () => {
                           </button>
                           
                           <button
-                            onClick={() => setGenerationMethod('analysis')}
+                            onClick={() => handleGenerationMethodChange('analysis')}
                             className={`p-4 border rounded-lg text-left transition-colors ${
                               generationMethod === 'analysis'
                                 ? 'border-apricot bg-apricot/5'
@@ -553,7 +569,7 @@ const CoverLetter = () => {
                         )}
                       </Button>
                       <p className="text-sm text-gray-600 dark:text-gray-400 text-center mt-2">
-                        1 credit will be used to generate your personalized cover letter
+                        Our AI uses the info above to generate a tailored cover letter, to help you stand out.
                       </p>
                     </CardContent>
                   </Card>

@@ -1,14 +1,12 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle, Sparkles } from 'lucide-react';
 
 interface ServiceExplanationProps {
   title: string;
   subtitle: string;
   benefits: string[];
   features: string[];
-  icon?: React.ReactNode;
+  icon: React.ReactNode;
   compact?: boolean;
 }
 
@@ -21,49 +19,58 @@ const ServiceExplanation: React.FC<ServiceExplanationProps> = ({
   compact = false
 }) => {
   return (
-    <div className="lg:col-span-2 space-y-6">
-      <div className="text-center mb-8">
-        <div className="flex items-center justify-center mb-4">
-          {icon || <Sparkles className="h-8 w-8 text-apricot" />}
+    <div className={`bg-white dark:bg-blueberry/20 rounded-xl shadow-lg p-8 border border-apple-core/30 dark:border-citrus/20 h-full ${compact ? 'max-w-2xl' : ''}`}>
+      <div className="flex items-center mb-6">
+        <div className="mr-4">
+          {icon}
         </div>
-        <h1 className="text-4xl font-bold text-blueberry dark:text-citrus mb-4">{title}</h1>
-        <p className="text-xl text-blueberry/80 dark:text-apple-core max-w-2xl mx-auto">
-          {subtitle}
-        </p>
+        <div>
+          <h2 className="text-3xl font-bold text-blueberry dark:text-citrus mb-2">
+            {title}
+          </h2>
+          <p className="text-lg text-blueberry/80 dark:text-apple-core/80">
+            {subtitle}
+          </p>
+        </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-xl text-blueberry dark:text-citrus">Why Use Our Service?</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <h3 className="text-base font-semibold text-blueberry dark:text-citrus mb-2">Key Benefits</h3>
-            <ul className="space-y-1">
-              {(compact ? benefits.slice(0, 3) : benefits).map((benefit, index) => (
-                <li key={index} className="flex items-start space-x-2">
-                  <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-blueberry/80 dark:text-apple-core/80">{benefit}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+      <div className="space-y-6">
+        <div>
+          <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mb-3">
+            Key Benefits
+          </h3>
+          <ul className="space-y-2">
+            {benefits.map((benefit, index) => (
+              <li key={index} className="flex items-start">
+                <div className="w-2 h-2 bg-apricot rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                <span className="text-blueberry/80 dark:text-apple-core/80">
+                  {benefit}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
 
-          <div>
-            <h3 className="text-base font-semibold text-blueberry dark:text-citrus mb-2">How It Works</h3>
-            <div className="space-y-2">
-              {(compact ? features.slice(0, 3) : features).map((feature, index) => (
-                <div key={index} className="flex items-start space-x-2">
-                  <div className="bg-apricot text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium flex-shrink-0">
+        <div>
+          <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mb-3">
+            How It Works
+          </h3>
+          <ul className="space-y-2">
+            {features.map((feature, index) => (
+              <li key={index} className="flex items-start">
+                <div className="w-6 h-6 bg-citrus/20 rounded-full flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                  <span className="text-xs font-semibold text-citrus">
                     {index + 1}
-                  </div>
-                  <span className="text-sm text-blueberry/80 dark:text-apple-core/80">{feature}</span>
+                  </span>
                 </div>
-              ))}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+                <span className="text-blueberry/80 dark:text-apple-core/80">
+                  {feature}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
     </div>
   );
 };
