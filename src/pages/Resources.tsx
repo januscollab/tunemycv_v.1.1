@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { FileText, Users, BookOpen, Target, TrendingUp, CheckCircle } from 'lucide-react';
+import { FileText, Users, BookOpen, Target, TrendingUp, CheckCircle, AlertCircle } from 'lucide-react';
 
 const Resources = () => {
   const resources = [
@@ -96,6 +96,18 @@ const Resources = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Work in Progress Banner */}
+      <div className="bg-zapier-orange/10 border-b border-zapier-orange/20 py-3 px-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex items-center justify-center space-x-3">
+            <AlertCircle className="h-5 w-5 text-zapier-orange" />
+            <p className="text-sm text-zapier-orange font-medium">
+              📚 Work in Progress: We're adding vital career resources. Check back soon for updates!
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-apple-core/30 via-white to-citrus/20 dark:from-blueberry/30 dark:via-gray-900 dark:to-citrus/10 py-10 px-4">
         <div className="max-w-4xl mx-auto text-center">

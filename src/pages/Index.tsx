@@ -12,7 +12,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
       {/* Hero Section */}
-      <section className="py-20 px-4">
+      <section className="py-10 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center bg-zapier-orange/10 text-zapier-orange px-4 py-2 rounded-full text-sm font-medium mb-6">
             <Sparkles className="h-4 w-4 mr-2" />
@@ -64,7 +64,7 @@ const Index = () => {
       </section>
 
       {/* Features Grid */}
-      <section className="py-20 px-4 bg-cream/30">
+      <section className="py-10 px-4 bg-cream/30">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-earth dark:text-white mb-4">
@@ -117,7 +117,7 @@ const Index = () => {
                 Prepare for interviews with personalized questions and expert guidance tailored to your target role.
               </p>
               <Link
-                to={user ? "/analyze" : "/auth"}
+                to={user ? "/analyze?tab=interview-prep" : "/auth"}
                 className="text-zapier-orange font-semibold hover:text-zapier-orange/80 transition-colors inline-flex items-center"
               >
                 Prepare Now <ArrowRight className="ml-1 h-4 w-4" />
@@ -134,7 +134,7 @@ const Index = () => {
       <Testimonials />
 
       {/* CTA Section */}
-      <section className="py-20 px-4 bg-gradient-to-r from-zapier-orange to-orange-600">
+      <section className="py-10 px-4 bg-gradient-to-r from-zapier-orange to-orange-600">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-bold text-white mb-6">
             Ready to Transform Your Career?

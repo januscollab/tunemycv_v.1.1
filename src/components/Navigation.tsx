@@ -30,11 +30,14 @@ const Navigation = () => {
   const navItems = [
     { path: '/analyze', label: 'Analyze CV' },
     { path: '/cover-letter', label: 'Cover Letter' },
-    { path: '/next-steps', label: 'Next Steps' },
+    { path: '/analyze?tab=interview-prep', label: 'Interview Prep' },
     { path: '/resources', label: 'Resources' },
   ];
 
   const isActive = (path: string) => {
+    if (path === '/analyze?tab=interview-prep') {
+      return location.pathname === '/analyze' && location.search.includes('tab=interview-prep');
+    }
     return location.pathname === path;
   };
 
