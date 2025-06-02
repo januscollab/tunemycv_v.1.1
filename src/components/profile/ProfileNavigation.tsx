@@ -17,19 +17,19 @@ const ProfileNavigation: React.FC<ProfileNavigationProps> = ({ activeTab, onTabC
   ];
 
   return (
-    <nav className="mb-6">
+    <nav className="mb-8">
       {/* Desktop horizontal navigation */}
-      <div className="hidden md:flex space-x-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+      <div className="hidden md:flex space-x-1 bg-cream/50 rounded-lg p-1">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           return (
             <button
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
-              className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors flex-1 justify-center ${
+              className={`flex items-center px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex-1 justify-center ${
                 activeTab === tab.id
-                  ? 'bg-white dark:bg-gray-700 text-blue-700 dark:text-blue-300 shadow-sm'
-                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-gray-700/50'
+                  ? 'bg-white text-zapier-orange border border-border'
+                  : 'text-earth hover:text-zapier-orange hover:bg-white/50'
               }`}
             >
               <Icon className="h-4 w-4 mr-2" />
@@ -48,10 +48,10 @@ const ProfileNavigation: React.FC<ProfileNavigationProps> = ({ activeTab, onTabC
             <button
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
-              className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+              className={`w-full flex items-center px-4 py-3 text-sm font-semibold rounded-lg transition-colors ${
                 activeTab === tab.id
-                  ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-r-2 border-blue-700 dark:border-blue-300'
-                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800'
+                  ? 'bg-white text-zapier-orange border border-border'
+                  : 'text-earth hover:text-zapier-orange hover:bg-cream/30'
               }`}
             >
               <Icon className="h-5 w-5 mr-3" />

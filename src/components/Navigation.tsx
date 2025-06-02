@@ -37,49 +37,49 @@ const Navigation = () => {
   const navItems = user ? loggedInNavItems : loggedOutNavItems;
 
   return (
-    <nav className="bg-white dark:bg-blueberry shadow-sm border-b border-apple-core/20 dark:border-citrus/20">
+    <nav className="bg-white border-b border-border">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-14">
+        <div className="flex justify-between h-16">
           <NavigationLogo />
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-6">
+          <div className="hidden md:flex items-center space-x-8">
             {navItems.map((item) => {
               const Icon = item.icon;
               return (
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center px-3 py-2 text-sm font-medium transition-colors relative ${
+                  className={`flex items-center px-3 py-2 text-sm font-semibold transition-colors relative ${
                     isActive(item.path)
-                      ? 'text-apricot'
-                      : 'text-blueberry dark:text-apple-core hover:text-apricot'
+                      ? 'text-zapier-orange'
+                      : 'text-earth hover:text-zapier-orange'
                   }`}
                 >
                   <Icon className="h-4 w-4 mr-2" />
                   {item.label}
                   {isActive(item.path) && (
-                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-apricot"></div>
+                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-zapier-orange"></div>
                   )}
                 </Link>
               );
             })}
             
             {user ? (
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-4">
                 {isAdmin && (
                   <Link
                     to="/admin"
-                    className={`flex items-center px-3 py-2 text-sm font-medium transition-colors relative ${
+                    className={`flex items-center px-3 py-2 text-sm font-semibold transition-colors relative ${
                       isActive('/admin')
-                        ? 'text-apricot'
-                        : 'text-blueberry dark:text-apple-core hover:text-apricot'
+                        ? 'text-zapier-orange'
+                        : 'text-earth hover:text-zapier-orange'
                     }`}
                   >
                     <Shield className="h-4 w-4 mr-2" />
                     Admin
                     {isActive('/admin') && (
-                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-apricot"></div>
+                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-zapier-orange"></div>
                     )}
                   </Link>
                 )}
@@ -100,7 +100,7 @@ const Navigation = () => {
             <ThemeToggle />
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="text-blueberry dark:text-apple-core hover:text-apricot focus:outline-none"
+              className="text-earth hover:text-zapier-orange focus:outline-none"
             >
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
@@ -110,7 +110,7 @@ const Navigation = () => {
         {/* Mobile Navigation */}
         {isOpen && (
           <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-apple-core/20 dark:border-citrus/20">
+            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-border">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 return (
@@ -118,10 +118,10 @@ const Navigation = () => {
                     key={item.path}
                     to={item.path}
                     onClick={() => setIsOpen(false)}
-                    className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    className={`flex items-center px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
                       isActive(item.path)
-                        ? 'text-apricot bg-citrus/10'
-                        : 'text-blueberry dark:text-apple-core hover:text-apricot hover:bg-apple-core/10 dark:hover:bg-citrus/10'
+                        ? 'text-zapier-orange bg-cream/50'
+                        : 'text-earth hover:text-zapier-orange hover:bg-cream/30'
                     }`}
                   >
                     <Icon className="h-4 w-4 mr-3" />
@@ -136,10 +136,10 @@ const Navigation = () => {
                     <Link
                       to="/admin"
                       onClick={() => setIsOpen(false)}
-                      className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                      className={`flex items-center px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
                         isActive('/admin')
-                          ? 'text-apricot bg-citrus/10'
-                          : 'text-blueberry dark:text-apple-core hover:text-apricot hover:bg-apple-core/10 dark:hover:bg-citrus/10'
+                          ? 'text-zapier-orange bg-cream/50'
+                          : 'text-earth hover:text-zapier-orange hover:bg-cream/30'
                       }`}
                     >
                       <Shield className="h-4 w-4 mr-3" />
@@ -149,10 +149,10 @@ const Navigation = () => {
                   <Link
                     to="/profile"
                     onClick={() => setIsOpen(false)}
-                    className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    className={`flex items-center px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
                       isActive('/profile')
-                        ? 'text-apricot bg-citrus/10'
-                        : 'text-blueberry dark:text-apple-core hover:text-apricot hover:bg-apple-core/10 dark:hover:bg-citrus/10'
+                        ? 'text-zapier-orange bg-cream/50'
+                        : 'text-earth hover:text-zapier-orange hover:bg-cream/30'
                     }`}
                   >
                     <User className="h-4 w-4 mr-3" />
@@ -163,7 +163,7 @@ const Navigation = () => {
                 <Link
                   to="/auth"
                   onClick={() => setIsOpen(false)}
-                  className="block px-3 py-2 bg-apricot text-white rounded-md text-sm font-medium hover:bg-apricot/90 transition-colors"
+                  className="block px-3 py-2 bg-zapier-orange text-white rounded-lg text-sm font-semibold hover:bg-zapier-orange/90 transition-colors"
                 >
                   Sign In
                 </Link>
