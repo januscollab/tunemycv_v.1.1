@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -85,8 +86,8 @@ const AnalyzeCV = () => {
     setAnalyzing(true);
     try {
       const uploadedFiles = {
-        cv: selectedFile ? { file: selectedFile, id: '', extractedText: '', type: 'cv' as const } : undefined,
-        jobDescription: jobDescriptionFile ? { file: jobDescriptionFile, id: '', extractedText: jobDescriptionText, type: 'job_description' as const } : undefined
+        cv: selectedFile ? { file: selectedFile, id: '', extractedText: '' } : undefined,
+        jobDescription: jobDescriptionFile ? { file: jobDescriptionFile, id: '', extractedText: jobDescriptionText } : undefined
       };
 
       const result = await executeAnalysis(
@@ -212,7 +213,7 @@ const AnalyzeCV = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
-      <div className="max-w-4xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-earth dark:text-white mb-4">
             Analyze Your CV
@@ -224,7 +225,7 @@ const AnalyzeCV = () => {
 
         <div className="flex gap-6">
           {/* Main Content */}
-          <div className="flex-1">
+          <div className="flex-1" style={{ width: '80%' }}>
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-3 mb-6">
                 <TabsTrigger value="analyze" className="flex items-center space-x-2">
@@ -274,7 +275,7 @@ const AnalyzeCV = () => {
 
               <TabsContent value="results">
                 {analysisResult && (
-                  <AnalysisResults analysis={analysisResult} />
+                  <AnalysisResults analysisResult={analysisResult} />
                 )}
               </TabsContent>
 
@@ -300,7 +301,7 @@ const AnalyzeCV = () => {
           </div>
 
           {/* Credits Panel */}
-          <div className="w-[200px]">
+          <div className="w-[180px]">
             <CreditsPanel credits={credits} hasCreditsForAI={hasCreditsForAI} />
           </div>
         </div>
