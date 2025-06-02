@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -10,7 +11,7 @@ import AnalyzeButton from '@/components/analyze/AnalyzeButton';
 import { useAnalysis } from '@/hooks/useAnalysis';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { FileText, History, Eye } from 'lucide-react';
+import { FileText, History, MessageSquare } from 'lucide-react';
 import EmbeddedAuth from '@/components/auth/EmbeddedAuth';
 import ServiceExplanation from '@/components/common/ServiceExplanation';
 import { UploadedFile } from '@/types/fileTypes';
@@ -142,7 +143,7 @@ const AnalyzeCV = () => {
     setActiveTab('analysis');
   };
 
-  const canAnalyze = uploadedFiles.jobDescription; // Only job description is required now
+  const canAnalyze = !!uploadedFiles.jobDescription; // Fixed: properly check if job description exists
   const hasCreditsForAI = userCredits?.credits && userCredits.credits > 0;
 
   // Logged-out user experience
@@ -247,9 +248,9 @@ const AnalyzeCV = () => {
                   <FileText className="h-4 w-4" />
                   <span>CV Analysis</span>
                 </TabsTrigger>
-                <TabsTrigger value="report" className="flex items-center space-x-2 text-sm" disabled={!analysisResult}>
-                  <Eye className="h-4 w-4" />
-                  <span>Current Result</span>
+                <TabsTrigger value="interview-prep" className="flex items-center space-x-2 text-sm">
+                  <MessageSquare className="h-4 w-4" />
+                  <span>Interview Prep</span>
                 </TabsTrigger>
                 <TabsTrigger value="history" className="flex items-center space-x-2 text-sm">
                   <History className="h-4 w-4" />
@@ -306,47 +307,27 @@ const AnalyzeCV = () => {
                   </div>
 
                   {/* Analyze Button */}
-                  <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-5 border border-apple-core/20 dark:border-citrus/20">
-                    <button
-                      onClick={handleAnalysis}
-                      disabled={!canAnalyze || analyzing}
-                      className={`w-full py-4 px-6 rounded-lg text-lg font-semibold transition-colors ${
-                        canAnalyze && !analyzing && hasCreditsForAI
-                          ? 'bg-zapier-orange text-white hover:bg-zapier-orange/90'
-                          : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                      }`}
-                    >
-                      {analyzing ? 'Analyzing...' : 'Start AI Analysis of CV'}
-                    </button>
-                    
-                    {!hasCreditsForAI && (
-                      <p className="text-sm text-red-500 mt-2 text-center">
-                        You need AI credits to perform analysis. Check the credits panel for options.
-                      </p>
-                    )}
-                  </div>
+                  <AnalyzeButton
+                    onAnalyze={handleAnalysis}
+                    canAnalyze={canAnalyze}
+                    analyzing={analyzing}
+                    hasCreditsForAI={hasCreditsForAI}
+                  />
                 </div>
               </TabsContent>
 
-              {/* Current Report Tab */}
-              <TabsContent value="report" className="mt-0">
-                {analysisResult ? (
-                  <AnalysisResults result={analysisResult} onStartNew={handleStartNew} />
-                ) : (
-                  <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-8 border border-apple-core/20 dark:border-citrus/20 text-center">
-                    <Eye className="h-12 w-12 text-blueberry/30 dark:text-apple-core/50 mx-auto mb-3" />
-                    <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-2">No Report Available</h3>
-                    <p className="text-blueberry/60 dark:text-apple-core/70 mb-4 text-sm">
-                      Complete a CV analysis to view your report here.
-                    </p>
-                    <button
-                      onClick={() => setActiveTab('analysis')}
-                      className="bg-zapier-orange hover:bg-zapier-orange/90 text-white px-4 py-2 rounded-md transition-colors text-sm"
-                    >
-                      Start Analysis
-                    </button>
+              {/* Interview Prep Tab */}
+              <TabsContent value="interview-prep" className="mt-0">
+                <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-8 border border-apple-core/20 dark:border-citrus/20 text-center">
+                  <MessageSquare className="h-12 w-12 text-blueberry/30 dark:text-apple-core/50 mx-auto mb-3" />
+                  <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-2">Interview Prep Coming Soon!</h3>
+                  <p className="text-blueberry/60 dark:text-apple-core/70 mb-4 text-sm">
+                    We're working on an exciting new feature that will help you prepare for interviews with personalized questions and expert guidance.
+                  </p>
+                  <div className="inline-block bg-zapier-orange/10 text-zapier-orange px-4 py-2 rounded-full text-sm font-medium">
+                    Coming Soon
                   </div>
-                )}
+                </div>
               </TabsContent>
 
               {/* Analysis History Tab */}

@@ -21,7 +21,7 @@ const AnalyzeButton: React.FC<AnalyzeButtonProps> = ({
         <button
           onClick={onAnalyze}
           disabled={!canAnalyze || analyzing}
-          className={`w-full py-3 px-5 rounded-lg font-semibold text-lg transition-colors ${
+          className={`w-full py-4 px-6 rounded-lg text-lg font-semibold transition-colors ${
             canAnalyze && !analyzing
               ? 'bg-zapier-orange text-white hover:bg-zapier-orange/90'
               : 'bg-gray-300 text-gray-500 cursor-not-allowed'
