@@ -109,9 +109,13 @@ const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ credits, member
   };
 
   const handleInterviewPrep = (analysis: AnalysisResult) => {
-    setUpcomingFeatureModal({
-      isOpen: true,
-      featureType: 'interview-prep'
+    console.log('Navigating to Interview Prep with analysis:', analysis);
+    // Navigate to Analyze CV page with Interview Prep tab and analysis data
+    navigate('/analyze?tab=interview-prep', {
+      state: {
+        analysis: analysis,
+        source: 'history'
+      }
     });
   };
 

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -8,6 +7,7 @@ import CVSelector from '@/components/analyze/CVSelector';
 import JobDescriptionInput from '@/components/analyze/JobDescriptionInput';
 import CreditsPanel from '@/components/analyze/CreditsPanel';
 import AnalyzeButton from '@/components/analyze/AnalyzeButton';
+import InterviewPrepAnalysisSelector from '@/components/analyze/InterviewPrepAnalysisSelector';
 import { useAnalysis } from '@/hooks/useAnalysis';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -17,10 +17,13 @@ import ServiceExplanation from '@/components/common/ServiceExplanation';
 import { UploadedFile } from '@/types/fileTypes';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AnalysisHistoryTab from '@/components/profile/AnalysisHistoryTab';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const AnalyzeCV = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [uploading, setUploading] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<{
     cv?: UploadedFile;
@@ -28,7 +31,16 @@ const AnalyzeCV = () => {
   }>({});
   const [jobTitle, setJobTitle] = useState('');
   const [currentLoadingMessage, setCurrentLoadingMessage] = useState('');
-  const [activeTab, setActiveTab] = useState('analysis');
+  
+  // Get initial tab from URL parameter or location state
+  const urlParams = new URLSearchParams(location.search);
+  const tabFromUrl = urlParams.get('tab');
+  const initialTab = tabFromUrl || 'analysis';
+  const [activeTab, setActiveTab] = useState(initialTab);
+
+  // Handle pre-loaded analysis from navigation state
+  const navigationState = location.state as { analysis?: any; source?: string } | null;
+  const [preloadedAnalysis, setPreloadedAnalysis] = useState(navigationState?.analysis || null);
 
   const { analyzing, analysisResult, setAnalysisResult, performAnalysis } = useAnalysis();
 
@@ -85,6 +97,21 @@ const AnalyzeCV = () => {
     enabled: !!user?.id,
   });
 
+  // Update the tab when URL changes
+  React.useEffect(() => {
+    if (tabFromUrl && tabFromUrl !== activeTab) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [tabFromUrl]);
+
+  // Clear URL state after it's been processed
+  React.useEffect(() => {
+    if (navigationState) {
+      // Clear the navigation state by replacing the current history entry
+      navigate(location.pathname + location.search, { replace: true });
+    }
+  }, []);
+
   const handleCVSelect = (uploadedFile: UploadedFile) => {
     setUploadedFiles(prev => ({
       ...prev,
@@ -140,7 +167,12 @@ const AnalyzeCV = () => {
     setAnalysisResult(null);
     setUploadedFiles({});
     setJobTitle('');
+    setPreloadedAnalysis(null);
     setActiveTab('analysis');
+  };
+
+  const handleDeselectAnalysis = () => {
+    setPreloadedAnalysis(null);
   };
 
   const canAnalyze = !!uploadedFiles.jobDescription; // Fixed: properly check if job description exists
@@ -318,15 +350,24 @@ const AnalyzeCV = () => {
 
               {/* Interview Prep Tab */}
               <TabsContent value="interview-prep" className="mt-0">
-                <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-8 border border-apple-core/20 dark:border-citrus/20 text-center">
-                  <MessageSquare className="h-12 w-12 text-blueberry/30 dark:text-apple-core/50 mx-auto mb-3" />
-                  <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-2">Interview Prep Coming Soon!</h3>
-                  <p className="text-blueberry/60 dark:text-apple-core/70 mb-4 text-sm">
-                    We're working on an exciting new feature that will help you prepare for interviews with personalized questions and expert guidance.
-                  </p>
-                  <div className="inline-block bg-zapier-orange/10 text-zapier-orange px-4 py-2 rounded-full text-sm font-medium">
-                    Coming Soon
-                  </div>
+                <div className="space-y-6">
+                  {preloadedAnalysis ? (
+                    <InterviewPrepAnalysisSelector
+                      selectedAnalysis={preloadedAnalysis}
+                      onDeselect={handleDeselectAnalysis}
+                    />
+                  ) : (
+                    <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-8 border border-apple-core/20 dark:border-citrus/20 text-center">
+                      <MessageSquare className="h-12 w-12 text-blueberry/30 dark:text-apple-core/50 mx-auto mb-3" />
+                      <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-2">Interview Prep Coming Soon!</h3>
+                      <p className="text-blueberry/60 dark:text-apple-core/70 mb-4 text-sm">
+                        We're working on an exciting new feature that will help you prepare for interviews with personalized questions and expert guidance.
+                      </p>
+                      <div className="inline-block bg-zapier-orange/10 text-zapier-orange px-4 py-2 rounded-full text-sm font-medium">
+                        Coming Soon
+                      </div>
+                    </div>
+                  )}
                 </div>
               </TabsContent>
 
