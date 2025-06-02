@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FileText, Sparkles, Trash2, RefreshCw, Clock, FileUp, Search, AlertCircle, Eye, Edit } from 'lucide-react';
+import { FileText, Sparkles, Trash2, RefreshCw, Clock, FileUp, Search, AlertCircle, Eye, Edit, Download } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCoverLetter } from '@/hooks/useCoverLetter';
 import { useUserData } from '@/hooks/useUserData';
@@ -299,8 +299,8 @@ const CoverLetter = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 py-6">
-      <div className="max-w-4xl mx-auto px-4">
+    <div className="min-h-screen bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5 py-6">
+      <div className="max-w-5xl mx-auto px-4">
         <div className="mb-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
@@ -342,9 +342,9 @@ const CoverLetter = () => {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Main Content */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-3">
             <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="create">Generate New</TabsTrigger>
@@ -368,11 +368,11 @@ const CoverLetter = () => {
                     </Alert>
                   )}
 
-                  {/* Panel 1: Title and Generation Method Selection */}
+                  {/* Panel 1: Generation Method Selection */}
                   <Card className="border border-gray-200 dark:border-gray-700">
                     <CardHeader className="pb-3">
                       <CardTitle className="flex items-center text-xl font-semibold">
-                        <Sparkles className="h-5 w-5 text-apricot mr-2" />
+                        <Sparkles className="h-5 w-5 text-zapier-orange mr-2" />
                         Generate Cover Letter
                       </CardTitle>
                     </CardHeader>
@@ -381,15 +381,15 @@ const CoverLetter = () => {
                         <Label className="text-base font-medium">How would you like to generate your cover letter?</Label>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
                           <button
-                            onClick={() => handleGenerationMethodChange('input')}
+                            onClick={() => setGenerationMethod('input')}
                             className={`p-4 border rounded-md text-left transition-colors ${
                               generationMethod === 'input'
-                                ? 'border-apricot bg-apricot/5'
-                                : 'border-gray-200 hover:border-gray-300'
+                                ? 'border-zapier-orange bg-zapier-orange/5'
+                                : 'border-gray-200 hover:border-zapier-orange/50'
                             }`}
                           >
                             <div className="flex items-center mb-2">
-                              <FileUp className="h-5 w-5 text-apricot mr-2" />
+                              <FileUp className="h-5 w-5 text-zapier-orange mr-2" />
                               <span className="font-medium">Generate from Input</span>
                             </div>
                             <p className="text-sm font-normal text-gray-600">
@@ -398,15 +398,15 @@ const CoverLetter = () => {
                           </button>
                           
                           <button
-                            onClick={() => handleGenerationMethodChange('analysis')}
+                            onClick={() => setGenerationMethod('analysis')}
                             className={`p-4 border rounded-md text-left transition-colors ${
                               generationMethod === 'analysis'
-                                ? 'border-apricot bg-apricot/5'
-                                : 'border-gray-200 hover:border-gray-300'
+                                ? 'border-zapier-orange bg-zapier-orange/5'
+                                : 'border-gray-200 hover:border-zapier-orange/50'
                             }`}
                           >
                             <div className="flex items-center mb-2">
-                              <Search className="h-5 w-5 text-apricot mr-2" />
+                              <Search className="h-5 w-5 text-zapier-orange mr-2" />
                               <span className="font-medium">Generate from Analysis</span>
                             </div>
                             <p className="text-sm font-normal text-gray-600">
@@ -542,7 +542,7 @@ const CoverLetter = () => {
                       <Button
                         onClick={handleGenerate}
                         disabled={!canGenerate || isGenerating || credits < 1}
-                        className="w-full bg-apricot hover:bg-apricot/90 text-white font-medium"
+                        className="w-full bg-zapier-orange hover:bg-zapier-orange/90 text-white font-medium"
                       >
                         {isGenerating ? (
                           <>
@@ -706,7 +706,7 @@ const CoverLetter = () => {
                         {coverLetters.map((coverLetter) => (
                           <div
                             key={coverLetter.id}
-                            className="border rounded-md p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                            className="border rounded-md p-4 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-zapier-orange/50 transition-colors"
                           >
                             <div className="flex items-center justify-between">
                               <div className="flex-1">
@@ -721,34 +721,38 @@ const CoverLetter = () => {
                                 <div className="flex items-center gap-4 text-sm font-normal text-gray-600 dark:text-gray-400">
                                   <div className="flex items-center gap-1">
                                     <Clock className="h-3 w-3" />
-                                    {formatDate(coverLetter.created_at)}
+                                    {new Date(coverLetter.created_at).toLocaleDateString()}
                                   </div>
                                   {coverLetter.updated_at !== coverLetter.created_at && (
-                                    <div>Updated {formatDate(coverLetter.updated_at)}</div>
+                                    <div>Updated {new Date(coverLetter.updated_at).toLocaleDateString()}</div>
                                   )}
                                 </div>
                               </div>
-                              <div className="flex items-center space-x-2">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
+                              <div className="flex items-center space-x-3">
+                                <button
                                   onClick={() => handleViewCoverLetter(coverLetter)}
+                                  className="flex items-center text-sm text-gray-600 hover:text-zapier-orange transition-colors"
                                 >
                                   <Eye className="h-4 w-4 mr-1" />
                                   View
-                                </Button>
-                                <DownloadOptions
-                                  content={coverLetter.content}
-                                  fileName={`Cover_Letter_${coverLetter.company_name}_${coverLetter.job_title}`}
-                                />
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => handleDelete(coverLetter.id)}
+                                </button>
+                                <button
+                                  className="flex items-center text-sm text-gray-600 hover:text-zapier-orange transition-colors"
                                 >
-                                  <Trash2 className="h-4 w-4 mr-1" />
-                                  Delete
-                                </Button>
+                                  <Edit className="h-4 w-4 mr-1" />
+                                  Edit
+                                </button>
+                                <button
+                                  className="text-sm text-gray-600 hover:text-zapier-orange transition-colors"
+                                >
+                                  <Download className="h-4 w-4" />
+                                </button>
+                                <button
+                                  onClick={() => handleDelete(coverLetter.id)}
+                                  className="text-sm text-red-600 hover:text-zapier-orange transition-colors"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </button>
                               </div>
                             </div>
                           </div>
@@ -761,13 +765,20 @@ const CoverLetter = () => {
             </Tabs>
           </div>
 
-          {/* Credits Panel */}
+          {/* Credits Panel - Reduced Width */}
           <div className="lg:col-span-1">
             <CreditsPanel
               credits={credits}
               hasCreditsForAI={credits > 0}
             />
           </div>
+        </div>
+        
+        {/* Bottom CTA */}
+        <div className="text-center mt-16">
+          <button className="bg-zapier-orange text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange/90 transition-colors">
+            Create Your Perfect Cover Letter
+          </button>
         </div>
       </div>
     </div>

@@ -47,8 +47,13 @@ const AnalysisListItem: React.FC<AnalysisListItemProps> = ({
     onInterviewPrep(analysis);
   };
 
+  const handleView = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onViewDetails(analysis);
+  };
+
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+    <div className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow hover:border-zapier-orange/50">
       <div className="flex justify-between items-start">
         <div className="flex-1">
           <div className="flex items-center space-x-3 mb-2">
@@ -75,34 +80,33 @@ const AnalysisListItem: React.FC<AnalysisListItemProps> = ({
           </div>
         </div>
         
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-3">
           <button
             onClick={handleCoverLetter}
-            className="flex items-center px-3 py-2 text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-md transition-colors"
+            className="flex items-center px-3 py-2 text-sm text-blue-600 hover:text-zapier-orange hover:bg-zapier-orange/10 rounded-md transition-colors"
           >
             <FileText className="h-4 w-4 mr-1" />
             Cover Letter
           </button>
           <button
             onClick={handleInterviewPrep}
-            className="flex items-center px-3 py-2 text-sm text-green-600 hover:text-green-700 hover:bg-green-50 rounded-md transition-colors"
+            className="flex items-center px-3 py-2 text-sm text-green-600 hover:text-zapier-orange hover:bg-zapier-orange/10 rounded-md transition-colors"
           >
             <MessageSquare className="h-4 w-4 mr-1" />
             Interview Prep
           </button>
           <button
-            onClick={() => onViewDetails(analysis)}
-            className="flex items-center px-3 py-2 text-sm text-gray-600 hover:text-gray-700 hover:bg-gray-50 rounded-md transition-colors"
+            onClick={handleView}
+            className="flex items-center text-sm text-gray-600 hover:text-zapier-orange transition-colors"
           >
             <Eye className="h-4 w-4 mr-1" />
-            View Details
+            View
           </button>
           <button
             onClick={handleDelete}
-            className="flex items-center px-3 py-2 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors"
+            className="text-sm text-red-600 hover:text-zapier-orange transition-colors"
           >
-            <Trash2 className="h-4 w-4 mr-1" />
-            Delete
+            <Trash2 className="h-4 w-4" />
           </button>
         </div>
       </div>

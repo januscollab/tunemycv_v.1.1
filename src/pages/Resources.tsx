@@ -101,26 +101,26 @@ const Resources = () => {
           {/* Resources Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredResources.map((resource, index) => (
-              <div key={index} className="bg-white dark:bg-blueberry/20 rounded-xl shadow-lg p-4 hover:shadow-xl transition-shadow border border-apple-core/20 dark:border-citrus/20" style={{ height: '240px' }}>
-                <div className="bg-apricot/20 rounded-full w-12 h-12 flex items-center justify-center mb-4">
-                  <resource.icon className="h-6 w-6 text-apricot" />
+              <div key={index} className="bg-white dark:bg-blueberry/20 rounded-xl shadow-lg p-4 hover:shadow-xl transition-all border border-apple-core/20 dark:border-citrus/20 hover:border-zapier-orange/50" style={{ height: '144px' }}>
+                <div className="bg-apricot/20 rounded-full w-10 h-10 flex items-center justify-center mb-3">
+                  <resource.icon className="h-5 w-5 text-apricot" />
                 </div>
                 
-                <div className="mb-3">
+                <div className="mb-2">
                   <span className="inline-block bg-citrus/20 text-citrus px-2 py-1 rounded-full text-xs font-medium mb-2">
                     {resource.category}
                   </span>
-                  <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-2">
+                  <h3 className="text-base font-semibold text-blueberry dark:text-citrus mb-1 line-clamp-1">
                     {resource.title}
                   </h3>
-                  <p className="text-blueberry/70 dark:text-apple-core/80 leading-relaxed text-sm">
+                  <p className="text-blueberry/70 dark:text-apple-core/80 leading-relaxed text-xs line-clamp-2">
                     {resource.description}
                   </p>
                 </div>
                 
                 <a 
                   href={resource.link}
-                  className="inline-flex items-center text-apricot font-medium hover:text-zapier-orange transition-colors"
+                  className="inline-flex items-center text-apricot font-medium hover:text-zapier-orange transition-colors text-sm"
                 >
                   Read More →
                 </a>
@@ -142,7 +142,7 @@ const Resources = () => {
             <input
               type="email"
               placeholder="Enter your email"
-              className="flex-1 px-4 py-3 rounded-lg text-earth focus:outline-none focus:ring-2 focus:ring-zapier-orange"
+              className="flex-1 px-4 py-3 rounded-lg text-earth focus:outline-none focus:ring-2 focus:ring-zapier-orange border border-gray-200 hover:border-zapier-orange/50 transition-colors"
             />
             <button className="bg-zapier-orange text-white px-6 py-3 rounded-lg font-semibold hover:bg-zapier-orange/90 transition-colors">
               Subscribe

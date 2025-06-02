@@ -16,6 +16,7 @@ import EmbeddedAuth from '@/components/auth/EmbeddedAuth';
 import ServiceExplanation from '@/components/common/ServiceExplanation';
 import { UploadedFile } from '@/types/fileTypes';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import AnalysisHistoryTab from '@/components/profile/AnalysisHistoryTab';
 
 const AnalyzeCV = () => {
   const { user } = useAuth();
@@ -200,6 +201,13 @@ const AnalyzeCV = () => {
               </div>
             </div>
           </div>
+          
+          {/* Bottom CTA */}
+          <div className="text-center mt-16">
+            <button className="bg-zapier-orange text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange/90 transition-colors">
+              Get Started with CV Analysis
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -220,7 +228,7 @@ const AnalyzeCV = () => {
         </div>
       )}
       
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="max-w-5xl mx-auto px-4 py-8">
         {/* Header Section */}
         <div className="mb-6">
           <div className="flex items-start mb-3">
@@ -237,9 +245,9 @@ const AnalyzeCV = () => {
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Main Content Section */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-3">
             {/* Tabs Navigation */}
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-3 mb-6">
@@ -253,7 +261,7 @@ const AnalyzeCV = () => {
                 </TabsTrigger>
                 <TabsTrigger value="history" className="flex items-center space-x-2 text-sm">
                   <History className="h-4 w-4" />
-                  <span>History</span>
+                  <span>Analysis History</span>
                 </TabsTrigger>
               </TabsList>
 
@@ -268,7 +276,7 @@ const AnalyzeCV = () => {
                       value={jobTitle}
                       onChange={(e) => setJobTitle(e.target.value)}
                       placeholder="e.g., Senior Software Engineer (auto-extracted from job description)"
-                      className="w-full px-3 py-2 border border-apple-core/30 dark:border-citrus/30 rounded-md focus:outline-none focus:ring-2 focus:ring-apricot focus:border-transparent bg-white dark:bg-blueberry/10 text-blueberry dark:text-apple-core text-sm"
+                      className="w-full px-3 py-2 border border-apple-core/30 dark:border-citrus/30 rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange focus:border-transparent bg-white dark:bg-blueberry/10 text-blueberry dark:text-apple-core text-sm hover:border-zapier-orange/50 transition-colors"
                       disabled={analyzing}
                     />
                     <p className="text-xs text-blueberry/60 dark:text-apple-core/70 mt-2">
@@ -341,7 +349,7 @@ const AnalyzeCV = () => {
                     </p>
                     <button
                       onClick={() => setActiveTab('analysis')}
-                      className="bg-apricot hover:bg-apricot/90 text-white px-4 py-2 rounded-md transition-colors text-sm"
+                      className="bg-zapier-orange hover:bg-zapier-orange/90 text-white px-4 py-2 rounded-md transition-colors text-sm"
                     >
                       Start Analysis
                     </button>
@@ -351,29 +359,25 @@ const AnalyzeCV = () => {
 
               {/* Analysis History Tab */}
               <TabsContent value="history" className="mt-0">
-                <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-8 border border-apple-core/20 dark:border-citrus/20 text-center">
-                  <History className="h-12 w-12 text-blueberry/30 dark:text-apple-core/50 mx-auto mb-3" />
-                  <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-2">Analysis History</h3>
-                  <p className="text-blueberry/60 dark:text-apple-core/70 mb-3 text-sm">
-                    Coming soon! This feature will allow you to view and manage your previous CV analyses.
-                  </p>
-                  <div className="inline-flex items-center px-3 py-2 bg-blueberry/5 dark:bg-apple-core/5 rounded-md">
-                    <span className="text-xs text-blueberry/60 dark:text-apple-core/70">
-                      🚧 Feature in development
-                    </span>
-                  </div>
-                </div>
+                <AnalysisHistoryTab credits={userCredits?.credits || 0} memberSince="" />
               </TabsContent>
             </Tabs>
           </div>
 
-          {/* Credits Panel */}
+          {/* Credits Panel - Reduced Width */}
           <div className="lg:col-span-1">
             <CreditsPanel
               credits={userCredits?.credits || 0}
               hasCreditsForAI={hasCreditsForAI}
             />
           </div>
+        </div>
+        
+        {/* Bottom CTA */}
+        <div className="text-center mt-16">
+          <button className="bg-zapier-orange text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange/90 transition-colors">
+            Start Your CV Analysis Today
+          </button>
         </div>
       </div>
     </div>
