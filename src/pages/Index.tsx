@@ -1,4 +1,3 @@
-
 import { ArrowRight, CheckCircle, TrendingUp, Users, Star, Upload } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -17,12 +16,12 @@ const Index = () => {
       {/* Hero Section */}
       <section id="hero" className="bg-background py-20 px-4 relative overflow-hidden">
         <div className="max-w-4xl mx-auto text-center relative z-10">
-          <h1 className="text-5xl md:text-6xl font-bold text-earth mb-8 leading-tight font-display">
+          <h1 className="text-5xl md:text-6xl font-bold text-earth mb-8 leading-tight font-sans">
             Optimize Your CV, <span className="text-zapier-orange">Accelerate Your Career</span>
           </h1>
           <p className="text-xl text-earth/70 mb-10 max-w-2xl mx-auto leading-relaxed font-normal">
-            TuneMyCV is an AI-powered platform that helps job seekers improve their CVs, 
-            pass ATS systems, and increase their chances of landing their dream job.
+            TuneMyCV is an AI-powered platform trained on our models that helps job seekers improve their CVs, 
+            generate impactful cover letters, and increase their chances of landing their dream job.
           </p>
           
           {user ? (
