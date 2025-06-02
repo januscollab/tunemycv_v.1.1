@@ -9,7 +9,6 @@ export const useAnalysisState = () => {
   const [jobDescriptionText, setJobDescriptionText] = useState('');
   const [inputMethod, setInputMethod] = useState<'text' | 'file'>('text');
   const [analysisResult, setAnalysisResult] = useState<any>(null);
-  const [analyzing, setAnalyzing] = useState(false);
 
   return {
     selectedCVId,
@@ -25,8 +24,6 @@ export const useAnalysisState = () => {
     inputMethod,
     setInputMethod,
     analysisResult,
-    setAnalysisResult,
-    analyzing,
-    setAnalyzing
+    setAnalysisResult
   };
 };

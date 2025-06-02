@@ -21,6 +21,7 @@ const AnalyzeCV = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('analyze');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   
   const {
     selectedCVId,
@@ -36,9 +37,7 @@ const AnalyzeCV = () => {
     inputMethod,
     setInputMethod,
     analysisResult,
-    setAnalysisResult,
-    analyzing,
-    setAnalyzing
+    setAnalysisResult
   } = useAnalysisState();
 
   const { executeAnalysis } = useAnalysisExecution();
@@ -83,25 +82,16 @@ const AnalyzeCV = () => {
   const hasCreditsForAI = credits > 0;
 
   const handleAnalyze = async () => {
-    setAnalyzing(true);
+    setIsAnalyzing(true);
     try {
-      const uploadedFiles = {
-        cv: selectedFile ? { file: selectedFile, id: '', extractedText: '' } : undefined,
-        jobDescription: jobDescriptionFile ? { file: jobDescriptionFile, id: '', extractedText: jobDescriptionText } : undefined
-      };
-
-      const result = await executeAnalysis(
-        uploadedFiles,
-        jobDescription || 'Analysis Request',
-        true,
-        userCredits,
-        {
-          saveCV: false,
-          saveJobDescription: false,
-          cvSource: selectedFile ? 'new' : 'saved',
-          existingCVId: selectedFile ? undefined : selectedCVId
-        }
-      );
+      const result = await executeAnalysis({
+        selectedCVId,
+        selectedFile,
+        jobDescriptionFile,
+        jobDescriptionText,
+        inputMethod,
+        jobDescription
+      });
 
       if (result) {
         setAnalysisResult(result);
@@ -111,7 +101,7 @@ const AnalyzeCV = () => {
     } catch (error) {
       console.error('Analysis failed:', error);
     } finally {
-      setAnalyzing(false);
+      setIsAnalyzing(false);
     }
   };
 
@@ -254,19 +244,19 @@ const AnalyzeCV = () => {
 
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
                   <JobDescriptionInput
-                    onJobDescriptionSet={(text, file) => {
-                      setJobDescriptionText(text);
-                      setJobDescriptionFile(file);
-                    }}
+                    jobDescriptionFile={jobDescriptionFile}
+                    setJobDescriptionFile={setJobDescriptionFile}
+                    jobDescriptionText={jobDescriptionText}
+                    setJobDescriptionText={setJobDescriptionText}
                     inputMethod={inputMethod}
-                    onInputMethodChange={setInputMethod}
+                    setInputMethod={setInputMethod}
                   />
                 </div>
 
                 <div className="flex justify-center">
                   <AnalyzeButton
                     onAnalyze={handleAnalyze}
-                    analyzing={analyzing}
+                    analyzing={isAnalyzing}
                     disabled={(!selectedCVId && !selectedFile) || (!jobDescriptionFile && !jobDescriptionText)}
                     credits={credits}
                   />
@@ -275,7 +265,7 @@ const AnalyzeCV = () => {
 
               <TabsContent value="results">
                 {analysisResult && (
-                  <AnalysisResults analysisResult={analysisResult} />
+                  <AnalysisResults analysis={analysisResult} />
                 )}
               </TabsContent>
 
