@@ -3,61 +3,42 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import HowItWorks from '@/components/HowItWorks';
 import Testimonials from '@/components/Testimonials';
-
 const Index = () => {
-  const { user } = useAuth();
-
+  const {
+    user
+  } = useAuth();
   const scrollToHowItWorks = () => {
-    document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' });
+    document.getElementById('how-it-works')?.scrollIntoView({
+      behavior: 'smooth'
+    });
   };
-
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <section id="hero" className="bg-background py-20 px-4 relative overflow-hidden">
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <h1 className="text-5xl md:text-6xl font-bold text-earth mb-8 leading-tight font-sans">
             Optimize Your CV, <span className="text-zapier-orange">Accelerate Your Career</span>
           </h1>
-          <p className="text-xl text-earth/70 mb-10 max-w-2xl mx-auto leading-relaxed font-normal">
-            TuneMyCV is an AI-powered platform trained on our models that helps job seekers improve their CVs, 
-            generate impactful cover letters, and increase their chances of landing their dream job.
-          </p>
+          <p className="text-earth/70 mb-10 max-w-2xl mx-auto leading-relaxed font-normal text-center text-lg">TuneMyCV is an AI-powered platform trained on our models to helps job seekers improve their CVs, generate impactful cover letters, and increase their chances of landing their dream job.</p>
           
-          {user ? (
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Link
-                to="/analyze"
-                className="bg-zapier-orange text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange/90 transition-colors inline-flex items-center"
-              >
+          {user ? <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Link to="/analyze" className="bg-zapier-orange text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange/90 transition-colors inline-flex items-center">
                 <Upload className="mr-2 h-5 w-5 text-white" />
                 Analyze Your CV
                 <ArrowRight className="ml-2 h-5 w-5 text-white" />
               </Link>
-              <Link
-                to="/cover-letter"
-                className="border-2 border-earth text-earth px-8 py-4 rounded-lg text-lg font-semibold hover:bg-earth hover:text-white transition-colors"
-              >
+              <Link to="/cover-letter" className="border-2 border-earth text-earth px-8 py-4 rounded-lg text-lg font-semibold hover:bg-earth hover:text-white transition-colors">
                 Generate Cover Letter
               </Link>
-            </div>
-          ) : (
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Link
-                to="/analyze"
-                className="bg-zapier-orange text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange/90 transition-colors inline-flex items-center"
-              >
+            </div> : <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Link to="/analyze" className="bg-zapier-orange text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange/90 transition-colors inline-flex items-center">
                 Get Started Free
                 <ArrowRight className="ml-2 h-5 w-5 text-white" />
               </Link>
-              <button
-                onClick={scrollToHowItWorks}
-                className="border-2 border-earth text-earth px-8 py-4 rounded-lg text-lg font-semibold hover:bg-earth hover:text-white transition-colors"
-              >
+              <button onClick={scrollToHowItWorks} className="border-2 border-earth text-earth px-8 py-4 rounded-lg text-lg font-semibold hover:bg-earth hover:text-white transition-colors">
                 Learn More
               </button>
-            </div>
-          )}
+            </div>}
         </div>
       </section>
 
@@ -141,8 +122,7 @@ const Index = () => {
       <Testimonials />
 
       {/* CTA Section */}
-      {!user && (
-        <section className="py-20 px-4 bg-cream/30">
+      {!user && <section className="py-20 px-4 bg-cream/30">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-4xl font-bold text-earth mb-6">
               Ready to Transform Your Career?
@@ -150,19 +130,13 @@ const Index = () => {
             <p className="text-xl text-earth/70 mb-8">
               Start optimizing your CV today and take the first step towards landing your dream job.
             </p>
-            <Link
-              to="/analyze"
-              className="bg-zapier-orange text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange/90 transition-colors inline-flex items-center"
-            >
+            <Link to="/analyze" className="bg-zapier-orange text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange/90 transition-colors inline-flex items-center">
               <Users className="mr-2 h-5 w-5 text-white" />
               Join TuneMyCV Today
               <ArrowRight className="ml-2 h-5 w-5 text-white" />
             </Link>
           </div>
-        </section>
-      )}
-    </div>
-  );
+        </section>}
+    </div>;
 };
-
 export default Index;
