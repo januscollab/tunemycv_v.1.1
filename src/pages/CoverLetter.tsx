@@ -21,6 +21,7 @@ import AdvancedGenerationOptions from '@/components/cover-letter/AdvancedGenerat
 import DownloadOptions from '@/components/cover-letter/DownloadOptions';
 import EditableCoverLetter from '@/components/cover-letter/EditableCoverLetter';
 import NoAnalysisModal from '@/components/cover-letter/NoAnalysisModal';
+import CoverLetterLoggedOut from '@/components/cover-letter/CoverLetterLoggedOut';
 
 const CoverLetter = () => {
   const { user } = useAuth();
@@ -276,56 +277,7 @@ const CoverLetter = () => {
     : selectedAnalysisId;
 
   if (!user) {
-    return (
-      <div className="min-h-screen bg-white dark:bg-gray-900">
-        {/* Hero Section for logged-out users */}
-        <section className="bg-background py-16 px-4">
-          <div className="max-w-5xl mx-auto">
-            <div className="flex items-center mb-8">
-              <FileText className="h-12 w-12 text-zapier-orange mr-6" />
-              <div>
-                <h1 className="text-4xl md:text-5xl font-bold text-earth mb-4">
-                  Generate Cover Letter
-                </h1>
-                <p className="text-xl text-earth/70 max-w-3xl font-normal">
-                  Create tailored cover letters that highlight your strengths and align perfectly with specific job requirements.
-                </p>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-12">
-              <div className="flex items-start">
-                <ServiceExplanation
-                  title="AI-Powered Cover Letters"
-                  subtitle="Generate professional cover letters in minutes"
-                  benefits={[
-                    'AI-powered cover letter generation that matches your experience to the job requirements',
-                    'Multiple tone and length options to match company culture',
-                    'Tailored content that highlights your most relevant qualifications'
-                  ]}
-                  features={[
-                    'Enter the job title and company name for personalized addressing',
-                    'Paste the complete job description for maximum relevance and keyword optimization',
-                    'Choose your preferred tone and length to match the role and company culture'
-                  ]}
-                  icon={<FileText className="h-8 w-8 text-zapier-orange" />}
-                  compact={true}
-                />
-              </div>
-              <div className="flex items-end justify-center">
-                <div className="w-full max-w-sm">
-                  <EmbeddedAuth
-                    title="Login to Get Started"
-                    description="Cover letter generation requires an account to ensure personalized results and save your work."
-                    icon={<FileText className="h-6 w-6 text-zapier-orange mr-2" />}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      </div>
-    );
+    return <CoverLetterLoggedOut />;
   }
 
   const handleTabChange = (newTab: string) => {

@@ -3,6 +3,7 @@ import React from 'react';
 import { Edit } from 'lucide-react';
 import EmbeddedAuth from '@/components/auth/EmbeddedAuth';
 import ServiceExplanation from '@/components/common/ServiceExplanation';
+import { Link } from 'react-router-dom';
 
 const CoverLetterLoggedOut = () => {
   const coverLetterExplanation = {
@@ -70,10 +71,13 @@ const CoverLetterLoggedOut = () => {
             <p className="text-lg text-earth/70 dark:text-white/70 mb-6">
               Join thousands of job seekers who have successfully landed interviews with our AI-powered cover letters.
             </p>
-            <button className="bg-zapier-orange text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange/90 transition-colors inline-flex items-center">
+            <Link 
+              to="/auth"
+              className="bg-zapier-orange text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange/90 transition-colors inline-flex items-center"
+            >
               <Edit className="mr-2 h-5 w-5 text-white" />
               Start AI Cover Letter Generator
-            </button>
+            </Link>
           </div>
         </div>
       </div>

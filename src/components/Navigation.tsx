@@ -38,15 +38,17 @@ const Navigation = () => {
 
   return (
     <nav className="bg-white dark:bg-earth border-b border-border">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
-          {/* Logo */}
+          {/* Logo positioned between left edge and menu start */}
           <div className="flex items-center">
-            <NavigationLogo />
+            <div className="ml-[10%]">
+              <NavigationLogo />
+            </div>
           </div>
 
-          {/* Desktop Navigation - Centered */}
-          <div className="hidden md:flex items-center justify-center flex-1">
+          {/* Desktop Navigation - Centered in 80% container */}
+          <div className="hidden md:flex items-center justify-center flex-1 max-w-[80%] mx-auto">
             <div className="flex items-center space-x-8">
               {navItems.map((item) => {
                 const Icon = item.icon;

@@ -79,7 +79,7 @@ const Resources = () => {
       </section>
 
       {/* Resources Section */}
-      <section className="py-20 px-4">
+      <section className="py-10 px-4">
         <div className="max-w-4xl mx-auto">
           {/* Category Filter */}
           <div className="flex flex-wrap justify-center gap-4 mb-12">
@@ -89,8 +89,8 @@ const Resources = () => {
                 onClick={() => setSelectedCategory(category)}
                 className={`px-6 py-2 rounded-full font-medium transition-colors ${
                   selectedCategory === category
-                    ? 'bg-apricot text-white'
-                    : 'bg-white dark:bg-blueberry/20 text-blueberry dark:text-apple-core border border-apple-core/30 dark:border-citrus/20 hover:border-apricot hover:text-apricot'
+                    ? 'bg-zapier-orange text-white'
+                    : 'bg-white dark:bg-blueberry/20 text-blueberry dark:text-apple-core border border-apple-core/30 dark:border-citrus/20 hover:border-zapier-orange hover:text-zapier-orange'
                 }`}
               >
                 {category}
