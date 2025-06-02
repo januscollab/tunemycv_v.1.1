@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -20,8 +21,8 @@ interface AnalysisResult {
   weaknesses: string[];
   recommendations: string[];
   credit_cost?: number;
-  cv_file_name?: string; // New field from database enhancement
-  cv_file_size?: number; // New field from database enhancement
+  cv_file_name?: string;
+  cv_file_size?: number;
 }
 
 interface AnalysisHistoryTabProps {
@@ -32,6 +33,7 @@ interface AnalysisHistoryTabProps {
 const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ credits, memberSince }) => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [analyses, setAnalyses] = useState<AnalysisResult[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedAnalysis, setSelectedAnalysis] = useState<AnalysisResult | null>(null);
@@ -51,7 +53,6 @@ const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ credits, member
 
   const loadAnalysisHistory = async () => {
     try {
-      // Updated query to use new CV metadata fields and left join for cost estimate
       const { data, error } = await supabase
         .from('analysis_results')
         .select(`
@@ -63,7 +64,6 @@ const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ credits, member
 
       if (error) throw error;
       
-      // Transform data to include credit cost, handling null values gracefully
       const transformedData = (data || []).map(analysis => ({
         ...analysis,
         credit_cost: analysis.analysis_logs?.[0]?.cost_estimate ? Math.ceil(analysis.analysis_logs[0].cost_estimate) : 1
@@ -99,9 +99,12 @@ const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ credits, member
   };
 
   const handleCreateCoverLetter = (analysis: AnalysisResult) => {
-    setUpcomingFeatureModal({
-      isOpen: true,
-      featureType: 'cover-letter'
+    // Navigate to Cover Letter page with the analysis data
+    navigate('/cover-letter', {
+      state: {
+        selectedAnalysis: analysis,
+        generationMethod: 'analysis'
+      }
     });
   };
 

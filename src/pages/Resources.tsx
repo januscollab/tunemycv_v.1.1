@@ -30,42 +30,36 @@ const Resources = () => {
   const resources = [
     {
       title: "10 Common CV Mistakes to Avoid in 2025",
-      description: "Learn about the most frequent errors that can cost you job opportunities and how to fix them.",
       icon: FileText,
       link: "#",
       category: "CV Tips"
     },
     {
       title: "ATS Optimization Guide",
-      description: "Master the art of making your CV readable by Applicant Tracking Systems.",
       icon: Target,
       link: "#",
       category: "Technical"
     },
     {
       title: "Industry-Specific CV Templates",
-      description: "Download professionally designed CV templates tailored to your industry.",
       icon: BookOpen,
       link: "#",
       category: "Templates"
     },
     {
       title: "Interview Preparation Toolkit",
-      description: "Comprehensive guide to preparing for job interviews with practice questions.",
       icon: Users,
       link: "#",
       category: "Interview"
     },
     {
       title: "Salary Negotiation Strategies",
-      description: "Expert tips on how to negotiate your salary and benefits package effectively.",
       icon: TrendingUp,
       link: "#",
       category: "Career"
     },
     {
       title: "LinkedIn Profile Optimization",
-      description: "Transform your LinkedIn profile to attract recruiters and opportunities.",
       icon: CheckCircle,
       link: "#",
       category: "Social Media"
@@ -160,29 +154,27 @@ const Resources = () => {
           {/* Resources Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredResources.map((resource, index) => (
-              <div key={index} className="bg-white dark:bg-blueberry/20 rounded-xl shadow-lg p-4 hover:shadow-xl transition-all border border-apple-core/20 dark:border-citrus/20 hover:border-zapier-orange/50" style={{ height: '144px' }}>
-                <div className="bg-apricot/20 rounded-full w-8 h-8 flex items-center justify-center mb-3">
-                  <resource.icon className="h-4 w-4 text-apricot" />
-                </div>
-                
-                <div className="mb-2">
-                  <span className="inline-block bg-citrus/20 text-citrus px-2 py-1 rounded-full text-xs font-medium mb-2">
-                    {resource.category}
-                  </span>
-                  <h3 className="text-sm font-semibold text-blueberry dark:text-citrus mb-1 line-clamp-1">
+              <div key={index} className="bg-white dark:bg-blueberry/20 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all border border-apple-core/20 dark:border-citrus/20 hover:border-zapier-orange/50" style={{ height: '180px' }}>
+                <div className="flex flex-col items-center text-center h-full">
+                  <div className="bg-apricot/20 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+                    <resource.icon className="h-6 w-6 text-apricot" />
+                  </div>
+                  
+                  <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-3 line-clamp-2">
                     {resource.title}
                   </h3>
-                  <p className="text-blueberry/70 dark:text-apple-core/80 leading-relaxed text-xs line-clamp-2">
-                    {resource.description}
-                  </p>
+                  
+                  <span className="inline-block bg-citrus/20 text-citrus px-3 py-1 rounded-full text-sm font-medium mb-4">
+                    {resource.category}
+                  </span>
+                  
+                  <a 
+                    href={resource.link}
+                    className="inline-flex items-center text-apricot font-medium hover:text-zapier-orange transition-colors text-sm mt-auto"
+                  >
+                    Read More →
+                  </a>
                 </div>
-                
-                <a 
-                  href={resource.link}
-                  className="inline-flex items-center text-apricot font-medium hover:text-zapier-orange transition-colors text-xs"
-                >
-                  Read More →
-                </a>
               </div>
             ))}
           </div>
