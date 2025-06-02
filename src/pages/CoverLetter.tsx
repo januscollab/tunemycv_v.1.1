@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FileText, Sparkles, Trash2, RefreshCw, Clock, FileUp, Search, AlertCircle, Eye } from 'lucide-react';
@@ -126,11 +125,7 @@ const CoverLetter = () => {
   };
 
   const handleGenerationMethodChange = (method: 'input' | 'analysis') => {
-    if (method === 'analysis' && coverLetters.length === 0) {
-      // Check if user has any analysis history
-      setShowNoAnalysisModal(true);
-      return;
-    }
+    // Remove the incorrect check - let AnalysisSelector handle the empty state
     setGenerationMethod(method);
   };
 
@@ -336,9 +331,6 @@ const CoverLetter = () => {
                 Generate tailored cover letters that highlight your strengths and align with specific job requirements.
               </p>
             </div>
-            <Badge variant="outline" className="text-apricot border-apricot text-base sm:text-lg px-3 py-2 self-start sm:self-auto">
-              {credits} Credits Available
-            </Badge>
           </div>
         </div>
 

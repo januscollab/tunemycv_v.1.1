@@ -1,3 +1,4 @@
+
 import { ArrowRight, CheckCircle, TrendingUp, Users, Star, Upload } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -36,10 +37,10 @@ const Index = () => {
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
               <Link
-                to="/profile"
+                to="/cover-letter"
                 className="border-2 border-blueberry dark:border-citrus text-blueberry dark:text-citrus px-8 py-4 rounded-lg text-lg font-semibold hover:border-apricot hover:text-apricot transition-colors"
               >
-                View Profile
+                Generate Cover Letter
               </Link>
             </div>
           ) : (
