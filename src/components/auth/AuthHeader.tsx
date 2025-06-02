@@ -46,16 +46,16 @@ const AuthHeader: React.FC<AuthHeaderProps> = ({ mode, fromAnalyze }) => {
       
       {fromAnalyze && (
         <div className="bg-citrus/10 border border-citrus/30 rounded-md p-4 mb-6">
-          <div className="text-sm text-blueberry">
+          <div className="text-sm text-blueberry font-normal">
             <strong>Login Required:</strong> You need to sign in to analyze your CV and access personalized insights.
           </div>
         </div>
       )}
       
-      <h2 className="text-3xl font-bold text-blueberry">
+      <h2 className="text-3xl font-bold text-blueberry dark:text-citrus">
         {getTitle()}
       </h2>
-      <p className="mt-2 text-blueberry/70">
+      <p className="mt-2 text-blueberry/70 font-normal">
         {getSubtitle()}
       </p>
     </div>
