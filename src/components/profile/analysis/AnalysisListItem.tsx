@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { Eye, Calendar, Building, Trash2, FileText, MessageSquare, CreditCard } from 'lucide-react';
+import { Calendar, Building, CreditCard } from 'lucide-react';
+import DocumentActions from '@/components/common/DocumentActions';
 
 interface AnalysisResult {
   id: string;
@@ -21,6 +22,7 @@ interface AnalysisListItemProps {
   onDelete: (analysisId: string) => void;
   onCreateCoverLetter: (analysis: AnalysisResult) => void;
   onInterviewPrep: (analysis: AnalysisResult) => void;
+  onDownload?: (analysis: AnalysisResult) => void;
 }
 
 const AnalysisListItem: React.FC<AnalysisListItemProps> = ({ 
@@ -28,7 +30,8 @@ const AnalysisListItem: React.FC<AnalysisListItemProps> = ({
   onViewDetails, 
   onDelete, 
   onCreateCoverLetter, 
-  onInterviewPrep 
+  onInterviewPrep,
+  onDownload 
 }) => {
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -50,6 +53,66 @@ const AnalysisListItem: React.FC<AnalysisListItemProps> = ({
   const handleView = (e: React.MouseEvent) => {
     e.stopPropagation();
     onViewDetails(analysis);
+  };
+
+  const handleDownload = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onDownload) {
+      onDownload(analysis);
+    }
+  };
+
+  const generatePdfContent = () => {
+    return `CV Analysis Report\n\nJob Title: ${analysis.job_title}\nCompany: ${analysis.company_name}\nCompatibility Score: ${analysis.compatibility_score}%\n\nExecutive Summary:\n${analysis.executive_summary}\n\nStrengths:\n${analysis.strengths?.join('\n• ') || 'None listed'}\n\nWeaknesses:\n${analysis.weaknesses?.join('\n• ') || 'None listed'}\n\nRecommendations:\n${analysis.recommendations?.join('\n• ') || 'None listed'}`;
+  };
+
+  const downloadAsText = () => {
+    const content = generatePdfContent();
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${analysis.job_title}_${analysis.company_name}_analysis.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const downloadAsPdf = () => {
+    const content = generatePdfContent();
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>${analysis.job_title} - ${analysis.company_name} Analysis</title>
+            <style>
+              body { 
+                font-family: Arial, sans-serif; 
+                font-size: 12pt; 
+                line-height: 1.5; 
+                margin: 20mm; 
+                white-space: pre-wrap;
+              }
+              @media print {
+                body { margin: 0; }
+              }
+            </style>
+          </head>
+          <body>${content.replace(/\n/g, '<br>')}</body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
+      printWindow.close();
+    }
+  };
+
+  const downloadAsWord = () => {
+    // Fallback to text for Word download
+    downloadAsText();
   };
 
   return (
@@ -80,35 +143,18 @@ const AnalysisListItem: React.FC<AnalysisListItemProps> = ({
           </div>
         </div>
         
-        <div className="flex items-center space-x-3">
-          <button
-            onClick={handleCoverLetter}
-            className="flex items-center px-3 py-2 text-sm text-blue-600 hover:text-zapier-orange hover:bg-zapier-orange/10 rounded-md transition-colors"
-          >
-            <FileText className="h-4 w-4 mr-1" />
-            Cover Letter
-          </button>
-          <button
-            onClick={handleInterviewPrep}
-            className="flex items-center px-3 py-2 text-sm text-green-600 hover:text-zapier-orange hover:bg-zapier-orange/10 rounded-md transition-colors"
-          >
-            <MessageSquare className="h-4 w-4 mr-1" />
-            Interview Prep
-          </button>
-          <button
-            onClick={handleView}
-            className="flex items-center text-sm text-gray-600 hover:text-zapier-orange transition-colors"
-          >
-            <Eye className="h-4 w-4 mr-1" />
-            View
-          </button>
-          <button
-            onClick={handleDelete}
-            className="text-sm text-red-600 hover:text-zapier-orange transition-colors"
-          >
-            <Trash2 className="h-4 w-4" />
-          </button>
-        </div>
+        <DocumentActions
+          onView={handleView}
+          onDelete={handleDelete}
+          onCoverLetter={handleCoverLetter}
+          onInterviewPrep={handleInterviewPrep}
+          onDownloadTxt={downloadAsText}
+          onDownloadPdf={downloadAsPdf}
+          onDownloadWord={downloadAsWord}
+          showCoverLetter={true}
+          showInterviewPrep={true}
+          showDownload={true}
+        />
       </div>
     </div>
   );
