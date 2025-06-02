@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { FileText, Sparkles, Trash2, RefreshCw, Clock, FileUp, Search, AlertCircle, Eye, Edit, Download, History } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCoverLetter } from '@/hooks/useCoverLetter';
@@ -26,6 +26,7 @@ import CoverLetterLoggedOut from '@/components/cover-letter/CoverLetterLoggedOut
 const CoverLetter = () => {
   const { user } = useAuth();
   const { credits } = useUserData();
+  const location = useLocation();
   const { 
     generateCoverLetter, 
     generateFromAnalysis, 
@@ -91,6 +92,26 @@ const CoverLetter = () => {
     { value: 'enthusiastic', label: 'Enthusiastic' },
     { value: 'friendly', label: 'Friendly' }
   ];
+
+  // Handle navigation state from analysis history
+  useEffect(() => {
+    const state = location.state as { analysis?: any } | null;
+    if (state?.analysis) {
+      console.log('Navigation state detected:', state.analysis);
+      setGenerationMethod('analysis');
+      setSelectedAnalysisId(state.analysis.id);
+      
+      // Pre-populate form data from the analysis
+      setFormData(prev => ({
+        ...prev,
+        jobTitle: state.analysis.job_title || '',
+        companyName: state.analysis.company_name || ''
+      }));
+      
+      // Clear the navigation state to prevent re-triggering
+      window.history.replaceState({}, document.title, location.pathname);
+    }
+  }, [location.state, setSelectedAnalysisId]);
 
   useEffect(() => {
     if (user && activeTab === 'history') {
@@ -276,10 +297,10 @@ const CoverLetter = () => {
     ? (formData.jobTitle && formData.companyName && formData.jobDescription)
     : selectedAnalysisId;
 
-    const handleEditCoverLetter = (coverLetter: any) => {
-        setSelectedCoverLetter(coverLetter);
-        setActiveTab('result');
-    };
+  const handleEditCoverLetter = (coverLetter: any) => {
+    setSelectedCoverLetter(coverLetter);
+    setActiveTab('result');
+  };
 
   const handleTabChange = (newTab: string) => {
     if (hasUnsavedChanges && newTab !== activeTab) {
