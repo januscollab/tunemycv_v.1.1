@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -165,7 +164,7 @@ const AnalyzeCV = () => {
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
-        <div className="max-w-5xl mx-auto px-4 py-12">
+        <div className="max-w-4xl mx-auto px-4 py-12">
           <div className="flex items-start mb-8">
             <FileText className="h-12 w-12 text-zapier-orange mr-6 mt-2" />
             <div>
@@ -201,13 +200,6 @@ const AnalyzeCV = () => {
               </div>
             </div>
           </div>
-          
-          {/* Bottom CTA */}
-          <div className="text-center mt-16">
-            <button className="bg-zapier-orange text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange/90 transition-colors">
-              Get Started with CV Analysis
-            </button>
-          </div>
         </div>
       </div>
     );
@@ -228,7 +220,7 @@ const AnalyzeCV = () => {
         </div>
       )}
       
-      <div className="max-w-5xl mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Header Section */}
         <div className="mb-6">
           <div className="flex items-start mb-3">
@@ -257,11 +249,11 @@ const AnalyzeCV = () => {
                 </TabsTrigger>
                 <TabsTrigger value="report" className="flex items-center space-x-2 text-sm" disabled={!analysisResult}>
                   <Eye className="h-4 w-4" />
-                  <span>Current Report</span>
+                  <span>Current Result</span>
                 </TabsTrigger>
                 <TabsTrigger value="history" className="flex items-center space-x-2 text-sm">
                   <History className="h-4 w-4" />
-                  <span>Analysis History</span>
+                  <span>History</span>
                 </TabsTrigger>
               </TabsList>
 
@@ -371,13 +363,6 @@ const AnalyzeCV = () => {
               hasCreditsForAI={hasCreditsForAI}
             />
           </div>
-        </div>
-        
-        {/* Bottom CTA */}
-        <div className="text-center mt-16">
-          <button className="bg-zapier-orange text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange/90 transition-colors">
-            Start Your CV Analysis Today
-          </button>
         </div>
       </div>
     </div>

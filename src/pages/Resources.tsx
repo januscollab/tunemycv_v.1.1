@@ -3,6 +3,30 @@ import React from 'react';
 import { FileText, Users, BookOpen, Target, TrendingUp, CheckCircle } from 'lucide-react';
 
 const Resources = () => {
+  const topResources = [
+    {
+      title: "Complete CV Optimization Guide",
+      description: "Master the art of creating a standout CV that gets noticed by recruiters and passes ATS systems.",
+      icon: FileText,
+      link: "#",
+      category: "Featured"
+    },
+    {
+      title: "Interview Success Masterclass",
+      description: "Comprehensive preparation toolkit with practice questions, techniques, and confidence-building strategies.",
+      icon: Users,
+      link: "#",
+      category: "Featured"
+    },
+    {
+      title: "Salary Negotiation Blueprint",
+      description: "Expert strategies and scripts to negotiate your worth and secure the compensation you deserve.",
+      icon: TrendingUp,
+      link: "#",
+      category: "Featured"
+    }
+  ];
+
   const resources = [
     {
       title: "10 Common CV Mistakes to Avoid in 2025",
@@ -67,7 +91,7 @@ const Resources = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-apple-core/30 via-white to-citrus/20 dark:from-blueberry/30 dark:via-gray-900 dark:to-citrus/10 py-20 px-4">
+      <section className="bg-gradient-to-br from-apple-core/30 via-white to-citrus/20 dark:from-blueberry/30 dark:via-gray-900 dark:to-citrus/10 py-10 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-5xl font-bold text-blueberry dark:text-citrus mb-6">
             Career Resources
@@ -78,8 +102,43 @@ const Resources = () => {
         </div>
       </section>
 
+      {/* Top 3 Resources Section */}
+      <section className="py-8 px-4">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl font-bold text-center text-blueberry dark:text-citrus mb-8">
+            Our Top 3 Resources
+          </h2>
+          
+          <div className="grid md:grid-cols-3 gap-6 mb-12">
+            {topResources.map((resource, index) => (
+              <div key={index} className="bg-white dark:bg-blueberry/20 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all border border-apple-core/20 dark:border-citrus/20 hover:border-zapier-orange/50" style={{ height: '216px' }}>
+                <div className="bg-apricot/20 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+                  <resource.icon className="h-6 w-6 text-apricot" />
+                </div>
+                
+                <div className="mb-4">
+                  <div className="bg-gradient-to-r from-zapier-orange to-apricot h-24 rounded-lg mb-3 flex items-center justify-center">
+                    <span className="text-white text-sm font-medium">Featured Image</span>
+                  </div>
+                  <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-2 line-clamp-2">
+                    {resource.title}
+                  </h3>
+                </div>
+                
+                <a 
+                  href={resource.link}
+                  className="inline-flex items-center text-apricot font-medium hover:text-zapier-orange transition-colors text-sm"
+                >
+                  Explore →
+                </a>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Resources Section */}
-      <section className="py-10 px-4">
+      <section className="py-6 px-4">
         <div className="max-w-4xl mx-auto">
           {/* Category Filter */}
           <div className="flex flex-wrap justify-center gap-4 mb-6">
@@ -99,18 +158,18 @@ const Resources = () => {
           </div>
 
           {/* Resources Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredResources.map((resource, index) => (
               <div key={index} className="bg-white dark:bg-blueberry/20 rounded-xl shadow-lg p-4 hover:shadow-xl transition-all border border-apple-core/20 dark:border-citrus/20 hover:border-zapier-orange/50" style={{ height: '144px' }}>
-                <div className="bg-apricot/20 rounded-full w-10 h-10 flex items-center justify-center mb-3">
-                  <resource.icon className="h-5 w-5 text-apricot" />
+                <div className="bg-apricot/20 rounded-full w-8 h-8 flex items-center justify-center mb-3">
+                  <resource.icon className="h-4 w-4 text-apricot" />
                 </div>
                 
                 <div className="mb-2">
                   <span className="inline-block bg-citrus/20 text-citrus px-2 py-1 rounded-full text-xs font-medium mb-2">
                     {resource.category}
                   </span>
-                  <h3 className="text-base font-semibold text-blueberry dark:text-citrus mb-1 line-clamp-1">
+                  <h3 className="text-sm font-semibold text-blueberry dark:text-citrus mb-1 line-clamp-1">
                     {resource.title}
                   </h3>
                   <p className="text-blueberry/70 dark:text-apple-core/80 leading-relaxed text-xs line-clamp-2">
@@ -120,7 +179,7 @@ const Resources = () => {
                 
                 <a 
                   href={resource.link}
-                  className="inline-flex items-center text-apricot font-medium hover:text-zapier-orange transition-colors text-sm"
+                  className="inline-flex items-center text-apricot font-medium hover:text-zapier-orange transition-colors text-xs"
                 >
                   Read More →
                 </a>

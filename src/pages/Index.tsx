@@ -1,151 +1,156 @@
 
-import { ArrowRight, CheckCircle, TrendingUp, Users, Star, Upload } from 'lucide-react';
+import React from 'react';
 import { Link } from 'react-router-dom';
+import { ArrowRight, CheckCircle, FileText, Users, TrendingUp, Sparkles } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import HowItWorks from '@/components/HowItWorks';
 import Testimonials from '@/components/Testimonials';
 
 const Index = () => {
   const { user } = useAuth();
-  
-  const scrollToHowItWorks = () => {
-    document.getElementById('how-it-works')?.scrollIntoView({
-      behavior: 'smooth'
-    });
-  };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
       {/* Hero Section */}
-      <section id="hero" className="bg-background py-20 px-4 relative overflow-hidden">
-        <div className="max-w-[80%] mx-auto text-center relative z-10">
-          <h1 className="text-5xl md:text-6xl font-bold text-earth mb-8 leading-tight font-poppins">
-            Optimize Your CV, <span className="text-zapier-orange">Accelerate Your Career</span>
-          </h1>
-          <p className="text-earth/70 mb-10 max-w-2xl mx-auto leading-relaxed font-normal text-center text-lg">TuneMyCV is an AI-powered platform trained on our models that helps job seekers improve their CVs, generate impactful cover letters, and increase their chances of landing their dream job.</p>
+      <section className="py-20 px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="inline-flex items-center bg-zapier-orange/10 text-zapier-orange px-4 py-2 rounded-full text-sm font-medium mb-6">
+            <Sparkles className="h-4 w-4 mr-2" />
+            AI-Powered Career Optimization
+          </div>
           
-          {user ? (
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Link to="/analyze" className="bg-zapier-orange text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange/90 transition-colors inline-flex items-center">
-                <Upload className="mr-2 h-5 w-5 text-white" />
-                Analyze Your CV
-                <ArrowRight className="ml-2 h-5 w-5 text-white" />
-              </Link>
-              <Link to="/cover-letter" className="border-2 border-zapier-orange text-zapier-orange px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange hover:text-white transition-colors">
-                Generate Cover Letter
-              </Link>
+          <h1 className="text-5xl md:text-6xl font-bold text-earth dark:text-white mb-6 leading-tight">
+            Turn Your CV Into a
+            <span className="text-zapier-orange"> Job-Winning</span> Asset
+          </h1>
+          
+          <p className="text-xl text-earth/70 dark:text-white/70 mb-8 max-w-3xl mx-auto leading-relaxed">
+            Get AI-powered analysis, personalized recommendations, and professional cover letters 
+            that help you stand out from the competition and land your dream job.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+            <Link
+              to={user ? "/analyze" : "/auth"}
+              className="bg-zapier-orange text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange/90 transition-colors flex items-center justify-center"
+            >
+              Start Free Analysis
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Link>
+            <Link
+              to="/resources"
+              className="border border-earth/20 dark:border-white/20 text-earth dark:text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-earth/5 dark:hover:bg-white/5 transition-colors"
+            >
+              Explore Resources
+            </Link>
+          </div>
+
+          {/* Trust Indicators */}
+          <div className="flex flex-wrap justify-center items-center gap-8 text-earth/60 dark:text-white/60">
+            <div className="flex items-center">
+              <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+              <span>100% Free to Start</span>
             </div>
-          ) : (
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Link to="/analyze" className="bg-zapier-orange text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange/90 transition-colors inline-flex items-center">
-                Get Started Free
-                <ArrowRight className="ml-2 h-5 w-5 text-white" />
-              </Link>
-              <button onClick={scrollToHowItWorks} className="border-2 border-zapier-orange text-zapier-orange px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange hover:text-white transition-colors">
-                Learn More
-              </button>
+            <div className="flex items-center">
+              <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+              <span>AI-Powered Analysis</span>
             </div>
-          )}
+            <div className="flex items-center">
+              <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+              <span>Privacy Protected</span>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* How It Works Section */}
-      <HowItWorks />
-
-      {/* Features Section */}
+      {/* Features Grid */}
       <section className="py-20 px-4 bg-cream/30">
-        <div className="max-w-[80%] mx-auto">
+        <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-earth mb-6">
-              Why Choose TuneMyCV?
+            <h2 className="text-4xl font-bold text-earth dark:text-white mb-4">
+              Everything You Need to Succeed
             </h2>
-            <p className="text-xl text-earth/70 max-w-xl mx-auto">
-              Our AI-powered platform provides comprehensive CV optimization to help you stand out in today's competitive job market.
+            <p className="text-xl text-earth/70 dark:text-white/70 max-w-2xl mx-auto">
+              Our comprehensive suite of tools helps you optimize every aspect of your job application
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white rounded-lg border border-border p-8 text-center hover:border-zapier-orange transition-colors">
-              <div className="bg-zapier-orange/10 rounded-lg w-16 h-16 flex items-center justify-center mx-auto mb-6">
-                <CheckCircle className="h-8 w-8 text-zapier-orange" />
+            <div className="bg-white dark:bg-earth/10 rounded-2xl p-8 hover:shadow-lg transition-shadow border border-earth/10 dark:border-white/10">
+              <div className="bg-zapier-orange/10 rounded-full w-16 h-16 flex items-center justify-center mb-6">
+                <FileText className="h-8 w-8 text-zapier-orange" />
               </div>
-              <h3 className="text-xl font-bold text-earth mb-4">ATS Optimization</h3>
-              <p className="text-earth/60 leading-relaxed">
-                Ensure your CV passes Applicant Tracking Systems with our advanced formatting and keyword optimization.
+              <h3 className="text-2xl font-bold text-earth dark:text-white mb-4">CV Analysis</h3>
+              <p className="text-earth/70 dark:text-white/70 leading-relaxed mb-6">
+                Get detailed insights into your CV's performance, keyword optimization, and compatibility with specific job requirements.
               </p>
+              <Link
+                to={user ? "/analyze" : "/auth"}
+                className="text-zapier-orange font-semibold hover:text-zapier-orange/80 transition-colors inline-flex items-center"
+              >
+                Start Analysis <ArrowRight className="ml-1 h-4 w-4" />
+              </Link>
             </div>
 
-            <div className="bg-white rounded-lg border border-border p-8 text-center hover:border-zapier-orange transition-colors">
-              <div className="bg-zapier-orange/10 rounded-lg w-16 h-16 flex items-center justify-center mx-auto mb-6">
+            <div className="bg-white dark:bg-earth/10 rounded-2xl p-8 hover:shadow-lg transition-shadow border border-earth/10 dark:border-white/10">
+              <div className="bg-zapier-orange/10 rounded-full w-16 h-16 flex items-center justify-center mb-6">
+                <Users className="h-8 w-8 text-zapier-orange" />
+              </div>
+              <h3 className="text-2xl font-bold text-earth dark:text-white mb-4">Cover Letters</h3>
+              <p className="text-earth/70 dark:text-white/70 leading-relaxed mb-6">
+                Generate personalized, compelling cover letters that highlight your strengths and align with job requirements.
+              </p>
+              <Link
+                to={user ? "/cover-letter" : "/auth"}
+                className="text-zapier-orange font-semibold hover:text-zapier-orange/80 transition-colors inline-flex items-center"
+              >
+                Generate Letter <ArrowRight className="ml-1 h-4 w-4" />
+              </Link>
+            </div>
+
+            <div className="bg-white dark:bg-earth/10 rounded-2xl p-8 hover:shadow-lg transition-shadow border border-earth/10 dark:border-white/10">
+              <div className="bg-zapier-orange/10 rounded-full w-16 h-16 flex items-center justify-center mb-6">
                 <TrendingUp className="h-8 w-8 text-zapier-orange" />
               </div>
-              <h3 className="text-xl font-bold text-earth mb-4">AI-Powered Analysis</h3>
-              <p className="text-earth/60 leading-relaxed">
-                Get detailed feedback and personalized recommendations to improve your CV's impact and effectiveness.
+              <h3 className="text-2xl font-bold text-earth dark:text-white mb-4">Career Resources</h3>
+              <p className="text-earth/70 dark:text-white/70 leading-relaxed mb-6">
+                Access expert guides, templates, and tools to accelerate your job search and career advancement.
               </p>
-            </div>
-
-            <div className="bg-white rounded-lg border border-border p-8 text-center hover:border-zapier-orange transition-colors">
-              <div className="bg-zapier-orange/10 rounded-lg w-16 h-16 flex items-center justify-center mx-auto mb-6">
-                <Star className="h-8 w-8 text-zapier-orange" />
-              </div>
-              <h3 className="text-xl font-bold text-earth mb-4">Industry Expertise</h3>
-              <p className="text-earth/60 leading-relaxed">
-                Leverage insights from thousands of successful job applications across various industries and roles.
-              </p>
+              <Link
+                to="/resources"
+                className="text-zapier-orange font-semibold hover:text-zapier-orange/80 transition-colors inline-flex items-center"
+              >
+                Explore Resources <ArrowRight className="ml-1 h-4 w-4" />
+              </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Statistics Section */}
-      <section className="py-20 px-4 bg-earth text-white relative overflow-hidden">
-        <div className="max-w-[80%] mx-auto relative z-10">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-6 text-white">Trusted by Job Seekers Worldwide</h2>
-            <p className="text-xl text-white/90">
-              Join thousands of professionals who have successfully optimized their CVs with TuneMyCV
-            </p>
-          </div>
+      {/* How It Works */}
+      <HowItWorks />
 
-          <div className="grid md:grid-cols-3 gap-8 text-center">
-            <div className="bg-white/10 rounded-lg p-8 border border-white/20">
-              <div className="text-4xl font-bold mb-3 text-zapier-orange">50,000+</div>
-              <div className="text-white/90">CVs Analyzed</div>
-            </div>
-            <div className="bg-white/10 rounded-lg p-8 border border-white/20">
-              <div className="text-4xl font-bold mb-3 text-zapier-orange">89%</div>
-              <div className="text-white/90">Interview Rate Increase</div>
-            </div>
-            <div className="bg-white/10 rounded-lg p-8 border border-white/20">
-              <div className="text-4xl font-bold mb-3 text-zapier-orange">120+</div>
-              <div className="text-white/90">Countries Served</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
+      {/* Testimonials */}
       <Testimonials />
 
       {/* CTA Section */}
-      {!user && (
-        <section className="py-20 px-4 bg-cream/30">
-          <div className="max-w-[80%] mx-auto text-center">
-            <h2 className="text-4xl font-bold text-earth mb-6">
-              Ready to Transform Your Career?
-            </h2>
-            <p className="text-xl text-earth/70 mb-8">
-              Start optimizing your CV today and take the first step towards landing your dream job.
-            </p>
-            <Link to="/analyze" className="bg-zapier-orange text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange/90 transition-colors inline-flex items-center">
-              <Users className="mr-2 h-5 w-5 text-white" />
-              Join TuneMyCV Today
-              <ArrowRight className="ml-2 h-5 w-5 text-white" />
-            </Link>
-          </div>
-        </section>
-      )}
+      <section className="py-20 px-4 bg-gradient-to-r from-zapier-orange to-orange-600">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-4xl font-bold text-white mb-6">
+            Ready to Transform Your Career?
+          </h2>
+          <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+            Join thousands of professionals who have already improved their job prospects with TuneMyCV
+          </p>
+          <Link
+            to={user ? "/analyze" : "/auth"}
+            className="bg-white text-zapier-orange px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-50 transition-colors inline-flex items-center"
+          >
+            Get Started Free
+            <ArrowRight className="ml-2 h-5 w-5" />
+          </Link>
+        </div>
+      </section>
     </div>
   );
 };

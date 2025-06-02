@@ -1,108 +1,69 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, FileText, BookOpen, User, Shield, TrendingUp, Edit, Home } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useAdminAuth } from '@/hooks/useAdminAuth';
-import { useProfileData } from '@/hooks/useProfileData';
-import ThemeToggle from './ThemeToggle';
 import NavigationLogo from './navigation/NavigationLogo';
-import UserProfileDropdown from './navigation/UserProfileDropdown';
 import AuthButtons from './navigation/AuthButtons';
+import UserProfileDropdown from './navigation/UserProfileDropdown';
+import { ThemeToggle } from './ThemeToggle';
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const location = useLocation();
+  const [isSticky, setIsSticky] = useState(false);
   const { user } = useAuth();
-  const { isAdmin } = useAdminAuth();
-  const { getUserDisplayName } = useProfileData();
+  const location = useLocation();
 
-  const isActive = (path: string) => location.pathname === path;
+  // Handle scroll for sticky navigation
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      setIsSticky(scrollPosition > 100);
+    };
 
-  // Different navigation items based on auth state
-  const loggedInNavItems = [
-    { path: '/analyze', label: 'Analyze CV', icon: FileText },
-    { path: '/cover-letter', label: 'Cover Letter', icon: Edit },
-    { path: '/next-steps', label: 'Next Steps', icon: TrendingUp },
-    { path: '/resources', label: 'Resources', icon: BookOpen },
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const navItems = [
+    { path: '/analyze', label: 'Analyze CV' },
+    { path: '/cover-letter', label: 'Cover Letter' },
+    { path: '/resources', label: 'Resources' },
+    { path: '/next-steps', label: 'Next Steps' },
   ];
 
-  const loggedOutNavItems = [
-    { path: '/', label: 'Home', icon: Home },
-    { path: '/analyze', label: 'Analyze CV', icon: FileText },
-    { path: '/cover-letter', label: 'Cover Letter', icon: Edit },
-    { path: '/resources', label: 'Resources', icon: BookOpen },
-  ];
-
-  const navItems = user ? loggedInNavItems : loggedOutNavItems;
+  const isActive = (path: string) => {
+    return location.pathname === path;
+  };
 
   return (
-    <nav className="bg-white dark:bg-earth border-b border-border">
-      <div className="w-full px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          {/* Logo positioned halfway between left edge and menu start */}
-          <div className="flex items-center">
-            <div className="ml-[5%]">
-              <NavigationLogo />
-            </div>
+    <nav className={`bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 transition-all duration-300 ${
+      isSticky ? 'fixed top-0 left-0 right-0 z-50 shadow-lg' : 'relative'
+    }`}>
+      <div className="max-w-6xl mx-auto px-4">
+        <div className="flex justify-between items-center h-16">
+          {/* Logo */}
+          <NavigationLogo />
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-8">
+            {navItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`text-earth dark:text-white hover:text-zapier-orange transition-colors font-medium ${
+                  isActive(item.path) ? 'text-zapier-orange' : ''
+                }`}
+              >
+                {item.label}
+              </Link>
+            ))}
           </div>
 
-          {/* Desktop Navigation - Centered in 80% container */}
-          <div className="hidden md:flex items-center justify-center flex-1 max-w-[80%] mx-auto">
-            <div className="flex items-center space-x-8">
-              {navItems.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    className={`flex items-center px-3 py-2 text-sm font-semibold transition-colors relative ${
-                      isActive(item.path)
-                        ? 'text-zapier-orange'
-                        : 'text-earth hover:text-zapier-orange'
-                    }`}
-                  >
-                    <Icon className="h-4 w-4 mr-2 text-zapier-orange" />
-                    {item.label}
-                    {isActive(item.path) && (
-                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-zapier-orange"></div>
-                    )}
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Right side items */}
+          {/* Right Side Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            {user ? (
-              <div className="flex items-center space-x-4">
-                {isAdmin && (
-                  <Link
-                    to="/admin"
-                    className={`flex items-center px-3 py-2 text-sm font-semibold transition-colors relative ${
-                      isActive('/admin')
-                        ? 'text-zapier-orange'
-                        : 'text-earth hover:text-zapier-orange'
-                    }`}
-                  >
-                    <Shield className="h-4 w-4 mr-2 text-zapier-orange" />
-                    Admin
-                    {isActive('/admin') && (
-                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-zapier-orange"></div>
-                    )}
-                  </Link>
-                )}
-                <UserProfileDropdown 
-                  userDisplayName={getUserDisplayName()}
-                  isActive={isActive}
-                />
-              </div>
-            ) : (
-              <AuthButtons />
-            )}
-            
             <ThemeToggle />
+            {user ? <UserProfileDropdown /> : <AuthButtons />}
           </div>
 
           {/* Mobile menu button */}
@@ -110,74 +71,32 @@ const Navigation = () => {
             <ThemeToggle />
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="text-earth hover:text-zapier-orange focus:outline-none"
+              className="text-earth dark:text-white hover:text-zapier-orange transition-colors"
             >
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
         </div>
 
-        {/* Mobile Navigation */}
+        {/* Mobile Navigation Menu */}
         {isOpen && (
           <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-border">
-              {navItems.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    onClick={() => setIsOpen(false)}
-                    className={`flex items-center px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                      isActive(item.path)
-                        ? 'text-zapier-orange bg-cream/50'
-                        : 'text-earth hover:text-zapier-orange hover:bg-cream/30'
-                    }`}
-                  >
-                    <Icon className="h-4 w-4 mr-3 text-zapier-orange" />
-                    {item.label}
-                  </Link>
-                );
-              })}
-              
-              {user ? (
-                <>
-                  {isAdmin && (
-                    <Link
-                      to="/admin"
-                      onClick={() => setIsOpen(false)}
-                      className={`flex items-center px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                        isActive('/admin')
-                          ? 'text-zapier-orange bg-cream/50'
-                          : 'text-earth hover:text-zapier-orange hover:bg-cream/30'
-                      }`}
-                    >
-                      <Shield className="h-4 w-4 mr-3 text-zapier-orange" />
-                      Admin
-                    </Link>
-                  )}
-                  <Link
-                    to="/profile"
-                    onClick={() => setIsOpen(false)}
-                    className={`flex items-center px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                      isActive('/profile')
-                        ? 'text-zapier-orange bg-cream/50'
-                        : 'text-earth hover:text-zapier-orange hover:bg-cream/30'
-                    }`}
-                  >
-                    <User className="h-4 w-4 mr-3 text-zapier-orange" />
-                    Profile
-                  </Link>
-                </>
-              ) : (
+            <div className="px-2 pt-2 pb-3 space-y-1 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
+              {navItems.map((item) => (
                 <Link
-                  to="/auth"
+                  key={item.path}
+                  to={item.path}
+                  className={`block px-3 py-2 text-earth dark:text-white hover:text-zapier-orange transition-colors font-medium ${
+                    isActive(item.path) ? 'text-zapier-orange bg-zapier-orange/10' : 'hover:bg-gray-50 dark:hover:bg-gray-800'
+                  }`}
                   onClick={() => setIsOpen(false)}
-                  className="block px-3 py-2 bg-zapier-orange text-white rounded-lg text-sm font-semibold hover:bg-zapier-orange/90 transition-colors"
                 >
-                  Sign In
+                  {item.label}
                 </Link>
-              )}
+              ))}
+              <div className="px-3 py-2">
+                {user ? <UserProfileDropdown /> : <AuthButtons />}
+              </div>
             </div>
           </div>
         )}
