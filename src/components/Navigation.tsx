@@ -38,16 +38,16 @@ const Navigation = () => {
 
   return (
     <nav className="bg-white dark:bg-earth border-b border-border">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
-          {/* Logo positioned absolutely to the left */}
-          <div className="absolute left-4 top-0 h-16 flex items-center">
+          {/* Logo */}
+          <div className="flex items-center">
             <NavigationLogo />
           </div>
 
-          {/* Desktop Navigation - Centered in 80% container */}
+          {/* Desktop Navigation - Centered */}
           <div className="hidden md:flex items-center justify-center flex-1">
-            <div className="flex items-center space-x-8 max-w-4xl">
+            <div className="flex items-center space-x-8">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 return (
@@ -103,8 +103,8 @@ const Navigation = () => {
             <ThemeToggle />
           </div>
 
-          {/* Mobile menu button - positioned to the right */}
-          <div className="md:hidden flex items-center space-x-2 absolute right-4 top-0 h-16">
+          {/* Mobile menu button */}
+          <div className="md:hidden flex items-center space-x-2">
             <ThemeToggle />
             <button
               onClick={() => setIsOpen(!isOpen)}
