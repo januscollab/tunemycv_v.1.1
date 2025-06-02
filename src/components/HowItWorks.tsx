@@ -1,59 +1,66 @@
 
 import React from 'react';
-import { Upload, Search, FileText, Download } from 'lucide-react';
+import { Upload, Zap, Target, TrendingUp } from 'lucide-react';
 
 const HowItWorks = () => {
   const steps = [
     {
       icon: Upload,
       title: "Upload Your CV",
-      description: "Simply upload your current CV and the job description you're targeting."
+      description: "Simply upload your current CV and any job description you're targeting. Our system supports multiple file formats.",
+      image: "https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=300&h=200&fit=crop&crop=center"
     },
     {
-      icon: Search,
+      icon: Zap,
       title: "AI Analysis",
-      description: "Our advanced AI analyzes your CV against the job requirements and industry standards."
+      description: "Our advanced AI analyzes your CV against industry standards and ATS requirements, identifying strengths and areas for improvement.",
+      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=300&h=200&fit=crop&crop=center"
     },
     {
-      icon: FileText,
-      title: "Get Insights",
-      description: "Receive detailed feedback with actionable recommendations to improve your application."
+      icon: Target,
+      title: "Get Recommendations",
+      description: "Receive detailed, actionable feedback including keyword optimization, formatting suggestions, and content improvements.",
+      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=300&h=200&fit=crop&crop=center"
     },
     {
-      icon: Download,
-      title: "Apply with Confidence",
-      description: "Download your optimized CV and personalized cover letter, then apply with confidence."
+      icon: TrendingUp,
+      title: "Land Your Dream Job",
+      description: "Apply with confidence using your optimized CV and watch your interview rate increase significantly.",
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=200&fit=crop&crop=center"
     }
   ];
 
   return (
-    <section className="py-20 px-4 bg-white dark:bg-gray-900">
-      <div className="max-w-6xl mx-auto">
+    <section id="how-it-works" className="py-20 px-4 bg-white dark:bg-gray-900">
+      <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-earth dark:text-white mb-4">
-            How <span className="text-zapier-orange">Tune</span>MyCV Works
+          <h2 className="text-4xl font-bold text-blueberry dark:text-citrus mb-4">
+            How TuneMyCV Works
           </h2>
-          <p className="text-xl text-earth/70 dark:text-white/70 max-w-3xl mx-auto">
-            Our streamlined process helps you optimize your CV and cover letter in just a few simple steps
+          <p className="text-xl text-blueberry/80 dark:text-apple-core max-w-3xl mx-auto">
+            Transform your CV in four simple steps and increase your chances of landing your dream job
           </p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {steps.map((step, index) => (
             <div key={index} className="text-center">
-              <div className="bg-zapier-orange/10 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
-                <step.icon className="h-10 w-10 text-zapier-orange" />
+              <div className="bg-gradient-to-br from-citrus/20 to-apricot/20 rounded-lg overflow-hidden mb-6 border border-citrus/30">
+                <img 
+                  src={step.image} 
+                  alt={step.title}
+                  className="w-full h-48 object-cover"
+                />
+                <div className="p-4">
+                  <div className="bg-gradient-to-br from-citrus/20 to-apricot/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 border border-citrus/30">
+                    <step.icon className="h-8 w-8 text-apricot" />
+                  </div>
+                </div>
               </div>
-              
-              <div className="bg-zapier-orange text-white rounded-full w-8 h-8 flex items-center justify-center mx-auto mb-4 text-sm font-bold">
-                {index + 1}
-              </div>
-              
-              <h3 className="text-xl font-bold text-earth dark:text-white mb-3">
+              <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mb-4">
                 {step.title}
               </h3>
-              
-              <p className="text-earth/70 dark:text-white/70 leading-relaxed">
+              <p className="text-blueberry/70 dark:text-apple-core/80 leading-relaxed">
                 {step.description}
               </p>
             </div>

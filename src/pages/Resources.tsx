@@ -100,22 +100,23 @@ const Resources = () => {
       <section className="py-8 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold text-center text-blueberry dark:text-citrus mb-8">
-            Featured Resources
+            Our Top 3 Resources
           </h2>
           
           <div className="grid md:grid-cols-3 gap-6 mb-12">
             {topResources.map((resource, index) => (
-              <div key={index} className="bg-white dark:bg-blueberry/20 rounded-xl shadow-lg p-8 hover:shadow-xl transition-all border border-apple-core/20 dark:border-citrus/20 hover:border-zapier-orange/50" style={{ height: '280px' }}>
-                <div className="mb-6">
-                  <div className="bg-gradient-to-r from-zapier-orange to-apricot h-32 rounded-lg mb-4 flex items-center justify-center">
+              <div key={index} className="bg-white dark:bg-blueberry/20 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all border border-apple-core/20 dark:border-citrus/20 hover:border-zapier-orange/50" style={{ height: '216px' }}>
+                <div className="bg-apricot/20 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+                  <resource.icon className="h-6 w-6 text-apricot" />
+                </div>
+                
+                <div className="mb-4">
+                  <div className="bg-gradient-to-r from-zapier-orange to-apricot h-24 rounded-lg mb-3 flex items-center justify-center">
                     <span className="text-white text-sm font-medium">Featured Image</span>
                   </div>
-                  <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mb-3 line-clamp-2">
+                  <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-2 line-clamp-2">
                     {resource.title}
                   </h3>
-                  <p className="text-blueberry/70 dark:text-apple-core/80 text-sm mb-4 line-clamp-3">
-                    {resource.description}
-                  </p>
                 </div>
                 
                 <a 
@@ -153,24 +154,26 @@ const Resources = () => {
           {/* Resources Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredResources.map((resource, index) => (
-              <div key={index} className="bg-white dark:bg-blueberry/20 rounded-xl shadow-lg p-8 hover:shadow-xl transition-all border border-apple-core/20 dark:border-citrus/20 hover:border-zapier-orange/50" style={{ height: '220px' }}>
-                <div className="flex flex-col h-full">
-                  <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mb-4 line-clamp-2 flex-grow">
+              <div key={index} className="bg-white dark:bg-blueberry/20 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all border border-apple-core/20 dark:border-citrus/20 hover:border-zapier-orange/50" style={{ height: '180px' }}>
+                <div className="flex flex-col items-center text-center h-full">
+                  <div className="bg-apricot/20 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+                    <resource.icon className="h-6 w-6 text-apricot" />
+                  </div>
+                  
+                  <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-3 line-clamp-2">
                     {resource.title}
                   </h3>
                   
-                  <div className="mt-auto flex justify-between items-end">
-                    <span className="inline-block bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-xs font-medium">
-                      {resource.category}
-                    </span>
-                    
-                    <a 
-                      href={resource.link}
-                      className="inline-flex items-center text-apricot font-medium hover:text-zapier-orange transition-colors text-sm"
-                    >
-                      Read More →
-                    </a>
-                  </div>
+                  <span className="inline-block bg-citrus/20 text-citrus px-3 py-1 rounded-full text-sm font-medium mb-4">
+                    {resource.category}
+                  </span>
+                  
+                  <a 
+                    href={resource.link}
+                    className="inline-flex items-center text-apricot font-medium hover:text-zapier-orange transition-colors text-sm mt-auto"
+                  >
+                    Read More →
+                  </a>
                 </div>
               </div>
             ))}

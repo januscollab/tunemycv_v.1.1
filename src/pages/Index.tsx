@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, CheckCircle, FileText, Users, TrendingUp, Sparkles, MessageSquare } from 'lucide-react';
+import { ArrowRight, CheckCircle, FileText, Users, TrendingUp, Sparkles } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import HowItWorks from '@/components/HowItWorks';
 import Testimonials from '@/components/Testimonials';
@@ -76,7 +76,7 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-white dark:bg-earth/10 rounded-2xl p-8 hover:shadow-lg transition-shadow border border-earth/10 dark:border-white/10">
               <div className="bg-zapier-orange/10 rounded-full w-16 h-16 flex items-center justify-center mb-6">
                 <FileText className="h-8 w-8 text-zapier-orange" />
@@ -111,19 +111,6 @@ const Index = () => {
 
             <div className="bg-white dark:bg-earth/10 rounded-2xl p-8 hover:shadow-lg transition-shadow border border-earth/10 dark:border-white/10">
               <div className="bg-zapier-orange/10 rounded-full w-16 h-16 flex items-center justify-center mb-6">
-                <MessageSquare className="h-8 w-8 text-zapier-orange" />
-              </div>
-              <h3 className="text-2xl font-bold text-earth dark:text-white mb-4">Interview Prep</h3>
-              <p className="text-earth/70 dark:text-white/70 leading-relaxed mb-6">
-                Prepare for interviews with personalized questions and practice sessions based on your CV and target role.
-              </p>
-              <span className="text-zapier-orange font-semibold inline-flex items-center">
-                Coming Soon <ArrowRight className="ml-1 h-4 w-4" />
-              </span>
-            </div>
-
-            <div className="bg-white dark:bg-earth/10 rounded-2xl p-8 hover:shadow-lg transition-shadow border border-earth/10 dark:border-white/10">
-              <div className="bg-zapier-orange/10 rounded-full w-16 h-16 flex items-center justify-center mb-6">
                 <TrendingUp className="h-8 w-8 text-zapier-orange" />
               </div>
               <h3 className="text-2xl font-bold text-earth dark:text-white mb-4">Career Resources</h3>
@@ -136,6 +123,58 @@ const Index = () => {
               >
                 Explore Resources <ArrowRight className="ml-1 h-4 w-4" />
               </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Our Top 3 Resources Section */}
+      <section className="pt-12 pb-20">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-earth dark:text-white mb-4">
+              Our Top 3 Resources
+            </h2>
+            <p className="text-xl text-earth/70 dark:text-white/70 max-w-2xl mx-auto">
+              Essential tools and guides to accelerate your career development
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 hover:border-zapier-orange/50 transition-colors">
+              <h3 className="text-xl font-semibold text-earth dark:text-white mb-3">
+                CV Writing Guide
+              </h3>
+              <p className="text-earth/70 dark:text-white/70 mb-4">
+                Comprehensive guide to writing CVs that get noticed by employers and ATS systems.
+              </p>
+              <span className="inline-block px-3 py-1 bg-zapier-orange/10 text-zapier-orange text-sm rounded-full">
+                Essential
+              </span>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 hover:border-zapier-orange/50 transition-colors">
+              <h3 className="text-xl font-semibold text-earth dark:text-white mb-3">
+                Interview Preparation
+              </h3>
+              <p className="text-earth/70 dark:text-white/70 mb-4">
+                Expert tips and strategies to ace your next job interview with confidence.
+              </p>
+              <span className="inline-block px-3 py-1 bg-zapier-orange/10 text-zapier-orange text-sm rounded-full">
+                Popular
+              </span>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 hover:border-zapier-orange/50 transition-colors">
+              <h3 className="text-xl font-semibold text-earth dark:text-white mb-3">
+                Cover Letter Templates
+              </h3>
+              <p className="text-earth/70 dark:text-white/70 mb-4">
+                Professional templates and examples for compelling cover letters.
+              </p>
+              <span className="inline-block px-3 py-1 bg-zapier-orange/10 text-zapier-orange text-sm rounded-full">
+                Templates
+              </span>
             </div>
           </div>
         </div>

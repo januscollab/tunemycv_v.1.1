@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -11,7 +10,7 @@ import AnalyzeButton from '@/components/analyze/AnalyzeButton';
 import { useAnalysis } from '@/hooks/useAnalysis';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { FileText, History, MessageSquare } from 'lucide-react';
+import { FileText, History, Eye } from 'lucide-react';
 import EmbeddedAuth from '@/components/auth/EmbeddedAuth';
 import ServiceExplanation from '@/components/common/ServiceExplanation';
 import { UploadedFile } from '@/types/fileTypes';
@@ -61,10 +60,10 @@ const AnalyzeCV = () => {
     }
   }, [analyzing]);
 
-  // Switch to interview prep tab when analysis completes
+  // Switch to current report tab when analysis completes
   React.useEffect(() => {
     if (analysisResult && !analyzing) {
-      setActiveTab('interview-prep');
+      setActiveTab('report');
     }
   }, [analysisResult, analyzing]);
 
@@ -248,9 +247,9 @@ const AnalyzeCV = () => {
                   <FileText className="h-4 w-4" />
                   <span>CV Analysis</span>
                 </TabsTrigger>
-                <TabsTrigger value="interview-prep" className="flex items-center space-x-2 text-sm">
-                  <MessageSquare className="h-4 w-4" />
-                  <span>Interview Prep</span>
+                <TabsTrigger value="report" className="flex items-center space-x-2 text-sm" disabled={!analysisResult}>
+                  <Eye className="h-4 w-4" />
+                  <span>Current Result</span>
                 </TabsTrigger>
                 <TabsTrigger value="history" className="flex items-center space-x-2 text-sm">
                   <History className="h-4 w-4" />
@@ -329,21 +328,25 @@ const AnalyzeCV = () => {
                 </div>
               </TabsContent>
 
-              {/* Interview Prep Tab */}
-              <TabsContent value="interview-prep" className="mt-0">
-                <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-12 border border-apple-core/20 dark:border-citrus/20 text-center">
-                  <MessageSquare className="h-16 w-16 text-zapier-orange mx-auto mb-6" />
-                  <h3 className="text-2xl font-semibold text-blueberry dark:text-citrus mb-4">Interview Preparation</h3>
-                  <p className="text-blueberry/60 dark:text-apple-core/70 mb-6 text-lg max-w-2xl mx-auto">
-                    Get personalized interview questions and practice sessions based on your CV analysis and target role.
-                  </p>
-                  <div className="inline-block bg-zapier-orange/10 text-zapier-orange px-6 py-3 rounded-full text-lg font-medium">
-                    🚀 Coming Soon
+              {/* Current Report Tab */}
+              <TabsContent value="report" className="mt-0">
+                {analysisResult ? (
+                  <AnalysisResults result={analysisResult} onStartNew={handleStartNew} />
+                ) : (
+                  <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-8 border border-apple-core/20 dark:border-citrus/20 text-center">
+                    <Eye className="h-12 w-12 text-blueberry/30 dark:text-apple-core/50 mx-auto mb-3" />
+                    <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-2">No Report Available</h3>
+                    <p className="text-blueberry/60 dark:text-apple-core/70 mb-4 text-sm">
+                      Complete a CV analysis to view your report here.
+                    </p>
+                    <button
+                      onClick={() => setActiveTab('analysis')}
+                      className="bg-zapier-orange hover:bg-zapier-orange/90 text-white px-4 py-2 rounded-md transition-colors text-sm"
+                    >
+                      Start Analysis
+                    </button>
                   </div>
-                  <p className="text-sm text-blueberry/50 dark:text-apple-core/60 mt-4">
-                    We're working hard to bring you this feature. Stay tuned!
-                  </p>
-                </div>
+                )}
               </TabsContent>
 
               {/* Analysis History Tab */}
