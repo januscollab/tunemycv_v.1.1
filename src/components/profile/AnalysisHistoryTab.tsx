@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -99,10 +98,11 @@ const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ credits, member
   };
 
   const handleCreateCoverLetter = (analysis: AnalysisResult) => {
-    // Navigate to Cover Letter page with the analysis data
+    console.log('Navigating to Cover Letter with analysis:', analysis);
+    // Navigate to Cover Letter page with the analysis data - fixed property name
     navigate('/cover-letter', {
       state: {
-        selectedAnalysis: analysis,
+        analysis: analysis,  // Changed from selectedAnalysis to analysis
         generationMethod: 'analysis'
       }
     });
