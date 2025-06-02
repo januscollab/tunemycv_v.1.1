@@ -1,8 +1,7 @@
+
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { useQuery } from '@tanstack/react-query';
-import { useAuth } from '@/contexts/AuthContext';
 
 interface GenerateCoverLetterParams {
   jobTitle: string;
@@ -34,15 +33,7 @@ interface RegenerateCoverLetterParams {
   length: string;
 }
 
-interface AdvancedOptionsData {
-  workExperienceHighlights: string;
-  customHookOpener: string;
-  personalValues: string;
-  includeLinkedInUrl: boolean;
-}
-
 export const useCoverLetter = () => {
-  const { user } = useAuth();
   const [isGenerating, setIsGenerating] = useState(false);
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [analyses, setAnalyses] = useState<any[]>([]);
@@ -54,31 +45,7 @@ export const useCoverLetter = () => {
   const [coverLetter, setCoverLetter] = useState<any>(null);
   const [hasGenerated, setHasGenerated] = useState(false);
   const [showNoAnalysisModal, setShowNoAnalysisModal] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [advancedOptions, setAdvancedOptions] = useState<AdvancedOptionsData>({
-    workExperienceHighlights: '',
-    customHookOpener: '',
-    personalValues: '',
-    includeLinkedInUrl: false
-  });
   const { toast } = useToast();
-
-  // Fetch saved cover letters
-  const { data: savedCoverLetters, refetch: refetchSavedLetters } = useQuery({
-    queryKey: ['cover-letters', user?.id],
-    queryFn: async () => {
-      if (!user?.id) return [];
-      const { data, error } = await supabase
-        .from('cover_letters')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: !!user?.id,
-  });
 
   const resetForm = () => {
     setSelectedAnalysisId('');
@@ -88,42 +55,33 @@ export const useCoverLetter = () => {
     setLength('concise');
     setCoverLetter(null);
     setHasGenerated(false);
-    setError(null);
-    setAdvancedOptions({
-      workExperienceHighlights: '',
-      customHookOpener: '',
-      personalValues: '',
-      includeLinkedInUrl: false
-    });
   };
 
-  const generateCoverLetter = async (analysisId: string, options: AdvancedOptionsData) => {
+  const generateCoverLetter = async (params: GenerateCoverLetterParams) => {
     setIsGenerating(true);
-    setError(null);
     try {
-      // Get analysis data
-      const { data: analysisData, error: analysisError } = await supabase
-        .from('analysis_results')
-        .select('*')
-        .eq('id', analysisId)
-        .single();
+      const { data, error } = await supabase.functions.invoke('generate-cover-letter', {
+        body: params
+      });
 
-      if (analysisError) throw analysisError;
+      if (error) throw error;
 
-      const params: GenerateFromAnalysisParams = {
-        analysisResultId: analysisId,
-        tone,
-        length,
-        workExperienceHighlights: options.workExperienceHighlights,
-        customHookOpener: options.customHookOpener,
-        personalValues: options.personalValues,
-        includeLinkedInUrl: options.includeLinkedInUrl
-      };
+      setCoverLetter(data);
+      setHasGenerated(true);
 
-      const data = await generateFromAnalysis(params);
+      toast({
+        title: 'Cover Letter Generated!',
+        description: 'Your cover letter has been created successfully.',
+      });
+
       return data;
     } catch (error: any) {
-      setError(error.message);
+      console.error('Cover letter generation error:', error);
+      toast({
+        title: 'Generation Failed',
+        description: error.message || 'Failed to generate cover letter. Please try again.',
+        variant: 'destructive',
+      });
       throw error;
     } finally {
       setIsGenerating(false);
@@ -349,11 +307,6 @@ export const useCoverLetter = () => {
     hasGenerated,
     showNoAnalysisModal,
     setShowNoAnalysisModal,
-    resetForm,
-    error,
-    advancedOptions,
-    setAdvancedOptions,
-    savedCoverLetters,
-    refetchSavedLetters
+    resetForm
   };
 };
