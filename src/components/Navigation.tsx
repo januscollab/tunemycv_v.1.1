@@ -3,15 +3,17 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useProfileData } from '@/hooks/useProfileData';
 import NavigationLogo from './navigation/NavigationLogo';
 import AuthButtons from './navigation/AuthButtons';
 import UserProfileDropdown from './navigation/UserProfileDropdown';
-import { ThemeToggle } from './ThemeToggle';
+import ThemeToggle from './ThemeToggle';
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
   const { user } = useAuth();
+  const { getUserDisplayName } = useProfileData();
   const location = useLocation();
 
   // Handle scroll for sticky navigation
@@ -63,7 +65,14 @@ const Navigation = () => {
           {/* Right Side Actions */}
           <div className="hidden md:flex items-center space-x-4">
             <ThemeToggle />
-            {user ? <UserProfileDropdown /> : <AuthButtons />}
+            {user ? (
+              <UserProfileDropdown 
+                userDisplayName={getUserDisplayName()} 
+                isActive={isActive} 
+              />
+            ) : (
+              <AuthButtons />
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -95,7 +104,14 @@ const Navigation = () => {
                 </Link>
               ))}
               <div className="px-3 py-2">
-                {user ? <UserProfileDropdown /> : <AuthButtons />}
+                {user ? (
+                  <UserProfileDropdown 
+                    userDisplayName={getUserDisplayName()} 
+                    isActive={isActive} 
+                  />
+                ) : (
+                  <AuthButtons />
+                )}
               </div>
             </div>
           </div>
