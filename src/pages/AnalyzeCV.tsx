@@ -85,8 +85,8 @@ const AnalyzeCV = () => {
     setAnalyzing(true);
     try {
       const uploadedFiles = {
-        cv: selectedFile ? { file: selectedFile, id: '', extractedText: '', type: 'cv' } : undefined,
-        jobDescription: jobDescriptionFile ? { file: jobDescriptionFile, id: '', extractedText: jobDescriptionText, type: 'job_description' } : undefined
+        cv: selectedFile ? { file: selectedFile, id: '', extractedText: '', type: 'cv' as const } : undefined,
+        jobDescription: jobDescriptionFile ? { file: jobDescriptionFile, id: '', extractedText: jobDescriptionText, type: 'job_description' as const } : undefined
       };
 
       const result = await executeAnalysis(
@@ -212,7 +212,7 @@ const AnalyzeCV = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
-      <div className="max-w-6xl mx-auto px-4">
+      <div className="max-w-4xl mx-auto px-4">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-earth dark:text-white mb-4">
             Analyze Your CV
@@ -274,7 +274,7 @@ const AnalyzeCV = () => {
 
               <TabsContent value="results">
                 {analysisResult && (
-                  <AnalysisResults analysisResult={analysisResult} />
+                  <AnalysisResults analysis={analysisResult} />
                 )}
               </TabsContent>
 
