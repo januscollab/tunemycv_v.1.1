@@ -8,6 +8,7 @@ import JobDescriptionInput from '@/components/analyze/JobDescriptionInput';
 import CreditsPanel from '@/components/analyze/CreditsPanel';
 import AnalyzeButton from '@/components/analyze/AnalyzeButton';
 import InterviewPrepAnalysisSelector from '@/components/analyze/InterviewPrepAnalysisSelector';
+import InterviewPrepModal from '@/components/analyze/InterviewPrepModal';
 import AnalysisSelector from '@/components/cover-letter/AnalysisSelector';
 import { useAnalysis } from '@/hooks/useAnalysis';
 import { useQuery } from '@tanstack/react-query';
@@ -47,6 +48,8 @@ const AnalyzeCV = () => {
   });
   const [interviewJobTitle, setInterviewJobTitle] = useState('');
   const [interviewCompanyName, setInterviewCompanyName] = useState('');
+  const [interviewJobDescription, setInterviewJobDescription] = useState<UploadedFile | undefined>();
+  const [showInterviewPrepModal, setShowInterviewPrepModal] = useState(false);
   
   // Get initial tab from URL parameter or location state
   const urlParams = new URLSearchParams(location.search);
@@ -149,6 +152,16 @@ const AnalyzeCV = () => {
     }
   };
 
+  const handleInterviewJobDescriptionSet = (uploadedFile: UploadedFile) => {
+    setInterviewJobDescription(uploadedFile);
+
+    // Auto-extract job title from job description
+    if (!interviewJobTitle) {
+      const extractedJobTitle = extractJobTitleFromText(uploadedFile.extractedText);
+      setInterviewJobTitle(extractedJobTitle);
+    }
+  };
+
   const handleAnalysis = () => {
     // Validate that we have at least a job description
     if (!uploadedFiles.jobDescription) {
@@ -199,10 +212,58 @@ const AnalyzeCV = () => {
   };
 
   const handleGenerateInterviewPrep = () => {
-    toast({
-      title: 'Coming Soon!',
-      description: 'Interview Prep generation feature is currently in development.',
-    });
+    // Validation logic
+    const hasSelectedInclusions = Object.values(interviewPrepIncludes).some(Boolean);
+    
+    if (!hasSelectedInclusions) {
+      toast({
+        title: 'Selection Required',
+        description: 'Please select at least one item to include in your interview prep.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    if (interviewPrepMethod === 'input') {
+      if (!interviewJobDescription) {
+        toast({
+          title: 'Missing Job Description',
+          description: 'Please provide a job description.',
+          variant: 'destructive'
+        });
+        return;
+      }
+      
+      if (!interviewJobTitle.trim()) {
+        toast({
+          title: 'Missing Job Title',
+          description: 'Please provide a job title.',
+          variant: 'destructive'
+        });
+        return;
+      }
+      
+      if (!interviewCompanyName.trim()) {
+        toast({
+          title: 'Missing Company Name',
+          description: 'Please provide a company name.',
+          variant: 'destructive'
+        });
+        return;
+      }
+    }
+
+    if (interviewPrepMethod === 'analysis' && !selectedAnalysisId) {
+      toast({
+        title: 'Missing Analysis Selection',
+        description: 'Please select an existing analysis.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    // Show the work-in-progress modal
+    setShowInterviewPrepModal(true);
   };
 
   const canAnalyze = !!uploadedFiles.jobDescription; // Fixed: properly check if job description exists
@@ -448,6 +509,22 @@ const AnalyzeCV = () => {
                             </CardTitle>
                           </CardHeader>
                           <CardContent className="space-y-4">
+                            {/* Job Description Input */}
+                            <div>
+                              <label className="block text-sm font-medium text-blueberry dark:text-citrus mb-1">
+                                Job Description <span className="text-red-500">*</span>
+                              </label>
+                              <p className="text-xs text-blueberry/60 dark:text-apple-core/70 mb-3">
+                                Upload a file (PDF, DOCX, TXT) or paste the text directly
+                              </p>
+                              <JobDescriptionInput
+                                onJobDescriptionSet={handleInterviewJobDescriptionSet}
+                                uploadedFile={interviewJobDescription}
+                                disabled={false}
+                              />
+                            </div>
+                            
+                            {/* Job Title */}
                             <div>
                               <label className="block text-sm font-medium text-blueberry dark:text-citrus mb-1">
                                 Job Title <span className="text-red-500">*</span>
@@ -456,10 +533,12 @@ const AnalyzeCV = () => {
                                 type="text"
                                 value={interviewJobTitle}
                                 onChange={(e) => setInterviewJobTitle(e.target.value)}
-                                placeholder="e.g., Senior Software Engineer"
+                                placeholder="e.g., Senior Software Engineer (auto-extracted from job description)"
                                 className="w-full px-3 py-2 border border-apple-core/30 dark:border-citrus/30 rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange focus:border-transparent bg-white dark:bg-blueberry/10 text-blueberry dark:text-apple-core"
                               />
                             </div>
+                            
+                            {/* Company Name */}
                             <div>
                               <label className="block text-sm font-medium text-blueberry dark:text-citrus mb-1">
                                 Company Name <span className="text-red-500">*</span>
@@ -552,10 +631,11 @@ const AnalyzeCV = () => {
                       <div className="flex justify-center">
                         <Button
                           onClick={handleGenerateInterviewPrep}
-                          className="bg-zapier-orange hover:bg-zapier-orange/90 text-white px-8 py-3 text-lg font-semibold"
+                          className="bg-zapier-orange hover:bg-zapier-orange/90 text-white px-8 py-3 text-lg font-semibold flex items-center space-x-2"
                           size="lg"
                         >
-                          Generate Interview Prep Notes
+                          <MessageSquare className="h-5 w-5" />
+                          <span>Generate Interview Prep Notes</span>
                         </Button>
                       </div>
                     </div>
@@ -579,6 +659,12 @@ const AnalyzeCV = () => {
           </div>
         </div>
       </div>
+
+      {/* Interview Prep Modal */}
+      <InterviewPrepModal
+        isOpen={showInterviewPrepModal}
+        onClose={() => setShowInterviewPrepModal(false)}
+      />
     </div>
   );
 };
