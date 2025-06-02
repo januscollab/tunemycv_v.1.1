@@ -1,61 +1,48 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Mail } from 'lucide-react';
 
 const Footer = () => {
   return (
-    <footer className="bg-earth dark:bg-earth text-white py-12">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="grid md:grid-cols-4 gap-8">
-          {/* Company Info */}
-          <div className="md:col-span-2">
-            <div className="mb-4">
+    <footer className="bg-earth text-white py-12 px-4">
+      <div className="max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          {/* Logo and Description */}
+          <div className="md:col-span-1">
+            <div className="flex items-center mb-4">
               <img 
-                src="/lovable-uploads/27d510c8-5f8c-4af0-bab4-85845bfde88b.png" 
-                alt="TuneMyCV" 
-                className="h-8 w-auto"
+                src="/lovable-uploads/9c0fa345-67f1-4945-aec9-6e428b4de6b2.png" 
+                alt="TuneMyCV Logo" 
+                className="h-8 w-auto mr-2"
               />
             </div>
-            <p className="text-white/80 mb-4">
-              AI-powered CV analysis that helps you optimize your resume for Applicant Tracking Systems (ATS) and land your dream job.
-            </p>
-            <div className="mb-4">
-              <a 
-                href="mailto:hello@tunemycv.com"
-                className="flex items-center text-white/80 hover:text-zapier-orange transition-colors"
-              >
-                <Mail className="h-4 w-4 mr-2 text-zapier-orange" />
-                hello@tunemycv.com
-              </a>
-            </div>
-            <p className="text-sm text-white/60">
-              © 2024 TuneMyCV. All rights reserved.
+            <p className="text-white/80 text-sm leading-relaxed">
+              AI-powered CV optimization platform helping job seekers improve their applications and increase interview success rates.
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-semibold mb-4 font-display">Quick Links</h4>
-            <ul className="space-y-2 text-white/80">
+            <h3 className="text-lg font-bold text-white mb-4">Quick Links</h3>
+            <ul className="space-y-2">
               <li>
-                <Link to="/analyze" className="hover:text-zapier-orange transition-colors">
+                <Link to="/analyze" className="text-white/80 hover:text-zapier-orange transition-colors text-sm">
                   Analyze CV
                 </Link>
               </li>
               <li>
-                <Link to="/resources" className="hover:text-zapier-orange transition-colors">
+                <Link to="/cover-letter" className="text-white/80 hover:text-zapier-orange transition-colors text-sm">
+                  Cover Letter
+                </Link>
+              </li>
+              <li>
+                <Link to="/resources" className="text-white/80 hover:text-zapier-orange transition-colors text-sm">
                   Resources
                 </Link>
               </li>
               <li>
-                <Link to="/help" className="hover:text-zapier-orange transition-colors">
-                  Help Centre
-                </Link>
-              </li>
-              <li>
-                <Link to="/profile" className="hover:text-zapier-orange transition-colors">
-                  Profile
+                <Link to="/next-steps" className="text-white/80 hover:text-zapier-orange transition-colors text-sm">
+                  Next Steps
                 </Link>
               </li>
             </ul>
@@ -63,30 +50,54 @@ const Footer = () => {
 
           {/* Support */}
           <div>
-            <h4 className="font-semibold mb-4 font-display">Support</h4>
-            <ul className="space-y-2 text-white/80">
+            <h3 className="text-lg font-bold text-white mb-4">Support</h3>
+            <ul className="space-y-2">
               <li>
-                <Link to="/help" className="hover:text-zapier-orange transition-colors">
+                <Link to="/help-centre" className="text-white/80 hover:text-zapier-orange transition-colors text-sm">
                   Help Centre
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className="hover:text-zapier-orange transition-colors">
+                <Link to="/contact" className="text-white/80 hover:text-zapier-orange transition-colors text-sm">
                   Contact Us
                 </Link>
               </li>
               <li>
-                <Link to="/analyze" className="hover:text-zapier-orange transition-colors">
-                  Get Started
-                </Link>
-              </li>
-              <li>
-                <Link to="/privacy-policy" className="hover:text-zapier-orange transition-colors">
-                  Privacy Policy
-                </Link>
+                <a href="mailto:support@tunemycv.com" className="text-white/80 hover:text-zapier-orange transition-colors text-sm">
+                  Email Support
+                </a>
               </li>
             </ul>
           </div>
+
+          {/* Legal */}
+          <div>
+            <h3 className="text-lg font-bold text-white mb-4">Legal</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link to="/privacy" className="text-white/80 hover:text-zapier-orange transition-colors text-sm">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <a href="#" className="text-white/80 hover:text-zapier-orange transition-colors text-sm">
+                  Terms of Service
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-white/80 hover:text-zapier-orange transition-colors text-sm">
+                  Cookie Policy
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="border-t border-white/20 mt-8 pt-8 text-center">
+          <p className="text-white/60 text-sm">
+            © {new Date().getFullYear()} TuneMyCV. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>

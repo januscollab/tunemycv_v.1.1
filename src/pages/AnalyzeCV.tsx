@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -165,14 +164,26 @@ const AnalyzeCV = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
         <div className="max-w-5xl mx-auto px-4 py-12">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-[500px]">
+          <div className="flex items-center mb-8">
+            <FileText className="h-12 w-12 text-zapier-orange mr-6" />
+            <div>
+              <h1 className="text-4xl md:text-5xl font-bold text-earth dark:text-white mb-4">
+                Analyze Your CV
+              </h1>
+              <p className="text-xl text-earth/70 dark:text-white/70 max-w-3xl font-normal">
+                Get comprehensive compatibility analysis with actionable recommendations to improve your job application success.
+              </p>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-[500px] mt-12">
             <div className="flex items-start">
               <ServiceExplanation
                 title={analyzeExplanation.title}
                 subtitle={analyzeExplanation.subtitle}
                 benefits={analyzeExplanation.benefits}
                 features={analyzeExplanation.features}
-                icon={<FileText className="h-8 w-8 text-apricot" />}
+                icon={<FileText className="h-8 w-8 text-zapier-orange" />}
                 compact={true}
               />
             </div>
@@ -182,7 +193,7 @@ const AnalyzeCV = () => {
                   <EmbeddedAuth
                     title="Login to Get Started"
                     description="CV analysis requires an account to ensure personalized results and save your analysis history."
-                    icon={<FileText className="h-6 w-6 text-apricot mr-2" />}
+                    icon={<FileText className="h-6 w-6 text-zapier-orange mr-2" />}
                   />
                 </div>
               </div>
@@ -207,16 +218,16 @@ const AnalyzeCV = () => {
         </div>
       )}
       
-      <div className="max-w-5xl mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Header Section */}
         <div className="mb-6">
           <div className="flex items-center mb-3">
-            <FileText className="h-8 w-8 text-apricot mr-3" />
-            <h1 className="text-3xl font-bold text-blueberry dark:text-citrus">
+            <FileText className="h-8 w-8 text-zapier-orange mr-3" />
+            <h1 className="text-3xl font-bold text-earth dark:text-white">
               Analyze Your CV
             </h1>
           </div>
-          <p className="text-lg text-blueberry/70 dark:text-apple-core max-w-2xl">
+          <p className="text-lg text-earth/70 dark:text-white/70 max-w-2xl">
             Upload your CV and job description to get comprehensive compatibility analysis with actionable recommendations.
           </p>
         </div>

@@ -32,9 +32,9 @@ const Index = () => {
                 to="/analyze"
                 className="bg-zapier-orange text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange/90 transition-colors inline-flex items-center"
               >
-                <Upload className="mr-2 h-5 w-5 text-zapier-orange" />
+                <Upload className="mr-2 h-5 w-5 text-white" />
                 Analyze Your CV
-                <ArrowRight className="ml-2 h-5 w-5 text-zapier-orange" />
+                <ArrowRight className="ml-2 h-5 w-5 text-white" />
               </Link>
               <Link
                 to="/cover-letter"
@@ -50,7 +50,7 @@ const Index = () => {
                 className="bg-zapier-orange text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange/90 transition-colors inline-flex items-center"
               >
                 Get Started Free
-                <ArrowRight className="ml-2 h-5 w-5 text-zapier-orange" />
+                <ArrowRight className="ml-2 h-5 w-5 text-white" />
               </Link>
               <button
                 onClick={scrollToHowItWorks}
@@ -70,7 +70,7 @@ const Index = () => {
       <section className="py-20 px-4 bg-cream/30">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-earth mb-6 font-display">
+            <h2 className="text-4xl font-bold text-earth mb-6">
               Why Choose TuneMyCV?
             </h2>
             <p className="text-xl text-earth/70 max-w-xl mx-auto">
@@ -83,7 +83,7 @@ const Index = () => {
               <div className="bg-zapier-orange/10 rounded-lg w-16 h-16 flex items-center justify-center mx-auto mb-6">
                 <CheckCircle className="h-8 w-8 text-zapier-orange" />
               </div>
-              <h3 className="text-xl font-bold text-earth mb-4 font-display">ATS Optimization</h3>
+              <h3 className="text-xl font-bold text-earth mb-4">ATS Optimization</h3>
               <p className="text-earth/60 leading-relaxed">
                 Ensure your CV passes Applicant Tracking Systems with our advanced formatting and keyword optimization.
               </p>
@@ -93,7 +93,7 @@ const Index = () => {
               <div className="bg-zapier-orange/10 rounded-lg w-16 h-16 flex items-center justify-center mx-auto mb-6">
                 <TrendingUp className="h-8 w-8 text-zapier-orange" />
               </div>
-              <h3 className="text-xl font-bold text-earth mb-4 font-display">AI-Powered Analysis</h3>
+              <h3 className="text-xl font-bold text-earth mb-4">AI-Powered Analysis</h3>
               <p className="text-earth/60 leading-relaxed">
                 Get detailed feedback and personalized recommendations to improve your CV's impact and effectiveness.
               </p>
@@ -103,7 +103,7 @@ const Index = () => {
               <div className="bg-zapier-orange/10 rounded-lg w-16 h-16 flex items-center justify-center mx-auto mb-6">
                 <Star className="h-8 w-8 text-zapier-orange" />
               </div>
-              <h3 className="text-xl font-bold text-earth mb-4 font-display">Industry Expertise</h3>
+              <h3 className="text-xl font-bold text-earth mb-4">Industry Expertise</h3>
               <p className="text-earth/60 leading-relaxed">
                 Leverage insights from thousands of successful job applications across various industries and roles.
               </p>
@@ -116,7 +116,7 @@ const Index = () => {
       <section className="py-20 px-4 bg-earth text-white relative overflow-hidden">
         <div className="max-w-4xl mx-auto relative z-10">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-6 text-white font-display">Trusted by Job Seekers Worldwide</h2>
+            <h2 className="text-4xl font-bold mb-6 text-white">Trusted by Job Seekers Worldwide</h2>
             <p className="text-xl text-white/90">
               Join thousands of professionals who have successfully optimized their CVs with TuneMyCV
             </p>
@@ -146,7 +146,7 @@ const Index = () => {
       {!user && (
         <section className="py-20 px-4 bg-cream/30">
           <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-4xl font-bold text-earth mb-6 font-display">
+            <h2 className="text-4xl font-bold text-earth mb-6">
               Ready to Transform Your Career?
             </h2>
             <p className="text-xl text-earth/70 mb-8">
@@ -156,9 +156,9 @@ const Index = () => {
               to="/analyze"
               className="bg-zapier-orange text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange/90 transition-colors inline-flex items-center"
             >
-              <Users className="mr-2 h-5 w-5 text-zapier-orange" />
+              <Users className="mr-2 h-5 w-5 text-white" />
               Join TuneMyCV Today
-              <ArrowRight className="ml-2 h-5 w-5 text-zapier-orange" />
+              <ArrowRight className="ml-2 h-5 w-5 text-white" />
             </Link>
           </div>
         </section>

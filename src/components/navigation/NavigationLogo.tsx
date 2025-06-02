@@ -7,7 +7,7 @@ const NavigationLogo: React.FC = () => {
     <div className="flex items-center">
       <Link to="/" className="flex items-center">
         <img 
-          src="/lovable-uploads/27d510c8-5f8c-4af0-bab4-85845bfde88b.png" 
+          src="/lovable-uploads/9c0fa345-67f1-4945-aec9-6e428b4de6b2.png" 
           alt="TuneMyCV Logo" 
           className="h-8 w-auto mr-2"
         />
