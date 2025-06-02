@@ -143,7 +143,7 @@ const AnalyzeCV = () => {
     setActiveTab('analysis');
   };
 
-  const canAnalyze = uploadedFiles.jobDescription; // Only job description is required now
+  const canAnalyze = !!uploadedFiles.jobDescription; // Fixed: properly check if job description exists
   const hasCreditsForAI = userCredits?.credits && userCredits.credits > 0;
 
   // Logged-out user experience
