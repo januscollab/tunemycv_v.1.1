@@ -37,34 +37,42 @@ const Navigation = () => {
   const navItems = user ? loggedInNavItems : loggedOutNavItems;
 
   return (
-    <nav className="bg-white border-b border-border">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <nav className="bg-white dark:bg-earth border-b border-border">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="flex justify-between h-16">
-          <NavigationLogo />
+          {/* Logo positioned absolutely to the left */}
+          <div className="absolute left-4 top-0 h-16 flex items-center">
+            <NavigationLogo />
+          </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`flex items-center px-3 py-2 text-sm font-semibold transition-colors relative ${
-                    isActive(item.path)
-                      ? 'text-zapier-orange'
-                      : 'text-earth hover:text-zapier-orange'
-                  }`}
-                >
-                  <Icon className="h-4 w-4 mr-2" />
-                  {item.label}
-                  {isActive(item.path) && (
-                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-zapier-orange"></div>
-                  )}
-                </Link>
-              );
-            })}
-            
+          {/* Desktop Navigation - Centered in 80% container */}
+          <div className="hidden md:flex items-center justify-center flex-1">
+            <div className="flex items-center space-x-8 max-w-4xl">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={`flex items-center px-3 py-2 text-sm font-semibold transition-colors relative ${
+                      isActive(item.path)
+                        ? 'text-zapier-orange'
+                        : 'text-earth hover:text-zapier-orange'
+                    }`}
+                  >
+                    <Icon className="h-4 w-4 mr-2 text-zapier-orange" />
+                    {item.label}
+                    {isActive(item.path) && (
+                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-zapier-orange"></div>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Right side items */}
+          <div className="hidden md:flex items-center space-x-4">
             {user ? (
               <div className="flex items-center space-x-4">
                 {isAdmin && (
@@ -76,7 +84,7 @@ const Navigation = () => {
                         : 'text-earth hover:text-zapier-orange'
                     }`}
                   >
-                    <Shield className="h-4 w-4 mr-2" />
+                    <Shield className="h-4 w-4 mr-2 text-zapier-orange" />
                     Admin
                     {isActive('/admin') && (
                       <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-zapier-orange"></div>
@@ -124,7 +132,7 @@ const Navigation = () => {
                         : 'text-earth hover:text-zapier-orange hover:bg-cream/30'
                     }`}
                   >
-                    <Icon className="h-4 w-4 mr-3" />
+                    <Icon className="h-4 w-4 mr-3 text-zapier-orange" />
                     {item.label}
                   </Link>
                 );
@@ -142,7 +150,7 @@ const Navigation = () => {
                           : 'text-earth hover:text-zapier-orange hover:bg-cream/30'
                       }`}
                     >
-                      <Shield className="h-4 w-4 mr-3" />
+                      <Shield className="h-4 w-4 mr-3 text-zapier-orange" />
                       Admin
                     </Link>
                   )}
@@ -155,7 +163,7 @@ const Navigation = () => {
                         : 'text-earth hover:text-zapier-orange hover:bg-cream/30'
                     }`}
                   >
-                    <User className="h-4 w-4 mr-3" />
+                    <User className="h-4 w-4 mr-3 text-zapier-orange" />
                     Profile
                   </Link>
                 </>

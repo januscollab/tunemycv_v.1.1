@@ -19,14 +19,12 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-background py-8">
-      <div className="max-w-4xl mx-auto px-4">
-        <ProfileContainer
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          credits={credits}
-          memberSince={memberSince}
-        />
-      </div>
+      <ProfileContainer
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        credits={credits}
+        memberSince={memberSince}
+      />
     </div>
   );
 };

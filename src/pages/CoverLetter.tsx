@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FileText, Sparkles, Trash2, RefreshCw, Clock, FileUp, Search, AlertCircle, Eye } from 'lucide-react';
@@ -26,7 +25,32 @@ import NoAnalysisModal from '@/components/cover-letter/NoAnalysisModal';
 const CoverLetter = () => {
   const { user } = useAuth();
   const { credits } = useUserData();
-  const { generateCoverLetter, generateFromAnalysis, regenerateCoverLetter, getCoverLetters, deleteCoverLetter, updateCoverLetter, isGenerating, isRegenerating } = useCoverLetter();
+  const { 
+    generateCoverLetter, 
+    generateFromAnalysis, 
+    regenerateCoverLetter, 
+    getCoverLetters, 
+    deleteCoverLetter, 
+    updateCoverLetter, 
+    isGenerating, 
+    isRegenerating,
+    analyses,
+    selectedAnalysisId,
+    setSelectedAnalysisId,
+    companyName,
+    setCompanyName,
+    jobTitle,
+    setJobTitle,
+    tone,
+    setTone,
+    length,
+    setLength,
+    coverLetter,
+    hasGenerated,
+    showNoAnalysisModal,
+    setShowNoAnalysisModal,
+    resetForm
+  } = useCoverLetter();
   
   const [formData, setFormData] = useState({
     jobTitle: '',
@@ -50,9 +74,7 @@ const CoverLetter = () => {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showSavePrompt, setShowSavePrompt] = useState(false);
   const [generationMethod, setGenerationMethod] = useState<'input' | 'analysis'>('input');
-  const [selectedAnalysisId, setSelectedAnalysisId] = useState<string>('');
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
-  const [showNoAnalysisModal, setShowNoAnalysisModal] = useState(false);
 
   const lengthOptions = [
     { value: 'short', label: 'Short (150-200 words)', description: 'Brief and to the point' },
@@ -254,46 +276,58 @@ const CoverLetter = () => {
     : selectedAnalysisId;
 
   if (!user) {
-    const coverLetterExplanation = {
-      title: 'Generate Cover Letter',
-      subtitle: 'Create tailored cover letters that highlight your strengths and align perfectly with specific job requirements.',
-      benefits: [
-        'AI-powered cover letter generation that matches your experience to the job requirements',
-        'Multiple tone and length options to match company culture',
-        'Tailored content that highlights your most relevant qualifications'
-      ],
-      features: [
-        'Enter the job title and company name for personalized addressing',
-        'Paste the complete job description for maximum relevance and keyword optimization',
-        'Choose your preferred tone and length to match the role and company culture'
-      ]
-    };
-
     return (
       <div className="min-h-screen bg-white dark:bg-gray-900">
-        <div className="max-w-4xl mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-[500px]">
-            <div className="flex items-start">
-              <ServiceExplanation
-                title={coverLetterExplanation.title}
-                subtitle={coverLetterExplanation.subtitle}
-                benefits={coverLetterExplanation.benefits}
-                features={coverLetterExplanation.features}
-                icon={<FileText className="h-8 w-8 text-apricot" />}
-                compact={true}
+        {/* Hero Section for logged-out users */}
+        <section className="bg-background py-16 px-4">
+          <div className="max-w-5xl mx-auto">
+            <div className="flex items-center mb-8">
+              <img 
+                src="/lovable-uploads/27d510c8-5f8c-4af0-bab4-85845bfde88b.png" 
+                alt="TuneMyCV Logo" 
+                className="h-12 w-auto mr-6"
               />
+              <div>
+                <h1 className="text-4xl md:text-5xl font-bold text-earth mb-4 font-display">
+                  Generate Cover Letter
+                </h1>
+                <p className="text-xl text-earth/70 max-w-3xl font-normal">
+                  Create tailored cover letters that highlight your strengths and align perfectly with specific job requirements.
+                </p>
+              </div>
             </div>
-            <div className="flex items-end justify-center">
-              <div className="w-full max-w-sm">
-                <EmbeddedAuth
-                  title="Login to Get Started"
-                  description="Cover letter generation requires an account to ensure personalized results and save your work."
-                  icon={<FileText className="h-6 w-6 text-apricot mr-2" />}
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-12">
+              <div className="flex items-start">
+                <ServiceExplanation
+                  title="AI-Powered Cover Letters"
+                  subtitle="Generate professional cover letters in minutes"
+                  benefits={[
+                    'AI-powered cover letter generation that matches your experience to the job requirements',
+                    'Multiple tone and length options to match company culture',
+                    'Tailored content that highlights your most relevant qualifications'
+                  ]}
+                  features={[
+                    'Enter the job title and company name for personalized addressing',
+                    'Paste the complete job description for maximum relevance and keyword optimization',
+                    'Choose your preferred tone and length to match the role and company culture'
+                  ]}
+                  icon={<FileText className="h-8 w-8 text-zapier-orange" />}
+                  compact={true}
                 />
+              </div>
+              <div className="flex items-end justify-center">
+                <div className="w-full max-w-sm">
+                  <EmbeddedAuth
+                    title="Login to Get Started"
+                    description="Cover letter generation requires an account to ensure personalized results and save your work."
+                    icon={<FileText className="h-6 w-6 text-zapier-orange mr-2" />}
+                  />
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </section>
       </div>
     );
   }
@@ -308,7 +342,7 @@ const CoverLetter = () => {
 
   const confirmTabChange = (save: boolean) => {
     if (save) {
-      handleSaveCoverLetter();
+      // handleSaveCoverLetter();
     } else {
       setHasUnsavedChanges(false);
     }
@@ -318,17 +352,17 @@ const CoverLetter = () => {
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 py-6">
-      <div className="max-w-4xl mx-auto px-4">
+      <div className="max-w-5xl mx-auto px-4">
         <div className="mb-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <div className="flex items-center mb-3">
-                <FileText className="h-8 w-8 text-apricot mr-3" />
-                <h1 className="text-3xl font-bold text-blueberry dark:text-citrus">
+                <FileText className="h-8 w-8 text-zapier-orange mr-3" />
+                <h1 className="text-3xl font-bold text-earth dark:text-white font-display">
                   Generate Cover Letter
                 </h1>
               </div>
-              <p className="text-lg font-normal text-blueberry/70 dark:text-apple-core max-w-2xl">
+              <p className="text-lg font-normal text-earth/70 dark:text-white/70 max-w-2xl">
                 Generate tailored cover letters that highlight your strengths and align with specific job requirements.
               </p>
             </div>
@@ -338,16 +372,16 @@ const CoverLetter = () => {
         <NoAnalysisModal
           isOpen={showNoAnalysisModal}
           onClose={() => setShowNoAnalysisModal(false)}
-          onUseManualInput={handleUseManualInput}
+          onUseManualInput={() => setGenerationMethod('input')}
         />
 
         {showSavePrompt && (
           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
             <div className="bg-white dark:bg-gray-800 rounded-md p-6 max-w-md border border-gray-200 dark:border-gray-700">
-              <h3 className="text-xl font-semibold mb-4">Unsaved Changes</h3>
+              <h3 className="text-xl font-semibold mb-4 font-display">Unsaved Changes</h3>
               <p className="mb-6 font-normal">You have unsaved changes. Would you like to save before continuing?</p>
               <div className="flex space-x-4">
-                <Button onClick={() => confirmTabChange(true)} className="bg-apricot hover:bg-apricot/90">
+                <Button onClick={() => confirmTabChange(true)} className="bg-zapier-orange hover:bg-zapier-orange/90">
                   Save & Continue
                 </Button>
                 <Button variant="outline" onClick={() => confirmTabChange(false)}>

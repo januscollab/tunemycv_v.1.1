@@ -36,7 +36,26 @@ interface RegenerateCoverLetterParams {
 export const useCoverLetter = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isRegenerating, setIsRegenerating] = useState(false);
+  const [analyses, setAnalyses] = useState<any[]>([]);
+  const [selectedAnalysisId, setSelectedAnalysisId] = useState('');
+  const [companyName, setCompanyName] = useState('');
+  const [jobTitle, setJobTitle] = useState('');
+  const [tone, setTone] = useState('professional');
+  const [length, setLength] = useState('concise');
+  const [coverLetter, setCoverLetter] = useState<any>(null);
+  const [hasGenerated, setHasGenerated] = useState(false);
+  const [showNoAnalysisModal, setShowNoAnalysisModal] = useState(false);
   const { toast } = useToast();
+
+  const resetForm = () => {
+    setSelectedAnalysisId('');
+    setCompanyName('');
+    setJobTitle('');
+    setTone('professional');
+    setLength('concise');
+    setCoverLetter(null);
+    setHasGenerated(false);
+  };
 
   const generateCoverLetter = async (params: GenerateCoverLetterParams) => {
     setIsGenerating(true);
@@ -46,6 +65,9 @@ export const useCoverLetter = () => {
       });
 
       if (error) throw error;
+
+      setCoverLetter(data);
+      setHasGenerated(true);
 
       toast({
         title: 'Cover Letter Generated!',
@@ -96,6 +118,9 @@ export const useCoverLetter = () => {
       });
 
       if (error) throw error;
+
+      setCoverLetter(data);
+      setHasGenerated(true);
 
       toast({
         title: 'Cover Letter Generated!',
@@ -266,6 +291,22 @@ export const useCoverLetter = () => {
     updateCoverLetter,
     deleteCoverLetter,
     isGenerating,
-    isRegenerating
+    isRegenerating,
+    analyses,
+    selectedAnalysisId,
+    setSelectedAnalysisId,
+    companyName,
+    setCompanyName,
+    jobTitle,
+    setJobTitle,
+    tone,
+    setTone,
+    length,
+    setLength,
+    coverLetter,
+    hasGenerated,
+    showNoAnalysisModal,
+    setShowNoAnalysisModal,
+    resetForm
   };
 };

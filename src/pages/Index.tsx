@@ -32,9 +32,9 @@ const Index = () => {
                 to="/analyze"
                 className="bg-zapier-orange text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange/90 transition-colors inline-flex items-center"
               >
-                <Upload className="mr-2 h-5 w-5" />
+                <Upload className="mr-2 h-5 w-5 text-zapier-orange" />
                 Analyze Your CV
-                <ArrowRight className="ml-2 h-5 w-5" />
+                <ArrowRight className="ml-2 h-5 w-5 text-zapier-orange" />
               </Link>
               <Link
                 to="/cover-letter"
@@ -50,7 +50,7 @@ const Index = () => {
                 className="bg-zapier-orange text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange/90 transition-colors inline-flex items-center"
               >
                 Get Started Free
-                <ArrowRight className="ml-2 h-5 w-5" />
+                <ArrowRight className="ml-2 h-5 w-5 text-zapier-orange" />
               </Link>
               <button
                 onClick={scrollToHowItWorks}
@@ -83,7 +83,7 @@ const Index = () => {
               <div className="bg-zapier-orange/10 rounded-lg w-16 h-16 flex items-center justify-center mx-auto mb-6">
                 <CheckCircle className="h-8 w-8 text-zapier-orange" />
               </div>
-              <h3 className="text-xl font-bold text-earth mb-4">ATS Optimization</h3>
+              <h3 className="text-xl font-bold text-earth mb-4 font-display">ATS Optimization</h3>
               <p className="text-earth/60 leading-relaxed">
                 Ensure your CV passes Applicant Tracking Systems with our advanced formatting and keyword optimization.
               </p>
@@ -93,7 +93,7 @@ const Index = () => {
               <div className="bg-zapier-orange/10 rounded-lg w-16 h-16 flex items-center justify-center mx-auto mb-6">
                 <TrendingUp className="h-8 w-8 text-zapier-orange" />
               </div>
-              <h3 className="text-xl font-bold text-earth mb-4">AI-Powered Analysis</h3>
+              <h3 className="text-xl font-bold text-earth mb-4 font-display">AI-Powered Analysis</h3>
               <p className="text-earth/60 leading-relaxed">
                 Get detailed feedback and personalized recommendations to improve your CV's impact and effectiveness.
               </p>
@@ -103,7 +103,7 @@ const Index = () => {
               <div className="bg-zapier-orange/10 rounded-lg w-16 h-16 flex items-center justify-center mx-auto mb-6">
                 <Star className="h-8 w-8 text-zapier-orange" />
               </div>
-              <h3 className="text-xl font-bold text-earth mb-4">Industry Expertise</h3>
+              <h3 className="text-xl font-bold text-earth mb-4 font-display">Industry Expertise</h3>
               <p className="text-earth/60 leading-relaxed">
                 Leverage insights from thousands of successful job applications across various industries and roles.
               </p>
@@ -156,9 +156,9 @@ const Index = () => {
               to="/analyze"
               className="bg-zapier-orange text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange/90 transition-colors inline-flex items-center"
             >
-              <Users className="mr-2 h-5 w-5" />
+              <Users className="mr-2 h-5 w-5 text-zapier-orange" />
               Join TuneMyCV Today
-              <ArrowRight className="ml-2 h-5 w-5" />
+              <ArrowRight className="ml-2 h-5 w-5 text-zapier-orange" />
             </Link>
           </div>
         </section>
