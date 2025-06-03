@@ -18,7 +18,7 @@ const Profile = () => {
   }, [searchParams]);
 
   return (
-    <div className="min-h-screen bg-almost-white py-8">
+    <div className="min-h-screen bg-background-secondary py-8">
       <ProfileContainer
         activeTab={activeTab}
         onTabChange={setActiveTab}

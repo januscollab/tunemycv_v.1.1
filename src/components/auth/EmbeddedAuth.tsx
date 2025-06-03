@@ -40,7 +40,7 @@ const EmbeddedAuth: React.FC<EmbeddedAuthProps> = ({ title, description, icon })
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4 px-6 pb-6">
-        <p className="text-earth/70 text-center text-sm font-normal mb-4">
+        <p className="text-earth/70 dark:text-white/70 text-center text-sm font-normal mb-4">
           {description}
         </p>
         
