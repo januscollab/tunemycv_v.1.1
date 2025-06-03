@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FileText, Sparkles, Trash2, RefreshCw, Clock, FileUp, Search, AlertCircle, Eye, Edit, Download, History } from 'lucide-react';
+import { FileText, Sparkles, Trash2, RefreshCw, Clock, FileUp, Search, AlertCircle, Eye, Edit, Download, History, RotateCcw } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCoverLetter } from '@/hooks/useCoverLetter';
 import { useUserData } from '@/hooks/useUserData';
@@ -13,6 +13,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
 import EmbeddedAuth from '@/components/auth/EmbeddedAuth';
 import ServiceExplanation from '@/components/common/ServiceExplanation';
 import CreditsPanel from '@/components/analyze/CreditsPanel';
@@ -24,6 +33,18 @@ import NoAnalysisModal from '@/components/cover-letter/NoAnalysisModal';
 import CoverLetterLoggedOut from '@/components/cover-letter/CoverLetterLoggedOut';
 
 const CoverLetter = () => {
+  const { user } = useAuth();
+
+  // If user is not authenticated, show the logged-out landing page
+  if (!user) {
+    return <CoverLetterLoggedOut />;
+  }
+
+  // If user is authenticated, show the full cover letter interface
+  return <AuthenticatedCoverLetter />;
+};
+
+const AuthenticatedCoverLetter = () => {
   const { user } = useAuth();
   const { credits } = useUserData();
   const location = useLocation();
@@ -70,6 +91,7 @@ const CoverLetter = () => {
   });
   
   const [coverLetters, setCoverLetters] = useState<any[]>([]);
+  const [allCoverLetters, setAllCoverLetters] = useState<any[]>([]);
   const [selectedCoverLetter, setSelectedCoverLetter] = useState<any>(null);
   const [activeTab, setActiveTab] = useState('create');
   const [loadingHistory, setLoadingHistory] = useState(false);
@@ -77,6 +99,10 @@ const CoverLetter = () => {
   const [showSavePrompt, setShowSavePrompt] = useState(false);
   const [generationMethod, setGenerationMethod] = useState<'input' | 'analysis'>('input');
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const lengthOptions = [
     { value: 'short', label: 'Short (150-200 words)', description: 'Brief and to the point' },
@@ -95,9 +121,17 @@ const CoverLetter = () => {
 
   // Handle navigation state from analysis history
   useEffect(() => {
-    const state = location.state as { analysis?: any } | null;
-    if (state?.analysis) {
-      console.log('Navigation state detected:', state.analysis);
+    const state = location.state as { analysis?: any; coverLetter?: any; viewMode?: boolean; activeTab?: string } | null;
+    if (state?.coverLetter && state?.viewMode) {
+      console.log('Navigation state detected for viewing cover letter:', state.coverLetter);
+      setSelectedCoverLetter(state.coverLetter);
+      if (state.activeTab) {
+        setActiveTab(state.activeTab);
+      }
+      // Clear the navigation state to prevent re-triggering
+      window.history.replaceState({}, document.title, location.pathname);
+    } else if (state?.analysis) {
+      console.log('Navigation state detected for creating cover letter:', state.analysis);
       setGenerationMethod('analysis');
       setSelectedAnalysisId(state.analysis.id);
       
@@ -119,11 +153,23 @@ const CoverLetter = () => {
     }
   }, [user, activeTab]);
 
+  // Calculate pagination
+  const totalPages = Math.ceil(allCoverLetters.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedCoverLetters = allCoverLetters.slice(startIndex, endIndex);
+
+  // Reset to first page when items per page changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [itemsPerPage]);
+
   const loadCoverLetterHistory = async () => {
     setLoadingHistory(true);
     try {
       const data = await getCoverLetters();
-      setCoverLetters(data);
+      setAllCoverLetters(data);
+      setCoverLetters(data); // For backward compatibility
     } catch (error) {
       console.error('Failed to load cover letter history:', error);
     } finally {
@@ -198,9 +244,9 @@ const CoverLetter = () => {
           ...generationParams
         });
 
-        setSelectedCoverLetter({ ...result.coverLetter, isUnsaved: true });
+        setSelectedCoverLetter({ ...result.coverLetter, isUnsaved: false });
         setActiveTab('result');
-        setHasUnsavedChanges(true);
+        setHasUnsavedChanges(false);
         
         if (coverLetters.length > 0) {
           loadCoverLetterHistory();
@@ -215,9 +261,9 @@ const CoverLetter = () => {
           ...generationParams
         });
 
-        setSelectedCoverLetter({ ...result.coverLetter, isUnsaved: true });
+        setSelectedCoverLetter({ ...result.coverLetter, isUnsaved: false });
         setActiveTab('result');
-        setHasUnsavedChanges(true);
+        setHasUnsavedChanges(false);
         
         if (coverLetters.length > 0) {
           loadCoverLetterHistory();
@@ -225,14 +271,6 @@ const CoverLetter = () => {
       } catch (error) {
         console.error('Generation from analysis failed:', error);
       }
-    }
-  };
-
-  const handleSaveCoverLetter = () => {
-    if (selectedCoverLetter) {
-      setSelectedCoverLetter(prev => ({ ...prev, isUnsaved: false }));
-      setHasUnsavedChanges(false);
-      loadCoverLetterHistory();
     }
   };
 
@@ -270,6 +308,7 @@ const CoverLetter = () => {
   const handleDelete = async (id: string) => {
     try {
       await deleteCoverLetter(id);
+      setAllCoverLetters(prev => prev.filter(cl => cl.id !== id));
       setCoverLetters(prev => prev.filter(cl => cl.id !== id));
       if (selectedCoverLetter?.id === id) {
         setSelectedCoverLetter(null);
@@ -290,7 +329,7 @@ const CoverLetter = () => {
   };
 
   const getRemainingFreeRegenerations = (regenerationCount: number) => {
-    return Math.max(0, 5 - regenerationCount);
+    return Math.max(0, 2 - regenerationCount);
   };
 
   const canGenerate = generationMethod === 'input' 
@@ -325,14 +364,14 @@ const CoverLetter = () => {
       <div className="max-w-4xl mx-auto px-4">
         <div className="mb-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <div className="flex items-start mb-3">
+            <div className="text-left">
+              <div className="flex items-start mb-3 text-left">
                 <Edit className="h-8 w-8 text-zapier-orange mr-3 flex-shrink-0" />
-                <div>
-                  <h1 className="text-3xl font-bold text-earth dark:text-white">
+                <div className="text-left">
+                  <h1 className="text-3xl font-bold text-earth dark:text-white text-left">
                     Generate Cover Letter
                   </h1>
-                  <p className="text-lg font-normal text-earth/70 dark:text-white/70 max-w-2xl mt-2">
+                  <p className="text-lg font-normal text-earth/70 dark:text-white/70 max-w-2xl mt-2 text-left">
                     Create tailored cover letters that highlight your strengths and align perfectly with specific job requirements.
                   </p>
                 </div>
@@ -453,7 +492,7 @@ const CoverLetter = () => {
                   {generationMethod === 'input' && (
                     <Card className="border border-gray-200 dark:border-gray-700">
                       <CardHeader className="pb-3">
-                        <CardTitle className="text-xl font-semibold">Job Details</CardTitle>
+                        <CardTitle className="text-xl font-semibold text-left">Job Details</CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-4 pt-0">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -584,9 +623,14 @@ const CoverLetter = () => {
                           'Generate Cover Letter'
                         )}
                       </Button>
-                      <p className="text-sm font-normal text-gray-600 dark:text-gray-400 text-center mt-2">
-                        Our AI uses the info above to generate a tailored cover letter, to help you stand out.
-                      </p>
+                      <div className="text-center mt-2 space-y-1">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          Our AI will generate a tailored cover letter, to help you stand out.
+                        </p>
+                        <p className="text-xs text-red-600 dark:text-red-400">
+                          Please provide above required info to continue
+                        </p>
+                      </div>
                     </CardContent>
                   </Card>
                 </div>
@@ -609,38 +653,34 @@ const CoverLetter = () => {
                                 Iteration {selectedCoverLetter.regeneration_count + 1}
                               </Badge>
                             )}
-                            {selectedCoverLetter.isUnsaved && (
-                              <Badge variant="outline" className="text-orange-600 border-orange-600">
-                                Unsaved
-                              </Badge>
-                            )}
                           </div>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          {selectedCoverLetter.isUnsaved && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={handleSaveCoverLetter}
-                              className="bg-green-50 border-green-300 text-green-700 hover:bg-green-100"
-                            >
-                              Save Cover Letter
-                            </Button>
-                          )}
-                          <DownloadOptions
-                            content={selectedCoverLetter.content}
-                            fileName={`Cover_Letter_${selectedCoverLetter.company_name}_${selectedCoverLetter.job_title}`}
-                          />
                         </div>
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-4 pt-0">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center text-sm text-gray-600 hover:text-zapier-orange transition-colors cursor-pointer">
+                          <RotateCcw className="h-4 w-4 mr-1" />
+                          Revert to Original
+                        </div>
+                        <DownloadOptions
+                          content={selectedCoverLetter.content}
+                          fileName={`Cover_Letter_${selectedCoverLetter.company_name}_${selectedCoverLetter.job_title}`}
+                          triggerComponent={
+                            <div className="flex items-center text-sm text-gray-600 hover:text-zapier-orange transition-colors cursor-pointer">
+                              <Download className="h-4 w-4 mr-1" />
+                              Download
+                            </div>
+                          }
+                        />
+                      </div>
+
                       <EditableCoverLetter
                         content={selectedCoverLetter.content}
                         onSave={handleUpdateCoverLetter}
                       />
                       
-                      <div className="flex items-center justify-between pt-4 border-t">
+                      <div className="flex items-start justify-between pt-4 border-t">
                         <div className="flex items-center space-x-4">
                           <Select
                             value={formData.tone}
@@ -676,10 +716,10 @@ const CoverLetter = () => {
                         </div>
                         
                         <div className="flex flex-col items-end">
-                          <Button
-                            variant="outline"
+                          <button
                             onClick={() => handleRegenerate(selectedCoverLetter.id, formData.tone, formData.length)}
                             disabled={isRegenerating}
+                            className="bg-zapier-orange text-white px-4 py-2 rounded-md font-normal text-sm hover:bg-zapier-orange/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                           >
                             {isRegenerating ? (
                               <>
@@ -692,7 +732,7 @@ const CoverLetter = () => {
                                 Regenerate (1 Credit)
                               </>
                             )}
-                          </Button>
+                          </button>
                           <div className="text-xs font-normal text-gray-500 mt-1">
                             {getRemainingFreeRegenerations(selectedCoverLetter.regeneration_count || 0) > 0 
                               ? `${getRemainingFreeRegenerations(selectedCoverLetter.regeneration_count || 0)} free regenerations left`
@@ -721,12 +761,29 @@ const CoverLetter = () => {
               <TabsContent value="history">
                 <Card className="border border-gray-200 dark:border-gray-700">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-xl font-semibold">History</CardTitle>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-xl font-semibold">History</CardTitle>
+                      {allCoverLetters.length > 0 && (
+                        <div className="flex items-center space-x-2">
+                          <span className="text-sm text-gray-600">Show:</span>
+                          <Select value={itemsPerPage.toString()} onValueChange={(value) => setItemsPerPage(Number(value))}>
+                            <SelectTrigger className="w-20">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="10">10</SelectItem>
+                              <SelectItem value="20">20</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <span className="text-sm text-gray-600">per page</span>
+                        </div>
+                      )}
+                    </div>
                   </CardHeader>
                   <CardContent className="pt-0">
                     {loadingHistory ? (
                       <div className="text-center py-8 font-normal">Loading...</div>
-                    ) : coverLetters.length === 0 ? (
+                    ) : allCoverLetters.length === 0 ? (
                       <div className="text-center py-8">
                         <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                         <p className="text-gray-600 dark:text-gray-400 font-normal">
@@ -734,67 +791,112 @@ const CoverLetter = () => {
                         </p>
                       </div>
                     ) : (
-                      <div className="space-y-4">
-                        {coverLetters.map((coverLetter) => (
-                          <div
-                            key={coverLetter.id}
-                            className="border rounded-md p-4 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-zapier-orange/50 transition-colors"
-                          >
-                            <div className="flex items-center justify-between">
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <h3 className="font-medium">{coverLetter.job_title} at {coverLetter.company_name}</h3>
-                                  {coverLetter.regeneration_count > 0 && (
-                                    <Badge variant="outline" className="text-xs">
-                                      v{coverLetter.regeneration_count + 1}
-                                    </Badge>
-                                  )}
-                                </div>
-                                <div className="flex items-center gap-4 text-sm font-normal text-gray-600 dark:text-gray-400">
-                                  <div className="flex items-center gap-1">
-                                    <Clock className="h-3 w-3" />
-                                    {new Date(coverLetter.created_at).toLocaleDateString()}
+                      <>
+                        <div className="space-y-4">
+                          {paginatedCoverLetters.map((coverLetter) => (
+                            <div
+                              key={coverLetter.id}
+                              className="border rounded-md p-4 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-zapier-orange/50 transition-colors"
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <h3 className="font-medium">{coverLetter.job_title} at {coverLetter.company_name}</h3>
+                                    {coverLetter.regeneration_count > 0 && (
+                                      <Badge variant="outline" className="text-xs">
+                                        v{coverLetter.regeneration_count + 1}
+                                      </Badge>
+                                    )}
                                   </div>
-                                  {coverLetter.updated_at !== coverLetter.created_at && (
-                                    <div>Updated {new Date(coverLetter.updated_at).toLocaleDateString()}</div>
-                                  )}
+                                  <div className="flex items-center gap-4 text-sm font-normal text-gray-600 dark:text-gray-400">
+                                    <div className="flex items-center gap-1">
+                                      <Clock className="h-3 w-3" />
+                                      Updated {formatDate(coverLetter.updated_at)}
+                                    </div>
+                                  </div>
                                 </div>
-                              </div>
-                              <div className="flex items-center space-x-3">
-                                <button
-                                  onClick={() => handleViewCoverLetter(coverLetter)}
-                                  className="flex items-center text-sm text-gray-600 hover:text-zapier-orange transition-colors"
-                                >
-                                  <Eye className="h-4 w-4 mr-1" />
-                                  View
-                                </button>
-                                <button
-                                  onClick={() => handleEditCoverLetter(coverLetter)}
-                                  className="flex items-center text-sm text-gray-600 hover:text-zapier-orange transition-colors"
-                                >
-                                  <Edit className="h-4 w-4 mr-1" />
-                                  Edit
-                                </button>
-                                <DownloadOptions
-                                  content={coverLetter.content}
-                                  fileName={`Cover_Letter_${coverLetter.company_name}_${coverLetter.job_title}`}
-                                  triggerComponent={
-                                    <button className="text-sm text-gray-600 hover:text-zapier-orange transition-colors">
-                                      <Download className="h-4 w-4" />
-                                    </button>
-                                  }
-                                />
-                                <button
-                                  onClick={() => handleDelete(coverLetter.id)}
-                                  className="text-sm text-red-600 hover:text-zapier-orange transition-colors"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </button>
+                                <div className="flex items-center space-x-3">
+                                  <button
+                                    onClick={() => handleViewCoverLetter(coverLetter)}
+                                    className="flex items-center text-sm text-gray-600 hover:text-zapier-orange transition-colors"
+                                  >
+                                    <Eye className="h-4 w-4 mr-1" />
+                                    View
+                                  </button>
+                                  <button
+                                    onClick={() => handleEditCoverLetter(coverLetter)}
+                                    className="flex items-center text-sm text-gray-600 hover:text-zapier-orange transition-colors"
+                                  >
+                                    <Edit className="h-4 w-4 mr-1" />
+                                    Edit
+                                  </button>
+                                  <DownloadOptions
+                                    content={coverLetter.content}
+                                    fileName={`Cover_Letter_${coverLetter.company_name}_${coverLetter.job_title}`}
+                                    triggerComponent={
+                                      <button className="text-sm text-gray-600 hover:text-zapier-orange transition-colors">
+                                        <Download className="h-4 w-4" />
+                                      </button>
+                                    }
+                                  />
+                                  <button
+                                    onClick={() => handleDelete(coverLetter.id)}
+                                    className="text-sm text-red-600 hover:text-zapier-orange transition-colors"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </button>
+                                </div>
                               </div>
                             </div>
+                          ))}
+                        </div>
+
+                        {/* Pagination */}
+                        {totalPages > 1 && (
+                          <div className="mt-6 flex justify-center">
+                            <Pagination>
+                              <PaginationContent>
+                                <PaginationItem>
+                                  <PaginationPrevious 
+                                    href="#" 
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      if (currentPage > 1) setCurrentPage(currentPage - 1);
+                                    }}
+                                    className={currentPage <= 1 ? 'pointer-events-none opacity-50' : ''}
+                                  />
+                                </PaginationItem>
+                                
+                                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                                  <PaginationItem key={page}>
+                                    <PaginationLink
+                                      href="#"
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        setCurrentPage(page);
+                                      }}
+                                      isActive={currentPage === page}
+                                    >
+                                      {page}
+                                    </PaginationLink>
+                                  </PaginationItem>
+                                ))}
+                                
+                                <PaginationItem>
+                                  <PaginationNext 
+                                    href="#" 
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+                                    }}
+                                    className={currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''}
+                                  />
+                                </PaginationItem>
+                              </PaginationContent>
+                            </Pagination>
                           </div>
-                        ))}
-                      </div>
+                        )}
+                      </>
                     )}
                   </CardContent>
                 </Card>

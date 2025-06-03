@@ -20,25 +20,32 @@ const ServiceExplanation: React.FC<ServiceExplanationProps> = ({
 }) => {
   return (
     <div className={`bg-white dark:bg-earth/10 rounded-lg shadow-sm p-6 border border-apple-core/20 dark:border-citrus/10 h-full ${compact ? 'max-w-xl' : ''}`}>
-      <div className="flex items-center mb-5">
-        <div className="mr-3">
-          {icon}
+      {title && subtitle && (
+        <div className="flex items-center mb-5">
+          <div className="mr-3">
+            {icon}
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-earth dark:text-white mb-2 font-display">
+              {title}
+            </h2>
+            <p className="text-base text-earth/70 dark:text-white/70">
+              {subtitle}
+            </p>
+          </div>
         </div>
-        <div>
-          <h2 className="text-2xl font-bold text-earth dark:text-white mb-2 font-display">
-            {title}
-          </h2>
-          <p className="text-base text-earth/70 dark:text-white/70">
-            {subtitle}
-          </p>
-        </div>
-      </div>
+      )}
 
       <div className="space-y-5">
         <div>
-          <h3 className="text-lg font-semibold text-earth dark:text-white mb-3 font-display">
-            Key Benefits
-          </h3>
+          <div className="flex items-center mb-3">
+            <div className="w-6 h-6 flex items-center justify-center mr-2">
+              {React.cloneElement(icon as React.ReactElement, { className: "h-5 w-5 text-zapier-orange" })}
+            </div>
+            <h3 className="text-lg font-semibold text-earth dark:text-white font-display">
+              Key Benefits
+            </h3>
+          </div>
           <ul className="space-y-2">
             {benefits.map((benefit, index) => (
               <li key={index} className="flex items-start">

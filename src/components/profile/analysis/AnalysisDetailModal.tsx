@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { Download } from 'lucide-react';
+import DownloadOptions from '@/components/cover-letter/DownloadOptions';
 import jsPDF from 'jspdf';
 
 interface AnalysisResult {
@@ -23,180 +22,52 @@ interface AnalysisDetailModalProps {
 const AnalysisDetailModal: React.FC<AnalysisDetailModalProps> = ({ analysis, onClose }) => {
   if (!analysis) return null;
 
-  const downloadPDF = () => {
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.width;
-    const margin = 20;
-    const lineHeight = 7;
-    let currentY = margin;
-
-    // Helper function to add text with word wrapping
-    const addWrappedText = (text: string, x: number, y: number, maxWidth: number, fontSize = 12) => {
-      doc.setFontSize(fontSize);
-      const words = text.split(' ');
-      let line = '';
-      let currentLineY = y;
-
-      for (let i = 0; i < words.length; i++) {
-        const testLine = line + words[i] + ' ';
-        const testWidth = doc.getStringUnitWidth(testLine) * fontSize / doc.internal.scaleFactor;
-        
-        if (testWidth > maxWidth && i > 0) {
-          doc.text(line.trim(), x, currentLineY);
-          line = words[i] + ' ';
-          currentLineY += lineHeight;
-        } else {
-          line = testLine;
-        }
-      }
-      
-      if (line.trim()) {
-        doc.text(line.trim(), x, currentLineY);
-        currentLineY += lineHeight;
-      }
-      
-      return currentLineY;
-    };
-
-    // Header
-    doc.setFontSize(20);
-    doc.setFont('helvetica', 'bold');
-    doc.text('CV COMPATIBILITY ANALYSIS REPORT', pageWidth / 2, currentY, { align: 'center' });
-    currentY += 15;
-
-    // Job details
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Position Details', margin, currentY);
-    currentY += 10;
-
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'normal');
-    if (analysis.job_title) {
-      doc.text(`Job Title: ${analysis.job_title}`, margin, currentY);
-      currentY += lineHeight;
-    }
-    if (analysis.company_name && analysis.company_name !== 'Company') {
-      doc.text(`Company: ${analysis.company_name}`, margin, currentY);
-      currentY += lineHeight;
-    }
-    doc.text(`Analysis Date: ${new Date(analysis.created_at).toLocaleDateString()}`, margin, currentY);
-    currentY += 15;
-
+  const formatAnalysisForDownload = () => {
+    let content = `CV COMPATIBILITY ANALYSIS REPORT\n\n`;
+    
+    // Position Details
+    content += `POSITION DETAILS\n`;
+    if (analysis.job_title) content += `Job Title: ${analysis.job_title}\n`;
+    if (analysis.company_name && analysis.company_name !== 'Company') content += `Company: ${analysis.company_name}\n`;
+    content += `Analysis Date: ${new Date(analysis.created_at).toLocaleDateString()}\n\n`;
+    
     // Compatibility Score
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'bold');
-    doc.text('COMPATIBILITY SCORE', margin, currentY);
-    currentY += 10;
-
-    doc.setFontSize(24);
-    doc.setFont('helvetica', 'bold');
-    doc.text(`${analysis.compatibility_score}%`, margin, currentY);
-    currentY += 15;
-
+    content += `COMPATIBILITY SCORE\n${analysis.compatibility_score}%\n\n`;
+    
     // Executive Summary
     if (analysis.executive_summary) {
-      doc.setFontSize(14);
-      doc.setFont('helvetica', 'bold');
-      doc.text('EXECUTIVE SUMMARY', margin, currentY);
-      currentY += 10;
-
-      doc.setFontSize(12);
-      doc.setFont('helvetica', 'normal');
-      currentY = addWrappedText(analysis.executive_summary, margin, currentY, pageWidth - 2 * margin);
-      currentY += 10;
+      content += `EXECUTIVE SUMMARY\n${analysis.executive_summary}\n\n`;
     }
-
-    // Check if we need a new page
-    if (currentY > 250) {
-      doc.addPage();
-      currentY = margin;
-    }
-
+    
     // Strengths
     if (analysis.strengths && analysis.strengths.length > 0) {
-      doc.setFontSize(14);
-      doc.setFont('helvetica', 'bold');
-      doc.text('STRENGTHS', margin, currentY);
-      currentY += 10;
-
-      doc.setFontSize(12);
-      doc.setFont('helvetica', 'normal');
-      analysis.strengths.forEach((strength: string, index: number) => {
-        if (currentY > 270) {
-          doc.addPage();
-          currentY = margin;
-        }
-        currentY = addWrappedText(`${index + 1}. ${strength}`, margin, currentY, pageWidth - 2 * margin);
-        currentY += 5;
+      content += `STRENGTHS\n`;
+      analysis.strengths.forEach((strength, index) => {
+        content += `${index + 1}. ${strength}\n`;
       });
-      currentY += 10;
+      content += `\n`;
     }
-
-    // Check if we need a new page
-    if (currentY > 250) {
-      doc.addPage();
-      currentY = margin;
-    }
-
+    
     // Areas for Improvement
     if (analysis.weaknesses && analysis.weaknesses.length > 0) {
-      doc.setFontSize(14);
-      doc.setFont('helvetica', 'bold');
-      doc.text('AREAS FOR IMPROVEMENT', margin, currentY);
-      currentY += 10;
-
-      doc.setFontSize(12);
-      doc.setFont('helvetica', 'normal');
-      analysis.weaknesses.forEach((weakness: string, index: number) => {
-        if (currentY > 270) {
-          doc.addPage();
-          currentY = margin;
-        }
-        currentY = addWrappedText(`${index + 1}. ${weakness}`, margin, currentY, pageWidth - 2 * margin);
-        currentY += 5;
+      content += `AREAS FOR IMPROVEMENT\n`;
+      analysis.weaknesses.forEach((weakness, index) => {
+        content += `${index + 1}. ${weakness}\n`;
       });
-      currentY += 10;
+      content += `\n`;
     }
-
-    // Check if we need a new page
-    if (currentY > 250) {
-      doc.addPage();
-      currentY = margin;
-    }
-
+    
     // Recommendations
     if (analysis.recommendations && analysis.recommendations.length > 0) {
-      doc.setFontSize(14);
-      doc.setFont('helvetica', 'bold');
-      doc.text('RECOMMENDATIONS', margin, currentY);
-      currentY += 10;
-
-      doc.setFontSize(12);
-      doc.setFont('helvetica', 'normal');
-      analysis.recommendations.forEach((rec: string, index: number) => {
-        if (currentY > 270) {
-          doc.addPage();
-          currentY = margin;
-        }
-        currentY = addWrappedText(`${index + 1}. ${rec}`, margin, currentY, pageWidth - 2 * margin);
-        currentY += 5;
+      content += `RECOMMENDATIONS\n`;
+      analysis.recommendations.forEach((rec, index) => {
+        content += `${index + 1}. ${rec}\n`;
       });
     }
-
-    // Footer
-    const pageCount = doc.getNumberOfPages();
-    for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i);
-      doc.setFontSize(10);
-      doc.setFont('helvetica', 'normal');
-      doc.text('Generated by TuneMyCV.com', pageWidth / 2, doc.internal.pageSize.height - 10, { align: 'center' });
-      doc.text(`Page ${i} of ${pageCount}`, pageWidth - margin, doc.internal.pageSize.height - 10, { align: 'right' });
-    }
-
-    // Save the PDF
-    const fileName = `CV_Analysis_Report_${analysis.job_title || 'Report'}_${new Date().toISOString().split('T')[0]}.pdf`;
-    doc.save(fileName);
+    
+    content += `\n\nGenerated by TuneMyCV.com`;
+    
+    return content;
   };
 
   return (
@@ -205,13 +76,10 @@ const AnalysisDetailModal: React.FC<AnalysisDetailModalProps> = ({ analysis, onC
         <div className="flex justify-between items-center p-6 border-b">
           <h2 className="text-xl font-semibold text-gray-900">Analysis Details</h2>
           <div className="flex items-center space-x-2">
-            <button
-              onClick={downloadPDF}
-              className="flex items-center space-x-2 bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700 transition-colors"
-            >
-              <Download className="h-4 w-4" />
-              <span>PDF</span>
-            </button>
+            <DownloadOptions
+              content={formatAnalysisForDownload()}
+              fileName={`CV_Analysis_Report_${analysis.job_title || 'Report'}_${new Date().toISOString().split('T')[0]}`}
+            />
             <button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600"
