@@ -1,6 +1,6 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Mail } from 'lucide-react';
 
 const Footer = () => {
   return (
@@ -14,6 +14,15 @@ const Footer = () => {
                 alt="TuneMyCV" 
                 className="h-8 w-auto"
               />
+            </div>
+            <div className="flex items-center mb-4">
+              <Mail className="h-4 w-4 mr-2 text-white/80" />
+              <a 
+                href="mailto:hello@tunemycv.com" 
+                className="text-white/80 hover:text-zapier-orange transition-colors"
+              >
+                hello@tunemycv.com
+              </a>
             </div>
             <p className="text-white/80 mb-4 max-w-md">
               AI-powered CV analysis and optimization to help you land your dream job. 
