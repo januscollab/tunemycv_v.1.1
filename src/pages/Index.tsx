@@ -82,7 +82,7 @@ const Index = () => {
               </div>
               <h3 className="text-2xl font-bold text-earth dark:text-white mb-4">CV Analysis</h3>
               <p className="text-earth/70 dark:text-white/70 leading-relaxed mb-6">
-                Get detailed insights into your CV's performance, keyword optimization, and compatibility with specific job requirements.
+                Our advanced AI analyzes your CV against the role you're applying for, identifying strengths and areas for improvement.
               </p>
               <Link
                 to={user ? "/analyze" : "/auth"}
@@ -112,9 +112,9 @@ const Index = () => {
               <div className="bg-zapier-orange/10 rounded-full w-16 h-16 flex items-center justify-center mb-6">
                 <MessageSquare className="h-8 w-8 text-zapier-orange" />
               </div>
-              <h3 className="text-2xl font-bold text-earth dark:text-white mb-4">Interview Prep</h3>
+              <h3 className="text-2xl font-bold text-earth dark:text-white mb-4">Ready. Set. Interview.</h3>
               <p className="text-earth/70 dark:text-white/70 leading-relaxed mb-6">
-                Prepare for interviews with personalized questions and expert guidance tailored to your target role.
+                Our Interview Toolkit will help you with a tailored cover letter and a complete interview prep pack — including company insights, and key talking points — so you're fully equipped to succeed.
               </p>
               <Link
                 to={user ? "/analyze?tab=interview-prep" : "/auth"}

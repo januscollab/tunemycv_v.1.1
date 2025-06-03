@@ -30,7 +30,7 @@ const Navigation = () => {
   const navItems = [
     { path: '/analyze', label: 'Analyze CV' },
     { path: '/cover-letter', label: 'Cover Letter' },
-    { path: '/analyze?tab=interview-prep', label: 'Interview Prep' },
+    { path: '/analyze?tab=interview-prep', label: 'Interview Prep', disabled: true },
     { path: '/resources', label: 'Resources' },
   ];
 
@@ -53,15 +53,24 @@ const Navigation = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             {navItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`text-earth dark:text-white hover:text-zapier-orange transition-colors font-medium ${
-                  isActive(item.path) ? 'text-zapier-orange' : ''
-                }`}
-              >
-                {item.label}
-              </Link>
+              item.disabled ? (
+                <span
+                  key={item.path}
+                  className="text-earth/50 dark:text-white/50 font-medium cursor-not-allowed"
+                >
+                  {item.label}
+                </span>
+              ) : (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`text-earth dark:text-white hover:text-zapier-orange transition-colors font-medium ${
+                    isActive(item.path) ? 'text-zapier-orange' : ''
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              )
             ))}
           </div>
 
@@ -95,16 +104,25 @@ const Navigation = () => {
           <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
               {navItems.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`block px-3 py-2 text-earth dark:text-white hover:text-zapier-orange transition-colors font-medium ${
-                    isActive(item.path) ? 'text-zapier-orange bg-zapier-orange/10' : 'hover:bg-gray-50 dark:hover:bg-gray-800'
-                  }`}
-                  onClick={() => setIsOpen(false)}
-                >
-                  {item.label}
-                </Link>
+                item.disabled ? (
+                  <span
+                    key={item.path}
+                    className="block px-3 py-2 text-earth/50 dark:text-white/50 font-medium cursor-not-allowed"
+                  >
+                    {item.label}
+                  </span>
+                ) : (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={`block px-3 py-2 text-earth dark:text-white hover:text-zapier-orange transition-colors font-medium ${
+                      isActive(item.path) ? 'text-zapier-orange bg-zapier-orange/10' : 'hover:bg-gray-50 dark:hover:bg-gray-800'
+                    }`}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
+                )
               ))}
               <div className="px-3 py-2">
                 {user ? (

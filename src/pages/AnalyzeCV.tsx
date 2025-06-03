@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -294,7 +295,7 @@ const AnalyzeCV = () => {
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
-        <div className="max-w-4xl mx-auto px-4 py-12">
+        <div className="max-w-5xl mx-auto px-4 py-12">
           <div className="flex items-start mb-8">
             <FileText className="h-12 w-12 text-zapier-orange mr-6 mt-2" />
             <div>
@@ -307,7 +308,7 @@ const AnalyzeCV = () => {
             </div>
           </div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-[500px] mt-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-[500px] mt-12 w-4/5 mx-auto">
             <div className="flex items-start">
               <ServiceExplanation
                 title={analyzeExplanation.title}
