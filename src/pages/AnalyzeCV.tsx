@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -352,7 +351,7 @@ const AnalyzeCV = () => {
         </div>
       )}
       
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="max-w-wider mx-auto px-4 py-8">
         {/* Header Section */}
         <div className="mb-6">
           <div className="flex items-start mb-3">
@@ -369,9 +368,9 @@ const AnalyzeCV = () => {
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6">
           {/* Main Content Section */}
-          <div className="lg:col-span-3">
+          <div>
             {/* Tabs Navigation */}
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-3 mb-6">
@@ -662,8 +661,8 @@ const AnalyzeCV = () => {
             </Tabs>
           </div>
 
-          {/* Credits Panel - Reduced Width */}
-          <div className="lg:col-span-1">
+          {/* Credits Panel - Fixed Width */}
+          <div>
             <CreditsPanel
               credits={userCredits?.credits || 0}
               hasCreditsForAI={hasCreditsForAI}

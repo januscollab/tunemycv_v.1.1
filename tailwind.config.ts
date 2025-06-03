@@ -23,6 +23,9 @@ export default {
 				sans: ['Poppins', 'system-ui', 'sans-serif'],
 				display: ['Playfair Display', 'serif'],
 			},
+			maxWidth: {
+				'wider': '1076px', // 20% increase from max-w-4xl (896px)
+			},
 			colors: {
 				// Zapier color palette
 				earth: '#3A3A3A',

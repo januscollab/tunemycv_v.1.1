@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, LogOut, ChevronDown } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
 interface UserProfileDropdownProps {
@@ -13,14 +13,24 @@ interface UserProfileDropdownProps {
 const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({ userDisplayName, isActive }) => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const { signOut } = useAuth();
 
   const handleLogout = async () => {
+    if (isLoggingOut) return;
+    
+    setIsLoggingOut(true);
     try {
-      await supabase.auth.signOut();
+      await signOut();
       toast.success('Logged out successfully');
       navigate('/');
     } catch (error) {
+      console.error('Logout error:', error);
       toast.error('Error logging out');
+      // Force navigate to home even if logout failed
+      navigate('/');
+    } finally {
+      setIsLoggingOut(false);
     }
   };
 
@@ -62,10 +72,11 @@ const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({ userDisplayNa
                 setIsOpen(false);
                 handleLogout();
               }}
-              className="w-full text-left px-4 py-3 text-sm text-earth hover:bg-cream/50 transition-colors border-t border-border"
+              disabled={isLoggingOut}
+              className="w-full text-left px-4 py-3 text-sm text-earth hover:bg-cream/50 transition-colors border-t border-border disabled:opacity-50"
             >
               <LogOut className="h-4 w-4 mr-2 inline" />
-              Logout
+              {isLoggingOut ? 'Logging out...' : 'Logout'}
             </button>
           </div>
         </>
