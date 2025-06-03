@@ -10,7 +10,7 @@ const Footer = () => {
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center mb-4">
               <img 
-                src="/lovable-uploads/9c0fa345-67f1-4945-aec9-6e428b4de6b2.png" 
+                src="/lovable-uploads/0a954f23-ade3-4c24-8a1a-d548bf6299d2.png" 
                 alt="TuneMyCV" 
                 className="h-8 w-auto"
               />
@@ -71,7 +71,7 @@ const Footer = () => {
         
         <div className="border-t border-white/20 mt-8 pt-8 text-center">
           <p className="text-white/60">
-            © 2024 TuneMyCV. All rights reserved.
+            © 2024 <span className="text-zapier-orange">Tune</span>MyCV. All rights reserved.
           </p>
         </div>
       </div>

@@ -12,6 +12,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/admin/AdminRoute";
 import Index from "./pages/Index";
 import AnalyzeCV from "./pages/AnalyzeCV";
+import InterviewPrep from "./pages/InterviewPrep";
 import Resources from "./pages/Resources";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
@@ -60,6 +61,7 @@ const App: React.FC = () => {
                   <Route path="/" element={<Index />} />
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/analyze" element={<AnalyzeCV />} />
+                  <Route path="/interview-prep" element={<InterviewPrep />} />
                   <Route path="/next-steps" element={
                     <ProtectedRoute>
                       <NextSteps />

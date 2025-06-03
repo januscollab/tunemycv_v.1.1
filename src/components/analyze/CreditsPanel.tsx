@@ -39,12 +39,16 @@ const CreditsPanel: React.FC<CreditsPanelProps> = ({ credits, hasCreditsForAI })
             <span>Cover Letter</span>
             <span className="text-zapier-orange font-medium">1 Credit</span>
           </div>
+          <div className="flex items-center justify-between">
+            <span>Interview Prep</span>
+            <span className="text-zapier-orange font-medium">1 Credit</span>
+          </div>
         </div>
 
         <div className="mt-4 p-3 bg-zapier-orange/10 rounded-lg">
           <p className="text-xs text-earth dark:text-white">
             {hasCreditsForAI 
-              ? "You have credits available for AI analysis"
+              ? "You have credits available for AI analysis with multiple free AI iterations"
               : "Purchase credits to unlock AI-powered features"
             }
           </p>

@@ -23,6 +23,7 @@ interface AnalysisResult {
   credit_cost?: number;
   cv_file_name?: string;
   cv_file_size?: number;
+  has_cover_letter?: boolean;
 }
 
 interface AnalysisHistoryTabProps {
@@ -57,7 +58,8 @@ const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ credits, member
         .from('analysis_results')
         .select(`
           *,
-          analysis_logs(cost_estimate)
+          analysis_logs(cost_estimate),
+          cover_letters(id)
         `)
         .eq('user_id', user?.id)
         .order('created_at', { ascending: false });
@@ -66,7 +68,8 @@ const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ credits, member
       
       const transformedData = (data || []).map(analysis => ({
         ...analysis,
-        credit_cost: analysis.analysis_logs?.[0]?.cost_estimate ? Math.ceil(analysis.analysis_logs[0].cost_estimate) : 1
+        credit_cost: analysis.analysis_logs?.[0]?.cost_estimate ? Math.ceil(analysis.analysis_logs[0].cost_estimate) : 1,
+        has_cover_letter: analysis.cover_letters && analysis.cover_letters.length > 0
       }));
       
       setAnalyses(transformedData);
@@ -98,20 +101,54 @@ const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ credits, member
     }
   };
 
-  const handleCreateCoverLetter = (analysis: AnalysisResult) => {
-    // Navigate to Cover Letter page with the analysis data
-    navigate('/cover-letter', {
-      state: {
-        selectedAnalysis: analysis,
-        generationMethod: 'analysis'
+  const handleCreateCoverLetter = async (analysis: AnalysisResult) => {
+    if (analysis.has_cover_letter) {
+      // If cover letter exists, fetch it and navigate to view it
+      try {
+        const { data: coverLetter, error } = await supabase
+          .from('cover_letters')
+          .select('*')
+          .eq('analysis_result_id', analysis.id)
+          .eq('user_id', user?.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
+
+        if (error) throw error;
+
+        console.log('Navigating to Cover Letter to view existing letter:', coverLetter);
+        // Navigate to Cover Letter page with the existing cover letter data
+        navigate('/cover-letter', {
+          state: {
+            coverLetter: coverLetter,
+            viewMode: true,
+            activeTab: 'result'
+          }
+        });
+      } catch (error) {
+        console.error('Failed to fetch cover letter:', error);
+        toast({ title: 'Error', description: 'Failed to load cover letter', variant: 'destructive' });
       }
-    });
+    } else {
+      // If no cover letter exists, navigate to create one
+      console.log('Navigating to Cover Letter to create new letter:', analysis);
+      navigate('/cover-letter', {
+        state: {
+          analysis: analysis,
+          generationMethod: 'analysis'
+        }
+      });
+    }
   };
 
   const handleInterviewPrep = (analysis: AnalysisResult) => {
-    setUpcomingFeatureModal({
-      isOpen: true,
-      featureType: 'interview-prep'
+    console.log('Navigating to Interview Prep with analysis:', analysis);
+    // Navigate to Analyze CV page with Interview Prep tab and analysis data
+    navigate('/analyze?tab=interview-prep', {
+      state: {
+        analysis: analysis,
+        source: 'history'
+      }
     });
   };
 

@@ -1,19 +1,18 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, CheckCircle, FileText, Users, TrendingUp, Sparkles, MessageSquare } from 'lucide-react';
+import { ArrowRight, CheckCircle, FileText, Users, TrendingUp, Sparkles, MessageSquare, Zap, BookOpen } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import HowItWorks from '@/components/HowItWorks';
 import Testimonials from '@/components/Testimonials';
-import Footer from '@/components/Footer';
 
 const Index = () => {
   const { user } = useAuth();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
+    <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="py-20 px-4">
+      <section className="py-10 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center bg-zapier-orange/10 text-zapier-orange px-4 py-2 rounded-full text-sm font-medium mb-6">
             <Sparkles className="h-4 w-4 mr-2" />
@@ -65,7 +64,7 @@ const Index = () => {
       </section>
 
       {/* Features Grid */}
-      <section className="py-20 px-4 bg-cream/30">
+      <section className="py-10 px-4 bg-cream/30">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-earth dark:text-white mb-4">
@@ -76,14 +75,14 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="bg-white dark:bg-earth/10 rounded-2xl p-8 hover:shadow-lg transition-shadow border border-earth/10 dark:border-white/10">
               <div className="bg-zapier-orange/10 rounded-full w-16 h-16 flex items-center justify-center mb-6">
                 <FileText className="h-8 w-8 text-zapier-orange" />
               </div>
               <h3 className="text-2xl font-bold text-earth dark:text-white mb-4">CV Analysis</h3>
               <p className="text-earth/70 dark:text-white/70 leading-relaxed mb-6">
-                Get detailed insights into your CV's performance, keyword optimization, and compatibility with specific job requirements.
+                Our advanced AI analyzes your CV against the role you're applying for, identifying strengths and areas for improvement.
               </p>
               <Link
                 to={user ? "/analyze" : "/auth"}
@@ -115,62 +114,65 @@ const Index = () => {
               </div>
               <h3 className="text-2xl font-bold text-earth dark:text-white mb-4">Interview Prep</h3>
               <p className="text-earth/70 dark:text-white/70 leading-relaxed mb-6">
-                Prepare for interviews with personalized questions and expert guidance tailored to your target role.
+                Our Interview Toolkit will help you with a tailored cover letter and a complete interview prep pack — so you're fully equipped to succeed
               </p>
               <Link
-                to={user ? "/analyze" : "/auth"}
+                to={user ? "/analyze?tab=interview-prep" : "/auth"}
                 className="text-zapier-orange font-semibold hover:text-zapier-orange/80 transition-colors inline-flex items-center"
               >
                 Prepare Now <ArrowRight className="ml-1 h-4 w-4" />
-              </Link>
-            </div>
-
-            <div className="bg-white dark:bg-earth/10 rounded-2xl p-8 hover:shadow-lg transition-shadow border border-earth/10 dark:border-white/10">
-              <div className="bg-zapier-orange/10 rounded-full w-16 h-16 flex items-center justify-center mb-6">
-                <TrendingUp className="h-8 w-8 text-zapier-orange" />
-              </div>
-              <h3 className="text-2xl font-bold text-earth dark:text-white mb-4">Career Resources</h3>
-              <p className="text-earth/70 dark:text-white/70 leading-relaxed mb-6">
-                Access expert guides, templates, and tools to accelerate your job search and career advancement.
-              </p>
-              <Link
-                to="/resources"
-                className="text-zapier-orange font-semibold hover:text-zapier-orange/80 transition-colors inline-flex items-center"
-              >
-                Explore Resources <ArrowRight className="ml-1 h-4 w-4" />
               </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* How It Works */}
-      <HowItWorks />
+      {/* How It Works Section */}
+      <section className="py-16 bg-white dark:bg-gray-900">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-earth dark:text-white mb-4">
+              How <span className="text-zapier-orange">Tune</span>MyCV Works
+            </h2>
+            <p className="text-xl text-earth/70 dark:text-white/70 max-w-3xl mx-auto">
+              Our AI-powered platform streamlines your job search with intelligent analysis and personalized recommendations
+            </p>
+          </div>
+          
+          <HowItWorks />
+        </div>
+      </section>
 
       {/* Testimonials */}
       <Testimonials />
 
-      {/* CTA Section */}
-      <section className="py-20 px-4 bg-gradient-to-r from-zapier-orange to-orange-600">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-white mb-6">
+      {/* CTA Section - Updated background color to match Resources page */}
+      <section className="py-16 bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-earth dark:text-white mb-6">
             Ready to Transform Your Career?
           </h2>
-          <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            Join thousands of professionals who have already improved their job prospects with TuneMyCV
+          <p className="text-xl text-earth/70 dark:text-white/70 mb-8 max-w-2xl mx-auto">
+            Join thousands of job seekers who have successfully landed their dream jobs with TuneMyCV
           </p>
-          <Link
-            to={user ? "/analyze" : "/auth"}
-            className="bg-white text-zapier-orange px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-50 transition-colors inline-flex items-center"
-          >
-            Get Started Free
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link 
+              to="/analyze"
+              className="bg-zapier-orange text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange/90 transition-colors inline-flex items-center justify-center"
+            >
+              <Zap className="mr-2 h-5 w-5" />
+              Start Free Analysis
+            </Link>
+            <Link 
+              to="/resources"
+              className="border-2 border-zapier-orange text-zapier-orange px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange hover:text-white transition-colors inline-flex items-center justify-center"
+            >
+              <BookOpen className="mr-2 h-5 w-5" />
+              Explore Resources
+            </Link>
+          </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <Footer />
     </div>
   );
 };

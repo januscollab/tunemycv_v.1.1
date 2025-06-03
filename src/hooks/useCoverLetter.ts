@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -153,8 +152,8 @@ export const useCoverLetter = () => {
 
       if (fetchError) throw fetchError;
 
-      // Check regeneration count for credit calculation
-      const isFreeregeneration = originalData.regeneration_count < 5;
+      // Check regeneration count for credit calculation - now 2 free regenerations
+      const isFreeregeneration = originalData.regeneration_count < 2;
       
       if (!isFreeregeneration) {
         // Check credits for paid regeneration
