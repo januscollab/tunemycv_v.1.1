@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FileText, Sparkles, Trash2, RefreshCw, Clock, FileUp, Search, AlertCircle, Eye, Edit, Download, History } from 'lucide-react';
@@ -639,9 +640,22 @@ const AuthenticatedCoverLetter = () => {
                               Save Cover Letter
                             </Button>
                           )}
+                          <button
+                            onClick={() => setActiveTab('result')}
+                            className="flex items-center text-sm text-gray-600 hover:text-zapier-orange transition-colors px-3 py-1 rounded border border-gray-300 hover:border-zapier-orange"
+                          >
+                            <Edit className="h-4 w-4 mr-1" />
+                            Edit
+                          </button>
                           <DownloadOptions
                             content={selectedCoverLetter.content}
                             fileName={`Cover_Letter_${selectedCoverLetter.company_name}_${selectedCoverLetter.job_title}`}
+                            triggerComponent={
+                              <button className="flex items-center text-sm text-gray-600 hover:text-zapier-orange transition-colors px-3 py-1 rounded border border-gray-300 hover:border-zapier-orange">
+                                <Download className="h-4 w-4 mr-1" />
+                                Download
+                              </button>
+                            }
                           />
                         </div>
                       </div>
@@ -688,10 +702,10 @@ const AuthenticatedCoverLetter = () => {
                         </div>
                         
                         <div className="flex flex-col items-end">
-                          <Button
-                            variant="outline"
+                          <button
                             onClick={() => handleRegenerate(selectedCoverLetter.id, formData.tone, formData.length)}
                             disabled={isRegenerating}
+                            className="bg-zapier-orange text-white px-4 py-2 rounded-md font-normal text-sm hover:bg-zapier-orange/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                           >
                             {isRegenerating ? (
                               <>
@@ -704,7 +718,7 @@ const AuthenticatedCoverLetter = () => {
                                 Regenerate (1 Credit)
                               </>
                             )}
-                          </Button>
+                          </button>
                           <div className="text-xs font-normal text-gray-500 mt-1">
                             {getRemainingFreeRegenerations(selectedCoverLetter.regeneration_count || 0) > 0 
                               ? `${getRemainingFreeRegenerations(selectedCoverLetter.regeneration_count || 0)} free regenerations left`
