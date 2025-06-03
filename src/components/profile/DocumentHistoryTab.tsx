@@ -27,6 +27,11 @@ interface DocumentItem {
   content?: string;
   job_title?: string;
   analysis_result_id?: string;
+  has_cover_letter?: boolean;
+  executive_summary?: string;
+  strengths?: string[];
+  weaknesses?: string[];
+  recommendations?: string[];
 }
 
 interface DocumentHistoryTabProps {
@@ -53,10 +58,13 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
 
   const loadDocumentHistory = async () => {
     try {
-      // Load analysis results
+      // Load analysis results with cover letter check
       const { data: analysisData, error: analysisError } = await supabase
         .from('analysis_results')
-        .select('*')
+        .select(`
+          *,
+          cover_letters(id)
+        `)
         .eq('user_id', user?.id)
         .order('created_at', { ascending: false });
 
@@ -79,7 +87,12 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
         company_name: analysis.company_name,
         created_at: analysis.created_at,
         compatibility_score: analysis.compatibility_score,
-        job_title: analysis.job_title
+        job_title: analysis.job_title,
+        has_cover_letter: analysis.cover_letters && analysis.cover_letters.length > 0,
+        executive_summary: analysis.executive_summary,
+        strengths: analysis.strengths,
+        weaknesses: analysis.weaknesses,
+        recommendations: analysis.recommendations
       }));
 
       const coverLetterDocuments: DocumentItem[] = (coverLetterData || []).map(letter => ({
@@ -350,21 +363,25 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
                     {/* Show additional action buttons for CV Analysis items */}
                     {document.type === 'analysis' && (
                       <>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate('/cover-letter', {
-                              state: {
-                                analysisId: document.id,
-                                activeTab: 'generate'
-                              }
-                            });
-                          }}
-                          className="flex items-center px-2 py-1 text-xs text-black hover:text-zapier-orange hover:bg-zapier-orange/10 rounded-md transition-colors"
-                        >
-                          <FileText className="h-3 w-3 mr-1" />
-                          Generate Cover Letter
-                        </button>
+                         <button
+                           onClick={(e) => {
+                             e.stopPropagation();
+                             navigate('/cover-letter', {
+                               state: {
+                                 analysisId: document.id,
+                                 activeTab: 'generate'
+                               }
+                             });
+                           }}
+                           className={`flex items-center px-2 py-1 text-xs rounded-md transition-colors ${
+                             document.has_cover_letter
+                               ? 'text-green-600 hover:text-green-700 hover:bg-green-50'
+                               : 'text-black hover:text-zapier-orange hover:bg-zapier-orange/10'
+                           }`}
+                         >
+                           <FileText className="h-3 w-3 mr-1" />
+                           {document.has_cover_letter ? 'View Cover Letter' : 'Generate Cover Letter'}
+                         </button>
                         
                         <button
                           onClick={(e) => {
@@ -399,19 +416,43 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
                       </button>
                     )}
                     
-                    <DownloadOptions
-                      content={document.type === 'analysis' 
-                        ? `CV Analysis Report for ${document.job_title}` 
-                        : document.content || `Cover Letter for ${document.job_title}`
-                      }
-                      fileName={`${document.type === 'analysis' ? 'CV_Analysis' : 'Cover_Letter'}_${document.job_title?.replace(/[^a-zA-Z0-9]/g, '_') || 'Document'}_${new Date().toISOString().split('T')[0]}`}
-                      triggerComponent={
-                        <button className="flex items-center px-2 py-1 text-xs text-black hover:text-zapier-orange hover:bg-zapier-orange/10 rounded-md transition-colors">
-                          <Download className="h-3 w-3 mr-1" />
-                          Download
-                        </button>
-                      }
-                    />
+                     <DownloadOptions
+                       content={document.type === 'analysis' 
+                         ? `CV ANALYSIS REPORT
+==================
+
+Job Title: ${document.job_title || 'Untitled Position'}
+Company: ${document.company_name || 'Company not specified'}
+Compatibility Score: ${document.compatibility_score}%
+Date: ${new Date(document.created_at).toLocaleDateString()}
+
+EXECUTIVE SUMMARY
+================
+${document.executive_summary || 'No executive summary available'}
+
+STRENGTHS
+=========
+${document.strengths?.map((strength, index) => `${index + 1}. ${strength}`).join('\n') || 'No strengths listed'}
+
+AREAS FOR IMPROVEMENT
+====================
+${document.weaknesses?.map((weakness, index) => `${index + 1}. ${weakness}`).join('\n') || 'No weaknesses listed'}
+
+RECOMMENDATIONS
+===============
+${document.recommendations?.map((rec, index) => `${index + 1}. ${rec}`).join('\n') || 'No recommendations available'}
+
+Generated by TuneMyCV` 
+                         : document.content || `Cover Letter for ${document.job_title}`
+                       }
+                       fileName={`${document.type === 'analysis' ? 'CV_Analysis' : 'Cover_Letter'}_${document.job_title?.replace(/[^a-zA-Z0-9]/g, '_') || 'Document'}_${new Date().toISOString().split('T')[0]}`}
+                       triggerComponent={
+                         <button className="flex items-center px-2 py-1 text-xs text-black hover:text-zapier-orange hover:bg-zapier-orange/10 rounded-md transition-colors">
+                           <Download className="h-3 w-3 mr-1" />
+                           Download
+                         </button>
+                       }
+                     />
                   </div>
                   
                   {/* Delete button in bottom right */}
