@@ -232,7 +232,7 @@ const HelpCentre = () => {
                   
                   <Button 
                     type="submit" 
-                    className="w-full bg-apricot hover:bg-apricot/90"
+                    className="w-full bg-zapier-orange hover:bg-zapier-orange/90 text-white font-normal"
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? 'Sending...' : (

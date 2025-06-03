@@ -363,19 +363,15 @@ const AuthenticatedCoverLetter = () => {
     <div className="min-h-screen bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5 py-6">
       <div className="max-w-4xl mx-auto px-4">
         <div className="mb-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="text-left">
-              <div className="flex items-start mb-3 text-left">
-                <Edit className="h-8 w-8 text-zapier-orange mr-3 flex-shrink-0" />
-                <div className="text-left">
-                  <h1 className="text-3xl font-bold text-earth dark:text-white text-left">
-                    Generate Cover Letter
-                  </h1>
-                  <p className="text-lg font-normal text-earth/70 dark:text-white/70 max-w-2xl mt-2 text-left">
-                    Create tailored cover letters that highlight your strengths and align perfectly with specific job requirements.
-                  </p>
-                </div>
-              </div>
+          <div className="flex items-start mb-6">
+            <Edit className="h-8 w-8 text-zapier-orange mr-3 flex-shrink-0" />
+            <div>
+              <h1 className="text-3xl font-bold text-earth dark:text-white">
+                Generate Cover Letter
+              </h1>
+              <p className="text-lg text-earth/70 dark:text-white/70 max-w-2xl mt-2">
+                Create tailored cover letters that highlight your strengths and align perfectly with specific job requirements.
+              </p>
             </div>
           </div>
         </div>
