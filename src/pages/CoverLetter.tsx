@@ -615,9 +615,14 @@ const AuthenticatedCoverLetter = () => {
                           'Generate Cover Letter'
                         )}
                       </Button>
-                      <p className="text-sm font-normal text-gray-600 dark:text-gray-400 text-center mt-2">
-                        Our AI uses the info above to generate a tailored cover letter, to help you stand out.
-                      </p>
+                      <div className="text-center mt-2 space-y-1">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          Our AI will generate a tailored cover letter, to help you stand out.
+                        </p>
+                        <p className="text-xs text-red-600 dark:text-red-400">
+                          Please provide above required info to continue
+                        </p>
+                      </div>
                     </CardContent>
                   </Card>
                 </div>
@@ -642,21 +647,26 @@ const AuthenticatedCoverLetter = () => {
                             )}
                           </div>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <DownloadOptions
-                            content={selectedCoverLetter.content}
-                            fileName={`Cover_Letter_${selectedCoverLetter.company_name}_${selectedCoverLetter.job_title}`}
-                            triggerComponent={
-                              <div className="flex items-center text-sm text-gray-600 hover:text-zapier-orange transition-colors cursor-pointer">
-                                <Download className="h-4 w-4 mr-1" />
-                                Download
-                              </div>
-                            }
-                          />
-                        </div>
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-4 pt-0">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center text-sm text-gray-600 hover:text-zapier-orange transition-colors cursor-pointer">
+                          <RotateCcw className="h-4 w-4 mr-1" />
+                          Revert to Original
+                        </div>
+                        <DownloadOptions
+                          content={selectedCoverLetter.content}
+                          fileName={`Cover_Letter_${selectedCoverLetter.company_name}_${selectedCoverLetter.job_title}`}
+                          triggerComponent={
+                            <div className="flex items-center text-sm text-gray-600 hover:text-zapier-orange transition-colors cursor-pointer">
+                              <Download className="h-4 w-4 mr-1" />
+                              Download
+                            </div>
+                          }
+                        />
+                      </div>
+
                       <EditableCoverLetter
                         content={selectedCoverLetter.content}
                         onSave={handleUpdateCoverLetter}
@@ -793,7 +803,7 @@ const AuthenticatedCoverLetter = () => {
                                   <div className="flex items-center gap-4 text-sm font-normal text-gray-600 dark:text-gray-400">
                                     <div className="flex items-center gap-1">
                                       <Clock className="h-3 w-3" />
-                                      Updated {new Date(coverLetter.updated_at).toLocaleDateString()}
+                                      Updated {formatDate(coverLetter.updated_at)}
                                     </div>
                                   </div>
                                 </div>

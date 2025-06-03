@@ -39,18 +39,6 @@ const EditableCoverLetter: React.FC<EditableCoverLetterProps> = ({ content, onSa
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={handleRevert}
-            className="flex items-center text-sm text-gray-600 hover:text-zapier-orange transition-colors"
-          >
-            <RotateCcw className="h-4 w-4 mr-1" />
-            Revert to Original
-          </button>
-        </div>
-      </div>
-
       <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
         <Textarea
           value={editedContent}
