@@ -73,12 +73,11 @@ const FloatingFeedback = () => {
       <div className="fixed right-0 top-1/2 -translate-y-1/2 z-50">
         <button
           onClick={() => setIsOpen(true)}
-          className="bg-zapier-orange hover:bg-zapier-orange/90 text-white px-3 py-6 rounded-l-lg shadow-lg transition-all duration-300 hover:shadow-xl group"
-          style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}
+          className="bg-zapier-orange hover:bg-zapier-orange/90 text-white px-4 py-3 rounded-l-lg shadow-lg transition-all duration-300 hover:shadow-xl group"
         >
-          <div className="flex flex-col items-center space-y-2">
+          <div className="flex items-center space-x-2">
             <MessageSquare className="h-5 w-5 group-hover:scale-110 transition-transform" />
-            <span className="text-sm font-semibold tracking-wider">FEEDBACK</span>
+            <span className="text-sm tracking-wider">Feedback</span>
           </div>
         </button>
       </div>
@@ -123,7 +122,7 @@ const FloatingFeedback = () => {
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-blueberry dark:text-citrus mb-1">
-                      Name
+                      Name <span className="text-sm text-blueberry/60 dark:text-apple-core/70">(optional)</span>
                     </label>
                     <Input
                       type="text"
@@ -131,14 +130,13 @@ const FloatingFeedback = () => {
                       value={formData.name}
                       onChange={handleInputChange}
                       placeholder="Your name"
-                      required
                       disabled={isSubmitting}
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-blueberry dark:text-citrus mb-1">
-                      Email
+                      Email <span className="text-sm text-blueberry/60 dark:text-apple-core/70">(optional)</span>
                     </label>
                     <Input
                       type="email"
@@ -146,7 +144,6 @@ const FloatingFeedback = () => {
                       value={formData.email}
                       onChange={handleInputChange}
                       placeholder="your@email.com"
-                      required
                       disabled={isSubmitting}
                     />
                   </div>
