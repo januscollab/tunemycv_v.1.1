@@ -112,9 +112,9 @@ const Index = () => {
               <div className="bg-zapier-orange/10 rounded-full w-16 h-16 flex items-center justify-center mb-6">
                 <MessageSquare className="h-8 w-8 text-zapier-orange" />
               </div>
-              <h3 className="text-2xl font-bold text-earth dark:text-white mb-4">Ready. Set. Interview.</h3>
+              <h3 className="text-2xl font-bold text-earth dark:text-white mb-4">Apply and Prep</h3>
               <p className="text-earth/70 dark:text-white/70 leading-relaxed mb-6">
-                Our Interview Toolkit will help you with a tailored cover letter and a complete interview prep pack — including company insights, and key talking points — so you're fully equipped to succeed.
+                Practice interview questions with AI feedback and get insights on company culture and hiring processes.
               </p>
               <Link
                 to={user ? "/analyze?tab=interview-prep" : "/auth"}
