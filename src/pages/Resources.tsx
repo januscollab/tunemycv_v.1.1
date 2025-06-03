@@ -184,11 +184,11 @@ const Resources = () => {
             {filteredResources.map((resource, index) => (
               <div key={index} className="bg-white dark:bg-blueberry/20 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all border border-apple-core/20 dark:border-citrus/20 hover:border-zapier-orange/50">
                 <div className="flex flex-col h-full">
-                  <h3 className="text-lg font-semibold text-earth dark:text-white mb-3 line-clamp-2">
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-3 line-clamp-2">
                     {resource.title}
                   </h3>
                   
-                  <p className="text-sm text-earth/70 dark:text-white/80 mb-4 flex-grow leading-relaxed">
+                  <p className="text-sm text-slate-600 dark:text-white/80 mb-4 flex-grow leading-relaxed">
                     {resource.description}
                   </p>
                   
@@ -199,7 +199,7 @@ const Resources = () => {
                     
                     <a 
                       href={resource.link}
-                      className="inline-flex items-center text-apricot font-medium hover:text-zapier-orange transition-colors text-sm"
+                      className="inline-flex items-center text-zapier-orange font-medium hover:text-zapier-orange/80 transition-colors text-sm"
                     >
                       Read More →
                     </a>
