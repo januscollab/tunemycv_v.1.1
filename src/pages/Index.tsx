@@ -1,11 +1,10 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, CheckCircle, FileText, Users, TrendingUp, Sparkles, MessageSquare } from 'lucide-react';
+import { ArrowRight, CheckCircle, FileText, Users, TrendingUp, Sparkles, MessageSquare, Zap, BookOpen } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import HowItWorks from '@/components/HowItWorks';
 import Testimonials from '@/components/Testimonials';
-import Zap from '@/components/Zap';
-import BookOpen from '@/components/BookOpen';
 
 const Index = () => {
   const { user } = useAuth();
@@ -113,9 +112,9 @@ const Index = () => {
               <div className="bg-zapier-orange/10 rounded-full w-16 h-16 flex items-center justify-center mb-6">
                 <MessageSquare className="h-8 w-8 text-zapier-orange" />
               </div>
-              <h3 className="text-2xl font-bold text-earth dark:text-white mb-4">Apply and Prep</h3>
+              <h3 className="text-2xl font-bold text-earth dark:text-white mb-4">Ready. Set. Interview.</h3>
               <p className="text-earth/70 dark:text-white/70 leading-relaxed mb-6">
-                Practice interview questions with AI feedback and get insights on company culture and hiring processes.
+                Our Interview Toolkit will help you with a tailored cover letter and a complete interview prep pack — so you're fully equipped to succeed
               </p>
               <Link
                 to={user ? "/analyze?tab=interview-prep" : "/auth"}
