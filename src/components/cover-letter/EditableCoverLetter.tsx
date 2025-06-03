@@ -18,12 +18,19 @@ const EditableCoverLetter: React.FC<EditableCoverLetterProps> = ({ content, onSa
   // Auto-resize textarea based on content
   const adjustTextareaHeight = () => {
     if (textareaRef.current) {
+      // Reset height to auto to get accurate scrollHeight
       textareaRef.current.style.height = 'auto';
-      const scrollHeight = textareaRef.current.scrollHeight;
-      const minHeight = 400; // Minimum height for cover letters
-      const maxHeight = window.innerHeight * 0.7; // Max 70% of viewport
-      const newHeight = Math.max(minHeight, Math.min(scrollHeight, maxHeight));
-      textareaRef.current.style.height = `${newHeight}px`;
+      
+      // Use requestAnimationFrame to ensure DOM has updated
+      requestAnimationFrame(() => {
+        if (textareaRef.current) {
+          const scrollHeight = textareaRef.current.scrollHeight;
+          const minHeight = 400; // Minimum height for cover letters
+          // Remove max height constraint to allow unlimited expansion
+          const newHeight = Math.max(minHeight, scrollHeight + 20); // Add small padding
+          textareaRef.current.style.height = `${newHeight}px`;
+        }
+      });
     }
   };
 
@@ -65,8 +72,8 @@ const EditableCoverLetter: React.FC<EditableCoverLetterProps> = ({ content, onSa
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setEditedContent(e.target.value);
-    // Trigger resize on next tick to ensure content is updated
-    setTimeout(adjustTextareaHeight, 0);
+    // Immediately trigger resize for responsive height adjustment
+    adjustTextareaHeight();
   };
 
   return (
@@ -76,7 +83,7 @@ const EditableCoverLetter: React.FC<EditableCoverLetterProps> = ({ content, onSa
           ref={textareaRef}
           value={editedContent}
           onChange={handleContentChange}
-          className="w-full font-sans text-sm leading-relaxed resize-none border-0 focus:ring-0 bg-transparent overflow-hidden"
+          className="w-full font-sans text-sm leading-relaxed resize-none border-0 focus:ring-0 bg-transparent"
           style={{ minHeight: '400px' }}
           placeholder="Edit your cover letter content here..."
         />

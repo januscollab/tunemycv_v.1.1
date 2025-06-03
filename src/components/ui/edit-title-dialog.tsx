@@ -46,7 +46,10 @@ const EditTitleDialog: React.FC<EditTitleDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleCancel}>
-      <DialogContent className="sm:max-w-[400px] bg-white border-gray-200 shadow-lg">
+      <DialogContent 
+        className="sm:max-w-[400px] bg-white border-gray-200 shadow-lg"
+        onInteractOutside={handleCancel}
+      >
         <DialogHeader className="pb-2">
           <DialogTitle className="text-lg font-medium text-gray-900">
             Edit {titleType === 'analysis' ? 'Analysis' : 'Cover Letter'} Title

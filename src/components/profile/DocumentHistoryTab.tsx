@@ -184,7 +184,8 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
     navigate('/analyze', { 
       state: { 
         analysisId: analysisId,
-        activeTab: 'results'
+        activeTab: 'results',
+        viewMode: true
       } 
     });
   };
@@ -300,7 +301,7 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
                         </span>
                       )}
                       
-                      {document.type === 'cover_letter' && document.regeneration_count && document.regeneration_count > 0 && (
+                      {document.type === 'cover_letter' && document.regeneration_count > 0 && (
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                           v{document.regeneration_count + 1}
                         </span>
