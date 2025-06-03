@@ -216,7 +216,12 @@ const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ credits, member
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <AnalysisHistoryHeader analysisCount={analyses.length} />
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold text-gray-900">Analysis History</h2>
+        <div className="text-sm text-gray-500 mt-1">
+          {analyses.length} {analyses.length === 1 ? 'analysis' : 'analyses'}
+        </div>
+      </div>
         {analyses.length > 0 && (
           <div className="flex items-center space-x-2">
             <span className="text-sm text-gray-600">Show:</span>

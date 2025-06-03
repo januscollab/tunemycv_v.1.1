@@ -742,11 +742,11 @@ const AuthenticatedCoverLetter = () => {
                 )}
               </TabsContent>
 
-              <TabsContent value="history">
-                <Card className="border border-gray-200 dark:border-gray-700">
+              <TabsContent value="history" className="mt-6">
+                <Card className="border-0 shadow-none bg-transparent">
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-xl font-semibold">History</CardTitle>
+                      <CardTitle className="text-xl font-semibold">Saved Cover Letters</CardTitle>
                       {allCoverLetters.length > 0 && (
                         <div className="flex items-center space-x-2">
                           <span className="text-sm text-gray-600">Show:</span>
