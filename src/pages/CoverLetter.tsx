@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FileText, Sparkles, Trash2, RefreshCw, Clock, FileUp, Search, AlertCircle, Eye, Edit, Download, History } from 'lucide-react';
@@ -303,7 +302,7 @@ const AuthenticatedCoverLetter = () => {
   };
 
   const getRemainingFreeRegenerations = (regenerationCount: number) => {
-    return Math.max(0, 5 - regenerationCount);
+    return Math.max(0, 2 - regenerationCount);
   };
 
   const canGenerate = generationMethod === 'input' 
@@ -640,13 +639,6 @@ const AuthenticatedCoverLetter = () => {
                               Save Cover Letter
                             </Button>
                           )}
-                          <button
-                            onClick={() => setActiveTab('result')}
-                            className="flex items-center text-sm text-gray-600 hover:text-zapier-orange transition-colors px-3 py-1 rounded border border-gray-300 hover:border-zapier-orange"
-                          >
-                            <Edit className="h-4 w-4 mr-1" />
-                            Edit
-                          </button>
                           <DownloadOptions
                             content={selectedCoverLetter.content}
                             fileName={`Cover_Letter_${selectedCoverLetter.company_name}_${selectedCoverLetter.job_title}`}
@@ -666,7 +658,7 @@ const AuthenticatedCoverLetter = () => {
                         onSave={handleUpdateCoverLetter}
                       />
                       
-                      <div className="flex items-center justify-between pt-4 border-t">
+                      <div className="flex items-start justify-between pt-4 border-t">
                         <div className="flex items-center space-x-4">
                           <Select
                             value={formData.tone}
