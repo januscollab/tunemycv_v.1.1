@@ -15,7 +15,7 @@ import AnalysisSelector from '@/components/cover-letter/AnalysisSelector';
 import { useAnalysis } from '@/hooks/useAnalysis';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { FileText, History, MessageSquare, Target, Calendar, Building, CheckCircle } from 'lucide-react';
+import { FileText, History, MessageSquare, Target, Calendar, Building, CheckCircle, FileUp, Search } from 'lucide-react';
 import EmbeddedAuth from '@/components/auth/EmbeddedAuth';
 import ServiceExplanation from '@/components/common/ServiceExplanation';
 import { UploadedFile } from '@/types/fileTypes';
@@ -467,9 +467,9 @@ const AnalyzeCV = () => {
                           }`}
                         >
                           <div className="flex items-center space-x-3">
-                            <div className={`w-4 h-4 rounded-full border-2 ${
-                              interviewPrepMethod === 'input' ? 'border-zapier-orange bg-zapier-orange' : 'border-gray-300'
-                            }`}></div>
+                            <FileUp className={`h-5 w-5 ${
+                              interviewPrepMethod === 'input' ? 'text-zapier-orange' : 'text-gray-500'
+                            }`} />
                             <div className="text-left">
                               <h3 className="font-semibold text-blueberry dark:text-citrus">Generate From Input</h3>
                               <p className="text-sm text-blueberry/70 dark:text-apple-core/80">Enter job details manually</p>
@@ -486,9 +486,9 @@ const AnalyzeCV = () => {
                           }`}
                         >
                           <div className="flex items-center space-x-3">
-                            <div className={`w-4 h-4 rounded-full border-2 ${
-                              interviewPrepMethod === 'analysis' ? 'border-zapier-orange bg-zapier-orange' : 'border-gray-300'
-                            }`}></div>
+                            <Search className={`h-5 w-5 ${
+                              interviewPrepMethod === 'analysis' ? 'text-zapier-orange' : 'text-gray-500'
+                            }`} />
                             <div className="text-left">
                               <h3 className="font-semibold text-blueberry dark:text-citrus">Generate from Existing Analysis</h3>
                               <p className="text-sm text-blueberry/70 dark:text-apple-core/80">Use a previous CV analysis</p>

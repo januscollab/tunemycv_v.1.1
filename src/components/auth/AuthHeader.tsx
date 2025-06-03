@@ -52,7 +52,7 @@ const AuthHeader: React.FC<AuthHeaderProps> = ({ mode, fromAnalyze }) => {
         </div>
       )}
       
-      <h2 className="text-4xl font-bold text-earth font-display">
+      <h2 className="text-4xl font-bold text-earth">
         {getTitle()}
       </h2>
       <p className="mt-3 text-earth/70 font-normal text-lg">
