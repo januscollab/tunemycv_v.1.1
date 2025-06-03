@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -351,8 +352,8 @@ const AnalyzeCV = () => {
       )}
       
       <div className="max-w-4xl mx-auto px-4 py-8">
-        {/* Header Section */}
-        <div className="mb-6">
+        {/* Header Section - Changed from centered to left-aligned */}
+        <div className="mb-6 text-left">
           <div className="flex items-start mb-3">
             <FileText className="h-8 w-8 text-zapier-orange mr-3 mt-1" />
             <div>
@@ -390,9 +391,9 @@ const AnalyzeCV = () => {
               {/* CV Analysis Tab */}
               <TabsContent value="analysis" className="mt-0">
                 <div className="space-y-5">
-                  {/* Job Title */}
+                  {/* Job Title - Changed heading to left-aligned */}
                   <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-5 border border-apple-core/20 dark:border-citrus/20">
-                    <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-3">Job Title</h3>
+                    <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-3 text-left">Job Title</h3>
                     <input
                       type="text"
                       value={jobTitle}
@@ -406,9 +407,9 @@ const AnalyzeCV = () => {
                     </p>
                   </div>
 
-                  {/* Job Description Input - Required */}
+                  {/* Job Description Input - Required - Changed heading to left-aligned */}
                   <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-5 border border-apple-core/20 dark:border-citrus/20">
-                    <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-3">
+                    <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-3 text-left">
                       Job Description <span className="text-red-500">*</span>
                     </h3>
                     <p className="text-xs text-blueberry/60 dark:text-apple-core/70 mb-3">
@@ -422,9 +423,9 @@ const AnalyzeCV = () => {
                     />
                   </div>
 
-                  {/* CV Selection - Optional */}
+                  {/* CV Selection - Optional - Changed heading to left-aligned */}
                   <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-5 border border-apple-core/20 dark:border-citrus/20">
-                    <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-3">
+                    <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-3 text-left">
                       Your CV
                     </h3>
                     
@@ -451,7 +452,7 @@ const AnalyzeCV = () => {
                   {/* Generation Method Selection */}
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-xl font-bold text-blueberry dark:text-citrus">
+                      <CardTitle className="text-xl font-bold text-blueberry dark:text-citrus text-left">
                         Generate Interview Prep Notes
                       </CardTitle>
                     </CardHeader>

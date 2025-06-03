@@ -41,7 +41,7 @@ function App() {
                   <Routes>
                     <Route path="/" element={<Index />} />
                     <Route path="/auth" element={<Auth />} />
-                    <Route path="/auth/callback" element={<OAuthCallback />} />
+                    <Route path="/auth/callback" element={<OAuthCallback onLoadingChange={() => {}} />} />
                     <Route path="/analyze" element={<AnalyzeCV />} />
                     <Route path="/cover-letter" element={<CoverLetter />} />
                     <Route path="/interview-prep" element={<InterviewPrep />} />

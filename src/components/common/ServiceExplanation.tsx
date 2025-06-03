@@ -36,9 +36,12 @@ const ServiceExplanation: React.FC<ServiceExplanationProps> = ({
 
       <div className="space-y-5">
         <div>
-          <h3 className="text-lg font-semibold text-earth dark:text-white mb-3 font-display">
-            Key Benefits
-          </h3>
+          <div className="flex items-center mb-3">
+            <div className="w-1.5 h-1.5 bg-zapier-orange rounded-full mr-3"></div>
+            <h3 className="text-lg font-semibold text-earth dark:text-white font-display">
+              Key Benefits
+            </h3>
+          </div>
           <ul className="space-y-2">
             {benefits.map((benefit, index) => (
               <li key={index} className="flex items-start">
@@ -52,9 +55,12 @@ const ServiceExplanation: React.FC<ServiceExplanationProps> = ({
         </div>
 
         <div>
-          <h3 className="text-lg font-semibold text-earth dark:text-white mb-3 font-display">
-            How It Works
-          </h3>
+          <div className="flex items-center mb-3">
+            <div className="w-1.5 h-1.5 bg-zapier-orange rounded-full mr-3"></div>
+            <h3 className="text-lg font-semibold text-earth dark:text-white font-display">
+              How It Works
+            </h3>
+          </div>
           <ul className="space-y-2">
             {features.map((feature, index) => (
               <li key={index} className="flex items-start">
