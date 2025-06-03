@@ -361,7 +361,7 @@ const AuthenticatedCoverLetter = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5 py-6">
-      <div className="max-w-4xl mx-auto px-4">
+      <div className="max-w-wider mx-auto px-4">
         <div className="mb-6">
           <div className="flex items-start mb-6">
             <Edit className="h-8 w-8 text-zapier-orange mr-3 flex-shrink-0" />
@@ -399,9 +399,9 @@ const AuthenticatedCoverLetter = () => {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6">
           {/* Main Content */}
-          <div className="lg:col-span-3">
+          <div>
             <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="create" className="flex items-center space-x-2 text-sm">
@@ -900,8 +900,8 @@ const AuthenticatedCoverLetter = () => {
             </Tabs>
           </div>
 
-          {/* Credits Panel - Reduced Width */}
-          <div className="lg:col-span-1">
+          {/* Credits Panel - Fixed Width */}
+          <div>
             <CreditsPanel
               credits={credits}
               hasCreditsForAI={credits > 0}
