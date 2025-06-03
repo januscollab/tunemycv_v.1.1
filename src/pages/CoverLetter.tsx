@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLocation } from 'react-router-dom';
@@ -27,7 +26,7 @@ const CoverLetter = () => {
     generationOptions,
     updateGenerationOptions,
     generateCoverLetter,
-    updateCoverLetter,
+    updateCoverLetterInDB,
     downloadCoverLetter
   } = useCoverLetter();
 
@@ -60,6 +59,13 @@ const CoverLetter = () => {
     console.log('Manual input selected');
   };
 
+  // Create a wrapper function that matches the expected signature
+  const handleSaveCoverLetter = async (newContent: string) => {
+    if (coverLetter?.id) {
+      await updateCoverLetterInDB(coverLetter.id, newContent);
+    }
+  };
+
   // Logged-out user experience
   if (!user) {
     return <CoverLetterLoggedOut />;
@@ -67,7 +73,7 @@ const CoverLetter = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
-      <div className="max-w-7xl mx-auto px-4 py-12">
+      <div className="max-w-[120%] mx-auto px-4 py-12">
         <div className="mb-8">
           <div className="flex items-start">
             <Users className="h-12 w-12 text-zapier-orange mr-6 mt-0" />
@@ -140,7 +146,7 @@ const CoverLetter = () => {
             {coverLetter && (
               <EditableCoverLetter
                 content={coverLetter.content || coverLetter}
-                onSave={updateCoverLetter}
+                onSave={handleSaveCoverLetter}
                 onDownload={downloadCoverLetter}
               />
             )}
