@@ -133,18 +133,18 @@ const Index = () => {
       {/* Testimonials */}
       <Testimonials />
 
-      {/* CTA Section - Changed background to match Resources page "Stay Updated" section */}
-      <section className="py-10 px-4 bg-cream/30">
+      {/* CTA Section */}
+      <section className="py-10 px-4 bg-gradient-to-r from-zapier-orange to-orange-600">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-earth dark:text-white mb-6">
+          <h2 className="text-4xl font-bold text-white mb-6">
             Ready to Transform Your Career?
           </h2>
-          <p className="text-xl text-earth/70 dark:text-white/70 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
             Join thousands of professionals who have already improved their job prospects with <span className="text-zapier-orange">Tune</span>MyCV
           </p>
           <Link
             to={user ? "/analyze" : "/auth"}
-            className="bg-zapier-orange text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange/90 transition-colors inline-flex items-center"
+            className="bg-white text-zapier-orange px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-50 transition-colors inline-flex items-center"
           >
             Get Started Free
             <ArrowRight className="ml-2 h-5 w-5" />

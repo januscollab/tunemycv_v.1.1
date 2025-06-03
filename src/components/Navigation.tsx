@@ -30,19 +30,13 @@ const Navigation = () => {
   const navItems = [
     { path: '/analyze', label: 'Analyze CV' },
     { path: '/cover-letter', label: 'Cover Letter' },
-    { 
-      path: user ? '/analyze?tab=interview-prep' : '/interview-prep', 
-      label: 'Interview Prep' 
-    },
+    { path: user ? '/analyze?tab=interview-prep' : '/analyze?tab=interview-prep', label: 'Interview Prep' },
     { path: '/resources', label: 'Resources' },
   ];
 
   const isActive = (path: string) => {
     if (path === '/analyze?tab=interview-prep' || path.includes('tab=interview-prep')) {
       return location.pathname === '/analyze' && location.search.includes('tab=interview-prep');
-    }
-    if (path === '/interview-prep') {
-      return location.pathname === '/interview-prep';
     }
     return location.pathname === path;
   };
