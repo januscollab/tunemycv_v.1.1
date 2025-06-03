@@ -114,6 +114,28 @@ const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ credits, member
     }
   };
 
+  const handleEditAnalysisTitle = async (analysisId: string, newTitle: string) => {
+    try {
+      const { error } = await supabase
+        .from('analysis_results')
+        .update({ job_title: newTitle })
+        .eq('id', analysisId)
+        .eq('user_id', user?.id);
+
+      if (error) throw error;
+
+      setAnalyses(prev => prev.map(analysis => 
+        analysis.id === analysisId 
+          ? { ...analysis, job_title: newTitle }
+          : analysis
+      ));
+
+      toast({ title: 'Success', description: 'Analysis title updated successfully' });
+    } catch (error) {
+      toast({ title: 'Error', description: 'Failed to update analysis title', variant: 'destructive' });
+    }
+  };
+
   const handleCreateCoverLetter = async (analysis: AnalysisResult) => {
     if (analysis.has_cover_letter) {
       // If cover letter exists, fetch it and navigate to view it
@@ -226,6 +248,7 @@ const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ credits, member
                 onDelete={handleDeleteAnalysis}
                 onCreateCoverLetter={handleCreateCoverLetter}
                 onInterviewPrep={handleInterviewPrep}
+                onEditTitle={handleEditAnalysisTitle}
               />
             ))}
           </div>

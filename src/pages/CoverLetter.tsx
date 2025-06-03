@@ -4,6 +4,8 @@ import { FileText, Sparkles, Trash2, RefreshCw, Clock, FileUp, Search, AlertCirc
 import { useAuth } from '@/contexts/AuthContext';
 import { useCoverLetter } from '@/hooks/useCoverLetter';
 import { useUserData } from '@/hooks/useUserData';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -47,6 +49,7 @@ const CoverLetter = () => {
 const AuthenticatedCoverLetter = () => {
   const { user } = useAuth();
   const { credits } = useUserData();
+  const { toast } = useToast();
   const location = useLocation();
   const { 
     generateCoverLetter, 
@@ -796,7 +799,23 @@ const AuthenticatedCoverLetter = () => {
                                   <div className="flex items-center gap-2 mb-1">
                                     <h3 className="font-medium">{coverLetter.job_title} at {coverLetter.company_name}</h3>
                                     <button
-                                      onClick={() => {/* TODO: Add edit functionality */}}
+                                      onClick={async () => {
+                                        const newTitle = prompt('Edit job title:', coverLetter.job_title || '');
+                                        if (newTitle && newTitle.trim()) {
+                                          try {
+                                            const { error } = await supabase
+                                              .from('cover_letters')
+                                              .update({ job_title: newTitle.trim() })
+                                              .eq('id', coverLetter.id)
+                                              .eq('user_id', user?.id);
+                                            if (error) throw error;
+                                            await loadCoverLetterHistory();
+                                            toast({ title: 'Success', description: 'Cover letter title updated successfully' });
+                                          } catch (error) {
+                                            toast({ title: 'Error', description: 'Failed to update title', variant: 'destructive' });
+                                          }
+                                        }
+                                      }}
                                       className="text-gray-400 hover:text-zapier-orange transition-colors"
                                       title="Edit title"
                                     >

@@ -12,7 +12,7 @@ const Profile = () => {
   // Handle URL tab parameter
   useEffect(() => {
     const tabParam = searchParams.get('tab');
-    if (tabParam && ['personal', 'history', 'files', 'password', 'settings'].includes(tabParam)) {
+    if (tabParam && ['personal', 'history', 'documents', 'files', 'password', 'settings'].includes(tabParam)) {
       setActiveTab(tabParam);
     }
   }, [searchParams]);
