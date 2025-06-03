@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -336,9 +337,6 @@ const AnalyzeCV = () => {
     );
   }
 
-  // Define container class based on authentication status
-  const containerClass = user ? "max-w-[806px]" : "max-w-4xl";
-
   return (
     <div className={`min-h-screen bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5 ${analyzing ? 'pointer-events-none' : ''}`}>
       {/* Loading overlay */}
@@ -354,7 +352,7 @@ const AnalyzeCV = () => {
         </div>
       )}
       
-      <div className={`${containerClass} mx-auto px-4 py-8`}>
+      <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Header Section */}
         <div className="mb-6">
           <div className="flex items-start mb-3">

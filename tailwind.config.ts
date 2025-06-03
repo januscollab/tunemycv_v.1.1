@@ -1,6 +1,7 @@
+
 import type { Config } from "tailwindcss";
 
-const config = {
+export default {
 	darkMode: ["class"],
 	content: [
 		"./pages/**/*.{ts,tsx}",
@@ -18,9 +19,6 @@ const config = {
 			}
 		},
 		extend: {
-			maxWidth: {
-				'806': '806px',
-			},
 			fontFamily: {
 				sans: ['Poppins', 'system-ui', 'sans-serif'],
 				display: ['Playfair Display', 'serif'],
@@ -107,5 +105,3 @@ const config = {
 	},
 	plugins: [require("tailwindcss-animate")],
 } satisfies Config;
-
-export default config
