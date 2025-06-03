@@ -3,7 +3,6 @@ import React from 'react';
 import { Edit } from 'lucide-react';
 import EmbeddedAuth from '@/components/auth/EmbeddedAuth';
 import ServiceExplanation from '@/components/common/ServiceExplanation';
-import { Link } from 'react-router-dom';
 
 const CoverLetterLoggedOut = () => {
   const coverLetterExplanation = {
@@ -25,14 +24,14 @@ const CoverLetterLoggedOut = () => {
     <div className="min-h-screen bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
       <div className="max-w-5xl mx-auto px-4 py-12">
         <div className="mb-8">
-          <div className="flex items-start">
+          <div className="flex items-start text-left">
             <Edit className="h-12 w-12 text-zapier-orange mr-6 mt-0" />
-            <div>
-              <h1 className="text-4xl md:text-5xl font-bold text-earth dark:text-white mb-4">
+            <div className="text-left">
+              <h1 className="text-4xl md:text-5xl font-bold text-earth dark:text-white mb-4 text-left">
                 Generate Cover Letter
               </h1>
-              <p className="text-xl text-earth/70 dark:text-white/70 max-w-3xl font-normal">
-                Generate tailored cover letters that highlight your strengths and align with specific job requirements.
+              <p className="text-xl text-earth/70 dark:text-white/70 max-w-3xl font-normal text-left">
+                Create tailored cover letters that highlight your strengths and align perfectly with specific job requirements.
               </p>
             </div>
           </div>

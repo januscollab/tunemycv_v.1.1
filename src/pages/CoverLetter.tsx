@@ -337,14 +337,14 @@ const AuthenticatedCoverLetter = () => {
       <div className="max-w-4xl mx-auto px-4">
         <div className="mb-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <div className="flex items-start mb-3">
+            <div className="text-left">
+              <div className="flex items-start mb-3 text-left">
                 <Edit className="h-8 w-8 text-zapier-orange mr-3 flex-shrink-0" />
-                <div>
-                  <h1 className="text-3xl font-bold text-earth dark:text-white">
+                <div className="text-left">
+                  <h1 className="text-3xl font-bold text-earth dark:text-white text-left">
                     Generate Cover Letter
                   </h1>
-                  <p className="text-lg font-normal text-earth/70 dark:text-white/70 max-w-2xl mt-2">
+                  <p className="text-lg font-normal text-earth/70 dark:text-white/70 max-w-2xl mt-2 text-left">
                     Create tailored cover letters that highlight your strengths and align perfectly with specific job requirements.
                   </p>
                 </div>
@@ -465,7 +465,7 @@ const AuthenticatedCoverLetter = () => {
                   {generationMethod === 'input' && (
                     <Card className="border border-gray-200 dark:border-gray-700">
                       <CardHeader className="pb-3">
-                        <CardTitle className="text-xl font-semibold">Job Details</CardTitle>
+                        <CardTitle className="text-xl font-semibold text-left">Job Details</CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-4 pt-0">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

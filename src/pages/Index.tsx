@@ -1,16 +1,17 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, CheckCircle, FileText, Users, TrendingUp, Sparkles, MessageSquare } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import HowItWorks from '@/components/HowItWorks';
 import Testimonials from '@/components/Testimonials';
+import Zap from '@/components/Zap';
+import BookOpen from '@/components/BookOpen';
 
 const Index = () => {
   const { user } = useAuth();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
+    <div className="min-h-screen">
       {/* Hero Section */}
       <section className="py-10 px-4">
         <div className="max-w-4xl mx-auto text-center">
@@ -127,28 +128,50 @@ const Index = () => {
         </div>
       </section>
 
-      {/* How It Works */}
-      <HowItWorks />
+      {/* How It Works Section */}
+      <section className="py-16 bg-white dark:bg-gray-900">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-earth dark:text-white mb-4">
+              How TuneMyCV Works
+            </h2>
+            <p className="text-xl text-earth/70 dark:text-white/70 max-w-3xl mx-auto">
+              Our AI-powered platform streamlines your job search with intelligent analysis and personalized recommendations
+            </p>
+          </div>
+          
+          <HowItWorks />
+        </div>
+      </section>
 
       {/* Testimonials */}
       <Testimonials />
 
-      {/* CTA Section */}
-      <section className="py-10 px-4 bg-gradient-to-r from-zapier-orange to-orange-600">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-white mb-6">
+      {/* CTA Section - Updated background color to match Resources page */}
+      <section className="py-16 bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-earth dark:text-white mb-6">
             Ready to Transform Your Career?
           </h2>
-          <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            Join thousands of professionals who have already improved their job prospects with <span className="text-zapier-orange">Tune</span>MyCV
+          <p className="text-xl text-earth/70 dark:text-white/70 mb-8 max-w-2xl mx-auto">
+            Join thousands of job seekers who have successfully landed their dream jobs with TuneMyCV
           </p>
-          <Link
-            to={user ? "/analyze" : "/auth"}
-            className="bg-white text-zapier-orange px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-50 transition-colors inline-flex items-center"
-          >
-            Get Started Free
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link 
+              to="/analyze"
+              className="bg-zapier-orange text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange/90 transition-colors inline-flex items-center justify-center"
+            >
+              <Zap className="mr-2 h-5 w-5" />
+              Start Free Analysis
+            </Link>
+            <Link 
+              to="/resources"
+              className="border-2 border-zapier-orange text-zapier-orange px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange hover:text-white transition-colors inline-flex items-center justify-center"
+            >
+              <BookOpen className="mr-2 h-5 w-5" />
+              Explore Resources
+            </Link>
+          </div>
         </div>
       </section>
     </div>
