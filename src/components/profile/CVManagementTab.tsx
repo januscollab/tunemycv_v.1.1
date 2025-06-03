@@ -179,7 +179,7 @@ const CVManagementTab: React.FC<CVManagementTabProps> = ({ credits, memberSince 
                 <div className="flex items-center space-x-2">
                   <button
                     onClick={() => setEditingCV(cv)}
-                    className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md transition-colors"
+                    className="p-2 text-zapier-orange hover:bg-zapier-orange/10 rounded-md transition-colors"
                     title="Edit CV name"
                   >
                     <Edit className="h-4 w-4" />

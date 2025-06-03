@@ -71,7 +71,7 @@ const FileUploadTab: React.FC = () => {
     return (
       <div className="bg-white rounded-lg shadow p-6">
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-zapier-orange"></div>
         </div>
       </div>
     );
@@ -91,7 +91,7 @@ const FileUploadTab: React.FC = () => {
           <p className="text-gray-500 mb-4">Upload your CV and job descriptions to start analyzing compatibility.</p>
           <a
             href="/analyze"
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center px-4 py-2 bg-zapier-orange text-white rounded-md hover:bg-zapier-orange/90 transition-colors"
           >
             Start Your First Analysis
           </a>
@@ -124,7 +124,7 @@ const FileUploadTab: React.FC = () => {
                   <div className="flex items-center space-x-1">
                     <button
                       onClick={() => window.location.href = `/analysis/${analysis.id}`}
-                      className="p-2 text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                      className="p-2 text-zapier-orange hover:bg-zapier-orange/10 rounded-md transition-colors"
                       title="View Details"
                     >
                       <Eye className="h-4 w-4" />

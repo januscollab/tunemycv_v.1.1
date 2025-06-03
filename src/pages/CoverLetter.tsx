@@ -35,6 +35,7 @@ import EditableCoverLetter from '@/components/cover-letter/EditableCoverLetter';
 import NoAnalysisModal from '@/components/cover-letter/NoAnalysisModal';
 import CoverLetterLoggedOut from '@/components/cover-letter/CoverLetterLoggedOut';
 import ProcessingModal from '@/components/ui/processing-modal';
+import CoverLetterGenerationModal from '@/components/cover-letter/CoverLetterGenerationModal';
 
 const CoverLetter = () => {
   const { user } = useAuth();
@@ -382,6 +383,11 @@ const AuthenticatedCoverLetter = () => {
           isOpen={isRegenerating}
           title="Regenerating Cover Letter"
           message="Please wait while we regenerate your cover letter with the new settings..."
+        />
+
+        <CoverLetterGenerationModal
+          isOpen={isGenerating}
+          title="Crafting Your Cover Letter"
         />
 
 

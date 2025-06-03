@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { FileText, Calendar, Building, Eye, Edit2, Trash2, Download } from 'lucide-react';
+import { FileText, Calendar, Building, Eye, Edit2, Trash2, Download, MessageSquare } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   Pagination,
@@ -209,7 +209,7 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-zapier-orange"></div>
       </div>
     );
   }
@@ -302,7 +302,7 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
                       )}
                       
                       {document.type === 'cover_letter' && (document.regeneration_count || 0) > 0 && (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-zapier-orange/10 text-zapier-orange">
                           v{(document.regeneration_count || 0) + 1}
                         </span>
                       )}
@@ -321,7 +321,7 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
                   <div className="text-xs uppercase font-medium text-gray-500 flex items-center">
                     {document.type === 'analysis' ? (
                       <span className="flex items-center">
-                        <FileText className="h-3 w-3 mr-1 text-blue-600" />
+                        <FileText className="h-3 w-3 mr-1 text-zapier-orange" />
                         CV Analysis
                       </span>
                     ) : (
@@ -347,11 +347,50 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
                       View
                     </button>
                     
+                    {/* Show additional action buttons for CV Analysis items */}
+                    {document.type === 'analysis' && (
+                      <>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate('/cover-letter', {
+                              state: {
+                                analysisId: document.id,
+                                activeTab: 'generate'
+                              }
+                            });
+                          }}
+                          className="flex items-center px-2 py-1 text-xs text-black hover:text-zapier-orange hover:bg-zapier-orange/10 rounded-md transition-colors"
+                        >
+                          <FileText className="h-3 w-3 mr-1" />
+                          Generate Cover Letter
+                        </button>
+                        
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate('/interview-prep', {
+                              state: {
+                                analysisId: document.id,
+                                jobTitle: document.job_title,
+                                companyName: document.company_name
+                              }
+                            });
+                          }}
+                          className="flex items-center px-2 py-1 text-xs text-black hover:text-zapier-orange hover:bg-zapier-orange/10 rounded-md transition-colors"
+                        >
+                          <MessageSquare className="h-3 w-3 mr-1" />
+                          Create Interview Prep
+                        </button>
+                      </>
+                    )}
+                    
                     {document.type === 'cover_letter' && document.analysis_result_id && (
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleViewCVAnalysis(document.analysis_result_id!);
+                          // Fallback navigation to CV Analysis History tab
+                          navigate('/analyze?tab=history');
                         }}
                         className="flex items-center px-2 py-1 text-xs text-green-600 hover:text-green-700 hover:bg-green-50 rounded-md transition-colors"
                       >
