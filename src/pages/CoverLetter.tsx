@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { FileText, Sparkles, Trash2, RefreshCw, Clock, FileUp, Search, AlertCircle, Eye, Edit, Download, History, RotateCcw } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { FileText, Sparkles, Trash2, RefreshCw, Clock, FileUp, Search, AlertCircle, Eye, Edit, Download, History, RotateCcw, Edit2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCoverLetter } from '@/hooks/useCoverLetter';
 import { useUserData } from '@/hooks/useUserData';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import EditTitleDialog from '@/components/ui/edit-title-dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -31,6 +34,8 @@ import DownloadOptions from '@/components/cover-letter/DownloadOptions';
 import EditableCoverLetter from '@/components/cover-letter/EditableCoverLetter';
 import NoAnalysisModal from '@/components/cover-letter/NoAnalysisModal';
 import CoverLetterLoggedOut from '@/components/cover-letter/CoverLetterLoggedOut';
+import ProcessingModal from '@/components/ui/processing-modal';
+import CoverLetterGenerationModal from '@/components/cover-letter/CoverLetterGenerationModal';
 
 const CoverLetter = () => {
   const { user } = useAuth();
@@ -47,7 +52,9 @@ const CoverLetter = () => {
 const AuthenticatedCoverLetter = () => {
   const { user } = useAuth();
   const { credits } = useUserData();
+  const { toast } = useToast();
   const location = useLocation();
+  const navigate = useNavigate();
   const { 
     generateCoverLetter, 
     generateFromAnalysis, 
@@ -95,14 +102,14 @@ const AuthenticatedCoverLetter = () => {
   const [selectedCoverLetter, setSelectedCoverLetter] = useState<any>(null);
   const [activeTab, setActiveTab] = useState('create');
   const [loadingHistory, setLoadingHistory] = useState(false);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const [showSavePrompt, setShowSavePrompt] = useState(false);
   const [generationMethod, setGenerationMethod] = useState<'input' | 'analysis'>('input');
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingCoverLetter, setEditingCoverLetter] = useState<any>(null);
 
   const lengthOptions = [
     { value: 'short', label: 'Short (150-200 words)', description: 'Brief and to the point' },
@@ -206,9 +213,6 @@ const AuthenticatedCoverLetter = () => {
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    if (selectedCoverLetter && !hasUnsavedChanges) {
-      setHasUnsavedChanges(true);
-    }
     // Clear validation errors when user starts typing
     if (validationErrors.length > 0) {
       setValidationErrors([]);
@@ -246,7 +250,6 @@ const AuthenticatedCoverLetter = () => {
 
         setSelectedCoverLetter({ ...result.coverLetter, isUnsaved: false });
         setActiveTab('result');
-        setHasUnsavedChanges(false);
         
         if (coverLetters.length > 0) {
           loadCoverLetterHistory();
@@ -263,7 +266,6 @@ const AuthenticatedCoverLetter = () => {
 
         setSelectedCoverLetter({ ...result.coverLetter, isUnsaved: false });
         setActiveTab('result');
-        setHasUnsavedChanges(false);
         
         if (coverLetters.length > 0) {
           loadCoverLetterHistory();
@@ -323,6 +325,15 @@ const AuthenticatedCoverLetter = () => {
     setActiveTab('result');
   };
 
+  const handleViewCVAnalysis = (analysisResultId: string) => {
+    navigate('/analyze', {
+      state: {
+        analysisId: analysisResultId,
+        activeTab: 'results'
+      }
+    });
+  };
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString() + ' at ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -342,21 +353,7 @@ const AuthenticatedCoverLetter = () => {
   };
 
   const handleTabChange = (newTab: string) => {
-    if (hasUnsavedChanges && newTab !== activeTab) {
-      setShowSavePrompt(true);
-      return;
-    }
     setActiveTab(newTab);
-  };
-
-  const confirmTabChange = (save: boolean) => {
-    if (save) {
-      // handleSaveCoverLetter();
-    } else {
-      setHasUnsavedChanges(false);
-    }
-    setShowSavePrompt(false);
-    setActiveTab('create');
   };
 
   return (
@@ -382,22 +379,17 @@ const AuthenticatedCoverLetter = () => {
           onUseManualInput={() => setGenerationMethod('input')}
         />
 
-        {showSavePrompt && (
-          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-            <div className="bg-white dark:bg-gray-800 rounded-md p-6 max-w-md border border-gray-200 dark:border-gray-700">
-              <h3 className="text-xl font-semibold mb-4 font-display">Unsaved Changes</h3>
-              <p className="mb-6 font-normal">You have unsaved changes. Would you like to save before continuing?</p>
-              <div className="flex space-x-4">
-                <Button onClick={() => confirmTabChange(true)} className="bg-zapier-orange hover:bg-zapier-orange/90">
-                  Save & Continue
-                </Button>
-                <Button variant="outline" onClick={() => confirmTabChange(false)}>
-                  Don't Save
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
+        <ProcessingModal
+          isOpen={isRegenerating}
+          title="Regenerating Cover Letter"
+          message="Please wait while we regenerate your cover letter with the new settings..."
+        />
+
+        <CoverLetterGenerationModal
+          isOpen={isGenerating}
+          title="Crafting Your Cover Letter"
+        />
+
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6">
           {/* Main Content */}
@@ -654,11 +646,7 @@ const AuthenticatedCoverLetter = () => {
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-4 pt-0">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center text-sm text-gray-600 hover:text-zapier-orange transition-colors cursor-pointer">
-                          <RotateCcw className="h-4 w-4 mr-1" />
-                          Revert to Original
-                        </div>
+                      <div className="flex items-center justify-end">
                         <DownloadOptions
                           content={selectedCoverLetter.content}
                           fileName={`Cover_Letter_${selectedCoverLetter.company_name}_${selectedCoverLetter.job_title}`}
@@ -754,11 +742,11 @@ const AuthenticatedCoverLetter = () => {
                 )}
               </TabsContent>
 
-              <TabsContent value="history">
-                <Card className="border border-gray-200 dark:border-gray-700">
+              <TabsContent value="history" className="mt-6">
+                <Card className="border-0 shadow-none bg-transparent">
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-xl font-semibold">History</CardTitle>
+                      <CardTitle className="text-xl font-semibold">Saved Cover Letters</CardTitle>
                       {allCoverLetters.length > 0 && (
                         <div className="flex items-center space-x-2">
                           <span className="text-sm text-gray-600">Show:</span>
@@ -769,6 +757,7 @@ const AuthenticatedCoverLetter = () => {
                             <SelectContent>
                               <SelectItem value="10">10</SelectItem>
                               <SelectItem value="20">20</SelectItem>
+                              <SelectItem value="30">30</SelectItem>
                             </SelectContent>
                           </Select>
                           <span className="text-sm text-gray-600">per page</span>
@@ -792,56 +781,78 @@ const AuthenticatedCoverLetter = () => {
                           {paginatedCoverLetters.map((coverLetter) => (
                             <div
                               key={coverLetter.id}
-                              className="border rounded-md p-4 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-zapier-orange/50 transition-colors"
+                              className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow hover:border-zapier-orange/50 relative"
                             >
-                              <div className="flex items-center justify-between">
-                                <div className="flex-1">
-                                  <div className="flex items-center gap-2 mb-1">
-                                    <h3 className="font-medium">{coverLetter.job_title} at {coverLetter.company_name}</h3>
+                              <div className="flex justify-between items-start">
+                                <div className="flex-1 pr-4">
+                                  <div className="flex items-center space-x-3 mb-2">
+                                    <h3 className="text-lg font-medium text-gray-900">
+                                      {coverLetter.job_title} at {coverLetter.company_name}
+                                    </h3>
+                                    <button
+                                      onClick={() => {
+                                        setEditingCoverLetter(coverLetter);
+                                        setIsEditDialogOpen(true);
+                                      }}
+                                      className="text-gray-400 hover:text-zapier-orange transition-colors"
+                                      title="Edit title"
+                                    >
+                                      <Edit2 className="h-3 w-3" />
+                                    </button>
                                     {coverLetter.regeneration_count > 0 && (
                                       <Badge variant="outline" className="text-xs">
                                         v{coverLetter.regeneration_count + 1}
                                       </Badge>
                                     )}
                                   </div>
-                                  <div className="flex items-center gap-4 text-sm font-normal text-gray-600 dark:text-gray-400">
-                                    <div className="flex items-center gap-1">
-                                      <Clock className="h-3 w-3" />
-                                      Updated {formatDate(coverLetter.updated_at)}
-                                    </div>
+                                  
+                                  <div className="flex items-center text-sm text-gray-600 mb-3">
+                                    <Clock className="h-4 w-4 mr-1" />
+                                    <span>Updated {formatDate(coverLetter.updated_at)}</span>
                                   </div>
                                 </div>
+                              </div>
+                              
+                              {/* Action buttons row at bottom */}
+                              <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-100">
                                 <div className="flex items-center space-x-3">
                                   <button
                                     onClick={() => handleViewCoverLetter(coverLetter)}
-                                    className="flex items-center text-sm text-gray-600 hover:text-zapier-orange transition-colors"
+                                    className="flex items-center px-2 py-1 text-xs text-black hover:text-zapier-orange transition-colors"
                                   >
-                                    <Eye className="h-4 w-4 mr-1" />
+                                    <Eye className="h-3 w-3 mr-1" />
                                     View
                                   </button>
-                                  <button
-                                    onClick={() => handleEditCoverLetter(coverLetter)}
-                                    className="flex items-center text-sm text-gray-600 hover:text-zapier-orange transition-colors"
-                                  >
-                                    <Edit className="h-4 w-4 mr-1" />
-                                    Edit
-                                  </button>
+                                  
+                                  {coverLetter.analysis_result_id && (
+                                    <button
+                                      onClick={() => handleViewCVAnalysis(coverLetter.analysis_result_id)}
+                                      className="flex items-center px-2 py-1 text-xs text-green-600 hover:text-green-700 hover:bg-green-50 rounded-md transition-colors"
+                                    >
+                                      <FileText className="h-3 w-3 mr-1" />
+                                      View CV Analysis
+                                    </button>
+                                  )}
+                                  
                                   <DownloadOptions
                                     content={coverLetter.content}
                                     fileName={`Cover_Letter_${coverLetter.company_name}_${coverLetter.job_title}`}
                                     triggerComponent={
-                                      <button className="text-sm text-gray-600 hover:text-zapier-orange transition-colors">
-                                        <Download className="h-4 w-4" />
+                                      <button className="flex items-center px-2 py-1 text-xs text-black hover:text-zapier-orange hover:bg-zapier-orange/10 rounded-md transition-colors">
+                                        <FileText className="h-3 w-3 mr-1" />
+                                        Download
                                       </button>
                                     }
                                   />
-                                  <button
-                                    onClick={() => handleDelete(coverLetter.id)}
-                                    className="text-sm text-red-600 hover:text-zapier-orange transition-colors"
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </button>
                                 </div>
+                                
+                                {/* Delete button in bottom right */}
+                                <button
+                                  onClick={() => handleDelete(coverLetter.id)}
+                                  className="p-1 text-xs text-red-600 hover:text-zapier-orange transition-colors"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </button>
                               </div>
                             </div>
                           ))}
@@ -859,7 +870,7 @@ const AuthenticatedCoverLetter = () => {
                                       e.preventDefault();
                                       if (currentPage > 1) setCurrentPage(currentPage - 1);
                                     }}
-                                    className={currentPage <= 1 ? 'pointer-events-none opacity-50' : ''}
+                                    className={`${currentPage <= 1 ? 'pointer-events-none opacity-50' : ''} text-sm font-normal`}
                                   />
                                 </PaginationItem>
                                 
@@ -872,6 +883,7 @@ const AuthenticatedCoverLetter = () => {
                                         setCurrentPage(page);
                                       }}
                                       isActive={currentPage === page}
+                                      className="text-sm font-normal"
                                     >
                                       {page}
                                     </PaginationLink>
@@ -885,7 +897,7 @@ const AuthenticatedCoverLetter = () => {
                                       e.preventDefault();
                                       if (currentPage < totalPages) setCurrentPage(currentPage + 1);
                                     }}
-                                    className={currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''}
+                                    className={`${currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''} text-sm font-normal`}
                                   />
                                 </PaginationItem>
                               </PaginationContent>
@@ -908,6 +920,32 @@ const AuthenticatedCoverLetter = () => {
             />
           </div>
         </div>
+
+        <EditTitleDialog
+          isOpen={isEditDialogOpen}
+          onClose={() => {
+            setIsEditDialogOpen(false);
+            setEditingCoverLetter(null);
+          }}
+          onSave={async (newTitle) => {
+            if (editingCoverLetter) {
+              try {
+                const { error } = await supabase
+                  .from('cover_letters')
+                  .update({ job_title: newTitle })
+                  .eq('id', editingCoverLetter.id)
+                  .eq('user_id', user?.id);
+                if (error) throw error;
+                await loadCoverLetterHistory();
+                toast({ title: 'Success', description: 'Cover letter title updated successfully' });
+              } catch (error) {
+                toast({ title: 'Error', description: 'Failed to update title', variant: 'destructive' });
+              }
+            }
+          }}
+          currentTitle={editingCoverLetter?.job_title || ''}
+          titleType="cover-letter"
+        />
       </div>
     </div>
   );

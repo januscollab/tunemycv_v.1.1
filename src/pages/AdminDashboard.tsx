@@ -1,10 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
-import { Users, CreditCard, FileText } from 'lucide-react';
+import { Users, CreditCard, FileText, ChevronLeft, ChevronRight } from 'lucide-react';
 import UserManagement from '@/components/admin/UserManagement';
 import CreditManagement from '@/components/admin/CreditManagement';
 import AnalysisLogsManagement from '@/components/admin/AnalysisLogsManagement';
 import AdminNavigation from '@/components/admin/AdminNavigation';
+import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -12,6 +13,7 @@ const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('users');
   const [loading, setLoading] = useState(true);
   const [hasAdminAccess, setHasAdminAccess] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -86,42 +88,61 @@ const AdminDashboard = () => {
     <div className="min-h-screen bg-apple-core/10">
       <AdminNavigation />
       <div className="flex">
-        <div className="w-64 bg-white shadow-sm border-r min-h-screen border-apple-core/30">
+        <div className={`${sidebarCollapsed ? 'w-16' : 'w-64'} bg-white shadow-sm border-r min-h-screen border-apple-core/30 transition-all duration-300 relative`}>
+          {/* Collapse toggle button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            className="absolute -right-4 top-6 z-10 bg-white border border-gray-200 shadow-sm hover:shadow-md rounded-full w-8 h-8 p-0"
+          >
+            {sidebarCollapsed ? (
+              <ChevronRight className="h-4 w-4" />
+            ) : (
+              <ChevronLeft className="h-4 w-4" />
+            )}
+          </Button>
+          
           <div className="p-6">
-            <h2 className="text-lg font-semibold text-blueberry mb-6">Admin Dashboard</h2>
+            {!sidebarCollapsed && (
+              <h2 className="text-lg font-semibold text-blueberry mb-6">Admin Dashboard</h2>
+            )}
             <nav className="space-y-2">
               <button
                 onClick={() => setActiveTab('users')}
-                className={`w-full flex items-center px-3 py-2 text-left rounded-md transition-colors ${
+                className={`w-full flex items-center ${sidebarCollapsed ? 'px-2 justify-center' : 'px-3'} py-2 text-left rounded-md transition-colors ${
                   activeTab === 'users'
                     ? 'bg-citrus/20 text-blueberry border border-citrus/30'
                     : 'text-blueberry/70 hover:bg-apple-core/20'
                 }`}
+                title={sidebarCollapsed ? 'User Management' : undefined}
               >
-                <Users className="h-5 w-5 mr-3 text-apricot" />
-                User Management
+                <Users className={`h-5 w-5 text-apricot ${sidebarCollapsed ? '' : 'mr-3'}`} />
+                {!sidebarCollapsed && 'User Management'}
               </button>
               <button
                 onClick={() => setActiveTab('credits')}
-                className={`w-full flex items-center px-3 py-2 text-left rounded-md transition-colors ${
+                className={`w-full flex items-center ${sidebarCollapsed ? 'px-2 justify-center' : 'px-3'} py-2 text-left rounded-md transition-colors ${
                   activeTab === 'credits'
                     ? 'bg-citrus/20 text-blueberry border border-citrus/30'
                     : 'text-blueberry/70 hover:bg-apple-core/20'
                 }`}
+                title={sidebarCollapsed ? 'Credit Management' : undefined}
               >
-                <CreditCard className="h-5 w-5 mr-3 text-apricot" />
-                Credit Management
+                <CreditCard className={`h-5 w-5 text-apricot ${sidebarCollapsed ? '' : 'mr-3'}`} />
+                {!sidebarCollapsed && 'Credit Management'}
               </button>
               <button
                 onClick={() => setActiveTab('logs')}
-                className={`w-full flex items-center px-3 py-2 text-left rounded-md transition-colors ${
+                className={`w-full flex items-center ${sidebarCollapsed ? 'px-2 justify-center' : 'px-3'} py-2 text-left rounded-md transition-colors ${
                   activeTab === 'logs'
                     ? 'bg-citrus/20 text-blueberry border border-citrus/30'
                     : 'text-blueberry/70 hover:bg-apple-core/20'
                 }`}
+                title={sidebarCollapsed ? 'Analysis Logs' : undefined}
               >
-                <FileText className="h-5 w-5 mr-3 text-apricot" />
-                Analysis Logs
+                <FileText className={`h-5 w-5 text-apricot ${sidebarCollapsed ? '' : 'mr-3'}`} />
+                {!sidebarCollapsed && 'Analysis Logs'}
               </button>
             </nav>
           </div>

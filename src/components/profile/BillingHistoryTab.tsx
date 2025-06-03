@@ -12,13 +12,13 @@ const BillingHistoryTab: React.FC<BillingHistoryTabProps> = ({ credits, memberSi
     <div className="space-y-6">
       <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
         <div className="flex items-center mb-6">
-          <CreditCard className="h-5 w-5 text-blue-600 mr-2" />
+          <CreditCard className="h-5 w-5 text-zapier-orange mr-2" />
           <h2 className="text-lg font-semibold text-gray-900">Billing History</h2>
         </div>
 
         <div className="text-center py-12">
-          <div className="bg-blue-50 rounded-full p-3 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-            <Clock className="h-8 w-8 text-blue-600" />
+          <div className="bg-zapier-orange/10 rounded-full p-3 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+            <Clock className="h-8 w-8 text-zapier-orange" />
           </div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">Coming Soon</h3>
           <p className="text-gray-600 mb-6 max-w-md mx-auto">

@@ -127,19 +127,19 @@ const CVManagementTab: React.FC<CVManagementTabProps> = ({ credits, memberSince 
   return (
     <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold text-blueberry dark:text-citrus">My CVs</h2>
-        <span className="text-sm text-blueberry/70 dark:text-apple-core/80">{cvs.length}/5 CVs uploaded</span>
+        <h2 className="text-xl font-semibold text-slate-900 dark:text-citrus">My CVs</h2>
+        <span className="text-sm text-slate-600 dark:text-apple-core/80">{cvs.length}/5 CVs uploaded</span>
       </div>
       
       {cvs.length < 5 && (
         <div className="mb-6">
           <label className="cursor-pointer">
             <div className="border-2 border-dashed border-apple-core/30 dark:border-citrus/30 rounded-lg p-6 text-center hover:border-apricot hover:bg-apricot/5 transition-colors">
-              <Upload className="mx-auto h-8 w-8 text-blueberry/60 dark:text-apple-core/60 mb-2" />
-              <p className="text-blueberry dark:text-apple-core font-medium">
+              <Upload className="mx-auto h-8 w-8 text-slate-600 dark:text-apple-core/60 mb-2" />
+              <p className="text-slate-900 dark:text-apple-core font-medium">
                 {uploading ? 'Uploading...' : 'Upload New CV'}
               </p>
-              <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mt-1">
+              <p className="text-sm text-slate-600 dark:text-apple-core/80 mt-1">
                 PDF or DOCX, max 5MB
               </p>
             </div>
@@ -157,8 +157,8 @@ const CVManagementTab: React.FC<CVManagementTabProps> = ({ credits, memberSince 
       {cvs.length === 0 ? (
         <div className="text-center py-8">
           <FileText className="mx-auto h-12 w-12 text-blueberry/40 dark:text-apple-core/40 mb-4" />
-          <h3 className="text-lg font-medium text-blueberry dark:text-citrus mb-2">No CVs uploaded</h3>
-          <p className="text-blueberry/70 dark:text-apple-core/80">
+          <h3 className="text-lg font-medium text-slate-900 dark:text-citrus mb-2">No CVs uploaded</h3>
+          <p className="text-slate-600 dark:text-apple-core/80">
             Upload your first CV to get started with analysis.
           </p>
         </div>
@@ -170,8 +170,8 @@ const CVManagementTab: React.FC<CVManagementTabProps> = ({ credits, memberSince 
                 <div className="flex items-center space-x-3">
                   <FileText className="h-8 w-8 text-apricot" />
                   <div>
-                    <h3 className="font-medium text-blueberry dark:text-citrus">{cv.file_name}</h3>
-                    <p className="text-sm text-blueberry/70 dark:text-apple-core/80">
+                    <h3 className="font-medium text-slate-900 dark:text-citrus">{cv.file_name}</h3>
+                    <p className="text-sm text-slate-600 dark:text-apple-core/80">
                       {formatFileSize(cv.file_size)} • {new Date(cv.created_at).toLocaleDateString()}
                     </p>
                   </div>
@@ -179,7 +179,7 @@ const CVManagementTab: React.FC<CVManagementTabProps> = ({ credits, memberSince 
                 <div className="flex items-center space-x-2">
                   <button
                     onClick={() => setEditingCV(cv)}
-                    className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md transition-colors"
+                    className="p-2 text-zapier-orange hover:bg-zapier-orange/10 rounded-md transition-colors"
                     title="Edit CV name"
                   >
                     <Edit className="h-4 w-4" />

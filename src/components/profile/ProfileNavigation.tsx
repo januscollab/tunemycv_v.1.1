@@ -1,6 +1,6 @@
-
 import React from 'react';
-import { User, History, Upload, CreditCard, Settings } from 'lucide-react';
+import { User, Upload, Settings, FileText } from 'lucide-react';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface ProfileNavigationProps {
   activeTab: string;
@@ -9,35 +9,35 @@ interface ProfileNavigationProps {
 
 const ProfileNavigation: React.FC<ProfileNavigationProps> = ({ activeTab, onTabChange }) => {
   const tabs = [
-    { id: 'personal', label: 'Personal Info', icon: User },
-    { id: 'history', label: 'Document History', icon: History },
-    { id: 'files', label: 'File Management', icon: Upload },
-    { id: 'password', label: 'Billing History', icon: CreditCard },
+    { id: 'personal', label: 'Account Info', icon: User },
+    { id: 'documents', label: 'Document History', icon: FileText },
+    { id: 'files', label: 'CV Management', icon: Upload },
+    { id: 'billing', label: 'Billing History', icon: FileText },
     { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
   return (
-    <nav className="mb-8">
+    <div className="mb-8">
       {/* Desktop horizontal navigation */}
-      <div className="hidden md:flex space-x-1 bg-cream/50 rounded-lg p-1">
-        {tabs.map((tab) => {
-          const Icon = tab.icon;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => onTabChange(tab.id)}
-              className={`flex items-center px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex-1 justify-center ${
-                activeTab === tab.id
-                  ? 'bg-white text-zapier-orange border border-border'
-                  : 'text-earth hover:text-zapier-orange hover:bg-white/50'
-              }`}
-            >
-              <Icon className="h-4 w-4 mr-2" />
-              <span className="hidden lg:inline">{tab.label}</span>
-              <span className="lg:hidden">{tab.label.split(' ')[0]}</span>
-            </button>
-          );
-        })}
+      <div className="hidden md:block">
+        <Tabs value={activeTab} onValueChange={onTabChange}>
+          <TabsList className="grid w-full grid-cols-5 bg-muted">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <TabsTrigger
+                  key={tab.id}
+                  value={tab.id}
+                  className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:text-zapier-orange"
+                >
+                  <Icon className="h-4 w-4" />
+                  <span className="hidden lg:inline">{tab.label}</span>
+                  <span className="lg:hidden">{tab.label.split(' ')[0]}</span>
+                </TabsTrigger>
+              );
+            })}
+          </TabsList>
+        </Tabs>
       </div>
 
       {/* Mobile vertical navigation */}
@@ -60,7 +60,7 @@ const ProfileNavigation: React.FC<ProfileNavigationProps> = ({ activeTab, onTabC
           );
         })}
       </div>
-    </nav>
+    </div>
   );
 };
 

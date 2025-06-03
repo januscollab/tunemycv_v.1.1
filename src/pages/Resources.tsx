@@ -125,7 +125,7 @@ const Resources = () => {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-earth dark:text-white mb-4">
-              Our Top 3 Resources
+              Our Top 3 Must Reads
             </h2>
             <p className="text-xl text-earth/70 dark:text-white/70">
               Start with these essential guides that have helped thousands of job seekers
@@ -171,7 +171,7 @@ const Resources = () => {
                 className={`px-6 py-2 rounded-full font-medium transition-colors ${
                   selectedCategory === category
                     ? 'bg-zapier-orange text-white'
-                    : 'bg-white dark:bg-blueberry/20 text-blueberry dark:text-apple-core border border-apple-core/30 dark:border-citrus/20 hover:border-zapier-orange hover:text-zapier-orange'
+                    : 'bg-white dark:bg-surface-secondary text-earth dark:text-white border border-border dark:border-border-secondary hover:border-zapier-orange hover:text-zapier-orange'
                 }`}
               >
                 {category}
@@ -184,11 +184,11 @@ const Resources = () => {
             {filteredResources.map((resource, index) => (
               <div key={index} className="bg-white dark:bg-blueberry/20 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all border border-apple-core/20 dark:border-citrus/20 hover:border-zapier-orange/50">
                 <div className="flex flex-col h-full">
-                  <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-3 line-clamp-2">
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-3 line-clamp-2">
                     {resource.title}
                   </h3>
                   
-                  <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mb-4 flex-grow leading-relaxed">
+                  <p className="text-sm text-slate-600 dark:text-white/80 mb-4 flex-grow leading-relaxed">
                     {resource.description}
                   </p>
                   
@@ -199,7 +199,7 @@ const Resources = () => {
                     
                     <a 
                       href={resource.link}
-                      className="inline-flex items-center text-apricot font-medium hover:text-zapier-orange transition-colors text-sm"
+                      className="inline-flex items-center text-zapier-orange font-medium hover:text-zapier-orange/80 transition-colors text-sm"
                     >
                       Read More →
                     </a>
@@ -212,10 +212,10 @@ const Resources = () => {
       </section>
 
       {/* Newsletter Section */}
-      <section className="py-20 px-4 bg-cream/30">
+      <section className="py-20 px-4 bg-cream/30 dark:bg-surface-secondary">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-6 text-earth">Stay Updated</h2>
-          <p className="text-xl mb-8 text-earth/70">
+          <h2 className="text-4xl font-bold mb-6 text-earth dark:text-white">Stay Updated</h2>
+          <p className="text-xl mb-8 text-earth/70 dark:text-white/70">
             Get the latest career tips, CV trends, and job market insights delivered to your inbox
           </p>
           
@@ -223,14 +223,14 @@ const Resources = () => {
             <input
               type="email"
               placeholder="Enter your email"
-              className="flex-1 px-4 py-3 rounded-lg text-earth focus:outline-none focus:ring-2 focus:ring-zapier-orange border border-gray-200 hover:border-zapier-orange/50 transition-colors"
+              className="flex-1 px-4 py-3 rounded-lg text-earth dark:text-white bg-white dark:bg-surface placeholder:text-earth/70 dark:placeholder:text-white/70 focus:outline-none focus:ring-2 focus:ring-zapier-orange border border-gray-200 dark:border-border hover:border-zapier-orange/50 transition-colors"
             />
             <button className="bg-zapier-orange text-white px-6 py-3 rounded-lg font-semibold hover:bg-zapier-orange/90 transition-colors">
               Subscribe
             </button>
           </div>
           
-          <p className="text-sm text-earth/60 mt-4">
+          <p className="text-sm text-earth/60 dark:text-white/60 mt-4">
             No spam, unsubscribe at any time
           </p>
         </div>
