@@ -16,36 +16,17 @@ interface AdvancedOptionsData {
 interface AdvancedGenerationOptionsProps {
   value: AdvancedOptionsData;
   onChange: (data: AdvancedOptionsData) => void;
-  isGenerating?: boolean;
-  options?: AdvancedOptionsData;
-  onOptionsChange?: (data: AdvancedOptionsData) => void;
 }
 
-const AdvancedGenerationOptions: React.FC<AdvancedGenerationOptionsProps> = ({ 
-  value, 
-  onChange, 
-  isGenerating = false,
-  options,
-  onOptionsChange 
-}) => {
+const AdvancedGenerationOptions: React.FC<AdvancedGenerationOptionsProps> = ({ value, onChange }) => {
   const [isOpen, setIsOpen] = useState(false);
-  
-  // Use either the new props or fallback to legacy props
-  const currentValue = value || options || {
-    workExperienceHighlights: '',
-    customHookOpener: '',
-    personalValues: '',
-    includeLinkedInUrl: false
-  };
-  
-  const handleChange = onChange || onOptionsChange || (() => {});
 
   // Load LinkedIn preference from localStorage
   useEffect(() => {
     const savedPreference = localStorage.getItem('includeLinkedInUrl');
     if (savedPreference !== null) {
-      handleChange({
-        ...currentValue,
+      onChange({
+        ...value,
         includeLinkedInUrl: JSON.parse(savedPreference)
       });
     }
@@ -53,19 +34,19 @@ const AdvancedGenerationOptions: React.FC<AdvancedGenerationOptionsProps> = ({
 
   // Save LinkedIn preference to localStorage
   useEffect(() => {
-    localStorage.setItem('includeLinkedInUrl', JSON.stringify(currentValue.includeLinkedInUrl));
-  }, [currentValue.includeLinkedInUrl]);
+    localStorage.setItem('includeLinkedInUrl', JSON.stringify(value.includeLinkedInUrl));
+  }, [value.includeLinkedInUrl]);
 
-  const handleFieldChange = (field: keyof AdvancedOptionsData, newValue: string | boolean) => {
-    handleChange({
-      ...currentValue,
+  const handleChange = (field: keyof AdvancedOptionsData, newValue: string | boolean) => {
+    onChange({
+      ...value,
       [field]: newValue
     });
   };
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-      <CollapsibleTrigger className="w-full flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" disabled={isGenerating}>
+      <CollapsibleTrigger className="w-full flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
         <span className="font-medium text-left">Advanced Generation Options (Optional)</span>
         {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
       </CollapsibleTrigger>
@@ -78,11 +59,10 @@ const AdvancedGenerationOptions: React.FC<AdvancedGenerationOptionsProps> = ({
           <Textarea
             id="workHighlights"
             placeholder="Mention specific achievements, metrics, or experiences you want emphasized in your cover letter..."
-            value={currentValue.workExperienceHighlights}
-            onChange={(e) => handleFieldChange('workExperienceHighlights', e.target.value)}
+            value={value.workExperienceHighlights}
+            onChange={(e) => handleChange('workExperienceHighlights', e.target.value)}
             rows={1}
             className="mt-1"
-            disabled={isGenerating}
           />
         </div>
 
@@ -93,11 +73,10 @@ const AdvancedGenerationOptions: React.FC<AdvancedGenerationOptionsProps> = ({
           <Textarea
             id="customHook"
             placeholder="Write a personalized opening line or mention how you discovered the company/role..."
-            value={currentValue.customHookOpener}
-            onChange={(e) => handleFieldChange('customHookOpener', e.target.value)}
+            value={value.customHookOpener}
+            onChange={(e) => handleChange('customHookOpener', e.target.value)}
             rows={1}
             className="mt-1"
-            disabled={isGenerating}
           />
         </div>
 
@@ -108,20 +87,18 @@ const AdvancedGenerationOptions: React.FC<AdvancedGenerationOptionsProps> = ({
           <Textarea
             id="personalValues"
             placeholder="Describe what motivates you professionally or values that align with the company culture..."
-            value={currentValue.personalValues}
-            onChange={(e) => handleFieldChange('personalValues', e.target.value)}
+            value={value.personalValues}
+            onChange={(e) => handleChange('personalValues', e.target.value)}
             rows={1}
             className="mt-1"
-            disabled={isGenerating}
           />
         </div>
 
         <div className="flex items-center space-x-2 pt-1">
           <Checkbox
             id="includeLinkedIn"
-            checked={currentValue.includeLinkedInUrl}
-            onCheckedChange={(checked) => handleFieldChange('includeLinkedInUrl', Boolean(checked))}
-            disabled={isGenerating}
+            checked={value.includeLinkedInUrl}
+            onCheckedChange={(checked) => handleChange('includeLinkedInUrl', Boolean(checked))}
           />
           <Label htmlFor="includeLinkedIn" className="text-sm font-medium flex items-center">
             <Linkedin className="h-4 w-4 mr-1" />

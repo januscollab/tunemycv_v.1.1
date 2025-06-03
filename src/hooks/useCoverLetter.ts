@@ -32,13 +32,6 @@ interface RegenerateCoverLetterParams {
   length: string;
 }
 
-interface GenerationOptions {
-  workExperienceHighlights: string;
-  customHookOpener: string;
-  personalValues: string;
-  includeLinkedInUrl: boolean;
-}
-
 export const useCoverLetter = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isRegenerating, setIsRegenerating] = useState(false);
@@ -51,12 +44,6 @@ export const useCoverLetter = () => {
   const [coverLetter, setCoverLetter] = useState<any>(null);
   const [hasGenerated, setHasGenerated] = useState(false);
   const [showNoAnalysisModal, setShowNoAnalysisModal] = useState(false);
-  const [generationOptions, setGenerationOptions] = useState<GenerationOptions>({
-    workExperienceHighlights: '',
-    customHookOpener: '',
-    personalValues: '',
-    includeLinkedInUrl: false
-  });
   const { toast } = useToast();
 
   const resetForm = () => {
@@ -69,29 +56,9 @@ export const useCoverLetter = () => {
     setHasGenerated(false);
   };
 
-  const updateGenerationOptions = (options: GenerationOptions) => {
-    setGenerationOptions(options);
-  };
-
-  const generateCoverLetter = async (analysisData: any, options: GenerationOptions) => {
+  const generateCoverLetter = async (params: GenerateCoverLetterParams) => {
     setIsGenerating(true);
     try {
-      const params = {
-        jobTitle: analysisData.job_title,
-        companyName: analysisData.company_name,
-        jobDescription: analysisData.job_description_extracted_text,
-        cvText: analysisData.cv_extracted_text,
-        tone: 'professional',
-        length: 'concise',
-        analysisResultId: analysisData.id !== 'manual-input' ? analysisData.id : undefined,
-        workExperienceHighlights: options.workExperienceHighlights,
-        customHookOpener: options.customHookOpener,
-        personalValues: options.personalValues,
-        includeLinkedInUrl: options.includeLinkedInUrl
-      };
-
-      console.log('Generating cover letter with params:', params);
-
       const { data, error } = await supabase.functions.invoke('generate-cover-letter', {
         body: params
       });
@@ -118,11 +85,6 @@ export const useCoverLetter = () => {
     } finally {
       setIsGenerating(false);
     }
-  };
-
-  const downloadCoverLetter = () => {
-    // This would be handled by the DownloadOptions component
-    console.log('Download cover letter');
   };
 
   const generateFromAnalysis = async (params: GenerateFromAnalysisParams) => {
@@ -283,7 +245,7 @@ export const useCoverLetter = () => {
     return data;
   };
 
-  const updateCoverLetterInDB = async (id: string, content: string) => {
+  const updateCoverLetter = async (id: string, content: string) => {
     const { error } = await supabase
       .from('cover_letters')
       .update({ 
@@ -325,7 +287,7 @@ export const useCoverLetter = () => {
     generateFromAnalysis,
     regenerateCoverLetter,
     getCoverLetters,
-    updateCoverLetterInDB,
+    updateCoverLetter,
     deleteCoverLetter,
     isGenerating,
     isRegenerating,
@@ -341,13 +303,9 @@ export const useCoverLetter = () => {
     length,
     setLength,
     coverLetter,
-    setCoverLetter,
     hasGenerated,
     showNoAnalysisModal,
     setShowNoAnalysisModal,
-    resetForm,
-    generationOptions,
-    updateGenerationOptions,
-    downloadCoverLetter
+    resetForm
   };
 };
