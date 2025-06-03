@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FileText, Sparkles, Trash2, RefreshCw, Clock, FileUp, Search, AlertCircle, Eye, Edit, Download, History } from 'lucide-react';
+import { FileText, Sparkles, Trash2, RefreshCw, Clock, FileUp, Search, AlertCircle, Eye, Edit, Download, History, RotateCcw } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCoverLetter } from '@/hooks/useCoverLetter';
 import { useUserData } from '@/hooks/useUserData';
@@ -615,9 +615,14 @@ const AuthenticatedCoverLetter = () => {
                           'Generate Cover Letter'
                         )}
                       </Button>
-                      <p className="text-sm font-normal text-gray-600 dark:text-gray-400 text-center mt-2">
-                        Our AI uses the info above to generate a tailored cover letter, to help you stand out.
-                      </p>
+                      <div className="text-center mt-3 space-y-1">
+                        <p className="text-sm text-gray-600 dark:text-gray-300">
+                          Our AI uses the info above to generate a tailored cover letter, to help you stand out.
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          Please provide above required info to continue
+                        </p>
+                      </div>
                     </CardContent>
                   </Card>
                 </div>
@@ -642,7 +647,11 @@ const AuthenticatedCoverLetter = () => {
                             )}
                           </div>
                         </div>
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center justify-between w-full">
+                          <div className="flex items-center text-sm text-gray-600 hover:text-zapier-orange transition-colors cursor-pointer">
+                            <RotateCcw className="h-4 w-4 mr-1" />
+                            Revert to Original
+                          </div>
                           <DownloadOptions
                             content={selectedCoverLetter.content}
                             fileName={`Cover_Letter_${selectedCoverLetter.company_name}_${selectedCoverLetter.job_title}`}
@@ -793,7 +802,7 @@ const AuthenticatedCoverLetter = () => {
                                   <div className="flex items-center gap-4 text-sm font-normal text-gray-600 dark:text-gray-400">
                                     <div className="flex items-center gap-1">
                                       <Clock className="h-3 w-3" />
-                                      Updated {new Date(coverLetter.updated_at).toLocaleDateString()}
+                                      Updated {formatDate(coverLetter.updated_at)}
                                     </div>
                                   </div>
                                 </div>
