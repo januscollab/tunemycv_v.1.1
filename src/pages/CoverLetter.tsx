@@ -34,6 +34,7 @@ import DownloadOptions from '@/components/cover-letter/DownloadOptions';
 import EditableCoverLetter from '@/components/cover-letter/EditableCoverLetter';
 import NoAnalysisModal from '@/components/cover-letter/NoAnalysisModal';
 import CoverLetterLoggedOut from '@/components/cover-letter/CoverLetterLoggedOut';
+import ProcessingModal from '@/components/ui/processing-modal';
 
 const CoverLetter = () => {
   const { user } = useAuth();
@@ -100,8 +101,6 @@ const AuthenticatedCoverLetter = () => {
   const [selectedCoverLetter, setSelectedCoverLetter] = useState<any>(null);
   const [activeTab, setActiveTab] = useState('create');
   const [loadingHistory, setLoadingHistory] = useState(false);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const [showSavePrompt, setShowSavePrompt] = useState(false);
   const [generationMethod, setGenerationMethod] = useState<'input' | 'analysis'>('input');
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   
@@ -213,9 +212,6 @@ const AuthenticatedCoverLetter = () => {
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    if (selectedCoverLetter && !hasUnsavedChanges) {
-      setHasUnsavedChanges(true);
-    }
     // Clear validation errors when user starts typing
     if (validationErrors.length > 0) {
       setValidationErrors([]);
@@ -253,7 +249,6 @@ const AuthenticatedCoverLetter = () => {
 
         setSelectedCoverLetter({ ...result.coverLetter, isUnsaved: false });
         setActiveTab('result');
-        setHasUnsavedChanges(false);
         
         if (coverLetters.length > 0) {
           loadCoverLetterHistory();
@@ -270,7 +265,6 @@ const AuthenticatedCoverLetter = () => {
 
         setSelectedCoverLetter({ ...result.coverLetter, isUnsaved: false });
         setActiveTab('result');
-        setHasUnsavedChanges(false);
         
         if (coverLetters.length > 0) {
           loadCoverLetterHistory();
@@ -358,21 +352,7 @@ const AuthenticatedCoverLetter = () => {
   };
 
   const handleTabChange = (newTab: string) => {
-    if (hasUnsavedChanges && newTab !== activeTab) {
-      setShowSavePrompt(true);
-      return;
-    }
     setActiveTab(newTab);
-  };
-
-  const confirmTabChange = (save: boolean) => {
-    if (save) {
-      // handleSaveCoverLetter();
-    } else {
-      setHasUnsavedChanges(false);
-    }
-    setShowSavePrompt(false);
-    setActiveTab('create');
   };
 
   return (
@@ -398,22 +378,12 @@ const AuthenticatedCoverLetter = () => {
           onUseManualInput={() => setGenerationMethod('input')}
         />
 
-        {showSavePrompt && (
-          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-            <div className="bg-white dark:bg-gray-800 rounded-md p-6 max-w-md border border-gray-200 dark:border-gray-700">
-              <h3 className="text-xl font-semibold mb-4 font-display">Unsaved Changes</h3>
-              <p className="mb-6 font-normal">You have unsaved changes. Would you like to save before continuing?</p>
-              <div className="flex space-x-4">
-                <Button onClick={() => confirmTabChange(true)} className="bg-zapier-orange hover:bg-zapier-orange/90">
-                  Save & Continue
-                </Button>
-                <Button variant="outline" onClick={() => confirmTabChange(false)}>
-                  Don't Save
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
+        <ProcessingModal
+          isOpen={isRegenerating}
+          title="Regenerating Cover Letter"
+          message="Please wait while we regenerate your cover letter with the new settings..."
+        />
+
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6">
           {/* Main Content */}

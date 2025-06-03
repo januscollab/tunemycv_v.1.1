@@ -137,9 +137,11 @@ The cover letter should:
 - Include a professional opening and closing
 - Be well-structured with clear paragraphs
 - Match the requested length and tone precisely
+- NEVER include placeholder headers like "[Your Name]", "[Your Address]", "[City, State, Zip]", "[Your Email]", "[Your Phone Number]", "[Date]" or similar placeholders
+- Start directly with the content, not with contact information placeholders
 ${advancedOptionsText ? `\nAdditional personalization requirements:${advancedOptionsText}` : ''}
 
-Format the response as a complete, ready-to-send cover letter with proper formatting.`
+Format the response as a complete, ready-to-send cover letter with proper formatting. Do not include any placeholder contact information or headers.`
 
     const userPrompt = `Write a cover letter for the following position:
 

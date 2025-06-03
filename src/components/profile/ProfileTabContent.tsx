@@ -3,6 +3,7 @@ import React from 'react';
 import PersonalInfoTab from './PersonalInfoTab';
 import DocumentHistoryTab from './DocumentHistoryTab';
 import CVManagementTab from './CVManagementTab';
+import BillingHistoryTab from './BillingHistoryTab';
 import SettingsTab from './SettingsTab';
 
 interface ProfileTabContentProps {
@@ -20,6 +21,8 @@ const ProfileTabContent: React.FC<ProfileTabContentProps> = ({ activeTab, credit
         return <DocumentHistoryTab credits={credits} memberSince={memberSince} />;
       case 'files':
         return <CVManagementTab credits={credits} memberSince={memberSince} />;
+      case 'billing':
+        return <BillingHistoryTab credits={credits} memberSince={memberSince} />;
       case 'settings':
         return <SettingsTab credits={credits} memberSince={memberSince} />;
       default:

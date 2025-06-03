@@ -301,9 +301,9 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
                         </span>
                       )}
                       
-                      {document.type === 'cover_letter' && document.regeneration_count > 0 && (
+                      {document.type === 'cover_letter' && (document.regeneration_count || 0) > 0 && (
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                          v{document.regeneration_count + 1}
+                          v{(document.regeneration_count || 0) + 1}
                         </span>
                       )}
                     </div>

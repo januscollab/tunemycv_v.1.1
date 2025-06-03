@@ -12,6 +12,7 @@ const ProfileNavigation: React.FC<ProfileNavigationProps> = ({ activeTab, onTabC
     { id: 'personal', label: 'Account Info', icon: User },
     { id: 'documents', label: 'Document History', icon: FileText },
     { id: 'files', label: 'CV Management', icon: Upload },
+    { id: 'billing', label: 'Billing History', icon: FileText },
     { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
@@ -20,7 +21,7 @@ const ProfileNavigation: React.FC<ProfileNavigationProps> = ({ activeTab, onTabC
       {/* Desktop horizontal navigation */}
       <div className="hidden md:block">
         <Tabs value={activeTab} onValueChange={onTabChange}>
-          <TabsList className="grid w-full grid-cols-4 bg-muted">
+          <TabsList className="grid w-full grid-cols-5 bg-muted">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               return (
