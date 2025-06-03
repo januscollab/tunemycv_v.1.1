@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { RotateCcw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 
@@ -38,22 +37,17 @@ const EditableCoverLetter: React.FC<EditableCoverLetterProps> = ({ content, onSa
     });
   };
 
-  const characterCount = editedContent.length;
-
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <Button variant="outline" size="sm" onClick={handleRevert}>
+          <button
+            onClick={handleRevert}
+            className="flex items-center text-sm text-gray-600 hover:text-zapier-orange transition-colors"
+          >
             <RotateCcw className="h-4 w-4 mr-1" />
             Revert to Original
-          </Button>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <span className="text-sm text-gray-500">
-            {characterCount} characters
-          </span>
+          </button>
         </div>
       </div>
 

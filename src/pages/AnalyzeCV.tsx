@@ -15,7 +15,7 @@ import AnalysisSelector from '@/components/cover-letter/AnalysisSelector';
 import { useAnalysis } from '@/hooks/useAnalysis';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { FileText, History, MessageSquare, Target, Calendar, Building, CheckCircle, FileUp, Search } from 'lucide-react';
+import { FileText, History, MessageSquare, Target, Calendar, Building, CheckCircle, FileUp, Search, Clock } from 'lucide-react';
 import EmbeddedAuth from '@/components/auth/EmbeddedAuth';
 import ServiceExplanation from '@/components/common/ServiceExplanation';
 import { UploadedFile } from '@/types/fileTypes';
@@ -23,6 +23,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import AnalysisHistoryTab from '@/components/profile/AnalysisHistoryTab';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -300,7 +301,7 @@ const AnalyzeCV = () => {
             <FileText className="h-12 w-12 text-zapier-orange mr-6 mt-2" />
             <div>
               <h1 className="text-4xl md:text-5xl font-bold text-earth dark:text-white mb-4">
-                Analyze Your CV
+                Analyze Your CV & Interview Prep
               </h1>
               <p className="text-xl text-earth/70 dark:text-white/70 max-w-3xl font-normal">
                 Get comprehensive compatibility analysis with actionable recommendations to improve your job application success.
@@ -358,7 +359,7 @@ const AnalyzeCV = () => {
             <FileText className="h-8 w-8 text-zapier-orange mr-3 mt-1" />
             <div>
               <h1 className="text-3xl font-bold text-earth dark:text-white">
-                Analyze Your CV
+                Analyze Your CV & Interview Prep
               </h1>
               <p className="text-lg text-earth/70 dark:text-white/70 max-w-2xl mt-1">
                 Upload your CV and job description to get comprehensive compatibility analysis with actionable recommendations.
@@ -449,6 +450,14 @@ const AnalyzeCV = () => {
               {/* Interview Prep Tab */}
               <TabsContent value="interview-prep" className="mt-0">
                 <div className="space-y-6">
+                  {/* Coming Soon Banner */}
+                  <Alert className="border-orange-200 bg-orange-50 dark:bg-orange-950 dark:border-orange-800">
+                    <Clock className="h-4 w-4 text-orange-600" />
+                    <AlertDescription className="text-orange-800 dark:text-orange-200">
+                      This feature is coming soon! We're working hard to bring you comprehensive interview preparation tools.
+                    </AlertDescription>
+                  </Alert>
+
                   {/* Generation Method Selection */}
                   <Card>
                     <CardHeader>
@@ -627,17 +636,22 @@ const AnalyzeCV = () => {
                     </CardContent>
                   </Card>
 
-                  {/* Generate Button */}
-                  <div className="flex justify-center">
-                    <Button
-                      onClick={handleGenerateInterviewPrep}
-                      className="bg-zapier-orange hover:bg-zapier-orange/90 text-white px-8 py-3 text-lg font-semibold flex items-center space-x-2"
-                      size="lg"
-                    >
-                      <MessageSquare className="h-5 w-5" />
-                      <span>Generate Interview Prep Notes</span>
-                    </Button>
-                  </div>
+                  {/* Generate Button Card */}
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="flex justify-center">
+                        <Button
+                          onClick={handleGenerateInterviewPrep}
+                          className="bg-zapier-orange hover:bg-zapier-orange/90 text-white px-8 py-3 text-lg font-semibold flex items-center space-x-2"
+                          size="lg"
+                          disabled
+                        >
+                          <MessageSquare className="h-5 w-5" />
+                          <span>Generate Interview Prep Notes</span>
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
               </TabsContent>
 
