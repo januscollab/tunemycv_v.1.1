@@ -438,7 +438,6 @@ export type Database = {
           operation_type: string | null
           processing_time_ms: number | null
           prompt_text: string | null
-          response_metadata: Json | null
           response_text: string | null
           status: string | null
           tokens_used: number | null
