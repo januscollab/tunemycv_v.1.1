@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import EditTitleDialog from '@/components/ui/edit-title-dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -106,6 +107,8 @@ const AuthenticatedCoverLetter = () => {
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingCoverLetter, setEditingCoverLetter] = useState<any>(null);
 
   const lengthOptions = [
     { value: 'short', label: 'Short (150-200 words)', description: 'Brief and to the point' },
@@ -792,29 +795,18 @@ const AuthenticatedCoverLetter = () => {
                           {paginatedCoverLetters.map((coverLetter) => (
                             <div
                               key={coverLetter.id}
-                              className="border rounded-md p-4 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-zapier-orange/50 transition-colors"
+                              className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow hover:border-zapier-orange/50 relative"
                             >
-                              <div className="flex items-center justify-between">
-                                <div className="flex-1">
-                                  <div className="flex items-center gap-2 mb-1">
-                                    <h3 className="font-medium">{coverLetter.job_title} at {coverLetter.company_name}</h3>
+                              <div className="flex justify-between items-start">
+                                <div className="flex-1 pr-4">
+                                  <div className="flex items-center space-x-3 mb-2">
+                                    <h3 className="text-lg font-medium text-gray-900">
+                                      {coverLetter.job_title} at {coverLetter.company_name}
+                                    </h3>
                                     <button
-                                      onClick={async () => {
-                                        const newTitle = prompt('Edit job title:', coverLetter.job_title || '');
-                                        if (newTitle && newTitle.trim()) {
-                                          try {
-                                            const { error } = await supabase
-                                              .from('cover_letters')
-                                              .update({ job_title: newTitle.trim() })
-                                              .eq('id', coverLetter.id)
-                                              .eq('user_id', user?.id);
-                                            if (error) throw error;
-                                            await loadCoverLetterHistory();
-                                            toast({ title: 'Success', description: 'Cover letter title updated successfully' });
-                                          } catch (error) {
-                                            toast({ title: 'Error', description: 'Failed to update title', variant: 'destructive' });
-                                          }
-                                        }
+                                      onClick={() => {
+                                        setEditingCoverLetter(coverLetter);
+                                        setIsEditDialogOpen(true);
                                       }}
                                       className="text-gray-400 hover:text-zapier-orange transition-colors"
                                       title="Edit title"
@@ -827,37 +819,44 @@ const AuthenticatedCoverLetter = () => {
                                       </Badge>
                                     )}
                                   </div>
-                                  <div className="flex items-center gap-4 text-sm font-normal text-gray-600 dark:text-gray-400">
-                                    <div className="flex items-center gap-1">
-                                      <Clock className="h-3 w-3" />
-                                      Updated {formatDate(coverLetter.updated_at)}
-                                    </div>
+                                  
+                                  <div className="flex items-center text-sm text-gray-600 mb-3">
+                                    <Clock className="h-4 w-4 mr-1" />
+                                    <span>Updated {formatDate(coverLetter.updated_at)}</span>
                                   </div>
                                 </div>
+                              </div>
+                              
+                              {/* Action buttons row at bottom */}
+                              <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
                                 <div className="flex items-center space-x-3">
                                   <button
                                     onClick={() => handleViewCoverLetter(coverLetter)}
-                                    className="flex items-center text-sm text-gray-600 hover:text-zapier-orange transition-colors"
+                                    className="flex items-center px-2 py-1 text-xs text-black hover:text-zapier-orange transition-colors"
                                   >
-                                    <Eye className="h-4 w-4 mr-1" />
+                                    <Eye className="h-3 w-3 mr-1" />
                                     View
                                   </button>
+                                  
                                   <DownloadOptions
                                     content={coverLetter.content}
                                     fileName={`Cover_Letter_${coverLetter.company_name}_${coverLetter.job_title}`}
                                     triggerComponent={
-                                      <button className="text-sm text-gray-600 hover:text-zapier-orange transition-colors">
-                                        <Download className="h-4 w-4" />
+                                      <button className="flex items-center px-2 py-1 text-xs text-black hover:text-zapier-orange hover:bg-zapier-orange/10 rounded-md transition-colors">
+                                        <FileText className="h-3 w-3 mr-1" />
+                                        Download
                                       </button>
                                     }
                                   />
-                                  <button
-                                    onClick={() => handleDelete(coverLetter.id)}
-                                    className="text-sm text-red-600 hover:text-zapier-orange transition-colors"
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </button>
                                 </div>
+                                
+                                {/* Delete button in bottom right */}
+                                <button
+                                  onClick={() => handleDelete(coverLetter.id)}
+                                  className="p-1 text-xs text-red-600 hover:text-zapier-orange transition-colors"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </button>
                               </div>
                             </div>
                           ))}
@@ -924,6 +923,32 @@ const AuthenticatedCoverLetter = () => {
             />
           </div>
         </div>
+
+        <EditTitleDialog
+          isOpen={isEditDialogOpen}
+          onClose={() => {
+            setIsEditDialogOpen(false);
+            setEditingCoverLetter(null);
+          }}
+          onSave={async (newTitle) => {
+            if (editingCoverLetter) {
+              try {
+                const { error } = await supabase
+                  .from('cover_letters')
+                  .update({ job_title: newTitle })
+                  .eq('id', editingCoverLetter.id)
+                  .eq('user_id', user?.id);
+                if (error) throw error;
+                await loadCoverLetterHistory();
+                toast({ title: 'Success', description: 'Cover letter title updated successfully' });
+              } catch (error) {
+                toast({ title: 'Error', description: 'Failed to update title', variant: 'destructive' });
+              }
+            }
+          }}
+          currentTitle={editingCoverLetter?.job_title || ''}
+          titleType="cover-letter"
+        />
       </div>
     </div>
   );
