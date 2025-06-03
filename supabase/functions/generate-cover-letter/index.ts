@@ -131,17 +131,22 @@ serve(async (req) => {
     const systemPrompt = `You are an expert cover letter writer. ${templatePrompt} ${lengthInstruction}
 
 The cover letter should:
+- Always start with this exact header format:
+  "Hiring Manager  
+  [Company Name]
+  [Company Address]  
+  [City, State, Zip]  
+  
+  Dear Hiring Manager,"
 - Be tailored specifically to the job and company
 - Highlight relevant experience and skills
 - Show genuine enthusiasm for the role
 - Include a professional opening and closing
 - Be well-structured with clear paragraphs
 - Match the requested length and tone precisely
-- NEVER include placeholder headers like "[Your Name]", "[Your Address]", "[City, State, Zip]", "[Your Email]", "[Your Phone Number]", "[Date]" or similar placeholders
-- Start directly with the content, not with contact information placeholders
 ${advancedOptionsText ? `\nAdditional personalization requirements:${advancedOptionsText}` : ''}
 
-Format the response as a complete, ready-to-send cover letter with proper formatting. Do not include any placeholder contact information or headers.`
+Format the response as a complete, ready-to-send cover letter with proper formatting, always starting with the required header format above.`
 
     const userPrompt = `Write a cover letter for the following position:
 
