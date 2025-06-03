@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
 import AnalyzeCV from './pages/AnalyzeCV';
 import CoverLetter from './pages/CoverLetter';
+import InterviewPrep from './pages/InterviewPrep';
 import Profile from './pages/Profile';
 import Resources from './pages/Resources';
 import HelpCentre from './pages/HelpCentre';
@@ -31,6 +32,7 @@ function App() {
                 <Route path="/" element={<AnalyzeCV />} />
                 <Route path="/analyze" element={<AnalyzeCV />} />
                 <Route path="/cover-letter" element={<CoverLetter />} />
+                <Route path="/interview-prep" element={<InterviewPrep />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/resources" element={<Resources />} />
                 <Route path="/help-centre" element={<HelpCentre />} />
