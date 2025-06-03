@@ -25,6 +25,18 @@ import CoverLetterLoggedOut from '@/components/cover-letter/CoverLetterLoggedOut
 
 const CoverLetter = () => {
   const { user } = useAuth();
+
+  // If user is not authenticated, show the logged-out landing page
+  if (!user) {
+    return <CoverLetterLoggedOut />;
+  }
+
+  // If user is authenticated, show the full cover letter interface
+  return <AuthenticatedCoverLetter />;
+};
+
+const AuthenticatedCoverLetter = () => {
+  const { user } = useAuth();
   const { credits } = useUserData();
   const location = useLocation();
   const { 
