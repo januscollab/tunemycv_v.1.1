@@ -24,7 +24,7 @@ const InterviewPrep = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
-      <div className="max-w-6xl mx-auto px-4 py-12">
+      <div className="max-w-5xl mx-auto px-4 py-12">
         <div className="mb-8">
           <div className="flex items-start">
             <MessageSquare className="h-12 w-12 text-zapier-orange mr-6 mt-0" />

@@ -8,14 +8,10 @@ import { FileText, Search } from 'lucide-react';
 interface NoAnalysisModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onUseManualInput?: () => void;
+  onUseManualInput: () => void;
 }
 
-const NoAnalysisModal: React.FC<NoAnalysisModalProps> = ({ 
-  isOpen, 
-  onClose, 
-  onUseManualInput = () => {} 
-}) => {
+const NoAnalysisModal: React.FC<NoAnalysisModalProps> = ({ isOpen, onClose, onUseManualInput }) => {
   const navigate = useNavigate();
 
   const handleAnalyzeNow = () => {

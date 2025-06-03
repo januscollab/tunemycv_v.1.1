@@ -73,11 +73,11 @@ const FloatingFeedback = () => {
 
   return (
     <>
-      {/* Floating Tab - Flush against right edge with rounded corners */}
+      {/* Floating Tab - Flush against right edge */}
       <div className="fixed right-0 top-1/2 -translate-y-1/2 z-50">
         <button
           onClick={() => setIsOpen(true)}
-          className="bg-zapier-orange hover:bg-zapier-orange/90 text-white px-3 py-4 rounded-l-lg shadow-lg transition-all duration-300 hover:shadow-xl group rotate-90 origin-center"
+          className="bg-zapier-orange hover:bg-zapier-orange/90 text-white px-3 py-4 rounded-l-xl shadow-lg transition-all duration-300 hover:shadow-xl group rotate-90 origin-center"
           style={{ transformOrigin: 'center center' }}
         >
           <div className="flex items-center space-x-2">
