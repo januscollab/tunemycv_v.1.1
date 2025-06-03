@@ -9,6 +9,15 @@ import EmptyAnalysisState from './analysis/EmptyAnalysisState';
 import AnalysisListItem from './analysis/AnalysisListItem';
 import AnalysisDetailModal from './analysis/AnalysisDetailModal';
 import UpcomingFeatureModal from './analysis/UpcomingFeatureModal';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
 
 interface AnalysisResult {
   id: string;
@@ -45,6 +54,10 @@ const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ credits, member
     isOpen: false,
     featureType: null
   });
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   useEffect(() => {
     if (user) {
@@ -159,6 +172,17 @@ const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ credits, member
     });
   };
 
+  // Calculate pagination
+  const totalPages = Math.ceil(analyses.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedAnalyses = analyses.slice(startIndex, endIndex);
+
+  // Reset to first page when items per page changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [itemsPerPage]);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -169,23 +193,90 @@ const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ credits, member
 
   return (
     <div className="space-y-6">
-      <AnalysisHistoryHeader analysisCount={analyses.length} />
+      <div className="flex items-center justify-between">
+        <AnalysisHistoryHeader analysisCount={analyses.length} />
+        {analyses.length > 0 && (
+          <div className="flex items-center space-x-2">
+            <span className="text-sm text-gray-600">Show:</span>
+            <Select value={itemsPerPage.toString()} onValueChange={(value) => setItemsPerPage(Number(value))}>
+              <SelectTrigger className="w-20">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="20">20</SelectItem>
+                <SelectItem value="30">30</SelectItem>
+              </SelectContent>
+            </Select>
+            <span className="text-sm text-gray-600">per page</span>
+          </div>
+        )}
+      </div>
 
       {analyses.length === 0 ? (
         <EmptyAnalysisState />
       ) : (
-        <div className="space-y-4">
-          {analyses.map((analysis) => (
-            <AnalysisListItem
-              key={analysis.id}
-              analysis={analysis}
-              onViewDetails={handleViewDetails}
-              onDelete={handleDeleteAnalysis}
-              onCreateCoverLetter={handleCreateCoverLetter}
-              onInterviewPrep={handleInterviewPrep}
-            />
-          ))}
-        </div>
+        <>
+          <div className="space-y-4">
+            {paginatedAnalyses.map((analysis) => (
+              <AnalysisListItem
+                key={analysis.id}
+                analysis={analysis}
+                onViewDetails={handleViewDetails}
+                onDelete={handleDeleteAnalysis}
+                onCreateCoverLetter={handleCreateCoverLetter}
+                onInterviewPrep={handleInterviewPrep}
+              />
+            ))}
+          </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="mt-6 flex justify-center">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious 
+                      href="#" 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (currentPage > 1) setCurrentPage(currentPage - 1);
+                      }}
+                      className={`${currentPage <= 1 ? 'pointer-events-none opacity-50' : ''} font-normal`}
+                    />
+                  </PaginationItem>
+                  
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <PaginationItem key={page}>
+                      <PaginationLink
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setCurrentPage(page);
+                        }}
+                        isActive={currentPage === page}
+                        className="font-normal"
+                      >
+                        {page}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
+                  
+                  <PaginationItem>
+                    <PaginationNext 
+                      href="#" 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+                      }}
+                      className={`${currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''} font-normal`}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
+        </>
       )}
 
       <AnalysisDetailModal

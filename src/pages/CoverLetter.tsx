@@ -765,6 +765,7 @@ const AuthenticatedCoverLetter = () => {
                             <SelectContent>
                               <SelectItem value="10">10</SelectItem>
                               <SelectItem value="20">20</SelectItem>
+                              <SelectItem value="30">30</SelectItem>
                             </SelectContent>
                           </Select>
                           <span className="text-sm text-gray-600">per page</span>
@@ -874,7 +875,7 @@ const AuthenticatedCoverLetter = () => {
                                       e.preventDefault();
                                       if (currentPage < totalPages) setCurrentPage(currentPage + 1);
                                     }}
-                                    className={currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''}
+                                    className={`${currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''} font-normal`}
                                   />
                                 </PaginationItem>
                               </PaginationContent>
