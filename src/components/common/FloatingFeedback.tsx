@@ -1,236 +1,119 @@
 
-import React, { useState } from 'react';
-import { X, MessageSquare, Send } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import React, { useState, useEffect } from 'react';
+import { X, MessageSquare, Sparkles } from 'lucide-react';
+import { FloatingFeedbackForm } from './FloatingFeedbackForm';
+import { useLocation } from 'react-router-dom';
 
 const FloatingFeedback = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [allowContact, setAllowContact] = useState(false);
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: ''
-  });
-  const { toast } = useToast();
+  const [isPulseVisible, setIsPulseVisible] = useState(true);
+  const location = useLocation();
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  // Get current page context
+  const getCurrentPage = () => {
+    const pathname = location.pathname;
+    if (pathname === '/') return 'homepage';
+    if (pathname.includes('/analyze')) return 'analyze';
+    if (pathname.includes('/resources')) return 'resources';
+    if (pathname.includes('/profile')) return 'profile';
+    return 'default';
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+  // Hide pulse after 10 seconds or when opened
+  useEffect(() => {
+    const timer = setTimeout(() => setIsPulseVisible(false), 10000);
+    return () => clearTimeout(timer);
+  }, []);
 
-    try {
-      const { error } = await supabase.functions.invoke('send-feedback-email', {
-        body: {
-          name: formData.name,
-          email: formData.email,
-          subject: formData.subject,
-          message: formData.message,
-          allowContact: allowContact
-        }
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: 'Feedback Sent!',
-        description: 'Thank you for your feedback. We\'ll get back to you soon.',
-      });
-
-      // Reset form
-      setFormData({
-        name: '',
-        email: '',
-        subject: '',
-        message: ''
-      });
-      setAllowContact(false);
-      setIsOpen(false);
-    } catch (error) {
-      console.error('Error sending feedback:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to send feedback. Please try again or email us directly at hello@tunemycv.com',
-        variant: 'destructive'
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+  const handleOpen = () => {
+    setIsOpen(true);
+    setIsPulseVisible(false);
   };
 
   return (
     <>
-      {/* Floating Tab - Flush against right edge */}
-      <div className="fixed right-0 top-1/2 -translate-y-1/2 z-50">
+      {/* Enhanced Floating Tab */}
+      <div className="fixed right-0 top-1/2 -translate-y-1/2 z-50 group">
+        {/* Pulse animation ring */}
+        {isPulseVisible && (
+          <div className="absolute inset-0 rounded-l-lg animate-ping bg-zapier-orange/30 scale-110" />
+        )}
+        
         <button
-          onClick={() => setIsOpen(true)}
-          className="bg-zapier-orange hover:bg-zapier-orange/90 text-white px-3 py-4 rounded-l-lg shadow-lg transition-all duration-300 hover:shadow-xl group rotate-90 origin-center"
+          onClick={handleOpen}
+          className="relative bg-gradient-to-br from-zapier-orange to-zapier-orange/80 hover:from-zapier-orange hover:to-zapier-orange/90 text-white px-4 py-5 rounded-l-lg shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 rotate-90 origin-center backdrop-blur-sm border border-white/10"
           style={{ transformOrigin: 'center center' }}
+          aria-label="Open feedback form"
         >
-          <div className="flex items-center space-x-2">
-            <MessageSquare className="h-4 w-4 group-hover:scale-110 transition-transform" />
-            <span className="text-xs tracking-wider whitespace-nowrap">Feedback</span>
+          <div className="flex items-center space-x-2.5">
+            <div className="relative">
+              <MessageSquare className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+              {isPulseVisible && (
+                <Sparkles className="absolute -top-1 -right-1 h-2.5 w-2.5 text-yellow-300 animate-pulse" />
+              )}
+            </div>
+            <span className="text-xs font-medium tracking-wider whitespace-nowrap">
+              Feedback
+            </span>
           </div>
         </button>
       </div>
 
-      {/* Slide-out Panel */}
+      {/* Enhanced Slide-out Panel */}
       {isOpen && (
         <>
-          {/* Backdrop */}
+          {/* Enhanced Backdrop with blur */}
           <div 
-            className="fixed inset-0 bg-black/50 z-40 transition-opacity"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-all duration-300 animate-fade-in"
             onClick={() => setIsOpen(false)}
           />
           
-          {/* Panel */}
-          <div className="fixed right-0 top-0 h-full w-96 bg-white dark:bg-blueberry/90 shadow-2xl z-50 transform transition-transform duration-300 ease-in-out">
+          {/* Glassmorphism Panel */}
+          <div className="fixed right-0 top-0 h-full w-[420px] bg-white/95 dark:bg-blueberry/95 backdrop-blur-xl shadow-2xl z-50 transform transition-all duration-500 ease-out animate-slide-in-right border-l border-white/20 dark:border-citrus/10">
             <div className="flex flex-col h-full">
-              {/* Header */}
-              <div className="flex items-center justify-between p-6 border-b border-apple-core/20 dark:border-citrus/20">
-                <div>
-                  <h2 className="text-xl font-bold text-blueberry dark:text-citrus">Share Your Feedback</h2>
-                  <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mt-1">
-                    We're in beta and value your input!
-                  </p>
-                </div>
-                <button
-                  onClick={() => setIsOpen(false)}
-                  className="text-blueberry/60 hover:text-blueberry dark:text-apple-core/60 dark:hover:text-apple-core transition-colors"
-                >
-                  <X className="h-6 w-6" />
-                </button>
-              </div>
-
-              {/* Beta Message */}
-              <div className="p-6 bg-zapier-orange/10 border-b border-apple-core/20 dark:border-citrus/20">
-                <p className="text-sm text-blueberry dark:text-citrus">
-                  🚀 <strong>Beta Version:</strong> Help us improve TuneMyCV! Your feedback shapes our future features and helps us create the best CV optimization experience.
-                </p>
-              </div>
-
-              {/* Form */}
-              <div className="flex-1 p-6 overflow-y-auto">
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-blueberry dark:text-citrus mb-1">
-                      Name <span className="text-sm text-blueberry/60 dark:text-apple-core/70">(optional)</span>
-                    </label>
-                    <Input
-                      type="text"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      placeholder="Your name"
-                      disabled={isSubmitting}
-                    />
+              {/* Enhanced Header */}
+              <div className="relative p-6 border-b border-apple-core/10 dark:border-citrus/10 bg-gradient-to-r from-zapier-orange/5 to-transparent">
+                <div className="absolute inset-0 bg-white/50 dark:bg-blueberry/30 backdrop-blur-sm" />
+                <div className="relative flex items-center justify-between">
+                  <div className="animate-fade-in">
+                    <h2 className="text-2xl font-bold text-blueberry dark:text-citrus bg-gradient-to-r from-blueberry to-zapier-orange dark:from-citrus dark:to-zapier-orange bg-clip-text text-transparent">
+                      Share Your Feedback
+                    </h2>
+                    <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mt-2">
+                      🚀 Help us shape the future of TuneMyCV
+                    </p>
                   </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-blueberry dark:text-citrus mb-1">
-                      Email <span className="text-sm text-blueberry/60 dark:text-apple-core/70">(optional)</span>
-                    </label>
-                    <Input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      placeholder="your@email.com"
-                      disabled={isSubmitting}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-blueberry dark:text-citrus mb-1">
-                      Subject
-                    </label>
-                    <Input
-                      type="text"
-                      name="subject"
-                      value={formData.subject}
-                      onChange={handleInputChange}
-                      placeholder="What's this about?"
-                      required
-                      disabled={isSubmitting}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-blueberry dark:text-citrus mb-1">
-                      Message
-                    </label>
-                    <Textarea
-                      name="message"
-                      value={formData.message}
-                      onChange={handleInputChange}
-                      placeholder="Share your feedback, suggestions, or report issues..."
-                      rows={5}
-                      required
-                      disabled={isSubmitting}
-                      className="resize-none"
-                    />
-                  </div>
-
-                  {/* Contact Permission Checkbox */}
-                  <div className="flex items-start space-x-3 pt-2">
-                    <Checkbox
-                      id="allowContact"
-                      checked={allowContact}
-                      onCheckedChange={(checked) => setAllowContact(checked as boolean)}
-                      disabled={isSubmitting}
-                    />
-                    <label 
-                      htmlFor="allowContact" 
-                      className="text-sm text-blueberry dark:text-citrus leading-relaxed cursor-pointer"
-                    >
-                      I give permission for TuneMyCV to contact me if needed regarding my feedback
-                    </label>
-                  </div>
-
-                  <Button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full bg-zapier-orange hover:bg-zapier-orange/90 text-white font-normal"
+                  <button
+                    onClick={() => setIsOpen(false)}
+                    className="text-blueberry/60 hover:text-blueberry dark:text-apple-core/60 dark:hover:text-apple-core transition-all duration-200 hover:scale-110 p-2 rounded-full hover:bg-surface/20"
+                    aria-label="Close feedback form"
                   >
-                    {isSubmitting ? (
-                      <div className="flex items-center space-x-2">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                        <span>Sending...</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center space-x-2">
-                        <Send className="h-4 w-4" />
-                        <span>Send Feedback</span>
-                      </div>
-                    )}
-                  </Button>
-                </form>
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
               </div>
 
-              {/* Footer */}
-              <div className="p-6 border-t border-apple-core/20 dark:border-citrus/20 bg-gray-50 dark:bg-blueberry/50">
-                <p className="text-xs text-blueberry/60 dark:text-apple-core/70 text-center">
-                  You can also email us directly at{' '}
+              {/* Form Content */}
+              <div className="flex-1 p-6 overflow-y-auto">
+                <FloatingFeedbackForm 
+                  onClose={() => setIsOpen(false)} 
+                  currentPage={getCurrentPage()}
+                />
+              </div>
+
+              {/* Enhanced Footer */}
+              <div className="p-6 border-t border-apple-core/10 dark:border-citrus/10 bg-surface/30 dark:bg-blueberry/20 backdrop-blur-sm">
+                <div className="text-center space-y-2">
+                  <p className="text-xs text-blueberry/60 dark:text-apple-core/70">
+                    Need immediate help?
+                  </p>
                   <a 
                     href="mailto:hello@tunemycv.com" 
-                    className="text-zapier-orange hover:underline"
+                    className="inline-flex items-center text-sm text-zapier-orange hover:text-zapier-orange/80 transition-colors hover:underline font-medium"
                   >
-                    hello@tunemycv.com
+                    Email us at hello@tunemycv.com
                   </a>
-                </p>
+                </div>
               </div>
             </div>
           </div>
