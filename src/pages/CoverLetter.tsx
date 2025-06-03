@@ -121,9 +121,17 @@ const AuthenticatedCoverLetter = () => {
 
   // Handle navigation state from analysis history
   useEffect(() => {
-    const state = location.state as { analysis?: any } | null;
-    if (state?.analysis) {
-      console.log('Navigation state detected:', state.analysis);
+    const state = location.state as { analysis?: any; coverLetter?: any; viewMode?: boolean; activeTab?: string } | null;
+    if (state?.coverLetter && state?.viewMode) {
+      console.log('Navigation state detected for viewing cover letter:', state.coverLetter);
+      setSelectedCoverLetter(state.coverLetter);
+      if (state.activeTab) {
+        setActiveTab(state.activeTab);
+      }
+      // Clear the navigation state to prevent re-triggering
+      window.history.replaceState({}, document.title, location.pathname);
+    } else if (state?.analysis) {
+      console.log('Navigation state detected for creating cover letter:', state.analysis);
       setGenerationMethod('analysis');
       setSelectedAnalysisId(state.analysis.id);
       
