@@ -1,12 +1,11 @@
 
-import React, { useState, useEffect } from 'react';
-import { X, MessageSquare, Sparkles } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, MessageSquare } from 'lucide-react';
 import { FloatingFeedbackForm } from './FloatingFeedbackForm';
 import { useLocation } from 'react-router-dom';
 
 const FloatingFeedback = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isPulseVisible, setIsPulseVisible] = useState(true);
   const location = useLocation();
 
   // Get current page context
@@ -19,39 +18,22 @@ const FloatingFeedback = () => {
     return 'default';
   };
 
-  // Hide pulse after 10 seconds or when opened
-  useEffect(() => {
-    const timer = setTimeout(() => setIsPulseVisible(false), 10000);
-    return () => clearTimeout(timer);
-  }, []);
-
   const handleOpen = () => {
     setIsOpen(true);
-    setIsPulseVisible(false);
   };
 
   return (
     <>
-      {/* Enhanced Floating Tab */}
+      {/* Subtle Floating Tab */}
       <div className="fixed right-0 top-1/2 -translate-y-1/2 z-50 group">
-        {/* Pulse animation ring */}
-        {isPulseVisible && (
-          <div className="absolute inset-0 rounded-l-lg animate-ping bg-zapier-orange/30 scale-110" />
-        )}
-        
         <button
           onClick={handleOpen}
-          className="relative bg-gradient-to-br from-zapier-orange to-zapier-orange/80 hover:from-zapier-orange hover:to-zapier-orange/90 text-white px-4 py-5 rounded-l-lg shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 rotate-90 origin-center backdrop-blur-sm border border-white/10"
+          className="relative bg-zapier-orange hover:bg-zapier-orange/90 text-white px-4 py-5 rounded-l-lg shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.02] rotate-90 origin-center backdrop-blur-sm border border-white/10 hover:glow"
           style={{ transformOrigin: 'center center' }}
           aria-label="Open feedback form"
         >
           <div className="flex items-center space-x-2.5">
-            <div className="relative">
-              <MessageSquare className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-              {isPulseVisible && (
-                <Sparkles className="absolute -top-1 -right-1 h-2.5 w-2.5 text-yellow-300 animate-pulse" />
-              )}
-            </div>
+            <MessageSquare className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
             <span className="text-xs font-medium tracking-wider whitespace-nowrap">
               Feedback
             </span>
@@ -76,7 +58,7 @@ const FloatingFeedback = () => {
                 <div className="absolute inset-0 bg-white/50 dark:bg-blueberry/30 backdrop-blur-sm" />
                 <div className="relative flex items-center justify-between">
                   <div className="animate-fade-in">
-                    <h2 className="text-2xl font-bold text-blueberry dark:text-citrus bg-gradient-to-r from-blueberry to-zapier-orange dark:from-citrus dark:to-zapier-orange bg-clip-text text-transparent">
+                    <h2 className="text-2xl font-bold text-blueberry dark:text-white">
                       Share Your Feedback
                     </h2>
                     <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mt-2">
