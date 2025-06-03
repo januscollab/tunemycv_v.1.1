@@ -1,96 +1,84 @@
 
-import React, { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { AuthProvider } from "./contexts/AuthContext";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { ThemeProvider } from "next-themes";
+import Index from "./pages/Index";
+import Auth from "./pages/Auth";
+import AnalyzeCV from "./pages/AnalyzeCV";
+import CoverLetter from "./pages/CoverLetter";
+import InterviewPrep from "./pages/InterviewPrep";
+import Profile from "./pages/Profile";
+import Resources from "./pages/Resources";
+import HelpCentre from "./pages/HelpCentre";
+import ContactUs from "./pages/ContactUs";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import NextSteps from "./pages/NextSteps";
+import AdminDashboard from "./pages/AdminDashboard";
+import NotFound from "./pages/NotFound";
 import Navigation from "./components/Navigation";
 import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/admin/AdminRoute";
-import Index from "./pages/Index";
-import AnalyzeCV from "./pages/AnalyzeCV";
-import Resources from "./pages/Resources";
-import Auth from "./pages/Auth";
-import Profile from "./pages/Profile";
-import AdminDashboard from "./pages/AdminDashboard";
-import HelpCentre from "./pages/HelpCentre";
-import ContactUs from "./pages/ContactUs";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import NotFound from "./pages/NotFound";
-import NextSteps from "./pages/NextSteps";
-import CoverLetter from "./pages/CoverLetter";
+import OAuthCallback from "./components/auth/OAuthCallback";
+import "./App.css";
 
-// Component to handle scroll to top on route change
-const ScrollToTop = () => {
-  const { pathname } = useLocation();
+const queryClient = new QueryClient();
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
-
-  return null;
-};
-
-const App: React.FC = () => {
-  // Create QueryClient inside component to avoid initialization issues
-  const [queryClient] = useState(() => new QueryClient({
-    defaultOptions: {
-      queries: {
-        staleTime: 60 * 1000, // 1 minute
-        retry: 1,
-      },
-    },
-  }));
-
+function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <ScrollToTop />
-          <AuthProvider>
-            <div className="min-h-screen flex flex-col">
-              <Navigation />
-              <main className="flex-1">
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/auth" element={<Auth />} />
-                  <Route path="/analyze" element={<AnalyzeCV />} />
-                  <Route path="/next-steps" element={
-                    <ProtectedRoute>
-                      <NextSteps />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/resources" element={<Resources />} />
-                  <Route path="/help" element={<HelpCentre />} />
-                  <Route path="/contact" element={<ContactUs />} />
-                  <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-                  <Route path="/profile" element={
-                    <ProtectedRoute>
-                      <Profile />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/admin" element={
-                    <AdminRoute>
-                      <AdminDashboard />
-                    </AdminRoute>
-                  } />
-                  <Route path="/cover-letter" element={<CoverLetter />} />
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </main>
-              <Footer />
-            </div>
-          </AuthProvider>
-        </BrowserRouter>
-      </TooltipProvider>
+      <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+        <TooltipProvider>
+          <BrowserRouter>
+            <AuthProvider>
+              <div className="min-h-screen flex flex-col">
+                <Navigation />
+                <main className="flex-1">
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/auth" element={<Auth />} />
+                    <Route path="/auth/callback" element={<OAuthCallback />} />
+                    <Route path="/analyze" element={<AnalyzeCV />} />
+                    <Route path="/cover-letter" element={<CoverLetter />} />
+                    <Route path="/interview-prep" element={<InterviewPrep />} />
+                    <Route path="/resources" element={<Resources />} />
+                    <Route path="/help" element={<HelpCentre />} />
+                    <Route path="/contact" element={<ContactUs />} />
+                    <Route path="/privacy" element={<PrivacyPolicy />} />
+                    <Route path="/next-steps" element={<NextSteps />} />
+                    <Route
+                      path="/profile"
+                      element={
+                        <ProtectedRoute>
+                          <Profile />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/admin"
+                      element={
+                        <AdminRoute>
+                          <AdminDashboard />
+                        </AdminRoute>
+                      }
+                    />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </main>
+                <Footer />
+              </div>
+              <Toaster />
+              <Sonner />
+            </AuthProvider>
+          </BrowserRouter>
+        </TooltipProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
-};
+}
 
 export default App;

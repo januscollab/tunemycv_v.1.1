@@ -3,7 +3,6 @@ import React from 'react';
 import { Edit } from 'lucide-react';
 import EmbeddedAuth from '@/components/auth/EmbeddedAuth';
 import ServiceExplanation from '@/components/common/ServiceExplanation';
-import { Link } from 'react-router-dom';
 
 const CoverLetterLoggedOut = () => {
   const coverLetterExplanation = {
