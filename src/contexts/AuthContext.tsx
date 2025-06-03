@@ -29,6 +29,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const clearAuthState = () => {
+    console.log('Clearing auth state');
+    setSession(null);
+    setUser(null);
+  };
+
   useEffect(() => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -41,10 +47,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
 
     // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log('Initial session check:', session?.user?.email);
-      setSession(session);
-      setUser(session?.user ?? null);
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      console.log('Initial session check:', session?.user?.email, error);
+      if (error) {
+        console.error('Session check error:', error);
+        clearAuthState();
+      } else {
+        setSession(session);
+        setUser(session?.user ?? null);
+      }
       setLoading(false);
     });
 
@@ -77,7 +88,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    try {
+      console.log('Attempting to sign out...');
+      
+      // First, try to sign out normally
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error('Logout error:', error);
+        
+        // If logout fails due to session issues, force clear local state
+        if (error.message.includes('session') || error.message.includes('Session not found')) {
+          console.log('Session error detected, clearing local state');
+          clearAuthState();
+          // Also clear any stored tokens
+          localStorage.removeItem('supabase.auth.token');
+          return;
+        }
+        
+        throw error;
+      }
+      
+      console.log('Logout successful');
+    } catch (error) {
+      console.error('Unexpected logout error:', error);
+      // Force clear local state on any error
+      clearAuthState();
+      localStorage.removeItem('supabase.auth.token');
+    }
   };
 
   const resetPassword = async (email: string) => {

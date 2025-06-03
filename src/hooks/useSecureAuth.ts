@@ -33,6 +33,7 @@ export const useSecureAuth = () => {
       const { error } = await signIn(sanitizedEmail, password);
       
       if (error) {
+        console.error('Sign in error:', error);
         // Record failed attempt
         loginRateLimiter.recordAttempt(identifier);
         
@@ -47,6 +48,7 @@ export const useSecureAuth = () => {
       toast({ title: 'Success', description: 'Welcome back!' });
       return { success: true };
     } catch (error) {
+      console.error('Unexpected sign in error:', error);
       loginRateLimiter.recordAttempt(identifier);
       const message = 'An unexpected error occurred. Please try again.';
       toast({ title: 'Error', description: message, variant: 'destructive' });
@@ -64,6 +66,7 @@ export const useSecureAuth = () => {
       const { error } = await signUp(sanitizedEmail, password, firstName, lastName);
       
       if (error) {
+        console.error('Sign up error:', error);
         if (error.message.includes('User already registered')) {
           toast({ title: 'Account Exists', description: 'An account with this email already exists. Try signing in instead.', variant: 'destructive' });
         } else {
@@ -75,6 +78,7 @@ export const useSecureAuth = () => {
       toast({ title: 'Success', description: 'Account created! Please check your email for verification.' });
       return { success: true };
     } catch (error) {
+      console.error('Unexpected sign up error:', error);
       const message = 'An unexpected error occurred during registration.';
       toast({ title: 'Error', description: message, variant: 'destructive' });
       return { success: false, error: message };
@@ -101,6 +105,7 @@ export const useSecureAuth = () => {
       const { error } = await resetPassword(sanitizedEmail);
       
       if (error) {
+        console.error('Password reset error:', error);
         // Don't reveal whether email exists or not
         const message = 'If an account with this email exists, you will receive a password reset link.';
         toast({ title: 'Reset Requested', description: message });
@@ -110,6 +115,7 @@ export const useSecureAuth = () => {
       toast({ title: 'Reset Requested', description: 'If an account with this email exists, you will receive a password reset link.' });
       return { success: true };
     } catch (error) {
+      console.error('Unexpected password reset error:', error);
       const message = 'Unable to process password reset request.';
       toast({ title: 'Error', description: message, variant: 'destructive' });
       return { success: false, error: message };
