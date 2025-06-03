@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 const TermsOfService = () => {
@@ -380,6 +379,233 @@ const TermsOfService = () => {
             </p>
             <p>
               Before proceeding with additional revisions that incur fees, we will provide a clear estimate of the costs involved and obtain your explicit approval. No additional charges will be applied without your prior consent and understanding of the associated costs.
+            </p>
+
+            <h2 className="text-2xl font-semibold text-blueberry dark:text-citrus mt-8 mb-4">9. Intellectual Property Rights</h2>
+            
+            <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mt-6 mb-3">Ownership of Final Deliverables</h3>
+            <p>
+              Upon full payment for services and completion of the project, you retain ownership of the final CV, resume, cover letter, or other documents created specifically for you by TuneMyCV. This ownership includes the right to use, modify, and distribute these documents as needed for your job search and career advancement activities.
+            </p>
+            <p>
+              The transfer of ownership is contingent upon full payment of all fees associated with the service. Until payment is complete, TuneMyCV retains all rights to the created documents and may withhold delivery pending payment resolution.
+            </p>
+            <p>
+              Your ownership rights extend to the specific content created for your documents but do not include the underlying methodologies, templates, processes, or proprietary techniques used by TuneMyCV in creating those documents.
+            </p>
+
+            <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mt-6 mb-3">TuneMyCV Intellectual Property</h3>
+            <p>
+              TuneMyCV retains ownership of all proprietary methodologies, writing techniques, template designs, assessment tools, and other intellectual property developed for use in providing our services. These assets represent significant investment in research, development, and professional expertise.
+            </p>
+            <p>
+              You agree not to attempt to reverse engineer, copy, or reproduce our proprietary processes for commercial purposes or to compete with TuneMyCV. This includes but is not limited to our consultation frameworks, optimization techniques, and strategic approaches to CV development.
+            </p>
+            <p>
+              Our website content, including text, graphics, logos, images, and software, is protected by copyright and other intellectual property laws. You may not reproduce, distribute, or create derivative works from this content without explicit written permission.
+            </p>
+
+            <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mt-6 mb-3">Client Information and Confidentiality</h3>
+            <p>
+              Information you provide to TuneMyCV, including your personal details, career history, and professional achievements, remains your property. We use this information solely for the purpose of providing the requested services and do not claim ownership of your personal or professional information.
+            </p>
+            <p>
+              TuneMyCV maintains strict confidentiality regarding all client information and will not share your personal details, career information, or documents with third parties without your explicit consent, except as required by law or as necessary to provide the requested services.
+            </p>
+            <p>
+              We may use anonymized, aggregated information derived from client projects for research, service improvement, and marketing purposes, provided that such use cannot be traced back to individual clients or compromise their privacy.
+            </p>
+
+            <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mt-6 mb-3">Third-Party Content and Materials</h3>
+            <p>
+              If you provide materials created by third parties, such as job descriptions, company information, or reference materials, you represent that you have the right to share such materials with TuneMyCV for the purpose of service delivery.
+            </p>
+            <p>
+              TuneMyCV respects the intellectual property rights of third parties and will not knowingly incorporate copyrighted material into your documents without appropriate permission or fair use justification.
+            </p>
+            <p>
+              You agree to indemnify TuneMyCV against any claims arising from your provision of materials that infringe upon third-party intellectual property rights or violate confidentiality obligations.
+            </p>
+
+            <h2 className="text-2xl font-semibold text-blueberry dark:text-citrus mt-8 mb-4">10. Data Protection and Privacy</h2>
+            
+            <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mt-6 mb-3">Data Collection and Processing</h3>
+            <p>
+              TuneMyCV is committed to protecting your personal data and privacy in accordance with applicable data protection laws, including the General Data Protection Regulation (GDPR) and other relevant privacy legislation. Our comprehensive approach to data protection is detailed in our Privacy Policy, available at https://tunemycv.com/privacy-policy, which forms an integral part of these Terms.
+            </p>
+            <p>
+              We collect personal data necessary to provide our services effectively, including your contact information, educational background, employment history, professional skills, and career objectives. This information is essential for creating personalized, effective career documents and providing relevant consultation services.
+            </p>
+            <p>
+              The legal basis for processing your personal data is primarily our legitimate interest in providing professional CV and career services, as well as the contractual necessity of processing your information to fulfill our service obligations. In some cases, we may rely on your explicit consent for specific processing activities.
+            </p>
+            <p>
+              All personal data is processed in accordance with data protection principles, ensuring that information is processed lawfully, fairly, and transparently, collected for specified and legitimate purposes, and kept accurate and up to date.
+            </p>
+
+            <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mt-6 mb-3">Data Security and Protection Measures</h3>
+            <p>
+              TuneMyCV implements comprehensive technical and organizational security measures to protect your personal data against unauthorized access, alteration, disclosure, or destruction. These measures include encryption of data in transit and at rest, secure access controls, and regular security assessments.
+            </p>
+            <p>
+              Our staff and contractors are bound by strict confidentiality obligations and receive regular training on data protection requirements and best practices. Access to personal data is limited to those individuals who require it to perform their job functions.
+            </p>
+            <p>
+              We use industry-standard security protocols for all data transmission and storage, including SSL encryption for website communications and secure, encrypted storage systems for document and personal information retention.
+            </p>
+            <p>
+              Regular security audits and vulnerability assessments ensure that our protection measures remain effective against evolving threats and comply with current security standards and best practices.
+            </p>
+
+            <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mt-6 mb-3">Data Retention and Deletion</h3>
+            <p>
+              Personal data is retained only for as long as necessary to fulfill the purposes for which it was collected, comply with legal obligations, and resolve any disputes that may arise. For most services, this means retaining your information for a period of up to two years following completion of services.
+            </p>
+            <p>
+              After the retention period expires, personal data is securely deleted or anonymized in accordance with our data retention policy. You may request earlier deletion of your personal data, subject to any legal obligations that require us to retain certain information.
+            </p>
+            <p>
+              Backup copies of data may be retained for additional periods as part of our disaster recovery and business continuity procedures, but these are subject to the same security measures and deletion schedules as primary data stores.
+            </p>
+
+            <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mt-6 mb-3">Your Data Protection Rights</h3>
+            <p>
+              Under applicable data protection laws, you have several rights regarding your personal data, including the right to access, rectify, erase, restrict processing, and data portability. You also have the right to object to certain types of processing and to withdraw consent where processing is based on consent.
+            </p>
+            <p>
+              To exercise these rights, please contact us using the information provided in the Contact Information section of these Terms. We will respond to your requests within the timeframes required by applicable law, typically within 30 days.
+            </p>
+            <p>
+              If you believe that our processing of your personal data violates applicable law, you have the right to lodge a complaint with the relevant data protection authority in your jurisdiction.
+            </p>
+
+            <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mt-6 mb-3">International Data Transfers</h3>
+            <p>
+              TuneMyCV may transfer your personal data to countries outside your jurisdiction for processing and storage purposes. When such transfers occur, we ensure that appropriate safeguards are in place to protect your data in accordance with applicable data protection laws.
+            </p>
+            <p>
+              These safeguards may include adequacy decisions by relevant authorities, standard contractual clauses, or other legally recognized transfer mechanisms that provide equivalent protection to that required in your jurisdiction.
+            </p>
+            <p>
+              You will be informed of any international data transfers that may affect your personal data, and you have the right to obtain information about the safeguards in place to protect your data during such transfers.
+            </p>
+
+            <h2 className="text-2xl font-semibold text-blueberry dark:text-citrus mt-8 mb-4">11. Professional Services Disclaimer</h2>
+            
+            <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mt-6 mb-3">No Guarantee of Employment Outcomes</h3>
+            <p>
+              TuneMyCV provides professional CV writing, optimization, and career consultation services designed to improve your professional presentation and enhance your competitiveness in the job market. However, we want to be absolutely clear that our services do not guarantee employment, job interviews, job offers, salary increases, promotions, or any other specific career outcomes.
+            </p>
+            <p>
+              The success of your job search depends on numerous factors beyond the quality of your CV or resume, including but not limited to your qualifications, experience, skills, interview performance, market conditions, industry trends, economic factors, employer preferences, competition from other candidates, networking efforts, and timing of applications.
+            </p>
+            <p>
+              While our services are designed to significantly improve your professional presentation and increase your chances of success, we cannot control or influence the hiring decisions of potential employers. Each employer has unique requirements, preferences, and selection criteria that may vary significantly across organizations and positions.
+            </p>
+            <p>
+              You acknowledge and agree that you are ultimately responsible for the outcome of your job search and career advancement efforts. A professionally written CV is just one component of a successful job search strategy, and additional efforts such as networking, skill development, interview preparation, and strategic job targeting are typically necessary for optimal results.
+            </p>
+
+            <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mt-6 mb-3">Service Quality and Professional Standards</h3>
+            <p>
+              TuneMyCV is committed to providing high-quality professional services that meet industry standards and best practices for CV writing and career consultation. Our writers and consultants possess relevant qualifications, experience, and expertise in their respective areas of specialization.
+            </p>
+            <p>
+              However, we make no warranties or representations, express or implied, regarding the effectiveness, accuracy, or suitability of the documents or advice we provide for your specific situation or career objectives. The subjective nature of hiring decisions means that what appeals to one employer may not appeal to another.
+            </p>
+            <p>
+              Our services are based on current industry best practices, market research, and professional expertise, but the rapidly evolving nature of the job market means that strategies and approaches that are effective today may become less effective in the future.
+            </p>
+            <p>
+              We strive to stay current with industry trends, employer preferences, and best practices, but we cannot guarantee that our approaches will remain optimal for all situations or that they will be universally accepted by all employers or industries.
+            </p>
+
+            <h2 className="text-2xl font-semibold text-blueberry dark:text-citrus mt-8 mb-4">12. Limitation of Liability</h2>
+            
+            <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mt-6 mb-3">General Limitation of Liability</h3>
+            <p>
+              To the maximum extent permitted by applicable law, TuneMyCV's total liability to you for any and all claims arising out of or relating to these Terms or the use of our services, regardless of the form of action or the basis of the claim, shall not exceed the total amount paid by you to TuneMyCV for the specific service giving rise to the claim.
+            </p>
+            <p>
+              This limitation applies to all types of damages, including but not limited to direct, indirect, incidental, special, consequential, or punitive damages, loss of profits, loss of revenue, loss of business opportunities, loss of data, or any other commercial or economic loss, even if TuneMyCV has been advised of the possibility of such damages.
+            </p>
+
+            <h2 className="text-2xl font-semibold text-blueberry dark:text-citrus mt-8 mb-4">13. Termination and Suspension</h2>
+            
+            <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mt-6 mb-3">Termination by TuneMyCV</h3>
+            <p>
+              TuneMyCV reserves the right to terminate or suspend your access to our services at any time, with or without cause, and with or without notice, although we will generally provide reasonable notice when circumstances permit.
+            </p>
+            <p>
+              We may terminate services immediately without notice if you violate these Terms, engage in fraudulent or illegal activities, provide false or misleading information, or behave in a manner that is abusive, threatening, or inappropriate toward our staff or other users.
+            </p>
+
+            <h2 className="text-2xl font-semibold text-blueberry dark:text-citrus mt-8 mb-4">14. Dispute Resolution and Governing Law</h2>
+            
+            <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mt-6 mb-3">Governing Law and Jurisdiction</h3>
+            <p>
+              These Terms and any disputes arising out of or relating to these Terms or the use of TuneMyCV services shall be governed by and construed in accordance with the laws of [Jurisdiction to be specified], without regard to its conflict of law provisions.
+            </p>
+
+            <h2 className="text-2xl font-semibold text-blueberry dark:text-citrus mt-8 mb-4">15. Communication and Support</h2>
+            
+            <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mt-6 mb-3">Primary Communication Channels</h3>
+            <p>
+              TuneMyCV maintains multiple communication channels to ensure effective interaction between our team and clients throughout the service delivery process. Our primary communication method is email, which provides a written record of all interactions and ensures that important information is properly documented.
+            </p>
+
+            <h2 className="text-2xl font-semibold text-blueberry dark:text-citrus mt-8 mb-4">16. Service Modifications and Updates</h2>
+            
+            <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mt-6 mb-3">Right to Modify Services</h3>
+            <p>
+              TuneMyCV reserves the right to modify, update, enhance, or discontinue any aspect of our services at any time without prior notice. This includes changes to service offerings, pricing, delivery methods, platform features, and operational procedures.
+            </p>
+
+            <h2 className="text-2xl font-semibold text-blueberry dark:text-citrus mt-8 mb-4">17. Third-Party Services and Integrations</h2>
+            
+            <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mt-6 mb-3">Use of Third-Party Providers</h3>
+            <p>
+              TuneMyCV may utilize third-party service providers to enhance our service delivery capabilities, including but not limited to payment processing, email communications, document storage, and specialized consultation services. These partnerships enable us to provide comprehensive, high-quality services while maintaining cost efficiency.
+            </p>
+
+            <h2 className="text-2xl font-semibold text-blueberry dark:text-citrus mt-8 mb-4">18. Force Majeure</h2>
+            
+            <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mt-6 mb-3">Definition and Scope</h3>
+            <p>
+              Force majeure refers to extraordinary circumstances beyond the reasonable control of TuneMyCV that prevent or significantly impair our ability to perform our obligations under these Terms. Such circumstances include but are not limited to natural disasters, acts of God, war, terrorism, civil unrest, government actions, labor disputes, pandemics, and widespread technical failures.
+            </p>
+
+            <h2 className="text-2xl font-semibold text-blueberry dark:text-citrus mt-8 mb-4">19. Severability</h2>
+            
+            <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mt-6 mb-3">Invalid Provisions</h3>
+            <p>
+              If any provision of these Terms is found to be invalid, illegal, or unenforceable by a court of competent jurisdiction, such provision shall be deemed severed from these Terms, and the remaining provisions shall continue in full force and effect.
+            </p>
+
+            <h2 className="text-2xl font-semibold text-blueberry dark:text-citrus mt-8 mb-4">20. Contact Information</h2>
+            
+            <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mt-6 mb-3">Customer Service and General Inquiries</h3>
+            <p>
+              For all customer service inquiries, support requests, and general questions about TuneMyCV services, please contact us at:
+            </p>
+            <p>
+              <strong>Email:</strong> hello@tunemycv.com
+            </p>
+            <p>
+              Our customer service team is available during standard business hours to assist with account issues, service questions, billing inquiries, and technical support. We strive to respond to all inquiries within 24 hours during business days.
+            </p>
+
+            <hr className="my-8 border-blueberry/20 dark:border-citrus/20" />
+
+            <h2 className="text-2xl font-semibold text-blueberry dark:text-citrus mt-8 mb-4">Acknowledgment and Agreement</h2>
+            <p>
+              By using TuneMyCV services, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service in their entirety. You further acknowledge that you have reviewed our Privacy Policy at https://tunemycv.com/privacy-policy and understand how your personal information will be collected, used, and protected.
+            </p>
+            <p>
+              These Terms constitute a legally binding agreement between you and TuneMyCV, and your continued use of our services constitutes ongoing acceptance of these Terms as they may be modified from time to time.
+            </p>
+            <p>
+              If you have any questions about these Terms or our services, please contact us at hello@tunemycv.com before using our services.
             </p>
 
             <p className="text-sm text-blueberry/60 dark:text-apple-core/70 mt-8">
