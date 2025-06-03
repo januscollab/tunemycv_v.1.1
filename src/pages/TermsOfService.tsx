@@ -10,6 +10,91 @@ const TermsOfService = () => {
               Terms of Service - TuneMyCV
             </h1>
 
+            {/* Summary Section */}
+            <div className="bg-citrus/10 dark:bg-citrus/20 rounded-lg p-6 mb-8 border border-citrus/30">
+              <h2 className="text-2xl font-semibold text-blueberry dark:text-citrus mb-4">📋 Terms Summary</h2>
+              <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mb-4 italic">
+                This summary highlights key points for quick reference. Please read the full terms below for complete details.
+              </p>
+              
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-3">
+                  <div className="flex items-start space-x-2">
+                    <span className="text-citrus font-bold">✓</span>
+                    <div>
+                      <h3 className="font-semibold text-blueberry dark:text-citrus">Our Services</h3>
+                      <p className="text-sm text-blueberry/70 dark:text-apple-core/80">Professional CV writing, optimization, cover letters, LinkedIn profiles, and career coaching</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start space-x-2">
+                    <span className="text-citrus font-bold">💳</span>
+                    <div>
+                      <h3 className="font-semibold text-blueberry dark:text-citrus">Payment & Refunds</h3>
+                      <p className="text-sm text-blueberry/70 dark:text-apple-core/80">Payment required upfront. 48-hour full refund window before work begins. Limited refunds after service starts</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start space-x-2">
+                    <span className="text-citrus font-bold">⏱️</span>
+                    <div>
+                      <h3 className="font-semibold text-blueberry dark:text-citrus">Delivery Times</h3>
+                      <p className="text-sm text-blueberry/70 dark:text-apple-core/80">5-7 business days for basic CV services. 7-10 days for comprehensive packages. Rush options available</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start space-x-2">
+                    <span className="text-citrus font-bold">🔄</span>
+                    <div>
+                      <h3 className="font-semibold text-blueberry dark:text-citrus">Revisions</h3>
+                      <p className="text-sm text-blueberry/70 dark:text-apple-core/80">Two revision rounds included with basic services. Additional revisions available for extra fees</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="flex items-start space-x-2">
+                    <span className="text-zapier-orange font-bold">⚠️</span>
+                    <div>
+                      <h3 className="font-semibold text-blueberry dark:text-citrus">No Employment Guarantee</h3>
+                      <p className="text-sm text-blueberry/70 dark:text-apple-core/80">We create professional documents but cannot guarantee job interviews or employment outcomes</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start space-x-2">
+                    <span className="text-citrus font-bold">🔒</span>
+                    <div>
+                      <h3 className="font-semibold text-blueberry dark:text-citrus">Your Data</h3>
+                      <p className="text-sm text-blueberry/70 dark:text-apple-core/80">We protect your personal information. You own your final documents. Data retained for up to 2 years</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start space-x-2">
+                    <span className="text-citrus font-bold">👤</span>
+                    <div>
+                      <h3 className="font-semibold text-blueberry dark:text-citrus">Your Responsibilities</h3>
+                      <p className="text-sm text-blueberry/70 dark:text-apple-core/80">Provide accurate information, respond promptly to requests, participate actively in the process</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start space-x-2">
+                    <span className="text-citrus font-bold">📞</span>
+                    <div>
+                      <h3 className="font-semibold text-blueberry dark:text-citrus">Support</h3>
+                      <p className="text-sm text-blueberry/70 dark:text-apple-core/80">Contact us at hello@tunemycv.com for questions, support, or disputes</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="mt-4 p-3 bg-zapier-orange/10 rounded border border-zapier-orange/30">
+                <p className="text-sm text-blueberry/80 dark:text-apple-core/90">
+                  <strong>Key Requirements:</strong> Must be 18+, provide truthful information, and treat our staff respectfully. 
+                  By using our services, you agree to these terms and our arbitration process for disputes.
+                </p>
+              </div>
+            </div>
+
             <h2 className="text-xl font-semibold text-blueberry dark:text-citrus mt-8 mb-4">Table of Contents</h2>
             <ol className="list-decimal list-inside space-y-1 mb-8">
               <li>Introduction and Acceptance of Terms</li>
