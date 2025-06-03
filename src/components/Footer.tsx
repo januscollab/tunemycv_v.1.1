@@ -15,6 +15,10 @@ const Footer = () => {
                 className="h-8 w-auto"
               />
             </div>
+            <p className="text-white/80 mb-4 max-w-md">
+              AI-powered CV analysis and optimization to help you land your dream job. 
+              Get personalized feedback and improve your chances with every application.
+            </p>
             <div className="flex items-center mb-4">
               <Mail className="h-4 w-4 mr-2 text-white/80" />
               <a 
@@ -24,10 +28,6 @@ const Footer = () => {
                 hello@tunemycv.com
               </a>
             </div>
-            <p className="text-white/80 mb-4 max-w-md">
-              AI-powered CV analysis and optimization to help you land your dream job. 
-              Get personalized feedback and improve your chances with every application.
-            </p>
           </div>
           
           <div>
