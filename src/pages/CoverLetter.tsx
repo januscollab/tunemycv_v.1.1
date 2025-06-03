@@ -654,11 +654,7 @@ const AuthenticatedCoverLetter = () => {
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-4 pt-0">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center text-sm text-gray-600 hover:text-zapier-orange transition-colors cursor-pointer">
-                          <RotateCcw className="h-4 w-4 mr-1" />
-                          Revert to Original
-                        </div>
+                      <div className="flex items-center justify-end">
                         <DownloadOptions
                           content={selectedCoverLetter.content}
                           fileName={`Cover_Letter_${selectedCoverLetter.company_name}_${selectedCoverLetter.job_title}`}
@@ -818,13 +814,6 @@ const AuthenticatedCoverLetter = () => {
                                   >
                                     <Eye className="h-4 w-4 mr-1" />
                                     View
-                                  </button>
-                                  <button
-                                    onClick={() => handleEditCoverLetter(coverLetter)}
-                                    className="flex items-center text-sm text-gray-600 hover:text-zapier-orange transition-colors"
-                                  >
-                                    <Edit className="h-4 w-4 mr-1" />
-                                    Edit
                                   </button>
                                   <DownloadOptions
                                     content={coverLetter.content}

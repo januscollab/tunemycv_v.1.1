@@ -262,6 +262,89 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
           </button>
         </form>
       </div>
+
+      {/* Notification Settings */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="flex items-center mb-6">
+          <Mail className="h-5 w-5 text-gray-500 mr-2" />
+          <h3 className="text-lg font-medium text-gray-900">Notification Preferences</h3>
+        </div>
+        
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <label className="font-medium text-gray-700">Email Notifications</label>
+              <p className="text-sm text-gray-500">Receive notifications about your CV analysis results</p>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                defaultChecked={true}
+                className="sr-only peer"
+              />
+              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+            </label>
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <div>
+              <label className="font-medium text-gray-700">Marketing Emails</label>
+              <p className="text-sm text-gray-500">Receive tips, updates, and promotional content</p>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                defaultChecked={false}
+                className="sr-only peer"
+              />
+              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      {/* Privacy Settings */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="flex items-center mb-6">
+          <Lock className="h-5 w-5 text-gray-500 mr-2" />
+          <h3 className="text-lg font-medium text-gray-900">Privacy Settings</h3>
+        </div>
+        
+        <div className="space-y-4">
+          <div>
+            <label className="block font-medium text-gray-700 mb-2">Data Privacy Level</label>
+            <select
+              defaultValue="standard"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="minimal">Minimal - Only essential data</option>
+              <option value="standard">Standard - Standard analytics and improvements</option>
+              <option value="enhanced">Enhanced - Help us improve our services</option>
+            </select>
+            <p className="text-sm text-gray-500 mt-1">
+              Controls how your data is used to improve our services
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Account Management */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="flex items-center mb-6">
+          <User className="h-5 w-5 text-gray-500 mr-2" />
+          <h3 className="text-lg font-medium text-gray-900">Account Management</h3>
+        </div>
+        
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <h4 className="font-medium text-red-900 mb-2">Request Account Deactivation</h4>
+          <p className="text-sm text-red-700 mb-4">
+            This will permanently delete your account and all associated data. This action cannot be undone.
+          </p>
+          <button className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors">
+            Request Deactivation
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
