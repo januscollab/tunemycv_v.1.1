@@ -1,46 +1,42 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Sun, Moon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useTheme } from '@/components/theme-provider';
 
 const ThemeToggle = () => {
-  const [isDark, setIsDark] = useState(false);
+  const { theme, setTheme } = useTheme();
+  const [isAnimating, setIsAnimating] = useState(false);
 
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const handleThemeToggle = () => {
+    setIsAnimating(true);
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
     
-    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-      setIsDark(true);
-      document.documentElement.classList.add('dark');
-    }
-  }, []);
-
-  const toggleTheme = () => {
-    const newTheme = !isDark;
-    setIsDark(newTheme);
-    
-    if (newTheme) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    }
+    // Reset animation after completion
+    setTimeout(() => setIsAnimating(false), 500);
   };
+
+  const isDark = theme === 'dark';
 
   return (
     <Button
       variant="ghost"
       size="icon"
-      onClick={toggleTheme}
-      className="text-earth dark:text-white hover:text-zapier-orange transition-colors"
+      onClick={handleThemeToggle}
+      className={`
+        relative text-foreground-secondary hover:text-foreground 
+        hover:bg-surface-hover transition-all duration-normal
+        ${isAnimating ? 'animate-theme-switch' : ''}
+        focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2
+      `}
+      aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+      title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
     >
-      {isDark ? (
-        <Sun className="h-5 w-5 text-zapier-orange" />
-      ) : (
-        <Moon className="h-5 w-5 text-zapier-orange" />
-      )}
+      <div className="relative">
+        {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+        <div className="absolute inset-0 rounded-full bg-primary/10 opacity-0 transition-opacity duration-fast group-hover:opacity-100" />
+      </div>
     </Button>
   );
 };

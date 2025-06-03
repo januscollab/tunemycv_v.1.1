@@ -131,6 +131,13 @@ serve(async (req) => {
     const systemPrompt = `You are an expert cover letter writer. ${templatePrompt} ${lengthInstruction}
 
 The cover letter should:
+- Always start with this exact header format:
+  "Hiring Manager  
+  [Company Name]
+  [Company Address]  
+  [City, State, Zip]  
+  
+  Dear Hiring Manager,"
 - Be tailored specifically to the job and company
 - Highlight relevant experience and skills
 - Show genuine enthusiasm for the role
@@ -139,7 +146,7 @@ The cover letter should:
 - Match the requested length and tone precisely
 ${advancedOptionsText ? `\nAdditional personalization requirements:${advancedOptionsText}` : ''}
 
-Format the response as a complete, ready-to-send cover letter with proper formatting.`
+Format the response as a complete, ready-to-send cover letter with proper formatting, always starting with the required header format above.`
 
     const userPrompt = `Write a cover letter for the following position:
 

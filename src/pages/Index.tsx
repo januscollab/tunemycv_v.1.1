@@ -31,15 +31,14 @@ const Index = () => {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <Link
-              to={user ? "/analyze" : "/auth"}
+              to={user ? "/analyze" : "/analyze"}
               className="bg-zapier-orange text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange/90 transition-colors flex items-center justify-center"
             >
               Start Free Analysis
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
             <Link
-              to={user ? "/cover-letter" : "/auth"}
-              state={user ? undefined : { from: '/cover-letter' }}
+              to={user ? "/cover-letter" : "/cover-letter"}
               className="border border-earth/20 dark:border-white/20 text-earth dark:text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-earth/5 dark:hover:bg-white/5 transition-colors"
             >
               Create Cover Letter

@@ -47,7 +47,7 @@ const Auth = () => {
         <div className="max-w-md w-full space-y-8">
           <AuthHeader mode={mode} fromAnalyze={fromAnalyze} />
 
-          <div className="bg-white rounded-lg border border-border p-8">
+          <div className="bg-card dark:bg-surface rounded-lg border border-card-border p-8">
             {mode !== 'forgot-password' && (
               <SocialAuthButtons isAnyLoading={isAnyLoading} />
             )}

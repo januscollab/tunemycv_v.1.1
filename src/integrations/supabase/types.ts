@@ -107,6 +107,7 @@ export type Database = {
           cv_file_name: string | null
           cv_file_size: number | null
           cv_upload_id: string | null
+          deleted_at: string | null
           executive_summary: string | null
           id: string
           job_description_extracted_text: string | null
@@ -128,6 +129,7 @@ export type Database = {
           cv_file_name?: string | null
           cv_file_size?: number | null
           cv_upload_id?: string | null
+          deleted_at?: string | null
           executive_summary?: string | null
           id?: string
           job_description_extracted_text?: string | null
@@ -149,6 +151,7 @@ export type Database = {
           cv_file_name?: string | null
           cv_file_size?: number | null
           cv_upload_id?: string | null
+          deleted_at?: string | null
           executive_summary?: string | null
           id?: string
           job_description_extracted_text?: string | null
@@ -423,6 +426,7 @@ export type Database = {
           created_at: string | null
           cv_file_name: string | null
           cv_upload_id: string | null
+          entry_status: string | null
           error_message: string | null
           first_name: string | null
           id: string | null
@@ -431,9 +435,9 @@ export type Database = {
           job_title: string | null
           last_name: string | null
           openai_model: string | null
+          operation_type: string | null
           processing_time_ms: number | null
           prompt_text: string | null
-          response_metadata: Json | null
           response_text: string | null
           status: string | null
           tokens_used: number | null

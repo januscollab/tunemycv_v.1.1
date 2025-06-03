@@ -30,7 +30,7 @@ const AuthSubmitButton: React.FC<AuthSubmitButtonProps> = ({ mode, loading }) =>
       <Button
         type="submit"
         disabled={loading}
-        className="w-full bg-apricot hover:bg-apricot/90 text-white"
+        className="w-full bg-zapier-orange hover:bg-zapier-orange/90 text-white"
       >
         {getButtonText()}
       </Button>

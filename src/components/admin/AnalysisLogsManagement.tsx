@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Eye, FileText, Clock, AlertCircle, CheckCircle } from 'lucide-react';
+import { Search, Eye, Clock, AlertCircle, CheckCircle, ChevronLeft, ChevronRight, Calendar, Tag } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 import AnalysisLogDetailModal from './AnalysisLogDetailModal';
 
 interface AnalysisLog {
@@ -19,6 +22,8 @@ interface AnalysisLog {
   processing_time_ms: number;
   tokens_used: number;
   status: string;
+  operation_type: string;
+  entry_status: string;
   created_at: string;
   prompt_text: string;
   response_text: string;
@@ -30,6 +35,10 @@ const AnalysisLogsManagement = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [operationFilter, setOperationFilter] = useState('all');
+  const [entryStatusFilter, setEntryStatusFilter] = useState('all');
+  const [pageSize, setPageSize] = useState(50);
+  const [currentPage, setCurrentPage] = useState(1);
   const [selectedLog, setSelectedLog] = useState<AnalysisLog | null>(null);
   const { toast } = useToast();
 
@@ -49,8 +58,7 @@ const AnalysisLogsManagement = () => {
       const { data, error } = await supabase
         .from('analysis_logs_with_details')
         .select('*')
-        .order('created_at', { ascending: false })
-        .limit(100);
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
       setLogs(data || []);
@@ -71,9 +79,17 @@ const AnalysisLogsManagement = () => {
       log.company_name?.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesStatus = statusFilter === 'all' || log.status === statusFilter;
+    const matchesOperation = operationFilter === 'all' || log.operation_type === operationFilter;
+    const matchesEntryStatus = entryStatusFilter === 'all' || log.entry_status === entryStatusFilter;
     
-    return matchesSearch && matchesStatus;
+    return matchesSearch && matchesStatus && matchesOperation && matchesEntryStatus;
   });
+
+  // Pagination logic
+  const totalPages = pageSize === 999999 ? 1 : Math.ceil(filteredLogs.length / pageSize);
+  const startIndex = pageSize === 999999 ? 0 : (currentPage - 1) * pageSize;
+  const endIndex = pageSize === 999999 ? filteredLogs.length : startIndex + pageSize;
+  const paginatedLogs = filteredLogs.slice(startIndex, endIndex);
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -97,6 +113,29 @@ const AnalysisLogsManagement = () => {
     }
   };
 
+  const getOperationTypeIcon = (operationType: string) => {
+    switch (operationType) {
+      case 'cv_analysis':
+        return '📄';
+      case 'cover_letter':
+        return '✉️';
+      default:
+        return '📊';
+    }
+  };
+
+  const getEntryStatusBadge = (entryStatus: string) => {
+    const variant = entryStatus === 'active' ? 'default' : 'secondary';
+    const color = entryStatus === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800';
+    
+    return (
+      <Badge variant={variant} className={`${color} flex items-center gap-1`}>
+        <Tag className="h-3 w-3" />
+        {entryStatus}
+      </Badge>
+    );
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -110,30 +149,71 @@ const AnalysisLogsManagement = () => {
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-900">Analysis Logs</h1>
         <div className="text-sm text-gray-500">
-          Total Logs: {logs.length} | Filtered: {filteredLogs.length}
+          Total Logs: {logs.length} | Filtered: {filteredLogs.length} | Page: {currentPage} of {totalPages}
         </div>
       </div>
 
-      <div className="flex items-center space-x-4">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search by user, job title, or company..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
+      {/* Filters Section */}
+      <div className="bg-white p-4 rounded-lg border border-gray-200 space-y-4">
+        <div className="flex items-center space-x-4 flex-wrap gap-4">
+          <div className="relative flex-1 min-w-64">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search by user, job title, or company..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="Filter by Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="success">Success</SelectItem>
+              <SelectItem value="error">Error</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select value={operationFilter} onValueChange={setOperationFilter}>
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="Filter by Type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Types</SelectItem>
+              <SelectItem value="cv_analysis">CV Analysis</SelectItem>
+              <SelectItem value="cover_letter">Cover Letter</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select value={entryStatusFilter} onValueChange={setEntryStatusFilter}>
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="Filter by Entry Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Entries</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="deleted">Deleted</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select value={pageSize.toString()} onValueChange={(value) => {
+            setPageSize(value === 'all' ? 999999 : parseInt(value));
+            setCurrentPage(1);
+          }}>
+            <SelectTrigger className="w-32">
+              <SelectValue placeholder="Page Size" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="50">50</SelectItem>
+              <SelectItem value="100">100</SelectItem>
+              <SelectItem value="all">All</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="all">All Status</option>
-          <option value="success">Success</option>
-          <option value="error">Error</option>
-        </select>
       </div>
 
       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
@@ -142,15 +222,17 @@ const AnalysisLogsManagement = () => {
             <TableRow>
               <TableHead>User</TableHead>
               <TableHead>Job Details</TableHead>
+              <TableHead>Type</TableHead>
               <TableHead>Model</TableHead>
               <TableHead>Performance</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Entry Status</TableHead>
               <TableHead>Date</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredLogs.map((log) => (
+            {paginatedLogs.map((log) => (
               <TableRow key={log.id}>
                 <TableCell>
                   <div>
@@ -167,6 +249,14 @@ const AnalysisLogsManagement = () => {
                     {log.compatibility_score && (
                       <div className="text-xs text-blue-600">Score: {log.compatibility_score}%</div>
                     )}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-lg">{getOperationTypeIcon(log.operation_type)}</span>
+                    <span className="text-sm font-medium capitalize">
+                      {log.operation_type?.replace('_', ' ') || 'Analysis'}
+                    </span>
                   </div>
                 </TableCell>
                 <TableCell>
@@ -190,32 +280,81 @@ const AnalysisLogsManagement = () => {
                     </span>
                   </div>
                 </TableCell>
+                <TableCell>
+                  {getEntryStatusBadge(log.entry_status)}
+                </TableCell>
                 <TableCell className="text-gray-600">
-                  {new Date(log.created_at).toLocaleDateString()} {new Date(log.created_at).toLocaleTimeString()}
+                  <div className="flex items-center space-x-1">
+                    <Calendar className="h-3 w-3" />
+                    <span className="text-sm">
+                      {new Date(log.created_at).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {new Date(log.created_at).toLocaleTimeString()}
+                  </div>
                 </TableCell>
                 <TableCell>
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => setSelectedLog(log)}
-                      className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
-                      title="View Details"
-                    >
-                      <Eye className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => setSelectedLog(log)}
-                      className="p-1 text-gray-400 hover:text-green-600 transition-colors"
-                      title="View Prompt & Response"
-                    >
-                      <FileText className="h-4 w-4" />
-                    </button>
-                  </div>
+                  <button
+                    onClick={() => setSelectedLog(log)}
+                    className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                    title="View Details"
+                  >
+                    <Eye className="h-4 w-4" />
+                  </button>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </div>
+
+      {/* Pagination */}
+      {pageSize !== 999999 && totalPages > 1 && (
+        <div className="flex items-center justify-between">
+          <div className="text-sm text-gray-500">
+            Showing {startIndex + 1}-{Math.min(endIndex, filteredLogs.length)} of {filteredLogs.length} entries
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+              disabled={currentPage === 1}
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Previous
+            </Button>
+            
+            <div className="flex items-center space-x-1">
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                const pageNum = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i;
+                return (
+                  <Button
+                    key={pageNum}
+                    variant={pageNum === currentPage ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setCurrentPage(pageNum)}
+                    className="w-10 h-8"
+                  >
+                    {pageNum}
+                  </Button>
+                );
+              })}
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+              disabled={currentPage === totalPages}
+            >
+              Next
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
 
       {selectedLog && (
         <AnalysisLogDetailModal

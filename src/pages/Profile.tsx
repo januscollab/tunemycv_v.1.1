@@ -12,13 +12,13 @@ const Profile = () => {
   // Handle URL tab parameter
   useEffect(() => {
     const tabParam = searchParams.get('tab');
-    if (tabParam && ['personal', 'history', 'files', 'password', 'settings'].includes(tabParam)) {
+    if (tabParam && ['personal', 'documents', 'files', 'billing', 'settings'].includes(tabParam)) {
       setActiveTab(tabParam);
     }
   }, [searchParams]);
 
   return (
-    <div className="min-h-screen bg-background py-8">
+    <div className="min-h-screen bg-background-secondary py-8">
       <ProfileContainer
         activeTab={activeTab}
         onTabChange={setActiveTab}
