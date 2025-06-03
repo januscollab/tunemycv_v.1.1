@@ -55,6 +55,11 @@ const CoverLetter = () => {
     await generateCoverLetter(selectedAnalysis, generationOptions);
   };
 
+  const handleUseManualInput = () => {
+    // This would handle manual input mode
+    console.log('Manual input selected');
+  };
+
   // Logged-out user experience
   if (!user) {
     return <CoverLetterLoggedOut />;
@@ -62,7 +67,7 @@ const CoverLetter = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
-      <div className="max-w-6xl mx-auto px-4 py-12">
+      <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="mb-8">
           <div className="flex items-start">
             <Users className="h-12 w-12 text-zapier-orange mr-6 mt-0" />
@@ -100,8 +105,8 @@ const CoverLetter = () => {
                 />
                 
                 <AdvancedGenerationOptions
-                  options={generationOptions}
-                  onOptionsChange={updateGenerationOptions}
+                  value={generationOptions}
+                  onChange={updateGenerationOptions}
                   isGenerating={isGenerating}
                 />
               </div>
@@ -134,8 +139,8 @@ const CoverLetter = () => {
           <TabsContent value="edit" className="mt-0">
             {coverLetter && (
               <EditableCoverLetter
-                initialContent={coverLetter}
-                onContentChange={updateCoverLetter}
+                content={coverLetter.content || coverLetter}
+                onSave={updateCoverLetter}
                 onDownload={downloadCoverLetter}
               />
             )}
@@ -145,6 +150,7 @@ const CoverLetter = () => {
         <NoAnalysisModal
           isOpen={showNoAnalysisModal}
           onClose={() => setShowNoAnalysisModal(false)}
+          onUseManualInput={handleUseManualInput}
         />
       </div>
     </div>
