@@ -22,6 +22,7 @@ interface AnalysisResult {
   credit_cost?: number;
   cv_file_name?: string;
   cv_file_size?: number;
+  has_cover_letter?: boolean;
 }
 
 interface AnalysisHistoryTabProps {
@@ -56,7 +57,8 @@ const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ credits, member
         .from('analysis_results')
         .select(`
           *,
-          analysis_logs(cost_estimate)
+          analysis_logs(cost_estimate),
+          cover_letters(id)
         `)
         .eq('user_id', user?.id)
         .order('created_at', { ascending: false });
@@ -65,7 +67,8 @@ const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ credits, member
       
       const transformedData = (data || []).map(analysis => ({
         ...analysis,
-        credit_cost: analysis.analysis_logs?.[0]?.cost_estimate ? Math.ceil(analysis.analysis_logs[0].cost_estimate) : 1
+        credit_cost: analysis.analysis_logs?.[0]?.cost_estimate ? Math.ceil(analysis.analysis_logs[0].cost_estimate) : 1,
+        has_cover_letter: analysis.cover_letters && analysis.cover_letters.length > 0
       }));
       
       setAnalyses(transformedData);
