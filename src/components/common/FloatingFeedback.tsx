@@ -24,12 +24,17 @@ const FloatingFeedback = () => {
 
   return (
     <>
-      {/* Subtle Floating Tab */}
-      <div className="fixed right-0 top-1/2 -translate-y-1/2 z-50 group">
+      {/* Browser Edge Tab */}
+      <div className="fixed -right-1 top-1/2 -translate-y-1/2 z-50 group">
         <button
           onClick={handleOpen}
-          className="relative bg-zapier-orange hover:bg-zapier-orange/90 text-white px-4 py-5 rounded-l-lg shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.02] rotate-90 origin-center backdrop-blur-sm border border-white/10 hover:glow"
-          style={{ transformOrigin: 'center center' }}
+          className="relative bg-zapier-orange hover:bg-zapier-orange/90 text-white px-4 py-5 rounded-l-lg shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.02] rotate-90 origin-center backdrop-blur-sm border-l border-t border-b border-white/10"
+          style={{ 
+            transformOrigin: 'center center',
+            marginRight: '-4px',
+            borderTopRightRadius: '0',
+            borderBottomRightRadius: '0'
+          }}
           aria-label="Open feedback form"
         >
           <div className="flex items-center space-x-2.5">
