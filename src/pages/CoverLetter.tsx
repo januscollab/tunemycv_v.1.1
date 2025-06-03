@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FileText, Sparkles, Trash2, RefreshCw, Clock, FileUp, Search, AlertCircle, Eye, Edit, Download, History, RotateCcw } from 'lucide-react';
+import { FileText, Sparkles, Trash2, RefreshCw, Clock, FileUp, Search, AlertCircle, Eye, Edit, Download, History, RotateCcw, Edit2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCoverLetter } from '@/hooks/useCoverLetter';
 import { useUserData } from '@/hooks/useUserData';
@@ -795,6 +795,13 @@ const AuthenticatedCoverLetter = () => {
                                 <div className="flex-1">
                                   <div className="flex items-center gap-2 mb-1">
                                     <h3 className="font-medium">{coverLetter.job_title} at {coverLetter.company_name}</h3>
+                                    <button
+                                      onClick={() => {/* TODO: Add edit functionality */}}
+                                      className="text-gray-400 hover:text-zapier-orange transition-colors"
+                                      title="Edit title"
+                                    >
+                                      <Edit2 className="h-3 w-3" />
+                                    </button>
                                     {coverLetter.regeneration_count > 0 && (
                                       <Badge variant="outline" className="text-xs">
                                         v{coverLetter.regeneration_count + 1}

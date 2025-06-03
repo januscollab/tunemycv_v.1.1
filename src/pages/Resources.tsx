@@ -125,7 +125,7 @@ const Resources = () => {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-earth dark:text-white mb-4">
-              Our Top 3 Resources
+              Our Top 3 Must Reads
             </h2>
             <p className="text-xl text-earth/70 dark:text-white/70">
               Start with these essential guides that have helped thousands of job seekers
