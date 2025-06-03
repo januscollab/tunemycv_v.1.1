@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -84,12 +83,14 @@ export const useCoverLetter = () => {
         cvText: analysisData.cv_extracted_text,
         tone: 'professional',
         length: 'concise',
-        analysisResultId: analysisData.id,
+        analysisResultId: analysisData.id !== 'manual-input' ? analysisData.id : undefined,
         workExperienceHighlights: options.workExperienceHighlights,
         customHookOpener: options.customHookOpener,
         personalValues: options.personalValues,
         includeLinkedInUrl: options.includeLinkedInUrl
       };
+
+      console.log('Generating cover letter with params:', params);
 
       const { data, error } = await supabase.functions.invoke('generate-cover-letter', {
         body: params

@@ -13,6 +13,7 @@ import AnalysisSelector from '@/components/cover-letter/AnalysisSelector';
 import AdvancedGenerationOptions from '@/components/cover-letter/AdvancedGenerationOptions';
 import EditableCoverLetter from '@/components/cover-letter/EditableCoverLetter';
 import NoAnalysisModal from '@/components/cover-letter/NoAnalysisModal';
+import ManualInputForm from '@/components/cover-letter/ManualInputForm';
 import CreditsPanel from '@/components/analyze/CreditsPanel';
 import { useCoverLetter } from '@/hooks/useCoverLetter';
 import { AnalysisData } from '@/types/fileTypes';
@@ -22,6 +23,7 @@ const CoverLetter = () => {
   const location = useLocation();
   const [selectedAnalysisId, setSelectedAnalysisId] = useState<string>('');
   const [showNoAnalysisModal, setShowNoAnalysisModal] = useState(false);
+  const [showManualInput, setShowManualInput] = useState(false);
   const [activeTab, setActiveTab] = useState('generate');
   const [currentLoadingMessage, setCurrentLoadingMessage] = useState('');
 
@@ -92,7 +94,7 @@ const CoverLetter = () => {
     }
   }, [isGenerating]);
 
-  const handleGenerate = async (selectedAnalysis: AnalysisData | null) => {
+  const handleGenerateFromAnalysis = async (selectedAnalysis: AnalysisData | null) => {
     if (!selectedAnalysis) {
       setShowNoAnalysisModal(true);
       return;
@@ -101,8 +103,27 @@ const CoverLetter = () => {
     await generateCoverLetter(selectedAnalysis, generationOptions);
   };
 
+  const handleGenerateFromManualInput = async (data: {
+    jobTitle: string;
+    companyName: string;
+    cvText: string;
+    jobDescription: string;
+  }) => {
+    // Create a mock analysis data structure for manual input
+    const mockAnalysis = {
+      id: 'manual-input',
+      job_title: data.jobTitle,
+      company_name: data.companyName,
+      cv_extracted_text: data.cvText,
+      job_description_extracted_text: data.jobDescription,
+    };
+
+    await generateCoverLetter(mockAnalysis, generationOptions);
+  };
+
   const handleUseManualInput = () => {
-    console.log('Manual input selected');
+    setShowNoAnalysisModal(false);
+    setShowManualInput(true);
   };
 
   const handleSaveCoverLetter = async (newContent: string) => {
@@ -143,16 +164,16 @@ const CoverLetter = () => {
                 Cover Letter Generator
               </h1>
               <p className="text-lg text-earth/70 dark:text-white/70 max-w-2xl">
-                Generate personalized, compelling cover letters based on your CV analysis results. 
+                Generate personalized, compelling cover letters based on your CV analysis results or manual input. 
                 Our AI crafts tailored content that highlights your strengths and aligns with job requirements.
               </p>
             </div>
           </div>
         </div>
 
-        {/* Main Content Grid */}
+        {/* Main Content Grid - Standardized 4-column layout */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Main Content Section */}
+          {/* Main Content Section - 3 columns */}
           <div className="lg:col-span-3">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-2 mb-6">
@@ -168,25 +189,48 @@ const CoverLetter = () => {
 
               <TabsContent value="generate" className="mt-0">
                 <div className="space-y-6">
-                  {/* Analysis Selection */}
-                  <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-5 border border-apple-core/20 dark:border-citrus/20">
-                    <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-3">
-                      Select CV Analysis
-                    </h3>
-                    <p className="text-sm text-blueberry/60 dark:text-apple-core/70 mb-4">
-                      Choose from your previous CV analyses to generate a personalized cover letter
-                    </p>
-                    
-                    <AnalysisSelector
-                      onAnalysisSelect={setSelectedAnalysisId}
-                      selectedAnalysisId={selectedAnalysisId}
-                      onGenerate={handleGenerate}
-                      disabled={isGenerating}
-                    />
-                  </div>
+                  {!showManualInput ? (
+                    <>
+                      {/* Analysis Selection */}
+                      <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-6 border border-apple-core/20 dark:border-citrus/20">
+                        <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-3">
+                          Select CV Analysis
+                        </h3>
+                        <p className="text-sm text-blueberry/60 dark:text-apple-core/70 mb-4">
+                          Choose from your previous CV analyses to generate a personalized cover letter
+                        </p>
+                        
+                        <AnalysisSelector
+                          onAnalysisSelect={setSelectedAnalysisId}
+                          selectedAnalysisId={selectedAnalysisId}
+                          onGenerate={handleGenerateFromAnalysis}
+                          disabled={isGenerating}
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      {/* Manual Input Form */}
+                      <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-6 border border-apple-core/20 dark:border-citrus/20">
+                        <ManualInputForm
+                          onGenerate={handleGenerateFromManualInput}
+                          disabled={isGenerating}
+                        />
+                        <div className="mt-4 pt-4 border-t border-apple-core/20 dark:border-citrus/20">
+                          <button
+                            onClick={() => setShowManualInput(false)}
+                            className="text-sm text-blueberry/60 dark:text-apple-core/70 hover:text-blueberry dark:hover:text-citrus"
+                            disabled={isGenerating}
+                          >
+                            ← Back to Analysis Selection
+                          </button>
+                        </div>
+                      </div>
+                    </>
+                  )}
                   
                   {/* Advanced Options */}
-                  <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-5 border border-apple-core/20 dark:border-citrus/20">
+                  <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-6 border border-apple-core/20 dark:border-citrus/20">
                     <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-3">
                       Customize Your Cover Letter
                     </h3>
@@ -202,7 +246,7 @@ const CoverLetter = () => {
 
               <TabsContent value="edit" className="mt-0">
                 {coverLetter && (
-                  <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-5 border border-apple-core/20 dark:border-citrus/20">
+                  <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-6 border border-apple-core/20 dark:border-citrus/20">
                     <EditableCoverLetter
                       content={coverLetter.content || coverLetter}
                       onSave={handleSaveCoverLetter}
@@ -214,7 +258,7 @@ const CoverLetter = () => {
             </Tabs>
           </div>
 
-          {/* Credits Panel */}
+          {/* Credits Panel - 1 column */}
           <div className="lg:col-span-1">
             <div className="space-y-6">
               <CreditsPanel
