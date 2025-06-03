@@ -4,12 +4,14 @@ import { X, MessageSquare, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
 const FloatingFeedback = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [allowContact, setAllowContact] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -36,7 +38,8 @@ const FloatingFeedback = () => {
           name: formData.name,
           email: formData.email,
           subject: formData.subject,
-          message: formData.message
+          message: formData.message,
+          allowContact: allowContact
         }
       });
 
@@ -54,6 +57,7 @@ const FloatingFeedback = () => {
         subject: '',
         message: ''
       });
+      setAllowContact(false);
       setIsOpen(false);
     } catch (error) {
       console.error('Error sending feedback:', error);
@@ -69,15 +73,16 @@ const FloatingFeedback = () => {
 
   return (
     <>
-      {/* Floating Tab */}
+      {/* Floating Tab - Rotated 90 degrees clockwise */}
       <div className="fixed right-0 top-1/2 -translate-y-1/2 z-50">
         <button
           onClick={() => setIsOpen(true)}
-          className="bg-zapier-orange hover:bg-zapier-orange/90 text-white px-4 py-3 rounded-l-lg shadow-lg transition-all duration-300 hover:shadow-xl group"
+          className="bg-zapier-orange hover:bg-zapier-orange/90 text-white px-3 py-4 rounded-l-lg shadow-lg transition-all duration-300 hover:shadow-xl group rotate-90 origin-center"
+          style={{ transformOrigin: 'center center' }}
         >
           <div className="flex items-center space-x-2">
-            <MessageSquare className="h-5 w-5 group-hover:scale-110 transition-transform" />
-            <span className="text-sm tracking-wider">Feedback</span>
+            <MessageSquare className="h-4 w-4 group-hover:scale-110 transition-transform" />
+            <span className="text-xs tracking-wider whitespace-nowrap">Feedback</span>
           </div>
         </button>
       </div>
@@ -179,10 +184,26 @@ const FloatingFeedback = () => {
                     />
                   </div>
 
+                  {/* Contact Permission Checkbox */}
+                  <div className="flex items-start space-x-3 pt-2">
+                    <Checkbox
+                      id="allowContact"
+                      checked={allowContact}
+                      onCheckedChange={(checked) => setAllowContact(checked as boolean)}
+                      disabled={isSubmitting}
+                    />
+                    <label 
+                      htmlFor="allowContact" 
+                      className="text-sm text-blueberry dark:text-citrus leading-relaxed cursor-pointer"
+                    >
+                      I give permission for TuneMyCV to contact me if needed regarding my feedback
+                    </label>
+                  </div>
+
                   <Button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-zapier-orange hover:bg-zapier-orange/90 text-white"
+                    className="w-full bg-zapier-orange hover:bg-zapier-orange/90 text-white font-normal"
                   >
                     {isSubmitting ? (
                       <div className="flex items-center space-x-2">
