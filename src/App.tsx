@@ -3,6 +3,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
+import Index from './pages/Index';
 import AnalyzeCV from './pages/AnalyzeCV';
 import CoverLetter from './pages/CoverLetter';
 import InterviewPrep from './pages/InterviewPrep';
@@ -29,7 +30,7 @@ function App() {
             <Navigation />
             <main className="flex-grow">
               <Routes>
-                <Route path="/" element={<AnalyzeCV />} />
+                <Route path="/" element={<Index />} />
                 <Route path="/analyze" element={<AnalyzeCV />} />
                 <Route path="/cover-letter" element={<CoverLetter />} />
                 <Route path="/interview-prep" element={<InterviewPrep />} />
