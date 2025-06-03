@@ -259,13 +259,13 @@ const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ credits, member
               <Pagination>
                 <PaginationContent>
                   <PaginationItem>
-                    <PaginationPrevious 
+                      <PaginationPrevious 
                       href="#" 
                       onClick={(e) => {
                         e.preventDefault();
                         if (currentPage > 1) setCurrentPage(currentPage - 1);
                       }}
-                      className={`${currentPage <= 1 ? 'pointer-events-none opacity-50' : ''} font-normal`}
+                      className={`${currentPage <= 1 ? 'pointer-events-none opacity-50' : ''} text-sm font-normal`}
                     />
                   </PaginationItem>
                   
@@ -278,7 +278,7 @@ const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ credits, member
                           setCurrentPage(page);
                         }}
                         isActive={currentPage === page}
-                        className="font-normal"
+                        className="text-sm font-normal"
                       >
                         {page}
                       </PaginationLink>
@@ -286,13 +286,13 @@ const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ credits, member
                   ))}
                   
                   <PaginationItem>
-                    <PaginationNext 
+                      <PaginationNext 
                       href="#" 
                       onClick={(e) => {
                         e.preventDefault();
                         if (currentPage < totalPages) setCurrentPage(currentPage + 1);
                       }}
-                      className={`${currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''} font-normal`}
+                      className={`${currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''} text-sm font-normal`}
                     />
                   </PaginationItem>
                 </PaginationContent>

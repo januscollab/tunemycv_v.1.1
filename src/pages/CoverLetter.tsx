@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FileText, Sparkles, Trash2, RefreshCw, Clock, FileUp, Search, AlertCircle, Eye, Edit, Download, History, RotateCcw, Edit2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCoverLetter } from '@/hooks/useCoverLetter';
@@ -52,6 +52,7 @@ const AuthenticatedCoverLetter = () => {
   const { credits } = useUserData();
   const { toast } = useToast();
   const location = useLocation();
+  const navigate = useNavigate();
   const { 
     generateCoverLetter, 
     generateFromAnalysis, 
@@ -327,6 +328,15 @@ const AuthenticatedCoverLetter = () => {
   const handleViewCoverLetter = (coverLetter: any) => {
     setSelectedCoverLetter(coverLetter);
     setActiveTab('result');
+  };
+
+  const handleViewCVAnalysis = (analysisResultId: string) => {
+    navigate('/analyze', {
+      state: {
+        analysisId: analysisResultId,
+        activeTab: 'results'
+      }
+    });
   };
 
   const formatDate = (dateString: string) => {
@@ -828,7 +838,7 @@ const AuthenticatedCoverLetter = () => {
                               </div>
                               
                               {/* Action buttons row at bottom */}
-                              <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
+                              <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-100">
                                 <div className="flex items-center space-x-3">
                                   <button
                                     onClick={() => handleViewCoverLetter(coverLetter)}
@@ -837,6 +847,16 @@ const AuthenticatedCoverLetter = () => {
                                     <Eye className="h-3 w-3 mr-1" />
                                     View
                                   </button>
+                                  
+                                  {coverLetter.analysis_result_id && (
+                                    <button
+                                      onClick={() => handleViewCVAnalysis(coverLetter.analysis_result_id)}
+                                      className="flex items-center px-2 py-1 text-xs text-green-600 hover:text-green-700 hover:bg-green-50 rounded-md transition-colors"
+                                    >
+                                      <FileText className="h-3 w-3 mr-1" />
+                                      View CV Analysis
+                                    </button>
+                                  )}
                                   
                                   <DownloadOptions
                                     content={coverLetter.content}
@@ -874,7 +894,7 @@ const AuthenticatedCoverLetter = () => {
                                       e.preventDefault();
                                       if (currentPage > 1) setCurrentPage(currentPage - 1);
                                     }}
-                                    className={currentPage <= 1 ? 'pointer-events-none opacity-50' : ''}
+                                    className={`${currentPage <= 1 ? 'pointer-events-none opacity-50' : ''} text-sm font-normal`}
                                   />
                                 </PaginationItem>
                                 
@@ -887,6 +907,7 @@ const AuthenticatedCoverLetter = () => {
                                         setCurrentPage(page);
                                       }}
                                       isActive={currentPage === page}
+                                      className="text-sm font-normal"
                                     >
                                       {page}
                                     </PaginationLink>
@@ -900,7 +921,7 @@ const AuthenticatedCoverLetter = () => {
                                       e.preventDefault();
                                       if (currentPage < totalPages) setCurrentPage(currentPage + 1);
                                     }}
-                                    className={`${currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''} font-normal`}
+                                    className={`${currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''} text-sm font-normal`}
                                   />
                                 </PaginationItem>
                               </PaginationContent>

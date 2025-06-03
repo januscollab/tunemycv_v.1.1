@@ -317,7 +317,7 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
                 </div>
                 
                 {/* Action buttons */}
-                <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
+                <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-100">
                   <div className="flex items-center space-x-3">
                     <button
                       onClick={() => handleView(document)}
@@ -364,7 +364,7 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
                         e.preventDefault();
                         if (currentPage > 1) setCurrentPage(currentPage - 1);
                       }}
-                      className={`${currentPage <= 1 ? 'pointer-events-none opacity-50' : ''} font-normal`}
+                      className={`${currentPage <= 1 ? 'pointer-events-none opacity-50' : ''} text-sm font-normal`}
                     />
                   </PaginationItem>
                   
@@ -377,7 +377,7 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
                           setCurrentPage(page);
                         }}
                         isActive={currentPage === page}
-                        className="font-normal"
+                        className="text-sm font-normal"
                       >
                         {page}
                       </PaginationLink>
@@ -391,7 +391,7 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
                         e.preventDefault();
                         if (currentPage < totalPages) setCurrentPage(currentPage + 1);
                       }}
-                      className={`${currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''} font-normal`}
+                      className={`${currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''} text-sm font-normal`}
                     />
                   </PaginationItem>
                 </PaginationContent>

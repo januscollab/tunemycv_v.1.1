@@ -14,6 +14,14 @@ const EditableCoverLetter: React.FC<EditableCoverLetterProps> = ({ content, onSa
   const [originalContent] = useState(content);
   const { toast } = useToast();
 
+  // Calculate dynamic height based on content
+  const calculateHeight = (text: string) => {
+    const lines = text.split('\n').length;
+    const estimatedLinesFromContent = Math.ceil(text.length / 80); // Rough estimate
+    const totalLines = Math.max(lines, estimatedLinesFromContent, 25); // Minimum 25 lines
+    return Math.min(totalLines * 24 + 40, window.innerHeight * 0.7); // Max 70% of viewport
+  };
+
   useEffect(() => {
     setEditedContent(content);
   }, [content]);
@@ -43,8 +51,8 @@ const EditableCoverLetter: React.FC<EditableCoverLetterProps> = ({ content, onSa
         <Textarea
           value={editedContent}
           onChange={(e) => setEditedContent(e.target.value)}
-          rows={30}
-          className="w-full font-sans text-sm leading-relaxed resize-none min-h-[600px]"
+          className="w-full font-sans text-sm leading-relaxed resize-none border-0 focus:ring-0 bg-transparent"
+          style={{ height: `${calculateHeight(editedContent)}px` }}
           placeholder="Edit your cover letter content here..."
         />
       </div>
