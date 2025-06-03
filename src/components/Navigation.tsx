@@ -33,7 +33,7 @@ const Navigation = () => {
       label: 'Analyze CV' 
     },
     { path: '/cover-letter', label: 'Cover Letter' },
-    { path: user ? '/analyze?tab=interview-prep' : '/analyze?tab=interview-prep', label: 'Interview Prep' },
+    { path: user ? '/analyze?tab=interview-prep' : '/interview-prep', label: 'Interview Prep' },
     { path: '/resources', label: 'Resources' },
   ];
 
@@ -43,6 +43,9 @@ const Navigation = () => {
     }
     if (path === '/analyze?tab=analysis') {
       return location.pathname === '/analyze' && (location.search.includes('tab=analysis') || location.search === '');
+    }
+    if (path === '/interview-prep') {
+      return location.pathname === '/interview-prep';
     }
     return location.pathname === path;
   };

@@ -301,7 +301,7 @@ const AnalyzeCV = () => {
             <FileText className="h-12 w-12 text-zapier-orange mr-6 mt-2" />
             <div>
               <h1 className="text-4xl md:text-5xl font-bold text-earth dark:text-white mb-4">
-                Analyze Your CV & Interview Prep
+                Analyze Your CV
               </h1>
               <p className="text-xl text-earth/70 dark:text-white/70 max-w-3xl font-normal">
                 Get comprehensive compatibility analysis with actionable recommendations to improve your job application success.
