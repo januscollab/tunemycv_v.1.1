@@ -9,6 +9,8 @@ import AnalyzeCV from './pages/AnalyzeCV';
 import CoverLetter from './pages/CoverLetter';
 import InterviewPrep from './pages/InterviewPrep';
 import Profile from './pages/Profile';
+import AdminDashboard from './pages/AdminDashboard';
+import AdminRoute from './components/admin/AdminRoute';
 import Resources from './pages/Resources';
 import HelpCentre from './pages/HelpCentre';
 import PrivacyPolicy from './pages/PrivacyPolicy';
@@ -50,6 +52,7 @@ function App() {
                 <Route path="/cover-letter" element={<CoverLetter />} />
                 <Route path="/interview-prep" element={<InterviewPrep />} />
                 <Route path="/profile" element={<Profile />} />
+                <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
                 <Route path="/resources" element={<Resources />} />
                 <Route path="/help-centre" element={<HelpCentre />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />

@@ -187,7 +187,7 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
         state: {
           coverLetterId: document.id,
           viewMode: true,
-          activeTab: 'result'
+          activeTab: 'Current Result'
         }
       });
     }

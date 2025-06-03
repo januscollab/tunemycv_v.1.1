@@ -1,8 +1,9 @@
 
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, LogOut, ChevronDown } from 'lucide-react';
+import { User, LogOut, ChevronDown, Shield } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { toast } from 'sonner';
 
 interface UserProfileDropdownProps {
@@ -15,6 +16,7 @@ const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({ userDisplayNa
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const { signOut } = useAuth();
+  const { isAdmin } = useAdminAuth();
 
   const handleLogout = async () => {
     if (isLoggingOut) return;
@@ -58,7 +60,7 @@ const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({ userDisplayNa
             className="fixed inset-0 z-10" 
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-border rounded-lg shadow-lg z-20">
+           <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-border rounded-lg shadow-lg z-20">
             <Link
               to="/profile"
               onClick={() => setIsOpen(false)}
@@ -67,6 +69,16 @@ const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({ userDisplayNa
               <User className="h-4 w-4 mr-2 inline" />
               Profile Settings
             </Link>
+            {isAdmin && (
+              <Link
+                to="/admin"
+                onClick={() => setIsOpen(false)}
+                className="block px-4 py-3 text-sm text-earth hover:bg-cream/50 transition-colors border-t border-border"
+              >
+                <Shield className="h-4 w-4 mr-2 inline" />
+                Admin Dashboard
+              </Link>
+            )}
             <button
               onClick={() => {
                 setIsOpen(false);
