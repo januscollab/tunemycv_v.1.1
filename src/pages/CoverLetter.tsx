@@ -639,20 +639,24 @@ const AuthenticatedCoverLetter = () => {
                               Save Cover Letter
                             </Button>
                           )}
-                          <DownloadOptions
-                            content={selectedCoverLetter.content}
-                            fileName={`Cover_Letter_${selectedCoverLetter.company_name}_${selectedCoverLetter.job_title}`}
-                            triggerComponent={
-                              <button className="flex items-center text-sm text-gray-600 hover:text-zapier-orange transition-colors px-3 py-1 rounded border border-gray-300 hover:border-zapier-orange">
-                                <Download className="h-4 w-4 mr-1" />
-                                Download
-                              </button>
-                            }
-                          />
                         </div>
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-4 pt-0">
+                      {/* Download option above edit area */}
+                      <div className="flex justify-end">
+                        <DownloadOptions
+                          content={selectedCoverLetter.content}
+                          fileName={`Cover_Letter_${selectedCoverLetter.company_name}_${selectedCoverLetter.job_title}`}
+                          triggerComponent={
+                            <div className="flex items-center text-sm text-gray-600 hover:text-zapier-orange transition-colors cursor-pointer">
+                              <Download className="h-4 w-4 mr-1" />
+                              Download
+                            </div>
+                          }
+                        />
+                      </div>
+
                       <EditableCoverLetter
                         content={selectedCoverLetter.content}
                         onSave={handleUpdateCoverLetter}
