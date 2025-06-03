@@ -1,130 +1,61 @@
 import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { FileText, Sparkles, Trash2, RefreshCw, Clock, FileUp, Search, AlertCircle, Eye, Edit, Download, History, RotateCcw } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
 import { useCoverLetter } from '@/hooks/useCoverLetter';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { Edit, History, FileText, Download, Eye, Trash2, RotateCcw } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useUserData } from '@/hooks/useUserData';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
 import EmbeddedAuth from '@/components/auth/EmbeddedAuth';
 import ServiceExplanation from '@/components/common/ServiceExplanation';
 import CreditsPanel from '@/components/analyze/CreditsPanel';
-import JobDescriptionInput from '@/components/analyze/JobDescriptionInput';
 import AnalysisSelector from '@/components/cover-letter/AnalysisSelector';
-import NoAnalysisModal from '@/components/cover-letter/NoAnalysisModal';
 import AdvancedGenerationOptions from '@/components/cover-letter/AdvancedGenerationOptions';
 import DownloadOptions from '@/components/cover-letter/DownloadOptions';
 import EditableCoverLetter from '@/components/cover-letter/EditableCoverLetter';
-import { UploadedFile } from '@/types/fileTypes';
-import { useLocation, useNavigate } from 'react-router-dom';
+import NoAnalysisModal from '@/components/cover-letter/NoAnalysisModal';
+import CoverLetterLoggedOut from '@/components/cover-letter/CoverLetterLoggedOut';
 
-interface CoverLetterResult {
-  id: string;
-  job_title: string;
-  company_name: string;
-  content: string;
-  created_at: string;
-  template_id: string;
-  analysis_result_id: string | null;
-  regeneration_count: number;
-}
+const CoverLetter = () => {
+  const { user } = useAuth();
 
-interface CoverLetterProps {
-  coverLetter: CoverLetterResult;
-  viewMode: boolean;
-}
+  // If user is not authenticated, show the logged-out landing page
+  if (!user) {
+    return <CoverLetterLoggedOut />;
+  }
 
-const CoverLetterLoggedOut = () => {
-  const coverLetterExplanation = {
-    title: '',
-    subtitle: '',
-    benefits: [
-      'AI-powered cover letter generation tailored to your CV and the job description',
-      'Customizable templates and tones to match your personal brand',
-      'Optimized content to highlight your key skills and experience'
-    ],
-    features: [
-      'Upload your CV and the job description for instant analysis',
-      'Choose from a variety of templates and writing styles',
-      'Edit and refine the generated cover letter to perfection'
-    ]
-  };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
-      <div className="max-w-5xl mx-auto px-4 py-12">
-        <div className="flex items-start mb-8">
-          <Edit className="h-12 w-12 text-zapier-orange mr-6 mt-2" />
-          <div>
-            <h1 className="text-4xl md:text-5xl font-bold text-earth dark:text-white mb-4">
-              Generate Your Cover Letter
-            </h1>
-            <p className="text-xl text-earth/70 dark:text-white/70 max-w-3xl font-normal">
-              Create a personalized cover letter that highlights your skills and experience, tailored to the job description.
-            </p>
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-[500px] mt-12 w-4/5 mx-auto">
-          <div className="flex items-start">
-            <ServiceExplanation
-              title={coverLetterExplanation.title}
-              subtitle={coverLetterExplanation.subtitle}
-              benefits={coverLetterExplanation.benefits}
-              features={coverLetterExplanation.features}
-              icon={<Edit className="h-8 w-8 text-zapier-orange" />}
-              compact={true}
-            />
-          </div>
-          <div className="flex flex-col justify-end">
-            <div className="flex justify-center">
-              <div className="w-full max-w-sm">
-                <EmbeddedAuth
-                  title="Login to Get Started"
-                  description="Cover letter generation requires an account to ensure personalized results and save your cover letter history."
-                  icon={<Edit className="h-6 w-6 text-zapier-orange mr-2" />}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  // If user is authenticated, show the full cover letter interface
+  return <AuthenticatedCoverLetter />;
 };
 
 const AuthenticatedCoverLetter = () => {
   const { user } = useAuth();
-  const { toast } = useToast();
+  const { credits } = useUserData();
   const location = useLocation();
-  const navigate = useNavigate();
-  
-  // Get initial tab from URL parameter or location state
-  const urlParams = new URLSearchParams(location.search);
-  const tabFromUrl = urlParams.get('tab');
-  const initialTab = tabFromUrl || 'create';
-  const [activeTab, setActiveTab] = useState(initialTab);
-
-  // Handle pre-loaded analysis from navigation state
-  const navigationState = location.state as { analysis?: any; coverLetter?: any; viewMode?: boolean; generationMethod?: 'input' | 'analysis'; activeTab?: string } | null;
-  const [preloadedAnalysis, setPreloadedAnalysis] = useState(navigationState?.analysis || null);
-  const [viewMode, setViewMode] = useState(navigationState?.viewMode || false);
-
-  const {
-    generateCoverLetter,
-    generateFromAnalysis,
-    regenerateCoverLetter,
-    getCoverLetters,
-    updateCoverLetter,
-    deleteCoverLetter,
-    isGenerating,
+  const { 
+    generateCoverLetter, 
+    generateFromAnalysis, 
+    regenerateCoverLetter, 
+    getCoverLetters, 
+    deleteCoverLetter, 
+    updateCoverLetter, 
+    isGenerating, 
     isRegenerating,
     analyses,
     selectedAnalysisId,
@@ -143,250 +74,293 @@ const AuthenticatedCoverLetter = () => {
     setShowNoAnalysisModal,
     resetForm
   } = useCoverLetter();
-  const [coverLetterHistory, setCoverLetterHistory] = useState<CoverLetterResult[]>([]);
-  const [loadingHistory, setLoadingHistory] = useState(true);
-  const [credits, setCredits] = useState<number>(0);
-  const [jobDescriptionFile, setJobDescriptionFile] = useState<UploadedFile | null>(null);
-  const [cvFile, setCvFile] = useState<UploadedFile | null>(null);
-  const [workExperienceHighlights, setWorkExperienceHighlights] = useState('');
-  const [customHookOpener, setCustomHookOpener] = useState('');
-  const [personalValues, setPersonalValues] = useState('');
-  const [includeLinkedInUrl, setIncludeLinkedInUrl] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-
-  // Fetch user credits
-  const { data: userCredits } = useQuery({
-    queryKey: ['user-credits', user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-      const { data, error } = await supabase
-        .from('user_credits')
-        .select('credits')
-        .eq('user_id', user.id)
-        .single();
-      
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!user?.id,
+  
+  const [formData, setFormData] = useState({
+    jobTitle: '',
+    companyName: '',
+    jobDescription: '',
+    tone: 'professional',
+    length: 'concise'
   });
 
-  useEffect(() => {
-    if (userCredits && userCredits.credits !== null) {
-      setCredits(userCredits.credits);
-    }
-  }, [userCredits]);
+  const [advancedOptions, setAdvancedOptions] = useState({
+    workExperienceHighlights: '',
+    customHookOpener: '',
+    personalValues: '',
+    includeLinkedInUrl: false
+  });
+  
+  const [coverLetters, setCoverLetters] = useState<any[]>([]);
+  const [allCoverLetters, setAllCoverLetters] = useState<any[]>([]);
+  const [selectedCoverLetter, setSelectedCoverLetter] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState('create');
+  const [loadingHistory, setLoadingHistory] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [showSavePrompt, setShowSavePrompt] = useState(false);
+  const [generationMethod, setGenerationMethod] = useState<'input' | 'analysis'>('input');
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  // Load cover letter history on mount
+  const lengthOptions = [
+    { value: 'short', label: 'Short (150-200 words)', description: 'Brief and to the point' },
+    { value: 'concise', label: 'Concise (250-300 words)', description: 'Balanced length' },
+    { value: 'standard', label: 'Standard (350-400 words)', description: 'Comprehensive coverage' },
+    { value: 'detailed', label: 'Detailed (450-500 words)', description: 'In-depth presentation' }
+  ];
+
+  const toneOptions = [
+    { value: 'professional', label: 'Professional' },
+    { value: 'conversational', label: 'Conversational' },
+    { value: 'confident', label: 'Confident' },
+    { value: 'enthusiastic', label: 'Enthusiastic' },
+    { value: 'friendly', label: 'Friendly' }
+  ];
+
+  // Handle navigation state from analysis history
   useEffect(() => {
-    const fetchCoverLetterHistory = async () => {
-      setLoadingHistory(true);
-      try {
-        const data = await getCoverLetters();
-        setCoverLetterHistory(data);
-      } catch (error) {
-        toast({
-          title: 'Error',
-          description: 'Failed to load cover letter history',
-          variant: 'destructive',
-        });
-      } finally {
-        setLoadingHistory(false);
+    const state = location.state as { analysis?: any; coverLetter?: any; viewMode?: boolean; activeTab?: string } | null;
+    if (state?.coverLetter && state?.viewMode) {
+      console.log('Navigation state detected for viewing cover letter:', state.coverLetter);
+      setSelectedCoverLetter(state.coverLetter);
+      if (state.activeTab) {
+        setActiveTab(state.activeTab);
       }
+      // Clear the navigation state to prevent re-triggering
+      window.history.replaceState({}, document.title, location.pathname);
+    } else if (state?.analysis) {
+      console.log('Navigation state detected for creating cover letter:', state.analysis);
+      setGenerationMethod('analysis');
+      setSelectedAnalysisId(state.analysis.id);
+      
+      // Pre-populate form data from the analysis
+      setFormData(prev => ({
+        ...prev,
+        jobTitle: state.analysis.job_title || '',
+        companyName: state.analysis.company_name || ''
+      }));
+      
+      // Clear the navigation state to prevent re-triggering
+      window.history.replaceState({}, document.title, location.pathname);
+    }
+  }, [location.state, setSelectedAnalysisId]);
+
+  useEffect(() => {
+    if (user && activeTab === 'history') {
+      loadCoverLetterHistory();
+    }
+  }, [user, activeTab]);
+
+  // Calculate pagination
+  const totalPages = Math.ceil(allCoverLetters.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedCoverLetters = allCoverLetters.slice(startIndex, endIndex);
+
+  // Reset to first page when items per page changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [itemsPerPage]);
+
+  const loadCoverLetterHistory = async () => {
+    setLoadingHistory(true);
+    try {
+      const data = await getCoverLetters();
+      setAllCoverLetters(data);
+      setCoverLetters(data); // For backward compatibility
+    } catch (error) {
+      console.error('Failed to load cover letter history:', error);
+    } finally {
+      setLoadingHistory(false);
+    }
+  };
+
+  const validateForm = () => {
+    const errors: string[] = [];
+    
+    if (generationMethod === 'input') {
+      if (!formData.jobTitle.trim()) {
+        errors.push('Job title is required');
+      }
+      if (!formData.companyName.trim()) {
+        errors.push('Company name is required');
+      }
+      if (!formData.jobDescription.trim()) {
+        errors.push('Job description is required');
+      }
+    } else {
+      if (!selectedAnalysisId) {
+        errors.push('Please select an analysis to generate from');
+      }
+    }
+
+    if (credits < 1) {
+      errors.push('Insufficient credits. You need at least 1 credit to generate a cover letter.');
+    }
+
+    setValidationErrors(errors);
+    return errors.length === 0;
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    if (selectedCoverLetter && !hasUnsavedChanges) {
+      setHasUnsavedChanges(true);
+    }
+    // Clear validation errors when user starts typing
+    if (validationErrors.length > 0) {
+      setValidationErrors([]);
+    }
+  };
+
+  const handleGenerationMethodChange = (method: 'input' | 'analysis') => {
+    // Remove the incorrect check - let AnalysisSelector handle the empty state
+    setGenerationMethod(method);
+  };
+
+  const handleUseManualInput = () => {
+    setGenerationMethod('input');
+  };
+
+  const handleGenerate = async () => {
+    if (!validateForm()) {
+      return;
+    }
+
+    const generationParams = {
+      tone: formData.tone,
+      length: formData.length,
+      ...advancedOptions
     };
 
-    fetchCoverLetterHistory();
-  }, [getCoverLetters, toast]);
+    if (generationMethod === 'input') {
+      try {
+        const result = await generateCoverLetter({
+          jobTitle: formData.jobTitle,
+          companyName: formData.companyName,
+          jobDescription: formData.jobDescription,
+          ...generationParams
+        });
 
-  // Handle pre-loaded cover letter from navigation state
-  useEffect(() => {
-    if (navigationState?.coverLetter) {
-      // Load the cover letter into the state
-      setCoverLetter(navigationState.coverLetter);
-      
-      // Set the active tab to 'result'
-      setActiveTab('result');
-      
-      // Set view mode to true
-      setViewMode(navigationState.viewMode || false);
+        setSelectedCoverLetter({ ...result.coverLetter, isUnsaved: false });
+        setActiveTab('result');
+        setHasUnsavedChanges(false);
+        
+        if (coverLetters.length > 0) {
+          loadCoverLetterHistory();
+        }
+      } catch (error) {
+        console.error('Generation failed:', error);
+      }
+    } else {
+      try {
+        const result = await generateFromAnalysis({
+          analysisResultId: selectedAnalysisId,
+          ...generationParams
+        });
+
+        setSelectedCoverLetter({ ...result.coverLetter, isUnsaved: false });
+        setActiveTab('result');
+        setHasUnsavedChanges(false);
+        
+        if (coverLetters.length > 0) {
+          loadCoverLetterHistory();
+        }
+      } catch (error) {
+        console.error('Generation from analysis failed:', error);
+      }
     }
-  }, [navigationState?.coverLetter, navigationState?.viewMode]);
-
-  // Handle pre-loaded analysis from navigation state
-  useEffect(() => {
-    if (preloadedAnalysis) {
-      // Load the analysis into the state
-      setSelectedAnalysisId(preloadedAnalysis.id);
-      setCompanyName(preloadedAnalysis.company_name);
-      setJobTitle(preloadedAnalysis.job_title);
-    }
-  }, [preloadedAnalysis]);
-
-  // Handle tab change
-  const handleTabChange = (tab: string) => {
-    setActiveTab(tab);
   };
 
-  // Handle job description file upload
-  const handleJobDescriptionUpload = (file: UploadedFile) => {
-    setJobDescriptionFile(file);
-  };
-
-  // Handle CV file upload
-  const handleCVUpload = (file: UploadedFile) => {
-    setCvFile(file);
-  };
-
-  // Handle cover letter generation
-  const handleGenerateCoverLetter = async () => {
-    if (!jobTitle || !companyName) {
-      toast({
-        title: 'Missing Information',
-        description: 'Please provide both job title and company name.',
-        variant: 'destructive',
-      });
-      return;
+  const handleUpdateCoverLetter = async (newContent: string) => {
+    if (selectedCoverLetter) {
+      try {
+        await updateCoverLetter(selectedCoverLetter.id, newContent);
+        setSelectedCoverLetter(prev => ({ ...prev, content: newContent }));
+        loadCoverLetterHistory();
+      } catch (error) {
+        console.error('Update failed:', error);
+      }
     }
+  };
 
+  const handleRegenerate = async (coverLetterId: string, tone: string, length: string) => {
     try {
-      await generateCoverLetter({
-        jobTitle,
-        companyName,
-        jobDescription: jobDescriptionFile?.extractedText,
-        cvText: cvFile?.extractedText,
-        tone,
-        length,
-        workExperienceHighlights,
-        customHookOpener,
-        personalValues,
-        includeLinkedInUrl
-      });
-      setActiveTab('result');
-    } catch (error) {
-      // Error is already handled in the useCoverLetter hook
-    }
-  };
-
-  // Handle cover letter generation from analysis
-  const handleGenerateFromAnalysis = async () => {
-    if (!selectedAnalysisId) {
-      toast({
-        title: 'Missing Analysis',
-        description: 'Please select an analysis to generate a cover letter from.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    try {
-      await generateFromAnalysis({
-        analysisResultId: selectedAnalysisId,
-        tone,
-        length,
-        workExperienceHighlights,
-        customHookOpener,
-        personalValues,
-        includeLinkedInUrl
-      });
-      setActiveTab('result');
-    } catch (error) {
-      // Error is already handled in the useCoverLetter hook
-    }
-  };
-
-  // Handle cover letter regeneration
-  const handleRegenerateCoverLetter = async (coverLetterId: string) => {
-    try {
-      const regeneratedLetter = await regenerateCoverLetter({
+      const result = await regenerateCoverLetter({
         coverLetterId,
         tone,
-        length,
+        length
       });
 
-      // Update the cover letter content in the state
-      setCoverLetter(prevLetter => {
-        if (!prevLetter) return null;
-        return {
-          ...prevLetter,
-          content: regeneratedLetter.content,
-          regeneration_count: regeneratedLetter.regeneration_count
-        };
-      });
+      setSelectedCoverLetter(prev => ({ 
+        ...prev, 
+        content: result.content,
+        regeneration_count: result.regeneration_count 
+      }));
+      loadCoverLetterHistory();
     } catch (error) {
-      // Error is already handled in the useCoverLetter hook
+      console.error('Regeneration failed:', error);
     }
   };
 
-  // Handle view cover letter
-  const handleViewCoverLetter = (letter: CoverLetterResult) => {
-    setCoverLetter(letter);
-    setActiveTab('result');
-    setViewMode(true);
-  };
-
-  // Handle update cover letter
-  const handleUpdateCoverLetter = async (content: string) => {
-    if (!coverLetter) return;
-
-    try {
-      await updateCoverLetter(coverLetter.id, content);
-      // Update the cover letter content in the state
-      setCoverLetter(prevLetter => {
-        if (!prevLetter) return null;
-        return {
-          ...prevLetter,
-          content: content
-        };
-      });
-    } catch (error) {
-      // Error is already handled in the useCoverLetter hook
-    }
-  };
-
-  // Handle delete cover letter
-  const handleDeleteCoverLetter = async (id: string) => {
+  const handleDelete = async (id: string) => {
     try {
       await deleteCoverLetter(id);
-      setCoverLetterHistory(prev => prev.filter(letter => letter.id !== id));
-      if (coverLetter && coverLetter.id === id) {
-        setCoverLetter(null);
-        setActiveTab('create');
+      setAllCoverLetters(prev => prev.filter(cl => cl.id !== id));
+      setCoverLetters(prev => prev.filter(cl => cl.id !== id));
+      if (selectedCoverLetter?.id === id) {
+        setSelectedCoverLetter(null);
       }
     } catch (error) {
-      // Error is already handled in the useCoverLetter hook
+      console.error('Delete failed:', error);
     }
   };
 
-  // Clear URL state after it's been processed
-  useEffect(() => {
-    if (navigationState) {
-      // Clear the navigation state by replacing the current history entry
-      navigate(location.pathname + location.search, { replace: true });
+  const handleViewCoverLetter = (coverLetter: any) => {
+    setSelectedCoverLetter(coverLetter);
+    setActiveTab('result');
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString() + ' at ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  const getRemainingFreeRegenerations = (regenerationCount: number) => {
+    return Math.max(0, 2 - regenerationCount);
+  };
+
+  const canGenerate = generationMethod === 'input' 
+    ? (formData.jobTitle && formData.companyName && formData.jobDescription)
+    : selectedAnalysisId;
+
+  const handleEditCoverLetter = (coverLetter: any) => {
+    setSelectedCoverLetter(coverLetter);
+    setActiveTab('result');
+  };
+
+  const handleTabChange = (newTab: string) => {
+    if (hasUnsavedChanges && newTab !== activeTab) {
+      setShowSavePrompt(true);
+      return;
     }
-  }, []);
+    setActiveTab(newTab);
+  };
 
-  const hasCreditsForAI = userCredits?.credits && userCredits.credits > 0;
-
-  // Logged-out user experience
-  if (!user) {
-    return <CoverLetterLoggedOut />;
-  }
+  const confirmTabChange = (save: boolean) => {
+    if (save) {
+      // handleSaveCoverLetter();
+    } else {
+      setHasUnsavedChanges(false);
+    }
+    setShowSavePrompt(false);
+    setActiveTab('create');
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5 py-6">
-      {/* Loading overlay */}
-      {isGenerating && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-          <div className="bg-white dark:bg-blueberry/90 rounded-lg p-6 text-center max-w-md">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-apricot mx-auto mb-4"></div>
-            <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-2">Generating Your Cover Letter</h3>
-            <p className="text-blueberry/70 dark:text-apple-core/80 min-h-[1.5rem] transition-opacity duration-500 text-sm">
-              Please wait while we craft the perfect cover letter for you.
-            </p>
-          </div>
-        </div>
-      )}
-
       <div className="max-w-wider mx-auto px-4">
         <div className="mb-6">
           <div className="flex items-start mb-6">
@@ -395,34 +369,30 @@ const AuthenticatedCoverLetter = () => {
               <h1 className="text-3xl font-bold text-earth dark:text-white">
                 Generate Cover Letter
               </h1>
-              <p className="text-lg text-earth/70 dark:text-white/70 max-w-2xl mt-1">
-                Create personalized cover letters using AI or your existing CV analysis.
+              <p className="text-lg text-earth/70 dark:text-white/70 max-w-2xl mt-2">
+                Create tailored cover letters that highlight your strengths and align perfectly with specific job requirements.
               </p>
             </div>
           </div>
         </div>
 
-        {/* Floating Action Bar */}
-        {coverLetter && activeTab === 'result' && (
-          <div className="fixed bottom-0 left-0 w-full bg-white dark:bg-blueberry/50 border-t border-apple-core/20 dark:border-citrus/20 py-3 px-4">
-            <div className="max-w-wider mx-auto flex items-center justify-between">
-              <div className="text-sm text-gray-600 dark:text-gray-400">
-                Last updated: {new Date(coverLetter.updated_at || coverLetter.created_at).toLocaleDateString()}
-              </div>
-              <div className="space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsEditing(!isEditing)}
-                >
-                  {isEditing ? 'Stop Editing' : 'Edit'}
+        <NoAnalysisModal
+          isOpen={showNoAnalysisModal}
+          onClose={() => setShowNoAnalysisModal(false)}
+          onUseManualInput={() => setGenerationMethod('input')}
+        />
+
+        {showSavePrompt && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+            <div className="bg-white dark:bg-gray-800 rounded-md p-6 max-w-md border border-gray-200 dark:border-gray-700">
+              <h3 className="text-xl font-semibold mb-4 font-display">Unsaved Changes</h3>
+              <p className="mb-6 font-normal">You have unsaved changes. Would you like to save before continuing?</p>
+              <div className="flex space-x-4">
+                <Button onClick={() => confirmTabChange(true)} className="bg-zapier-orange hover:bg-zapier-orange/90">
+                  Save & Continue
                 </Button>
-                <Button
-                  variant="primary"
-                  size="sm"
-                  onClick={() => {}}
-                >
-                  Download
+                <Button variant="outline" onClick={() => confirmTabChange(false)}>
+                  Don't Save
                 </Button>
               </div>
             </div>
@@ -435,11 +405,11 @@ const AuthenticatedCoverLetter = () => {
             <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="create" className="flex items-center space-x-2 text-sm">
-                  <Edit className="h-4 w-4" />
-                  <span>Create</span>
+                  <Sparkles className="h-4 w-4" />
+                  <span>Generate New</span>
                 </TabsTrigger>
                 <TabsTrigger value="result" className="flex items-center space-x-2 text-sm">
-                  <FileText className="h-4 w-4" />
+                  <Eye className="h-4 w-4" />
                   <span>Current Result</span>
                 </TabsTrigger>
                 <TabsTrigger value="history" className="flex items-center space-x-2 text-sm">
@@ -448,308 +418,481 @@ const AuthenticatedCoverLetter = () => {
                 </TabsTrigger>
               </TabsList>
 
-              {/* Create Tab */}
-              <TabsContent value="create" className="mt-0">
-                <div className="space-y-6">
-                  {/* Generation Method Selection */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg font-semibold text-blueberry dark:text-citrus flex items-center">
-                        <Edit className="h-5 w-5 text-zapier-orange mr-2" />
-                        Choose Generation Method
+              <TabsContent value="create">
+                <div className="space-y-4">
+                  {/* Validation Errors */}
+                  {validationErrors.length > 0 && (
+                    <Alert variant="destructive">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertDescription>
+                        <ul className="list-disc list-inside space-y-1">
+                          {validationErrors.map((error, index) => (
+                            <li key={index}>{error}</li>
+                          ))}
+                        </ul>
+                      </AlertDescription>
+                    </Alert>
+                  )}
+
+                  {/* Panel 1: Generation Method Selection */}
+                  <Card className="border border-gray-200 dark:border-gray-700">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="flex items-center text-xl font-semibold">
+                        <Sparkles className="h-5 w-5 text-zapier-orange mr-2" />
+                        Generate Cover Letter
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <Button
-                          variant="outline"
-                          className={`justify-start ${preloadedAnalysis ? 'opacity-50 pointer-events-none' : ''}`}
-                          onClick={() => {
-                            setPreloadedAnalysis(null);
-                            resetForm();
-                          }}
-                          disabled={preloadedAnalysis}
-                        >
-                          <div className="flex items-center space-x-3">
-                            <FileText className="h-5 w-5 text-gray-500" />
-                            <div>
-                              <h3 className="font-medium text-blueberry dark:text-citrus">Manual Input</h3>
-                              <p className="text-sm text-gray-600 dark:text-gray-400">Enter job details manually</p>
+                    <CardContent className="space-y-4 pt-0">
+                      <div>
+                        <Label className="text-base font-medium">How would you like to generate your cover letter?</Label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+                          <button
+                            onClick={() => setGenerationMethod('input')}
+                            className={`p-4 border rounded-md text-left transition-colors ${
+                              generationMethod === 'input'
+                                ? 'border-zapier-orange bg-zapier-orange/5'
+                                : 'border-gray-200 hover:border-zapier-orange/50'
+                            }`}
+                          >
+                            <div className="flex items-center mb-2">
+                              <FileUp className="h-5 w-5 text-zapier-orange mr-2" />
+                              <span className="font-medium">Generate from Input</span>
                             </div>
-                          </div>
-                        </Button>
-                        <Button
-                          variant="outline"
-                          className={`justify-start ${!preloadedAnalysis ? 'opacity-50 pointer-events-none' : ''}`}
-                          onClick={handleGenerateFromAnalysis}
-                          disabled={!preloadedAnalysis}
-                        >
-                          <div className="flex items-center space-x-3">
-                            <History className="h-5 w-5 text-gray-500" />
-                            <div>
-                              <h3 className="font-medium text-blueberry dark:text-citrus">Use Existing Analysis</h3>
-                              <p className="text-sm text-gray-600 dark:text-gray-400">Generate from a previous CV analysis</p>
+                            <p className="text-sm font-normal text-gray-600">
+                              Enter job details manually to create a cover letter
+                            </p>
+                          </button>
+                          
+                          <button
+                            onClick={() => setGenerationMethod('analysis')}
+                            className={`p-4 border rounded-md text-left transition-colors ${
+                              generationMethod === 'analysis'
+                                ? 'border-zapier-orange bg-zapier-orange/5'
+                                : 'border-gray-200 hover:border-zapier-orange/50'
+                            }`}
+                          >
+                            <div className="flex items-center mb-2">
+                              <Search className="h-5 w-5 text-zapier-orange mr-2" />
+                              <span className="font-medium">Generate from Analysis</span>
                             </div>
-                          </div>
-                        </Button>
-                      </div>
-                      {preloadedAnalysis && (
-                        <div className="mt-4">
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
-                            Using analysis: {preloadedAnalysis.job_title} at {preloadedAnalysis.company_name}
-                            <Button
-                              variant="link"
-                              size="sm"
-                              onClick={() => setPreloadedAnalysis(null)}
-                              className="ml-2"
-                            >
-                              Change
-                            </Button>
-                          </p>
+                            <p className="text-sm font-normal text-gray-600">
+                              Use your previous CV analysis results
+                            </p>
+                          </button>
                         </div>
-                      )}
+                      </div>
                     </CardContent>
                   </Card>
 
-                  {/* Manual Input Form */}
-                  {!preloadedAnalysis && (
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-lg font-semibold text-blueberry dark:text-citrus flex items-center">
-                          <Edit className="h-5 w-5 text-zapier-orange mr-2" />
-                          Manual Input
-                        </CardTitle>
+                  {/* Panel 2: Job Details (only shown for input method) */}
+                  {generationMethod === 'input' && (
+                    <Card className="border border-gray-200 dark:border-gray-700">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-xl font-semibold text-left">Job Details</CardTitle>
                       </CardHeader>
-                      <CardContent className="space-y-4">
-                        {/* Job Title */}
-                        <div>
-                          <Label htmlFor="jobTitle" className="block text-sm font-medium text-blueberry dark:text-citrus mb-1">
-                            Job Title <span className="text-red-500">*</span>
-                          </Label>
-                          <Input
-                            type="text"
-                            id="jobTitle"
-                            value={jobTitle}
-                            onChange={(e) => setJobTitle(e.target.value)}
-                            placeholder="e.g., Senior Software Engineer"
-                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange focus:border-transparent bg-white dark:bg-gray-800 text-blueberry dark:text-citrus"
-                          />
+                      <CardContent className="space-y-4 pt-0">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor="jobTitle">Job Title *</Label>
+                            <Input
+                              id="jobTitle"
+                              placeholder="e.g., Marketing Manager"
+                              value={formData.jobTitle}
+                              onChange={(e) => handleInputChange('jobTitle', e.target.value)}
+                              className={validationErrors.includes('Job title is required') ? 'border-red-500' : ''}
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="companyName">Company Name *</Label>
+                            <Input
+                              id="companyName"
+                              placeholder="e.g., TechCorp"
+                              value={formData.companyName}
+                              onChange={(e) => handleInputChange('companyName', e.target.value)}
+                              className={validationErrors.includes('Company name is required') ? 'border-red-500' : ''}
+                            />
+                          </div>
                         </div>
 
-                        {/* Company Name */}
                         <div>
-                          <Label htmlFor="companyName" className="block text-sm font-medium text-blueberry dark:text-citrus mb-1">
-                            Company Name <span className="text-red-500">*</span>
-                          </Label>
-                          <Input
-                            type="text"
-                            id="companyName"
-                            value={companyName}
-                            onChange={(e) => setCompanyName(e.target.value)}
-                            placeholder="e.g., Tech Corp Inc."
-                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange focus:border-transparent bg-white dark:bg-gray-800 text-blueberry dark:text-citrus"
+                          <Label htmlFor="jobDescription">Job Description *</Label>
+                          <Textarea
+                            id="jobDescription"
+                            placeholder="Paste the complete job description here for the most tailored results..."
+                            value={formData.jobDescription}
+                            onChange={(e) => handleInputChange('jobDescription', e.target.value)}
+                            rows={6}
+                            className={validationErrors.includes('Job description is required') ? 'border-red-500' : ''}
                           />
-                        </div>
-
-                        {/* Job Description Input */}
-                        <div>
-                          <Label htmlFor="jobDescription" className="block text-sm font-medium text-blueberry dark:text-citrus mb-1">
-                            Job Description
-                          </Label>
-                          <JobDescriptionInput
-                            onJobDescriptionSet={handleJobDescriptionUpload}
-                            uploadedFile={jobDescriptionFile}
-                          />
-                        </div>
-
-                        {/* CV Upload */}
-                        <div>
-                          <Label htmlFor="cv" className="block text-sm font-medium text-blueberry dark:text-citrus mb-1">
-                            Your CV
-                          </Label>
-                          <JobDescriptionInput
-                            onJobDescriptionSet={handleCVUpload}
-                            uploadedFile={cvFile}
-                          />
+                          <p className="text-sm font-normal text-blueberry/70 dark:text-apple-core/70 mt-1">
+                            Job description is required for optimal cover letter generation
+                          </p>
                         </div>
                       </CardContent>
                     </Card>
                   )}
 
-                  {/* Analysis Selection */}
-                  {preloadedAnalysis && (
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-lg font-semibold text-blueberry dark:text-citrus flex items-center">
-                          <History className="h-5 w-5 text-zapier-orange mr-2" />
-                          Select Analysis
-                        </CardTitle>
+                  {/* Panel 3: Analysis Selection (only shown for analysis method) */}
+                  {generationMethod === 'analysis' && (
+                    <Card className="border border-gray-200 dark:border-gray-700">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-xl font-semibold">Select Analysis</CardTitle>
                       </CardHeader>
-                      <CardContent>
-                        <AnalysisSelector
-                          onAnalysisSelect={setSelectedAnalysisId}
-                          selectedAnalysisId={selectedAnalysisId}
-                        />
+                      <CardContent className="pt-0">
+                        <div>
+                          <Label>Select Analysis *</Label>
+                          <AnalysisSelector
+                            onAnalysisSelect={setSelectedAnalysisId}
+                            selectedAnalysisId={selectedAnalysisId}
+                            disabled={isGenerating}
+                          />
+                          {validationErrors.includes('Please select an analysis to generate from') && (
+                            <p className="text-sm text-red-600 mt-1">Please select an analysis to continue</p>
+                          )}
+                        </div>
                       </CardContent>
                     </Card>
                   )}
 
-                  {/* Advanced Generation Options */}
-                  <AdvancedGenerationOptions
-                    tone={tone}
-                    setTone={setTone}
-                    length={length}
-                    setLength={setLength}
-                    workExperienceHighlights={workExperienceHighlights}
-                    setWorkExperienceHighlights={setWorkExperienceHighlights}
-                    customHookOpener={customHookOpener}
-                    setCustomHookOpener={setCustomHookOpener}
-                    personalValues={personalValues}
-                    setPersonalValues={setPersonalValues}
-                    includeLinkedInUrl={includeLinkedInUrl}
-                    setIncludeLinkedInUrl={setIncludeLinkedInUrl}
-                  />
+                  {/* Panel 4: Settings and Options */}
+                  <Card className="border border-gray-200 dark:border-gray-700">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-xl font-semibold">Generation Settings</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4 pt-0">
+                      {/* Advanced Generation Options */}
+                      <AdvancedGenerationOptions
+                        value={advancedOptions}
+                        onChange={setAdvancedOptions}
+                      />
 
-                  {/* Generate Button */}
-                  <Button
-                    onClick={preloadedAnalysis ? handleGenerateFromAnalysis : handleGenerateCoverLetter}
-                    className="w-full bg-zapier-orange hover:bg-zapier-orange/90 text-white"
-                    disabled={isGenerating}
-                  >
-                    {isGenerating ? (
-                      <div className="flex items-center space-x-2">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                        <span>Generating...</span>
+                      {/* Tone and Length */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="tone">Tone</Label>
+                          <Select value={formData.tone} onValueChange={(value) => handleInputChange('tone', value)}>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {toneOptions.map((option) => (
+                                <SelectItem key={option.value} value={option.value}>
+                                  {option.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label htmlFor="length">Length</Label>
+                          <Select value={formData.length} onValueChange={(value) => handleInputChange('length', value)}>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {lengthOptions.map((option) => (
+                                <SelectItem key={option.value} value={option.value}>
+                                  {option.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </div>
-                    ) : (
-                      'Generate Cover Letter'
-                    )}
-                  </Button>
+                    </CardContent>
+                  </Card>
+
+                  {/* Panel 5: Generate Button */}
+                  <Card className="border border-gray-200 dark:border-gray-700">
+                    <CardContent className="pt-4">
+                      <Button
+                        onClick={handleGenerate}
+                        disabled={!canGenerate || isGenerating || credits < 1}
+                        className="w-full bg-zapier-orange hover:bg-zapier-orange/90 text-white font-medium"
+                      >
+                        {isGenerating ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                            Generating...
+                          </>
+                        ) : (
+                          'Generate Cover Letter'
+                        )}
+                      </Button>
+                      <div className="text-center mt-2 space-y-1">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          Our AI will generate a tailored cover letter, to help you stand out.
+                        </p>
+                        <p className="text-xs text-red-600 dark:text-red-400">
+                          Please provide above required info to continue
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
               </TabsContent>
 
-              {/* Current Result Tab */}
-              <TabsContent value="result" className="mt-0">
-                {coverLetter ? (
-                  <div className="space-y-6">
-                    {/* Download Actions */}
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-lg font-semibold text-blueberry dark:text-citrus flex items-center">
-                          <Download className="h-5 w-5 text-zapier-orange mr-2" />
-                          Download & Actions
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="flex flex-wrap gap-3">
-                          <DownloadOptions coverLetter={coverLetter} />
+              <TabsContent value="result">
+                {selectedCoverLetter ? (
+                  <Card className="border border-gray-200 dark:border-gray-700">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <CardTitle className="text-xl font-semibold">{selectedCoverLetter.job_title} at {selectedCoverLetter.company_name}</CardTitle>
+                          <div className="flex items-center gap-4 mt-2 text-sm font-normal text-gray-600 dark:text-gray-400">
+                            <div className="flex items-center gap-1">
+                              <Clock className="h-4 w-4" />
+                              Generated {formatDate(selectedCoverLetter.created_at)}
+                            </div>
+                            {selectedCoverLetter.regeneration_count > 0 && (
+                              <Badge variant="outline" className="text-xs">
+                                Iteration {selectedCoverLetter.regeneration_count + 1}
+                              </Badge>
+                            )}
+                          </div>
                         </div>
-                      </CardContent>
-                    </Card>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-4 pt-0">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center text-sm text-gray-600 hover:text-zapier-orange transition-colors cursor-pointer">
+                          <RotateCcw className="h-4 w-4 mr-1" />
+                          Revert to Original
+                        </div>
+                        <DownloadOptions
+                          content={selectedCoverLetter.content}
+                          fileName={`Cover_Letter_${selectedCoverLetter.company_name}_${selectedCoverLetter.job_title}`}
+                          triggerComponent={
+                            <div className="flex items-center text-sm text-gray-600 hover:text-zapier-orange transition-colors cursor-pointer">
+                              <Download className="h-4 w-4 mr-1" />
+                              Download
+                            </div>
+                          }
+                        />
+                      </div>
 
-                    {/* Editable Cover Letter */}
-                    <EditableCoverLetter
-                      coverLetter={coverLetter}
-                      onUpdate={handleUpdateCoverLetter}
-                    />
-                  </div>
+                      <EditableCoverLetter
+                        content={selectedCoverLetter.content}
+                        onSave={handleUpdateCoverLetter}
+                      />
+                      
+                      <div className="flex items-start justify-between pt-4 border-t">
+                        <div className="flex items-center space-x-4">
+                          <Select
+                            value={formData.tone}
+                            onValueChange={(value) => handleInputChange('tone', value)}
+                          >
+                            <SelectTrigger className="w-32">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="professional">Professional</SelectItem>
+                              <SelectItem value="conversational">Conversational</SelectItem>
+                              <SelectItem value="confident">Confident</SelectItem>
+                              <SelectItem value="enthusiastic">Enthusiastic</SelectItem>
+                              <SelectItem value="friendly">Friendly</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          
+                          <Select
+                            value={formData.length}
+                            onValueChange={(value) => handleInputChange('length', value)}
+                          >
+                            <SelectTrigger className="w-48">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {lengthOptions.map((option) => (
+                                <SelectItem key={option.value} value={option.value}>
+                                  {option.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div className="flex flex-col items-end">
+                          <button
+                            onClick={() => handleRegenerate(selectedCoverLetter.id, formData.tone, formData.length)}
+                            disabled={isRegenerating}
+                            className="bg-zapier-orange text-white px-4 py-2 rounded-md font-normal text-sm hover:bg-zapier-orange/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                          >
+                            {isRegenerating ? (
+                              <>
+                                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                                Regenerating...
+                              </>
+                            ) : (
+                              <>
+                                <RefreshCw className="h-4 w-4 mr-2" />
+                                Regenerate (1 Credit)
+                              </>
+                            )}
+                          </button>
+                          <div className="text-xs font-normal text-gray-500 mt-1">
+                            {getRemainingFreeRegenerations(selectedCoverLetter.regeneration_count || 0) > 0 
+                              ? `${getRemainingFreeRegenerations(selectedCoverLetter.regeneration_count || 0)} free regenerations left`
+                              : 'Additional regenerations: 1 credit each'
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 ) : (
-                  <Card>
-                    <CardContent className="flex flex-col items-center justify-center py-12">
-                      <FileText className="h-16 w-16 text-gray-400 mb-4" />
-                      <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                        No Cover Letter Generated
-                      </h3>
-                      <p className="text-gray-600 dark:text-gray-400 text-center mb-6">
-                        Generate your first cover letter using the Create tab to see it here.
+                  <Card className="border border-gray-200 dark:border-gray-700">
+                    <CardContent className="text-center py-8">
+                      <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                      <p className="text-gray-600 dark:text-gray-400 mb-2 font-normal">
+                        No cover letter generated yet.
                       </p>
-                      <Button
-                        onClick={() => setActiveTab('create')}
-                        className="bg-zapier-orange hover:bg-zapier-orange/90 text-white"
-                      >
-                        <Edit className="h-4 w-4 mr-2" />
-                        Create Cover Letter
-                      </Button>
+                      <p className="text-sm font-normal text-gray-500">
+                        Create one in the "Generate New" tab or view previous letters in "Document History".
+                      </p>
                     </CardContent>
                   </Card>
                 )}
               </TabsContent>
 
-              {/* History Tab */}
-              <TabsContent value="history" className="mt-0">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg font-semibold text-blueberry dark:text-citrus flex items-center">
-                      <History className="h-5 w-5 text-zapier-orange mr-2" />
-                      Cover Letter History
-                    </CardTitle>
+              <TabsContent value="history">
+                <Card className="border border-gray-200 dark:border-gray-700">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-xl font-semibold">History</CardTitle>
+                      {allCoverLetters.length > 0 && (
+                        <div className="flex items-center space-x-2">
+                          <span className="text-sm text-gray-600">Show:</span>
+                          <Select value={itemsPerPage.toString()} onValueChange={(value) => setItemsPerPage(Number(value))}>
+                            <SelectTrigger className="w-20">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="10">10</SelectItem>
+                              <SelectItem value="20">20</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <span className="text-sm text-gray-600">per page</span>
+                        </div>
+                      )}
+                    </div>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="pt-0">
                     {loadingHistory ? (
-                      <div className="flex items-center justify-center py-8">
-                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-zapier-orange"></div>
-                      </div>
-                    ) : coverLetterHistory.length === 0 ? (
+                      <div className="text-center py-8 font-normal">Loading...</div>
+                    ) : allCoverLetters.length === 0 ? (
                       <div className="text-center py-8">
                         <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                        <p className="text-gray-600 dark:text-gray-400">
-                          No cover letters generated yet.
+                        <p className="text-gray-600 dark:text-gray-400 font-normal">
+                          No cover letters created yet.
                         </p>
                       </div>
                     ) : (
-                      <div className="space-y-4">
-                        {coverLetterHistory.map((letter) => (
-                          <div
-                            key={letter.id}
-                            className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-zapier-orange/50 transition-colors"
-                          >
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1">
-                                <div className="flex items-center space-x-3 mb-2">
-                                  <FileText className="h-5 w-5 text-zapier-orange" />
-                                  <div>
-                                    <h4 className="font-medium text-blueberry dark:text-citrus">
-                                      {letter.job_title} at {letter.company_name}
-                                    </h4>
-                                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                                      Created {new Date(letter.created_at).toLocaleDateString()}
-                                      {letter.regeneration_count > 0 && (
-                                        <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                                          Regenerated {letter.regeneration_count} time{letter.regeneration_count !== 1 ? 's' : ''}
-                                        </span>
-                                      )}
-                                    </p>
+                      <>
+                        <div className="space-y-4">
+                          {paginatedCoverLetters.map((coverLetter) => (
+                            <div
+                              key={coverLetter.id}
+                              className="border rounded-md p-4 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-zapier-orange/50 transition-colors"
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <h3 className="font-medium">{coverLetter.job_title} at {coverLetter.company_name}</h3>
+                                    {coverLetter.regeneration_count > 0 && (
+                                      <Badge variant="outline" className="text-xs">
+                                        v{coverLetter.regeneration_count + 1}
+                                      </Badge>
+                                    )}
+                                  </div>
+                                  <div className="flex items-center gap-4 text-sm font-normal text-gray-600 dark:text-gray-400">
+                                    <div className="flex items-center gap-1">
+                                      <Clock className="h-3 w-3" />
+                                      Updated {formatDate(coverLetter.updated_at)}
+                                    </div>
                                   </div>
                                 </div>
-                                <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-2 mb-3">
-                                  {letter.content.substring(0, 150)}...
-                                </p>
+                                <div className="flex items-center space-x-3">
+                                  <button
+                                    onClick={() => handleViewCoverLetter(coverLetter)}
+                                    className="flex items-center text-sm text-gray-600 hover:text-zapier-orange transition-colors"
+                                  >
+                                    <Eye className="h-4 w-4 mr-1" />
+                                    View
+                                  </button>
+                                  <button
+                                    onClick={() => handleEditCoverLetter(coverLetter)}
+                                    className="flex items-center text-sm text-gray-600 hover:text-zapier-orange transition-colors"
+                                  >
+                                    <Edit className="h-4 w-4 mr-1" />
+                                    Edit
+                                  </button>
+                                  <DownloadOptions
+                                    content={coverLetter.content}
+                                    fileName={`Cover_Letter_${coverLetter.company_name}_${coverLetter.job_title}`}
+                                    triggerComponent={
+                                      <button className="text-sm text-gray-600 hover:text-zapier-orange transition-colors">
+                                        <Download className="h-4 w-4" />
+                                      </button>
+                                    }
+                                  />
+                                  <button
+                                    onClick={() => handleDelete(coverLetter.id)}
+                                    className="text-sm text-red-600 hover:text-zapier-orange transition-colors"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </button>
+                                </div>
                               </div>
                             </div>
-                            
-                            <div className="flex items-center space-x-2 pt-3 border-t border-gray-100 dark:border-gray-700">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleViewCoverLetter(letter)}
-                                className="text-xs"
-                              >
-                                <Eye className="h-4 w-4 mr-1" />
-                                View
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleDeleteCoverLetter(letter.id)}
-                                className="text-xs text-red-600 hover:text-red-700 hover:border-red-300"
-                              >
-                                <Trash2 className="h-4 w-4 mr-1" />
-                                Delete
-                              </Button>
-                            </div>
+                          ))}
+                        </div>
+
+                        {/* Pagination */}
+                        {totalPages > 1 && (
+                          <div className="mt-6 flex justify-center">
+                            <Pagination>
+                              <PaginationContent>
+                                <PaginationItem>
+                                  <PaginationPrevious 
+                                    href="#" 
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      if (currentPage > 1) setCurrentPage(currentPage - 1);
+                                    }}
+                                    className={currentPage <= 1 ? 'pointer-events-none opacity-50' : ''}
+                                  />
+                                </PaginationItem>
+                                
+                                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                                  <PaginationItem key={page}>
+                                    <PaginationLink
+                                      href="#"
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        setCurrentPage(page);
+                                      }}
+                                      isActive={currentPage === page}
+                                    >
+                                      {page}
+                                    </PaginationLink>
+                                  </PaginationItem>
+                                ))}
+                                
+                                <PaginationItem>
+                                  <PaginationNext 
+                                    href="#" 
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+                                    }}
+                                    className={currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''}
+                                  />
+                                </PaginationItem>
+                              </PaginationContent>
+                            </Pagination>
                           </div>
-                        ))}
-                      </div>
+                        )}
+                      </>
                     )}
                   </CardContent>
                 </Card>
@@ -766,20 +909,8 @@ const AuthenticatedCoverLetter = () => {
           </div>
         </div>
       </div>
-
-      {/* No Analysis Modal */}
-      <NoAnalysisModal
-        isOpen={showNoAnalysisModal}
-        onClose={() => setShowNoAnalysisModal(false)}
-      />
     </div>
   );
-};
-
-const CoverLetter = () => {
-  const { user } = useAuth();
-
-  return user ? <AuthenticatedCoverLetter /> : <CoverLetterLoggedOut />;
 };
 
 export default CoverLetter;
