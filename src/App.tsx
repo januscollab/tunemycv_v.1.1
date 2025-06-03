@@ -11,6 +11,7 @@ import Profile from './pages/Profile';
 import Resources from './pages/Resources';
 import HelpCentre from './pages/HelpCentre';
 import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
 import Navigation from './components/Navigation';
 import Footer from './components/Footer';
 import SecurityHeaders from './components/SecurityHeaders';
@@ -38,6 +39,7 @@ function App() {
                 <Route path="/resources" element={<Resources />} />
                 <Route path="/help-centre" element={<HelpCentre />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                <Route path="/terms-of-service" element={<TermsOfService />} />
               </Routes>
             </main>
             <Footer />
