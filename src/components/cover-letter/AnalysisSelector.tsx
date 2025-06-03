@@ -4,18 +4,21 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 import { FileText, Calendar } from 'lucide-react';
 
 interface AnalysisSelectorProps {
   onAnalysisSelect: (analysisId: string) => void;
   selectedAnalysisId?: string;
   disabled?: boolean;
+  onGenerate?: (selectedAnalysis: any) => Promise<void>;
 }
 
 const AnalysisSelector: React.FC<AnalysisSelectorProps> = ({
   onAnalysisSelect,
   selectedAnalysisId,
-  disabled = false
+  disabled = false,
+  onGenerate
 }) => {
   const { user } = useAuth();
 
@@ -43,6 +46,15 @@ const AnalysisSelector: React.FC<AnalysisSelectorProps> = ({
       day: 'numeric',
       year: 'numeric'
     });
+  };
+
+  const handleGenerate = async () => {
+    if (onGenerate && selectedAnalysisId) {
+      const selectedAnalysis = analyses?.find(a => a.id === selectedAnalysisId);
+      if (selectedAnalysis) {
+        await onGenerate(selectedAnalysis);
+      }
+    }
   };
 
   if (isLoading) {
@@ -92,8 +104,15 @@ const AnalysisSelector: React.FC<AnalysisSelectorProps> = ({
       </Select>
       
       {selectedAnalysisId && (
-        <div className="text-sm text-green-600 bg-green-50 p-2 rounded">
-          ✓ CV and job description will be used from your selected analysis
+        <div className="space-y-2">
+          <div className="text-sm text-green-600 bg-green-50 p-2 rounded">
+            ✓ CV and job description will be used from your selected analysis
+          </div>
+          {onGenerate && (
+            <Button onClick={handleGenerate} className="w-full">
+              Generate Cover Letter
+            </Button>
+          )}
         </div>
       )}
     </div>
