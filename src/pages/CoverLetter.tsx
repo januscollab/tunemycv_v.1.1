@@ -14,6 +14,14 @@ const CoverLetter = () => {
   const { user } = useAuth();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState('analysis');
+  const [selectedAnalysisId, setSelectedAnalysisId] = useState<string>('');
+  const [advancedOptions, setAdvancedOptions] = useState({
+    workExperienceHighlights: '',
+    customHookOpener: '',
+    personalValues: '',
+    includeLinkedInUrl: false
+  });
+  const [coverLetterContent, setCoverLetterContent] = useState('');
   
   // Get analysis data from navigation state if available
   const analysisFromState = location.state?.analysis;
@@ -22,12 +30,30 @@ const CoverLetter = () => {
   useEffect(() => {
     if (generationMethod === 'analysis' && analysisFromState) {
       setActiveTab('analysis');
+      setSelectedAnalysisId(analysisFromState.id || '');
     }
   }, [generationMethod, analysisFromState]);
 
   if (!user) {
     return <CoverLetterLoggedOut />;
   }
+
+  const handleAnalysisSelect = (analysisId: string) => {
+    setSelectedAnalysisId(analysisId);
+  };
+
+  const handleAdvancedOptionsChange = (newOptions: typeof advancedOptions) => {
+    setAdvancedOptions(newOptions);
+  };
+
+  const handleCoverLetterSave = (newContent: string) => {
+    setCoverLetterContent(newContent);
+  };
+
+  const handleGenerateCoverLetter = () => {
+    // TODO: Implement cover letter generation
+    console.log('Generating cover letter...');
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
@@ -55,7 +81,10 @@ const CoverLetter = () => {
                 </h2>
               </CardHeader>
               <CardContent>
-                <AnalysisSelector preselectedAnalysis={analysisFromState} />
+                <AnalysisSelector 
+                  onAnalysisSelect={handleAnalysisSelect}
+                  selectedAnalysisId={selectedAnalysisId}
+                />
               </CardContent>
             </Card>
           </TabsContent>
@@ -68,14 +97,25 @@ const CoverLetter = () => {
                 </h2>
               </CardHeader>
               <CardContent>
-                <AdvancedGenerationOptions />
+                <AdvancedGenerationOptions 
+                  value={advancedOptions}
+                  onChange={handleAdvancedOptionsChange}
+                />
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
 
-        <EditableCoverLetter />
-        <FloatingActionBar />
+        <EditableCoverLetter 
+          content={coverLetterContent}
+          onSave={handleCoverLetterSave}
+        />
+        <FloatingActionBar 
+          credits={10}
+          actionText="Generate Cover Letter"
+          onAction={handleGenerateCoverLetter}
+          creditCost={1}
+        />
       </div>
     </div>
   );
