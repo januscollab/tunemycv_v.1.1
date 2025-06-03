@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -116,10 +117,6 @@ export const useCoverLetter = () => {
     } finally {
       setIsGenerating(false);
     }
-  };
-
-  const updateCoverLetter = (content: string) => {
-    setCoverLetter({ ...coverLetter, content });
   };
 
   const downloadCoverLetter = () => {
@@ -349,7 +346,6 @@ export const useCoverLetter = () => {
     resetForm,
     generationOptions,
     updateGenerationOptions,
-    downloadCoverLetter,
-    updateCoverLetter
+    downloadCoverLetter
   };
 };
