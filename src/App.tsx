@@ -1,9 +1,10 @@
 
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
 import Index from './pages/Index';
+import Auth from './pages/Auth';
 import AnalyzeCV from './pages/AnalyzeCV';
 import CoverLetter from './pages/CoverLetter';
 import InterviewPrep from './pages/InterviewPrep';
@@ -21,6 +22,17 @@ import { Toaster } from "@/components/ui/toaster"
 // Create a client
 const queryClient = new QueryClient();
 
+// Component to handle scroll to top on route changes
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -28,10 +40,12 @@ function App() {
         <Router>
           <div className="flex flex-col min-h-screen">
             <SecurityHeaders />
+            <ScrollToTop />
             <Navigation />
             <main className="flex-grow">
               <Routes>
                 <Route path="/" element={<Index />} />
+                <Route path="/auth" element={<Auth />} />
                 <Route path="/analyze" element={<AnalyzeCV />} />
                 <Route path="/cover-letter" element={<CoverLetter />} />
                 <Route path="/interview-prep" element={<InterviewPrep />} />
