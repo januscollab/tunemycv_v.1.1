@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { RotateCcw } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
@@ -12,19 +12,37 @@ interface EditableCoverLetterProps {
 const EditableCoverLetter: React.FC<EditableCoverLetterProps> = ({ content, onSave }) => {
   const [editedContent, setEditedContent] = useState(content);
   const [originalContent] = useState(content);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { toast } = useToast();
 
-  // Calculate dynamic height based on content
-  const calculateHeight = (text: string) => {
-    const lines = text.split('\n').length;
-    const estimatedLinesFromContent = Math.ceil(text.length / 80); // Rough estimate
-    const totalLines = Math.max(lines, estimatedLinesFromContent, 25); // Minimum 25 lines
-    return Math.min(totalLines * 24 + 40, window.innerHeight * 0.7); // Max 70% of viewport
+  // Auto-resize textarea based on content
+  const adjustTextareaHeight = () => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      const scrollHeight = textareaRef.current.scrollHeight;
+      const minHeight = 400; // Minimum height for cover letters
+      const maxHeight = window.innerHeight * 0.7; // Max 70% of viewport
+      const newHeight = Math.max(minHeight, Math.min(scrollHeight, maxHeight));
+      textareaRef.current.style.height = `${newHeight}px`;
+    }
   };
 
   useEffect(() => {
     setEditedContent(content);
   }, [content]);
+
+  // Auto-resize textarea when content changes
+  useEffect(() => {
+    adjustTextareaHeight();
+  }, [editedContent]);
+
+  // Auto-resize on component mount and window resize
+  useEffect(() => {
+    adjustTextareaHeight();
+    const handleResize = () => adjustTextareaHeight();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Auto-save functionality with debounce
   useEffect(() => {
@@ -45,14 +63,21 @@ const EditableCoverLetter: React.FC<EditableCoverLetterProps> = ({ content, onSa
     });
   };
 
+  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setEditedContent(e.target.value);
+    // Trigger resize on next tick to ensure content is updated
+    setTimeout(adjustTextareaHeight, 0);
+  };
+
   return (
     <div className="space-y-4">
       <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
         <Textarea
+          ref={textareaRef}
           value={editedContent}
-          onChange={(e) => setEditedContent(e.target.value)}
-          className="w-full font-sans text-sm leading-relaxed resize-none border-0 focus:ring-0 bg-transparent"
-          style={{ height: `${calculateHeight(editedContent)}px` }}
+          onChange={handleContentChange}
+          className="w-full font-sans text-sm leading-relaxed resize-none border-0 focus:ring-0 bg-transparent overflow-hidden"
+          style={{ minHeight: '400px' }}
           placeholder="Edit your cover letter content here..."
         />
       </div>

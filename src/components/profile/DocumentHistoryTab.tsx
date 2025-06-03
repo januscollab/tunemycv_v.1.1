@@ -14,6 +14,7 @@ import {
   PaginationPrevious,
 } from '@/components/ui/pagination';
 import DownloadOptions from '@/components/cover-letter/DownloadOptions';
+import EditTitleDialog from '@/components/ui/edit-title-dialog';
 
 interface DocumentItem {
   id: string;
@@ -42,6 +43,7 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [filterType, setFilterType] = useState<'all' | 'analysis' | 'cover_letter'>('all');
+  const [editingDocument, setEditingDocument] = useState<{id: string, title: string, type: 'analysis' | 'cover_letter'} | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -178,6 +180,15 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
     }
   };
 
+  const handleViewCVAnalysis = async (analysisId: string) => {
+    navigate('/analyze', { 
+      state: { 
+        analysisId: analysisId,
+        activeTab: 'results'
+      } 
+    });
+  };
+
   // Filter documents
   const filteredDocuments = documents.filter(doc => 
     filterType === 'all' || doc.type === filterType
@@ -208,7 +219,7 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Document History</h2>
           <p className="text-gray-600 mt-1">
-            Complete catalog of all your CV analyses and cover letters ({filteredDocuments.length} total)
+            {filteredDocuments.length} total
           </p>
         </div>
         
@@ -261,31 +272,21 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
         <>
           <div className="space-y-4">
             {paginatedDocuments.map((document) => (
-              <div key={`${document.type}-${document.id}`} className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow hover:border-zapier-orange/50">
+              <div key={`${document.type}-${document.id}`} className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow hover:border-zapier-orange/50 relative">
                 <div className="flex justify-between items-start">
                   <div className="flex-1 pr-4">
                     <div className="flex items-center space-x-3 mb-2">
-                      <div className="flex items-center space-x-2">
-                        {document.type === 'analysis' ? (
-                          <FileText className="h-4 w-4 text-blue-600" />
-                        ) : (
-                          <FileText className="h-4 w-4 text-green-600" />
-                        )}
-                        <span className="text-xs uppercase font-medium text-gray-500">
-                          {document.type === 'analysis' ? 'CV Analysis' : 'Cover Letter'}
-                        </span>
-                      </div>
-                      
                       <h3 className="text-lg font-medium text-gray-900">
                         {document.job_title || 'Untitled'}
                       </h3>
-                      
                       <button
-                        onClick={() => {
-                          const newTitle = prompt('Edit job title:', document.job_title || '');
-                          if (newTitle && newTitle.trim()) {
-                            handleEditTitle(document.id, newTitle.trim(), document.type);
-                          }
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingDocument({
+                            id: document.id,
+                            title: document.job_title || '',
+                            type: document.type
+                          });
                         }}
                         className="text-gray-400 hover:text-zapier-orange transition-colors"
                         title="Edit title"
@@ -306,7 +307,7 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
                       )}
                     </div>
                     
-                    <div className="flex items-center text-sm text-gray-600 mb-3">
+                    <div className="flex items-center text-sm text-gray-600 mb-1">
                       <Building className="h-4 w-4 mr-1" />
                       <span>{document.company_name || 'Company not specified'}</span>
                       <span className="mx-2">•</span>
@@ -314,35 +315,71 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
                       <span>{new Date(document.created_at).toLocaleDateString()} at {new Date(document.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                     </div>
                   </div>
+                  
+                  {/* Document type identifier on the right */}
+                  <div className="text-xs uppercase font-medium text-gray-500 flex items-center">
+                    {document.type === 'analysis' ? (
+                      <span className="flex items-center">
+                        <FileText className="h-3 w-3 mr-1 text-blue-600" />
+                        CV Analysis
+                      </span>
+                    ) : (
+                      <span className="flex items-center">
+                        <FileText className="h-3 w-3 mr-1 text-green-600" />
+                        Cover Letter
+                      </span>
+                    )}
+                  </div>
                 </div>
                 
-                {/* Action buttons */}
+                {/* Action buttons row at bottom */}
                 <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-100">
                   <div className="flex items-center space-x-3">
                     <button
-                      onClick={() => handleView(document)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleView(document);
+                      }}
                       className="flex items-center px-2 py-1 text-xs text-black hover:text-zapier-orange transition-colors"
                     >
                       <Eye className="h-3 w-3 mr-1" />
                       View
                     </button>
                     
-                    {document.type === 'analysis' && (
-                      <DownloadOptions
-                        content={`CV Analysis Report for ${document.job_title}`}
-                        fileName={`CV_Analysis_${document.job_title?.replace(/[^a-zA-Z0-9]/g, '_') || 'Report'}_${new Date().toISOString().split('T')[0]}`}
-                        triggerComponent={
-                          <button className="flex items-center px-2 py-1 text-xs text-black hover:text-zapier-orange hover:bg-zapier-orange/10 rounded-md transition-colors">
-                            <Download className="h-3 w-3 mr-1" />
-                            Download
-                          </button>
-                        }
-                      />
+                    {document.type === 'cover_letter' && document.analysis_result_id && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleViewCVAnalysis(document.analysis_result_id!);
+                        }}
+                        className="flex items-center px-2 py-1 text-xs text-green-600 hover:text-green-700 hover:bg-green-50 rounded-md transition-colors"
+                      >
+                        <FileText className="h-3 w-3 mr-1" />
+                        View CV Analysis
+                      </button>
                     )}
+                    
+                    <DownloadOptions
+                      content={document.type === 'analysis' 
+                        ? `CV Analysis Report for ${document.job_title}` 
+                        : document.content || `Cover Letter for ${document.job_title}`
+                      }
+                      fileName={`${document.type === 'analysis' ? 'CV_Analysis' : 'Cover_Letter'}_${document.job_title?.replace(/[^a-zA-Z0-9]/g, '_') || 'Document'}_${new Date().toISOString().split('T')[0]}`}
+                      triggerComponent={
+                        <button className="flex items-center px-2 py-1 text-xs text-black hover:text-zapier-orange hover:bg-zapier-orange/10 rounded-md transition-colors">
+                          <Download className="h-3 w-3 mr-1" />
+                          Download
+                        </button>
+                      }
+                    />
                   </div>
                   
+                  {/* Delete button in bottom right */}
                   <button
-                    onClick={() => handleDelete(document.id, document.type)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(document.id, document.type);
+                    }}
                     className="p-1 text-xs text-red-600 hover:text-zapier-orange transition-colors"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -400,6 +437,19 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
           )}
         </>
       )}
+
+      <EditTitleDialog
+        isOpen={!!editingDocument}
+        onClose={() => setEditingDocument(null)}
+        onSave={(newTitle) => {
+          if (editingDocument) {
+            handleEditTitle(editingDocument.id, newTitle, editingDocument.type);
+          }
+          setEditingDocument(null);
+        }}
+        currentTitle={editingDocument?.title || ''}
+        titleType={editingDocument?.type === 'analysis' ? 'analysis' : 'cover-letter'}
+      />
     </div>
   );
 };
