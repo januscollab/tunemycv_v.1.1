@@ -38,10 +38,11 @@ const Index = () => {
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
             <Link
-              to="/resources"
+              to={user ? "/cover-letter" : "/auth"}
+              state={user ? undefined : { from: '/cover-letter' }}
               className="border border-earth/20 dark:border-white/20 text-earth dark:text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-earth/5 dark:hover:bg-white/5 transition-colors"
             >
-              Explore Resources
+              Create Cover Letter
             </Link>
           </div>
 
@@ -102,6 +103,7 @@ const Index = () => {
               </p>
               <Link
                 to={user ? "/cover-letter" : "/auth"}
+                state={user ? undefined : { from: '/cover-letter' }}
                 className="text-zapier-orange font-semibold hover:text-zapier-orange/80 transition-colors inline-flex items-center"
               >
                 Generate Letter <ArrowRight className="ml-1 h-4 w-4" />
