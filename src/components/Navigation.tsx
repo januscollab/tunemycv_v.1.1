@@ -34,7 +34,7 @@ const Navigation = () => {
     },
     { path: '/cover-letter', label: 'Cover Letter' },
     { path: user ? '/analyze?tab=interview-prep' : '/interview-prep', label: 'Interview Prep' },
-    { path: '/pricing-scale', label: 'Pricing' },
+    ...(user ? [{ path: '/pricing-scale', label: 'Pricing' }] : []),
     { path: '/resources', label: 'Resources' },
   ];
 

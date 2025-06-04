@@ -91,7 +91,7 @@ const PricingScale = () => {
         {/* Pricing Slider */}
         <div className="mb-16 max-w-4xl mx-auto">
           <Card className="bg-white dark:bg-blueberry/20 border-2 border-zapier-orange/50 dark:border-zapier-orange/60 p-8 shadow-xl shadow-zapier-orange/20">
-            <CardHeader className="pb-6 pt-4">
+            <CardHeader className="pb-6 pt-2">
               <CardTitle className="text-2xl font-bold text-earth dark:text-white text-left">
                 Simple Pay As you go Pricing
               </CardTitle>
@@ -143,9 +143,9 @@ const PricingScale = () => {
                   ) : (
                     <>
                       <div className="flex items-baseline space-x-2">
-                        <span className="text-3xl text-zapier-orange font-bold">${currentTier.price}</span>
+                        <span className="text-2xl text-zapier-orange font-bold">${currentTier.price}</span>
                         <span className="text-xl text-earth dark:text-white">for</span>
-                        <span className="text-3xl text-zapier-orange font-bold">{currentTier.credits} Credits</span>
+                        <span className="text-2xl text-zapier-orange font-bold">{currentTier.credits} Credits</span>
                         {currentTier.savings && (
                           <Badge className="bg-green-100 text-green-800 ml-3 px-4 py-1.5 text-sm">
                             {currentTier.savings}
@@ -202,7 +202,7 @@ const PricingScale = () => {
                     </p>
                     <div className="bg-zapier-orange/10 dark:bg-zapier-orange/5 rounded-lg p-3">
                       <p className="text-xs text-earth/80 dark:text-white/80 font-medium">
-                        ✓ ATS Optimization<br />
+                        ✓ Role Suitability<br />
                         ✓ Skills Gap Analysis<br />
                         ✓ Keyword Matching
                       </p>
@@ -212,16 +212,16 @@ const PricingScale = () => {
 
                 {/* Step 2: Cover Letter */}
                 <div className="text-center group">
-                  <div className="bg-white dark:bg-blueberry/20 border-2 border-citrus/30 dark:border-citrus/40 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 relative">
-                    <div className="w-16 h-16 bg-gradient-to-br from-citrus to-apricot rounded-full flex items-center justify-center mx-auto mb-4 relative z-10">
+                  <div className="bg-white dark:bg-blueberry/20 border-2 border-zapier-orange/30 dark:border-zapier-orange/40 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 relative">
+                    <div className="w-16 h-16 bg-gradient-to-br from-zapier-orange to-apricot rounded-full flex items-center justify-center mx-auto mb-4 relative z-10">
                       <Zap className="h-8 w-8 text-white" />
                     </div>
                     <h3 className="text-xl font-bold text-earth dark:text-white mb-2">2. Cover Letter</h3>
-                    <div className="text-2xl font-bold text-citrus mb-3">1 Credit</div>
+                    <div className="text-2xl font-bold text-zapier-orange mb-3">1 Credit</div>
                     <p className="text-earth/70 dark:text-white/70 text-sm mb-4">
                       Generate a personalized, compelling cover letter tailored to the specific role and company.
                     </p>
-                    <div className="bg-citrus/10 dark:bg-citrus/5 rounded-lg p-3">
+                    <div className="bg-zapier-orange/10 dark:bg-zapier-orange/5 rounded-lg p-3">
                       <p className="text-xs text-earth/80 dark:text-white/80 font-medium">
                         ✓ Role-Specific Content<br />
                         ✓ Professional Formatting<br />
@@ -238,7 +238,7 @@ const PricingScale = () => {
                       <Users className="h-8 w-8 text-white" />
                     </div>
                     <h3 className="text-xl font-bold text-earth dark:text-white mb-2">3. Interview Prep</h3>
-                    <div className="text-2xl font-bold text-green-600 mb-3">3 Credits</div>
+                    <div className="text-2xl font-bold text-green-600 mb-3">2 Credits</div>
                     <p className="text-earth/70 dark:text-white/70 text-sm mb-4">
                       Master your interview with role-specific questions, STAR examples, and company insights.
                     </p>
@@ -254,109 +254,9 @@ const PricingScale = () => {
               </div>
             </div>
 
-            {/* Total Summary */}
-            <div className="mt-12 bg-gradient-to-r from-zapier-orange/10 via-citrus/10 to-green-500/10 dark:from-zapier-orange/5 dark:via-citrus/5 dark:to-green-500/5 rounded-2xl p-8 border border-zapier-orange/20 text-center">
-              <h3 className="text-2xl font-bold text-earth dark:text-white mb-4">
-                Complete Package = <span className="text-zapier-orange">6 Credits</span>
-              </h3>
-              <p className="text-earth/70 dark:text-white/70 mb-6 max-w-2xl mx-auto">
-                Get everything you need for a successful job application. Our complete package gives you the competitive edge to land your dream role.
-              </p>
-              <div className="flex items-center justify-center space-x-8 text-sm">
-                <div className="flex items-center">
-                  <ArrowRight className="h-4 w-4 text-zapier-orange mr-2" />
-                  <span className="text-earth/80 dark:text-white/80">Higher Success Rate</span>
-                </div>
-                <div className="flex items-center">
-                  <ArrowRight className="h-4 w-4 text-citrus mr-2" />
-                  <span className="text-earth/80 dark:text-white/80">Professional Presentation</span>
-                </div>
-                <div className="flex items-center">
-                  <ArrowRight className="h-4 w-4 text-green-600 mr-2" />
-                  <span className="text-earth/80 dark:text-white/80">Interview Confidence</span>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
 
-        {/* How are Credits Spent Section */}
-        <div className="mb-16">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-earth dark:text-white mb-4">
-              How are Credits Spent?
-            </h2>
-            <p className="text-lg text-earth/70 dark:text-white/70 max-w-2xl mx-auto">
-              Each service consumes a specific number of credits. Here's our detailed breakdown:
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-3 gap-6 mb-8">
-            <Card className="bg-white dark:bg-blueberry/20 border border-apple-core/20 dark:border-citrus/20">
-              <CardContent className="p-6 text-center">
-                <FileText className="h-12 w-12 text-zapier-orange mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-earth dark:text-white mb-2">CV Analysis</h3>
-                <div className="text-3xl font-bold text-zapier-orange mb-2">2 Credits</div>
-                <p className="text-earth/70 dark:text-white/70 text-sm">
-                  Comprehensive CV analysis against a specific job role including ATS optimization, 
-                  skills gap analysis, keyword matching, and personalized recommendations for improvement.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white dark:bg-blueberry/20 border border-apple-core/20 dark:border-citrus/20">
-              <CardContent className="p-6 text-center">
-                <Zap className="h-12 w-12 text-zapier-orange mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-earth dark:text-white mb-2">Cover Letter</h3>
-                <div className="text-3xl font-bold text-zapier-orange mb-2">1 Credit</div>
-                <p className="text-earth/70 dark:text-white/70 text-sm">
-                  AI-generated, personalized cover letter tailored to the specific job role and your CV, 
-                  with professional formatting and compelling content that highlights your strengths.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white dark:bg-blueberry/20 border border-apple-core/20 dark:border-citrus/20">
-              <CardContent className="p-6 text-center">
-                <Users className="h-12 w-12 text-zapier-orange mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-earth dark:text-white mb-2">Interview Prep Pack</h3>
-                <div className="text-3xl font-bold text-zapier-orange mb-2">3 Credits</div>
-                <p className="text-earth/70 dark:text-white/70 text-sm">
-                  Complete interview preparation including role-specific questions, STAR method examples, 
-                  company research insights, and personalized talking points based on your experience.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="bg-gradient-to-r from-zapier-orange/10 to-apricot/10 dark:from-zapier-orange/5 dark:to-apricot/5 rounded-xl p-6 border border-zapier-orange/20">
-            <h3 className="text-xl font-semibold text-earth dark:text-white mb-3 text-center">
-              Complete Job Application Package
-            </h3>
-            <div className="text-center">
-              <p className="text-earth/70 dark:text-white/70 mb-4">
-                For a complete application to one role, you'll typically use:
-              </p>
-              <div className="flex items-center justify-center space-x-8 text-sm">
-                <div className="flex items-center">
-                  <div className="w-2 h-2 bg-zapier-orange rounded-full mr-2"></div>
-                  <span className="text-earth/80 dark:text-white/80">CV Analysis (2 credits)</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-2 h-2 bg-zapier-orange rounded-full mr-2"></div>
-                  <span className="text-earth/80 dark:text-white/80">Cover Letter (1 credit)</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-2 h-2 bg-zapier-orange rounded-full mr-2"></div>
-                  <span className="text-earth/80 dark:text-white/80">Interview Prep (3 credits)</span>
-                </div>
-              </div>
-              <div className="mt-4 text-lg font-semibold text-zapier-orange">
-                Total: 6 credits per complete application
-              </div>
-            </div>
-          </div>
-        </div>
 
         {/* FAQ Section */}
         <div className="text-center mb-12">
