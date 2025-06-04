@@ -402,7 +402,7 @@ const AuthenticatedCoverLetter = () => {
                 </TabsTrigger>
                 <TabsTrigger value="result" className="flex items-center space-x-2 text-sm">
                   <Eye className="h-4 w-4" />
-                  <span>Current Result</span>
+                  <span>View Letter</span>
                 </TabsTrigger>
                 <TabsTrigger value="history" className="flex items-center space-x-2 text-sm">
                   <History className="h-4 w-4" />

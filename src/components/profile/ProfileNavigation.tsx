@@ -17,18 +17,18 @@ const ProfileNavigation: React.FC<ProfileNavigationProps> = ({ activeTab, onTabC
   ];
 
   return (
-    <div className="mb-8">
+    <div className="mb-4">
       {/* Desktop horizontal navigation */}
       <div className="hidden md:block">
         <Tabs value={activeTab} onValueChange={onTabChange}>
-          <TabsList className="grid w-full grid-cols-5 bg-muted">
+          <TabsList className="grid w-full grid-cols-5">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               return (
                 <TabsTrigger
                   key={tab.id}
                   value={tab.id}
-                  className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:text-zapier-orange"
+                  className="flex items-center space-x-2 text-sm"
                 >
                   <Icon className="h-4 w-4" />
                   <span className="hidden lg:inline">{tab.label}</span>
