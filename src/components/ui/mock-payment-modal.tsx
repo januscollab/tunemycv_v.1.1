@@ -72,6 +72,48 @@ export const MockPaymentModal: React.FC<MockPaymentModalProps> = ({
       
       // Simulate payment processing (like Stripe would do)
       await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Add credits to user account after successful "payment"
+      if (user && plan.credits) {
+        // First get current credits
+        const { data: currentCredits, error: fetchError } = await supabase
+          .from('user_credits')
+          .select('credits')
+          .eq('user_id', user.id)
+          .single();
+        
+        if (fetchError && fetchError.code !== 'PGRST116') {
+          console.error('Error fetching current credits:', fetchError);
+          toast({
+            title: 'Credits Update Failed',
+            description: 'Could not retrieve current credit balance. Please contact support.',
+            variant: 'destructive'
+          });
+          return;
+        }
+        
+        const newCreditsTotal = (currentCredits?.credits || 0) + plan.credits;
+        
+        // Update with new total
+        const { error: creditsError } = await supabase
+          .from('user_credits')
+          .upsert({
+            user_id: user.id,
+            credits: newCreditsTotal,
+            updated_at: new Date().toISOString()
+          });
+        
+        if (creditsError) {
+          console.error('Error updating credits:', creditsError);
+          toast({
+            title: 'Credits Update Failed',
+            description: 'Payment processed but credits could not be added. Please contact support.',
+            variant: 'destructive'
+          });
+          return;
+        }
+      }
+      
       setStep('success');
       
     } catch (error) {

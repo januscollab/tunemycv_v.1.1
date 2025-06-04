@@ -97,7 +97,7 @@ const PricingScale = () => {
               </CardTitle>
               <div className="mt-4">
                 <h3 className="text-lg font-semibold text-earth dark:text-white mb-4">
-                  Why Choose Our Credit System?
+                  Why We're Just Better Than The Others? We Give You More!
                 </h3>
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-3">
@@ -131,7 +131,7 @@ const PricingScale = () => {
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="space-y-8">
+            <CardContent className="space-y-8 pt-5">
               {/* Slider */}
               <div className="px-4">
                 <Slider
