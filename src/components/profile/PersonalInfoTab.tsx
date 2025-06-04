@@ -3,7 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { User, Mail, Lock, Save, Linkedin } from 'lucide-react';
+import { User, Mail, Lock, Save, Linkedin, Phone, Globe } from 'lucide-react';
+import CountryCodeSelect from './CountryCodeSelect';
 
 interface PersonalInfoTabProps {
   credits: number;
@@ -18,7 +19,10 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
     first_name: '',
     last_name: '',
     email: '',
-    linkedin_url: ''
+    linkedin_url: '',
+    phone_number: '',
+    country_code: '+1',
+    personal_website_url: ''
   });
   const [passwords, setPasswords] = useState({
     current: '',
@@ -47,14 +51,20 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
           first_name: data.first_name || '',
           last_name: data.last_name || '',
           email: data.email || user?.email || '',
-          linkedin_url: data.linkedin_url || ''
+          linkedin_url: data.linkedin_url || '',
+          phone_number: data.phone_number || '',
+          country_code: data.country_code || '+1',
+          personal_website_url: data.personal_website_url || ''
         });
       } else {
         setProfile({
           first_name: '',
           last_name: '',
           email: user?.email || '',
-          linkedin_url: ''
+          linkedin_url: '',
+          phone_number: '',
+          country_code: '+1',
+          personal_website_url: ''
         });
       }
     } catch (error) {
@@ -75,6 +85,9 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
           last_name: profile.last_name,
           email: profile.email,
           linkedin_url: profile.linkedin_url,
+          phone_number: profile.phone_number,
+          country_code: profile.country_code,
+          personal_website_url: profile.personal_website_url,
           updated_at: new Date().toISOString()
         });
 
@@ -176,33 +189,75 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
             </div>
           </div>
 
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
-              Email Address
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={profile.email}
-              onChange={(e) => setProfile({ ...profile, email: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
-              placeholder="Enter your email address"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
+                <Mail className="h-4 w-4 inline mr-1" />
+                Email Address
+              </label>
+              <input
+                id="email"
+                type="email"
+                value={profile.email}
+                onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
+                placeholder="Enter your email address"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
+                <Phone className="h-4 w-4 inline mr-1" />
+                Phone Number
+              </label>
+              <div className="flex gap-2">
+                <CountryCodeSelect
+                  value={profile.country_code}
+                  onChange={(value) => setProfile({ ...profile, country_code: value })}
+                  className="w-32"
+                />
+                <input
+                  id="phoneNumber"
+                  type="tel"
+                  value={profile.phone_number}
+                  onChange={(e) => setProfile({ ...profile, phone_number: e.target.value })}
+                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
+                  placeholder="123 456 7890"
+                />
+              </div>
+            </div>
           </div>
 
-          <div>
-            <label htmlFor="linkedinUrl" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
-              <Linkedin className="h-4 w-4 inline mr-1" />
-              LinkedIn Profile URL
-            </label>
-            <input
-              id="linkedinUrl"
-              type="url"
-              value={profile.linkedin_url}
-              onChange={(e) => setProfile({ ...profile, linkedin_url: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
-              placeholder="https://linkedin.com/in/yourprofile"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="linkedinUrl" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
+                <Linkedin className="h-4 w-4 inline mr-1" />
+                LinkedIn Profile URL
+              </label>
+              <input
+                id="linkedinUrl"
+                type="url"
+                value={profile.linkedin_url}
+                onChange={(e) => setProfile({ ...profile, linkedin_url: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
+                placeholder="https://linkedin.com/in/yourprofile"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="personalWebsiteUrl" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
+                <Globe className="h-4 w-4 inline mr-1" />
+                Personal Website/Portfolio URL
+              </label>
+              <input
+                id="personalWebsiteUrl"
+                type="url"
+                value={profile.personal_website_url}
+                onChange={(e) => setProfile({ ...profile, personal_website_url: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
+                placeholder="https://yourportfolio.com"
+              />
+            </div>
           </div>
 
           <button

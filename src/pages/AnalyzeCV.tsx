@@ -95,10 +95,11 @@ const AnalyzeCV = () => {
     }
   }, [analyzing]);
 
-  // Switch to current report tab when analysis completes
+  // Switch to view-analysis tab when analysis completes and sync states
   React.useEffect(() => {
     if (analysisResult && !analyzing) {
-      setActiveTab('report');
+      setViewedAnalysis(analysisResult);
+      setActiveTab('view-analysis');
     }
   }, [analysisResult, analyzing]);
 

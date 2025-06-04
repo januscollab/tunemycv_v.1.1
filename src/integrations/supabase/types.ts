@@ -276,30 +276,39 @@ export type Database = {
       }
       profiles: {
         Row: {
+          country_code: string | null
           created_at: string | null
           email: string | null
           first_name: string | null
           id: string
           last_name: string | null
           linkedin_url: string | null
+          personal_website_url: string | null
+          phone_number: string | null
           updated_at: string | null
         }
         Insert: {
+          country_code?: string | null
           created_at?: string | null
           email?: string | null
           first_name?: string | null
           id: string
           last_name?: string | null
           linkedin_url?: string | null
+          personal_website_url?: string | null
+          phone_number?: string | null
           updated_at?: string | null
         }
         Update: {
+          country_code?: string | null
           created_at?: string | null
           email?: string | null
           first_name?: string | null
           id?: string
           last_name?: string | null
           linkedin_url?: string | null
+          personal_website_url?: string | null
+          phone_number?: string | null
           updated_at?: string | null
         }
         Relationships: []
