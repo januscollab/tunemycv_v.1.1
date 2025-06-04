@@ -35,7 +35,7 @@ import EditableCoverLetter from '@/components/cover-letter/EditableCoverLetter';
 import NoAnalysisModal from '@/components/cover-letter/NoAnalysisModal';
 import CoverLetterLoggedOut from '@/components/cover-letter/CoverLetterLoggedOut';
 import ProcessingModal from '@/components/ui/processing-modal';
-// Import ProcessingModal for cover letter generation
+
 
 const CoverLetter = () => {
   const { user } = useAuth();
