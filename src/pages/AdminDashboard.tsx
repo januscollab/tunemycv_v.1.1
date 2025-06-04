@@ -1,9 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
-import { Users, CreditCard, FileText, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Users, CreditCard, FileText, Settings, ChevronLeft, ChevronRight } from 'lucide-react';
 import UserManagement from '@/components/admin/UserManagement';
 import CreditManagement from '@/components/admin/CreditManagement';
 import AnalysisLogsManagement from '@/components/admin/AnalysisLogsManagement';
+
 import AdminNavigation from '@/components/admin/AdminNavigation';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';

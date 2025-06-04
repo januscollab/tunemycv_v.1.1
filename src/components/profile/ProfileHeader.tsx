@@ -11,7 +11,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ credits, memberSince }) =
   const { getUserDisplayName } = useProfileData();
   
   return (
-    <div className="bg-card dark:bg-surface rounded-lg border border-card-border p-8 mb-8">
+    <div className="bg-card dark:bg-surface rounded-lg border border-card-border p-4 mb-4">
       <div className="flex flex-col md:flex-row md:justify-between md:items-center">
         <div>
           <h1 className="text-4xl font-bold text-card-foreground font-display">

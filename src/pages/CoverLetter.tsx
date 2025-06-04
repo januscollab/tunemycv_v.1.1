@@ -402,7 +402,7 @@ const AuthenticatedCoverLetter = () => {
                 </TabsTrigger>
                 <TabsTrigger value="result" className="flex items-center space-x-2 text-sm">
                   <Eye className="h-4 w-4" />
-                  <span>Current Result</span>
+                  <span>View Letter</span>
                 </TabsTrigger>
                 <TabsTrigger value="history" className="flex items-center space-x-2 text-sm">
                   <History className="h-4 w-4" />
@@ -629,19 +629,29 @@ const AuthenticatedCoverLetter = () => {
                   <Card className="border border-gray-200 dark:border-gray-700">
                     <CardHeader className="pb-3">
                       <div className="flex items-center justify-between">
-                        <div>
+                        <div className="flex items-center space-x-3">
                           <CardTitle className="text-xl font-semibold">{selectedCoverLetter.job_title} at {selectedCoverLetter.company_name}</CardTitle>
-                          <div className="flex items-center gap-4 mt-2 text-sm font-normal text-gray-600 dark:text-gray-400">
-                            <div className="flex items-center gap-1">
-                              <Clock className="h-4 w-4" />
-                              Generated {formatDate(selectedCoverLetter.created_at)}
-                            </div>
-                            {selectedCoverLetter.regeneration_count > 0 && (
-                              <Badge variant="outline" className="text-xs">
-                                Iteration {selectedCoverLetter.regeneration_count + 1}
-                              </Badge>
-                            )}
+                          <button
+                            onClick={() => {
+                              setEditingCoverLetter(selectedCoverLetter);
+                              setIsEditDialogOpen(true);
+                            }}
+                            className="text-gray-400 hover:text-zapier-orange transition-colors"
+                            title="Edit title"
+                          >
+                            <Edit2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                        <div className="flex items-center gap-4 mt-2 text-sm font-normal text-gray-600 dark:text-gray-400">
+                          <div className="flex items-center gap-1">
+                            <Clock className="h-4 w-4" />
+                            Generated {formatDate(selectedCoverLetter.created_at)}
                           </div>
+                          {selectedCoverLetter.regeneration_count > 0 && (
+                            <Badge variant="outline" className="text-xs">
+                              Iteration {selectedCoverLetter.regeneration_count + 1}
+                            </Badge>
+                          )}
                         </div>
                       </div>
                     </CardHeader>
@@ -730,12 +740,12 @@ const AuthenticatedCoverLetter = () => {
                 ) : (
                   <Card className="border border-gray-200 dark:border-gray-700">
                     <CardContent className="text-center py-8">
-                      <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                      <FileText className="h-12 w-12 text-zapier-orange mx-auto mb-4" />
                       <p className="text-gray-600 dark:text-gray-400 mb-2 font-normal">
                         No cover letter generated yet.
                       </p>
                       <p className="text-sm font-normal text-gray-500">
-                        Create one in the "Generate New" tab or view previous letters in "Document History".
+                        Create one in the "Generate New" tab or view previous letters in <Link to="#" onClick={() => setActiveTab('history')} className="text-zapier-orange hover:text-zapier-orange/80 underline">"Document History"</Link>.
                       </p>
                     </CardContent>
                   </Card>

@@ -94,7 +94,9 @@ const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ credits, member
   };
 
   const handleViewDetails = (analysis: AnalysisResult) => {
-    setSelectedAnalysis(analysis);
+    navigate('/analyze-cv', { 
+      state: { analysis, source: 'history', targetTab: 'view-analysis' }
+    });
   };
 
   const handleDeleteAnalysis = async (analysisId: string) => {

@@ -10,6 +10,11 @@ import { FloatingLabelTextarea } from './FloatingLabelTextarea';
 interface FloatingFeedbackFormProps {
   onClose: () => void;
   currentPage?: string;
+  prefilledData?: {
+    category?: string;
+    subject?: string;
+    message?: string;
+  };
 }
 
 const feedbackCategories = [
@@ -23,17 +28,18 @@ const feedbackCategories = [
 
 export const FloatingFeedbackForm: React.FC<FloatingFeedbackFormProps> = ({ 
   onClose, 
-  currentPage = 'homepage' 
+  currentPage = 'homepage',
+  prefilledData 
 }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [allowContact, setAllowContact] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState('general');
+  const [selectedCategory, setSelectedCategory] = useState(prefilledData?.category || 'general');
   const [showSuccess, setShowSuccess] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    subject: '',
-    message: ''
+    subject: prefilledData?.subject || '',
+    message: prefilledData?.message || ''
   });
   const [characterCount, setCharacterCount] = useState(0);
   const formRef = useRef<HTMLFormElement>(null);
@@ -73,7 +79,7 @@ export const FloatingFeedbackForm: React.FC<FloatingFeedbackFormProps> = ({
   const handleCategorySelect = (categoryId: string) => {
     setSelectedCategory(categoryId);
     const category = feedbackCategories.find(c => c.id === categoryId);
-    if (category) {
+    if (category && !prefilledData?.subject) {
       setFormData(prev => ({ ...prev, subject: category.label }));
     }
   };
