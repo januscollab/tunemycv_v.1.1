@@ -17,11 +17,11 @@ const ProfileNavigation: React.FC<ProfileNavigationProps> = ({ activeTab, onTabC
   ];
 
   return (
-    <div className="mb-4">
+    <div className="mb-2">
       {/* Desktop horizontal navigation */}
       <div className="hidden md:block">
         <Tabs value={activeTab} onValueChange={onTabChange}>
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-5 mb-3">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               return (

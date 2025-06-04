@@ -472,21 +472,17 @@ const AnalyzeCV = () => {
                     readOnly={true}
                   />
                 ) : (
-                  <div className="text-center py-12">
-                    <Eye className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mb-2">
-                      No Analysis Selected
-                    </h3>
-                    <p className="text-blueberry/70 dark:text-apple-core/80 mb-4">
-                      Select an analysis from the History tab to view it here.
-                    </p>
-                    <Button 
-                      onClick={() => setActiveTab('history')}
-                      className="bg-zapier-orange hover:bg-zapier-orange/90 text-white"
-                    >
-                      Go to History
-                    </Button>
-                  </div>
+                  <Card className="border border-gray-200 dark:border-gray-700">
+                    <CardContent className="text-center py-8">
+                      <FileText className="h-12 w-12 text-zapier-orange mx-auto mb-4" />
+                      <p className="text-gray-600 dark:text-gray-400 mb-2 font-normal">
+                        No analysis generated yet.
+                      </p>
+                      <p className="text-sm font-normal text-gray-500">
+                        Create one in the "Analyze CV" tab or view previous analysis in <Button variant="link" onClick={() => setActiveTab('history')} className="text-zapier-orange hover:text-zapier-orange/80 underline p-0 h-auto">"Document History"</Button>.
+                      </p>
+                    </CardContent>
+                  </Card>
                 )}
               </TabsContent>
 

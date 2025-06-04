@@ -83,7 +83,9 @@ serve(async (req) => {
     // Prepare contact info placeholders
     const fullName = profileData?.first_name && profileData?.last_name 
       ? `${profileData.first_name} ${profileData.last_name}` 
-      : '[Your Name]'
+      : profileData?.first_name 
+        ? profileData.first_name 
+        : '[Your Name]'
     const phoneNumber = profileData?.phone_number 
       ? `${profileData.country_code || ''}${profileData.phone_number}` 
       : '[Your Phone Number]'
