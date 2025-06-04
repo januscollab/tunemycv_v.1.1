@@ -1,38 +1,19 @@
-import React from 'react';
-import { Check, X, CreditCard } from 'lucide-react';
+import React, { useState } from 'react';
+import { Check, CreditCard, Zap, FileText, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { MockPaymentModal } from '@/components/ui/mock-payment-modal';
 
 const Pricing = () => {
+  const [selectedPlan, setSelectedPlan] = useState<any>(null);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+
   const plans = [
     {
-      name: 'FREE',
-      price: 0,
-      credits: 10,
-      period: 'credits',
-      description: '10 FREE credits, valid for 7 days',
-      costPerCredit: null,
-      savings: null,
-      features: [
-        '2 CV analyses against role',
-        '2 Cover letters generated',
-        '1 Interview prep pack',
-        'Apply for up to 2 roles, absolutely free'
-      ],
-      restrictions: [
-        'ZERO restrictions to functionality while using available credits',
-        'Valid for 14 days from signing up'
-      ],
-      buttonText: 'Get Started Free',
-      popular: false
-    },
-    {
-      name: 'USD 10',
+      name: '10 Credits',
       price: 10,
       credits: 10,
-      period: 'credits',
-      description: '10 credits',
       costPerCredit: '~$1.00 per credit',
       savings: null,
       features: [
@@ -49,11 +30,9 @@ const Pricing = () => {
       popular: false
     },
     {
-      name: 'USD 25',
+      name: '30 Credits',
       price: 25,
       credits: 30,
-      period: 'credits',
-      description: '30 credits',
       costPerCredit: '~$0.83 per credit',
       savings: '17% Saving',
       features: [
@@ -70,11 +49,9 @@ const Pricing = () => {
       popular: true
     },
     {
-      name: 'USD 50',
+      name: '100 Credits',
       price: 50,
       credits: 100,
-      period: 'credits',
-      description: '100 credits',
       costPerCredit: '~$0.50 per credit',
       savings: '50% Saving',
       features: [
@@ -91,6 +68,11 @@ const Pricing = () => {
       popular: false
     }
   ];
+
+  const handleBuyCredits = (plan: any) => {
+    setSelectedPlan(plan);
+    setIsPaymentModalOpen(true);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5 py-6">
@@ -110,7 +92,7 @@ const Pricing = () => {
         </div>
 
         {/* Pricing Cards */}
-        <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-6 mb-16">
+        <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-6 mb-16">
           {plans.map((plan, index) => (
             <Card 
               key={plan.name}
@@ -129,20 +111,13 @@ const Pricing = () => {
               )}
               
               <CardHeader className="text-center pb-6">
-                <CardTitle className="text-2xl font-bold text-earth dark:text-white mb-2">
+                <CardTitle className="text-4xl font-bold text-zapier-orange mb-4">
                   {plan.name}
                 </CardTitle>
                 <div className="mb-4">
-                  {plan.price === 0 ? (
-                    <div className="text-4xl font-bold text-zapier-orange">FREE</div>
-                  ) : (
-                    <div className="flex items-baseline justify-center">
-                      <span className="text-4xl font-bold text-zapier-orange">${plan.price}</span>
-                      <span className="text-lg text-earth/70 dark:text-white/70 ml-2">
-                        for {plan.credits} credits
-                      </span>
-                    </div>
-                  )}
+                  <div className="flex items-baseline justify-center">
+                    <span className="text-3xl font-bold text-earth dark:text-white">${plan.price}</span>
+                  </div>
                   {plan.costPerCredit && (
                     <div className="text-sm text-earth/60 dark:text-white/60 mt-1">
                       {plan.costPerCredit}
@@ -154,9 +129,6 @@ const Pricing = () => {
                     </Badge>
                   )}
                 </div>
-                <p className="text-earth/70 dark:text-white/70">
-                  {plan.description}
-                </p>
               </CardHeader>
 
               <CardContent className="space-y-6">
@@ -189,6 +161,7 @@ const Pricing = () => {
 
                 {/* CTA Button */}
                 <Button 
+                  onClick={() => handleBuyCredits(plan)}
                   className={`w-full py-3 font-semibold transition-all duration-300 ${
                     plan.popular
                       ? 'bg-zapier-orange hover:bg-zapier-orange/90 text-white'
@@ -200,6 +173,84 @@ const Pricing = () => {
               </CardContent>
             </Card>
           ))}
+        </div>
+
+        {/* How are Credits Spent Section */}
+        <div className="mb-16">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-earth dark:text-white mb-4">
+              How are Credits Spent?
+            </h2>
+            <p className="text-lg text-earth/70 dark:text-white/70 max-w-2xl mx-auto">
+              Each service consumes a specific number of credits. Here's our detailed breakdown:
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-6 mb-8">
+            <Card className="bg-white dark:bg-blueberry/20 border border-apple-core/20 dark:border-citrus/20">
+              <CardContent className="p-6 text-center">
+                <FileText className="h-12 w-12 text-zapier-orange mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-earth dark:text-white mb-2">CV Analysis</h3>
+                <div className="text-3xl font-bold text-zapier-orange mb-2">2 Credits</div>
+                <p className="text-earth/70 dark:text-white/70 text-sm">
+                  Comprehensive CV analysis against a specific job role including ATS optimization, 
+                  skills gap analysis, keyword matching, and personalized recommendations for improvement.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white dark:bg-blueberry/20 border border-apple-core/20 dark:border-citrus/20">
+              <CardContent className="p-6 text-center">
+                <Zap className="h-12 w-12 text-zapier-orange mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-earth dark:text-white mb-2">Cover Letter</h3>
+                <div className="text-3xl font-bold text-zapier-orange mb-2">1 Credit</div>
+                <p className="text-earth/70 dark:text-white/70 text-sm">
+                  AI-generated, personalized cover letter tailored to the specific job role and your CV, 
+                  with professional formatting and compelling content that highlights your strengths.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white dark:bg-blueberry/20 border border-apple-core/20 dark:border-citrus/20">
+              <CardContent className="p-6 text-center">
+                <Users className="h-12 w-12 text-zapier-orange mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-earth dark:text-white mb-2">Interview Prep Pack</h3>
+                <div className="text-3xl font-bold text-zapier-orange mb-2">3 Credits</div>
+                <p className="text-earth/70 dark:text-white/70 text-sm">
+                  Complete interview preparation including role-specific questions, STAR method examples, 
+                  company research insights, and personalized talking points based on your experience.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="bg-gradient-to-r from-zapier-orange/10 to-apricot/10 dark:from-zapier-orange/5 dark:to-apricot/5 rounded-xl p-6 border border-zapier-orange/20">
+            <h3 className="text-xl font-semibold text-earth dark:text-white mb-3 text-center">
+              Complete Job Application Package
+            </h3>
+            <div className="text-center">
+              <p className="text-earth/70 dark:text-white/70 mb-4">
+                For a complete application to one role, you'll typically use:
+              </p>
+              <div className="flex items-center justify-center space-x-8 text-sm">
+                <div className="flex items-center">
+                  <div className="w-2 h-2 bg-zapier-orange rounded-full mr-2"></div>
+                  <span className="text-earth/80 dark:text-white/80">CV Analysis (2 credits)</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-2 h-2 bg-zapier-orange rounded-full mr-2"></div>
+                  <span className="text-earth/80 dark:text-white/80">Cover Letter (1 credit)</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-2 h-2 bg-zapier-orange rounded-full mr-2"></div>
+                  <span className="text-earth/80 dark:text-white/80">Interview Prep (3 credits)</span>
+                </div>
+              </div>
+              <div className="mt-4 text-lg font-semibold text-zapier-orange">
+                Total: 6 credits per complete application
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* FAQ Section */}
@@ -266,6 +317,15 @@ const Pricing = () => {
             </div>
           </div>
         </div>
+
+        {/* Mock Payment Modal */}
+        {selectedPlan && (
+          <MockPaymentModal
+            isOpen={isPaymentModalOpen}
+            onClose={() => setIsPaymentModalOpen(false)}
+            plan={selectedPlan}
+          />
+        )}
       </div>
     </div>
   );
