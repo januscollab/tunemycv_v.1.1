@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { RotateCcw } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { useCopyRestriction } from '@/hooks/useCopyRestriction';
 
 interface EditableCoverLetterProps {
   content: string;
@@ -14,6 +15,7 @@ const EditableCoverLetter: React.FC<EditableCoverLetterProps> = ({ content, onSa
   const [originalContent] = useState(content);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { toast } = useToast();
+  const { restrictionClass } = useCopyRestriction();
 
   // Auto-resize textarea based on content
   const adjustTextareaHeight = () => {
@@ -77,7 +79,7 @@ const EditableCoverLetter: React.FC<EditableCoverLetterProps> = ({ content, onSa
   };
 
   return (
-    <div className="space-y-4">
+    <div className={`space-y-4 ${restrictionClass}`}>
       <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
         <Textarea
           ref={textareaRef}
