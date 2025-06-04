@@ -20,6 +20,7 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
     name: '',
     email: '',
     subject: '',
+    customSubject: '',
     message: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -47,7 +48,7 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
     // Reset form after 3 seconds and close modal
     setTimeout(() => {
       setIsSubmitted(false);
-      setFormData({ name: '', email: '', subject: '', message: '' });
+      setFormData({ name: '', email: '', subject: '', customSubject: '', message: '' });
       onClose();
     }, 3000);
   };
@@ -61,7 +62,7 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
 
   const handleClose = () => {
     setIsSubmitted(false);
-    setFormData({ name: '', email: '', subject: '', message: '' });
+    setFormData({ name: '', email: '', subject: '', customSubject: '', message: '' });
     onClose();
   };
 
@@ -125,6 +126,20 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
                   </Select>
                 </div>
 
+                {formData.subject === 'custom' && (
+                  <div>
+                    <Label htmlFor="customSubject">Custom Subject</Label>
+                    <Input
+                      id="customSubject"
+                      type="text"
+                      value={formData.customSubject || ''}
+                      onChange={(e) => handleInputChange('customSubject', e.target.value)}
+                      placeholder="Enter your custom subject"
+                      required
+                    />
+                  </div>
+                )}
+
                 <div>
                   <Label htmlFor="message">Message</Label>
                   <Textarea
@@ -150,7 +165,7 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
                   <Button
                     type="submit"
                     className="flex-1 bg-zapier-orange hover:bg-zapier-orange/90"
-                    disabled={isSubmitting || !formData.name || !formData.email || !formData.subject || !formData.message}
+                    disabled={isSubmitting || !formData.name || !formData.email || !formData.subject || !formData.message || (formData.subject === 'custom' && !formData.customSubject)}
                   >
                     {isSubmitting ? (
                       'Sending...'

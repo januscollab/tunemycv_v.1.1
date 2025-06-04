@@ -105,14 +105,14 @@ const PricingScale = () => {
                   max={4}
                   min={0}
                   step={1}
-                  className="w-full [&>*:first-child]:bg-gray-200 dark:[&>*:first-child]:bg-gray-700"
+                  className="w-full [&>*:first-child]:bg-gray-200 dark:[&>*:first-child]:bg-gray-700 [&_[role=slider]]:h-4 [&_[role=slider]]:w-4 [&>*:first-child]:h-1"
                 />
               </div>
 
               {/* Tier Labels Below Slider */}
-              <div className="flex justify-between items-center px-2">
+              <div className="flex justify-between items-center px-2 max-w-[calc(100%-120px)] mx-auto">
                 {pricingTiers.map((tier, index) => (
-                  <div key={index} className="text-left">
+                  <div key={index} className="text-center flex-1">
                     {tier.isEnterprise ? (
                       <div className="space-y-1">
                         <div className="text-lg font-bold text-earth dark:text-white">Enterprise</div>
@@ -143,9 +143,9 @@ const PricingScale = () => {
                   ) : (
                     <>
                       <div className="flex items-baseline space-x-2">
-                        <span className="text-2xl text-zapier-orange font-bold">${currentTier.price}</span>
+                        <span className="text-xl text-zapier-orange font-bold">${currentTier.price}</span>
                         <span className="text-xl text-earth dark:text-white">for</span>
-                        <span className="text-2xl text-zapier-orange font-bold">{currentTier.credits} Credits</span>
+                        <span className="text-xl text-zapier-orange font-bold">{currentTier.credits} Credits</span>
                         {currentTier.savings && (
                           <Badge className="bg-green-100 text-green-800 ml-3 px-4 py-1.5 text-sm">
                             {currentTier.savings}
@@ -212,16 +212,16 @@ const PricingScale = () => {
 
                 {/* Step 2: Cover Letter */}
                 <div className="text-center group">
-                  <div className="bg-white dark:bg-blueberry/20 border-2 border-zapier-orange/30 dark:border-zapier-orange/40 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 relative">
-                    <div className="w-16 h-16 bg-gradient-to-br from-zapier-orange to-apricot rounded-full flex items-center justify-center mx-auto mb-4 relative z-10">
+                  <div className="bg-white dark:bg-blueberry/20 border-2 border-blue-500/30 dark:border-blue-500/40 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 relative">
+                    <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 relative z-10">
                       <Zap className="h-8 w-8 text-white" />
                     </div>
                     <h3 className="text-xl font-bold text-earth dark:text-white mb-2">2. Cover Letter</h3>
-                    <div className="text-2xl font-bold text-zapier-orange mb-3">1 Credit</div>
+                    <div className="text-2xl font-bold text-blue-600 mb-3">1 Credit</div>
                     <p className="text-earth/70 dark:text-white/70 text-sm mb-4">
                       Generate a personalized, compelling cover letter tailored to the specific role and company.
                     </p>
-                    <div className="bg-zapier-orange/10 dark:bg-zapier-orange/5 rounded-lg p-3">
+                    <div className="bg-blue-100/50 dark:bg-blue-900/20 rounded-lg p-3">
                       <p className="text-xs text-earth/80 dark:text-white/80 font-medium">
                         ✓ Role-Specific Content<br />
                         ✓ Professional Formatting<br />
