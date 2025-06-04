@@ -87,20 +87,6 @@ const FloatingFeedback = () => {
                 />
               </div>
 
-              {/* Enhanced Footer */}
-              <div className="p-6 border-t border-apple-core/10 dark:border-citrus/10 bg-surface/30 dark:bg-blueberry/20 backdrop-blur-sm">
-                <div className="text-center space-y-2">
-                  <p className="text-xs text-blueberry/60 dark:text-apple-core/70">
-                    Need immediate help?
-                  </p>
-                  <a 
-                    href="mailto:hello@tunemycv.com" 
-                    className="inline-flex items-center text-sm text-zapier-orange hover:text-zapier-orange/80 transition-colors hover:underline font-medium"
-                  >
-                    Email us at hello@tunemycv.com
-                  </a>
-                </div>
-              </div>
             </div>
           </div>
         </>
