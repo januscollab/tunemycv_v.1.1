@@ -9,6 +9,10 @@ export const useProfileData = () => {
     first_name?: string;
     last_name?: string;
     email?: string;
+    phone_number?: string;
+    country_code?: string;
+    linkedin_url?: string;
+    personal_website_url?: string;
   } | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -26,7 +30,7 @@ export const useProfileData = () => {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('first_name, last_name, email')
+        .select('first_name, last_name, email, phone_number, country_code, linkedin_url, personal_website_url')
         .eq('id', user.id)
         .single();
 
@@ -50,5 +54,25 @@ export const useProfileData = () => {
     return 'Jobseeker';
   };
 
-  return { profileData, loading, getUserDisplayName };
+  const getFullContactInfo = () => {
+    if (!profileData) return null;
+    
+    const fullName = [profileData.first_name, profileData.last_name].filter(Boolean).join(' ') || '[Your Name]';
+    const phoneNumber = profileData.phone_number 
+      ? `${profileData.country_code || ''}${profileData.phone_number}` 
+      : '[Your Phone Number]';
+    const email = profileData.email || '[Your Email Address]';
+    const linkedInUrl = profileData.linkedin_url || '';
+    const websiteUrl = profileData.personal_website_url || '';
+    
+    return {
+      fullName,
+      phoneNumber,
+      email,
+      linkedInUrl,
+      websiteUrl
+    };
+  };
+
+  return { profileData, loading, getUserDisplayName, getFullContactInfo };
 };

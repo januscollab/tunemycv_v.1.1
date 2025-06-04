@@ -14,7 +14,7 @@ import AnalysisSelector from '@/components/cover-letter/AnalysisSelector';
 import { useAnalysis } from '@/hooks/useAnalysis';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { FileText, History, MessageSquare, Target, Calendar, Building, CheckCircle, FileUp, Search, Clock } from 'lucide-react';
+import { FileText, History, MessageSquare, Target, Calendar, Building, CheckCircle, FileUp, Search, Clock, Eye } from 'lucide-react';
 import EmbeddedAuth from '@/components/auth/EmbeddedAuth';
 import ServiceExplanation from '@/components/common/ServiceExplanation';
 import { UploadedFile } from '@/types/fileTypes';
@@ -60,8 +60,9 @@ const AnalyzeCV = () => {
   const [activeTab, setActiveTab] = useState(initialTab);
 
   // Handle pre-loaded analysis from navigation state
-  const navigationState = location.state as { analysis?: any; source?: string } | null;
+  const navigationState = location.state as { analysis?: any; source?: string; targetTab?: string } | null;
   const [preloadedAnalysis, setPreloadedAnalysis] = useState(navigationState?.analysis || null);
+  const [viewedAnalysis, setViewedAnalysis] = useState(navigationState?.analysis || null);
 
   const { analyzing, analysisResult, setAnalysisResult, performAnalysis } = useAnalysis();
 
@@ -94,10 +95,11 @@ const AnalyzeCV = () => {
     }
   }, [analyzing]);
 
-  // Switch to current report tab when analysis completes
+  // Switch to view-analysis tab when analysis completes and sync states
   React.useEffect(() => {
     if (analysisResult && !analyzing) {
-      setActiveTab('report');
+      setViewedAnalysis(analysisResult);
+      setActiveTab('view-analysis');
     }
   }, [analysisResult, analyzing]);
 
@@ -124,6 +126,16 @@ const AnalyzeCV = () => {
       setActiveTab(tabFromUrl);
     }
   }, [tabFromUrl]);
+
+  // Handle navigation state for viewing analysis
+  React.useEffect(() => {
+    if (navigationState?.targetTab) {
+      setActiveTab(navigationState.targetTab);
+      if (navigationState.analysis) {
+        setViewedAnalysis(navigationState.analysis);
+      }
+    }
+  }, [navigationState]);
 
   // Clear URL state after it's been processed
   React.useEffect(() => {
@@ -199,6 +211,7 @@ const AnalyzeCV = () => {
     setUploadedFiles({});
     setJobTitle('');
     setPreloadedAnalysis(null);
+    setViewedAnalysis(null);
     setActiveTab('analysis');
   };
 
@@ -373,10 +386,14 @@ const AnalyzeCV = () => {
           <div>
             {/* Tabs Navigation */}
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-3 mb-6">
+              <TabsList className="grid w-full grid-cols-4 mb-6">
                 <TabsTrigger value="analysis" className="flex items-center space-x-2 text-sm">
                   <FileText className="h-4 w-4" />
-                  <span>CV Analysis</span>
+                  <span>Analyze CV</span>
+                </TabsTrigger>
+                <TabsTrigger value="view-analysis" className="flex items-center space-x-2 text-sm">
+                  <Eye className="h-4 w-4" />
+                  <span>View Analysis</span>
                 </TabsTrigger>
                 <TabsTrigger value="interview-prep" className="flex items-center space-x-2 text-sm">
                   <MessageSquare className="h-4 w-4" />
@@ -444,6 +461,29 @@ const AnalyzeCV = () => {
                     hasCreditsForAI={hasCreditsForAI}
                   />
                 </div>
+              </TabsContent>
+
+              {/* View Analysis Tab */}
+              <TabsContent value="view-analysis" className="mt-0">
+                {viewedAnalysis ? (
+                  <AnalysisResults 
+                    result={viewedAnalysis} 
+                    onStartNew={handleStartNew}
+                    readOnly={true}
+                  />
+                ) : (
+                  <Card className="border border-gray-200 dark:border-gray-700">
+                    <CardContent className="text-center py-8">
+                      <FileText className="h-12 w-12 text-zapier-orange mx-auto mb-4" />
+                      <p className="text-gray-600 dark:text-gray-400 mb-2 font-normal">
+                        No analysis generated yet.
+                      </p>
+                      <p className="text-sm font-normal text-gray-500">
+                        Create one in the "Analyze CV" tab or view previous analysis in <Button variant="link" onClick={() => setActiveTab('history')} className="text-zapier-orange hover:text-zapier-orange/80 underline p-0 h-auto">"Document History"</Button>.
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
               </TabsContent>
 
               {/* Interview Prep Tab */}
