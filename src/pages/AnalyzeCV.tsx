@@ -400,13 +400,13 @@ const AnalyzeCV = () => {
       <div className="max-w-wider mx-auto px-4 py-8">
         {/* Header Section */}
         <div className="mb-6">
-          <div className="flex items-start mb-3">
-            <FileText className="h-8 w-8 text-zapier-orange mr-3 mt-1" />
+          <div className="flex items-start mb-6">
+            <FileText className="h-8 w-8 text-zapier-orange mr-3 flex-shrink-0" />
             <div>
               <h1 className="text-3xl font-bold text-earth dark:text-white">
                 Analyze Your CV & Interview Prep
               </h1>
-              <p className="text-lg text-earth/70 dark:text-white/70 max-w-2xl mt-1">
+              <p className="text-lg text-earth/70 dark:text-white/70 max-w-2xl mt-2">
                 Upload your CV and job description to get comprehensive compatibility analysis with actionable recommendations.
               </p>
             </div>
