@@ -90,21 +90,8 @@ const PricingScale = () => {
 
         {/* Pricing Slider */}
         <div className="mb-16 max-w-4xl mx-auto">
-          <Card className="bg-white dark:bg-blueberry/20 border border-apple-core/20 dark:border-citrus/20 p-8">
+          <Card className="bg-white dark:bg-blueberry/20 border-2 border-zapier-orange/30 dark:border-zapier-orange/40 p-8 shadow-xl shadow-zapier-orange/10">
             <CardContent className="space-y-8">
-              {/* Tier Labels */}
-              <div className="flex justify-between items-center text-sm font-medium text-earth/70 dark:text-white/70">
-                {pricingTiers.map((tier, index) => (
-                  <div key={index} className="text-center">
-                    {tier.isEnterprise ? (
-                      <span className="text-zapier-orange font-semibold">Enterprise</span>
-                    ) : (
-                      <span>{tier.credits} credits</span>
-                    )}
-                  </div>
-                ))}
-              </div>
-
               {/* Slider */}
               <div className="px-2">
                 <Slider
@@ -117,30 +104,54 @@ const PricingScale = () => {
                 />
               </div>
 
-              {/* Selected Tier Display */}
-              <div className="text-center space-y-4">
-                <div>
-                  <h3 className="text-4xl font-bold text-zapier-orange mb-2">
-                    {currentTier.isEnterprise ? 'Enterprise' : `${currentTier.credits} Credits`}
-                  </h3>
-                  {!currentTier.isEnterprise && (
-                    <div className="text-3xl font-bold text-earth dark:text-white mb-2">
-                      ${currentTier.price}
-                    </div>
-                  )}
-                  {currentTier.savings && (
-                    <Badge className="bg-green-100 text-green-800 mb-2">
-                      {currentTier.savings}
-                    </Badge>
-                  )}
-                  <div className="text-lg text-earth/70 dark:text-white/70">
-                    {currentTier.isEnterprise ? 'Contact Our Team' : `Apply for ${currentTier.roles} Roles`}
+              {/* Tier Labels Below Slider */}
+              <div className="flex justify-between items-center text-sm font-medium text-earth/70 dark:text-white/70 px-2">
+                {pricingTiers.map((tier, index) => (
+                  <div key={index} className="text-center">
+                    {tier.isEnterprise ? (
+                      <span className="text-zapier-orange font-semibold">Enterprise</span>
+                    ) : (
+                      <span>${tier.price} {tier.credits} Credits</span>
+                    )}
                   </div>
+                ))}
+              </div>
+
+              {/* Selected Tier Display */}
+              <div className="text-left space-y-6 bg-gradient-to-br from-zapier-orange/5 to-apricot/5 dark:from-zapier-orange/10 dark:to-apricot/10 rounded-xl p-6 border border-zapier-orange/20">
+                <div className="space-y-3">
+                  {currentTier.isEnterprise ? (
+                    <>
+                      <h3 className="text-4xl text-zapier-orange mb-2">
+                        Enterprise
+                      </h3>
+                      <div className="text-lg text-earth/70 dark:text-white/70">
+                        Contact Our Team
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex items-baseline space-x-2">
+                        <span className="text-3xl text-zapier-orange">${currentTier.price}</span>
+                        <span className="text-xl text-earth dark:text-white">for</span>
+                        <span className="text-3xl text-zapier-orange">{currentTier.credits} Credits</span>
+                        {currentTier.savings && (
+                          <Badge className="bg-green-100 text-green-800 ml-3">
+                            {currentTier.savings}
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="text-lg font-medium text-earth/80 dark:text-white/80">
+                        Apply for {currentTier.roles} Roles
+                      </div>
+                    </>
+                  )}
                 </div>
 
                 <Button 
                   onClick={handleBuyCredits}
-                  className="bg-zapier-orange hover:bg-zapier-orange/90 text-white px-8 py-3 text-lg font-semibold"
+                  variant="outline"
+                  className="border-2 border-zapier-orange bg-white hover:bg-zapier-orange/5 text-zapier-orange hover:text-zapier-orange px-8 py-3 text-lg font-normal transition-all duration-200 hover:shadow-lg hover:shadow-zapier-orange/20"
                 >
                   {currentTier.isEnterprise ? 'Contact Sales' : 'Buy Now'}
                   <ArrowRight className="ml-2 h-5 w-5" />
@@ -274,21 +285,36 @@ const PricingScale = () => {
         </div>
 
         {/* Trust Indicators */}
-        <div className="text-center bg-white dark:bg-blueberry/20 rounded-xl p-8 border border-apple-core/20 dark:border-citrus/20">
-          <h3 className="text-xl font-semibold text-earth dark:text-white mb-4">
-            Trusted by thousands of professionals
-          </h3>
-          <div className="flex justify-center items-center space-x-8 opacity-60">
-            <div className="text-sm font-medium text-earth/70 dark:text-white/70">
-              10,000+ CVs analyzed
+        <div className="bg-gradient-to-br from-white via-zapier-orange/5 to-apricot/5 dark:from-blueberry/20 dark:via-zapier-orange/10 dark:to-apricot/10 rounded-2xl p-8 border border-zapier-orange/20 dark:border-citrus/20 shadow-lg hover:shadow-xl transition-all duration-300">
+          <div className="text-center mb-6">
+            <h3 className="text-2xl font-bold text-earth dark:text-white mb-2">
+              Trusted by thousands of professionals
+            </h3>
+            <p className="text-earth/60 dark:text-white/60">
+              Join our community of successful job seekers
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="text-center group">
+              <div className="w-16 h-16 bg-gradient-to-br from-zapier-orange/20 to-apricot/20 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-200">
+                <FileText className="h-8 w-8 text-zapier-orange" />
+              </div>
+              <div className="text-2xl font-bold text-zapier-orange mb-1">10,000+</div>
+              <div className="text-sm font-medium text-earth/70 dark:text-white/70">CVs analyzed</div>
             </div>
-            <div className="w-px h-6 bg-apple-core/30 dark:bg-citrus/30"></div>
-            <div className="text-sm font-medium text-earth/70 dark:text-white/70">
-              98% satisfaction rate
+            <div className="text-center group">
+              <div className="w-16 h-16 bg-gradient-to-br from-green-400/20 to-green-600/20 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-200">
+                <Check className="h-8 w-8 text-green-600" />
+              </div>
+              <div className="text-2xl font-bold text-green-600 mb-1">98%</div>
+              <div className="text-sm font-medium text-earth/70 dark:text-white/70">satisfaction rate</div>
             </div>
-            <div className="w-px h-6 bg-apple-core/30 dark:bg-citrus/30"></div>
-            <div className="text-sm font-medium text-earth/70 dark:text-white/70">
-              SOC 2 compliant
+            <div className="text-center group">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-400/20 to-blue-600/20 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-200">
+                <Zap className="h-8 w-8 text-blue-600" />
+              </div>
+              <div className="text-lg font-bold text-blue-600 mb-1">SOC 2</div>
+              <div className="text-sm font-medium text-earth/70 dark:text-white/70">compliant</div>
             </div>
           </div>
         </div>

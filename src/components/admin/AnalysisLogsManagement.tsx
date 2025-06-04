@@ -185,7 +185,7 @@ const AnalysisLogsManagement = () => {
             <SelectContent>
               <SelectItem value="all">All Types</SelectItem>
               <SelectItem value="cv_analysis">CV Analysis</SelectItem>
-              <SelectItem value="cover_letter">Cover Letter</SelectItem>
+              <SelectItem value="cover_letter_generation">Cover Letter</SelectItem>
             </SelectContent>
           </Select>
 
@@ -255,7 +255,7 @@ const AnalysisLogsManagement = () => {
                   <div className="flex items-center space-x-2">
                     <span className="text-lg">{getOperationTypeIcon(log.operation_type)}</span>
                     <span className="text-sm font-medium capitalize">
-                      {log.operation_type === 'cover_letter_generation' ? 'Cover Letter' : (log.operation_type?.replace('_', ' ') || 'Analysis')}
+                      {log.operation_type === 'cover_letter_generation' ? 'Cover Letter' : log.operation_type === 'cv_analysis' ? 'CV Analysis' : (log.operation_type?.replace('_', ' ') || 'Analysis')}
                     </span>
                   </div>
                 </TableCell>
