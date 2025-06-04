@@ -98,7 +98,7 @@ const PricingScale = () => {
             </CardHeader>
             <CardContent className="space-y-8">
               {/* Slider */}
-              <div className="px-2">
+              <div className="px-4">
                 <Slider
                   value={[selectedTier]}
                   onValueChange={handleSliderChange}
@@ -109,11 +109,11 @@ const PricingScale = () => {
                 />
               </div>
 
-              {/* Tier Labels Below Slider - Grid Layout for Perfect Alignment */}
-              <div className="px-2">
-                <div className="grid grid-cols-5 gap-0">
+              {/* Tier Labels Below Slider - Positioned to align with slider stops */}
+              <div className="px-4 relative">
+                <div className="flex justify-between items-center">
                   {pricingTiers.map((tier, index) => (
-                    <div key={index} className="text-center">
+                    <div key={index} className="text-center flex-1 first:text-left last:text-right [&:nth-child(3)]:text-center">
                       {tier.isEnterprise ? (
                         <div className="space-y-1">
                           <div className="text-lg font-bold text-earth dark:text-white">Enterprise</div>
