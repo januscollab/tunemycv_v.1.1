@@ -28,7 +28,7 @@ const FloatingFeedback = () => {
       <div className="fixed bottom-6 right-6 z-50 group">
         <button
           onClick={handleOpen}
-          className="relative bg-zapier-orange hover:bg-zapier-orange/90 text-white shadow-lg hover:shadow-xl backdrop-blur-sm border border-white/10 rounded-lg overflow-visible transition-all duration-300 ease-out w-12 h-12 group-hover:w-[120px] hover:scale-105"
+          className="relative bg-zapier-orange hover:bg-zapier-orange/90 text-white shadow-lg hover:shadow-xl backdrop-blur-sm border border-white/10 rounded-lg overflow-visible transition-all duration-300 ease-out w-12 h-12 group-hover:w-[140px] hover:scale-105"
           aria-label="Open feedback form"
         >
           {/* Icon Container - Always Visible */}
