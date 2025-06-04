@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Upload, FileText, Check, X, Plus } from 'lucide-react';
+import { Upload, FileText, Check, X, Plus, FolderOpen, FilePlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
@@ -175,25 +175,27 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
             <div className="grid grid-cols-2 gap-2 bg-apple-core/10 dark:bg-citrus/10 p-1 rounded-lg">
               <button
                 onClick={() => setActiveTab('saved')}
-                className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                className={`px-3 py-2 text-sm font-medium rounded-md transition-colors flex items-center justify-center space-x-2 ${
                   activeTab === 'saved'
-                    ? 'bg-zapier-orange text-white'
+                    ? 'text-zapier-orange border-b-2 border-zapier-orange bg-transparent'
                     : 'text-blueberry/70 dark:text-apple-core/70 hover:bg-apple-core/10 dark:hover:bg-citrus/10'
                 }`}
                 disabled={uploading || isLoading}
               >
-                Saved CVs ({savedCVs.length})
+                <FolderOpen className="h-4 w-4" />
+                <span>Saved CVs ({savedCVs.length})</span>
               </button>
               <button
                 onClick={() => setActiveTab('upload')}
-                className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                className={`px-3 py-2 text-sm font-medium rounded-md transition-colors flex items-center justify-center space-x-2 ${
                   activeTab === 'upload'
-                    ? 'bg-zapier-orange text-white'
+                    ? 'text-zapier-orange border-b-2 border-zapier-orange bg-transparent'
                     : 'text-blueberry/70 dark:text-apple-core/70 hover:bg-apple-core/10 dark:hover:bg-citrus/10'
                 }`}
                 disabled={uploading || isLoading}
               >
-                Upload New CV
+                <FilePlus className="h-4 w-4" />
+                <span>Upload New CV</span>
               </button>
             </div>
 

@@ -109,25 +109,27 @@ const JobDescriptionInput: React.FC<JobDescriptionInputProps> = ({
       <div className="grid grid-cols-2 gap-2 bg-apple-core/10 dark:bg-citrus/10 p-1 rounded-lg">
         <button
           onClick={() => setActiveTab('paste')}
-          className={`py-2 px-3 rounded-md text-sm font-medium transition-colors ${
+          className={`py-2 px-3 rounded-md text-sm font-medium transition-colors flex items-center justify-center space-x-2 ${
             activeTab === 'paste'
-              ? 'bg-zapier-orange text-white'
+              ? 'text-zapier-orange border-b-2 border-zapier-orange bg-transparent'
               : 'text-blueberry/70 dark:text-apple-core/70 hover:bg-apple-core/10 dark:hover:bg-citrus/10'
           }`}
           disabled={disabled}
         >
-          Paste Text
+          <FileText className="h-4 w-4" />
+          <span>Paste Text</span>
         </button>
         <button
           onClick={() => setActiveTab('upload')}
-          className={`py-2 px-3 rounded-md text-sm font-medium transition-colors ${
+          className={`py-2 px-3 rounded-md text-sm font-medium transition-colors flex items-center justify-center space-x-2 ${
             activeTab === 'upload'
-              ? 'bg-zapier-orange text-white'
+              ? 'text-zapier-orange border-b-2 border-zapier-orange bg-transparent'
               : 'text-blueberry/70 dark:text-apple-core/70 hover:bg-apple-core/10 dark:hover:bg-citrus/10'
           }`}
           disabled={disabled}
         >
-          Upload File
+          <Upload className="h-4 w-4" />
+          <span>Upload Job Description</span>
         </button>
       </div>
 
@@ -160,7 +162,7 @@ const JobDescriptionInput: React.FC<JobDescriptionInputProps> = ({
         <div className="border-2 border-dashed border-apple-core/30 dark:border-citrus/30 rounded-lg p-6 text-center">
           <Upload className="mx-auto h-8 w-8 text-blueberry/60 dark:text-apple-core/60 mb-2" />
           <label className="cursor-pointer">
-            <span className="text-apricot hover:text-apricot/80 font-medium">Upload Job Description</span>
+            <span className="text-apricot hover:text-apricot/80 font-medium">Upload <span className="text-zapier-orange">Job Description</span></span>
             <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mt-1">PDF, DOCX, TXT - max 5MB</p>
             <input
               type="file"
