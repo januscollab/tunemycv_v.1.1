@@ -55,10 +55,7 @@ const Testimonials = () => {
   ];
 
   return (
-    <section className="py-20 px-4" style={{
-      background: `linear-gradient(to bottom, #d4d1c8 0%, #d4d1c8 25%, #eceae3 100%)`,
-      backgroundImage: `linear-gradient(to bottom, #d4d1c8 0%, #d4d1c8 25%, #eceae3 100%)`
-    }}>
+    <section className="py-20 px-4 bg-gray-50 dark:bg-gray-800">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-blueberry dark:text-citrus mb-4">
