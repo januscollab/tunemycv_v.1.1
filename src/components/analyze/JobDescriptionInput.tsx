@@ -106,29 +106,27 @@ const JobDescriptionInput: React.FC<JobDescriptionInputProps> = ({
   return (
     <div className="space-y-4">
       {/* Tab Selection */}
-      <div className="flex space-x-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
+      <div className="grid grid-cols-2 gap-2 bg-apple-core/10 dark:bg-citrus/10 p-1 rounded-lg">
         <button
           onClick={() => setActiveTab('paste')}
-          className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
+          className={`py-2 px-3 rounded-md text-sm font-medium transition-colors ${
             activeTab === 'paste'
-              ? 'bg-white dark:bg-gray-700 text-blueberry dark:text-citrus shadow-sm'
-              : 'text-blueberry/70 dark:text-apple-core/70 hover:text-blueberry dark:hover:text-citrus'
+              ? 'bg-zapier-orange text-white'
+              : 'text-blueberry/70 dark:text-apple-core/70 hover:bg-apple-core/10 dark:hover:bg-citrus/10'
           }`}
           disabled={disabled}
         >
-          <FileText className="h-4 w-4 inline mr-2" />
           Paste Text
         </button>
         <button
           onClick={() => setActiveTab('upload')}
-          className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
+          className={`py-2 px-3 rounded-md text-sm font-medium transition-colors ${
             activeTab === 'upload'
-              ? 'bg-white dark:bg-gray-700 text-blueberry dark:text-citrus shadow-sm'
-              : 'text-blueberry/70 dark:text-apple-core/70 hover:text-blueberry dark:hover:text-citrus'
+              ? 'bg-zapier-orange text-white'
+              : 'text-blueberry/70 dark:text-apple-core/70 hover:bg-apple-core/10 dark:hover:bg-citrus/10'
           }`}
           disabled={disabled}
         >
-          <Upload className="h-4 w-4 inline mr-2" />
           Upload File
         </button>
       </div>

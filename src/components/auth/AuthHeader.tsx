@@ -14,13 +14,13 @@ const AuthHeader: React.FC<AuthHeaderProps> = ({ mode, fromAnalyze }) => {
   const getTitle = () => {
     switch (mode) {
       case 'login':
-        return 'Welcome back';
+        return 'Sign In';
       case 'register':
         return 'Create your account';
       case 'forgot-password':
         return 'Reset your password';
       default:
-        return 'Welcome back';
+        return 'Sign In';
     }
   };
 

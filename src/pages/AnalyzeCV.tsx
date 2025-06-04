@@ -512,7 +512,7 @@ const AnalyzeCV = () => {
                         No analysis generated yet.
                       </p>
                       <p className="text-sm font-normal text-gray-500">
-                        Create one in the "Analyze CV" tab or view previous analysis in <Button variant="link" onClick={() => setActiveTab('history')} className="text-zapier-orange hover:text-zapier-orange/80 underline p-0 h-auto">"Document History"</Button>.
+                        Create one in the <Button variant="link" onClick={() => setActiveTab('analysis')} className="text-zapier-orange hover:text-zapier-orange/80 underline p-0 h-auto">Analyze CV</Button> tab or view previous analysis in <Button variant="link" onClick={() => setActiveTab('history')} className="text-zapier-orange hover:text-zapier-orange/80 underline p-0 h-auto">History</Button>.
                       </p>
                     </CardContent>
                   </Card>

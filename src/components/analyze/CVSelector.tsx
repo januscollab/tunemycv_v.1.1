@@ -172,30 +172,28 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
         ) : (
           <div className="space-y-4">
             {/* Tab Navigation */}
-            <div className="flex space-x-1 bg-apple-core/20 dark:bg-citrus/20 rounded-lg p-1">
+            <div className="grid grid-cols-2 gap-2 bg-apple-core/10 dark:bg-citrus/10 p-1 rounded-lg">
               <button
                 onClick={() => setActiveTab('saved')}
-                className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                   activeTab === 'saved'
-                    ? 'bg-white dark:bg-blueberry/40 text-blueberry dark:text-citrus shadow-sm'
-                    : 'text-blueberry/70 dark:text-apple-core/70 hover:text-blueberry dark:hover:text-citrus'
+                    ? 'bg-zapier-orange text-white'
+                    : 'text-blueberry/70 dark:text-apple-core/70 hover:bg-apple-core/10 dark:hover:bg-citrus/10'
                 }`}
                 disabled={uploading || isLoading}
               >
-                <FileText className="h-4 w-4 mx-auto mb-1" />
                 Saved CVs ({savedCVs.length})
               </button>
               <button
                 onClick={() => setActiveTab('upload')}
-                className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                   activeTab === 'upload'
-                    ? 'bg-white dark:bg-blueberry/40 text-blueberry dark:text-citrus shadow-sm'
-                    : 'text-blueberry/70 dark:text-apple-core/70 hover:text-blueberry dark:hover:text-citrus'
+                    ? 'bg-zapier-orange text-white'
+                    : 'text-blueberry/70 dark:text-apple-core/70 hover:bg-apple-core/10 dark:hover:bg-citrus/10'
                 }`}
                 disabled={uploading || isLoading}
               >
-                <Plus className="h-4 w-4 mx-auto mb-1" />
-                Upload New
+                Upload New CV
               </button>
             </div>
 

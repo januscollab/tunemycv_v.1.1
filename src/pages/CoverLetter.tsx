@@ -642,7 +642,7 @@ const AuthenticatedCoverLetter = () => {
                             <Edit2 className="h-4 w-4" />
                           </button>
                         </div>
-                        <div className="flex items-center gap-4 mt-2 text-sm font-normal text-gray-600 dark:text-gray-400">
+                        <div className="text-sm font-normal text-gray-600 dark:text-gray-400 mt-2">
                           <div className="flex items-center gap-1">
                             <Clock className="h-4 w-4" />
                             Generated {formatDate(selectedCoverLetter.created_at)}
@@ -745,7 +745,7 @@ const AuthenticatedCoverLetter = () => {
                         No cover letter generated yet.
                       </p>
                       <p className="text-sm font-normal text-gray-500">
-                        Create one in the "Generate New" tab or view previous letters in <Link to="#" onClick={() => setActiveTab('history')} className="text-zapier-orange hover:text-zapier-orange/80 underline">"Document History"</Link>.
+                        Create one in the <Link to="#" onClick={() => setActiveTab('create')} className="text-zapier-orange hover:text-zapier-orange/80 underline">Generate New</Link> tab or view previous letters in <Link to="#" onClick={() => setActiveTab('history')} className="text-zapier-orange hover:text-zapier-orange/80 underline">History</Link>.
                       </p>
                     </CardContent>
                   </Card>

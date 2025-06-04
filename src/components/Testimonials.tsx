@@ -83,7 +83,7 @@ const Testimonials = () => {
                 </div>
               </div>
               
-              <p className="text-blueberry/80 dark:text-white/90 mb-6 leading-relaxed">
+              <p className="text-blueberry/80 dark:text-blueberry mb-6 leading-relaxed">
                 "{testimonial.content}"
               </p>
               
@@ -94,8 +94,8 @@ const Testimonials = () => {
                   className="w-12 h-12 rounded-full mr-4 border-2 border-apple-core/30 dark:border-citrus/30"
                 />
                 <div>
-                  <h4 className="font-semibold text-blueberry dark:text-white">{testimonial.name}</h4>
-                  <p className="text-sm text-blueberry/70 dark:text-white/80">{testimonial.role}</p>
+                  <h4 className="font-semibold text-blueberry dark:text-blueberry">{testimonial.name}</h4>
+                  <p className="text-sm text-blueberry/70 dark:text-blueberry/80">{testimonial.role}</p>
                   <p className="text-sm text-apricot font-medium">{testimonial.company}</p>
                 </div>
               </div>

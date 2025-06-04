@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, CreditCard } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfileData } from '@/hooks/useProfileData';
 import NavigationLogo from './navigation/NavigationLogo';
@@ -78,10 +78,19 @@ const Navigation = () => {
           <div className="hidden md:flex items-center space-x-4">
             <ThemeToggle />
             {user ? (
-              <UserProfileDropdown 
-                userDisplayName={getUserDisplayName()} 
-                isActive={isActive} 
-              />
+              <>
+                <Link
+                  to="/pricing"
+                  className="flex items-center px-3 py-2 text-sm font-medium text-white bg-zapier-orange hover:bg-zapier-orange/90 rounded-lg transition-colors"
+                >
+                  <CreditCard className="h-4 w-4 mr-2" />
+                  Buy Credits
+                </Link>
+                <UserProfileDropdown 
+                  userDisplayName={getUserDisplayName()} 
+                  isActive={isActive} 
+                />
+              </>
             ) : (
               <AuthButtons />
             )}
