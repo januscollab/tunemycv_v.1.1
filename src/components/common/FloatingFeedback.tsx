@@ -24,22 +24,21 @@ const FloatingFeedback = () => {
 
   return (
     <>
-      {/* Browser Edge Tab */}
-      <div className="fixed -right-1 top-1/2 -translate-y-1/2 z-50 group">
+      {/* Bottom-Right Expandable Feedback Tab */}
+      <div className="fixed bottom-6 right-6 z-50 group">
         <button
           onClick={handleOpen}
-          className="relative bg-zapier-orange hover:bg-zapier-orange/90 text-white px-4 py-5 rounded-l-lg shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.02] rotate-90 origin-center backdrop-blur-sm border-l border-t border-b border-white/10"
-          style={{ 
-            transformOrigin: 'center center',
-            marginRight: '-4px',
-            borderTopRightRadius: '0',
-            borderBottomRightRadius: '0'
-          }}
+          className="relative bg-zapier-orange hover:bg-zapier-orange/90 text-white shadow-lg hover:shadow-xl backdrop-blur-sm border border-white/10 rounded-lg overflow-visible transition-all duration-300 ease-out w-12 h-12 group-hover:w-[140px] hover:scale-105"
           aria-label="Open feedback form"
         >
-          <div className="flex items-center space-x-2.5">
-            <MessageSquare className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-            <span className="text-xs font-medium tracking-wider whitespace-nowrap">
+          {/* Icon Container - Always Visible */}
+          <div className="w-12 h-12 flex items-center justify-center flex-shrink-0">
+            <MessageSquare className="h-5 w-5 transition-transform duration-200 group-hover:scale-110" />
+          </div>
+          
+          {/* Text Container - Expands on Hover */}
+          <div className="absolute left-12 top-0 h-12 flex items-center px-3 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">
+            <span className="text-sm font-medium tracking-wide">
               Feedback
             </span>
           </div>
@@ -88,20 +87,6 @@ const FloatingFeedback = () => {
                 />
               </div>
 
-              {/* Enhanced Footer */}
-              <div className="p-6 border-t border-apple-core/10 dark:border-citrus/10 bg-surface/30 dark:bg-blueberry/20 backdrop-blur-sm">
-                <div className="text-center space-y-2">
-                  <p className="text-xs text-blueberry/60 dark:text-apple-core/70">
-                    Need immediate help?
-                  </p>
-                  <a 
-                    href="mailto:hello@tunemycv.com" 
-                    className="inline-flex items-center text-sm text-zapier-orange hover:text-zapier-orange/80 transition-colors hover:underline font-medium"
-                  >
-                    Email us at hello@tunemycv.com
-                  </a>
-                </div>
-              </div>
             </div>
           </div>
         </>
