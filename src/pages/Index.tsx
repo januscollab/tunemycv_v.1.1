@@ -12,7 +12,7 @@ const Index = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="py-10 px-4">
+      <section className="py-10 px-4 bg-gradient-to-br from-white via-cream/30 to-apple-core/10 dark:from-gray-900 dark:via-blueberry/20 dark:to-citrus/5">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center bg-zapier-orange/10 text-zapier-orange px-4 py-2 rounded-full text-sm font-medium mb-6">
             <Sparkles className="h-4 w-4 mr-2" />
@@ -64,7 +64,7 @@ const Index = () => {
       </section>
 
       {/* Features Grid */}
-      <section className="py-10 px-4 bg-cream/30">
+      <section className="py-10 px-4 bg-gradient-to-br from-cream/40 via-white to-zapier-orange/5 dark:from-blueberry/15 dark:via-gray-900 dark:to-zapier-orange/10">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-earth dark:text-white mb-4">
@@ -129,7 +129,7 @@ const Index = () => {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-16 bg-white dark:bg-gray-900">
+      <section className="py-16 bg-gradient-to-br from-apple-core/10 via-cream/20 to-earth/5 dark:from-blueberry/20 dark:via-gray-900 dark:to-earth/10">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-earth dark:text-white mb-4">
