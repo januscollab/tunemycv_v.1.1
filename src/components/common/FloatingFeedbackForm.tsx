@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, MessageSquare, Lightbulb, Bug, Heart, Zap } from 'lucide-react';
+import { Send, MessageSquare, Lightbulb, Bug, Heart, Zap, Brain } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
@@ -18,6 +18,7 @@ const feedbackCategories = [
   { id: 'bug', label: 'Bug Report', icon: Bug, color: 'bg-red-500' },
   { id: 'appreciation', label: 'Appreciation', icon: Heart, color: 'bg-pink-500' },
   { id: 'performance', label: 'Performance', icon: Zap, color: 'bg-green-500' },
+  { id: 'ai-query', label: 'AI Query', icon: Brain, color: 'bg-purple-500' },
 ];
 
 export const FloatingFeedbackForm: React.FC<FloatingFeedbackFormProps> = ({ 
@@ -51,7 +52,7 @@ export const FloatingFeedbackForm: React.FC<FloatingFeedbackFormProps> = ({
 
   const getContextualMessage = () => {
     const messages = {
-      homepage: "We'd love to hear how we can improve your CV optimization experience!",
+      homepage: "Help us improve your experience!",
       analyze: "How was your CV analysis experience? Any suggestions for improvement?",
       resources: "Found our resources helpful? Let us know what else you'd like to see!",
       profile: "How can we improve your profile and dashboard experience?",
@@ -72,7 +73,7 @@ export const FloatingFeedbackForm: React.FC<FloatingFeedbackFormProps> = ({
   const handleCategorySelect = (categoryId: string) => {
     setSelectedCategory(categoryId);
     const category = feedbackCategories.find(c => c.id === categoryId);
-    if (category && !formData.subject) {
+    if (category) {
       setFormData(prev => ({ ...prev, subject: category.label }));
     }
   };
@@ -177,12 +178,6 @@ export const FloatingFeedbackForm: React.FC<FloatingFeedbackFormProps> = ({
         </div>
       </div>
 
-      {/* Contextual Message */}
-      <div className="mb-6 p-4 bg-zapier-orange/5 border border-zapier-orange/20 rounded-lg animate-fade-in" style={{ animationDelay: '400ms' }}>
-        <p className="text-sm text-blueberry dark:text-citrus">
-          💡 {getContextualMessage()}
-        </p>
-      </div>
 
       {/* Form Fields */}
       <div className="space-y-5 flex-1 animate-fade-in" style={{ animationDelay: '500ms' }}>
