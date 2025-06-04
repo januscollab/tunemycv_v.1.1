@@ -35,7 +35,7 @@ import EditableCoverLetter from '@/components/cover-letter/EditableCoverLetter';
 import NoAnalysisModal from '@/components/cover-letter/NoAnalysisModal';
 import CoverLetterLoggedOut from '@/components/cover-letter/CoverLetterLoggedOut';
 import ProcessingModal from '@/components/ui/processing-modal';
-import CoverLetterGenerationModal from '@/components/cover-letter/CoverLetterGenerationModal';
+// Import ProcessingModal for cover letter generation
 
 const CoverLetter = () => {
   const { user } = useAuth();
@@ -385,9 +385,10 @@ const AuthenticatedCoverLetter = () => {
           message="Please wait while we regenerate your cover letter with the new settings..."
         />
 
-        <CoverLetterGenerationModal
+        <ProcessingModal
           isOpen={isGenerating}
-          title="Crafting Your Cover Letter"
+          title="Generating Cover Letter"
+          message="Please wait while we create your personalized cover letter..."
         />
 
 
@@ -814,19 +815,17 @@ const AuthenticatedCoverLetter = () => {
                                         v{coverLetter.regeneration_count + 1}
                                       </Badge>
                                     )}
-                                  </div>
-                                  
+                                   </div>
+                                   
+                                   {/* Date/time stamp moved under title */}
+                                   <div className="flex items-center text-sm text-gray-600 mb-3">
+                                     <Clock className="h-4 w-4 mr-1" />
+                                     <span>Updated {formatDate(coverLetter.updated_at)}</span>
+                                   </div>
                                  </div>
-                                 
-                                 {/* Date/time stamp moved under title */}
-                                 <div className="flex items-center text-sm text-gray-600 mb-3">
-                                   <Clock className="h-4 w-4 mr-1" />
-                                   <span>Updated {formatDate(coverLetter.updated_at)}</span>
-                                 </div>
-                                </div>
-                              </div>
-                              
-                              {/* Action buttons row at bottom */}
+                               </div>
+                               
+                               {/* Action buttons row at bottom */}
                               <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-100">
                                 <div className="flex items-center space-x-3">
                                   <button

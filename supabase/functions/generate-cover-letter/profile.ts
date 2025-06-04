@@ -18,6 +18,7 @@ export function formatContactInfo(
   profile: UserProfile | null,
   includeLinkedInUrl?: boolean
 ): ContactInfo {
+  // Format contact information with fallbacks to placeholders
   const fullName = profile?.first_name && profile?.last_name 
     ? `${profile.first_name} ${profile.last_name}` 
     : profile?.first_name 
@@ -29,8 +30,14 @@ export function formatContactInfo(
     : '[Your Phone Number]'
   
   const email = profile?.email || '[Your Email Address]'
-  const linkedInUrl = (includeLinkedInUrl && profile?.linkedin_url) ? profile.linkedin_url : ''
-  const websiteUrl = profile?.personal_website_url || ''
+  
+  // Only include LinkedIn URL if flag is true and URL exists
+  const linkedInUrl = (includeLinkedInUrl && profile?.linkedin_url) 
+    ? profile.linkedin_url 
+    : '[LinkedIn Profile URL]'
+  
+  // Only include website if it exists, otherwise use placeholder
+  const websiteUrl = profile?.personal_website_url || '[Personal Website/Portfolio URL]'
 
   return {
     fullName,
