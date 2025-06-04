@@ -42,15 +42,19 @@ const HelpCentre = () => {
       faqs: [
         {
           question: "How do I analyze my CV?",
-          answer: "Simply upload your CV and paste the job description you're applying for. Our AI will analyze compatibility and provide detailed recommendations."
+          answer: "Upload your CV and provide a job description (by pasting text or uploading a file). Our AI will analyze compatibility and provide detailed recommendations including keyword analysis, skills gap assessment, and personalized suggestions."
         },
         {
           question: "What file formats are supported?",
-          answer: "We support PDF, DOCX, and TXT files up to 5MB in size for both CVs and job descriptions."
+          answer: "We support PDF, DOCX, and TXT files up to 5MB in size for both CVs and job descriptions. You can also paste job descriptions directly as text."
         },
         {
           question: "How accurate is the analysis?",
-          answer: "Our AI-powered analysis uses advanced natural language processing to provide detailed insights with industry-standard accuracy."
+          answer: "Our AI-powered analysis uses advanced natural language processing to provide detailed insights with industry-standard accuracy. If you notice any errors, you can report them using the bug report feature in your analysis results."
+        },
+        {
+          question: "Can I save my CVs for future use?",
+          answer: "Yes! You can save your CVs in your profile for quick access in future analyses. Manage your saved CVs in the CV Management section of your profile."
         }
       ]
     },
@@ -60,15 +64,19 @@ const HelpCentre = () => {
       faqs: [
         {
           question: "What does the compatibility score mean?",
-          answer: "The compatibility score (0-100%) indicates how well your CV matches the job requirements. Scores above 70% indicate strong compatibility."
+          answer: "The compatibility score (0-100%) indicates how well your CV matches the job requirements. Scores above 80% are excellent, 70-79% are good, 50-69% are moderate, and below 50% need improvement."
         },
         {
           question: "How are keywords identified?",
-          answer: "Our system extracts key terms from the job description and checks for their presence in your CV, considering context and relevance."
+          answer: "Our enhanced AI system extracts key terms from the job description and analyzes their context, relevance, and frequency in your CV. We identify both present and missing keywords with detailed recommendations."
         },
         {
           question: "Can I save my analysis results?",
-          answer: "Yes, all analysis results are automatically saved to your profile and can be accessed anytime from your dashboard."
+          answer: "Yes, all analysis results are automatically saved to your profile. Access them from the Analysis History tab in your profile, where you can view, download, or generate cover letters from past analyses."
+        },
+        {
+          question: "What's included in the analysis report?",
+          answer: "Our comprehensive reports include executive summary, compatibility breakdown, keyword analysis, skills gap assessment, ATS optimization tips, and interview preparation insights with personalized recommendations."
         }
       ]
     },
@@ -91,12 +99,38 @@ const HelpCentre = () => {
       ]
     },
     {
+      title: "Cover Letter Generation",
+      icon: <FileText className="h-5 w-5" />,
+      faqs: [
+        {
+          question: "How do I generate a cover letter?",
+          answer: "You can generate cover letters from your analysis results or by manually entering job details. Navigate to the Generate Cover Letter page and choose your preferred method."
+        },
+        {
+          question: "Can I customize my cover letter?",
+          answer: "Yes! You can choose from different tones (professional, conversational, confident, etc.), adjust length, add work experience highlights, personal values, and custom opening hooks."
+        },
+        {
+          question: "How many times can I regenerate a cover letter?",
+          answer: "You get 2 free regenerations per cover letter. After that, each regeneration uses 1 credit. You can also edit the generated text directly."
+        },
+        {
+          question: "Does the cover letter include my contact information?",
+          answer: "Yes! If you've completed your profile with contact details, we'll automatically populate your name, phone number, email, LinkedIn URL, and personal website URL in the cover letter header."
+        }
+      ]
+    },
+    {
       title: "Credits & Billing",
       icon: <CreditCard className="h-5 w-5" />,
       faqs: [
         {
           question: "How do credits work?",
-          answer: "Each comprehensive AI analysis uses 1 credit. You start with 5 free credits, and can purchase more as needed."
+          answer: "Each comprehensive AI analysis uses 1 credit. Cover letter generation also uses 1 credit, with 2 free regenerations per cover letter. You start with 5 free credits, and can purchase more as needed."
+        },
+        {
+          question: "What can I do with my credits?",
+          answer: "Use credits for CV analysis, cover letter generation, and interview preparation features. Check your credit balance in the top navigation or your profile settings."
         },
         {
           question: "What's the difference between free and paid analysis?",

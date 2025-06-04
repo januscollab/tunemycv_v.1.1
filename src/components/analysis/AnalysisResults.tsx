@@ -1,6 +1,8 @@
 
-import React from 'react';
-import { CheckCircle, Download, ArrowLeft } from 'lucide-react';
+import React, { useState } from 'react';
+import { CheckCircle, Download, ArrowLeft, Bug } from 'lucide-react';
+import { useProfileData } from '@/hooks/useProfileData';
+import { FloatingFeedbackForm } from '@/components/common/FloatingFeedbackForm';
 import ExecutiveSummarySection from './ExecutiveSummarySection';
 import CompatibilityBreakdownSection from './CompatibilityBreakdownSection';
 import EnhancedKeywordAnalysis from './EnhancedKeywordAnalysis';
@@ -23,7 +25,61 @@ interface AnalysisResultsProps {
   readOnly?: boolean;
 }
 
+interface BugReportModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  transactionId: string;
+  userName: string;
+}
+
+const BugReportModal: React.FC<BugReportModalProps> = ({ isOpen, onClose, transactionId, userName }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
+      <div className="bg-white dark:bg-surface rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col border border-apple-core/10 dark:border-citrus/20">
+        <div className="p-6 border-b border-apple-core/10 dark:border-citrus/20 flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-red-500/10 rounded-lg flex items-center justify-center">
+              <Bug className="h-5 w-5 text-red-500" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-blueberry dark:text-citrus">
+                Report Analysis Error
+              </h2>
+              <p className="text-sm text-blueberry/60 dark:text-apple-core/60">
+                Help us improve by reporting issues
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-apple-core/10 dark:hover:bg-citrus/10 rounded-lg transition-colors"
+            aria-label="Close bug report form"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </button>
+        </div>
+
+        <div className="flex-1 p-6 overflow-y-auto">
+          <FloatingFeedbackForm 
+            onClose={onClose} 
+            currentPage="analysis"
+            prefilledData={{
+              category: 'bug',
+              subject: 'Bug Report',
+              message: `I encountered an error in my CV analysis report.\n\nTransaction ID: ${transactionId}\nUser: ${userName}\n\nError details:\n`
+            }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, readOnly = false }) => {
+  const [showBugReport, setShowBugReport] = useState(false);
+  const { getUserDisplayName } = useProfileData();
   const getMatchLevel = (score: number) => {
     if (score >= 80) return 'Excellent Match';
     if (score >= 70) return 'Good Match';
@@ -166,16 +222,28 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
           </div>
         )}
 
-        {/* Transaction ID Note */}
+        {/* Transaction ID Note with Bug Report */}
         <div className="mt-12 mb-8 bg-gray-50 dark:bg-blueberry/10 border border-gray-200 dark:border-citrus/20 rounded-lg p-4">
-          <p className="text-sm text-blueberry/70 dark:text-apple-core/80 text-center">
-            <strong>Note:</strong> While our AI models are well-trained, occasional errors may occur. 
-            If you believe there's an error in your report, please contact us at{' '}
-            <a href="mailto:hello@tunemycv.com" className="text-apricot hover:text-apricot/80 underline">
-              hello@tunemycv.com
-            </a>{' '}
-            and quote transaction ID: <span className="font-mono text-blueberry dark:text-citrus">{transactionId}</span> for investigation.
-          </p>
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <p className="text-sm text-blueberry/70 dark:text-apple-core/80">
+                <strong>Note:</strong> While our AI models are well-trained, occasional errors may occur. 
+                If you believe there's an error in your report, please contact us at{' '}
+                <a href="mailto:hello@tunemycv.com" className="text-apricot hover:text-apricot/80 underline">
+                  hello@tunemycv.com
+                </a>{' '}
+                and quote transaction ID: <span className="font-mono text-blueberry dark:text-citrus">{transactionId}</span> for investigation.
+              </p>
+            </div>
+            <button
+              onClick={() => setShowBugReport(true)}
+              className="ml-4 p-2 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 rounded-lg transition-colors flex items-center gap-1 text-sm font-medium"
+              title="Report an error in this analysis"
+            >
+              <Bug className="h-4 w-4" />
+              <span className="hidden sm:inline">Report Error</span>
+            </button>
+          </div>
         </div>
 
         {/* Next Steps Section - only show if not in read-only mode */}
@@ -184,6 +252,14 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
             <NextStepsSection onStartNew={onStartNew} />
           </div>
         )}
+
+        {/* Bug Report Modal */}
+        <BugReportModal
+          isOpen={showBugReport}
+          onClose={() => setShowBugReport(false)}
+          transactionId={transactionId}
+          userName={getUserDisplayName()}
+        />
       </div>
     </div>
   );

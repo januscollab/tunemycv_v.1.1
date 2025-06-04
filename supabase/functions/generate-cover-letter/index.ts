@@ -73,17 +73,23 @@ serve(async (req) => {
       )
     }
 
-    // Get LinkedIn URL if needed
-    let linkedInUrl = ''
-    if (includeLinkedInUrl) {
-      const { data: profileData } = await supabaseClient
-        .from('profiles')
-        .select('linkedin_url')
-        .eq('id', user.id)
-        .single()
-      
-      linkedInUrl = profileData?.linkedin_url || ''
-    }
+    // Get user profile for contact info auto-population
+    const { data: profileData } = await supabaseClient
+      .from('profiles')
+      .select('first_name, last_name, email, phone_number, country_code, linkedin_url, personal_website_url')
+      .eq('id', user.id)
+      .single()
+    
+    // Prepare contact info placeholders
+    const fullName = profileData?.first_name && profileData?.last_name 
+      ? `${profileData.first_name} ${profileData.last_name}` 
+      : '[Your Name]'
+    const phoneNumber = profileData?.phone_number 
+      ? `${profileData.country_code || ''}${profileData.phone_number}` 
+      : '[Your Phone Number]'
+    const email = profileData?.email || '[Your Email Address]'
+    const linkedInUrl = (includeLinkedInUrl && profileData?.linkedin_url) ? profileData.linkedin_url : ''
+    const websiteUrl = profileData?.personal_website_url || ''
 
     // Get template prompt
     const { data: templateData } = await supabaseClient
@@ -113,6 +119,11 @@ serve(async (req) => {
         lengthInstruction = 'Write a concise cover letter, around 250-300 words.'
     }
 
+    // Build contact header
+    let contactHeader = `${fullName}\n${phoneNumber}\n${email}`
+    if (linkedInUrl) contactHeader += `\n${linkedInUrl}`
+    if (websiteUrl) contactHeader += `\n${websiteUrl}`
+
     // Build advanced options text
     let advancedOptionsText = ''
     if (workExperienceHighlights) {
@@ -132,12 +143,14 @@ serve(async (req) => {
 
 The cover letter should:
 - Always start with this exact header format:
-  "Hiring Manager  
-  [Company Name]
+  "${contactHeader}
+  
+  Hiring Manager  
+  ${companyName}
   [Company Address]  
   [City, State, Zip]  
   
-  Dear Hiring Manager,"
+  Dear Hiring Manager,"`
 - Be tailored specifically to the job and company
 - Highlight relevant experience and skills
 - Show genuine enthusiasm for the role
