@@ -816,10 +816,13 @@ const AuthenticatedCoverLetter = () => {
                                     )}
                                   </div>
                                   
-                                  <div className="flex items-center text-sm text-gray-600 mb-3">
-                                    <Clock className="h-4 w-4 mr-1" />
-                                    <span>Updated {formatDate(coverLetter.updated_at)}</span>
-                                  </div>
+                                 </div>
+                                 
+                                 {/* Date/time stamp moved under title */}
+                                 <div className="flex items-center text-sm text-gray-600 mb-3">
+                                   <Clock className="h-4 w-4 mr-1" />
+                                   <span>Updated {formatDate(coverLetter.updated_at)}</span>
+                                 </div>
                                 </div>
                               </div>
                               
