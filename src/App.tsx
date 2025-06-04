@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-route
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './components/theme-provider';
-import { useCopyRestriction } from './hooks/useCopyRestriction';
+
 import Index from './pages/Index';
 import Auth from './pages/Auth';
 import AnalyzeCV from './pages/AnalyzeCV';
@@ -37,10 +37,8 @@ function ScrollToTop() {
 }
 
 function AppContent() {
-  const { restrictionClass } = useCopyRestriction();
-  
   return (
-    <div className={`flex flex-col min-h-screen w-full transition-colors duration-normal ${restrictionClass}`}>
+    <div className="flex flex-col min-h-screen w-full transition-colors duration-normal">
       <SecurityHeaders />
       <ScrollToTop />
       <Navigation />

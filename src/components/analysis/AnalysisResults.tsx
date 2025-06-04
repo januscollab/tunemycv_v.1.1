@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { CheckCircle, Download, ArrowLeft, Bug } from 'lucide-react';
-import { useCopyRestriction } from '@/hooks/useCopyRestriction';
+
 import { useProfileData } from '@/hooks/useProfileData';
 import { FloatingFeedbackForm } from '@/components/common/FloatingFeedbackForm';
 import ExecutiveSummarySection from './ExecutiveSummarySection';
@@ -81,7 +81,6 @@ const BugReportModal: React.FC<BugReportModalProps> = ({ isOpen, onClose, transa
 const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, readOnly = false }) => {
   const [showBugReport, setShowBugReport] = useState(false);
   const { getUserDisplayName } = useProfileData();
-  const { restrictionClass } = useCopyRestriction();
   const getMatchLevel = (score: number) => {
     if (score >= 80) return 'Excellent Match';
     if (score >= 70) return 'Good Match';
@@ -111,7 +110,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-apple-core/20 via-white to-citrus/10 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
-      <div className={`max-w-6xl mx-auto px-4 py-8 ${restrictionClass}`}>
+      <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Header with title, back button, and download icon */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center">
