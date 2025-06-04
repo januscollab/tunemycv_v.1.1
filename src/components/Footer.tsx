@@ -1,9 +1,12 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail } from 'lucide-react';
+import { ContactFormModal } from '@/components/ui/contact-form-modal';
 
 const Footer = () => {
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+
   return (
     <footer className="bg-earth dark:bg-gray-900 text-white py-12">
       <div className="max-w-6xl mx-auto px-4">
@@ -22,12 +25,12 @@ const Footer = () => {
             </p>
             <div className="flex items-center mb-4">
               <Mail className="h-4 w-4 mr-2 text-white/80" />
-              <a 
-                href="mailto:hello@tunemycv.com" 
-                className="text-white/80 hover:text-zapier-orange transition-colors"
+              <button 
+                onClick={() => setIsContactModalOpen(true)}
+                className="text-white/80 hover:text-zapier-orange transition-colors cursor-pointer underline"
               >
                 hello@tunemycv.com
-              </a>
+              </button>
             </div>
           </div>
           
@@ -90,6 +93,11 @@ const Footer = () => {
           </p>
         </div>
       </div>
+      
+      <ContactFormModal
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
+      />
     </footer>
   );
 };

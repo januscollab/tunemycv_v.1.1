@@ -90,7 +90,12 @@ const PricingScale = () => {
 
         {/* Pricing Slider */}
         <div className="mb-16 max-w-4xl mx-auto">
-          <Card className="bg-white dark:bg-blueberry/20 border-2 border-zapier-orange/30 dark:border-zapier-orange/40 p-8 shadow-xl shadow-zapier-orange/10">
+          <Card className="bg-white dark:bg-blueberry/20 border-2 border-zapier-orange/50 dark:border-zapier-orange/60 p-8 shadow-xl shadow-zapier-orange/20">
+            <CardHeader className="pb-6">
+              <CardTitle className="text-2xl font-bold text-earth dark:text-white text-center">
+                Simple Pay As you go Pricing
+              </CardTitle>
+            </CardHeader>
             <CardContent className="space-y-8">
               {/* Slider */}
               <div className="px-2">
@@ -100,18 +105,21 @@ const PricingScale = () => {
                   max={4}
                   min={0}
                   step={1}
-                  className="w-full"
+                  className="w-full [&>*:first-child]:bg-gray-300 dark:[&>*:first-child]:bg-gray-600"
                 />
               </div>
 
               {/* Tier Labels Below Slider */}
-              <div className="flex justify-between items-center text-sm font-medium text-earth/70 dark:text-white/70 px-2">
+              <div className="flex justify-between items-center px-2">
                 {pricingTiers.map((tier, index) => (
                   <div key={index} className="text-center">
                     {tier.isEnterprise ? (
-                      <span className="text-zapier-orange font-semibold">Enterprise</span>
+                      <div className="text-zapier-orange font-semibold text-sm">Enterprise</div>
                     ) : (
-                      <span>${tier.price} {tier.credits} Credits</span>
+                      <div className="space-y-1">
+                        <div className="text-lg font-bold text-earth dark:text-white">${tier.price}</div>
+                        <div className="text-sm text-earth/70 dark:text-white/70">{tier.credits} Credits</div>
+                      </div>
                     )}
                   </div>
                 ))}
@@ -132,11 +140,11 @@ const PricingScale = () => {
                   ) : (
                     <>
                       <div className="flex items-baseline space-x-2">
-                        <span className="text-3xl text-zapier-orange">${currentTier.price}</span>
+                        <span className="text-3xl text-zapier-orange font-bold">${currentTier.price}</span>
                         <span className="text-xl text-earth dark:text-white">for</span>
-                        <span className="text-3xl text-zapier-orange">{currentTier.credits} Credits</span>
+                        <span className="text-3xl text-zapier-orange font-bold">{currentTier.credits} Credits</span>
                         {currentTier.savings && (
-                          <Badge className="bg-green-100 text-green-800 ml-3">
+                          <Badge className="bg-green-100 text-green-800 ml-3 px-4 py-1.5 text-sm">
                             {currentTier.savings}
                           </Badge>
                         )}
@@ -159,6 +167,114 @@ const PricingScale = () => {
               </div>
             </CardContent>
           </Card>
+        </div>
+
+        {/* End-to-End Journey Section */}
+        <div className="mb-16">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-earth dark:text-white mb-4">
+              Your Complete Job Application Journey
+            </h2>
+            <p className="text-lg text-earth/70 dark:text-white/70 max-w-2xl mx-auto">
+              Transform your job search with our comprehensive AI-powered process
+            </p>
+          </div>
+          
+          <div className="max-w-6xl mx-auto">
+            <div className="relative">
+              {/* Flow Line */}
+              <div className="hidden md:block absolute top-1/2 left-16 right-16 h-0.5 bg-gradient-to-r from-zapier-orange via-citrus to-zapier-orange transform -translate-y-1/2"></div>
+              
+              <div className="grid md:grid-cols-3 gap-8 relative">
+                {/* Step 1: CV Analysis */}
+                <div className="text-center group">
+                  <div className="bg-white dark:bg-blueberry/20 border-2 border-zapier-orange/30 dark:border-zapier-orange/40 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 relative">
+                    <div className="w-16 h-16 bg-gradient-to-br from-zapier-orange to-apricot rounded-full flex items-center justify-center mx-auto mb-4 relative z-10">
+                      <FileText className="h-8 w-8 text-white" />
+                    </div>
+                    <h3 className="text-xl font-bold text-earth dark:text-white mb-2">1. CV Analysis</h3>
+                    <div className="text-2xl font-bold text-zapier-orange mb-3">2 Credits</div>
+                    <p className="text-earth/70 dark:text-white/70 text-sm mb-4">
+                      Get AI-powered insights on your CV's strengths, weaknesses, and ATS optimization opportunities.
+                    </p>
+                    <div className="bg-zapier-orange/10 dark:bg-zapier-orange/5 rounded-lg p-3">
+                      <p className="text-xs text-earth/80 dark:text-white/80 font-medium">
+                        ✓ ATS Optimization<br />
+                        ✓ Skills Gap Analysis<br />
+                        ✓ Keyword Matching
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Step 2: Cover Letter */}
+                <div className="text-center group">
+                  <div className="bg-white dark:bg-blueberry/20 border-2 border-citrus/30 dark:border-citrus/40 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 relative">
+                    <div className="w-16 h-16 bg-gradient-to-br from-citrus to-apricot rounded-full flex items-center justify-center mx-auto mb-4 relative z-10">
+                      <Zap className="h-8 w-8 text-white" />
+                    </div>
+                    <h3 className="text-xl font-bold text-earth dark:text-white mb-2">2. Cover Letter</h3>
+                    <div className="text-2xl font-bold text-citrus mb-3">1 Credit</div>
+                    <p className="text-earth/70 dark:text-white/70 text-sm mb-4">
+                      Generate a personalized, compelling cover letter tailored to the specific role and company.
+                    </p>
+                    <div className="bg-citrus/10 dark:bg-citrus/5 rounded-lg p-3">
+                      <p className="text-xs text-earth/80 dark:text-white/80 font-medium">
+                        ✓ Role-Specific Content<br />
+                        ✓ Professional Formatting<br />
+                        ✓ Compelling Narrative
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Step 3: Interview Prep */}
+                <div className="text-center group">
+                  <div className="bg-white dark:bg-blueberry/20 border-2 border-green-500/30 dark:border-green-500/40 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 relative">
+                    <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4 relative z-10">
+                      <Users className="h-8 w-8 text-white" />
+                    </div>
+                    <h3 className="text-xl font-bold text-earth dark:text-white mb-2">3. Interview Prep</h3>
+                    <div className="text-2xl font-bold text-green-600 mb-3">3 Credits</div>
+                    <p className="text-earth/70 dark:text-white/70 text-sm mb-4">
+                      Master your interview with role-specific questions, STAR examples, and company insights.
+                    </p>
+                    <div className="bg-green-100/50 dark:bg-green-900/20 rounded-lg p-3">
+                      <p className="text-xs text-earth/80 dark:text-white/80 font-medium">
+                        ✓ Tailored Questions<br />
+                        ✓ STAR Method Examples<br />
+                        ✓ Company Research
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Total Summary */}
+            <div className="mt-12 bg-gradient-to-r from-zapier-orange/10 via-citrus/10 to-green-500/10 dark:from-zapier-orange/5 dark:via-citrus/5 dark:to-green-500/5 rounded-2xl p-8 border border-zapier-orange/20 text-center">
+              <h3 className="text-2xl font-bold text-earth dark:text-white mb-4">
+                Complete Package = <span className="text-zapier-orange">6 Credits</span>
+              </h3>
+              <p className="text-earth/70 dark:text-white/70 mb-6 max-w-2xl mx-auto">
+                Get everything you need for a successful job application. Our complete package gives you the competitive edge to land your dream role.
+              </p>
+              <div className="flex items-center justify-center space-x-8 text-sm">
+                <div className="flex items-center">
+                  <ArrowRight className="h-4 w-4 text-zapier-orange mr-2" />
+                  <span className="text-earth/80 dark:text-white/80">Higher Success Rate</span>
+                </div>
+                <div className="flex items-center">
+                  <ArrowRight className="h-4 w-4 text-citrus mr-2" />
+                  <span className="text-earth/80 dark:text-white/80">Professional Presentation</span>
+                </div>
+                <div className="flex items-center">
+                  <ArrowRight className="h-4 w-4 text-green-600 mr-2" />
+                  <span className="text-earth/80 dark:text-white/80">Interview Confidence</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* How are Credits Spent Section */}
