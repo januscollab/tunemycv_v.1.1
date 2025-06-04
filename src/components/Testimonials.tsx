@@ -75,10 +75,10 @@ const Testimonials = () => {
               } ${index >= 3 ? 'lg:block' : ''}`}
             >
               <div className="flex items-center mb-4">
-                <Quote className="h-8 w-8 text-citrus mr-3" />
+                <Quote className="h-8 w-8 text-citrus dark:text-black mr-3" />
                 <div className="flex space-x-1">
                   {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-citrus text-citrus" />
+                    <Star key={i} className="h-4 w-4 fill-citrus text-citrus dark:fill-black dark:text-black" />
                   ))}
                 </div>
               </div>
@@ -94,8 +94,8 @@ const Testimonials = () => {
                   className="w-12 h-12 rounded-full mr-4 border-2 border-apple-core/30 dark:border-citrus/30"
                 />
                 <div>
-                  <h4 className="font-semibold text-blueberry dark:text-blueberry">{testimonial.name}</h4>
-                  <p className="text-sm text-blueberry/70 dark:text-blueberry/80">{testimonial.role}</p>
+                  <h4 className="font-semibold text-blueberry dark:text-black">{testimonial.name}</h4>
+                  <p className="text-sm text-blueberry/70 dark:text-black/80">{testimonial.role}</p>
                   <p className="text-sm text-apricot font-medium">{testimonial.company}</p>
                 </div>
               </div>
