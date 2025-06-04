@@ -195,7 +195,8 @@ export const FloatingFeedbackForm: React.FC<FloatingFeedbackFormProps> = ({
             name="email"
             value={formData.email}
             onChange={handleInputChange}
-            label="Email (optional)"
+            label={allowContact ? "Email (required for contact)" : "Email (optional)"}
+            required={allowContact}
             disabled={isSubmitting}
           />
         </div>
@@ -260,7 +261,7 @@ export const FloatingFeedbackForm: React.FC<FloatingFeedbackFormProps> = ({
       <div className="mt-6 animate-fade-in" style={{ animationDelay: '600ms' }}>
         <Button
           type="submit"
-          disabled={isSubmitting || !formData.subject || !formData.message}
+          disabled={isSubmitting || !formData.subject || !formData.message || (allowContact && !formData.email)}
           className="w-full bg-zapier-orange hover:bg-zapier-orange/90 text-white font-semibold h-12 rounded-lg transition-all duration-200 hover:scale-[1.02] hover:shadow-lg disabled:hover:scale-100"
         >
           {isSubmitting ? (
