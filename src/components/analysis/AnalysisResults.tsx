@@ -20,9 +20,10 @@ import PDFGenerator from './utils/PDFGenerator';
 interface AnalysisResultsProps {
   result: any;
   onStartNew: () => void;
+  readOnly?: boolean;
 }
 
-const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew }) => {
+const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, readOnly = false }) => {
   const getMatchLevel = (score: number) => {
     if (score >= 80) return 'Excellent Match';
     if (score >= 70) return 'Good Match';
@@ -53,7 +54,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
   return (
     <div className="min-h-screen bg-gradient-to-br from-apple-core/20 via-white to-citrus/10 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
       <div className="max-w-6xl mx-auto px-4 py-8">
-        <AnalysisHeader onStartNew={onStartNew} onDownloadPDF={downloadPDF} />
+        <AnalysisHeader onStartNew={onStartNew} onDownloadPDF={downloadPDF} readOnly={readOnly} />
 
         {/* Dynamic heading based on company and position */}
         <div className="mb-4">
@@ -159,10 +160,12 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew })
           </p>
         </div>
 
-        {/* Next Steps Section */}
-        <div className="mt-12">
-          <NextStepsSection onStartNew={onStartNew} />
-        </div>
+        {/* Next Steps Section - only show if not in read-only mode */}
+        {!readOnly && (
+          <div className="mt-12">
+            <NextStepsSection onStartNew={onStartNew} />
+          </div>
+        )}
       </div>
     </div>
   );

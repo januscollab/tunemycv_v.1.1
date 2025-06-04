@@ -14,7 +14,7 @@ import AnalysisSelector from '@/components/cover-letter/AnalysisSelector';
 import { useAnalysis } from '@/hooks/useAnalysis';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { FileText, History, MessageSquare, Target, Calendar, Building, CheckCircle, FileUp, Search, Clock } from 'lucide-react';
+import { FileText, History, MessageSquare, Target, Calendar, Building, CheckCircle, FileUp, Search, Clock, Eye } from 'lucide-react';
 import EmbeddedAuth from '@/components/auth/EmbeddedAuth';
 import ServiceExplanation from '@/components/common/ServiceExplanation';
 import { UploadedFile } from '@/types/fileTypes';
@@ -60,8 +60,9 @@ const AnalyzeCV = () => {
   const [activeTab, setActiveTab] = useState(initialTab);
 
   // Handle pre-loaded analysis from navigation state
-  const navigationState = location.state as { analysis?: any; source?: string } | null;
+  const navigationState = location.state as { analysis?: any; source?: string; targetTab?: string } | null;
   const [preloadedAnalysis, setPreloadedAnalysis] = useState(navigationState?.analysis || null);
+  const [viewedAnalysis, setViewedAnalysis] = useState(navigationState?.analysis || null);
 
   const { analyzing, analysisResult, setAnalysisResult, performAnalysis } = useAnalysis();
 
@@ -124,6 +125,16 @@ const AnalyzeCV = () => {
       setActiveTab(tabFromUrl);
     }
   }, [tabFromUrl]);
+
+  // Handle navigation state for viewing analysis
+  React.useEffect(() => {
+    if (navigationState?.targetTab) {
+      setActiveTab(navigationState.targetTab);
+      if (navigationState.analysis) {
+        setViewedAnalysis(navigationState.analysis);
+      }
+    }
+  }, [navigationState]);
 
   // Clear URL state after it's been processed
   React.useEffect(() => {
@@ -199,6 +210,7 @@ const AnalyzeCV = () => {
     setUploadedFiles({});
     setJobTitle('');
     setPreloadedAnalysis(null);
+    setViewedAnalysis(null);
     setActiveTab('analysis');
   };
 
@@ -373,10 +385,14 @@ const AnalyzeCV = () => {
           <div>
             {/* Tabs Navigation */}
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-3 mb-6">
+              <TabsList className="grid w-full grid-cols-4 mb-6">
                 <TabsTrigger value="analysis" className="flex items-center space-x-2 text-sm">
                   <FileText className="h-4 w-4" />
-                  <span>CV Analysis</span>
+                  <span>Analyze CV</span>
+                </TabsTrigger>
+                <TabsTrigger value="view-analysis" className="flex items-center space-x-2 text-sm">
+                  <Eye className="h-4 w-4" />
+                  <span>View Analysis</span>
                 </TabsTrigger>
                 <TabsTrigger value="interview-prep" className="flex items-center space-x-2 text-sm">
                   <MessageSquare className="h-4 w-4" />
@@ -444,6 +460,33 @@ const AnalyzeCV = () => {
                     hasCreditsForAI={hasCreditsForAI}
                   />
                 </div>
+              </TabsContent>
+
+              {/* View Analysis Tab */}
+              <TabsContent value="view-analysis" className="mt-0">
+                {viewedAnalysis ? (
+                  <AnalysisResults 
+                    result={viewedAnalysis} 
+                    onStartNew={handleStartNew}
+                    readOnly={true}
+                  />
+                ) : (
+                  <div className="text-center py-12">
+                    <Eye className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mb-2">
+                      No Analysis Selected
+                    </h3>
+                    <p className="text-blueberry/70 dark:text-apple-core/80 mb-4">
+                      Select an analysis from the History tab to view it here.
+                    </p>
+                    <Button 
+                      onClick={() => setActiveTab('history')}
+                      className="bg-zapier-orange hover:bg-zapier-orange/90 text-white"
+                    >
+                      Go to History
+                    </Button>
+                  </div>
+                )}
               </TabsContent>
 
               {/* Interview Prep Tab */}
