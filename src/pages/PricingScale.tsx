@@ -105,27 +105,29 @@ const PricingScale = () => {
                   max={4}
                   min={0}
                   step={1}
-                  className="w-full [&>*:first-child]:bg-gray-200 dark:[&>*:first-child]:bg-gray-700 [&_[role=slider]]:h-4 [&_[role=slider]]:w-4 [&>*:first-child]:h-1"
+                  className="w-full [&>*:first-child]:bg-gray-200 dark:[&>*:first-child]:bg-gray-700 [&_[role=slider]]:h-4 [&_[role=slider]]:w-4 [&>*:first-child]:h-0.5"
                 />
               </div>
 
-              {/* Tier Labels Below Slider */}
-              <div className="flex justify-between items-center px-2 max-w-[calc(100%-120px)] mx-auto">
-                {pricingTiers.map((tier, index) => (
-                  <div key={index} className="text-center flex-1">
-                    {tier.isEnterprise ? (
-                      <div className="space-y-1">
-                        <div className="text-lg font-bold text-earth dark:text-white">Enterprise</div>
-                        <div className="text-sm text-earth/70 dark:text-white/70">Let's talk</div>
-                      </div>
-                    ) : (
-                      <div className="space-y-1">
-                        <div className="text-lg font-bold text-earth dark:text-white">${tier.price}</div>
-                        <div className="text-sm text-earth/70 dark:text-white/70">{tier.credits} Credits</div>
-                      </div>
-                    )}
-                  </div>
-                ))}
+              {/* Tier Labels Below Slider - Grid Layout for Perfect Alignment */}
+              <div className="px-2">
+                <div className="grid grid-cols-5 gap-0">
+                  {pricingTiers.map((tier, index) => (
+                    <div key={index} className="text-center">
+                      {tier.isEnterprise ? (
+                        <div className="space-y-1">
+                          <div className="text-lg font-bold text-earth dark:text-white">Enterprise</div>
+                          <div className="text-sm text-earth/70 dark:text-white/70">Let's talk</div>
+                        </div>
+                      ) : (
+                        <div className="space-y-1">
+                          <div className="text-lg font-bold text-earth dark:text-white">${tier.price}</div>
+                          <div className="text-sm text-earth/70 dark:text-white/70">{tier.credits} Credits</div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
 
               {/* Selected Tier Display */}
