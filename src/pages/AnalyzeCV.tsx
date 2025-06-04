@@ -137,6 +137,39 @@ const AnalyzeCV = () => {
     }
   }, [navigationState]);
 
+  // Load analysis by ID from URL parameters
+  React.useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const analysisId = params.get('analysisId');
+    
+    if (activeTab === 'view-analysis' && analysisId && user && !viewedAnalysis) {
+      loadAnalysisById(analysisId);
+    }
+  }, [activeTab, location.search, user, viewedAnalysis]);
+
+  const loadAnalysisById = async (analysisId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('analysis_results')
+        .select('*')
+        .eq('id', analysisId)
+        .eq('user_id', user!.id)
+        .single();
+
+      if (error) throw error;
+      if (data) {
+        setViewedAnalysis(data);
+      }
+    } catch (error) {
+      console.error('Error loading analysis:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load analysis details",
+        variant: "destructive",
+      });
+    }
+  };
+
   // Clear URL state after it's been processed
   React.useEffect(() => {
     if (navigationState) {

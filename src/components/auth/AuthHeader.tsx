@@ -39,10 +39,6 @@ const AuthHeader: React.FC<AuthHeaderProps> = ({ mode, fromAnalyze }) => {
 
   return (
     <div className="text-center">
-      <Link to="/" className="inline-flex items-center text-zapier-orange hover:text-zapier-orange/80 mb-6">
-        <ArrowLeft className="h-4 w-4 mr-2" />
-        Back to Home
-      </Link>
       
       {fromAnalyze && (
         <div className="bg-cream dark:bg-surface border border-cream dark:border-border rounded-lg p-4 mb-8">
