@@ -49,17 +49,17 @@ const PersonalizationSurveyModal: React.FC<PersonalizationSurveyModalProps> = ({
     },
     {
       id: 'concerns',
-      title: 'Any concerns or challenges you anticipate?',
-      subtitle: 'Understanding potential obstacles helps us provide better guidance',
+      title: 'Are there any personal circumstances driving this application?',
+      subtitle: 'This is completely optional and deeply personal - feel free to skip if you prefer',
       icon: <Lightbulb className="h-5 w-5 text-yellow-500" />,
-      placeholder: 'e.g., I\'m concerned about adapting to the company culture and managing larger projects than I\'ve handled before...'
+      placeholder: 'e.g., I\'m looking for better work-life balance to spend more time with family, or seeking a role that offers remote work options...'
     },
     {
       id: 'uniqueValue',
-      title: 'What unique value would you bring to this role?',
-      subtitle: 'Highlight what makes you the right fit',
+      title: 'Why should you not get this role?',
+      subtitle: 'This is a very personal question - completely optional and can be skipped',
       icon: <CheckCircle className="h-5 w-5 text-green-500" />,
-      placeholder: 'e.g., My background in both technical and business domains allows me to bridge communication gaps and drive cross-functional collaboration...'
+      placeholder: 'e.g., I might struggle with the steep learning curve, or I lack experience in certain technical areas mentioned in the job description...'
     }
   ];
 

@@ -98,39 +98,35 @@ const PricingScale = () => {
             </CardHeader>
             <CardContent className="space-y-8">
               {/* Slider */}
-              <div className="px-2 flex justify-center">
-                <div className="w-4/5">
-                  <Slider
-                    value={[selectedTier]}
-                    onValueChange={handleSliderChange}
-                    max={4}
-                    min={0}
-                    step={1}
-                    className="w-full [&>*:first-child]:bg-gray-200 dark:[&>*:first-child]:bg-gray-700 [&_[role=slider]]:h-4 [&_[role=slider]]:w-4 [&>*:first-child]:h-0.5"
-                  />
-                </div>
+              <div className="px-2">
+                <Slider
+                  value={[selectedTier]}
+                  onValueChange={handleSliderChange}
+                  max={4}
+                  min={0}
+                  step={1}
+                  className="w-full [&>*:first-child]:bg-gray-200 dark:[&>*:first-child]:bg-gray-700 [&_[role=slider]]:h-4 [&_[role=slider]]:w-4 [&>*:first-child]:h-0.5"
+                />
               </div>
 
               {/* Tier Labels Below Slider - Grid Layout for Perfect Alignment */}
-              <div className="px-2 flex justify-center">
-                <div className="w-4/5">
-                  <div className="grid grid-cols-5 gap-0">
-                    {pricingTiers.map((tier, index) => (
-                      <div key={index} className="text-center">
-                        {tier.isEnterprise ? (
-                          <div className="space-y-1">
-                            <div className="text-lg font-bold text-earth dark:text-white">Enterprise</div>
-                            <div className="text-sm text-earth/70 dark:text-white/70">Let's talk</div>
-                          </div>
-                        ) : (
-                          <div className="space-y-1">
-                            <div className="text-lg font-bold text-earth dark:text-white">${tier.price}</div>
-                            <div className="text-sm text-earth/70 dark:text-white/70">{tier.credits} Credits</div>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
+              <div className="px-2">
+                <div className="grid grid-cols-5 gap-0">
+                  {pricingTiers.map((tier, index) => (
+                    <div key={index} className="text-center">
+                      {tier.isEnterprise ? (
+                        <div className="space-y-1">
+                          <div className="text-lg font-bold text-earth dark:text-white">Enterprise</div>
+                          <div className="text-sm text-earth/70 dark:text-white/70">Let's talk</div>
+                        </div>
+                      ) : (
+                        <div className="space-y-1">
+                          <div className="text-lg font-bold text-earth dark:text-white">${tier.price}</div>
+                          <div className="text-sm text-earth/70 dark:text-white/70">{tier.credits} Credits</div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
               </div>
 
