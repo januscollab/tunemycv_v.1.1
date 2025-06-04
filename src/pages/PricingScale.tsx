@@ -111,23 +111,33 @@ const PricingScale = () => {
 
               {/* Tier Labels Below Slider - Positioned to align with slider stops */}
               <div className="px-4 relative">
-                <div className="flex justify-between items-center">
-                  {pricingTiers.map((tier, index) => (
-                    <div key={index} className="text-center flex-1 first:text-left last:text-right [&:nth-child(3)]:text-center">
-                      {tier.isEnterprise ? (
-                        <div className="space-y-1">
-                          <div className="text-lg font-bold text-earth dark:text-white">Enterprise</div>
-                          <div className="text-sm text-earth/70 dark:text-white/70">Let's talk</div>
-                        </div>
-                      ) : (
-                        <div className="space-y-1">
-                          <div className="text-lg font-bold text-earth dark:text-white">${tier.price}</div>
-                          <div className="text-sm text-earth/70 dark:text-white/70">{tier.credits} Credits</div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                <div className="relative flex">
+                  {pricingTiers.map((tier, index) => {
+                    // Calculate position: 0%, 25%, 50%, 75%, 100%
+                    const leftPosition = (index / (pricingTiers.length - 1)) * 100;
+                    return (
+                      <div 
+                        key={index} 
+                        className="absolute transform -translate-x-1/2"
+                        style={{ left: `${leftPosition}%` }}
+                      >
+                        {tier.isEnterprise ? (
+                          <div className="space-y-1 text-center">
+                            <div className="text-lg font-bold text-earth dark:text-white">Enterprise</div>
+                            <div className="text-sm text-earth/70 dark:text-white/70">Let's talk</div>
+                          </div>
+                        ) : (
+                          <div className="space-y-1 text-center">
+                            <div className="text-lg font-bold text-earth dark:text-white">${tier.price}</div>
+                            <div className="text-sm text-earth/70 dark:text-white/70">{tier.credits} Credits</div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
+                {/* Spacer to maintain height */}
+                <div className="h-16"></div>
               </div>
 
               {/* Selected Tier Display */}
