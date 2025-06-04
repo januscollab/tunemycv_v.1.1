@@ -150,7 +150,7 @@ The cover letter should:
   [Company Address]  
   [City, State, Zip]  
   
-  Dear Hiring Manager,"`
+  Dear Hiring Manager,"
 - Be tailored specifically to the job and company
 - Highlight relevant experience and skills
 - Show genuine enthusiasm for the role
