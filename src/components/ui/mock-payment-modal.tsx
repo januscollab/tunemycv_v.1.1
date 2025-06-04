@@ -80,7 +80,7 @@ export const MockPaymentModal: React.FC<MockPaymentModalProps> = ({
           .from('user_credits')
           .select('credits')
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle();
         
         if (fetchError && fetchError.code !== 'PGRST116') {
           console.error('Error fetching current credits:', fetchError);

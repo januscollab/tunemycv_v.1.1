@@ -162,9 +162,12 @@ const PricingScale = () => {
                             <div className="text-sm text-earth/70 dark:text-white/70">Let's talk</div>
                           </div>
                         ) : (
-                          <div className="space-y-1 text-center">
-                            <div className="text-lg font-bold text-earth dark:text-white">${tier.price}</div>
-                            <div className="text-sm text-earth/70 dark:text-white/70">{tier.credits} Credits</div>
+                          <div 
+                            className="space-y-1 text-center cursor-pointer hover:scale-105 transition-transform duration-200"
+                            onClick={() => setSelectedTier(index)}
+                          >
+                            <div className="text-lg font-bold text-earth dark:text-white hover:text-zapier-orange transition-colors">${tier.price}</div>
+                            <div className="text-sm text-earth/70 dark:text-white/70 hover:text-zapier-orange/70 transition-colors">{tier.credits} Credits</div>
                           </div>
                         )}
                       </div>
@@ -172,7 +175,7 @@ const PricingScale = () => {
                   })}
                 </div>
                 {/* Spacer to maintain height */}
-                <div className="h-16"></div>
+                <div className="h-16 mt-5"></div>
               </div>
 
               {/* Selected Tier Display */}

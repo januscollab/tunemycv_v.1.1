@@ -69,9 +69,12 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className="text-white/80 hover:text-zapier-orange transition-colors">
+                <button 
+                  onClick={() => setIsContactModalOpen(true)}
+                  className="text-white/80 hover:text-zapier-orange transition-colors cursor-pointer"
+                >
                   Contact Us
-                </Link>
+                </button>
               </li>
               <li>
                 <Link to="/privacy-policy" className="text-white/80 hover:text-zapier-orange transition-colors">
