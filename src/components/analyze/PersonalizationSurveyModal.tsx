@@ -38,28 +38,32 @@ const PersonalizationSurveyModal: React.FC<PersonalizationSurveyModalProps> = ({
       title: 'What motivates you about this specific role?',
       subtitle: 'Help us understand what draws you to this opportunity',
       icon: <Heart className="h-5 w-5 text-red-500" />,
-      placeholder: 'e.g., I\'m excited about the opportunity to lead a team and work on innovative projects that impact millions of users...'
+      placeholder: 'e.g., I\'m excited about the opportunity to lead a team and work on innovative projects that impact millions of users...',
+      isPersonal: false
     },
     {
       id: 'expectations',
       title: 'What are you hoping to achieve in this role?',
       subtitle: 'Share your career goals and aspirations',
       icon: <Target className="h-5 w-5 text-blue-500" />,
-      placeholder: 'e.g., I want to develop my leadership skills, contribute to strategic decisions, and grow in my technical expertise...'
+      placeholder: 'e.g., I want to develop my leadership skills, contribute to strategic decisions, and grow in my technical expertise...',
+      isPersonal: false
     },
     {
       id: 'concerns',
       title: 'Are there any personal circumstances driving this application?',
       subtitle: 'This is completely optional and deeply personal - feel free to skip if you prefer',
       icon: <Lightbulb className="h-5 w-5 text-yellow-500" />,
-      placeholder: 'e.g., I\'m looking for better work-life balance to spend more time with family, or seeking a role that offers remote work options...'
+      placeholder: 'e.g., I\'m looking for better work-life balance to spend more time with family, or seeking a role that offers remote work options...',
+      isPersonal: true
     },
     {
       id: 'uniqueValue',
       title: 'Why should you not get this role?',
       subtitle: 'This is a very personal question - completely optional and can be skipped',
       icon: <CheckCircle className="h-5 w-5 text-green-500" />,
-      placeholder: 'e.g., I might struggle with the steep learning curve, or I lack experience in certain technical areas mentioned in the job description...'
+      placeholder: 'e.g., I might struggle with the steep learning curve, or I lack experience in certain technical areas mentioned in the job description...',
+      isPersonal: true
     }
   ];
 
@@ -73,15 +77,6 @@ const PersonalizationSurveyModal: React.FC<PersonalizationSurveyModalProps> = ({
   };
 
   const handleNext = () => {
-    if (!responses[currentQ.id as keyof SurveyResponses].trim()) {
-      toast({
-        title: 'Response Required',
-        description: 'Please provide a response before continuing.',
-        variant: 'destructive'
-      });
-      return;
-    }
-
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
     } else {
@@ -164,6 +159,14 @@ const PersonalizationSurveyModal: React.FC<PersonalizationSurveyModalProps> = ({
                   <p className="text-sm text-blueberry/70 dark:text-apple-core/70">
                     {currentQ.subtitle}
                   </p>
+                  {currentQ.isPersonal && (
+                    <div className="mt-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                      <p className="text-xs text-yellow-800 dark:text-yellow-200 font-medium flex items-center">
+                        <Heart className="h-3 w-3 mr-1" />
+                        This question is deeply personal and completely optional. Feel free to skip if you prefer.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             </CardHeader>
@@ -206,7 +209,6 @@ const PersonalizationSurveyModal: React.FC<PersonalizationSurveyModalProps> = ({
           <Button
             onClick={handleNext}
             className="bg-zapier-orange hover:bg-zapier-orange/90 text-white"
-            disabled={!responses[currentQ.id as keyof SurveyResponses].trim()}
           >
             {currentQuestion === questions.length - 1 ? 'Complete Survey' : 'Next Question'}
           </Button>

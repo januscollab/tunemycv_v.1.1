@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, CreditCard, CheckCircle } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useAuth } from '@/contexts/AuthContext';
+import { useProfileData } from '@/hooks/useProfileData';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface MockPaymentModalProps {
   isOpen: boolean;
@@ -22,17 +26,71 @@ export const MockPaymentModal: React.FC<MockPaymentModalProps> = ({
 }) => {
   const [step, setStep] = useState<'payment' | 'success'>('payment');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  
+  const { user } = useAuth();
+  const { profileData, loading } = useProfileData();
+  const { toast } = useToast();
+
+  // Auto-populate form fields when modal opens or profile data loads
+  useEffect(() => {
+    if (isOpen && profileData && !loading) {
+      setFirstName(profileData.first_name || '');
+      setLastName(profileData.last_name || '');
+      setEmail(profileData.email || user?.email || '');
+    }
+  }, [isOpen, profileData, loading, user]);
 
   const handlePayment = async () => {
     setIsProcessing(true);
-    // Simulate payment processing
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setStep('success');
-    setIsProcessing(false);
+    
+    try {
+      // Update profile with name if it's missing and user provided it
+      if (user && (firstName || lastName) && 
+          (!profileData?.first_name || !profileData?.last_name)) {
+        const { error } = await supabase
+          .from('profiles')
+          .upsert({
+            id: user.id,
+            first_name: firstName || profileData?.first_name,
+            last_name: lastName || profileData?.last_name,
+            email: email || user.email,
+            updated_at: new Date().toISOString()
+          });
+        
+        if (error) {
+          console.error('Error updating profile:', error);
+          toast({
+            title: 'Profile Update Failed',
+            description: 'Payment processed but profile update failed.',
+            variant: 'destructive'
+          });
+        }
+      }
+      
+      // Simulate payment processing (like Stripe would do)
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      setStep('success');
+      
+    } catch (error) {
+      console.error('Payment processing error:', error);
+      toast({
+        title: 'Payment Failed',
+        description: 'There was an error processing your payment. Please try again.',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const handleClose = () => {
     setStep('payment');
+    setFirstName('');
+    setLastName('');
+    setEmail('');
     onClose();
   };
 
@@ -71,6 +129,44 @@ export const MockPaymentModal: React.FC<MockPaymentModalProps> = ({
                 </div>
               </div>
 
+              {/* Customer Information */}
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="firstName">First Name</Label>
+                    <Input
+                      id="firstName"
+                      placeholder="John"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="lastName">Last Name</Label>
+                    <Input
+                      id="lastName"
+                      placeholder="Doe"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="your@email.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
               {/* Mock Payment Form */}
               <div className="space-y-4">
                 <div>
@@ -105,15 +201,6 @@ export const MockPaymentModal: React.FC<MockPaymentModalProps> = ({
                       className="bg-gray-50 dark:bg-gray-800"
                     />
                   </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="your@email.com"
-                  />
                 </div>
               </div>
 

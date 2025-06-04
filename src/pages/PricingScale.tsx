@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Check, CreditCard, Zap, FileText, Users, ArrowRight, Brain } from 'lucide-react';
+import { Check, CreditCard, Zap, FileText, Users, ArrowRight, Brain, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -95,6 +95,41 @@ const PricingScale = () => {
               <CardTitle className="text-2xl font-bold text-earth dark:text-white text-left">
                 Simple Pay As you go Pricing
               </CardTitle>
+              <div className="mt-4">
+                <h3 className="text-lg font-semibold text-earth dark:text-white mb-4">
+                  Why Choose Our Credit System?
+                </h3>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-2">
+                      <Check className="h-4 w-4 text-green-600" />
+                      <span className="text-earth/80 dark:text-white/80">No monthly subscriptions</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Check className="h-4 w-4 text-green-600" />
+                      <span className="text-earth/80 dark:text-white/80">Pay only for what you use</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Check className="h-4 w-4 text-green-600" />
+                      <span className="text-earth/80 dark:text-white/80">Bulk discounts available</span>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-2">
+                      <X className="h-4 w-4 text-red-500" />
+                      <span className="text-earth/80 dark:text-white/80">No hidden fees or charges</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <X className="h-4 w-4 text-red-500" />
+                      <span className="text-earth/80 dark:text-white/80">No auto-renewal surprises</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <X className="h-4 w-4 text-red-500" />
+                      <span className="text-earth/80 dark:text-white/80">No complicated cancellation</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </CardHeader>
             <CardContent className="space-y-8">
               {/* Slider */}
