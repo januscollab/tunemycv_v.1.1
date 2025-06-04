@@ -16,7 +16,7 @@ import Resources from './pages/Resources';
 import HelpCentre from './pages/HelpCentre';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
-import Pricing from './pages/Pricing';
+import Template from './pages/Template';
 import PricingScale from './pages/PricingScale';
 import Navigation from './components/Navigation';
 import Footer from './components/Footer';
@@ -53,7 +53,7 @@ function AppContent() {
           <Route path="/interview-prep" element={<InterviewPrep />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
-          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/template" element={<Template />} />
           <Route path="/pricing-scale" element={<PricingScale />} />
           <Route path="/resources" element={<Resources />} />
           <Route path="/help-centre" element={<HelpCentre />} />

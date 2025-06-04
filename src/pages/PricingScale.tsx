@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Check, CreditCard, Zap, FileText, Users, ArrowRight } from 'lucide-react';
+import { Check, CreditCard, Zap, FileText, Users, ArrowRight, Brain } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -91,8 +91,8 @@ const PricingScale = () => {
         {/* Pricing Slider */}
         <div className="mb-16 max-w-4xl mx-auto">
           <Card className="bg-white dark:bg-blueberry/20 border-2 border-zapier-orange/50 dark:border-zapier-orange/60 p-8 shadow-xl shadow-zapier-orange/20">
-            <CardHeader className="pb-6">
-              <CardTitle className="text-2xl font-bold text-earth dark:text-white text-center">
+            <CardHeader className="pb-6 pt-4">
+              <CardTitle className="text-2xl font-bold text-earth dark:text-white text-left">
                 Simple Pay As you go Pricing
               </CardTitle>
             </CardHeader>
@@ -105,16 +105,19 @@ const PricingScale = () => {
                   max={4}
                   min={0}
                   step={1}
-                  className="w-full [&>*:first-child]:bg-gray-300 dark:[&>*:first-child]:bg-gray-600"
+                  className="w-full [&>*:first-child]:bg-gray-200 dark:[&>*:first-child]:bg-gray-700"
                 />
               </div>
 
               {/* Tier Labels Below Slider */}
               <div className="flex justify-between items-center px-2">
                 {pricingTiers.map((tier, index) => (
-                  <div key={index} className="text-center">
+                  <div key={index} className="text-left">
                     {tier.isEnterprise ? (
-                      <div className="text-zapier-orange font-semibold text-sm">Enterprise</div>
+                      <div className="space-y-1">
+                        <div className="text-lg font-bold text-earth dark:text-white">Enterprise</div>
+                        <div className="text-sm text-earth/70 dark:text-white/70">Let's talk</div>
+                      </div>
                     ) : (
                       <div className="space-y-1">
                         <div className="text-lg font-bold text-earth dark:text-white">${tier.price}</div>
@@ -126,7 +129,7 @@ const PricingScale = () => {
               </div>
 
               {/* Selected Tier Display */}
-              <div className="text-left space-y-6 bg-gradient-to-br from-zapier-orange/5 to-apricot/5 dark:from-zapier-orange/10 dark:to-apricot/10 rounded-xl p-6 border border-zapier-orange/20">
+              <div className="text-left space-y-6">
                 <div className="space-y-3">
                   {currentTier.isEnterprise ? (
                     <>
@@ -134,7 +137,7 @@ const PricingScale = () => {
                         Enterprise
                       </h3>
                       <div className="text-lg text-earth/70 dark:text-white/70">
-                        Contact Our Team
+                        Let's talk
                       </div>
                     </>
                   ) : (
@@ -410,7 +413,7 @@ const PricingScale = () => {
               Join our community of successful job seekers
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div className="text-center group">
               <div className="w-16 h-16 bg-gradient-to-br from-zapier-orange/20 to-apricot/20 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-200">
                 <FileText className="h-8 w-8 text-zapier-orange" />
@@ -422,7 +425,7 @@ const PricingScale = () => {
               <div className="w-16 h-16 bg-gradient-to-br from-green-400/20 to-green-600/20 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-200">
                 <Check className="h-8 w-8 text-green-600" />
               </div>
-              <div className="text-2xl font-bold text-green-600 mb-1">98%</div>
+              <div className="text-2xl font-bold text-green-600 mb-1">92%</div>
               <div className="text-sm font-medium text-earth/70 dark:text-white/70">satisfaction rate</div>
             </div>
             <div className="text-center group">
@@ -431,6 +434,13 @@ const PricingScale = () => {
               </div>
               <div className="text-lg font-bold text-blue-600 mb-1">SOC 2</div>
               <div className="text-sm font-medium text-earth/70 dark:text-white/70">compliant</div>
+            </div>
+            <div className="text-center group">
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-400/20 to-purple-600/20 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-200">
+                <Brain className="h-8 w-8 text-purple-600" />
+              </div>
+              <div className="text-lg font-bold text-purple-600 mb-1">Trained AI</div>
+              <div className="text-sm font-medium text-earth/70 dark:text-white/70">Modelling</div>
             </div>
           </div>
         </div>
