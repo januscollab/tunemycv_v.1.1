@@ -139,16 +139,16 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
   return (
     <div className="space-y-8">
       {/* Profile Information */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="bg-white dark:bg-surface rounded-lg border border-gray-200 dark:border-border p-6">
         <div className="flex items-center mb-6">
-          <User className="h-5 w-5 text-gray-500 mr-2" />
-          <h3 className="text-lg font-medium text-gray-900">Profile Information</h3>
+          <User className="h-5 w-5 text-gray-500 dark:text-apple-core/60 mr-2" />
+          <h3 className="text-lg font-medium text-gray-900 dark:text-citrus">Profile Information</h3>
         </div>
 
         <form onSubmit={handleUpdateProfile} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
                 First Name
               </label>
               <input
@@ -156,13 +156,13 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
                 type="text"
                 value={profile.first_name}
                 onChange={(e) => setProfile({ ...profile, first_name: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
                 placeholder="Enter your first name"
               />
             </div>
 
             <div>
-              <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
                 Last Name
               </label>
               <input
@@ -170,14 +170,14 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
                 type="text"
                 value={profile.last_name}
                 onChange={(e) => setProfile({ ...profile, last_name: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
                 placeholder="Enter your last name"
               />
             </div>
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
               Email Address
             </label>
             <input
@@ -185,13 +185,13 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
               type="email"
               value={profile.email}
               onChange={(e) => setProfile({ ...profile, email: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
               placeholder="Enter your email address"
             />
           </div>
 
           <div>
-            <label htmlFor="linkedinUrl" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="linkedinUrl" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
               <Linkedin className="h-4 w-4 inline mr-1" />
               LinkedIn Profile URL
             </label>
@@ -200,7 +200,7 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
               type="url"
               value={profile.linkedin_url}
               onChange={(e) => setProfile({ ...profile, linkedin_url: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
               placeholder="https://linkedin.com/in/yourprofile"
             />
           </div>
@@ -217,15 +217,15 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
       </div>
 
       {/* Password Change */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="bg-white dark:bg-surface rounded-lg border border-gray-200 dark:border-border p-6">
         <div className="flex items-center mb-6">
-          <Lock className="h-5 w-5 text-gray-500 mr-2" />
-          <h3 className="text-lg font-medium text-gray-900">Change Password</h3>
+          <Lock className="h-5 w-5 text-gray-500 dark:text-apple-core/60 mr-2" />
+          <h3 className="text-lg font-medium text-gray-900 dark:text-citrus">Change Password</h3>
         </div>
 
         <form onSubmit={handleUpdatePassword} className="space-y-4">
           <div>
-            <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
               New Password
             </label>
             <input
@@ -233,13 +233,13 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
               type="password"
               value={passwords.new}
               onChange={(e) => setPasswords({ ...passwords, new: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
               placeholder="Enter new password"
             />
           </div>
 
           <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
               Confirm New Password
             </label>
             <input
@@ -247,7 +247,7 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
               type="password"
               value={passwords.confirm}
               onChange={(e) => setPasswords({ ...passwords, confirm: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
               placeholder="Confirm new password"
             />
           </div>
@@ -264,17 +264,17 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
       </div>
 
       {/* Notification Settings */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="bg-white dark:bg-surface rounded-lg border border-gray-200 dark:border-border p-6">
         <div className="flex items-center mb-6">
-          <Mail className="h-5 w-5 text-gray-500 mr-2" />
-          <h3 className="text-lg font-medium text-gray-900">Notification Preferences</h3>
+          <Mail className="h-5 w-5 text-gray-500 dark:text-apple-core/60 mr-2" />
+          <h3 className="text-lg font-medium text-gray-900 dark:text-citrus">Notification Preferences</h3>
         </div>
         
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <label className="font-medium text-gray-700">Email Notifications</label>
-              <p className="text-sm text-gray-500">Receive notifications about your CV analysis results</p>
+              <label className="font-medium text-gray-700 dark:text-apple-core/80">Email Notifications</label>
+              <p className="text-sm text-gray-500 dark:text-apple-core/60">Receive notifications about your CV analysis results</p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
@@ -288,8 +288,8 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
           
           <div className="flex items-center justify-between">
             <div>
-              <label className="font-medium text-gray-700">Marketing Emails</label>
-              <p className="text-sm text-gray-500">Receive tips, updates, and promotional content</p>
+              <label className="font-medium text-gray-700 dark:text-apple-core/80">Marketing Emails</label>
+              <p className="text-sm text-gray-500 dark:text-apple-core/60">Receive tips, updates, and promotional content</p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
@@ -304,24 +304,24 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
       </div>
 
       {/* Privacy Settings */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="bg-white dark:bg-surface rounded-lg border border-gray-200 dark:border-border p-6">
         <div className="flex items-center mb-6">
-          <Lock className="h-5 w-5 text-gray-500 mr-2" />
-          <h3 className="text-lg font-medium text-gray-900">Privacy Settings</h3>
+          <Lock className="h-5 w-5 text-gray-500 dark:text-apple-core/60 mr-2" />
+          <h3 className="text-lg font-medium text-gray-900 dark:text-citrus">Privacy Settings</h3>
         </div>
         
         <div className="space-y-4">
           <div>
-            <label className="block font-medium text-gray-700 mb-2">Data Privacy Level</label>
+            <label className="block font-medium text-gray-700 dark:text-apple-core/80 mb-2">Data Privacy Level</label>
             <select
               defaultValue="standard"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
             >
               <option value="minimal">Minimal - Only essential data</option>
               <option value="standard">Standard - Standard analytics and improvements</option>
               <option value="enhanced">Enhanced - Help us improve our services</option>
             </select>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-gray-500 dark:text-apple-core/60 mt-1">
               Controls how your data is used to improve our services
             </p>
           </div>
@@ -329,10 +329,10 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
       </div>
 
       {/* Account Management */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="bg-white dark:bg-surface rounded-lg border border-gray-200 dark:border-border p-6">
         <div className="flex items-center mb-6">
-          <User className="h-5 w-5 text-gray-500 mr-2" />
-          <h3 className="text-lg font-medium text-gray-900">Account Management</h3>
+          <User className="h-5 w-5 text-gray-500 dark:text-apple-core/60 mr-2" />
+          <h3 className="text-lg font-medium text-gray-900 dark:text-citrus">Account Management</h3>
         </div>
         
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
