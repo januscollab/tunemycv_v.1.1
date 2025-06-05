@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { Settings, Users, Zap, MessageSquare, Target, Lightbulb } from 'lucide-react';
+import { Settings, Users, Zap, MessageSquare, Target, Lightbulb, Info } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -183,6 +184,18 @@ const WorkStylePreferencesSection: React.FC = () => {
       <div className="flex items-center mb-8">
         <Settings className="h-5 w-5 text-gray-500 dark:text-apple-core/60 mr-2" />
         <h3 className="text-lg font-medium text-gray-900 dark:text-citrus">Work Style Preferences</h3>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:text-apple-core/60 dark:hover:text-apple-core/80 cursor-help ml-2" />
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="max-w-sm">
+              <p className="text-sm">
+                <strong>Find Companies That Actually Fit You</strong> - Answer 6 quick questions to discover work environments where you'll thrive and avoid toxic workplaces.
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
       <p className="text-sm text-gray-500 dark:text-apple-core/60 mb-8">
         Help us understand your preferred working style to better match you with company cultures

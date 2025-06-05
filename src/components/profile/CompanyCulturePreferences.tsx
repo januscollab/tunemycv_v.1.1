@@ -345,6 +345,18 @@ const CompanyCulturePreferences: React.FC = () => {
       <div className="flex items-center mb-6">
         <Building2 className="h-5 w-5 text-gray-500 dark:text-apple-core/60 mr-2" />
         <h3 className="text-lg font-medium text-gray-900 dark:text-citrus">Company Culture Preferences</h3>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:text-apple-core/60 dark:hover:text-apple-core/80 cursor-help ml-2" />
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="max-w-sm">
+              <p className="text-sm">
+                <strong>Stop Wasting Time on Wrong-Fit Companies</strong> - Rank these culture types to get matched with companies where you'll be happiest and most successful.
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
 
       <div className="mb-4">
