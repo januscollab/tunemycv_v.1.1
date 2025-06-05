@@ -15,7 +15,7 @@ const ProfileNavigation: React.FC<ProfileNavigationProps> = ({ activeTab, onTabC
       id: 'working-style', 
       label: 'My Working Style', 
       icon: Brain,
-      tooltip: 'Unlock Personalized Career Guidance - This optional assessment creates your professional profile to deliver highly targeted job matches and career insights.'
+      tooltip: 'Get 3x More Relevant Job Matches (Optional) - Complete your working style profile for personalized career guidance and better role matching.'
     },
     { id: 'documents', label: 'Document History', icon: FileText },
     { id: 'files', label: 'CV Management', icon: Upload },
