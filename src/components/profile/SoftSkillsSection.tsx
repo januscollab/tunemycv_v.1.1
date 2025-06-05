@@ -78,17 +78,14 @@ const SoftSkillsSection: React.FC = () => {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center text-gray-900 dark:text-citrus">
-          <Brain className="h-5 w-5 mr-2 text-gray-500 dark:text-apple-core/60" />
-          Soft Skills Assessment
-        </CardTitle>
-        <CardDescription>
+    <div className="bg-white dark:bg-surface rounded-lg border border-gray-200 dark:border-border p-6">
+        <div className="flex items-center mb-6">
+          <Brain className="h-5 w-5 text-gray-500 dark:text-apple-core/60 mr-2" />
+          <h3 className="text-lg font-medium text-gray-900 dark:text-citrus">Soft Skills Assessment</h3>
+        </div>
+        <p className="text-sm text-gray-500 dark:text-apple-core/60 mb-6">
           Your soft skills assessment used to enhance CV analysis
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
+        </p>
         {!currentSkills ? (
           <div className="text-center py-6">
             <Brain className="h-12 w-12 text-zapier-orange mx-auto mb-4" />
@@ -130,8 +127,7 @@ const SoftSkillsSection: React.FC = () => {
             ))}
           </div>
         )}
-      </CardContent>
-    </Card>
+    </div>
   );
 };
 

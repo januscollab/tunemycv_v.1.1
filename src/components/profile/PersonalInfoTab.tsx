@@ -157,7 +157,7 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
       <div className="bg-white dark:bg-surface rounded-lg border border-gray-200 dark:border-border p-6">
         <div className="flex items-center mb-6">
           <User className="h-5 w-5 text-gray-500 dark:text-apple-core/60 mr-2" />
-          <h3 className="text-lg font-medium text-gray-900 dark:text-citrus">Profile Information</h3>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-citrus">Personal Information</h3>
         </div>
 
         <form onSubmit={handleUpdateProfile} className="space-y-4">
@@ -279,6 +279,9 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
         </form>
       </div>
 
+      {/* Soft Skills Assessment */}
+      <SoftSkillsSection />
+
       {/* Notification Settings and Privacy Settings - Two Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Notification Settings */}
@@ -347,8 +350,6 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
         </div>
       </div>
 
-      {/* Soft Skills Assessment */}
-      <SoftSkillsSection />
 
       {/* Password Change */}
       <div className="bg-white dark:bg-surface rounded-lg border border-gray-200 dark:border-border p-6">
