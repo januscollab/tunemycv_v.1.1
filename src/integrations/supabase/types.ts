@@ -276,8 +276,10 @@ export type Database = {
       }
       profiles: {
         Row: {
+          company_size_preference: string | null
           country_code: string | null
           created_at: string | null
+          culture_preferences_order: Json | null
           email: string | null
           first_name: string | null
           id: string
@@ -288,11 +290,14 @@ export type Database = {
           soft_skills: Json | null
           survey_preferences: Json | null
           updated_at: string | null
+          work_location_preference: string | null
           work_style_preferences: Json | null
         }
         Insert: {
+          company_size_preference?: string | null
           country_code?: string | null
           created_at?: string | null
+          culture_preferences_order?: Json | null
           email?: string | null
           first_name?: string | null
           id: string
@@ -303,11 +308,14 @@ export type Database = {
           soft_skills?: Json | null
           survey_preferences?: Json | null
           updated_at?: string | null
+          work_location_preference?: string | null
           work_style_preferences?: Json | null
         }
         Update: {
+          company_size_preference?: string | null
           country_code?: string | null
           created_at?: string | null
+          culture_preferences_order?: Json | null
           email?: string | null
           first_name?: string | null
           id?: string
@@ -318,6 +326,7 @@ export type Database = {
           soft_skills?: Json | null
           survey_preferences?: Json | null
           updated_at?: string | null
+          work_location_preference?: string | null
           work_style_preferences?: Json | null
         }
         Relationships: []

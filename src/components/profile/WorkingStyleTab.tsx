@@ -1,6 +1,7 @@
 import React from 'react';
 import SoftSkillsSection from './SoftSkillsSection';
 import WorkStylePreferencesSection from './WorkStylePreferencesSection';
+import CompanyCulturePreferences from './CompanyCulturePreferences';
 
 interface WorkingStyleTabProps {
   credits: number;
@@ -15,6 +16,9 @@ const WorkingStyleTab: React.FC<WorkingStyleTabProps> = ({ credits, memberSince 
         <SoftSkillsSection />
         <WorkStylePreferencesSection />
       </div>
+      
+      {/* Company Culture Preferences - Full Width */}
+      <CompanyCulturePreferences />
     </div>
   );
 };
