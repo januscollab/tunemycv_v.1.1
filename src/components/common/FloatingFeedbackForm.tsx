@@ -2,10 +2,11 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, MessageSquare, Lightbulb, Bug, Heart, Zap, Brain } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { FloatingLabelInput } from './FloatingLabelInput';
-import { FloatingLabelTextarea } from './FloatingLabelTextarea';
 
 interface FloatingFeedbackFormProps {
   onClose: () => void;
@@ -128,18 +129,18 @@ export const FloatingFeedbackForm: React.FC<FloatingFeedbackFormProps> = ({
 
   if (showSuccess) {
     return (
-      <div className="flex flex-col items-center justify-center h-full text-center p-8 animate-fade-in">
-        <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mb-6 animate-scale-in">
-          <Heart className="w-8 h-8 text-green-500 animate-pulse" />
-        </div>
-        <h3 className="text-2xl font-bold text-blueberry dark:text-citrus mb-3">
-          Thank You! 🎉
-        </h3>
-        <p className="text-blueberry/70 dark:text-apple-core/80 mb-4">
-          Your feedback has been sent successfully. We truly appreciate you helping us improve TuneMyCV!
-        </p>
-        <div className="text-sm text-blueberry/60 dark:text-apple-core/60">
-          This window will close automatically...
+      <div className="space-y-6 text-center">
+        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-6">
+          <Send className="h-12 w-12 text-green-600 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-earth dark:text-white mb-2">
+            Thank you for your feedback!
+          </h3>
+          <p className="text-earth/70 dark:text-white/70">
+            Your feedback has been sent successfully. We truly appreciate you helping us improve TuneMyCV!
+          </p>
+          <div className="text-sm text-muted-foreground mt-2">
+            This window will close automatically...
+          </div>
         </div>
       </div>
     );
@@ -148,12 +149,10 @@ export const FloatingFeedbackForm: React.FC<FloatingFeedbackFormProps> = ({
   return (
     <form ref={formRef} onSubmit={handleSubmit} className="h-full flex flex-col">
       {/* Category Selection */}
-      <div className="mb-6 animate-fade-in" style={{ animationDelay: '100ms' }}>
-        <label className="block text-sm font-medium text-blueberry dark:text-citrus mb-3">
-          What type of feedback is this?
-        </label>
+      <div className="mb-6">
+        <Label className="mb-3">What type of feedback is this?</Label>
         <div className="grid grid-cols-2 gap-2">
-          {feedbackCategories.map((category, index) => {
+          {feedbackCategories.map((category) => {
             const Icon = category.icon;
             return (
               <button
@@ -161,20 +160,19 @@ export const FloatingFeedbackForm: React.FC<FloatingFeedbackFormProps> = ({
                 type="button"
                 onClick={() => handleCategorySelect(category.id)}
                 className={`
-                  p-3 rounded-lg border-2 transition-all duration-200 text-left
-                  hover:scale-105 hover:shadow-md group animate-fade-in
+                  p-3 rounded-lg border transition-all duration-200 text-left
+                  hover:shadow-md group
                   ${selectedCategory === category.id 
                     ? 'border-zapier-orange bg-zapier-orange/10' 
-                    : 'border-apple-core/20 dark:border-citrus/20 hover:border-zapier-orange/50'
+                    : 'border-border hover:border-zapier-orange/50'
                   }
                 `}
-                style={{ animationDelay: `${150 + index * 50}ms` }}
               >
                 <div className="flex items-center space-x-2">
                   <div className={`w-6 h-6 rounded-full ${category.color} flex items-center justify-center`}>
                     <Icon className="w-3 h-3 text-white" />
                   </div>
-                  <span className="text-xs font-medium text-blueberry dark:text-citrus group-hover:text-zapier-orange transition-colors">
+                  <span className="text-xs font-medium group-hover:text-zapier-orange transition-colors">
                     {category.label}
                   </span>
                 </div>
@@ -186,56 +184,76 @@ export const FloatingFeedbackForm: React.FC<FloatingFeedbackFormProps> = ({
 
 
       {/* Form Fields */}
-      <div className="space-y-5 flex-1 animate-fade-in" style={{ animationDelay: '500ms' }}>
+      <div className="space-y-4 flex-1">
+        <div className="bg-zapier-orange/10 dark:bg-zapier-orange/5 border border-zapier-orange/20 rounded-lg p-3 mb-6">
+          <p className="text-sm text-earth dark:text-white">
+            {getContextualMessage()}
+          </p>
+        </div>
+
         <div className="grid grid-cols-2 gap-4">
-          <FloatingLabelInput
+          <div>
+            <Label htmlFor="name">Name</Label>
+            <Input
+              id="name"
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
+              placeholder="Your full name (optional)"
+              disabled={isSubmitting}
+            />
+          </div>
+          <div>
+            <Label htmlFor="email">Email Address</Label>
+            <Input
+              id="email"
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              placeholder={allowContact ? "your@email.com (required)" : "your@email.com (optional)"}
+              required={allowContact}
+              disabled={isSubmitting}
+            />
+          </div>
+        </div>
+
+        <div>
+          <Label htmlFor="subject">Subject</Label>
+          <Input
+            id="subject"
             type="text"
-            name="name"
-            value={formData.name}
+            name="subject"
+            value={formData.subject}
             onChange={handleInputChange}
-            label="Name (optional)"
-            disabled={isSubmitting}
-          />
-          <FloatingLabelInput
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleInputChange}
-            label={allowContact ? "Email (required for contact)" : "Email (optional)"}
-            required={allowContact}
+            placeholder="Enter subject"
+            required
             disabled={isSubmitting}
           />
         </div>
 
-        <FloatingLabelInput
-          type="text"
-          name="subject"
-          value={formData.subject}
-          onChange={handleInputChange}
-          label="Subject"
-          required
-          disabled={isSubmitting}
-        />
-
-        <div className="relative">
-          <FloatingLabelTextarea
+        <div>
+          <Label htmlFor="message">Your Feedback</Label>
+          <Textarea
+            id="message"
             name="message"
             value={formData.message}
             onChange={handleInputChange}
-            label="Your feedback"
+            placeholder="Please share your feedback, ideas, or issues..."
+            className="min-h-[100px]"
             required
             disabled={isSubmitting}
             maxLength={maxCharacters}
-            rows={4}
           />
           <div className="flex justify-between items-center mt-2">
-            <div className="text-xs text-blueberry/50 dark:text-apple-core/50">
+            <div className="text-xs text-muted-foreground">
               Share your thoughts, ideas, or issues...
             </div>
             <div className={`text-xs transition-colors ${
               characterCount > maxCharacters * 0.9 
                 ? 'text-red-500' 
-                : 'text-blueberry/50 dark:text-apple-core/50'
+                : 'text-muted-foreground'
             }`}>
               {characterCount}/{maxCharacters}
             </div>
@@ -243,7 +261,7 @@ export const FloatingFeedbackForm: React.FC<FloatingFeedbackFormProps> = ({
         </div>
 
         {/* Contact Permission */}
-        <div className="flex items-start space-x-3 p-3 rounded-lg bg-surface/50 dark:bg-blueberry/20">
+        <div className="flex items-start space-x-3 p-3 rounded-lg bg-muted/50">
           <Checkbox
             id="allowContact"
             checked={allowContact}
@@ -253,10 +271,10 @@ export const FloatingFeedbackForm: React.FC<FloatingFeedbackFormProps> = ({
           />
           <label 
             htmlFor="allowContact" 
-            className="text-sm text-blueberry dark:text-citrus leading-relaxed cursor-pointer"
+            className="text-sm leading-relaxed cursor-pointer"
           >
             Yes, you can contact me about my feedback
-            <span className="text-xs text-blueberry/60 dark:text-apple-core/60 block mt-1">
+            <span className="text-xs text-muted-foreground block mt-1">
               We'll only reach out if we need clarification or have updates to share
             </span>
           </label>
@@ -264,22 +282,28 @@ export const FloatingFeedbackForm: React.FC<FloatingFeedbackFormProps> = ({
       </div>
 
       {/* Submit Button */}
-      <div className="mt-6 animate-fade-in" style={{ animationDelay: '600ms' }}>
+      <div className="flex gap-3 pt-4">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onClose}
+          className="flex-1"
+          disabled={isSubmitting}
+        >
+          Cancel
+        </Button>
         <Button
           type="submit"
+          className="flex-1 bg-zapier-orange hover:bg-zapier-orange/90"
           disabled={isSubmitting || !formData.subject || !formData.message || (allowContact && !formData.email)}
-          className="w-full bg-zapier-orange hover:bg-zapier-orange/90 text-white font-semibold h-12 rounded-lg transition-all duration-200 hover:scale-[1.02] hover:shadow-lg disabled:hover:scale-100"
         >
           {isSubmitting ? (
-            <div className="flex items-center space-x-2">
-              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-              <span>Sending your feedback...</span>
-            </div>
+            'Sending...'
           ) : (
-            <div className="flex items-center space-x-2">
-              <Send className="h-4 w-4" />
-              <span>Send Feedback</span>
-            </div>
+            <>
+              Send Feedback
+              <Send className="ml-2 h-4 w-4" />
+            </>
           )}
         </Button>
       </div>
