@@ -479,6 +479,10 @@ export type Database = {
       }
     }
     Functions: {
+      delete_user_admin: {
+        Args: { _user_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _user_id: string

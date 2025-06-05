@@ -1,10 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
-import { Search, Eye } from 'lucide-react';
+import { Search, Eye, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import UserDetailModal from './UserDetailModal';
+import DeleteUserDialog from './DeleteUserDialog';
 
 interface UserStats {
   user_id: string;
@@ -22,6 +23,8 @@ const UserManagement = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUser, setSelectedUser] = useState<UserStats | null>(null);
+  const [userToDelete, setUserToDelete] = useState<UserStats | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -83,6 +86,37 @@ const UserManagement = () => {
       toast({ title: 'Error', description: 'Failed to load users', variant: 'destructive' });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteUser = async () => {
+    if (!userToDelete) return;
+    
+    setDeleteLoading(true);
+    try {
+      const { error } = await supabase.rpc('delete_user_admin', {
+        _user_id: userToDelete.user_id
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: 'Success',
+        description: 'User has been deleted successfully',
+      });
+
+      // Refresh the users list
+      await loadUsers();
+      setUserToDelete(null);
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Failed to delete user',
+        variant: 'destructive'
+      });
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -170,6 +204,13 @@ const UserManagement = () => {
                     >
                       <Eye className="h-4 w-4" />
                     </button>
+                    <button
+                      onClick={() => setUserToDelete(user)}
+                      className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                      title="Delete User"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
                   </div>
                 </TableCell>
               </TableRow>
@@ -185,6 +226,13 @@ const UserManagement = () => {
           onUpdate={loadUsers}
         />
       )}
+
+      <DeleteUserDialog
+        user={userToDelete}
+        onClose={() => setUserToDelete(null)}
+        onConfirm={handleDeleteUser}
+        loading={deleteLoading}
+      />
     </div>
   );
 };
