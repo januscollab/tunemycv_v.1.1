@@ -62,13 +62,11 @@ export function buildSystemPrompt(
 
 The cover letter should:
 - Always start with this exact header format:
-  "Date: [Current Date]
-  
-  Hiring Manager  
+  "Hiring Manager  
   ${companyName}
   [Company Address]  
-  [City, State, Zip]  
-  
+  [City, State, Zip]
+
   Dear Hiring Manager,"
 - Be tailored specifically to the job and company
 - Highlight relevant experience and skills
