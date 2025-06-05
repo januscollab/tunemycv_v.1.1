@@ -20,7 +20,7 @@ import Template from './pages/Template';
 import PricingScale from './pages/PricingScale';
 import Navigation from './components/Navigation';
 import Footer from './components/Footer';
-import SecurityHeaders from './components/SecurityHeaders';
+import EnhancedSecurityHeaders from './components/security/EnhancedSecurityHeaders';
 import FloatingFeedback from '@/components/common/FloatingFeedback';
 import { Toaster } from "@/components/ui/toaster"
 
@@ -41,7 +41,7 @@ function ScrollToTop() {
 function AppContent() {
   return (
     <div className="flex flex-col min-h-screen w-full transition-colors duration-normal">
-      <SecurityHeaders />
+      <EnhancedSecurityHeaders />
       <ScrollToTop />
       <Navigation />
       <main className="flex-grow">

@@ -15,6 +15,90 @@ interface AnalysisRequest {
   userId: string;
 }
 
+// Security validation functions
+const validateAndSanitizeText = (text: string, maxLength: number, fieldName: string): string => {
+  if (!text || typeof text !== 'string') {
+    throw new Error(`${fieldName} is required and must be a string`);
+  }
+  
+  // Remove potential XSS and injection patterns
+  const sanitized = text
+    .trim()
+    .replace(/[<>]/g, '') // Remove angle brackets
+    .replace(/javascript:/gi, '') // Remove javascript: protocols
+    .replace(/on\w+\s*=/gi, '') // Remove event handlers
+    .replace(/script/gi, '') // Remove script references
+    .replace(/eval\s*\(/gi, '') // Remove eval calls
+    .replace(/function\s*\(/gi, ''); // Remove function declarations
+  
+  if (sanitized.length === 0) {
+    throw new Error(`${fieldName} cannot be empty after sanitization`);
+  }
+  
+  if (sanitized.length > maxLength) {
+    throw new Error(`${fieldName} exceeds maximum length of ${maxLength} characters`);
+  }
+  
+  if (sanitized.length < 50) {
+    throw new Error(`${fieldName} must be at least 50 characters long`);
+  }
+  
+  return sanitized;
+};
+
+const detectPromptInjection = (text: string): boolean => {
+  const suspiciousPatterns = [
+    /ignore\s+(previous|above|all)\s+instructions/gi,
+    /you\s+are\s+(now|a)\s+(different|new)/gi,
+    /roleplay\s+as/gi,
+    /pretend\s+(to\s+be|you\s+are)/gi,
+    /act\s+as\s+(if|though)/gi,
+    /system\s*:\s*/gi,
+    /assistant\s*:\s*/gi,
+    /human\s*:\s*/gi,
+    /\[system\]/gi,
+    /\[assistant\]/gi,
+    /override\s+your/gi,
+    /jailbreak/gi,
+    /tell\s+me\s+how\s+to/gi,
+    /create\s+(malicious|harmful)/gi
+  ];
+  
+  return suspiciousPatterns.some(pattern => pattern.test(text));
+};
+
+const validateJobTitle = (jobTitle?: string): string => {
+  if (!jobTitle) return 'Not specified';
+  
+  const sanitized = jobTitle
+    .trim()
+    .replace(/[<>]/g, '')
+    .substring(0, 100); // Limit job title length
+    
+  return sanitized || 'Not specified';
+};
+
+const checkRateLimit = async (supabase: any, userId: string): Promise<void> => {
+  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+  
+  const { data: recentAnalyses, error } = await supabase
+    .from('analysis_logs')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('operation_type', 'cv_analysis')
+    .gte('created_at', oneHourAgo.toISOString())
+    .limit(10);
+    
+  if (error) {
+    console.error('Rate limit check error:', error);
+    throw new Error('Unable to verify rate limits');
+  }
+  
+  if (recentAnalyses && recentAnalyses.length >= 10) {
+    throw new Error('Rate limit exceeded: Maximum 10 analyses per hour');
+  }
+};
+
 interface EnhancedAIAnalysisResult {
   compatibilityScore: number;
   companyName: string;
@@ -233,6 +317,35 @@ serve(async (req) => {
 
     console.log('Starting enhanced AI analysis for user:', userId);
 
+    // Security validations
+    console.log('Performing security validations...');
+    
+    // Validate required fields
+    if (!userId || typeof userId !== 'string') {
+      throw new Error('Valid user ID is required');
+    }
+    
+    // Check rate limiting first
+    await checkRateLimit(supabase, userId);
+    
+    // Validate and sanitize input texts
+    const sanitizedCvText = validateAndSanitizeText(cvText, 50000, 'CV text');
+    const sanitizedJobDescription = validateAndSanitizeText(jobDescriptionText, 20000, 'Job description');
+    const sanitizedJobTitle = validateJobTitle(jobTitle);
+    
+    // Check for prompt injection attempts
+    if (detectPromptInjection(sanitizedCvText)) {
+      console.warn('Potential prompt injection detected in CV text');
+      throw new Error('Invalid content detected in CV text');
+    }
+    
+    if (detectPromptInjection(sanitizedJobDescription)) {
+      console.warn('Potential prompt injection detected in job description');
+      throw new Error('Invalid content detected in job description');
+    }
+    
+    console.log('Security validations passed successfully');
+
     // Get upload IDs for logging
     const { data: cvUploads } = await supabase
       .from('uploads')
@@ -278,12 +391,12 @@ CRITICAL REQUIREMENTS:
 4. Extract 15-25+ relevant keywords from the job description
 
 CV TO ANALYZE:
-${cvText}
+${sanitizedCvText}
 
 JOB DESCRIPTION:
-${jobDescriptionText}
+${sanitizedJobDescription}
 
-POSITION: ${jobTitle || 'Not specified'}
+POSITION: ${sanitizedJobTitle}
 
 RESPOND WITH ANALYSIS IN THIS EXACT JSON STRUCTURE:
 {
