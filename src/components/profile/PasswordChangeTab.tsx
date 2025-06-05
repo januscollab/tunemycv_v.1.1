@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import SecureInput from '@/components/security/SecureInput';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
@@ -65,13 +65,14 @@ const PasswordChangeTab = () => {
           <div className="space-y-2">
             <Label htmlFor="currentPassword">Current Password</Label>
             <div className="relative">
-              <Input
+              <SecureInput
                 id="currentPassword"
                 type={showCurrentPassword ? 'text' : 'password'}
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 required
                 className="pr-10"
+                maxLength={128}
               />
               <button
                 type="button"
@@ -86,7 +87,7 @@ const PasswordChangeTab = () => {
           <div className="space-y-2">
             <Label htmlFor="newPassword">New Password</Label>
             <div className="relative">
-              <Input
+              <SecureInput
                 id="newPassword"
                 type={showNewPassword ? 'text' : 'password'}
                 value={newPassword}
@@ -94,6 +95,7 @@ const PasswordChangeTab = () => {
                 required
                 minLength={6}
                 className="pr-10"
+                maxLength={128}
               />
               <button
                 type="button"
@@ -108,7 +110,7 @@ const PasswordChangeTab = () => {
           <div className="space-y-2">
             <Label htmlFor="confirmPassword">Confirm New Password</Label>
             <div className="relative">
-              <Input
+              <SecureInput
                 id="confirmPassword"
                 type={showConfirmPassword ? 'text' : 'password'}
                 value={confirmPassword}
@@ -116,6 +118,7 @@ const PasswordChangeTab = () => {
                 required
                 minLength={6}
                 className="pr-10"
+                maxLength={128}
               />
               <button
                 type="button"
