@@ -7,6 +7,7 @@ import { User, Mail, Lock, Save, Linkedin, Phone, Globe } from 'lucide-react';
 import CountryCodeSelect from './CountryCodeSelect';
 import SecureInput from '@/components/security/SecureInput';
 import SoftSkillsSection from './SoftSkillsSection';
+import WorkStylePreferencesSection from './WorkStylePreferencesSection';
 
 interface PersonalInfoTabProps {
   credits: number;
@@ -282,6 +283,9 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
       {/* Soft Skills Assessment */}
       <SoftSkillsSection />
 
+      {/* Work Style Preferences */}
+      <WorkStylePreferencesSection />
+
       {/* Notification Settings and Privacy Settings - Two Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Notification Settings */}
@@ -351,70 +355,73 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
       </div>
 
 
-      {/* Password Change */}
-      <div className="bg-white dark:bg-surface rounded-lg border border-gray-200 dark:border-border p-6">
-        <div className="flex items-center mb-6">
-          <Lock className="h-5 w-5 text-gray-500 dark:text-apple-core/60 mr-2" />
-          <h3 className="text-lg font-medium text-gray-900 dark:text-citrus">Change Password</h3>
-        </div>
-
-        <form onSubmit={handleUpdatePassword} className="space-y-4">
-          <div>
-            <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
-              New Password
-            </label>
-            <SecureInput
-              id="newPassword"
-              type="password"
-              value={passwords.new}
-              onChange={(e) => setPasswords({ ...passwords, new: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
-              placeholder="Enter new password"
-              maxLength={128}
-            />
+      {/* Password Change and Account Management - Side by Side */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Password Change */}
+        <div className="bg-white dark:bg-surface rounded-lg border border-gray-200 dark:border-border p-6">
+          <div className="flex items-center mb-6">
+            <Lock className="h-5 w-5 text-gray-500 dark:text-apple-core/60 mr-2" />
+            <h3 className="text-lg font-medium text-gray-900 dark:text-citrus">Change Password</h3>
           </div>
 
-          <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
-              Confirm New Password
-            </label>
-            <SecureInput
-              id="confirmPassword"
-              type="password"
-              value={passwords.confirm}
-              onChange={(e) => setPasswords({ ...passwords, confirm: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
-              placeholder="Confirm new password"
-              maxLength={128}
-            />
-          </div>
+          <form onSubmit={handleUpdatePassword} className="space-y-4">
+            <div>
+              <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
+                New Password
+              </label>
+              <SecureInput
+                id="newPassword"
+                type="password"
+                value={passwords.new}
+                onChange={(e) => setPasswords({ ...passwords, new: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
+                placeholder="Enter new password"
+                maxLength={128}
+              />
+            </div>
 
-          <button
-            type="submit"
-            disabled={loading || !passwords.new || !passwords.confirm}
-            className="flex items-center px-4 py-2 bg-zapier-orange text-white rounded-md hover:bg-zapier-orange/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            <Lock className="h-4 w-4 mr-2" />
-            {loading ? 'Updating...' : 'Update Password'}
-          </button>
-        </form>
-      </div>
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
+                Confirm New Password
+              </label>
+              <SecureInput
+                id="confirmPassword"
+                type="password"
+                value={passwords.confirm}
+                onChange={(e) => setPasswords({ ...passwords, confirm: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
+                placeholder="Confirm new password"
+                maxLength={128}
+              />
+            </div>
 
-      {/* Account Management */}
-      <div className="bg-white dark:bg-surface rounded-lg border border-gray-200 dark:border-border p-6">
-        <div className="flex items-center mb-6">
-          <User className="h-5 w-5 text-gray-500 dark:text-apple-core/60 mr-2" />
-          <h3 className="text-lg font-medium text-gray-900 dark:text-citrus">Account Management</h3>
+            <button
+              type="submit"
+              disabled={loading || !passwords.new || !passwords.confirm}
+              className="flex items-center px-4 py-2 bg-zapier-orange text-white rounded-md hover:bg-zapier-orange/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              <Lock className="h-4 w-4 mr-2" />
+              {loading ? 'Updating...' : 'Update Password'}
+            </button>
+          </form>
         </div>
-        
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <h4 className="font-medium text-red-900 mb-2">Request Account Deactivation</h4>
-          <p className="text-sm text-red-700 mb-4">
-            This will permanently delete your account and all associated data. This action cannot be undone.
-          </p>
-          <button className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors">
-            Request Deactivation
-          </button>
+
+        {/* Account Management */}
+        <div className="bg-white dark:bg-surface rounded-lg border border-gray-200 dark:border-border p-6">
+          <div className="flex items-center mb-6">
+            <User className="h-5 w-5 text-gray-500 dark:text-apple-core/60 mr-2" />
+            <h3 className="text-lg font-medium text-gray-900 dark:text-citrus">Account Management</h3>
+          </div>
+          
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            <h4 className="font-medium text-red-900 mb-2">Request Account Deactivation</h4>
+            <p className="text-sm text-red-700 mb-4">
+              This will permanently delete your account and all associated data. This action cannot be undone.
+            </p>
+            <button className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors">
+              Request Deactivation
+            </button>
+          </div>
         </div>
       </div>
     </div>

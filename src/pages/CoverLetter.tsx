@@ -629,7 +629,7 @@ const AuthenticatedCoverLetter = () => {
                 {selectedCoverLetter ? (
                   <Card className="border border-gray-200 dark:border-gray-700">
                     <CardHeader className="pb-3">
-                      <div className="flex items-center justify-between">
+                      <div className="space-y-2">
                         <div className="flex items-center space-x-3">
                           <CardTitle className="text-xl font-semibold">{selectedCoverLetter.job_title} at {selectedCoverLetter.company_name}</CardTitle>
                           <button
@@ -643,7 +643,7 @@ const AuthenticatedCoverLetter = () => {
                             <Edit2 className="h-4 w-4" />
                           </button>
                         </div>
-                        <div className="text-sm font-normal text-gray-600 dark:text-gray-400 mt-2">
+                        <div className="flex items-center gap-4 text-sm font-normal text-gray-600 dark:text-gray-400">
                           <div className="flex items-center gap-1">
                             <Clock className="h-4 w-4" />
                             Generated {formatDate(selectedCoverLetter.created_at)}
