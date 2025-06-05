@@ -47,8 +47,8 @@ const WorkStylePreferencesSection: React.FC = () => {
 
       if (error && error.code !== 'PGRST116') throw error;
 
-      if (data?.work_style_preferences) {
-        setWorkStyle(data.work_style_preferences as WorkStyleData);
+      if (data?.work_style_preferences && typeof data.work_style_preferences === 'object') {
+        setWorkStyle(data.work_style_preferences as unknown as WorkStyleData);
       } else {
         setWorkStyle(defaultWorkStyle);
       }
@@ -79,7 +79,7 @@ const WorkStylePreferencesSection: React.FC = () => {
         .from('profiles')
         .upsert({
           id: user?.id,
-          work_style_preferences: workStyle,
+          work_style_preferences: workStyle as any,
           updated_at: new Date().toISOString()
         });
 
@@ -195,36 +195,34 @@ const WorkStylePreferencesSection: React.FC = () => {
           </button>
         </div>
       ) : (
-        <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {questions.map((question) => (
-            <div key={question.key} className="space-y-3">
-              <div className="flex items-center space-x-2">
+            <div key={question.key} className="space-y-2">
+              <div className="flex items-center space-x-2 mb-2">
                 <div className="text-zapier-orange">{question.icon}</div>
-                <div>
-                  <h4 className="font-medium text-gray-900 dark:text-apple-core/90">
-                    {question.title}
-                  </h4>
-                  <p className="text-sm text-gray-600 dark:text-apple-core/70">
-                    {question.question}
-                  </p>
-                </div>
+                <h4 className="font-medium text-gray-900 dark:text-apple-core/90 text-sm">
+                  {question.title}
+                </h4>
               </div>
+              <p className="text-xs text-gray-600 dark:text-apple-core/70 mb-3">
+                {question.question}
+              </p>
               
               <RadioGroup
                 value={workStyle[question.key]}
                 onValueChange={(value) => handlePreferenceChange(question.key, value)}
-                className="ml-7 space-y-2"
+                className="space-y-1"
               >
                 {question.options.map((option) => (
                   <div key={option.value} className="flex items-center space-x-2">
                     <RadioGroupItem 
                       value={option.value} 
                       id={`${question.key}-${option.value}`}
-                      className="text-zapier-orange"
+                      className="text-zapier-orange h-3 w-3"
                     />
                     <Label 
                       htmlFor={`${question.key}-${option.value}`}
-                      className="text-sm text-gray-700 dark:text-apple-core/80 cursor-pointer"
+                      className="text-xs text-gray-700 dark:text-apple-core/80 cursor-pointer"
                     >
                       {option.label}
                     </Label>

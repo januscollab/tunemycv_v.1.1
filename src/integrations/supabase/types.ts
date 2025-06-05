@@ -288,6 +288,7 @@ export type Database = {
           soft_skills: Json | null
           survey_preferences: Json | null
           updated_at: string | null
+          work_style_preferences: Json | null
         }
         Insert: {
           country_code?: string | null
@@ -302,6 +303,7 @@ export type Database = {
           soft_skills?: Json | null
           survey_preferences?: Json | null
           updated_at?: string | null
+          work_style_preferences?: Json | null
         }
         Update: {
           country_code?: string | null
@@ -316,6 +318,7 @@ export type Database = {
           soft_skills?: Json | null
           survey_preferences?: Json | null
           updated_at?: string | null
+          work_style_preferences?: Json | null
         }
         Relationships: []
       }

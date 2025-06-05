@@ -35,16 +35,16 @@ const SoftSkillsSection: React.FC = () => {
   const [currentSkills, setCurrentSkills] = useState<SoftSkillsData | null>(null);
 
   const defaultSkills: SoftSkillsData = {
-    communication: 5,
-    leadership: 5,
-    teamwork: 5,
-    problem_solving: 5,
-    adaptability: 5,
-    time_management: 5,
-    creativity: 5,
-    emotional_intelligence: 5,
-    critical_thinking: 5,
-    conflict_resolution: 5
+    communication: 0,
+    leadership: 0,
+    teamwork: 0,
+    problem_solving: 0,
+    adaptability: 0,
+    time_management: 0,
+    creativity: 0,
+    emotional_intelligence: 0,
+    critical_thinking: 0,
+    conflict_resolution: 0
   };
 
   // Initialize current skills
@@ -70,8 +70,21 @@ const SoftSkillsSection: React.FC = () => {
   };
 
   const handleCreateProfile = () => {
-    setCurrentSkills(defaultSkills);
+    setCurrentSkills({
+      communication: 5,
+      leadership: 5,
+      teamwork: 5,
+      problem_solving: 5,
+      adaptability: 5,
+      time_management: 5,
+      creativity: 5,
+      emotional_intelligence: 5,
+      critical_thinking: 5,
+      conflict_resolution: 5
+    });
   };
+
+  const isAssessmentEmpty = currentSkills && Object.values(currentSkills).every(value => value === 0);
 
   if (loading) {
     return null;
@@ -101,6 +114,13 @@ const SoftSkillsSection: React.FC = () => {
           </div>
         ) : (
           <div className="space-y-4">
+            {isAssessmentEmpty && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <p className="text-sm text-blue-800">
+                  <strong>Assessment Not Completed:</strong> This assessment is optional but helps improve your compatibility measurements against future roles. Complete it to get more personalized results.
+                </p>
+              </div>
+            )}
             {Object.entries(skillDefinitions).map(([key, label]) => (
               <div key={key} className="space-y-2">
                 <div className="flex justify-between items-center">
@@ -114,7 +134,7 @@ const SoftSkillsSection: React.FC = () => {
                 <Slider
                   value={[currentSkills[key as keyof SoftSkillsData]]}
                   onValueChange={(value) => handleSkillChange(key as keyof SoftSkillsData, value)}
-                  min={1}
+                  min={0}
                   max={10}
                   step={1}
                   className="w-full"
