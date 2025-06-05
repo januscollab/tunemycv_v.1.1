@@ -510,7 +510,7 @@ const AnalyzeCV = () => {
                           Let's Get Personal (Optional)
                         </h3>
                         <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mb-4 leading-relaxed">
-                          Every role you decide to apply for is different. We can analyze your CV and test it against our Advanced Recruitment Models but we'd like to get some more information directly from you regarding this role. Would you be interested in sharing some additional thoughts on this role with us?
+                          Every role is unique. Share additional insights about your motivation and goals to enhance your CV analysis with our Advanced Recruitment Models.
                         </p>
                         
                         {surveyResponses ? (

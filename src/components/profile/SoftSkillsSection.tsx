@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
-import { Button } from '@/components/ui/button';
-import { Brain, Save, Edit } from 'lucide-react';
+import { Brain } from 'lucide-react';
 import { useSoftSkills } from '@/hooks/useSoftSkills';
 
 interface SoftSkillsData extends Record<string, number> {
@@ -33,8 +32,7 @@ const skillDefinitions = {
 
 const SoftSkillsSection: React.FC = () => {
   const { softSkills, loading, saveSoftSkills } = useSoftSkills();
-  const [editingSkills, setEditingSkills] = useState<SoftSkillsData | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
+  const [currentSkills, setCurrentSkills] = useState<SoftSkillsData | null>(null);
 
   const defaultSkills: SoftSkillsData = {
     communication: 5,
@@ -49,30 +47,30 @@ const SoftSkillsSection: React.FC = () => {
     conflict_resolution: 5
   };
 
-  const currentSkills = editingSkills || softSkills || defaultSkills;
+  // Initialize current skills
+  useEffect(() => {
+    setCurrentSkills(softSkills || defaultSkills);
+  }, [softSkills]);
 
-  const handleEdit = () => {
-    setEditingSkills(softSkills || defaultSkills);
-    setIsEditing(true);
-  };
+  // Auto-save with debounce
+  useEffect(() => {
+    if (!currentSkills) return;
+    
+    const timeoutId = setTimeout(() => {
+      if (JSON.stringify(currentSkills) !== JSON.stringify(softSkills || defaultSkills)) {
+        saveSoftSkills(currentSkills);
+      }
+    }, 500);
 
-  const handleCancel = () => {
-    setEditingSkills(null);
-    setIsEditing(false);
-  };
-
-  const handleSave = async () => {
-    if (editingSkills) {
-      await saveSoftSkills(editingSkills);
-      setEditingSkills(null);
-      setIsEditing(false);
-    }
-  };
+    return () => clearTimeout(timeoutId);
+  }, [currentSkills, saveSoftSkills, softSkills]);
 
   const handleSkillChange = (skill: keyof SoftSkillsData, value: number[]) => {
-    if (editingSkills) {
-      setEditingSkills(prev => ({ ...prev!, [skill]: value[0] }));
-    }
+    setCurrentSkills(prev => ({ ...prev!, [skill]: value[0] }));
+  };
+
+  const handleCreateProfile = () => {
+    setCurrentSkills(defaultSkills);
   };
 
   if (loading) {
@@ -82,81 +80,55 @@ const SoftSkillsSection: React.FC = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center text-blueberry dark:text-citrus">
-          <Brain className="h-5 w-5 mr-2 text-zapier-orange" />
-          Soft Skills Profile
+        <CardTitle className="flex items-center text-gray-900 dark:text-citrus">
+          <Brain className="h-5 w-5 mr-2 text-gray-500 dark:text-apple-core/60" />
+          Soft Skills Assessment
         </CardTitle>
         <CardDescription>
           Your soft skills assessment used to enhance CV analysis
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {!softSkills && !isEditing ? (
+        {!currentSkills ? (
           <div className="text-center py-6">
             <Brain className="h-12 w-12 text-zapier-orange mx-auto mb-4" />
-            <p className="text-blueberry/60 dark:text-white/60 mb-4">
-              No soft skills profile found. Complete the assessment to improve your CV analysis.
+            <p className="text-gray-500 dark:text-apple-core/60 mb-4">
+              No soft skills assessment found. Complete the assessment to improve your CV analysis.
             </p>
-            <Button onClick={handleEdit} className="bg-zapier-orange hover:bg-zapier-orange/90 text-white">
-              Create Skills Profile
-            </Button>
+            <button 
+              onClick={handleCreateProfile}
+              className="px-4 py-2 bg-zapier-orange text-white rounded-md hover:bg-zapier-orange/90 transition-colors"
+            >
+              Create Skills Assessment
+            </button>
           </div>
         ) : (
-          <>
-            <div className="space-y-4">
-              {Object.entries(skillDefinitions).map(([key, label]) => (
-                <div key={key} className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <label className="text-sm font-medium text-blueberry dark:text-white">
-                      {label}
-                    </label>
-                    <span className="text-sm text-blueberry/60 dark:text-white/60 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
-                      {currentSkills[key as keyof SoftSkillsData]}/10
-                    </span>
-                  </div>
-                  <Slider
-                    value={[currentSkills[key as keyof SoftSkillsData]]}
-                    onValueChange={isEditing ? (value) => handleSkillChange(key as keyof SoftSkillsData, value) : undefined}
-                    min={1}
-                    max={10}
-                    step={1}
-                    className="w-full"
-                    disabled={!isEditing}
-                  />
-                  <div className="flex justify-between text-xs text-blueberry/40 dark:text-white/40">
-                    <span>Beginner</span>
-                    <span>Expert</span>
-                  </div>
+          <div className="space-y-4">
+            {Object.entries(skillDefinitions).map(([key, label]) => (
+              <div key={key} className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <label className="text-sm font-medium text-gray-700 dark:text-apple-core/80">
+                    {label}
+                  </label>
+                  <span className="text-sm text-gray-500 dark:text-apple-core/60 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                    {currentSkills[key as keyof SoftSkillsData]}/10
+                  </span>
                 </div>
-              ))}
-            </div>
-
-            <div className="flex justify-end space-x-3 mt-6">
-              {isEditing ? (
-                <>
-                  <Button variant="outline" onClick={handleCancel}>
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={handleSave}
-                    className="bg-zapier-orange hover:bg-zapier-orange/90 text-white flex items-center space-x-2"
-                  >
-                    <Save className="h-4 w-4" />
-                    <span>Save Changes</span>
-                  </Button>
-                </>
-              ) : (
-                <Button
-                  onClick={handleEdit}
-                  variant="outline"
-                  className="flex items-center space-x-2"
-                >
-                  <Edit className="h-4 w-4" />
-                  <span>Edit Skills</span>
-                </Button>
-              )}
-            </div>
-          </>
+                <Slider
+                  value={[currentSkills[key as keyof SoftSkillsData]]}
+                  onValueChange={(value) => handleSkillChange(key as keyof SoftSkillsData, value)}
+                  min={1}
+                  max={10}
+                  step={1}
+                  className="w-full"
+                />
+                <div className="flex justify-between text-xs text-gray-400 dark:text-apple-core/50">
+                  <span>Beginner</span>
+                  <span>Expert</span>
+                </div>
+              </div>
+            ))}
+          </div>
         )}
       </CardContent>
     </Card>

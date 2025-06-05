@@ -279,6 +279,77 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
         </form>
       </div>
 
+      {/* Notification Settings and Privacy Settings - Two Column Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Notification Settings */}
+        <div className="bg-white dark:bg-surface rounded-lg border border-gray-200 dark:border-border p-6">
+          <div className="flex items-center mb-6">
+            <Mail className="h-5 w-5 text-gray-500 dark:text-apple-core/60 mr-2" />
+            <h3 className="text-lg font-medium text-gray-900 dark:text-citrus">Notification Preferences</h3>
+          </div>
+          
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <label className="font-medium text-gray-700 dark:text-apple-core/80">Email Notifications</label>
+                <p className="text-sm text-gray-500 dark:text-apple-core/60">Receive notifications about your CV analysis results</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  defaultChecked={true}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-zapier-orange/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-zapier-orange"></div>
+              </label>
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <div>
+                <label className="font-medium text-gray-700 dark:text-apple-core/80">Marketing Emails</label>
+                <p className="text-sm text-gray-500 dark:text-apple-core/60">Receive tips, updates, and promotional content</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  defaultChecked={false}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-zapier-orange/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-zapier-orange"></div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        {/* Privacy Settings */}
+        <div className="bg-white dark:bg-surface rounded-lg border border-gray-200 dark:border-border p-6">
+          <div className="flex items-center mb-6">
+            <Lock className="h-5 w-5 text-gray-500 dark:text-apple-core/60 mr-2" />
+            <h3 className="text-lg font-medium text-gray-900 dark:text-citrus">Privacy Settings</h3>
+          </div>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="block font-medium text-gray-700 dark:text-apple-core/80 mb-2">Data Privacy Level</label>
+              <select
+                defaultValue="standard"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
+              >
+                <option value="minimal">Minimal - Only essential data</option>
+                <option value="standard">Standard - Standard analytics and improvements</option>
+                <option value="enhanced">Enhanced - Help us improve our services</option>
+              </select>
+              <p className="text-sm text-gray-500 dark:text-apple-core/60 mt-1">
+                Controls how your data is used to improve our services
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Soft Skills Assessment */}
+      <SoftSkillsSection />
+
       {/* Password Change */}
       <div className="bg-white dark:bg-surface rounded-lg border border-gray-200 dark:border-border p-6">
         <div className="flex items-center mb-6">
@@ -327,74 +398,6 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
           </button>
         </form>
       </div>
-
-      {/* Notification Settings */}
-      <div className="bg-white dark:bg-surface rounded-lg border border-gray-200 dark:border-border p-6">
-        <div className="flex items-center mb-6">
-          <Mail className="h-5 w-5 text-gray-500 dark:text-apple-core/60 mr-2" />
-          <h3 className="text-lg font-medium text-gray-900 dark:text-citrus">Notification Preferences</h3>
-        </div>
-        
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <label className="font-medium text-gray-700 dark:text-apple-core/80">Email Notifications</label>
-              <p className="text-sm text-gray-500 dark:text-apple-core/60">Receive notifications about your CV analysis results</p>
-            </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                defaultChecked={true}
-                className="sr-only peer"
-              />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-zapier-orange/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-zapier-orange"></div>
-            </label>
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <div>
-              <label className="font-medium text-gray-700 dark:text-apple-core/80">Marketing Emails</label>
-              <p className="text-sm text-gray-500 dark:text-apple-core/60">Receive tips, updates, and promotional content</p>
-            </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                defaultChecked={false}
-                className="sr-only peer"
-              />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-zapier-orange/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-zapier-orange"></div>
-            </label>
-          </div>
-        </div>
-      </div>
-
-      {/* Privacy Settings */}
-      <div className="bg-white dark:bg-surface rounded-lg border border-gray-200 dark:border-border p-6">
-        <div className="flex items-center mb-6">
-          <Lock className="h-5 w-5 text-gray-500 dark:text-apple-core/60 mr-2" />
-          <h3 className="text-lg font-medium text-gray-900 dark:text-citrus">Privacy Settings</h3>
-        </div>
-        
-        <div className="space-y-4">
-          <div>
-            <label className="block font-medium text-gray-700 dark:text-apple-core/80 mb-2">Data Privacy Level</label>
-            <select
-              defaultValue="standard"
-              className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
-            >
-              <option value="minimal">Minimal - Only essential data</option>
-              <option value="standard">Standard - Standard analytics and improvements</option>
-              <option value="enhanced">Enhanced - Help us improve our services</option>
-            </select>
-            <p className="text-sm text-gray-500 dark:text-apple-core/60 mt-1">
-              Controls how your data is used to improve our services
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Soft Skills Profile */}
-      <SoftSkillsSection />
 
       {/* Account Management */}
       <div className="bg-white dark:bg-surface rounded-lg border border-gray-200 dark:border-border p-6">
