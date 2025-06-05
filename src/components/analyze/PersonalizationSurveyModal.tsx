@@ -25,6 +25,13 @@ const PersonalizationSurveyModal: React.FC<PersonalizationSurveyModalProps> = ({
 }) => {
   const { toast } = useToast();
   const [currentQuestion, setCurrentQuestion] = useState(0);
+
+  // Reset to question 1 when modal opens
+  React.useEffect(() => {
+    if (isOpen) {
+      setCurrentQuestion(0);
+    }
+  }, [isOpen]);
   const [responses, setResponses] = useState<SurveyResponses>({
     motivation: '',
     expectations: '',
@@ -52,7 +59,7 @@ const PersonalizationSurveyModal: React.FC<PersonalizationSurveyModalProps> = ({
     {
       id: 'concerns',
       title: 'Are there any personal circumstances driving this application?',
-      subtitle: 'This is completely optional and deeply personal - feel free to skip if you prefer',
+      subtitle: 'Feel free to skip if you prefer',
       icon: <Lightbulb className="h-5 w-5 text-yellow-500" />,
       placeholder: 'e.g., I\'m looking for better work-life balance to spend more time with family, or seeking a role that offers remote work options...',
       isPersonal: true
@@ -60,7 +67,7 @@ const PersonalizationSurveyModal: React.FC<PersonalizationSurveyModalProps> = ({
     {
       id: 'uniqueValue',
       title: 'Why should you not get this role?',
-      subtitle: 'This is a very personal question - completely optional and can be skipped',
+      subtitle: 'Feel free to skip if you prefer',
       icon: <CheckCircle className="h-5 w-5 text-green-500" />,
       placeholder: 'e.g., I might struggle with the steep learning curve, or I lack experience in certain technical areas mentioned in the job description...',
       isPersonal: true

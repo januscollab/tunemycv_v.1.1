@@ -40,7 +40,7 @@ const SecureInput = forwardRef<HTMLInputElement, SecureInputProps>(
         ref={ref}
         onChange={handleChange}
         maxLength={maxLength}
-        className={cn(className)}
+        className={cn("border border-gray-300 dark:border-gray-600", className)}
         {...props}
       />
     );
