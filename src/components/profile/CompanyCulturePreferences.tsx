@@ -101,53 +101,58 @@ function SortableItem({ id, archetype, index, isMobile, onMoveUp, onMoveDown, ca
       style={style}
       className={`bg-white dark:bg-surface border border-gray-200 dark:border-border rounded-lg p-4 ${
         isDragging ? 'opacity-50 shadow-lg' : ''
-      } ${isMobile ? 'flex items-center justify-between' : ''}`}
+      }`}
     >
-      <div className="flex items-center flex-1">
-        <div className="flex items-center space-x-3">
-          <span className="text-2xl">{archetype.icon}</span>
-          <div className="flex-1">
-            <div className="flex items-center space-x-2">
-              <span className="inline-flex items-center justify-center w-6 h-6 bg-zapier-orange text-white text-sm font-bold rounded-full">
-                {index + 1}
-              </span>
-              <h4 className="font-medium text-gray-900 dark:text-citrus">{archetype.name}</h4>
-            </div>
-            <p className="text-sm text-gray-500 dark:text-apple-core/60 mt-1">{archetype.description}</p>
+      <div className="flex items-start space-x-3">
+        {/* Drag handle on the left, aligned with text content */}
+        {!isMobile && (
+          <div
+            {...attributes}
+            {...listeners}
+            className="cursor-grab active:cursor-grabbing p-1 text-gray-400 hover:text-gray-600 dark:text-apple-core/60 dark:hover:text-apple-core/80 mt-1"
+          >
+            <GripVertical className="h-5 w-5" />
           </div>
+        )}
+        
+        {/* Icon */}
+        <span className="text-2xl">{archetype.icon}</span>
+        
+        {/* Content */}
+        <div className="flex-1">
+          <div className="flex items-center space-x-2">
+            <span className="inline-flex items-center justify-center w-6 h-6 bg-zapier-orange text-white text-sm font-bold rounded-full">
+              {index + 1}
+            </span>
+            <h4 className="font-medium text-gray-900 dark:text-citrus">{archetype.name}</h4>
+          </div>
+          <p className="text-sm text-gray-500 dark:text-apple-core/60 mt-1">{archetype.description}</p>
         </div>
-      </div>
 
-      {isMobile ? (
-        <div className="flex flex-col space-y-1 ml-4">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onMoveUp}
-            disabled={!canMoveUp}
-            className="h-8 w-8 p-0"
-          >
-            <ChevronUp className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onMoveDown}
-            disabled={!canMoveDown}
-            className="h-8 w-8 p-0"
-          >
-            <ChevronDown className="h-4 w-4" />
-          </Button>
-        </div>
-      ) : (
-        <div
-          {...attributes}
-          {...listeners}
-          className="cursor-grab active:cursor-grabbing p-2 text-gray-400 hover:text-gray-600 dark:text-apple-core/60 dark:hover:text-apple-core/80"
-        >
-          <GripVertical className="h-5 w-5" />
-        </div>
-      )}
+        {/* Mobile controls on the right */}
+        {isMobile && (
+          <div className="flex flex-col space-y-1">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onMoveUp}
+              disabled={!canMoveUp}
+              className="h-8 w-8 p-0"
+            >
+              <ChevronUp className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onMoveDown}
+              disabled={!canMoveDown}
+              className="h-8 w-8 p-0"
+            >
+              <ChevronDown className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
