@@ -163,14 +163,16 @@ const CompanyCulturePreferences: React.FC = () => {
   const isMobile = useIsMobile();
   const [loading, setLoading] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
-  const [orderedArchetypes, setOrderedArchetypes] = useState<string[]>([
+  const defaultOrder = [
     'hierarchical_corporate',
     'startup_entrepreneurial', 
     'competitive_performance',
     'mission_driven',
     'flexible_autonomy',
     'process_driven'
-  ]);
+  ];
+  const [orderedArchetypes, setOrderedArchetypes] = useState<string[]>(defaultOrder);
+  const [initialOrder, setInitialOrder] = useState<string[] | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -185,16 +187,19 @@ const CompanyCulturePreferences: React.FC = () => {
     }
   }, [user]);
 
-  // Auto-save with debounce
+  // Auto-save with debounce - only if order actually changed
   useEffect(() => {
-    if (!user || loading || isInitialLoad) return;
+    if (!user || loading || isInitialLoad || !initialOrder) return;
+    
+    // Only save if order actually changed
+    if (JSON.stringify(orderedArchetypes) === JSON.stringify(initialOrder)) return;
     
     const timeoutId = setTimeout(() => {
       saveCulturePreferences();
     }, 1000);
 
     return () => clearTimeout(timeoutId);
-  }, [orderedArchetypes, user, loading, isInitialLoad]);
+  }, [orderedArchetypes, user, loading, isInitialLoad, initialOrder]);
 
   const loadCulturePreferences = async () => {
     try {
@@ -207,7 +212,11 @@ const CompanyCulturePreferences: React.FC = () => {
       if (error && error.code !== 'PGRST116') throw error;
 
       if (data?.culture_preferences_order) {
-        setOrderedArchetypes(data.culture_preferences_order as string[]);
+        const loadedOrder = data.culture_preferences_order as string[];
+        setOrderedArchetypes(loadedOrder);
+        setInitialOrder(loadedOrder);
+      } else {
+        setInitialOrder(defaultOrder);
       }
       setIsInitialLoad(false);
     } catch (error) {

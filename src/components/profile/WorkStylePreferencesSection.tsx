@@ -21,6 +21,7 @@ const WorkStylePreferencesSection: React.FC = () => {
   const { toast } = useToast();
   const [workStyle, setWorkStyle] = useState<WorkStyleData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [initialWorkStyle, setInitialWorkStyle] = useState<WorkStyleData | null>(null);
 
   const defaultWorkStyle: WorkStyleData = {
     autonomy_vs_structure: '',
@@ -48,9 +49,12 @@ const WorkStylePreferencesSection: React.FC = () => {
       if (error && error.code !== 'PGRST116') throw error;
 
       if (data?.work_style_preferences && typeof data.work_style_preferences === 'object') {
-        setWorkStyle(data.work_style_preferences as unknown as WorkStyleData);
+        const loadedStyle = data.work_style_preferences as unknown as WorkStyleData;
+        setWorkStyle(loadedStyle);
+        setInitialWorkStyle(loadedStyle);
       } else {
         setWorkStyle(defaultWorkStyle);
+        setInitialWorkStyle(defaultWorkStyle);
       }
     } catch (error) {
       console.error('Error loading work style preferences:', error);
@@ -60,16 +64,19 @@ const WorkStylePreferencesSection: React.FC = () => {
     }
   };
 
-  // Auto-save with debounce
+  // Auto-save with debounce - only if work style actually changed
   useEffect(() => {
-    if (!workStyle || loading) return;
+    if (!workStyle || loading || !initialWorkStyle) return;
+
+    // Only save if work style actually changed
+    if (JSON.stringify(workStyle) === JSON.stringify(initialWorkStyle)) return;
 
     const timeoutId = setTimeout(() => {
       saveWorkStylePreferences();
     }, 1000);
 
     return () => clearTimeout(timeoutId);
-  }, [workStyle, loading]);
+  }, [workStyle, loading, initialWorkStyle]);
 
   const saveWorkStylePreferences = async () => {
     if (!workStyle) return;

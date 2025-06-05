@@ -21,16 +21,21 @@ const WorkEnvironmentPreferences: React.FC = () => {
     }
   }, [user]);
 
-  // Auto-save with debounce
+  const [initialPreferences, setInitialPreferences] = useState<typeof preferences | null>(null);
+
+  // Auto-save with debounce - only if preferences actually changed
   useEffect(() => {
-    if (!user || loading || isInitialLoad) return;
+    if (!user || loading || isInitialLoad || !initialPreferences) return;
+    
+    // Only save if preferences actually changed
+    if (JSON.stringify(preferences) === JSON.stringify(initialPreferences)) return;
     
     const timeoutId = setTimeout(() => {
       savePreferences();
     }, 1000);
 
     return () => clearTimeout(timeoutId);
-  }, [preferences, user, loading, isInitialLoad]);
+  }, [preferences, user, loading, isInitialLoad, initialPreferences]);
 
   const loadPreferences = async () => {
     try {
@@ -43,10 +48,14 @@ const WorkEnvironmentPreferences: React.FC = () => {
       if (error && error.code !== 'PGRST116') throw error;
 
       if (data) {
-        setPreferences({
+        const loadedPrefs = {
           company_size_preference: data.company_size_preference || '',
           work_location_preference: data.work_location_preference || ''
-        });
+        };
+        setPreferences(loadedPrefs);
+        setInitialPreferences(loadedPrefs);
+      } else {
+        setInitialPreferences(preferences);
       }
       setIsInitialLoad(false);
     } catch (error) {
