@@ -115,8 +115,8 @@ const SoftSkillsSection: React.FC = () => {
         ) : (
           <div className="space-y-4">
             {isAssessmentEmpty && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                <p className="text-sm text-blue-800">
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                <p className="text-sm text-red-800">
                   <strong>Assessment Not Completed:</strong> This assessment is optional but helps improve your compatibility measurements against future roles. Complete it to get more personalized results.
                 </p>
               </div>

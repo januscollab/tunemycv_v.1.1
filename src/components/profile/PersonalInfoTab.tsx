@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { User, Mail, Lock, Save, Linkedin, Phone, Globe } from 'lucide-react';
+import { User, Mail, Lock, Save, Linkedin, Phone, Globe, Building, MapPin } from 'lucide-react';
 import CountryCodeSelect from './CountryCodeSelect';
 import SecureInput from '@/components/security/SecureInput';
 import SoftSkillsSection from './SoftSkillsSection';
@@ -25,7 +25,9 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
     linkedin_url: '',
     phone_number: '',
     country_code: '+1',
-    personal_website_url: ''
+    personal_website_url: '',
+    company_size_preference: '',
+    work_location_preference: ''
   });
   const [passwords, setPasswords] = useState({
     current: '',
@@ -57,7 +59,9 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
           linkedin_url: data.linkedin_url || '',
           phone_number: data.phone_number || '',
           country_code: data.country_code || '+1',
-          personal_website_url: data.personal_website_url || ''
+          personal_website_url: data.personal_website_url || '',
+          company_size_preference: data.company_size_preference || '',
+          work_location_preference: data.work_location_preference || ''
         });
       } else {
         setProfile({
@@ -67,7 +71,9 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
           linkedin_url: '',
           phone_number: '',
           country_code: '+1',
-          personal_website_url: ''
+          personal_website_url: '',
+          company_size_preference: '',
+          work_location_preference: ''
         });
       }
     } catch (error) {
@@ -91,6 +97,8 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
           phone_number: profile.phone_number,
           country_code: profile.country_code,
           personal_website_url: profile.personal_website_url,
+          company_size_preference: profile.company_size_preference,
+          work_location_preference: profile.work_location_preference,
           updated_at: new Date().toISOString()
         });
 
@@ -269,6 +277,51 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
             </div>
           </div>
 
+          {/* Work Environment Preferences */}
+          <div className="pt-6 border-t border-gray-200 dark:border-border">
+            <h4 className="text-md font-medium text-gray-900 dark:text-citrus mb-4 flex items-center">
+              <Building className="h-4 w-4 mr-2" />
+              Your Work Environment Preferences
+            </h4>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="companySize" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
+                  Company Size
+                </label>
+                <select
+                  id="companySize"
+                  value={profile.company_size_preference}
+                  onChange={(e) => setProfile({ ...profile, company_size_preference: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
+                >
+                  <option value="">Select preference</option>
+                  <option value="startup">Startup</option>
+                  <option value="sme">SME (Small to Medium Enterprise)</option>
+                  <option value="enterprise">Enterprise</option>
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="workLocation" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
+                  <MapPin className="h-4 w-4 inline mr-1" />
+                  Work Location Preference
+                </label>
+                <select
+                  id="workLocation"
+                  value={profile.work_location_preference}
+                  onChange={(e) => setProfile({ ...profile, work_location_preference: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
+                >
+                  <option value="">Select preference</option>
+                  <option value="remote">Remote</option>
+                  <option value="hybrid">Hybrid</option>
+                  <option value="in-office">In-office</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
           <button
             type="submit"
             disabled={loading}
@@ -280,11 +333,11 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
         </form>
       </div>
 
-      {/* Soft Skills Assessment */}
-      <SoftSkillsSection />
-
-      {/* Work Style Preferences */}
-      <WorkStylePreferencesSection />
+      {/* Soft Skills and Work Style - Side by Side */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <SoftSkillsSection />
+        <WorkStylePreferencesSection />
+      </div>
 
       {/* Notification Settings and Privacy Settings - Two Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
