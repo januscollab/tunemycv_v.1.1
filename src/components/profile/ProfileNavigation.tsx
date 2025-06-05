@@ -1,5 +1,5 @@
 import React from 'react';
-import { User, Upload, Settings, FileText } from 'lucide-react';
+import { User, Upload, Brain, FileText } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface ProfileNavigationProps {
@@ -10,10 +10,10 @@ interface ProfileNavigationProps {
 const ProfileNavigation: React.FC<ProfileNavigationProps> = ({ activeTab, onTabChange }) => {
   const tabs = [
     { id: 'personal', label: 'Account Info', icon: User },
+    { id: 'working-style', label: 'My Working Style', icon: Brain },
     { id: 'documents', label: 'Document History', icon: FileText },
     { id: 'files', label: 'CV Management', icon: Upload },
     { id: 'billing', label: 'Billing History', icon: FileText },
-    { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
   return (
