@@ -5,6 +5,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { User, Mail, Lock, Save, Linkedin, Phone, Globe } from 'lucide-react';
 import CountryCodeSelect from './CountryCodeSelect';
+import SecureInput from '@/components/security/SecureInput';
+import SoftSkillsSection from './SoftSkillsSection';
+import WorkStylePreferencesSection from './WorkStylePreferencesSection';
 
 interface PersonalInfoTabProps {
   credits: number;
@@ -155,7 +158,7 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
       <div className="bg-white dark:bg-surface rounded-lg border border-gray-200 dark:border-border p-6">
         <div className="flex items-center mb-6">
           <User className="h-5 w-5 text-gray-500 dark:text-apple-core/60 mr-2" />
-          <h3 className="text-lg font-medium text-gray-900 dark:text-citrus">Profile Information</h3>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-citrus">Personal Information</h3>
         </div>
 
         <form onSubmit={handleUpdateProfile} className="space-y-4">
@@ -164,13 +167,14 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
               <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
                 First Name
               </label>
-              <input
+              <SecureInput
                 id="firstName"
                 type="text"
                 value={profile.first_name}
                 onChange={(e) => setProfile({ ...profile, first_name: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
                 placeholder="Enter your first name"
+                maxLength={50}
               />
             </div>
 
@@ -178,13 +182,14 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
               <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
                 Last Name
               </label>
-              <input
+              <SecureInput
                 id="lastName"
                 type="text"
                 value={profile.last_name}
                 onChange={(e) => setProfile({ ...profile, last_name: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
                 placeholder="Enter your last name"
+                maxLength={50}
               />
             </div>
           </div>
@@ -195,13 +200,14 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
                 <Mail className="h-4 w-4 inline mr-1" />
                 Email Address
               </label>
-              <input
+              <SecureInput
                 id="email"
                 type="email"
                 value={profile.email}
                 onChange={(e) => setProfile({ ...profile, email: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
                 placeholder="Enter your email address"
+                maxLength={255}
               />
             </div>
 
@@ -216,13 +222,14 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
                   onChange={(value) => setProfile({ ...profile, country_code: value })}
                   className="w-32"
                 />
-                <input
+                <SecureInput
                   id="phoneNumber"
                   type="tel"
                   value={profile.phone_number}
                   onChange={(e) => setProfile({ ...profile, phone_number: e.target.value })}
                   className="flex-1 px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
                   placeholder="123 456 7890"
+                  maxLength={20}
                 />
               </div>
             </div>
@@ -234,13 +241,14 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
                 <Linkedin className="h-4 w-4 inline mr-1" />
                 LinkedIn Profile URL
               </label>
-              <input
+              <SecureInput
                 id="linkedinUrl"
                 type="url"
                 value={profile.linkedin_url}
                 onChange={(e) => setProfile({ ...profile, linkedin_url: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
                 placeholder="https://linkedin.com/in/yourprofile"
+                maxLength={500}
               />
             </div>
 
@@ -249,13 +257,14 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
                 <Globe className="h-4 w-4 inline mr-1" />
                 Personal Website/Portfolio URL
               </label>
-              <input
+              <SecureInput
                 id="personalWebsiteUrl"
                 type="url"
                 value={profile.personal_website_url}
                 onChange={(e) => setProfile({ ...profile, personal_website_url: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
                 placeholder="https://yourportfolio.com"
+                maxLength={500}
               />
             </div>
           </div>
@@ -271,133 +280,148 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
         </form>
       </div>
 
-      {/* Password Change */}
-      <div className="bg-white dark:bg-surface rounded-lg border border-gray-200 dark:border-border p-6">
-        <div className="flex items-center mb-6">
-          <Lock className="h-5 w-5 text-gray-500 dark:text-apple-core/60 mr-2" />
-          <h3 className="text-lg font-medium text-gray-900 dark:text-citrus">Change Password</h3>
-        </div>
+      {/* Soft Skills Assessment */}
+      <SoftSkillsSection />
 
-        <form onSubmit={handleUpdatePassword} className="space-y-4">
-          <div>
-            <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
-              New Password
-            </label>
-            <input
-              id="newPassword"
-              type="password"
-              value={passwords.new}
-              onChange={(e) => setPasswords({ ...passwords, new: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
-              placeholder="Enter new password"
-            />
-          </div>
+      {/* Work Style Preferences */}
+      <WorkStylePreferencesSection />
 
-          <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
-              Confirm New Password
-            </label>
-            <input
-              id="confirmPassword"
-              type="password"
-              value={passwords.confirm}
-              onChange={(e) => setPasswords({ ...passwords, confirm: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
-              placeholder="Confirm new password"
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading || !passwords.new || !passwords.confirm}
-            className="flex items-center px-4 py-2 bg-zapier-orange text-white rounded-md hover:bg-zapier-orange/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            <Lock className="h-4 w-4 mr-2" />
-            {loading ? 'Updating...' : 'Update Password'}
-          </button>
-        </form>
-      </div>
-
-      {/* Notification Settings */}
-      <div className="bg-white dark:bg-surface rounded-lg border border-gray-200 dark:border-border p-6">
-        <div className="flex items-center mb-6">
-          <Mail className="h-5 w-5 text-gray-500 dark:text-apple-core/60 mr-2" />
-          <h3 className="text-lg font-medium text-gray-900 dark:text-citrus">Notification Preferences</h3>
-        </div>
-        
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <label className="font-medium text-gray-700 dark:text-apple-core/80">Email Notifications</label>
-              <p className="text-sm text-gray-500 dark:text-apple-core/60">Receive notifications about your CV analysis results</p>
-            </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                defaultChecked={true}
-                className="sr-only peer"
-              />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-zapier-orange/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-zapier-orange"></div>
-            </label>
+      {/* Notification Settings and Privacy Settings - Two Column Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Notification Settings */}
+        <div className="bg-white dark:bg-surface rounded-lg border border-gray-200 dark:border-border p-6">
+          <div className="flex items-center mb-6">
+            <Mail className="h-5 w-5 text-gray-500 dark:text-apple-core/60 mr-2" />
+            <h3 className="text-lg font-medium text-gray-900 dark:text-citrus">Notification Preferences</h3>
           </div>
           
-          <div className="flex items-center justify-between">
-            <div>
-              <label className="font-medium text-gray-700 dark:text-apple-core/80">Marketing Emails</label>
-              <p className="text-sm text-gray-500 dark:text-apple-core/60">Receive tips, updates, and promotional content</p>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <label className="font-medium text-gray-700 dark:text-apple-core/80">Email Notifications</label>
+                <p className="text-sm text-gray-500 dark:text-apple-core/60">Receive notifications about your CV analysis results</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  defaultChecked={true}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-zapier-orange/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-zapier-orange"></div>
+              </label>
             </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                defaultChecked={false}
-                className="sr-only peer"
+            
+            <div className="flex items-center justify-between">
+              <div>
+                <label className="font-medium text-gray-700 dark:text-apple-core/80">Marketing Emails</label>
+                <p className="text-sm text-gray-500 dark:text-apple-core/60">Receive tips, updates, and promotional content</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  defaultChecked={false}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-zapier-orange/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-zapier-orange"></div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        {/* Privacy Settings */}
+        <div className="bg-white dark:bg-surface rounded-lg border border-gray-200 dark:border-border p-6">
+          <div className="flex items-center mb-6">
+            <Lock className="h-5 w-5 text-gray-500 dark:text-apple-core/60 mr-2" />
+            <h3 className="text-lg font-medium text-gray-900 dark:text-citrus">Privacy Settings</h3>
+          </div>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="block font-medium text-gray-700 dark:text-apple-core/80 mb-2">Data Privacy Level</label>
+              <select
+                defaultValue="standard"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
+              >
+                <option value="minimal">Minimal - Only essential data</option>
+                <option value="standard">Standard - Standard analytics and improvements</option>
+                <option value="enhanced">Enhanced - Help us improve our services</option>
+              </select>
+              <p className="text-sm text-gray-500 dark:text-apple-core/60 mt-1">
+                Controls how your data is used to improve our services
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      {/* Password Change and Account Management - Side by Side */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Password Change */}
+        <div className="bg-white dark:bg-surface rounded-lg border border-gray-200 dark:border-border p-6">
+          <div className="flex items-center mb-6">
+            <Lock className="h-5 w-5 text-gray-500 dark:text-apple-core/60 mr-2" />
+            <h3 className="text-lg font-medium text-gray-900 dark:text-citrus">Change Password</h3>
+          </div>
+
+          <form onSubmit={handleUpdatePassword} className="space-y-4">
+            <div>
+              <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
+                New Password
+              </label>
+              <SecureInput
+                id="newPassword"
+                type="password"
+                value={passwords.new}
+                onChange={(e) => setPasswords({ ...passwords, new: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
+                placeholder="Enter new password"
+                maxLength={128}
               />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-zapier-orange/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-zapier-orange"></div>
-            </label>
-          </div>
-        </div>
-      </div>
+            </div>
 
-      {/* Privacy Settings */}
-      <div className="bg-white dark:bg-surface rounded-lg border border-gray-200 dark:border-border p-6">
-        <div className="flex items-center mb-6">
-          <Lock className="h-5 w-5 text-gray-500 dark:text-apple-core/60 mr-2" />
-          <h3 className="text-lg font-medium text-gray-900 dark:text-citrus">Privacy Settings</h3>
-        </div>
-        
-        <div className="space-y-4">
-          <div>
-            <label className="block font-medium text-gray-700 dark:text-apple-core/80 mb-2">Data Privacy Level</label>
-            <select
-              defaultValue="standard"
-              className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
+                Confirm New Password
+              </label>
+              <SecureInput
+                id="confirmPassword"
+                type="password"
+                value={passwords.confirm}
+                onChange={(e) => setPasswords({ ...passwords, confirm: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
+                placeholder="Confirm new password"
+                maxLength={128}
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading || !passwords.new || !passwords.confirm}
+              className="flex items-center px-4 py-2 bg-zapier-orange text-white rounded-md hover:bg-zapier-orange/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              <option value="minimal">Minimal - Only essential data</option>
-              <option value="standard">Standard - Standard analytics and improvements</option>
-              <option value="enhanced">Enhanced - Help us improve our services</option>
-            </select>
-            <p className="text-sm text-gray-500 dark:text-apple-core/60 mt-1">
-              Controls how your data is used to improve our services
-            </p>
-          </div>
+              <Lock className="h-4 w-4 mr-2" />
+              {loading ? 'Updating...' : 'Update Password'}
+            </button>
+          </form>
         </div>
-      </div>
 
-      {/* Account Management */}
-      <div className="bg-white dark:bg-surface rounded-lg border border-gray-200 dark:border-border p-6">
-        <div className="flex items-center mb-6">
-          <User className="h-5 w-5 text-gray-500 dark:text-apple-core/60 mr-2" />
-          <h3 className="text-lg font-medium text-gray-900 dark:text-citrus">Account Management</h3>
-        </div>
-        
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <h4 className="font-medium text-red-900 mb-2">Request Account Deactivation</h4>
-          <p className="text-sm text-red-700 mb-4">
-            This will permanently delete your account and all associated data. This action cannot be undone.
-          </p>
-          <button className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors">
-            Request Deactivation
-          </button>
+        {/* Account Management */}
+        <div className="bg-white dark:bg-surface rounded-lg border border-gray-200 dark:border-border p-6">
+          <div className="flex items-center mb-6">
+            <User className="h-5 w-5 text-gray-500 dark:text-apple-core/60 mr-2" />
+            <h3 className="text-lg font-medium text-gray-900 dark:text-citrus">Account Management</h3>
+          </div>
+          
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            <h4 className="font-medium text-red-900 mb-2">Request Account Deactivation</h4>
+            <p className="text-sm text-red-700 mb-4">
+              This will permanently delete your account and all associated data. This action cannot be undone.
+            </p>
+            <button className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors">
+              Request Deactivation
+            </button>
+          </div>
         </div>
       </div>
     </div>

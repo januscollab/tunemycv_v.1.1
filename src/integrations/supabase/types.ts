@@ -285,7 +285,10 @@ export type Database = {
           linkedin_url: string | null
           personal_website_url: string | null
           phone_number: string | null
+          soft_skills: Json | null
+          survey_preferences: Json | null
           updated_at: string | null
+          work_style_preferences: Json | null
         }
         Insert: {
           country_code?: string | null
@@ -297,7 +300,10 @@ export type Database = {
           linkedin_url?: string | null
           personal_website_url?: string | null
           phone_number?: string | null
+          soft_skills?: Json | null
+          survey_preferences?: Json | null
           updated_at?: string | null
+          work_style_preferences?: Json | null
         }
         Update: {
           country_code?: string | null
@@ -309,7 +315,10 @@ export type Database = {
           linkedin_url?: string | null
           personal_website_url?: string | null
           phone_number?: string | null
+          soft_skills?: Json | null
+          survey_preferences?: Json | null
           updated_at?: string | null
+          work_style_preferences?: Json | null
         }
         Relationships: []
       }
@@ -479,6 +488,10 @@ export type Database = {
       }
     }
     Functions: {
+      delete_user_admin: {
+        Args: { _user_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _user_id: string

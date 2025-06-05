@@ -35,7 +35,7 @@ import EditableCoverLetter from '@/components/cover-letter/EditableCoverLetter';
 import NoAnalysisModal from '@/components/cover-letter/NoAnalysisModal';
 import CoverLetterLoggedOut from '@/components/cover-letter/CoverLetterLoggedOut';
 import ProcessingModal from '@/components/ui/processing-modal';
-import CoverLetterGenerationModal from '@/components/cover-letter/CoverLetterGenerationModal';
+
 
 const CoverLetter = () => {
   const { user } = useAuth();
@@ -385,9 +385,10 @@ const AuthenticatedCoverLetter = () => {
           message="Please wait while we regenerate your cover letter with the new settings..."
         />
 
-        <CoverLetterGenerationModal
+        <ProcessingModal
           isOpen={isGenerating}
-          title="Crafting Your Cover Letter"
+          title="Generating Cover Letter"
+          message="Please wait while we create your personalized cover letter..."
         />
 
 
@@ -628,7 +629,7 @@ const AuthenticatedCoverLetter = () => {
                 {selectedCoverLetter ? (
                   <Card className="border border-gray-200 dark:border-gray-700">
                     <CardHeader className="pb-3">
-                      <div className="flex items-center justify-between">
+                      <div className="space-y-2">
                         <div className="flex items-center space-x-3">
                           <CardTitle className="text-xl font-semibold">{selectedCoverLetter.job_title} at {selectedCoverLetter.company_name}</CardTitle>
                           <button
@@ -642,7 +643,7 @@ const AuthenticatedCoverLetter = () => {
                             <Edit2 className="h-4 w-4" />
                           </button>
                         </div>
-                        <div className="flex items-center gap-4 mt-2 text-sm font-normal text-gray-600 dark:text-gray-400">
+                        <div className="flex items-center gap-4 text-sm font-normal text-gray-600 dark:text-gray-400">
                           <div className="flex items-center gap-1">
                             <Clock className="h-4 w-4" />
                             Generated {formatDate(selectedCoverLetter.created_at)}
@@ -745,7 +746,7 @@ const AuthenticatedCoverLetter = () => {
                         No cover letter generated yet.
                       </p>
                       <p className="text-sm font-normal text-gray-500">
-                        Create one in the "Generate New" tab or view previous letters in <Link to="#" onClick={() => setActiveTab('history')} className="text-zapier-orange hover:text-zapier-orange/80 underline">"Document History"</Link>.
+                        Create one in the <Link to="#" onClick={() => setActiveTab('create')} className="text-zapier-orange hover:text-zapier-orange/80 underline">Generate New</Link> tab or view previous letters in <Link to="#" onClick={() => setActiveTab('history')} className="text-zapier-orange hover:text-zapier-orange/80 underline">History</Link>.
                       </p>
                     </CardContent>
                   </Card>
@@ -814,16 +815,17 @@ const AuthenticatedCoverLetter = () => {
                                         v{coverLetter.regeneration_count + 1}
                                       </Badge>
                                     )}
-                                  </div>
-                                  
-                                  <div className="flex items-center text-sm text-gray-600 mb-3">
-                                    <Clock className="h-4 w-4 mr-1" />
-                                    <span>Updated {formatDate(coverLetter.updated_at)}</span>
-                                  </div>
-                                </div>
-                              </div>
-                              
-                              {/* Action buttons row at bottom */}
+                                   </div>
+                                   
+                                   {/* Date/time stamp moved under title */}
+                                   <div className="flex items-center text-sm text-gray-600 mb-3">
+                                     <Clock className="h-4 w-4 mr-1" />
+                                     <span>Updated {formatDate(coverLetter.updated_at)}</span>
+                                   </div>
+                                 </div>
+                               </div>
+                               
+                               {/* Action buttons row at bottom */}
                               <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-100">
                                 <div className="flex items-center space-x-3">
                                   <button

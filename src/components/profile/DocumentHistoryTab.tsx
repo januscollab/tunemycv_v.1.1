@@ -179,7 +179,7 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
       navigate('/analyze', { 
         state: { 
           analysisId: document.id,
-          activeTab: 'results'
+          activeTab: 'view-analysis'
         } 
       });
     } else {

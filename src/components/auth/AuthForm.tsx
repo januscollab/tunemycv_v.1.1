@@ -6,6 +6,8 @@ import PasswordFields from './PasswordFields';
 import LoginOptions from './LoginOptions';
 import TermsAcceptance from './TermsAcceptance';
 import AuthSubmitButton from './AuthSubmitButton';
+import { WelcomeCreditsModal } from '@/components/ui/welcome-credits-modal';
+import { useWelcomeCredits } from '@/hooks/useWelcomeCredits';
 
 type AuthMode = 'login' | 'register' | 'forgot-password';
 
@@ -39,6 +41,8 @@ const AuthForm: React.FC<AuthFormProps> = ({
   setRememberMe,
   switchMode
 }) => {
+  const { showWelcomeModal, closeWelcomeModal } = useWelcomeCredits();
+  
   const handleInputChange = (field: keyof FormData) => (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -88,6 +92,11 @@ const AuthForm: React.FC<AuthFormProps> = ({
 
         <AuthSubmitButton mode={mode} loading={loading} />
       </form>
+      
+      <WelcomeCreditsModal 
+        isOpen={showWelcomeModal}
+        onClose={closeWelcomeModal}
+      />
     </div>
   );
 };
