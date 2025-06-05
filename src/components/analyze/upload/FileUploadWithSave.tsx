@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Upload, Link } from 'lucide-react';
+import { DragDropZone } from '@/components/ui/drag-drop-zone';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface FileUploadWithSaveProps {
@@ -25,12 +25,10 @@ const FileUploadWithSave: React.FC<FileUploadWithSaveProps> = ({
   const [shouldSave, setShouldSave] = useState(false);
   const { user } = useAuth();
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  const handleDrop = (files: File[]) => {
+    const file = files[0];
     if (file) {
       onFileSelect(file, shouldSave);
-      // Reset the input and checkbox
-      e.target.value = '';
       setShouldSave(false);
     }
   };
@@ -39,20 +37,15 @@ const FileUploadWithSave: React.FC<FileUploadWithSaveProps> = ({
 
   return (
     <div>
-      <div className="border-2 border-dashed border-apple-core/30 dark:border-citrus/30 rounded-lg p-6 text-center">
-        <Upload className="mx-auto h-8 w-8 text-blueberry/60 dark:text-apple-core/60 mb-2" />
-        <label className="cursor-pointer">
-          <span className="text-apricot hover:text-apricot/80 font-medium">{label}</span>
-          <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mt-1">{accept}, max {maxSize}</p>
-          <input
-            type="file"
-            className="hidden"
-            accept={accept}
-            onChange={handleFileChange}
-            disabled={uploading}
-          />
-        </label>
-      </div>
+      <DragDropZone
+        onDrop={handleDrop}
+        accept={accept}
+        maxSize={parseFloat(maxSize) * 1024 * 1024}
+        disabled={uploading}
+        placeholder={uploading ? "Uploading..." : label}
+        description={`${accept} • Max ${maxSize}`}
+        className="border-apple-core/30 dark:border-citrus/30"
+      />
 
       {user && (
         <div className="mt-4 space-y-2">
