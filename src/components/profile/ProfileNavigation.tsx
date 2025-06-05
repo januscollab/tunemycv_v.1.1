@@ -55,8 +55,12 @@ const ProfileNavigation: React.FC<ProfileNavigationProps> = ({ activeTab, onTabC
                         <TooltipTrigger asChild>
                           <Info className="h-3 w-3 text-gray-400 hover:text-gray-600 dark:text-apple-core/60 dark:hover:text-apple-core/80 cursor-help" />
                         </TooltipTrigger>
-                        <TooltipContent side="bottom" className="max-w-sm">
-                          <p className="text-sm">{tab.tooltip}</p>
+                        <TooltipContent 
+                          side="top" 
+                          className="w-max max-w-[280px] whitespace-normal break-words z-50" 
+                          collisionPadding={8}
+                        >
+                          <p className="text-sm leading-relaxed">{tab.tooltip}</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
@@ -90,8 +94,12 @@ const ProfileNavigation: React.FC<ProfileNavigationProps> = ({ activeTab, onTabC
                     <TooltipTrigger asChild>
                       <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:text-apple-core/60 dark:hover:text-apple-core/80 cursor-help" />
                     </TooltipTrigger>
-                    <TooltipContent side="left" className="max-w-sm">
-                      <p className="text-sm">{tab.tooltip}</p>
+                    <TooltipContent 
+                      side="bottom" 
+                      className="w-max max-w-[280px] whitespace-normal break-words z-50" 
+                      collisionPadding={8}
+                    >
+                      <p className="text-sm leading-relaxed">{tab.tooltip}</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
