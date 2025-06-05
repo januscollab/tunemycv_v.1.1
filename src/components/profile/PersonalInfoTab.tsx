@@ -60,8 +60,8 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
           phone_number: data.phone_number || '',
           country_code: data.country_code || '+1',
           personal_website_url: data.personal_website_url || '',
-          company_size_preference: data.company_size_preference || '',
-          work_location_preference: data.work_location_preference || ''
+          company_size_preference: (data as any).company_size_preference || '',
+          work_location_preference: (data as any).work_location_preference || ''
         });
       } else {
         setProfile({
