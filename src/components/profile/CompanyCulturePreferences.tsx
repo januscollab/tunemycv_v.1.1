@@ -122,7 +122,6 @@ function SortableItem({ id, archetype, index, isMobile, onMoveUp, onMoveDown, ca
         <div className="flex-1">
           <div className="flex items-center space-x-2">
             <span className="inline-flex items-center justify-center w-6 h-6 bg-zapier-orange text-white text-sm font-bold rounded-full">
-              {index + 1}
             </span>
             <h4 className="font-medium text-gray-900 dark:text-citrus">{archetype.name}</h4>
           </div>

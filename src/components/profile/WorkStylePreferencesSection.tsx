@@ -211,7 +211,7 @@ const WorkStylePreferencesSection: React.FC = () => {
                   {question.title}
                 </h4>
               </div>
-              <p className="text-xs text-gray-600 dark:text-apple-core/70 mb-3">
+              <p className="text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-3">
                 {question.question}
               </p>
               
