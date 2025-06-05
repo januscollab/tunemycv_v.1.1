@@ -37,7 +37,7 @@ const CoverLetterLoggedOut = () => {
           </div>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-[500px] mt-12 w-4/5 mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-[500px] mt-6 w-4/5 mx-auto">
           <div className="flex items-start">
             <ServiceExplanation
               title={coverLetterExplanation.title}

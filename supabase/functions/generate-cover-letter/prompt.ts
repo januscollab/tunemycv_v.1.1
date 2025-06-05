@@ -62,7 +62,7 @@ export function buildSystemPrompt(
 
 The cover letter should:
 - Always start with this exact header format:
-  "${contactHeader}
+  "Date: [Current Date]
   
   Hiring Manager  
   ${companyName}
@@ -76,9 +76,11 @@ The cover letter should:
 - Include a professional opening and closing
 - Be well-structured with clear paragraphs
 - Match the requested length and tone precisely
+- Always end with the following contact information at the bottom before "Sincerely":
+  "${contactHeader}"
 ${advancedOptionsText ? `\nAdditional personalization requirements:${advancedOptionsText}` : ''}
 
-Format the response as a complete, ready-to-send cover letter with proper formatting, always starting with the required header format above.`
+Format the response as a complete, ready-to-send cover letter with proper formatting, always starting with the required header format above and ending with the contact information before the signature.`
 }
 
 export function buildUserPrompt(request: CoverLetterRequest): string {

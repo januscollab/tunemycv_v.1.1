@@ -91,7 +91,7 @@ const PricingScale = () => {
         {/* Pricing Slider */}
         <div className="mb-16 max-w-4xl mx-auto">
           <Card className="bg-white dark:bg-blueberry/20 border-2 border-zapier-orange/50 dark:border-zapier-orange/60 p-8 shadow-xl shadow-zapier-orange/20">
-            <CardHeader className="pb-6 pt-2">
+            <CardHeader className="pb-6 pt-1">
               <CardTitle className="text-2xl font-bold text-earth dark:text-white text-left">
                 Simple Pay As you go Pricing
               </CardTitle>
@@ -103,29 +103,29 @@ const PricingScale = () => {
                   <div className="space-y-3">
                     <div className="flex items-center space-x-2">
                       <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-earth/80 dark:text-white/80">No monthly subscriptions</span>
+                      <span className="text-earth/80 dark:text-white/80">Pay for what you use, no recurring subscriptions</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-earth/80 dark:text-white/80">Pay only for what you use</span>
+                      <span className="text-earth/80 dark:text-white/80">Access to all features, no gate keeping the good stuff</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-earth/80 dark:text-white/80">Bulk discounts available</span>
+                      <span className="text-earth/80 dark:text-white/80">Clean, watermark-free exports (PDF, Word or TXT)</span>
                     </div>
                   </div>
                   <div className="space-y-3">
                     <div className="flex items-center space-x-2">
                       <X className="h-4 w-4 text-red-500" />
-                      <span className="text-earth/80 dark:text-white/80">No hidden fees or charges</span>
+                      <span className="text-earth/80 dark:text-white/80">No throttling AI model responses – you get the good stuff</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <X className="h-4 w-4 text-red-500" />
-                      <span className="text-earth/80 dark:text-white/80">No auto-renewal surprises</span>
+                      <span className="text-earth/80 dark:text-white/80">No limits on your documents length - it's your info</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <X className="h-4 w-4 text-red-500" />
-                      <span className="text-earth/80 dark:text-white/80">No complicated cancellation</span>
+                      <span className="text-earth/80 dark:text-white/80">No hidden fees or auto-renewal surprises</span>
                     </div>
                   </div>
                 </div>
@@ -157,17 +157,17 @@ const PricingScale = () => {
                         style={{ left: `${leftPosition}%` }}
                       >
                         {tier.isEnterprise ? (
-                          <div className="space-y-1 text-center">
-                            <div className="text-lg font-bold text-earth dark:text-white">Enterprise</div>
-                            <div className="text-sm text-earth/70 dark:text-white/70">Let's talk</div>
+                          <div className="space-y-1 text-center cursor-pointer group hover:scale-105 transition-transform duration-200" onClick={() => setSelectedTier(index)}>
+                            <div className="text-lg font-bold text-earth dark:text-white group-hover:text-zapier-orange transition-colors">Enterprise</div>
+                            <div className="text-base text-earth/70 dark:text-white/70 group-hover:text-zapier-orange/70 transition-colors">Let's talk</div>
                           </div>
                         ) : (
                           <div 
-                            className="space-y-1 text-center cursor-pointer hover:scale-105 transition-transform duration-200"
+                            className="space-y-1 text-center cursor-pointer group hover:scale-105 transition-transform duration-200"
                             onClick={() => setSelectedTier(index)}
                           >
-                            <div className="text-lg font-bold text-earth dark:text-white hover:text-zapier-orange transition-colors">${tier.price}</div>
-                            <div className="text-sm text-earth/70 dark:text-white/70 hover:text-zapier-orange/70 transition-colors">{tier.credits} Credits</div>
+                            <div className="text-lg font-bold text-earth dark:text-white group-hover:text-zapier-orange transition-colors">${tier.price}</div>
+                            <div className="text-base text-earth/70 dark:text-white/70 group-hover:text-zapier-orange/70 transition-colors">{tier.credits} Credits</div>
                           </div>
                         )}
                       </div>
@@ -241,7 +241,10 @@ const PricingScale = () => {
               <div className="grid md:grid-cols-3 gap-8 relative">
                 {/* Step 1: CV Analysis */}
                 <div className="text-center group">
-                  <div className="bg-white dark:bg-blueberry/20 border-2 border-zapier-orange/30 dark:border-zapier-orange/40 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 relative">
+                  <div 
+                    className="bg-white dark:bg-blueberry/20 border-2 border-zapier-orange/30 dark:border-zapier-orange/40 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 relative cursor-pointer"
+                    onClick={() => window.location.href = '/analyze-cv?tab=analysis'}
+                  >
                     <div className="w-16 h-16 bg-gradient-to-br from-zapier-orange to-apricot rounded-full flex items-center justify-center mx-auto mb-4 relative z-10">
                       <FileText className="h-8 w-8 text-white" />
                     </div>
@@ -262,7 +265,10 @@ const PricingScale = () => {
 
                 {/* Step 2: Cover Letter */}
                 <div className="text-center group">
-                  <div className="bg-white dark:bg-blueberry/20 border-2 border-blue-500/30 dark:border-blue-500/40 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 relative">
+                  <div 
+                    className="bg-white dark:bg-blueberry/20 border-2 border-blue-500/30 dark:border-blue-500/40 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 relative cursor-pointer"
+                    onClick={() => window.location.href = '/cover-letter'}
+                  >
                     <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 relative z-10">
                       <Zap className="h-8 w-8 text-white" />
                     </div>
@@ -283,7 +289,10 @@ const PricingScale = () => {
 
                 {/* Step 3: Interview Prep */}
                 <div className="text-center group">
-                  <div className="bg-white dark:bg-blueberry/20 border-2 border-green-500/30 dark:border-green-500/40 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 relative">
+                  <div 
+                    className="bg-white dark:bg-blueberry/20 border-2 border-green-500/30 dark:border-green-500/40 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 relative cursor-pointer"
+                    onClick={() => window.location.href = '/interview-prep'}
+                  >
                     <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4 relative z-10">
                       <Users className="h-8 w-8 text-white" />
                     </div>

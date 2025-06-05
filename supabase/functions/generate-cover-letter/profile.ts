@@ -49,8 +49,10 @@ export function formatContactInfo(
 }
 
 export function buildContactHeader(contactInfo: ContactInfo): string {
-  let contactHeader = `${contactInfo.fullName}\n${contactInfo.phoneNumber}\n${contactInfo.email}`
-  if (contactInfo.linkedInUrl) contactHeader += `\n${contactInfo.linkedInUrl}`
-  if (contactInfo.websiteUrl) contactHeader += `\n${contactInfo.websiteUrl}`
-  return contactHeader
+  // Format contact info for bottom placement in cover letter
+  return `${contactInfo.fullName}  
+${contactInfo.phoneNumber}  
+${contactInfo.email}  
+${contactInfo.linkedInUrl}
+${contactInfo.websiteUrl}`
 }
