@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { CheckCircle, Download, ArrowLeft, Bug } from 'lucide-react';
+
 import { useProfileData } from '@/hooks/useProfileData';
 import { FloatingFeedbackForm } from '@/components/common/FloatingFeedbackForm';
 import ExecutiveSummarySection from './ExecutiveSummarySection';
@@ -145,19 +146,6 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
           </button>
         </div>
 
-        {/* Success Alert */}
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-8">
-          <div className="flex items-center mb-2">
-            <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
-            <h2 className="text-lg font-semibold text-green-800">Analysis Complete!</h2>
-          </div>
-          <p className="text-green-700">
-            {hasEnhancedData 
-              ? `We've completed an enhanced AI-powered analysis of your CV for the ${position} position at ${companyName} with detailed insights and actionable recommendations.`
-              : `We've analyzed your CV against the ${position} job description and prepared a detailed compatibility report with personalized recommendations.`
-            }
-          </p>
-        </div>
 
         {/* Main Content Grid */}
         <div className="grid lg:grid-cols-3 gap-8 mb-8">

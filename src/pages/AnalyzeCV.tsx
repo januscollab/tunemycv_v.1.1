@@ -11,10 +11,11 @@ import InterviewPrepAnalysisSelector from '@/components/analyze/InterviewPrepAna
 import InterviewPrepModal from '@/components/analyze/InterviewPrepModal';
 import InterviewPrepLoggedOut from '@/components/analyze/InterviewPrepLoggedOut';
 import AnalysisSelector from '@/components/cover-letter/AnalysisSelector';
+import PersonalizationSurveyModal from '@/components/analyze/PersonalizationSurveyModal';
 import { useAnalysis } from '@/hooks/useAnalysis';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { FileText, History, MessageSquare, Target, Calendar, Building, CheckCircle, FileUp, Search, Clock, Eye } from 'lucide-react';
+import { FileText, History, MessageSquare, Target, Calendar, Building, CheckCircle, FileUp, Search, Clock, Eye, Users } from 'lucide-react';
 import EmbeddedAuth from '@/components/auth/EmbeddedAuth';
 import ServiceExplanation from '@/components/common/ServiceExplanation';
 import { UploadedFile } from '@/types/fileTypes';
@@ -52,6 +53,10 @@ const AnalyzeCV = () => {
   const [interviewCompanyName, setInterviewCompanyName] = useState('');
   const [interviewJobDescription, setInterviewJobDescription] = useState<UploadedFile | undefined>();
   const [showInterviewPrepModal, setShowInterviewPrepModal] = useState(false);
+  
+  // Personalization survey states
+  const [showPersonalizationSurvey, setShowPersonalizationSurvey] = useState(false);
+  const [surveyResponses, setSurveyResponses] = useState<any>(null);
   
   // Get initial tab from URL parameter or location state
   const urlParams = new URLSearchParams(location.search);
@@ -137,6 +142,39 @@ const AnalyzeCV = () => {
     }
   }, [navigationState]);
 
+  // Load analysis by ID from URL parameters
+  React.useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const analysisId = params.get('analysisId');
+    
+    if (activeTab === 'view-analysis' && analysisId && user && !viewedAnalysis) {
+      loadAnalysisById(analysisId);
+    }
+  }, [activeTab, location.search, user, viewedAnalysis]);
+
+  const loadAnalysisById = async (analysisId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('analysis_results')
+        .select('*')
+        .eq('id', analysisId)
+        .eq('user_id', user!.id)
+        .single();
+
+      if (error) throw error;
+      if (data) {
+        setViewedAnalysis(data);
+      }
+    } catch (error) {
+      console.error('Error loading analysis:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load analysis details",
+        variant: "destructive",
+      });
+    }
+  };
+
   // Clear URL state after it's been processed
   React.useEffect(() => {
     if (navigationState) {
@@ -213,6 +251,13 @@ const AnalyzeCV = () => {
     setPreloadedAnalysis(null);
     setViewedAnalysis(null);
     setActiveTab('analysis');
+    setSurveyResponses(null);
+  };
+
+  const handleSurveySubmit = (responses: any) => {
+    setSurveyResponses(responses);
+    // Here you could save the responses to enhance the analysis
+    console.log('Survey responses:', responses);
   };
 
   const handleDeselectAnalysis = () => {
@@ -441,16 +486,54 @@ const AnalyzeCV = () => {
                   </div>
 
                   {/* CV Selection - Optional */}
-                  <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-5 border border-apple-core/20 dark:border-citrus/20">
-                    <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-3">
-                      Your CV
-                    </h3>
-                    
-                    <CVSelector
-                      onCVSelect={handleCVSelect}
-                      selectedCV={uploadedFiles.cv}
-                      uploading={uploading || analyzing}
-                    />
+                  <CVSelector
+                    onCVSelect={handleCVSelect}
+                    selectedCV={uploadedFiles.cv}
+                    uploading={uploading || analyzing}
+                  />
+
+                  {/* Let's Get Personal Section */}
+                  <div className="bg-gradient-to-br from-zapier-orange/5 via-white to-apricot/5 dark:from-zapier-orange/10 dark:via-blueberry/10 dark:to-apricot/10 rounded-lg shadow-sm p-5 border border-zapier-orange/20 dark:border-zapier-orange/30">
+                    <div className="flex items-start space-x-3 mb-4">
+                      <div className="w-8 h-8 bg-zapier-orange/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Users className="h-4 w-4 text-zapier-orange" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-2">
+                          Let's Get Personal (Optional)
+                        </h3>
+                        <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mb-4 leading-relaxed">
+                          Every role you decide to apply for is different. We can analyze your CV and test it against our Advanced Recruitment Models but we'd like to get some more information directly from you regarding this role. Would you be interested in sharing some additional thoughts on this role with us?
+                        </p>
+                        
+                        {surveyResponses ? (
+                          <div className="flex items-center space-x-2 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                            <CheckCircle className="h-4 w-4 text-green-600" />
+                            <span className="text-sm font-medium text-green-800 dark:text-green-200">
+                              Survey completed! Your responses will enhance the analysis.
+                            </span>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setShowPersonalizationSurvey(true)}
+                              className="text-green-600 hover:text-green-700 ml-auto"
+                            >
+                              Retake Survey
+                            </Button>
+                          </div>
+                        ) : (
+                          <Button
+                            onClick={() => setShowPersonalizationSurvey(true)}
+                            variant="outline"
+                            className="border-zapier-orange text-zapier-orange hover:bg-zapier-orange hover:text-white transition-all duration-200"
+                            disabled={uploading || analyzing}
+                          >
+                            <MessageSquare className="h-4 w-4 mr-2" />
+                            Take Survey
+                          </Button>
+                        )}
+                      </div>
+                    </div>
                   </div>
 
                   {/* Analyze Button */}
@@ -479,7 +562,7 @@ const AnalyzeCV = () => {
                         No analysis generated yet.
                       </p>
                       <p className="text-sm font-normal text-gray-500">
-                        Create one in the "Analyze CV" tab or view previous analysis in <Button variant="link" onClick={() => setActiveTab('history')} className="text-zapier-orange hover:text-zapier-orange/80 underline p-0 h-auto">"Document History"</Button>.
+                        Create one in the <Button variant="link" onClick={() => setActiveTab('analysis')} className="text-zapier-orange hover:text-zapier-orange/80 p-0 h-auto font-normal text-sm">Analyze CV</Button> tab or view previous analysis in <Button variant="link" onClick={() => setActiveTab('history')} className="text-zapier-orange hover:text-zapier-orange/80 p-0 h-auto font-normal text-sm">History</Button>.
                       </p>
                     </CardContent>
                   </Card>
@@ -700,6 +783,13 @@ const AnalyzeCV = () => {
               </TabsContent>
             </Tabs>
           </div>
+
+          {/* Personalization Survey Modal */}
+          <PersonalizationSurveyModal
+            isOpen={showPersonalizationSurvey}
+            onClose={() => setShowPersonalizationSurvey(false)}
+            onSubmit={handleSurveySubmit}
+          />
 
           {/* Credits Panel - Fixed Width */}
           <div>

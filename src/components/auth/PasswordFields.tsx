@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Input } from '@/components/ui/input';
+import SecureInput from '@/components/security/SecureInput';
 import { Label } from '@/components/ui/label';
 import PasswordStrengthMeter from '@/components/PasswordStrengthMeter';
 
@@ -29,7 +29,7 @@ const PasswordFields: React.FC<PasswordFieldsProps> = ({
         <Label htmlFor="password" className="text-blueberry">
           Password
         </Label>
-        <Input
+        <SecureInput
           id="password"
           name="password"
           type="password"
@@ -52,7 +52,7 @@ const PasswordFields: React.FC<PasswordFieldsProps> = ({
           <Label htmlFor="confirmPassword" className="text-blueberry">
             Confirm password
           </Label>
-          <Input
+          <SecureInput
             id="confirmPassword"
             name="confirmPassword"
             type="password"

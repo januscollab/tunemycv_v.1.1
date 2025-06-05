@@ -43,8 +43,8 @@ const Auth = () => {
   return (
     <>
       <OAuthCallback onLoadingChange={setOauthLoading} />
-      <div className="min-h-screen bg-background flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
+      <div className="min-h-screen bg-background flex items-center justify-center py-6 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-4">
           <AuthHeader mode={mode} fromAnalyze={fromAnalyze} />
 
           <div className="bg-card dark:bg-surface rounded-lg border border-card-border p-8">

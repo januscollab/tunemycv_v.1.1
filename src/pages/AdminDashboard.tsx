@@ -1,9 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
-import { Users, CreditCard, FileText, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Users, CreditCard, FileText, Settings, ChevronLeft, ChevronRight, Mail } from 'lucide-react';
 import UserManagement from '@/components/admin/UserManagement';
 import CreditManagement from '@/components/admin/CreditManagement';
 import AnalysisLogsManagement from '@/components/admin/AnalysisLogsManagement';
+
 import AdminNavigation from '@/components/admin/AdminNavigation';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -60,6 +61,20 @@ const AdminDashboard = () => {
         return <CreditManagement />;
       case 'logs':
         return <AnalysisLogsManagement />;
+      case 'site-settings':
+        return (
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <h2 className="text-xl font-semibold text-blueberry mb-4">Site Settings</h2>
+            <p className="text-blueberry/70">Site settings functionality will be added here.</p>
+          </div>
+        );
+      case 'email-templates':
+        return (
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <h2 className="text-xl font-semibold text-blueberry mb-4">Email Templates</h2>
+            <p className="text-blueberry/70">Email template management will be added here.</p>
+          </div>
+        );
       default:
         return <UserManagement />;
     }
@@ -143,6 +158,30 @@ const AdminDashboard = () => {
               >
                 <FileText className={`h-5 w-5 text-apricot ${sidebarCollapsed ? '' : 'mr-3'}`} />
                 {!sidebarCollapsed && 'Analysis Logs'}
+              </button>
+              <button
+                onClick={() => setActiveTab('site-settings')}
+                className={`w-full flex items-center ${sidebarCollapsed ? 'px-2 justify-center' : 'px-3'} py-2 text-left rounded-md transition-colors ${
+                  activeTab === 'site-settings'
+                    ? 'bg-citrus/20 text-blueberry border border-citrus/30'
+                    : 'text-blueberry/70 hover:bg-apple-core/20'
+                }`}
+                title={sidebarCollapsed ? 'Site Settings' : undefined}
+              >
+                <Settings className={`h-5 w-5 text-apricot ${sidebarCollapsed ? '' : 'mr-3'}`} />
+                {!sidebarCollapsed && 'Site Settings'}
+              </button>
+              <button
+                onClick={() => setActiveTab('email-templates')}
+                className={`w-full flex items-center ${sidebarCollapsed ? 'px-2 justify-center' : 'px-3'} py-2 text-left rounded-md transition-colors ${
+                  activeTab === 'email-templates'
+                    ? 'bg-citrus/20 text-blueberry border border-citrus/30'
+                    : 'text-blueberry/70 hover:bg-apple-core/20'
+                }`}
+                title={sidebarCollapsed ? 'Email Templates' : undefined}
+              >
+                <Mail className={`h-5 w-5 text-apricot ${sidebarCollapsed ? '' : 'mr-3'}`} />
+                {!sidebarCollapsed && 'Email Templates'}
               </button>
             </nav>
           </div>

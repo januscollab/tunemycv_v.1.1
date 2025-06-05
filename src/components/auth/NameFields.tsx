@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Input } from '@/components/ui/input';
+import SecureInput from '@/components/security/SecureInput';
 import { Label } from '@/components/ui/label';
 
 interface NameFieldsProps {
@@ -22,7 +22,7 @@ const NameFields: React.FC<NameFieldsProps> = ({
         <Label htmlFor="firstName" className="text-blueberry">
           First name
         </Label>
-        <Input
+        <SecureInput
           id="firstName"
           name="firstName"
           type="text"
@@ -37,7 +37,7 @@ const NameFields: React.FC<NameFieldsProps> = ({
         <Label htmlFor="lastName" className="text-blueberry">
           Last name
         </Label>
-        <Input
+        <SecureInput
           id="lastName"
           name="lastName"
           type="text"

@@ -4,6 +4,7 @@ import { RotateCcw } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 
+
 interface EditableCoverLetterProps {
   content: string;
   onSave: (newContent: string) => void;
