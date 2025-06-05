@@ -17,8 +17,18 @@ const ProfileNavigation: React.FC<ProfileNavigationProps> = ({ activeTab, onTabC
       icon: Brain,
       tooltip: 'Get 3x More Relevant Job Matches (Optional) - Complete your working style profile for personalized career guidance and better role matching.'
     },
-    { id: 'documents', label: 'Document History', icon: FileText },
-    { id: 'files', label: 'CV Management', icon: Upload },
+    { 
+      id: 'documents', 
+      label: 'Document History', 
+      icon: FileText,
+      tooltip: 'View and manage your CV analyses and cover letters'
+    },
+    { 
+      id: 'files', 
+      label: 'CV Management', 
+      icon: Upload,
+      tooltip: 'Upload and organize up to 5 CV versions (PDF/DOCX)'
+    },
     { id: 'billing', label: 'Billing History', icon: FileText },
   ];
 
