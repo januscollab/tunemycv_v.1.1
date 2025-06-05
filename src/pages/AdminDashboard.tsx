@@ -118,71 +118,77 @@ const AdminDashboard = () => {
             )}
           </Button>
           
-          <div className="p-6">
+          <div className="p-6 flex flex-col h-full">
             {!sidebarCollapsed && (
               <h2 className="text-lg font-semibold text-blueberry mb-6">Admin Dashboard</h2>
             )}
-            <nav className="space-y-2">
-              <button
-                onClick={() => setActiveTab('users')}
-                className={`w-full flex items-center ${sidebarCollapsed ? 'px-2 justify-center' : 'px-3'} py-2 text-left rounded-md transition-colors ${
-                  activeTab === 'users'
-                    ? 'bg-citrus/20 text-blueberry border border-citrus/30'
-                    : 'text-blueberry/70 hover:bg-apple-core/20'
-                }`}
-                title={sidebarCollapsed ? 'User Management' : undefined}
-              >
-                <Users className={`h-5 w-5 text-apricot ${sidebarCollapsed ? '' : 'mr-3'}`} />
-                {!sidebarCollapsed && 'User Management'}
-              </button>
-              <button
-                onClick={() => setActiveTab('credits')}
-                className={`w-full flex items-center ${sidebarCollapsed ? 'px-2 justify-center' : 'px-3'} py-2 text-left rounded-md transition-colors ${
-                  activeTab === 'credits'
-                    ? 'bg-citrus/20 text-blueberry border border-citrus/30'
-                    : 'text-blueberry/70 hover:bg-apple-core/20'
-                }`}
-                title={sidebarCollapsed ? 'Credit Management' : undefined}
-              >
-                <CreditCard className={`h-5 w-5 text-apricot ${sidebarCollapsed ? '' : 'mr-3'}`} />
-                {!sidebarCollapsed && 'Credit Management'}
-              </button>
-              <button
-                onClick={() => setActiveTab('logs')}
-                className={`w-full flex items-center ${sidebarCollapsed ? 'px-2 justify-center' : 'px-3'} py-2 text-left rounded-md transition-colors ${
-                  activeTab === 'logs'
-                    ? 'bg-citrus/20 text-blueberry border border-citrus/30'
-                    : 'text-blueberry/70 hover:bg-apple-core/20'
-                }`}
-                title={sidebarCollapsed ? 'Analysis Logs' : undefined}
-              >
-                <FileText className={`h-5 w-5 text-apricot ${sidebarCollapsed ? '' : 'mr-3'}`} />
-                {!sidebarCollapsed && 'Analysis Logs'}
-              </button>
-              <button
-                onClick={() => setActiveTab('site-settings')}
-                className={`w-full flex items-center ${sidebarCollapsed ? 'px-2 justify-center' : 'px-3'} py-2 text-left rounded-md transition-colors ${
-                  activeTab === 'site-settings'
-                    ? 'bg-citrus/20 text-blueberry border border-citrus/30'
-                    : 'text-blueberry/70 hover:bg-apple-core/20'
-                }`}
-                title={sidebarCollapsed ? 'Site Settings' : undefined}
-              >
-                <Settings className={`h-5 w-5 text-apricot ${sidebarCollapsed ? '' : 'mr-3'}`} />
-                {!sidebarCollapsed && 'Site Settings'}
-              </button>
-              <button
-                onClick={() => setActiveTab('email-templates')}
-                className={`w-full flex items-center ${sidebarCollapsed ? 'px-2 justify-center' : 'px-3'} py-2 text-left rounded-md transition-colors ${
-                  activeTab === 'email-templates'
-                    ? 'bg-citrus/20 text-blueberry border border-citrus/30'
-                    : 'text-blueberry/70 hover:bg-apple-core/20'
-                }`}
-                title={sidebarCollapsed ? 'Email Templates' : undefined}
-              >
-                <Mail className={`h-5 w-5 text-apricot ${sidebarCollapsed ? '' : 'mr-3'}`} />
-                {!sidebarCollapsed && 'Email Templates'}
-              </button>
+            <nav className="flex flex-col h-full">
+              <div className="space-y-2 flex-1">
+                <button
+                  onClick={() => setActiveTab('users')}
+                  className={`w-full flex items-center ${sidebarCollapsed ? 'px-2 justify-center' : 'px-3'} py-2 text-left rounded-md transition-colors ${
+                    activeTab === 'users'
+                      ? 'bg-citrus/20 text-blueberry border border-citrus/30'
+                      : 'text-blueberry/70 hover:bg-apple-core/20'
+                  }`}
+                  title={sidebarCollapsed ? 'User Management' : undefined}
+                >
+                  <Users className={`h-5 w-5 text-apricot ${sidebarCollapsed ? '' : 'mr-3'}`} />
+                  {!sidebarCollapsed && 'User Management'}
+                </button>
+                <button
+                  onClick={() => setActiveTab('credits')}
+                  className={`w-full flex items-center ${sidebarCollapsed ? 'px-2 justify-center' : 'px-3'} py-2 text-left rounded-md transition-colors ${
+                    activeTab === 'credits'
+                      ? 'bg-citrus/20 text-blueberry border border-citrus/30'
+                      : 'text-blueberry/70 hover:bg-apple-core/20'
+                  }`}
+                  title={sidebarCollapsed ? 'Credit Management' : undefined}
+                >
+                  <CreditCard className={`h-5 w-5 text-apricot ${sidebarCollapsed ? '' : 'mr-3'}`} />
+                  {!sidebarCollapsed && 'Credit Management'}
+                </button>
+                <button
+                  onClick={() => setActiveTab('logs')}
+                  className={`w-full flex items-center ${sidebarCollapsed ? 'px-2 justify-center' : 'px-3'} py-2 text-left rounded-md transition-colors ${
+                    activeTab === 'logs'
+                      ? 'bg-citrus/20 text-blueberry border border-citrus/30'
+                      : 'text-blueberry/70 hover:bg-apple-core/20'
+                  }`}
+                  title={sidebarCollapsed ? 'Analysis Logs' : undefined}
+                >
+                  <FileText className={`h-5 w-5 text-apricot ${sidebarCollapsed ? '' : 'mr-3'}`} />
+                  {!sidebarCollapsed && 'Analysis Logs'}
+                </button>
+                <button
+                  onClick={() => setActiveTab('email-templates')}
+                  className={`w-full flex items-center ${sidebarCollapsed ? 'px-2 justify-center' : 'px-3'} py-2 text-left rounded-md transition-colors ${
+                    activeTab === 'email-templates'
+                      ? 'bg-citrus/20 text-blueberry border border-citrus/30'
+                      : 'text-blueberry/70 hover:bg-apple-core/20'
+                  }`}
+                  title={sidebarCollapsed ? 'Email Templates' : undefined}
+                >
+                  <Mail className={`h-5 w-5 text-apricot ${sidebarCollapsed ? '' : 'mr-3'}`} />
+                  {!sidebarCollapsed && 'Email Templates'}
+                </button>
+              </div>
+              
+              {/* Site Settings anchored to bottom */}
+              <div className="mt-auto pt-4 border-t border-apple-core/30">
+                <button
+                  onClick={() => setActiveTab('site-settings')}
+                  className={`w-full flex items-center ${sidebarCollapsed ? 'px-2 justify-center' : 'px-3'} py-2 text-left rounded-md transition-colors ${
+                    activeTab === 'site-settings'
+                      ? 'bg-citrus/20 text-blueberry border border-citrus/30'
+                      : 'text-blueberry/70 hover:bg-apple-core/20'
+                  }`}
+                  title={sidebarCollapsed ? 'Site Settings' : undefined}
+                >
+                  <Settings className={`h-5 w-5 text-apricot ${sidebarCollapsed ? '' : 'mr-3'}`} />
+                  {!sidebarCollapsed && 'Site Settings'}
+                </button>
+              </div>
             </nav>
           </div>
         </div>

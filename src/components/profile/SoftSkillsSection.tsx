@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
-import { Brain } from 'lucide-react';
+import { Brain, Info } from 'lucide-react';
 import { useSoftSkills } from '@/hooks/useSoftSkills';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface SoftSkillsData extends Record<string, number> {
   communication: number;
@@ -95,6 +96,18 @@ const SoftSkillsSection: React.FC = () => {
         <div className="flex items-center mb-6">
           <Brain className="h-5 w-5 text-gray-500 dark:text-apple-core/60 mr-2" />
           <h3 className="text-lg font-medium text-gray-900 dark:text-citrus">Soft Skills Assessment</h3>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:text-apple-core/60 dark:hover:text-apple-core/80 cursor-help ml-2" />
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="max-w-sm">
+                <p className="text-sm">
+                  <strong>Boost Your CV Analysis Accuracy by 40%</strong> - Complete this 2-minute assessment to get personalized insights into how your soft skills match specific roles.
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
         <p className="text-sm text-gray-500 dark:text-apple-core/60 mb-6">
           Your soft skills assessment used to enhance CV analysis
@@ -115,8 +128,8 @@ const SoftSkillsSection: React.FC = () => {
         ) : (
           <div className="space-y-4">
             {isAssessmentEmpty && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                <p className="text-sm text-blue-800">
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                <p className="text-sm text-red-800">
                   <strong>Assessment Not Completed:</strong> This assessment is optional but helps improve your compatibility measurements against future roles. Complete it to get more personalized results.
                 </p>
               </div>
@@ -124,7 +137,7 @@ const SoftSkillsSection: React.FC = () => {
             {Object.entries(skillDefinitions).map(([key, label]) => (
               <div key={key} className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <label className="text-sm font-medium text-gray-700 dark:text-apple-core/80">
+                  <label className="font-medium text-gray-900 dark:text-citrus">
                     {label}
                   </label>
                   <span className="text-sm text-gray-500 dark:text-apple-core/60 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">

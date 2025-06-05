@@ -1,6 +1,7 @@
 import React from 'react';
-import { User, Upload, Settings, FileText } from 'lucide-react';
+import { User, Upload, Brain, FileText, Info } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface ProfileNavigationProps {
   activeTab: string;
@@ -10,10 +11,25 @@ interface ProfileNavigationProps {
 const ProfileNavigation: React.FC<ProfileNavigationProps> = ({ activeTab, onTabChange }) => {
   const tabs = [
     { id: 'personal', label: 'Account Info', icon: User },
-    { id: 'documents', label: 'Document History', icon: FileText },
-    { id: 'files', label: 'CV Management', icon: Upload },
+    { 
+      id: 'working-style', 
+      label: 'My Working Style', 
+      icon: Brain,
+      tooltip: 'Get 3x More Relevant Job Matches (Optional) - Complete your working style profile for personalized career guidance and better role matching.'
+    },
+    { 
+      id: 'documents', 
+      label: 'Document History', 
+      icon: FileText,
+      tooltip: 'View and manage your CV analyses and cover letters'
+    },
+    { 
+      id: 'files', 
+      label: 'CV Management', 
+      icon: Upload,
+      tooltip: 'Upload and organize up to 5 CV versions (PDF/DOCX)'
+    },
     { id: 'billing', label: 'Billing History', icon: FileText },
-    { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
   return (
@@ -33,6 +49,22 @@ const ProfileNavigation: React.FC<ProfileNavigationProps> = ({ activeTab, onTabC
                   <Icon className="h-4 w-4" />
                   <span className="hidden lg:inline">{tab.label}</span>
                   <span className="lg:hidden">{tab.label.split(' ')[0]}</span>
+                  {tab.tooltip && (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Info className="h-3 w-3 text-gray-400 hover:text-gray-600 dark:text-apple-core/60 dark:hover:text-apple-core/80 cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipContent 
+                          side="top" 
+                          className="w-max max-w-[280px] whitespace-normal break-words z-50" 
+                          collisionPadding={8}
+                        >
+                          <p className="text-sm leading-relaxed">{tab.tooltip}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
                 </TabsTrigger>
               );
             })}
@@ -55,7 +87,23 @@ const ProfileNavigation: React.FC<ProfileNavigationProps> = ({ activeTab, onTabC
               }`}
             >
               <Icon className="h-5 w-5 mr-3" />
-              {tab.label}
+              <span className="flex-1 text-left">{tab.label}</span>
+              {tab.tooltip && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:text-apple-core/60 dark:hover:text-apple-core/80 cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent 
+                      side="bottom" 
+                      className="w-max max-w-[280px] whitespace-normal break-words z-50" 
+                      collisionPadding={8}
+                    >
+                      <p className="text-sm leading-relaxed">{tab.tooltip}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
             </button>
           );
         })}
