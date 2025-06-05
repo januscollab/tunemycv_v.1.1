@@ -12,6 +12,9 @@ import InterviewPrepModal from '@/components/analyze/InterviewPrepModal';
 import InterviewPrepLoggedOut from '@/components/analyze/InterviewPrepLoggedOut';
 import AnalysisSelector from '@/components/cover-letter/AnalysisSelector';
 import PersonalizationSurveyModal from '@/components/analyze/PersonalizationSurveyModal';
+import SoftSkillsSurveyPanel from '@/components/analyze/SoftSkillsSurveyPanel';
+import SoftSkillsSurveyModal from '@/components/analyze/SoftSkillsSurveyModal';
+import { useSoftSkills } from '@/hooks/useSoftSkills';
 import { useAnalysis } from '@/hooks/useAnalysis';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -57,6 +60,10 @@ const AnalyzeCV = () => {
   // Personalization survey states
   const [showPersonalizationSurvey, setShowPersonalizationSurvey] = useState(false);
   const [surveyResponses, setSurveyResponses] = useState<any>(null);
+  
+  // Soft skills survey states
+  const [showSurveyModal, setShowSurveyModal] = useState(false);
+  const { saveSoftSkills, dismissSurvey, shouldShowSurvey } = useSoftSkills();
   
   // Get initial tab from URL parameter or location state
   const urlParams = new URLSearchParams(location.search);
@@ -792,14 +799,26 @@ const AnalyzeCV = () => {
           />
 
           {/* Credits Panel - Fixed Width */}
-          <div>
+          <div className="space-y-4">
             <CreditsPanel
               credits={userCredits?.credits || 0}
               hasCreditsForAI={hasCreditsForAI}
             />
+            <SoftSkillsSurveyPanel
+              onTakeSurvey={() => setShowSurveyModal(true)}
+              onDismiss={dismissSurvey}
+              isVisible={shouldShowSurvey()}
+            />
           </div>
         </div>
       </div>
+
+      {/* Soft Skills Survey Modal */}
+      <SoftSkillsSurveyModal
+        isOpen={showSurveyModal}
+        onClose={() => setShowSurveyModal(false)}
+        onSubmit={saveSoftSkills}
+      />
 
       {/* Interview Prep Modal */}
       <InterviewPrepModal

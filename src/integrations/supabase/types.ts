@@ -285,6 +285,8 @@ export type Database = {
           linkedin_url: string | null
           personal_website_url: string | null
           phone_number: string | null
+          soft_skills: Json | null
+          survey_preferences: Json | null
           updated_at: string | null
         }
         Insert: {
@@ -297,6 +299,8 @@ export type Database = {
           linkedin_url?: string | null
           personal_website_url?: string | null
           phone_number?: string | null
+          soft_skills?: Json | null
+          survey_preferences?: Json | null
           updated_at?: string | null
         }
         Update: {
@@ -309,6 +313,8 @@ export type Database = {
           linkedin_url?: string | null
           personal_website_url?: string | null
           phone_number?: string | null
+          soft_skills?: Json | null
+          survey_preferences?: Json | null
           updated_at?: string | null
         }
         Relationships: []

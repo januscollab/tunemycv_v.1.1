@@ -6,6 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { User, Mail, Lock, Save, Linkedin, Phone, Globe } from 'lucide-react';
 import CountryCodeSelect from './CountryCodeSelect';
 import SecureInput from '@/components/security/SecureInput';
+import SoftSkillsSection from './SoftSkillsSection';
 
 interface PersonalInfoTabProps {
   credits: number;
@@ -391,6 +392,9 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
           </div>
         </div>
       </div>
+
+      {/* Soft Skills Profile */}
+      <SoftSkillsSection />
 
       {/* Account Management */}
       <div className="bg-white dark:bg-surface rounded-lg border border-gray-200 dark:border-border p-6">
