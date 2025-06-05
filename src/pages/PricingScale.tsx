@@ -103,21 +103,21 @@ const PricingScale = () => {
                   <div className="space-y-3">
                     <div className="flex items-center space-x-2">
                       <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-earth/80 dark:text-white/80">Pay for what you use, no recurring subscriptions</span>
+                      <span className="text-earth/80 dark:text-white/80">Pay for what you use, no sneaky recurring subscriptions</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-earth/80 dark:text-white/80">Access to all features, no gate keeping the good stuff</span>
+                      <span className="text-earth/80 dark:text-white/80">Access to all features all of the time, no gate keeping the good stuff</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-earth/80 dark:text-white/80">Clean, watermark-free exports (PDF, Word or TXT)</span>
+                      <span className="text-earth/80 dark:text-white/80">Clean, watermark-free downloads in popular PDF, Word or TXT formats</span>
                     </div>
                   </div>
                   <div className="space-y-3">
                     <div className="flex items-center space-x-2">
                       <X className="h-4 w-4 text-red-500" />
-                      <span className="text-earth/80 dark:text-white/80">No throttling AI model responses – you get the good stuff</span>
+                      <span className="text-earth/80 dark:text-white/80">No throttling AI model responses – you paid for it, you get the good stuff</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <X className="h-4 w-4 text-red-500" />
@@ -125,7 +125,7 @@ const PricingScale = () => {
                     </div>
                     <div className="flex items-center space-x-2">
                       <X className="h-4 w-4 text-red-500" />
-                      <span className="text-earth/80 dark:text-white/80">No hidden fees or auto-renewal surprises</span>
+                      <span className="text-earth/80 dark:text-white/80">We will never share or sell your data. It goes against our core values</span>
                     </div>
                   </div>
                 </div>
@@ -320,7 +320,7 @@ const PricingScale = () => {
         {/* FAQ Section */}
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-earth dark:text-white mb-8">
-            Frequently Asked Questions
+            Some Common Credit Questions
           </h2>
           <div className="grid md:grid-cols-2 gap-8 text-left">
             <div className="space-y-6">
@@ -329,7 +329,7 @@ const PricingScale = () => {
                   How do credits work?
                 </h3>
                 <p className="text-earth/70 dark:text-white/70">
-                  Each credit gives you access to one CV analysis, cover letter generation, or interview prep pack. Buy only what you need, when you need it.
+                  Credits are used to access our AI-powered tools: CV Analysis (2 credits), Cover Letter Generation (1 credit), and Interview Prep (2 credits). Purchase the exact amount you need with no subscriptions required.
                 </p>
               </div>
               <div>
@@ -337,7 +337,7 @@ const PricingScale = () => {
                   Do credits expire?
                 </h3>
                 <p className="text-earth/70 dark:text-white/70">
-                  Yes, credits have validity periods ranging from 14 days (free) to 1 year (100 credits pack). Check each plan for specific terms.
+                  All purchased credits expire 1 year after purchase. FREE credits received upon sign up expire after 14 days to encourage you to try our services.
                 </p>
               </div>
             </div>
@@ -355,7 +355,7 @@ const PricingScale = () => {
                   Can I get a refund on unused credits?
                 </h3>
                 <p className="text-earth/70 dark:text-white/70">
-                  Yes, we offer refunds on unused credits within 30 days of purchase, subject to our refund policy.
+                  No, all credit purchases are final. We recommend starting with a smaller credit pack to test our services before purchasing larger amounts.
                 </p>
               </div>
             </div>
