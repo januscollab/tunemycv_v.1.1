@@ -20,8 +20,9 @@ import {
   useSortable
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, ChevronUp, ChevronDown, Building2 } from 'lucide-react';
+import { GripVertical, ChevronUp, ChevronDown, Building2, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface CultureArchetype {
   id: string;
@@ -68,6 +69,45 @@ const CULTURE_ARCHETYPES: CultureArchetype[] = [
     icon: '⚙️'
   }
 ];
+
+const ARCHETYPE_DETAILS = {
+  hierarchical_corporate: {
+    traits: ["Clear chain of command", "Top-down decision-making", "Formal roles and responsibilities", "Emphasis on process, compliance, stability"],
+    commonIn: "Banks, government, multinational corporations",
+    pros: "Clarity, consistency, risk mitigation",
+    cons: "Can be slow, bureaucratic, less innovative"
+  },
+  startup_entrepreneurial: {
+    traits: ["Fast-paced, dynamic, high autonomy", "Everyone wears multiple hats", "Innovation and experimentation encouraged", "Flat hierarchy, often informal communication"],
+    commonIn: "Tech startups, early-stage companies",
+    pros: "Creative, empowering, flexible",
+    cons: "Can be chaotic, unstable, high burnout risk"
+  },
+  competitive_performance: {
+    traits: ["Results-driven, performance is everything", "High expectations, long hours common", "Recognition and promotions tied tightly to KPIs"],
+    commonIn: "Sales orgs, top law firms, investment banks",
+    pros: "Drives excellence and rewards achievement",
+    cons: "Stressful, less work-life balance, cutthroat"
+  },
+  mission_driven: {
+    traits: ["Employees united by a cause (e.g. sustainability, social impact)", "Values-driven decision-making", "Often non-profit or socially responsible orgs"],
+    commonIn: "NGOs, impact startups, B Corps",
+    pros: "Meaningful work, motivated teams",
+    cons: "May lack commercial aggressiveness or resources"
+  },
+  flexible_autonomy: {
+    traits: ["Emphasis on trust and freedom", "Employees choose hours, tools, remote/hybrid options", "Results matter more than attendance"],
+    commonIn: "Remote-first startups, modern tech orgs",
+    pros: "Great for work-life balance, attracts self-starters",
+    cons: "May lack alignment or cohesion if poorly managed"
+  },
+  process_driven: {
+    traits: ["Focus on efficiency, quality control, consistency", "Well-defined workflows and documentation", "Less tolerance for improvisation"],
+    commonIn: "Manufacturing, logistics, regulated industries",
+    pros: "Scalable, dependable operations",
+    cons: "Can be rigid, discourages innovation"
+  }
+};
 
 interface SortableItemProps {
   id: string;
@@ -120,8 +160,35 @@ function SortableItem({ id, archetype, index, isMobile, onMoveUp, onMoveDown, ca
         
         {/* Content */}
         <div className="flex-1">
-          <div className="flex items-center">
+          <div className="flex items-center justify-between">
             <h4 className="font-medium text-gray-900 dark:text-citrus">{archetype.name}</h4>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:text-apple-core/60 dark:hover:text-apple-core/80 cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent side="left" className="max-w-sm p-4">
+                  <div className="space-y-3">
+                    <div>
+                      <h5 className="font-semibold text-sm mb-2">Traits:</h5>
+                      <ul className="text-xs space-y-1">
+                        {ARCHETYPE_DETAILS[archetype.id as keyof typeof ARCHETYPE_DETAILS]?.traits.map((trait, i) => (
+                          <li key={i} className="flex items-start">
+                            <span className="mr-1">•</span>
+                            <span>{trait}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="text-xs">
+                      <p><strong>Common in:</strong> {ARCHETYPE_DETAILS[archetype.id as keyof typeof ARCHETYPE_DETAILS]?.commonIn}</p>
+                      <p className="mt-1"><strong>Pros:</strong> {ARCHETYPE_DETAILS[archetype.id as keyof typeof ARCHETYPE_DETAILS]?.pros}</p>
+                      <p className="mt-1"><strong>Cons:</strong> {ARCHETYPE_DETAILS[archetype.id as keyof typeof ARCHETYPE_DETAILS]?.cons}</p>
+                    </div>
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
           <p className="text-sm text-gray-500 dark:text-apple-core/60 mt-1">{archetype.description}</p>
         </div>

@@ -204,10 +204,10 @@ const WorkStylePreferencesSection: React.FC = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {questions.map((question) => (
-            <div key={question.key} className="space-y-4 p-4 border border-gray-100 dark:border-border rounded-lg">
+            <div key={question.key} className="space-y-3 p-4 border border-gray-100 dark:border-border rounded-lg">
               <div className="flex items-center space-x-2 mb-3">
                 <div className="text-zapier-orange">{question.icon}</div>
-                <h4 className="font-medium text-gray-900 dark:text-apple-core/90 text-sm">
+                <h4 className="font-medium text-gray-900 dark:text-citrus">
                   {question.title}
                 </h4>
               </div>
@@ -218,10 +218,10 @@ const WorkStylePreferencesSection: React.FC = () => {
               <RadioGroup
                 value={workStyle[question.key]}
                 onValueChange={(value) => handlePreferenceChange(question.key, value)}
-                className="space-y-3"
+                className="space-y-2"
               >
                 {question.options.map((option) => (
-                  <div key={option.value} className="flex items-center space-x-3 py-1">
+                  <div key={option.value} className="flex items-center space-x-3">
                     <RadioGroupItem 
                       value={option.value} 
                       id={`${question.key}-${option.value}`}

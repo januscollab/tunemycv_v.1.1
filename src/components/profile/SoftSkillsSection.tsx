@@ -124,7 +124,7 @@ const SoftSkillsSection: React.FC = () => {
             {Object.entries(skillDefinitions).map(([key, label]) => (
               <div key={key} className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <label className="text-sm font-medium text-gray-700 dark:text-apple-core/80">
+                  <label className="font-medium text-gray-900 dark:text-citrus">
                     {label}
                   </label>
                   <span className="text-sm text-gray-500 dark:text-apple-core/60 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
