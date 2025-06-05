@@ -344,11 +344,6 @@ const CompanyCulturePreferences: React.FC = () => {
         </DndContext>
       )}
 
-      {loading && (
-        <div className="mt-4 text-sm text-gray-500 dark:text-apple-core/60">
-          Saving preferences...
-        </div>
-      )}
     </div>
   );
 };
