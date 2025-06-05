@@ -287,50 +287,6 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
             </div>
           </div>
 
-          {/* Work Environment Preferences */}
-          <div className="pt-6 border-t border-gray-200 dark:border-border">
-            <h4 className="text-md font-medium text-gray-900 dark:text-citrus mb-4 flex items-center">
-              <Building className="h-4 w-4 mr-2" />
-              Your Work Environment Preferences
-            </h4>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="companySize" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
-                  Company Size
-                </label>
-                <select
-                  id="companySize"
-                  value={profile.company_size_preference}
-                  onChange={(e) => setProfile({ ...profile, company_size_preference: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
-                >
-                  <option value="">Select preference</option>
-                  <option value="startup">Startup</option>
-                  <option value="sme">SME (Small to Medium Enterprise)</option>
-                  <option value="enterprise">Enterprise</option>
-                </select>
-              </div>
-
-              <div>
-                <label htmlFor="workLocation" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
-                  <MapPin className="h-4 w-4 inline mr-1" />
-                  Work Location Preference
-                </label>
-                <select
-                  id="workLocation"
-                  value={profile.work_location_preference}
-                  onChange={(e) => setProfile({ ...profile, work_location_preference: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
-                >
-                  <option value="">Select preference</option>
-                  <option value="remote">Remote</option>
-                  <option value="hybrid">Hybrid</option>
-                  <option value="in-office">In-office</option>
-                </select>
-              </div>
-            </div>
-          </div>
 
         </div>
       </div>
