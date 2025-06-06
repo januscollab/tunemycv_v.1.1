@@ -460,17 +460,6 @@ const AnalyzeCV = () => {
         {/* Breadcrumbs */}
         <Breadcrumbs />
         
-        {/* Step Indicator for Analysis Tab */}
-        {activeTab === 'analysis' && (
-          <div className="mb-8">
-            <StepIndicator
-              steps={analysisSteps}
-              currentStep={getCurrentStep()}
-              completedSteps={getCompletedSteps()}
-              className="max-w-2xl mx-auto"
-            />
-          </div>
-        )}
         {/* Header Section */}
         <div className="mb-6">
           <div>

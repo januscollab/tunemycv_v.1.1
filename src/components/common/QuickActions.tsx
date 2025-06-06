@@ -39,18 +39,18 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
   showBackForward = true,
   className
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
 
   const defaultActions: QuickAction[] = [
     {
-      id: 'analyze',
-      label: 'Analyze CV',
-      icon: <FileText className="w-5 h-5" />,
-      href: '/analyze',
-      variant: 'default',
+      id: 'interview-prep',
+      label: 'Interview Prep',
+      icon: <MessageSquare className="w-5 h-5" />,
+      href: '/analyze?tab=interview-prep',
+      variant: 'secondary',
       requiresAuth: true
     },
     {
@@ -62,11 +62,11 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
       requiresAuth: true
     },
     {
-      id: 'interview-prep',
-      label: 'Interview Prep',
-      icon: <MessageSquare className="w-5 h-5" />,
-      href: '/analyze?tab=interview-prep',
-      variant: 'secondary',
+      id: 'analyze',
+      label: 'Analyze CV',
+      icon: <FileText className="w-5 h-5" />,
+      href: '/analyze',
+      variant: 'default',
       requiresAuth: true
     },
     {
@@ -100,7 +100,7 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
     } else if (action.href) {
       navigate(action.href);
     }
-    setIsOpen(false);
+    setIsHovered(false);
   };
 
   const handleBack = () => {
@@ -118,7 +118,11 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
 
   return (
     <TooltipProvider>
-      <div className={cn("fixed z-40", positionClasses[position], className)}>
+      <div 
+        className={cn("fixed z-40", positionClasses[position], className)}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
         <div className="flex flex-col items-end space-y-3">
 
           {/* Quick Actions */}
@@ -127,7 +131,7 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
               {/* Action Items */}
               <div className={cn(
                 "flex flex-col items-end space-y-3 transition-all duration-300 transform origin-bottom-right",
-                isOpen ? "scale-100 opacity-100" : "scale-0 opacity-0"
+                isHovered ? "scale-100 opacity-100" : "scale-0 opacity-0"
               )}>
                 {filteredActions.map((action) => (
                   <Tooltip key={action.id}>
@@ -153,23 +157,18 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
                 <TooltipTrigger asChild>
                   <Button
                     size="icon"
-                    onClick={() => setIsOpen(!isOpen)}
                     className={cn(
                       "w-14 h-14 rounded-full shadow-lg transition-all duration-300",
-                      isOpen 
-                        ? "bg-destructive hover:bg-destructive/90 rotate-180" 
+                      isHovered 
+                        ? "bg-primary hover:bg-primary/90 scale-110" 
                         : "bg-primary hover:bg-primary/90 hover:scale-110"
                     )}
                   >
-                    {isOpen ? (
-                      <X className="w-6 h-6" />
-                    ) : (
-                      <Zap className="w-6 h-6" />
-                    )}
+                    <Zap className="w-6 h-6" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent side="left">
-                  <p>{isOpen ? 'Close Quick Actions' : 'Quick Actions'}</p>
+                  <p>Quick Actions</p>
                 </TooltipContent>
               </Tooltip>
             </>
