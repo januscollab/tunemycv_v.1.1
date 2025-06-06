@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
-import { FileText, Eye, Edit, AlertTriangle, CheckCircle, Info, HelpCircle } from 'lucide-react';
+import React from 'react';
+import { FileText, Edit, AlertTriangle, CheckCircle, Info } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { formatFileSize } from '@/utils/fileUtils';
 import { assessDocumentQuality, getQualityColor, getQualityBadge, QualityAssessment } from '@/utils/documentQuality';
 
@@ -25,7 +24,6 @@ const DocumentPreviewCard: React.FC<DocumentPreviewCardProps> = ({
   onOpenVerification,
   onRemove
 }) => {
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const quality = assessDocumentQuality(extractedText, fileName, documentType);
   
   const getIssueIcon = (type: string) => {
@@ -63,25 +61,6 @@ const DocumentPreviewCard: React.FC<DocumentPreviewCardProps> = ({
               </div>
             </div>
           </div>
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onOpenVerification}
-              className="text-zapier-orange border-zapier-orange hover:bg-zapier-orange hover:text-white"
-            >
-              <Edit className="h-4 w-4 mr-1" />
-              Review
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onRemove}
-              className="text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
-            >
-              Remove
-            </Button>
-          </div>
         </div>
       </CardHeader>
       
@@ -102,7 +81,7 @@ const DocumentPreviewCard: React.FC<DocumentPreviewCardProps> = ({
                           <Button 
                             variant="link" 
                             className="h-auto p-0 ml-1 text-xs text-zapier-orange hover:text-zapier-orange/80"
-                            onClick={() => window.open('/help-centre#document-quality', '_blank')}
+                            onClick={() => window.open('/help-centre#document-quality-scoring', '_blank')}
                           >
                             Learn more
                           </Button>
@@ -127,33 +106,26 @@ const DocumentPreviewCard: React.FC<DocumentPreviewCardProps> = ({
           )}
         </div>
 
-        {/* Text Preview */}
-        <Collapsible open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
-          <CollapsibleTrigger asChild>
-            <Button variant="outline" size="sm" className="w-full">
-              <Eye className="h-4 w-4 mr-2" />
-              {isPreviewOpen ? 'Hide Preview' : 'Show Preview'}
-            </Button>
-          </CollapsibleTrigger>
-          <CollapsibleContent className="mt-3">
-            <div className="bg-muted rounded-md p-3 max-h-40 overflow-y-auto border border-border">
-              <pre className="whitespace-pre-wrap text-xs text-muted-foreground leading-relaxed">
-                {extractedText.substring(0, 500)}
-                {extractedText.length > 500 && '...'}
-              </pre>
-            </div>
-            {extractedText.length > 500 && (
-              <Button
-                variant="link"
-                size="sm"
-                onClick={onOpenVerification}
-                className="text-xs text-zapier-orange hover:text-zapier-orange/80 mt-2 p-0 h-auto"
-              >
-                View full document →
-              </Button>
-            )}
-          </CollapsibleContent>
-        </Collapsible>
+        {/* Action Buttons */}
+        <div className="flex items-center justify-between">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onOpenVerification}
+            className="text-zapier-orange border-zapier-orange hover:bg-zapier-orange hover:text-white"
+          >
+            <Edit className="h-4 w-4 mr-1" />
+            Review & Edit
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onRemove}
+            className="text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+          >
+            Remove
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );

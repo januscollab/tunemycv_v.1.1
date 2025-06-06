@@ -169,6 +169,41 @@ const HelpCentre = () => {
       ]
     },
     {
+      title: "Document Quality Scoring",
+      icon: <Search className="h-5 w-5" />,
+      id: "document-quality-scoring",
+      faqs: [
+        {
+          question: "How is the document quality score calculated?",
+          answer: "Our quality scoring system starts with an 85-point base score and evaluates multiple factors: document length (optimal: 75+ words for CVs), text extraction quality, presence of key sections (contact info, experience, education), and document structure. Scores are: 90-100% Excellent, 75-89% Good, 60-74% Acceptable, below 60% Needs Improvement."
+        },
+        {
+          question: "Why did my well-formatted document get a lower score?",
+          answer: "Common reasons include: Short document length (under 75 words for CVs), missing standard section headings that our AI can recognize, or formatting that doesn't extract well. Even well-designed documents can score lower if they lack clear structure indicators like 'Experience', 'Education', or contact information."
+        },
+        {
+          question: "What causes formatting issues warnings?",
+          answer: "We now use a lenient detection system that allows common professional formatting (bullets, em-dashes, smart quotes). Warnings only appear when there are significant extraction problems with 3+ problematic characters that suggest the document may be image-based or corrupted."
+        },
+        {
+          question: "How can I improve my document quality score?",
+          answer: "To boost your score: Use clear section headings ('Experience', 'Work History', 'Education', 'Qualifications'), include contact information prominently, ensure adequate content length (75+ words for CVs), use standard formatting without complex layouts, and consider the text input option for job descriptions."
+        },
+        {
+          question: "What do the different issue types mean?",
+          answer: "Error (red): Critical issues preventing analysis - fix these first. Warning (yellow): Moderate issues that may affect analysis quality - recommended to address. Info (blue/green): Suggestions for optimization or positive feedback - good practice to follow but not critical."
+        },
+        {
+          question: "Does a lower quality score affect my analysis results?",
+          answer: "Documents with scores above 60% are considered acceptable for analysis. Lower scores may indicate extraction issues that could impact analysis accuracy. We recommend reviewing and editing extracted text for documents with quality concerns before proceeding with analysis."
+        },
+        {
+          question: "Why does my CV show 'Contact information not clearly visible'?",
+          answer: "Our system looks for email addresses (@) in the document text. If your contact details are in headers, footers, or formatted in a way that doesn't extract as plain text, this warning appears. Ensure your email address is visible in the main document body for best results."
+        }
+      ]
+    },
+    {
       title: "Technical Support",
       icon: <HelpCircle className="h-5 w-5" />,
       faqs: [

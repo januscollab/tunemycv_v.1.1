@@ -79,17 +79,8 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
           {/* Quality Assessment Panel */}
           <div className="lg:col-span-1">
             <div className="bg-muted/50 rounded-lg p-4 h-full">
-              <div className="flex items-center justify-between mb-4">
+              <div className="mb-4">
                 <h3 className="font-medium text-blueberry dark:text-citrus">Quality Assessment</h3>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => window.open('/help-centre#document-quality', '_blank')}
-                  className="text-xs text-zapier-orange hover:text-zapier-orange/80"
-                >
-                  <HelpCircle className="h-3 w-3 mr-1" />
-                  Help
-                </Button>
               </div>
               
               <div className="space-y-3">
@@ -154,7 +145,7 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
                         <Button
                           variant="link"
                           className="h-auto p-0 ml-1 text-xs text-zapier-orange hover:text-zapier-orange/80"
-                          onClick={() => window.open('/help-centre#document-quality', '_blank')}
+                          onClick={() => window.open('/help-centre#document-quality-scoring', '_blank')}
                         >
                           <ExternalLink className="h-3 w-3 mr-1" />
                           Get help
@@ -190,26 +181,30 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
           <div className="flex items-center space-x-4">
             <Button
               variant="ghost"
-              onClick={() => window.open('/help-centre#document-quality', '_blank')}
+              onClick={() => window.open('/help-centre#document-quality-scoring', '_blank')}
               className="text-zapier-orange hover:text-zapier-orange/80"
             >
               <HelpCircle className="h-4 w-4 mr-2" />
-              Need help improving quality?
+              Understanding quality scores
             </Button>
           </div>
           
           <div className="flex items-center space-x-3">
-            <Button variant="outline" onClick={onClose}>
+            <Button 
+              variant="secondary" 
+              onClick={onClose}
+              className="hover:bg-secondary-hover"
+            >
               Cancel
             </Button>
             <Button 
               onClick={handleSave}
               disabled={isSaving}
-              className="bg-zapier-orange hover:bg-zapier-orange/90 text-white"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground hover:shadow-md"
             >
               {isSaving ? (
                 <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent mr-2" />
                   Saving...
                 </>
               ) : (

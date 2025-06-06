@@ -23,7 +23,7 @@ export const assessDocumentQuality = (
   const wordCount = extractedText.split(/\s+/).filter(word => word.length > 0).length;
   const characterCount = extractedText.length;
   
-  let score = 100;
+  let score = 85; // Start with a more generous base score
 
   // Check for empty or very short content
   if (wordCount < 10) {
@@ -32,40 +32,45 @@ export const assessDocumentQuality = (
       title: 'Document appears empty or too short',
       description: 'We extracted very little text from your document.',
       suggestion: 'Try uploading a text-based PDF or DOCX file, or use the text input option instead.',
-      helpUrl: '#document-quality'
+      helpUrl: '#document-quality-scoring'
     });
-    score -= 50;
-  } else if (documentType === 'cv' && wordCount < 100) {
+    score -= 40; // Reduced penalty
+  } else if (documentType === 'cv' && wordCount < 75) { // Lowered threshold from 100 to 75
     issues.push({
       type: 'warning',
       title: 'CV seems quite short',
       description: `We extracted ${wordCount} words, which is shorter than typical CVs.`,
       suggestion: 'Ensure your CV includes all relevant sections like experience, education, and skills.',
-      helpUrl: '#document-quality'
+      helpUrl: '#document-quality-scoring'
     });
-    score -= 20;
+    score -= 10; // Reduced penalty from 20 to 10
   } else if (documentType === 'job_description' && wordCount < 50) {
     issues.push({
       type: 'warning',
       title: 'Job description seems short',
       description: `We extracted ${wordCount} words, which may not include all job requirements.`,
       suggestion: 'Make sure to include the complete job description with requirements and responsibilities.',
-      helpUrl: '#document-quality'
+      helpUrl: '#document-quality-scoring'
     });
-    score -= 15;
+    score -= 10; // Reduced penalty from 15 to 10
   }
 
-  // Check for potential extraction issues
-  const hasGarbledText = /[^\w\s\-.,;:()!?'"@#$%&*+=<>{}[\]|\\\/~`]+/.test(extractedText);
+  // Check for potential extraction issues - much more lenient
+  // Allow common professional formatting characters: bullets (•), em-dashes (—), smart quotes, etc.
+  const hasGarbledText = /[^\w\s\-.,;:()!?'"@#$%&*+=<>{}[\]|\\\/~`•–—""''…°]+/.test(extractedText);
   if (hasGarbledText) {
-    issues.push({
-      type: 'warning',
-      title: 'Possible formatting issues detected',
-      description: 'Some text may not have extracted correctly.',
-      suggestion: 'Try converting your document to a text-based format or use our text input option.',
-      helpUrl: '#document-quality'
-    });
-    score -= 25;
+    // Only flag if there are truly problematic characters
+    const problematicChars = extractedText.match(/[^\w\s\-.,;:()!?'"@#$%&*+=<>{}[\]|\\\/~`•–—""''…°]+/g);
+    if (problematicChars && problematicChars.length > 3) { // Only flag if many issues
+      issues.push({
+        type: 'warning',
+        title: 'Some formatting may need review',
+        description: 'A few characters may not have extracted perfectly.',
+        suggestion: 'Review the extracted text and make any necessary corrections.',
+        helpUrl: '#document-quality-scoring'
+      });
+      score -= 8; // Much reduced penalty from 25 to 8
+    }
   }
 
   // Check for image-based PDF indicators
@@ -76,58 +81,88 @@ export const assessDocumentQuality = (
       title: 'Document might be image-based',
       description: 'This appears to be a scanned document or image-based PDF.',
       suggestion: 'For best results, use a text-based PDF or convert to DOCX/TXT format.',
-      helpUrl: '#document-quality'
+      helpUrl: '#document-quality-scoring'
     });
-    score -= 30;
+    score -= 15; // Reduced penalty from 30 to 15
   }
 
-  // Check for missing key CV sections (if CV)
+  // Check for CV sections with expanded keywords and less harsh penalties
   if (documentType === 'cv' && wordCount > 50) {
     const lowerText = extractedText.toLowerCase();
     const hasEmail = /@/.test(extractedText);
-    const hasExperience = /experience|work|employment|job|position|role/.test(lowerText);
-    const hasEducation = /education|university|college|degree|school/.test(lowerText);
     
+    // Expanded experience keywords
+    const hasExperience = /experience|work|employment|job|position|role|career|professional|responsibilities|achievements|accomplishments|worked|employed|managed|led|developed|created/.test(lowerText);
+    
+    // Expanded education keywords  
+    const hasEducation = /education|university|college|degree|school|qualification|diploma|certificate|studied|graduated|bachelor|master|phd|training|course/.test(lowerText);
+    
+    // Positive scoring for good structure
+    let structureBonus = 0;
+    if (hasEmail) structureBonus += 2;
+    if (hasExperience) structureBonus += 3;
+    if (hasEducation) structureBonus += 2;
+    score += structureBonus;
+    
+    // Less harsh penalties for missing sections
     if (!hasEmail) {
       issues.push({
         type: 'info',
-        title: 'No email address detected',
-        description: 'We couldn\'t find contact information in your CV.',
+        title: 'Contact information not clearly visible',
+        description: 'We couldn\'t find an email address in your CV.',
         suggestion: 'Ensure your contact details are clearly visible and not in headers/footers.',
-        helpUrl: '#document-quality'
+        helpUrl: '#document-quality-scoring'
       });
-      score -= 5;
+      score -= 2; // Reduced from 5 to 2
     }
     
     if (!hasExperience) {
       issues.push({
         type: 'info',
-        title: 'Work experience section unclear',
-        description: 'We couldn\'t clearly identify work experience information.',
-        suggestion: 'Make sure your work experience section uses clear headings and formatting.',
-        helpUrl: '#document-quality'
+        title: 'Experience section could be clearer',
+        description: 'We couldn\'t clearly identify work experience keywords.',
+        suggestion: 'Consider using standard headings like "Experience", "Work History", or "Career".',
+        helpUrl: '#document-quality-scoring'
       });
-      score -= 10;
+      score -= 3; // Reduced from 10 to 3
     }
     
     if (!hasEducation) {
       issues.push({
         type: 'info',
-        title: 'Education section unclear',
-        description: 'We couldn\'t clearly identify education information.',
-        suggestion: 'Ensure your education section is clearly formatted and labeled.',
-        helpUrl: '#document-quality'
+        title: 'Education section could be clearer',
+        description: 'We couldn\'t clearly identify education keywords.',
+        suggestion: 'Consider using standard headings like "Education", "Qualifications", or "Training".',
+        helpUrl: '#document-quality-scoring'
       });
-      score -= 5;
+      score -= 2; // Reduced from 5 to 2
     }
   }
 
-  // Positive indicators
-  if (issues.length === 0) {
+  // Add positive feedback for well-structured documents
+  if (documentType === 'cv' && wordCount >= 150 && wordCount <= 800) {
+    score += 5;
+    issues.unshift({
+      type: 'info',
+      title: 'Well-structured document length',
+      description: `Your CV has ${wordCount} words, which is in the optimal range.`,
+      suggestion: 'Great job maintaining a comprehensive yet concise format!',
+    });
+  }
+
+  // Positive indicators for excellent documents
+  if (score >= 90 && issues.filter(i => i.type !== 'info').length === 0) {
+    issues.unshift({
+      type: 'info',
+      title: 'Excellent document quality!',
+      description: `Successfully extracted ${wordCount} words with clear formatting and structure.`,
+      suggestion: 'Your document is ready for high-quality analysis.',
+    });
+  } else if (issues.filter(i => i.type === 'error').length === 0 && wordCount >= 50) {
     issues.push({
       type: 'info',
-      title: 'Great extraction quality!',
-      description: `Successfully extracted ${wordCount} words with clear formatting.`,
+      title: 'Good extraction quality',
+      description: `Successfully extracted ${wordCount} words from your document.`,
       suggestion: 'Your document looks ready for analysis.',
     });
   }
@@ -150,8 +185,8 @@ export const getQualityColor = (score: number): string => {
 };
 
 export const getQualityBadge = (score: number): string => {
-  if (score >= 80) return 'Excellent';
-  if (score >= 60) return 'Good';
-  if (score >= 40) return 'Needs Improvement';
-  return 'Poor';
+  if (score >= 90) return 'Excellent';
+  if (score >= 75) return 'Good';
+  if (score >= 60) return 'Acceptable';
+  return 'Needs Improvement';
 };
