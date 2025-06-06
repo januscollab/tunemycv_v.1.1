@@ -77,15 +77,6 @@ const DocumentPreviewCard: React.FC<DocumentPreviewCardProps> = ({
                     {issue.suggestion && (
                       <div className="mt-1 text-xs text-blueberry/70 dark:text-apple-core/70">
                         💡 {issue.suggestion}
-                        {issue.helpUrl && (
-                          <Button 
-                            variant="link" 
-                            className="h-auto p-0 ml-1 text-xs text-zapier-orange hover:text-zapier-orange/80"
-                            onClick={() => window.open('/help-centre#document-quality-scoring', '_blank')}
-                          >
-                            Learn more
-                          </Button>
-                        )}
                       </div>
                     )}
                   </AlertDescription>

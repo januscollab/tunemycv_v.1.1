@@ -75,7 +75,7 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
     toast({ title: 'Success', description: 'CV selected from saved CVs!' });
   };
 
-  const handleFileUpload = async (file: File, shouldSave: boolean) => {
+  const handleFileUpload = async (file: File, extractedText: string, shouldSave: boolean) => {
     const cvTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
     const maxSize = 5 * 1024 * 1024; // 5MB
     
@@ -94,7 +94,6 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
 
     try {
       setFileUploading(true);
-      const extractedText = await extractTextFromFile(file);
       
       // Only save to database if user explicitly requested it AND we're under the limit
       if (shouldSave && user?.id && savedCVs.length < 5) {

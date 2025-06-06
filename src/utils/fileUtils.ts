@@ -21,42 +21,52 @@ export const validateFileSecure = (file: File, type: 'cv' | 'job_description') =
 };
 
 export const extractTextFromFile = async (file: File): Promise<string> => {
-  // For PDF and DOCX files, use the Supabase edge function
-  if (file.type === 'application/pdf' || 
-      file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-    
+  if (file.type === 'application/pdf') {
     try {
-      const { supabase } = await import('@/integrations/supabase/client');
+      console.log(`Extracting text from PDF: ${file.name}`);
       
-      // Create FormData for the edge function
-      const formData = new FormData();
-      formData.append('file', file);
+      // Import pdf-parse dynamically
+      const pdfParse = await import('pdf-parse');
+      const arrayBuffer = await file.arrayBuffer();
+      const uint8Array = new Uint8Array(arrayBuffer);
       
-      console.log(`Extracting text from ${file.type} file: ${file.name}`);
+      const pdfData = await pdfParse.default(uint8Array);
+      const extractedText = pdfData.text;
       
-      const { data, error } = await supabase.functions.invoke('extract-document-text', {
-        body: formData,
-      });
-      
-      if (error) {
-        console.error('Edge function error:', error);
-        throw new Error(`Failed to extract text: ${error.message}`);
+      if (!extractedText || extractedText.trim().length === 0) {
+        throw new Error('No text content could be extracted from the PDF');
       }
       
-      if (!data || !data.success) {
-        throw new Error(data?.error || 'Text extraction failed');
-      }
-      
-      const extractedText = data.extractedText;
-      console.log(`Successfully extracted ${data.metadata?.wordCount || 0} words from ${file.name}`);
-      
-      return extractedText;
+      console.log(`Successfully extracted ${extractedText.split(/\s+/).length} words from ${file.name}`);
+      return extractedText.trim();
       
     } catch (error) {
-      console.error('Text extraction error:', error);
-      // Fallback to placeholder if extraction fails
-      const fallbackContent = `[Text extraction from ${file.name} failed]\n\nPlease ensure the file is not corrupted and try again. Error: ${error instanceof Error ? error.message : 'Unknown error'}`;
-      return fallbackContent;
+      console.error('PDF extraction error:', error);
+      throw new Error(`Failed to extract text from PDF: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+  
+  if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+    try {
+      console.log(`Extracting text from DOCX: ${file.name}`);
+      
+      // Import mammoth dynamically
+      const mammoth = await import('mammoth');
+      const arrayBuffer = await file.arrayBuffer();
+      
+      const result = await mammoth.extractRawText({ arrayBuffer });
+      const extractedText = result.value;
+      
+      if (!extractedText || extractedText.trim().length === 0) {
+        throw new Error('No text content could be extracted from the DOCX');
+      }
+      
+      console.log(`Successfully extracted ${extractedText.split(/\s+/).length} words from ${file.name}`);
+      return extractedText.trim();
+      
+    } catch (error) {
+      console.error('DOCX extraction error:', error);
+      throw new Error(`Failed to extract text from DOCX: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
   

@@ -20,6 +20,26 @@ export const assessDocumentQuality = (
   documentType: 'cv' | 'job_description'
 ): QualityAssessment => {
   const issues: QualityIssue[] = [];
+  
+  // Check for extraction failure first
+  const isExtractionFailure = /\[Text extraction from .+ failed\]/.test(extractedText) || 
+                             /Failed to extract text/.test(extractedText);
+  
+  if (isExtractionFailure) {
+    return {
+      score: 0,
+      issues: [{
+        type: 'error',
+        title: 'Document extraction failed',
+        description: 'Unable to extract text from this document.',
+        suggestion: 'Try uploading a different format or use the text input option instead.'
+      }],
+      isAcceptable: false,
+      wordCount: 0,
+      characterCount: extractedText.length
+    };
+  }
+  
   const wordCount = extractedText.split(/\s+/).filter(word => word.length > 0).length;
   const characterCount = extractedText.length;
   
@@ -31,8 +51,7 @@ export const assessDocumentQuality = (
       type: 'error',
       title: 'Document appears empty or too short',
       description: 'We extracted very little text from your document.',
-      suggestion: 'Try uploading a text-based PDF or DOCX file, or use the text input option instead.',
-      helpUrl: '#document-quality-scoring'
+      suggestion: 'Try uploading a text-based PDF or DOCX file, or use the text input option instead.'
     });
     score -= 40; // Reduced penalty
   } else if (documentType === 'cv' && wordCount < 75) { // Lowered threshold from 100 to 75
@@ -40,8 +59,7 @@ export const assessDocumentQuality = (
       type: 'warning',
       title: 'CV seems quite short',
       description: `We extracted ${wordCount} words, which is shorter than typical CVs.`,
-      suggestion: 'Ensure your CV includes all relevant sections like experience, education, and skills.',
-      helpUrl: '#document-quality-scoring'
+      suggestion: 'Ensure your CV includes all relevant sections like experience, education, and skills.'
     });
     score -= 10; // Reduced penalty from 20 to 10
   } else if (documentType === 'job_description' && wordCount < 50) {
@@ -49,8 +67,7 @@ export const assessDocumentQuality = (
       type: 'warning',
       title: 'Job description seems short',
       description: `We extracted ${wordCount} words, which may not include all job requirements.`,
-      suggestion: 'Make sure to include the complete job description with requirements and responsibilities.',
-      helpUrl: '#document-quality-scoring'
+      suggestion: 'Make sure to include the complete job description with requirements and responsibilities.'
     });
     score -= 10; // Reduced penalty from 15 to 10
   }
@@ -66,8 +83,7 @@ export const assessDocumentQuality = (
         type: 'warning',
         title: 'Some formatting may need review',
         description: 'A few characters may not have extracted perfectly.',
-        suggestion: 'Review the extracted text and make any necessary corrections.',
-        helpUrl: '#document-quality-scoring'
+        suggestion: 'Review the extracted text and make any necessary corrections.'
       });
       score -= 8; // Much reduced penalty from 25 to 8
     }
@@ -80,8 +96,7 @@ export const assessDocumentQuality = (
       type: 'warning',
       title: 'Document might be image-based',
       description: 'This appears to be a scanned document or image-based PDF.',
-      suggestion: 'For best results, use a text-based PDF or convert to DOCX/TXT format.',
-      helpUrl: '#document-quality-scoring'
+      suggestion: 'For best results, use a text-based PDF or convert to DOCX/TXT format.'
     });
     score -= 15; // Reduced penalty from 30 to 15
   }
@@ -110,8 +125,7 @@ export const assessDocumentQuality = (
         type: 'info',
         title: 'Contact information not clearly visible',
         description: 'We couldn\'t find an email address in your CV.',
-        suggestion: 'Ensure your contact details are clearly visible and not in headers/footers.',
-        helpUrl: '#document-quality-scoring'
+        suggestion: 'Ensure your contact details are clearly visible and not in headers/footers.'
       });
       score -= 2; // Reduced from 5 to 2
     }
@@ -121,8 +135,7 @@ export const assessDocumentQuality = (
         type: 'info',
         title: 'Experience section could be clearer',
         description: 'We couldn\'t clearly identify work experience keywords.',
-        suggestion: 'Consider using standard headings like "Experience", "Work History", or "Career".',
-        helpUrl: '#document-quality-scoring'
+        suggestion: 'Consider using standard headings like "Experience", "Work History", or "Career".'
       });
       score -= 3; // Reduced from 10 to 3
     }
@@ -132,8 +145,7 @@ export const assessDocumentQuality = (
         type: 'info',
         title: 'Education section could be clearer',
         description: 'We couldn\'t clearly identify education keywords.',
-        suggestion: 'Consider using standard headings like "Education", "Qualifications", or "Training".',
-        helpUrl: '#document-quality-scoring'
+        suggestion: 'Consider using standard headings like "Education", "Qualifications", or "Training".'
       });
       score -= 2; // Reduced from 5 to 2
     }
