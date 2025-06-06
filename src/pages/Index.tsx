@@ -5,6 +5,7 @@ import { ArrowRight, CheckCircle, FileText, Users, TrendingUp, Sparkles, Message
 import { useAuth } from '@/contexts/AuthContext';
 import HowItWorks from '@/components/HowItWorks';
 import Testimonials from '@/components/Testimonials';
+import MainFeaturesSection from '@/components/common/MainFeaturesSection';
 
 const Index = () => {
   const { user } = useAuth();
@@ -62,6 +63,9 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* Main Features Section */}
+      <MainFeaturesSection />
 
       {/* Features Grid */}
       <section className="py-10 px-4 bg-gradient-to-br from-cream/40 via-white to-zapier-orange/5 dark:from-blueberry/15 dark:via-gray-900 dark:to-zapier-orange/10">

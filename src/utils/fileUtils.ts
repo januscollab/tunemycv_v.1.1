@@ -21,44 +21,83 @@ export const validateFileSecure = (file: File, type: 'cv' | 'job_description') =
 };
 
 export const extractTextFromFile = async (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
+  // For PDF and DOCX files, use the Supabase edge function
+  if (file.type === 'application/pdf' || 
+      file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
     
-    reader.onload = () => {
-      try {
-        if (file.type === 'text/plain') {
+    try {
+      const { supabase } = await import('@/integrations/supabase/client');
+      
+      // Create FormData for the edge function
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      console.log(`Extracting text from ${file.type} file: ${file.name}`);
+      
+      const { data, error } = await supabase.functions.invoke('extract-document-text', {
+        body: formData,
+      });
+      
+      if (error) {
+        console.error('Edge function error:', error);
+        throw new Error(`Failed to extract text: ${error.message}`);
+      }
+      
+      if (!data || !data.success) {
+        throw new Error(data?.error || 'Text extraction failed');
+      }
+      
+      const extractedText = data.extractedText;
+      console.log(`Successfully extracted ${data.metadata?.wordCount || 0} words from ${file.name}`);
+      
+      return extractedText;
+      
+    } catch (error) {
+      console.error('Text extraction error:', error);
+      // Fallback to placeholder if extraction fails
+      const fallbackContent = `[Text extraction from ${file.name} failed]\n\nPlease ensure the file is not corrupted and try again. Error: ${error instanceof Error ? error.message : 'Unknown error'}`;
+      return fallbackContent;
+    }
+  }
+  
+  // For text files, use the existing file reader approach
+  if (file.type === 'text/plain') {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      
+      reader.onload = () => {
+        try {
           const content = reader.result as string;
           // Basic content validation
           if (content.length === 0) {
             reject(new Error('File appears to be empty'));
             return;
           }
-          if (content.length > 100000) { // 100KB text limit
+          if (content.length > 500000) { // 500KB text limit to match edge function
             reject(new Error('Text content too large'));
             return;
           }
           resolve(content);
-        } else {
-          // For PDF and DOCX files, return placeholder
-          const content = `[Extracted text from ${file.name}]\n\nThis is a placeholder for the actual extracted text content from the ${file.type} file.`;
-          resolve(content);
+        } catch (error) {
+          reject(new Error('Failed to process file content'));
         }
-      } catch (error) {
-        reject(new Error('Failed to process file content'));
-      }
-    };
-    
-    reader.onerror = () => {
-      reject(new Error('Failed to read file'));
-    };
-    
-    // Set a timeout for file reading
-    setTimeout(() => {
-      reject(new Error('File reading timed out'));
-    }, 30000); // 30 second timeout
-    
-    reader.readAsText(file);
-  });
+      };
+      
+      reader.onerror = () => {
+        reject(new Error('Failed to read file'));
+      };
+      
+      // Set a timeout for file reading
+      setTimeout(() => {
+        reject(new Error('File reading timed out'));
+      }, 30000); // 30 second timeout
+      
+      reader.readAsText(file);
+    });
+  }
+  
+  // Unsupported file type
+  throw new Error(`Unsupported file type: ${file.type}. Please use PDF, DOCX, or TXT files.`);
 };
 
 export const formatFileSize = (bytes: number): string => {

@@ -1,7 +1,9 @@
 
-import React from 'react';
-import { Upload, FileText, Briefcase, Check, X, Eye } from 'lucide-react';
+import React, { useState } from 'react';
+import { Upload, FileText, Briefcase, Check, X, Eye, AlertTriangle } from 'lucide-react';
 import { formatFileSize } from '@/utils/fileUtils';
+import { validateFileSecurely, createSecureFileObject } from '@/utils/secureFileValidation';
+import { useToast } from '@/hooks/use-toast';
 
 interface UploadedFile {
   file: File;
@@ -28,6 +30,9 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
   showPreview,
   uploading
 }) => {
+  const { toast } = useToast();
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  
   const isCV = type === 'cv';
   const title = isCV ? 'Upload Your CV' : 'Job Description';
   const subtitle = isCV 
@@ -35,6 +40,27 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
     : 'Upload a file (PDF, DOCX, TXT) or paste the text directly';
   const acceptTypes = isCV ? '.pdf,.docx' : '.pdf,.docx,.txt';
   const Icon = isCV ? FileText : Briefcase;
+  
+  const handleFileSelect = (file: File) => {
+    setValidationErrors([]);
+    
+    // Perform security validation
+    const validation = validateFileSecurely(file, type);
+    
+    if (!validation.isValid) {
+      setValidationErrors(validation.errors);
+      toast({
+        title: "File validation failed",
+        description: validation.errors[0],
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Create secure file object with sanitized name
+    const secureFile = createSecureFileObject(file, validation.sanitizedName!);
+    onFileUpload(secureFile, type);
+  };
 
   return (
     <div className="bg-card rounded-lg shadow-sm p-6 border border-card-border transition-all duration-normal hover:shadow-md">
@@ -51,7 +77,7 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
               type="file"
               className="hidden"
               accept={acceptTypes}
-              onChange={(e) => e.target.files?.[0] && onFileUpload(e.target.files[0], type)}
+              onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0])}
               disabled={uploading}
             />
           </label>
@@ -82,6 +108,22 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
             >
               <X className="h-4 w-4" />
             </button>
+          </div>
+        </div>
+      )}
+      
+      {validationErrors.length > 0 && (
+        <div className="mt-4 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+          <div className="flex items-start space-x-2">
+            <AlertTriangle className="h-4 w-4 text-destructive mt-0.5 flex-shrink-0" />
+            <div className="flex-1">
+              <p className="text-sm font-medium text-destructive mb-1">File validation errors:</p>
+              <ul className="text-sm text-destructive/80 list-disc list-inside space-y-1">
+                {validationErrors.map((error, index) => (
+                  <li key={index}>{error}</li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       )}

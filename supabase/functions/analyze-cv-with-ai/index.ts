@@ -6,6 +6,10 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'DENY',
+  'X-XSS-Protection': '1; mode=block',
+  'Referrer-Policy': 'strict-origin-when-cross-origin'
 };
 
 interface AnalysisRequest {
@@ -678,13 +682,33 @@ INSTRUCTIONS:
       });
     }
     
+    // Sanitize error message to prevent information disclosure
+    let sanitizedError = 'An error occurred during analysis. Please try again.';
+    
+    // Only include specific error details for certain safe error types
+    if (error.message.includes('Rate limit exceeded') || 
+        error.message.includes('Insufficient credits') ||
+        error.message.includes('Invalid content detected') ||
+        error.message.includes('required and must be a string') ||
+        error.message.includes('exceeds maximum length') ||
+        error.message.includes('must be at least') ||
+        error.message.includes('cannot be empty')) {
+      sanitizedError = error.message;
+    }
+    
+    // Determine appropriate HTTP status code
+    let statusCode = 500;
+    if (error.message.includes('Rate limit exceeded')) statusCode = 429;
+    if (error.message.includes('Insufficient credits')) statusCode = 402;
+    if (error.message.includes('Invalid content detected')) statusCode = 400;
+    if (error.message.includes('required') || error.message.includes('exceeds maximum')) statusCode = 400;
+
     return new Response(
       JSON.stringify({ 
-        error: error.message,
-        fallback: true
+        error: sanitizedError // Only return sanitized error to user
       }),
       { 
-        status: 500, 
+        status: statusCode, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       }
     );

@@ -50,6 +50,7 @@ export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
         'analyze': 'CV Analysis',
         'cover-letter': 'Cover Letter',
         'interview-prep': 'Interview Prep',
+        'interview-toolkit': 'Interview Toolkit',
         'profile': 'Profile',
         'admin': 'Admin Dashboard',
         'help-centre': 'Help Centre',
