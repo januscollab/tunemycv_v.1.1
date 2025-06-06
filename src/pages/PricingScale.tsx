@@ -111,7 +111,7 @@ const PricingScale = () => {
                     </div>
                     <div className="flex items-center space-x-2">
                       <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-earth/80 dark:text-white/80">Access to all features all of the time, no gate keeping the good stuff</span>
+                      <span className="text-earth/80 dark:text-white/80">Access all features all of the time, no gate keeping</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <Check className="h-4 w-4 text-green-600" />
@@ -202,11 +202,11 @@ const PricingScale = () => {
                          <span className="text-2xl text-earth dark:text-white font-bold transition-all duration-300 hover:text-zapier-orange hover:scale-110">${currentTier.price}</span>
                          <span className="text-xl text-earth dark:text-white">for</span>
                          <span className="text-2xl text-earth dark:text-white font-bold transition-all duration-300 hover:text-zapier-orange hover:scale-110">{currentTier.credits} Credits</span>
-                        {currentTier.savings && (
-                          <Badge className="bg-green-100 text-green-800 ml-3 px-4 py-1.5 text-sm animate-pulse hover:animate-none hover:scale-110 transition-transform duration-200">
-                            {currentTier.savings}
-                          </Badge>
-                        )}
+                         {currentTier.savings && (
+                           <Badge className="bg-green-100 text-green-800 ml-3 px-4 py-1.5 text-sm hover:scale-110 transition-transform duration-200">
+                             {currentTier.savings}
+                           </Badge>
+                         )}
                       </div>
                       <div className="text-lg font-medium text-earth/80 dark:text-white/80">
                         Apply for {currentTier.roles} Roles
