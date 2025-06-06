@@ -6,6 +6,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { useToast } from '@/hooks/use-toast';
 import { formatFileSize } from '@/utils/fileUtils';
 import { assessDocumentQuality, getQualityColor, getQualityBadge } from '@/utils/documentQuality';
 
@@ -31,6 +33,7 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
   const [editedText, setEditedText] = useState(extractedText);
   const [isSaving, setIsSaving] = useState(false);
   const [qualityExpanded, setQualityExpanded] = useState(true);
+  const { toast } = useToast();
   
   const quality = assessDocumentQuality(editedText, fileName, documentType);
   
@@ -157,17 +160,35 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
           <div className="flex-1 flex flex-col p-6">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-medium text-foreground">Extracted Text</h3>
-              <div className="text-xs text-muted-foreground">
-                Review and edit the extracted text below
+              <div className="flex items-center space-x-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-xs"
+                  onClick={() => {
+                    // TODO: Implement AI fix functionality
+                    toast({
+                      title: "Coming Soon!",
+                      description: "This feature will automatically format and clean up your document text using AI for 1 credit.",
+                    });
+                  }}
+                >
+                  ✨ Let AI Fix It (1 credit)
+                </Button>
+                <div className="text-xs text-muted-foreground">
+                  Review and edit the extracted text below
+                </div>
               </div>
             </div>
             
-            <Textarea
-              value={editedText}
-              onChange={(e) => setEditedText(e.target.value)}
-              className="flex-1 min-h-[600px] font-mono text-sm resize-none border focus:border-primary/50 bg-background"
-              placeholder="Document text appears here..."
-            />
+            <ScrollArea className="flex-1 h-[600px] border rounded-md">
+              <Textarea
+                value={editedText}
+                onChange={(e) => setEditedText(e.target.value)}
+                className="min-h-[580px] font-mono text-sm resize-none border-0 focus:border-0 focus:outline-none bg-background p-4"
+                placeholder="Document text appears here..."
+              />
+            </ScrollArea>
           </div>
         </div>
 

@@ -20,22 +20,25 @@ export const validateFileSecure = (file: File, type: 'cv' | 'job_description') =
   return validateFileSecurely(file, type);
 };
 
-// Smart text formatting cleanup
+// Smart text formatting cleanup that preserves document structure
 const cleanExtractedText = (text: string): string => {
   return text
-    // Fix smart quotes
+    // Fix smart quotes but preserve formatting
     .replace(/[""]/g, '"')
     .replace(/['']/g, "'")
-    // Normalize bullet points
-    .replace(/[•·‐−–—]/g, '-')
-    // Fix em-dashes and en-dashes
-    .replace(/[–—]/g, '-')
-    // Clean up excessive whitespace
-    .replace(/\s+/g, ' ')
-    // Fix line breaks (preserve intentional breaks but clean up excessive ones)
-    .replace(/\n\s*\n\s*\n+/g, '\n\n')
-    // Trim each line
-    .split('\n').map(line => line.trim()).join('\n')
+    // Normalize bullet points while preserving their structure
+    .replace(/[•·‐−]/g, '• ')
+    .replace(/[–—]/g, '- ')
+    // Clean up excessive blank lines (more than 2 consecutive)
+    .replace(/\n\s*\n\s*\n\s*\n+/g, '\n\n\n')
+    // Remove trailing spaces from lines but preserve line structure
+    .split('\n').map(line => line.replace(/\s+$/, '')).join('\n')
+    // Clean up excessive spaces within lines (but keep intentional spacing)
+    .replace(/ {3,}/g, '  ')
+    // Preserve headers and sections by detecting patterns
+    .replace(/^([A-Z][A-Z\s]{2,})$/gm, '\n$1\n')
+    // Ensure proper spacing around section headers
+    .replace(/\n\n\n([A-Z][A-Z\s]{2,})\n\n\n/g, '\n\n$1\n\n')
     .trim();
 };
 
@@ -44,13 +47,35 @@ export const extractTextFromFile = async (file: File): Promise<string> => {
     try {
       console.log(`Extracting text from PDF: ${file.name}`);
       
-      // Import pdf-parse dynamically
-      const pdfParse = await import('pdf-parse');
-      const arrayBuffer = await file.arrayBuffer();
-      const uint8Array = new Uint8Array(arrayBuffer);
+      // Import pdfjs-dist for better browser compatibility
+      const pdfjsLib = await import('pdfjs-dist');
       
-      const pdfData = await pdfParse.default(uint8Array);
-      let extractedText = pdfData.text;
+      // Set up worker if not already configured
+      if (!pdfjsLib.GlobalWorkerOptions.workerSrc) {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js`;
+      }
+      
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      
+      let extractedText = '';
+      
+      // Extract text from all pages
+      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        const page = await pdf.getPage(pageNum);
+        const textContent = await page.getTextContent();
+        
+        // Combine text items with proper spacing
+        const pageText = textContent.items
+          .map((item: any) => item.str)
+          .join(' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+          
+        if (pageText) {
+          extractedText += (extractedText ? '\n\n' : '') + pageText;
+        }
+      }
       
       if (!extractedText || extractedText.trim().length === 0) {
         throw new Error('No text content could be extracted from the PDF');
