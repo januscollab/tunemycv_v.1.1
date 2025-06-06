@@ -16,31 +16,31 @@ const AnalyzeButton: React.FC<AnalyzeButtonProps> = ({
   hasCreditsForAI
 }) => {
   return (
-    <div className="bg-white dark:bg-earth/10 rounded-lg shadow-sm p-5 border border-gray-200 dark:border-gray-700">
+    <div className="bg-card rounded-lg shadow-sm p-5 border border-card-border transition-all duration-normal hover:shadow-md">
       <div className="text-center">
         <button
           onClick={onAnalyze}
           disabled={!canAnalyze || analyzing}
-          className={`w-full py-4 px-6 rounded-lg text-lg transition-colors ${
+          className={`w-full py-4 px-6 rounded-lg text-lg font-semibold transition-all duration-normal group ${
             canAnalyze && !analyzing
-              ? 'bg-zapier-orange text-white hover:bg-zapier-orange/90'
-              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98]'
+              : 'bg-muted text-muted-foreground cursor-not-allowed'
           }`}
         >
           {analyzing ? (
             <div className="flex items-center justify-center space-x-2">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <span>Analyzing CV...</span>
+              <Loader2 className="h-5 w-5 animate-spin" />
+              <span className="animate-pulse">Analyzing CV...</span>
             </div>
           ) : (
-            <div className="flex items-center justify-center space-x-2">
-              <BarChart3 className="h-4 w-4" />
+            <div className="flex items-center justify-center space-x-2 group-hover:space-x-3 transition-all duration-normal">
+              <BarChart3 className="h-5 w-5 group-hover:scale-110 transition-transform duration-normal" />
               <span>Start AI Analysis of CV</span>
             </div>
           )}
         </button>
         
-        <p className="text-xs text-earth/60 dark:text-apple-core/70 mt-3">
+        <p className="text-sm text-muted-foreground mt-3 transition-colors duration-normal">
           {hasCreditsForAI 
             ? "Get detailed AI-powered insights and recommendations"
             : "Receive comprehensive analysis with actionable feedback"
@@ -48,9 +48,11 @@ const AnalyzeButton: React.FC<AnalyzeButtonProps> = ({
         </p>
         
         {!canAnalyze && !analyzing && (
-          <p className="text-xs text-red-600 mt-2">
-            Please upload both CV and job description to continue
-          </p>
+          <div className="mt-3 p-2 bg-destructive/10 border border-destructive/20 rounded-md">
+            <p className="text-sm text-destructive font-medium">
+              Please upload both CV and job description to continue
+            </p>
+          </div>
         )}
       </div>
     </div>

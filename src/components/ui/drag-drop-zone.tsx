@@ -130,14 +130,15 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
   return (
     <div
       className={cn(
-        "relative border-2 border-dashed rounded-lg p-6 text-center transition-all duration-200",
+        "relative border-2 border-dashed rounded-lg p-6 text-center transition-all duration-300 group",
         isDragOver && !dragError 
-          ? "border-primary bg-primary/5 scale-[1.02]" 
-          : "border-border hover:border-primary/50",
+          ? "border-primary bg-primary/10 scale-[1.02] shadow-lg" 
+          : "border-border hover:border-primary/50 hover:bg-accent/30",
         dragError && isDragOver
-          ? "border-destructive bg-destructive/5"
+          ? "border-destructive bg-destructive/10 animate-pulse"
           : "",
         disabled && "opacity-50 cursor-not-allowed",
+        !disabled && "hover:scale-[1.01]",
         className
       )}
       onDragOver={handleDragOver}
@@ -157,25 +158,25 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
         <div className="space-y-2">
           <div className="mx-auto w-12 h-12 flex items-center justify-center">
             {dragError ? (
-              <AlertCircle className="h-8 w-8 text-destructive" />
+              <AlertCircle className="h-8 w-8 text-destructive animate-bounce" />
             ) : (
               <Upload className={cn(
-                "h-8 w-8 transition-colors",
-                isDragOver ? "text-primary" : "text-muted-foreground"
+                "h-8 w-8 transition-all duration-300 group-hover:scale-110",
+                isDragOver ? "text-primary animate-pulse" : "text-muted-foreground"
               )} />
             )}
           </div>
           
           <div>
             <p className={cn(
-              "font-medium transition-colors",
-              dragError ? "text-destructive" : 
-              isDragOver ? "text-primary" : "text-foreground"
+              "font-medium transition-all duration-300",
+              dragError ? "text-destructive animate-pulse" : 
+              isDragOver ? "text-primary" : "text-foreground group-hover:text-primary"
             )}>
               {dragError || placeholder}
             </p>
             {!dragError && (
-              <p className="text-sm text-muted-foreground mt-1">
+              <p className="text-sm text-muted-foreground mt-1 transition-colors duration-300 group-hover:text-muted-foreground/80">
                 {description} {accept && `(${accept})`}
                 {maxSize && ` • Max ${(maxSize / 1024 / 1024).toFixed(1)}MB`}
               </p>
@@ -185,7 +186,7 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
       )}
       
       {isDragOver && !dragError && (
-        <div className="absolute inset-0 bg-primary/10 rounded-lg pointer-events-none animate-pulse" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/10 rounded-lg pointer-events-none animate-pulse border-2 border-primary/30" />
       )}
     </div>
   );
