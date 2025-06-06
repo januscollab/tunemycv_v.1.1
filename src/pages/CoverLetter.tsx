@@ -964,7 +964,7 @@ const AuthenticatedCoverLetter = () => {
       </div>
       
       {/* Quick Actions */}
-      <QuickActions showBackForward={true} />
+      <QuickActions />
     </div>
   );
 };

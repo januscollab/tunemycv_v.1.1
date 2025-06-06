@@ -6,12 +6,11 @@ import {
   FileText, 
   Edit, 
   MessageSquare, 
-  ArrowLeft, 
-  ArrowRight,
   Menu,
   X,
   Zap
 } from 'lucide-react';
+import { FloatingFeedbackForm } from './FloatingFeedbackForm';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -29,17 +28,16 @@ interface QuickAction {
 interface QuickActionsProps {
   customActions?: QuickAction[];
   position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left';
-  showBackForward?: boolean;
   className?: string;
 }
 
 export const QuickActions: React.FC<QuickActionsProps> = ({
   customActions,
   position = 'bottom-right',
-  showBackForward = true,
   className
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
@@ -68,6 +66,13 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
       href: '/analyze?tab=interview-prep',
       variant: 'secondary',
       requiresAuth: true
+    },
+    {
+      id: 'feedback',
+      label: 'Feedback',
+      icon: <MessageSquare className="w-5 h-5" />,
+      variant: 'outline',
+      onClick: () => setShowFeedback(true)
     }
   ];
 
@@ -92,12 +97,13 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
     setIsOpen(false);
   };
 
-  const handleBack = () => {
-    window.history.back();
-  };
-
-  const handleForward = () => {
-    window.history.forward();
+  const getCurrentPage = () => {
+    const pathname = location.pathname;
+    if (pathname === '/') return 'homepage';
+    if (pathname.includes('/analyze')) return 'analyze';
+    if (pathname.includes('/resources')) return 'resources';
+    if (pathname.includes('/profile')) return 'profile';
+    return 'default';
   };
 
   // Don't show quick actions on auth page or home page for non-authenticated users
@@ -109,42 +115,6 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
     <TooltipProvider>
       <div className={cn("fixed z-40", positionClasses[position], className)}>
         <div className="flex flex-col items-end space-y-3">
-          {/* Back/Forward Navigation */}
-          {showBackForward && (
-            <div className="flex space-x-2 mb-2">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    size="icon"
-                    variant="outline"
-                    onClick={handleBack}
-                    className="w-10 h-10 rounded-full shadow-lg hover:scale-110 transition-transform duration-200"
-                  >
-                    <ArrowLeft className="w-4 h-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="left">
-                  <p>Go Back</p>
-                </TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    size="icon"
-                    variant="outline"
-                    onClick={handleForward}
-                    className="w-10 h-10 rounded-full shadow-lg hover:scale-110 transition-transform duration-200"
-                  >
-                    <ArrowRight className="w-4 h-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="left">
-                  <p>Go Forward</p>
-                </TooltipContent>
-              </Tooltip>
-            </div>
-          )}
 
           {/* Quick Actions */}
           {filteredActions.length > 0 && (
@@ -201,6 +171,48 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
           )}
         </div>
       </div>
+
+      {/* Feedback Modal */}
+      {showFeedback && (
+        <>
+          <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-all duration-300 animate-fade-in"
+            onClick={() => setShowFeedback(false)}
+          />
+          
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-hidden border border-gray-200 dark:border-gray-700 animate-scale-in">
+              <div className="bg-zapier-orange/10 dark:bg-zapier-orange/5 border-b border-zapier-orange/20 p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-xl font-bold text-earth dark:text-white flex items-center gap-2">
+                      <MessageSquare className="h-5 w-5 text-zapier-orange" />
+                      Share Your Feedback
+                    </h2>
+                    <p className="text-sm text-earth/70 dark:text-white/70 mt-1">
+                      Help us improve TuneMyCV
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setShowFeedback(false)}
+                    className="text-earth/60 hover:text-earth dark:text-white/60 dark:hover:text-white transition-colors p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+                    aria-label="Close feedback form"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+                <FloatingFeedbackForm 
+                  onClose={() => setShowFeedback(false)} 
+                  currentPage={getCurrentPage()}
+                />
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </TooltipProvider>
   );
 };

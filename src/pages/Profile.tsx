@@ -30,7 +30,7 @@ const Profile = () => {
         credits={credits}
         memberSince={memberSince}
       />
-      <QuickActions showBackForward={true} />
+      <QuickActions />
     </div>
   );
 };
