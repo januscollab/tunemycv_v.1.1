@@ -20,6 +20,25 @@ export const validateFileSecure = (file: File, type: 'cv' | 'job_description') =
   return validateFileSecurely(file, type);
 };
 
+// Smart text formatting cleanup
+const cleanExtractedText = (text: string): string => {
+  return text
+    // Fix smart quotes
+    .replace(/[""]/g, '"')
+    .replace(/['']/g, "'")
+    // Normalize bullet points
+    .replace(/[•·‐−–—]/g, '-')
+    // Fix em-dashes and en-dashes
+    .replace(/[–—]/g, '-')
+    // Clean up excessive whitespace
+    .replace(/\s+/g, ' ')
+    // Fix line breaks (preserve intentional breaks but clean up excessive ones)
+    .replace(/\n\s*\n\s*\n+/g, '\n\n')
+    // Trim each line
+    .split('\n').map(line => line.trim()).join('\n')
+    .trim();
+};
+
 export const extractTextFromFile = async (file: File): Promise<string> => {
   if (file.type === 'application/pdf') {
     try {
@@ -31,14 +50,17 @@ export const extractTextFromFile = async (file: File): Promise<string> => {
       const uint8Array = new Uint8Array(arrayBuffer);
       
       const pdfData = await pdfParse.default(uint8Array);
-      const extractedText = pdfData.text;
+      let extractedText = pdfData.text;
       
       if (!extractedText || extractedText.trim().length === 0) {
         throw new Error('No text content could be extracted from the PDF');
       }
       
+      // Apply smart formatting cleanup
+      extractedText = cleanExtractedText(extractedText);
+      
       console.log(`Successfully extracted ${extractedText.split(/\s+/).length} words from ${file.name}`);
-      return extractedText.trim();
+      return extractedText;
       
     } catch (error) {
       console.error('PDF extraction error:', error);
@@ -55,14 +77,17 @@ export const extractTextFromFile = async (file: File): Promise<string> => {
       const arrayBuffer = await file.arrayBuffer();
       
       const result = await mammoth.extractRawText({ arrayBuffer });
-      const extractedText = result.value;
+      let extractedText = result.value;
       
       if (!extractedText || extractedText.trim().length === 0) {
         throw new Error('No text content could be extracted from the DOCX');
       }
       
+      // Apply smart formatting cleanup
+      extractedText = cleanExtractedText(extractedText);
+      
       console.log(`Successfully extracted ${extractedText.split(/\s+/).length} words from ${file.name}`);
-      return extractedText.trim();
+      return extractedText;
       
     } catch (error) {
       console.error('DOCX extraction error:', error);
@@ -77,7 +102,7 @@ export const extractTextFromFile = async (file: File): Promise<string> => {
       
       reader.onload = () => {
         try {
-          const content = reader.result as string;
+          let content = reader.result as string;
           // Basic content validation
           if (content.length === 0) {
             reject(new Error('File appears to be empty'));
@@ -87,6 +112,10 @@ export const extractTextFromFile = async (file: File): Promise<string> => {
             reject(new Error('Text content too large'));
             return;
           }
+          
+          // Apply smart formatting cleanup
+          content = cleanExtractedText(content);
+          
           resolve(content);
         } catch (error) {
           reject(new Error('Failed to process file content'));

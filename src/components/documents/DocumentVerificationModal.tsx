@@ -53,17 +53,19 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-5xl max-h-[95vh] flex flex-col p-0">
-        {/* Header */}
-        <DialogHeader className="px-6 py-4 border-b border-border">
+      <DialogContent className="max-w-7xl max-h-[95vh] flex flex-col p-0">
+        {/* Compact Header */}
+        <DialogHeader className="px-6 py-3 border-b border-border bg-background">
           <div className="flex items-center justify-between">
-            <div>
-              <DialogTitle className="text-xl font-semibold text-foreground">
-                Review & Verify Document
+            <div className="flex items-center space-x-4">
+              <DialogTitle className="text-lg font-semibold text-foreground">
+                Review Document
               </DialogTitle>
-              <div className="flex items-center space-x-4 mt-2 text-sm text-muted-foreground">
+              <div className="flex items-center space-x-3 text-sm text-muted-foreground">
                 <span className="font-medium">{fileName}</span>
+                <span>•</span>
                 <span>{formatFileSize(fileSize)}</span>
+                <span>•</span>
                 <span>{quality.wordCount} words</span>
                 <Badge 
                   variant="outline" 
@@ -80,17 +82,17 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
           {/* Quality Assessment Panel - Collapsible */}
           <Collapsible open={qualityExpanded} onOpenChange={setQualityExpanded}>
             <CollapsibleTrigger asChild>
-              <div className="px-6 py-4 border-b border-border bg-muted/30 cursor-pointer hover:bg-muted/50 transition-colors">
+              <div className="px-6 py-3 border-b border-border bg-muted/20 cursor-pointer hover:bg-muted/40 transition-colors">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
-                    <h3 className="font-medium text-foreground">Document Quality Assessment</h3>
+                    <h3 className="text-sm font-medium text-foreground">Quality Assessment</h3>
                     <div className="flex items-center space-x-2">
-                      <div className={`text-lg font-bold ${getQualityColor(quality.score)}`}>
+                      <div className={`text-sm font-bold ${getQualityColor(quality.score)}`}>
                         {quality.score}%
                       </div>
                       {quality.issues.length > 0 && (
                         <Badge variant="secondary" className="text-xs">
-                          {quality.issues.length} issue{quality.issues.length !== 1 ? 's' : ''}
+                          {quality.issues.length} note{quality.issues.length !== 1 ? 's' : ''}
                         </Badge>
                       )}
                     </div>
@@ -106,91 +108,71 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
             
             <CollapsibleContent>
               <div className="px-6 py-4 border-b border-border bg-muted/10">
-                <div className="grid grid-cols-3 gap-6">
+                <div className="flex items-start space-x-8">
                   {/* Document Stats */}
-                  <div className="space-y-2">
-                    <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                      Document Stats
+                  <div className="flex space-x-8">
+                    <div className="text-center">
+                      <div className="text-xl font-bold text-foreground">{quality.wordCount}</div>
+                      <div className="text-xs text-muted-foreground">Words</div>
                     </div>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <div className="font-semibold text-foreground text-lg">{quality.wordCount}</div>
-                        <div className="text-xs text-muted-foreground">Words</div>
-                      </div>
-                      <div>
-                        <div className="font-semibold text-foreground text-lg">{quality.characterCount}</div>
-                        <div className="text-xs text-muted-foreground">Characters</div>
-                      </div>
+                    <div className="text-center">
+                      <div className="text-xl font-bold text-foreground">{Math.round(quality.characterCount / 1000)}k</div>
+                      <div className="text-xs text-muted-foreground">Characters</div>
+                    </div>
+                    <div className="text-center">
+                      <div className={`text-xl font-bold ${getQualityColor(quality.score)}`}>{quality.score}%</div>
+                      <div className="text-xs text-muted-foreground">Quality</div>
                     </div>
                   </div>
 
-                  {/* Quality Issues */}
-                  <div className="col-span-2 space-y-2">
-                    <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                      Quality Issues
-                    </div>
+                  {/* Quality Notes */}
+                  <div className="flex-1">
                     {quality.issues.length === 0 ? (
-                      <div className="text-sm text-muted-foreground italic">No issues detected</div>
+                      <div className="text-sm text-muted-foreground italic">Perfect extraction - no issues detected</div>
                     ) : (
-                      <div className="space-y-2 max-h-32 overflow-y-auto">
-                        {quality.issues.map((issue, index) => (
-                          <Alert key={index} className="py-2 text-xs">
-                            <div className="flex items-start space-x-2">
-                              {getIssueIcon(issue.type)}
-                              <div className="flex-1 min-w-0">
-                                <AlertDescription>
-                                  <div className="font-medium">{issue.title}</div>
-                                  <div className="text-muted-foreground mt-1">{issue.description}</div>
-                                  {issue.suggestion && (
-                                    <div className="mt-1 text-primary">
-                                      💡 {issue.suggestion}
-                                    </div>
-                                  )}
-                                </AlertDescription>
-                              </div>
+                      <div className="space-y-2">
+                        {quality.issues.slice(0, 3).map((issue, index) => (
+                          <div key={index} className="flex items-start space-x-2 text-xs">
+                            {getIssueIcon(issue.type)}
+                            <div>
+                              <span className="font-medium">{issue.title}:</span>{' '}
+                              <span className="text-muted-foreground">{issue.description}</span>
                             </div>
-                          </Alert>
+                          </div>
                         ))}
+                        {quality.issues.length > 3 && (
+                          <div className="text-xs text-muted-foreground">
+                            + {quality.issues.length - 3} more notes
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
                 </div>
-
-                {!quality.isAcceptable && (
-                  <Alert className="mt-4 border-yellow-200 bg-yellow-50 dark:bg-yellow-900/20">
-                    <AlertTriangle className="h-4 w-4 text-yellow-600" />
-                    <AlertDescription className="text-sm">
-                      <div className="font-medium">Quality concerns detected</div>
-                      <div className="text-xs mt-1">
-                        Consider improving your document quality for better analysis results.
-                      </div>
-                    </AlertDescription>
-                  </Alert>
-                )}
               </div>
             </CollapsibleContent>
           </Collapsible>
 
-          {/* Text Editor - Full Width */}
+          {/* Full-Width Text Editor */}
           <div className="flex-1 flex flex-col p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-medium text-foreground">Extracted Text</h3>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-medium text-foreground">Extracted Text</h3>
               <div className="text-xs text-muted-foreground">
-                Edit the text below to fix any extraction issues
+                Review and edit the extracted text below
               </div>
             </div>
             
             <Textarea
               value={editedText}
               onChange={(e) => setEditedText(e.target.value)}
-              className="flex-1 min-h-[500px] font-mono text-sm resize-none border-2 focus:border-primary"
+              className="flex-1 min-h-[600px] font-mono text-sm resize-none border focus:border-primary/50 bg-background"
               placeholder="Document text appears here..."
             />
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="flex items-center justify-end space-x-3 px-6 py-4 border-t border-border bg-muted/20">
+        {/* Clean Footer */}
+        <div className="flex items-center justify-end space-x-3 px-6 py-4 border-t border-border bg-background">
           <Button 
             variant="outline" 
             onClick={onClose}
