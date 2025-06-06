@@ -90,7 +90,7 @@ const PricingScale = () => {
         </div>
 
         {/* Pricing Slider */}
-        <div className="mb-16 w-4/5 mx-auto">
+        <div className="mb-16 w-full">
           <Card className="bg-white dark:bg-blueberry/20 border-2 border-zapier-orange/50 dark:border-zapier-orange/60 p-8 shadow-xl shadow-zapier-orange/20 hover:shadow-2xl hover:shadow-zapier-orange/30 transition-all duration-500 hover:scale-[1.02] relative overflow-hidden group">
             {/* Animated background gradient */}
             <div className="absolute inset-0 bg-gradient-to-br from-zapier-orange/5 via-transparent to-citrus/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -162,16 +162,16 @@ const PricingScale = () => {
                       >
                         {tier.isEnterprise ? (
                           <div className="space-y-1 text-center cursor-pointer group hover:scale-105 transition-transform duration-200" onClick={() => setSelectedTier(index)}>
-                            <div className="text-lg font-bold text-earth dark:text-white group-hover:text-zapier-orange transition-colors">Enterprise</div>
-                            <div className="text-base text-earth/70 dark:text-white/70 group-hover:text-zapier-orange/70 transition-colors">Let's talk</div>
+                            <div className="text-lg font-bold text-earth dark:text-white hover:text-zapier-orange transition-colors">Enterprise</div>
+                            <div className="text-base text-earth/70 dark:text-white/70 hover:text-zapier-orange/70 transition-colors">Let's talk</div>
                           </div>
                         ) : (
                           <div 
                             className="space-y-1 text-center cursor-pointer group hover:scale-110 transition-all duration-300 hover:transform hover:-translate-y-1"
                             onClick={() => setSelectedTier(index)}
                           >
-                            <div className="text-lg font-bold text-earth dark:text-white group-hover:text-zapier-orange transition-all duration-300 group-hover:scale-110">${tier.price}</div>
-                            <div className="text-base text-earth/70 dark:text-white/70 group-hover:text-zapier-orange/70 transition-all duration-300">{tier.credits} Credits</div>
+                            <div className="text-lg font-bold text-earth dark:text-white hover:text-zapier-orange transition-all duration-300 hover:scale-110">${tier.price}</div>
+                            <div className="text-base text-earth/70 dark:text-white/70 hover:text-zapier-orange/70 transition-all duration-300">{tier.credits} Credits</div>
                           </div>
                         )}
                       </div>
@@ -187,11 +187,13 @@ const PricingScale = () => {
                 <div className="space-y-3">
                   {currentTier.isEnterprise ? (
                     <>
-                      <h3 className="text-4xl text-zapier-orange mb-2">
-                        Enterprise
-                      </h3>
-                      <div className="text-lg text-earth/70 dark:text-white/70">
-                        Let's talk
+                      <div className="space-y-1">
+                        <h3 className="text-4xl text-earth dark:text-white hover:text-zapier-orange transition-colors duration-300 mb-2">
+                          Enterprise
+                        </h3>
+                        <div className="text-lg text-earth/70 dark:text-white/70 hover:text-zapier-orange/70 transition-colors duration-300">
+                          Let's talk
+                        </div>
                       </div>
                     </>
                   ) : (
