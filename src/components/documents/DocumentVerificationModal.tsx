@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { X, Save, AlertTriangle, CheckCircle, Info, ChevronDown, ChevronUp } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -32,10 +32,40 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
 }) => {
   const [editedText, setEditedText] = useState(extractedText);
   const [isSaving, setIsSaving] = useState(false);
+  const [isAutoSaving, setIsAutoSaving] = useState(false);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [qualityExpanded, setQualityExpanded] = useState(true);
   const { toast } = useToast();
   
   const quality = assessDocumentQuality(editedText, fileName, documentType);
+
+  // Debounced autosave function
+  const debouncedAutoSave = useCallback(
+    debounce(async (text: string) => {
+      if (text !== extractedText) {
+        setIsAutoSaving(true);
+        await new Promise(resolve => setTimeout(resolve, 300)); // Simulate save
+        onSave(text);
+        setLastSaved(new Date());
+        setIsAutoSaving(false);
+      }
+    }, 2000),
+    [extractedText, onSave]
+  );
+
+  // Auto-save effect
+  useEffect(() => {
+    if (editedText !== extractedText) {
+      debouncedAutoSave(editedText);
+    }
+  }, [editedText, debouncedAutoSave, extractedText]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      debouncedAutoSave.cancel();
+    };
+  }, [debouncedAutoSave]);
   
   const handleSave = async () => {
     setIsSaving(true);
@@ -44,6 +74,17 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
     setIsSaving(false);
     onClose();
   };
+
+  // Simple debounce function
+  function debounce<T extends (...args: any[]) => void>(func: T, delay: number) {
+    let timeoutId: NodeJS.Timeout;
+    const debounced = (...args: Parameters<T>) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => func(...args), delay);
+    };
+    debounced.cancel = () => clearTimeout(timeoutId);
+    return debounced;
+  }
 
   const getIssueIcon = (type: string) => {
     switch (type) {
@@ -81,114 +122,145 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
           </div>
         </DialogHeader>
 
-        <div className="flex-1 flex flex-col min-h-0">
-          {/* Quality Assessment Panel - Collapsible */}
-          <Collapsible open={qualityExpanded} onOpenChange={setQualityExpanded}>
-            <CollapsibleTrigger asChild>
-              <div className="px-6 py-3 border-b border-border bg-muted/20 cursor-pointer hover:bg-muted/40 transition-colors">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <h3 className="text-sm font-medium text-foreground">Quality Assessment</h3>
+        {/* Two-Column Layout: 40% Information, 60% Text Editor */}
+        <div className="flex-1 flex min-h-0">
+          {/* Left Panel - Document Information (40%) */}
+          <div className="w-2/5 border-r border-border bg-muted/5 flex flex-col">
+            {/* Quality Assessment Panel */}
+            <Collapsible open={qualityExpanded} onOpenChange={setQualityExpanded}>
+              <CollapsibleTrigger asChild>
+                <div className="px-4 py-3 border-b border-border bg-muted/20 cursor-pointer hover:bg-muted/40 transition-colors">
+                  <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
+                      <h3 className="text-sm font-medium text-foreground">Quality Assessment</h3>
                       <div className={`text-sm font-bold ${getQualityColor(quality.score)}`}>
                         {quality.score}%
                       </div>
-                      {quality.issues.length > 0 && (
-                        <Badge variant="secondary" className="text-xs">
-                          {quality.issues.length} note{quality.issues.length !== 1 ? 's' : ''}
-                        </Badge>
-                      )}
                     </div>
+                    {qualityExpanded ? (
+                      <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                    )}
                   </div>
-                  {qualityExpanded ? (
-                    <ChevronUp className="h-4 w-4 text-muted-foreground" />
-                  ) : (
-                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                  )}
                 </div>
-              </div>
-            </CollapsibleTrigger>
-            
-            <CollapsibleContent>
-              <div className="px-6 py-4 border-b border-border bg-muted/10">
-                <div className="flex items-start space-x-8">
+              </CollapsibleTrigger>
+              
+              <CollapsibleContent>
+                <div className="p-4 border-b border-border bg-muted/10">
                   {/* Document Stats */}
-                  <div className="flex space-x-8">
+                  <div className="grid grid-cols-3 gap-4 mb-4">
                     <div className="text-center">
-                      <div className="text-xl font-bold text-foreground">{quality.wordCount}</div>
+                      <div className="text-lg font-bold text-foreground">{quality.wordCount}</div>
                       <div className="text-xs text-muted-foreground">Words</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-xl font-bold text-foreground">{Math.round(quality.characterCount / 1000)}k</div>
+                      <div className="text-lg font-bold text-foreground">{Math.round(quality.characterCount / 1000)}k</div>
                       <div className="text-xs text-muted-foreground">Characters</div>
                     </div>
                     <div className="text-center">
-                      <div className={`text-xl font-bold ${getQualityColor(quality.score)}`}>{quality.score}%</div>
+                      <div className={`text-lg font-bold ${getQualityColor(quality.score)}`}>{quality.score}%</div>
                       <div className="text-xs text-muted-foreground">Quality</div>
                     </div>
                   </div>
 
                   {/* Quality Notes */}
-                  <div className="flex-1">
+                  <div className="space-y-2">
                     {quality.issues.length === 0 ? (
                       <div className="text-sm text-muted-foreground italic">Perfect extraction - no issues detected</div>
                     ) : (
-                      <div className="space-y-2">
-                        {quality.issues.slice(0, 3).map((issue, index) => (
+                      <>
+                        {quality.issues.map((issue, index) => (
                           <div key={index} className="flex items-start space-x-2 text-xs">
                             {getIssueIcon(issue.type)}
-                            <div>
+                            <div className="flex-1">
                               <span className="font-medium">{issue.title}:</span>{' '}
                               <span className="text-muted-foreground">{issue.description}</span>
                             </div>
                           </div>
                         ))}
-                        {quality.issues.length > 3 && (
-                          <div className="text-xs text-muted-foreground">
-                            + {quality.issues.length - 3} more notes
-                          </div>
-                        )}
-                      </div>
+                      </>
                     )}
                   </div>
                 </div>
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
+              </CollapsibleContent>
+            </Collapsible>
 
-          {/* Full-Width Text Editor */}
-          <div className="flex-1 flex flex-col p-6">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-medium text-foreground">Extracted Text</h3>
-              <div className="flex items-center space-x-3">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="text-xs"
-                  onClick={() => {
-                    // TODO: Implement AI fix functionality
-                    toast({
-                      title: "Coming Soon!",
-                      description: "This feature will automatically format and clean up your document text using AI for 1 credit.",
-                    });
-                  }}
-                >
-                  ✨ Let AI Fix It (1 credit)
-                </Button>
+            {/* File Information */}
+            <div className="p-4 border-b border-border">
+              <h3 className="text-sm font-medium text-foreground mb-3">File Information</h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Name:</span>
+                  <span className="font-medium text-foreground truncate ml-2">{fileName}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Size:</span>
+                  <span className="font-medium text-foreground">{formatFileSize(fileSize)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Type:</span>
+                  <span className="font-medium text-foreground capitalize">{documentType.replace('_', ' ')}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* AI Enhancement */}
+            <div className="p-4 border-b border-border">
+              <h3 className="text-sm font-medium text-foreground mb-3">AI Enhancement</h3>
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full text-xs"
+                onClick={() => {
+                  toast({
+                    title: "Coming Soon!",
+                    description: "This feature will automatically format and clean up your document text using AI for 1 credit.",
+                  });
+                }}
+              >
+                ✨ Let AI Fix It (1 credit)
+              </Button>
+            </div>
+
+            {/* Auto-save Status */}
+            <div className="p-4 flex-1 flex flex-col justify-end">
+              <div className="text-xs text-muted-foreground">
+                {isAutoSaving ? (
+                  <div className="flex items-center space-x-2">
+                    <div className="animate-spin rounded-full h-3 w-3 border border-current border-t-transparent" />
+                    <span>Auto-saving...</span>
+                  </div>
+                ) : lastSaved ? (
+                  <span>Last saved: {lastSaved.toLocaleTimeString()}</span>
+                ) : (
+                  <span>Auto-save enabled</span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Right Panel - Text Editor (60%) */}
+          <div className="w-3/5 flex flex-col">
+            <div className="px-4 py-3 border-b border-border bg-background">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-medium text-foreground">Extracted Text</h3>
                 <div className="text-xs text-muted-foreground">
-                  Review and edit the extracted text below
+                  Click to edit • Changes auto-saved
                 </div>
               </div>
             </div>
             
-            <ScrollArea className="flex-1 h-[600px] border rounded-md">
-              <Textarea
-                value={editedText}
-                onChange={(e) => setEditedText(e.target.value)}
-                className="min-h-[580px] font-mono text-sm resize-none border-0 focus:border-0 focus:outline-none bg-background p-4"
-                placeholder="Document text appears here..."
-              />
-            </ScrollArea>
+            <div className="flex-1 p-4">
+              <ScrollArea className="h-[calc(100vh-300px)] border rounded-md">
+                <Textarea
+                  value={editedText}
+                  onChange={(e) => setEditedText(e.target.value)}
+                  className="min-h-[calc(100vh-320px)] font-mono text-sm resize-none border-0 focus:border-0 focus:outline-none bg-background p-4"
+                  placeholder="Document text appears here..."
+                />
+              </ScrollArea>
+            </div>
           </div>
         </div>
 
