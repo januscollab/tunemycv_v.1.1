@@ -117,12 +117,12 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
   }
 
   return (
-    <TooltipProvider>
-      <div 
-        className={cn("fixed z-60", positionClasses[position], className)}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
+    <div 
+      className={cn("fixed z-[9999]", positionClasses[position], className)}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <TooltipProvider>
         <div className="flex flex-col items-end space-y-3">
 
           {/* Quick Actions */}
@@ -131,50 +131,67 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
               {/* Action Items */}
               <div className={cn(
                 "flex flex-col items-end space-y-3 transition-all duration-300 transform origin-bottom-right",
-                isHovered ? "scale-100 opacity-100" : "scale-0 opacity-0"
+                isHovered ? "scale-100 opacity-100 translate-x-0" : "scale-95 opacity-0 translate-x-2"
               )}>
-                {filteredActions.map((action) => (
-                  <Tooltip key={action.id}>
-                    <TooltipTrigger asChild>
-                      <Button
-                        size="icon"
-                        onClick={() => handleAction(action)}
-                        className="w-12 h-12 rounded-full shadow-lg hover:scale-110 transition-all duration-200 bg-white border-2 border-zapier-orange text-zapier-orange hover:bg-zapier-orange hover:text-white"
+                {filteredActions.map((action, index) => (
+                  <TooltipProvider key={action.id}>
+                    <Tooltip delayDuration={100}>
+                      <TooltipTrigger asChild>
+                        <Button
+                          size="icon"
+                          onClick={() => handleAction(action)}
+                          className="w-12 h-12 rounded-full shadow-lg hover:scale-110 transition-all duration-200 bg-white border-2 border-zapier-orange text-zapier-orange hover:bg-zapier-orange hover:text-white"
+                          style={{ 
+                            zIndex: 10000 + index,
+                            position: 'relative'
+                          }}
+                        >
+                          {action.icon}
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent 
+                        side="left" 
+                        sideOffset={8}
+                        className="bg-popover text-popover-foreground border border-popover-border shadow-md"
                       >
-                        {action.icon}
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="left">
-                      <p>{action.label}</p>
-                    </TooltipContent>
-                  </Tooltip>
+                        <p>{action.label}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 ))}
               </div>
 
               {/* Main Toggle Button */}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    size="icon"
-                    className={cn(
-                      "w-14 h-14 rounded-full shadow-lg transition-all duration-300",
-                      isHovered 
-                        ? "bg-zapier-orange hover:bg-zapier-orange/90 scale-110" 
-                        : "bg-zapier-orange hover:bg-zapier-orange/90 hover:scale-110"
-                    )}
+              <TooltipProvider>
+                <Tooltip delayDuration={100}>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="icon"
+                      className={cn(
+                        "w-14 h-14 rounded-full shadow-lg transition-all duration-300 relative",
+                        isHovered 
+                          ? "bg-zapier-orange hover:bg-zapier-orange/90 scale-110" 
+                          : "bg-zapier-orange hover:bg-zapier-orange/90 hover:scale-110"
+                      )}
+                      style={{ zIndex: 10000 }}
+                    >
+                      <Zap className="w-6 h-6" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent 
+                    side="left" 
+                    sideOffset={8}
+                    className="bg-popover text-popover-foreground border border-popover-border shadow-md"
                   >
-                    <Zap className="w-6 h-6" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="left">
-                  <p>Quick Actions</p>
-                </TooltipContent>
-              </Tooltip>
+                    <p>Quick Actions</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </>
           )}
         </div>
-      </div>
-    </TooltipProvider>
+      </TooltipProvider>
+    </div>
   );
 };
 
