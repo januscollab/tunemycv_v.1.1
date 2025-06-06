@@ -48,7 +48,7 @@ const AnalyzeButton: React.FC<AnalyzeButtonProps> = ({
         </p>
         
         {!canAnalyze && !analyzing && (
-          <div className="mt-3 p-2 bg-destructive/10 border border-destructive/20 rounded-md">
+          <div className="mt-3">
             <p className="text-sm text-destructive font-medium">
               Please upload both CV and job description to continue
             </p>

@@ -428,7 +428,7 @@ const InterviewToolkit = () => {
                 </TabsTrigger>
                 <TabsTrigger value="view-analysis" className="flex items-center space-x-2 text-sm">
                   <Eye className="h-4 w-4" />
-                  <span>View Results</span>
+                  <span>View Interview Notes</span>
                 </TabsTrigger>
                 <TabsTrigger value="history" className="flex items-center space-x-2 text-sm">
                   <History className="h-4 w-4" />
@@ -439,13 +439,6 @@ const InterviewToolkit = () => {
               {/* Interview Prep Tab */}
               <TabsContent value="interview-prep" className="mt-0">
                 <div className="space-y-6">
-                  {/* Step Indicator */}
-                  <StepIndicator
-                    steps={interviewSteps}
-                    currentStep={getCurrentStep()}
-                    completedSteps={getCompletedSteps()}
-                  />
-
                   {/* Coming Soon Banner */}
                   <Alert className="border-orange-200 bg-orange-50 dark:bg-orange-950 dark:border-orange-800">
                     <Clock className="h-4 w-4 text-orange-600" />
@@ -578,76 +571,26 @@ const InterviewToolkit = () => {
                     </Card>
                   )}
 
-                  {/* What should we include Section */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg font-semibold text-blueberry dark:text-citrus flex items-center">
-                        <CheckCircle className="h-5 w-5 text-zapier-orange mr-2" />
-                        What should we include
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="flex items-center space-x-3">
-                          <Checkbox
-                            id="companyProfile"
-                            checked={interviewPrepIncludes.companyProfile}
-                            onCheckedChange={(checked) => handleInterviewPrepIncludeChange('companyProfile', checked as boolean)}
-                          />
-                          <label htmlFor="companyProfile" className="text-sm font-medium text-blueberry dark:text-citrus cursor-pointer">
-                            Company Profile
-                          </label>
-                        </div>
-                        <div className="flex items-center space-x-3">
-                          <Checkbox
-                            id="recentPressReleases"
-                            checked={interviewPrepIncludes.recentPressReleases}
-                            onCheckedChange={(checked) => handleInterviewPrepIncludeChange('recentPressReleases', checked as boolean)}
-                          />
-                          <label htmlFor="recentPressReleases" className="text-sm font-medium text-blueberry dark:text-citrus cursor-pointer">
-                            Recent Press Releases
-                          </label>
-                        </div>
-                        <div className="flex items-center space-x-3">
-                          <Checkbox
-                            id="interviewTips"
-                            checked={interviewPrepIncludes.interviewTips}
-                            onCheckedChange={(checked) => handleInterviewPrepIncludeChange('interviewTips', checked as boolean)}
-                          />
-                          <label htmlFor="interviewTips" className="text-sm font-medium text-blueberry dark:text-citrus cursor-pointer">
-                            Interview Tips
-                          </label>
-                        </div>
-                        <div className="flex items-center space-x-3">
-                          <Checkbox
-                            id="getNoticedQuestions"
-                            checked={interviewPrepIncludes.getNoticedQuestions}
-                            onCheckedChange={(checked) => handleInterviewPrepIncludeChange('getNoticedQuestions', checked as boolean)}
-                          />
-                          <label htmlFor="getNoticedQuestions" className="text-sm font-medium text-blueberry dark:text-citrus cursor-pointer">
-                            Get Noticed Questions
-                          </label>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
 
-                  {/* Generate Button Card */}
-                  <Card>
-                    <CardContent className="pt-6">
-                      <div className="flex justify-center">
-                        <Button
-                          onClick={handleGenerateInterviewPrep}
-                          className="bg-zapier-orange hover:bg-zapier-orange/90 text-white px-8 py-3 text-lg font-semibold flex items-center space-x-2"
-                          size="lg"
-                          disabled
-                        >
+                  {/* Generate Button */}
+                  <div className="bg-card rounded-lg shadow-sm p-5 border border-card-border transition-all duration-normal hover:shadow-md">
+                    <div className="text-center">
+                      <button
+                        onClick={handleGenerateInterviewPrep}
+                        disabled={true}
+                        className="w-full py-4 px-6 rounded-lg text-lg font-semibold transition-all duration-normal bg-muted text-muted-foreground cursor-not-allowed"
+                      >
+                        <div className="flex items-center justify-center space-x-2">
                           <MessageSquare className="h-5 w-5" />
                           <span>Generate Interview Prep Notes</span>
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
+                        </div>
+                      </button>
+                      
+                      <p className="text-sm text-muted-foreground mt-3 transition-colors duration-normal">
+                        Coming soon - Comprehensive interview preparation materials
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </TabsContent>
 
@@ -664,19 +607,29 @@ const InterviewToolkit = () => {
                     <CardContent className="text-center py-8">
                       <MessageSquare className="h-12 w-12 text-zapier-orange mx-auto mb-4" />
                       <p className="text-gray-600 dark:text-gray-400 mb-2 font-normal">
-                        No interview prep generated yet.
+                        No interview notes generated yet.
                       </p>
                       <p className="text-sm font-normal text-gray-500">
-                        Create one in the <Button variant="link" onClick={() => setActiveTab('interview-prep')} className="text-zapier-orange hover:text-zapier-orange/80 p-0 h-auto font-normal text-sm">Interview Prep</Button> tab or view previous results in <Button variant="link" onClick={() => setActiveTab('history')} className="text-zapier-orange hover:text-zapier-orange/80 p-0 h-auto font-normal text-sm">History</Button>.
+                        Generate personalized interview preparation notes in the <Button variant="link" onClick={() => setActiveTab('interview-prep')} className="text-zapier-orange hover:text-zapier-orange/80 p-0 h-auto font-normal text-sm">Interview Prep</Button> tab or view previous notes in <Button variant="link" onClick={() => setActiveTab('history')} className="text-zapier-orange hover:text-zapier-orange/80 p-0 h-auto font-normal text-sm">History</Button>.
                       </p>
                     </CardContent>
                   </Card>
                 )}
               </TabsContent>
 
-              {/* Analysis History Tab */}
+              {/* Interview Notes History Tab */}
               <TabsContent value="history" className="mt-0">
-                <AnalysisHistoryTab credits={userCredits?.credits || 0} memberSince="" />
+                <Card className="border border-gray-200 dark:border-gray-700">
+                  <CardContent className="text-center py-8">
+                    <MessageSquare className="h-12 w-12 text-zapier-orange mx-auto mb-4" />
+                    <p className="text-gray-600 dark:text-gray-400 mb-2 font-normal">
+                      Interview Notes History
+                    </p>
+                    <p className="text-sm font-normal text-gray-500">
+                      Your generated interview preparation notes will appear here once the feature is available.
+                    </p>
+                  </CardContent>
+                </Card>
               </TabsContent>
             </Tabs>
           </div>
