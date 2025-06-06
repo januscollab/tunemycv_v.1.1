@@ -139,7 +139,7 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
                       <Button
                         size="icon"
                         onClick={() => handleAction(action)}
-                        className="w-12 h-12 rounded-full shadow-lg hover:scale-110 transition-all duration-200 bg-zapier-orange hover:bg-zapier-orange/90 text-white"
+                        className="w-12 h-12 rounded-full shadow-lg hover:scale-110 transition-all duration-200 bg-white border-2 border-zapier-orange text-zapier-orange hover:bg-zapier-orange hover:text-white"
                       >
                         {action.icon}
                       </Button>
@@ -159,8 +159,8 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
                     className={cn(
                       "w-14 h-14 rounded-full shadow-lg transition-all duration-300",
                       isHovered 
-                        ? "bg-primary hover:bg-primary/90 scale-110" 
-                        : "bg-primary hover:bg-primary/90 hover:scale-110"
+                        ? "bg-zapier-orange hover:bg-zapier-orange/90 scale-110" 
+                        : "bg-zapier-orange hover:bg-zapier-orange/90 hover:scale-110"
                     )}
                   >
                     <Zap className="w-6 h-6" />
