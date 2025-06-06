@@ -9,7 +9,6 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Save, History, RotateCcw, FileText, MessageSquare, BrainCircuit, Target, Users } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 interface PromptVersion {
@@ -56,6 +55,12 @@ const AIPromptsManagement: React.FC = () => {
     try {
       setLoading(true);
       
+      // Temporarily disable database operations until types are regenerated
+      // This will be re-enabled once the database migration is complete
+      setLoading(false);
+      toast({ title: 'Info', description: 'AI Prompts system will be available after database setup completes', variant: 'default' });
+      
+      /*
       // Fetch prompts
       const { data: promptsData, error: promptsError } = await supabase
         .from('ai_prompts')
@@ -96,6 +101,7 @@ const AIPromptsManagement: React.FC = () => {
       setPromptVersions(versionsMap);
       setCurrentContent(contentMap);
       setSelectedVersions(selectedVersionsMap);
+      */
     } catch (error) {
       console.error('Error fetching prompts:', error);
       toast({ title: 'Error', description: 'Failed to load prompts', variant: 'destructive' });
@@ -132,6 +138,10 @@ const AIPromptsManagement: React.FC = () => {
     }
 
     try {
+      // Temporarily disabled until types are regenerated
+      toast({ title: 'Info', description: 'Save functionality will be available after database setup completes', variant: 'default' });
+      
+      /*
       const prompt = prompts[savingPromptId];
       const content = currentContent[savingPromptId];
       
@@ -165,6 +175,8 @@ const AIPromptsManagement: React.FC = () => {
       await fetchPrompts();
       
       toast({ title: 'Success', description: `Prompt saved as version ${nextVersionNumber}` });
+      */
+      
       setSaveDescription('');
       setShowSaveDialog(false);
       setSavingPromptId(null);
