@@ -6,6 +6,8 @@ import { validateFile, extractTextFromFile } from '@/utils/fileUtils';
 import { useToast } from '@/hooks/use-toast';
 import { UploadedFile } from '@/types/fileTypes';
 import JobDescriptionTextInput from './JobDescriptionTextInput';
+import DocumentPreviewCard from '@/components/documents/DocumentPreviewCard';
+import DocumentVerificationModal from '@/components/documents/DocumentVerificationModal';
 
 interface JobDescriptionUploadProps {
   onJobDescriptionSet: (file: UploadedFile) => void;
@@ -19,6 +21,7 @@ const JobDescriptionUpload: React.FC<JobDescriptionUploadProps> = ({
   disabled = false
 }) => {
   const [uploading, setUploading] = useState(false);
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
   const { toast } = useToast();
 
   const jobDescTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
@@ -73,24 +76,42 @@ const JobDescriptionUpload: React.FC<JobDescriptionUploadProps> = ({
     onJobDescriptionSet(undefined as any);
   };
 
+  const handleVerificationSave = (updatedText: string) => {
+    if (!uploadedFile) return;
+    
+    const updatedFile = new File([updatedText], uploadedFile.file.name, { type: uploadedFile.file.type });
+    const updatedUploadedFile: UploadedFile = {
+      file: updatedFile,
+      extractedText: updatedText,
+      type: 'job_description'
+    };
+    
+    onJobDescriptionSet(updatedUploadedFile);
+    toast({ title: 'Success', description: 'Job description updated successfully!' });
+  };
+
   if (uploadedFile) {
     return (
-      <div className="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
-        <div className="flex items-center space-x-3">
-          <Check className="h-5 w-5 text-green-600" />
-          <div>
-            <p className="font-medium text-green-900">{uploadedFile.file.name}</p>
-            <p className="text-sm text-green-700">Job description ready</p>
-          </div>
-        </div>
-        <button
-          onClick={removeFile}
-          className="p-2 text-red-600 hover:bg-red-100 rounded-md"
-          disabled={disabled}
-        >
-          <X className="h-4 w-4" />
-        </button>
-      </div>
+      <>
+        <DocumentPreviewCard
+          fileName={uploadedFile.file.name}
+          fileSize={uploadedFile.file.size}
+          extractedText={uploadedFile.extractedText}
+          documentType="job_description"
+          onOpenVerification={() => setShowVerificationModal(true)}
+          onRemove={removeFile}
+        />
+        
+        <DocumentVerificationModal
+          isOpen={showVerificationModal}
+          onClose={() => setShowVerificationModal(false)}
+          fileName={uploadedFile.file.name}
+          fileSize={uploadedFile.file.size}
+          extractedText={uploadedFile.extractedText}
+          documentType="job_description"
+          onSave={handleVerificationSave}
+        />
+      </>
     );
   }
 

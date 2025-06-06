@@ -11,6 +11,8 @@ import { useToast } from '@/hooks/use-toast';
 import { validateFile, extractTextFromFile } from '@/utils/fileUtils';
 import FileUploadWithSave from './upload/FileUploadWithSave';
 import SavedCVList from './upload/SavedCVList';
+import DocumentPreviewCard from '@/components/documents/DocumentPreviewCard';
+import DocumentVerificationModal from '@/components/documents/DocumentVerificationModal';
 
 interface UploadedFile {
   file: File;
@@ -38,6 +40,7 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
   const [activeTab, setActiveTab] = useState<'upload' | 'saved'>('saved');
   const [selectedCVId, setSelectedCVId] = useState<string | null>(null);
   const [fileUploading, setFileUploading] = useState(false);
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
 
   // Fetch saved CVs from database
   const { data: savedCVs = [], isLoading, refetch } = useQuery({
@@ -132,6 +135,20 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
     }
   };
 
+  const handleVerificationSave = (updatedText: string) => {
+    if (!selectedCV) return;
+    
+    const updatedFile = new File([updatedText], selectedCV.file.name, { type: selectedCV.file.type });
+    const updatedUploadedFile: UploadedFile = {
+      file: updatedFile,
+      extractedText: updatedText,
+      type: 'cv'
+    };
+    
+    onCVSelect(updatedUploadedFile);
+    toast({ title: 'Success', description: 'CV updated successfully!' });
+  };
+
   return (
     <Card className="bg-white dark:bg-blueberry/20 border border-apple-core/20 dark:border-citrus/20">
       <CardHeader>
@@ -151,24 +168,26 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
       </CardHeader>
       <CardContent>
         {selectedCV ? (
-          <div className="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
-            <div className="flex items-center space-x-3">
-              <Check className="h-5 w-5 text-green-600" />
-              <div>
-                <p className="font-medium text-green-900">{selectedCV.file.name}</p>
-                <p className="text-sm text-green-700">CV ready for analysis</p>
-              </div>
-            </div>
-            <button
-              onClick={() => {
-                window.location.reload(); // Simple way to reset without complex state management
-              }}
-              className="p-2 text-red-600 hover:bg-red-100 rounded-md"
-              disabled={uploading}
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
+          <>
+            <DocumentPreviewCard
+              fileName={selectedCV.file.name}
+              fileSize={selectedCV.file.size}
+              extractedText={selectedCV.extractedText}
+              documentType="cv"
+              onOpenVerification={() => setShowVerificationModal(true)}
+              onRemove={() => window.location.reload()}
+            />
+            
+            <DocumentVerificationModal
+              isOpen={showVerificationModal}
+              onClose={() => setShowVerificationModal(false)}
+              fileName={selectedCV.file.name}
+              fileSize={selectedCV.file.size}
+              extractedText={selectedCV.extractedText}
+              documentType="cv"
+              onSave={handleVerificationSave}
+            />
+          </>
         ) : (
           <div className="space-y-4">
             {/* Tab Navigation */}

@@ -143,6 +143,32 @@ const HelpCentre = () => {
       ]
     },
     {
+      title: "Document Upload Quality",
+      icon: <FileText className="h-5 w-5" />,
+      faqs: [
+        {
+          question: "How can I improve my document upload quality?",
+          answer: "For best results: Use text-based PDFs rather than scanned images, ensure clear formatting without complex layouts, convert problematic files to DOCX or TXT format, and avoid documents with graphics or unusual fonts. You can also use our text input option for job descriptions."
+        },
+        {
+          question: "Why is my CV text extraction incomplete?",
+          answer: "Common causes include: Image-based or scanned PDFs, complex formatting with columns or text boxes, password-protected files, or corrupted documents. Try converting to a simple DOCX format or use a plain text version for better extraction."
+        },
+        {
+          question: "My job description extraction looks garbled. What should I do?",
+          answer: "For job descriptions, we recommend: Copy-pasting the text directly using our text input option, saving web-based job postings as TXT files, or simplifying the document format. This often provides much better results than PDF uploads."
+        },
+        {
+          question: "What file formats work best for document upload?",
+          answer: "Best to worst formats: 1) Plain text (TXT) - perfect extraction, 2) DOCX files with simple formatting, 3) Text-based PDFs with standard fonts, 4) Avoid: Scanned PDFs, image-based documents, or files with complex layouts."
+        },
+        {
+          question: "How do I know if my document extraction was successful?",
+          answer: "After upload, you'll see a quality assessment with your document preview. Look for: Word count that matches your expectation, readable text without symbols or garbled characters, and all key sections (contact info, experience, education) clearly visible."
+        }
+      ]
+    },
+    {
       title: "Technical Support",
       icon: <HelpCircle className="h-5 w-5" />,
       faqs: [
