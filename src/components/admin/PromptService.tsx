@@ -44,6 +44,12 @@ class PromptService {
    */
   async getPrompt(promptName: string): Promise<string | null> {
     try {
+      // Temporarily return null until database types are regenerated
+      // This will be re-enabled once the types include the new tables
+      console.log(`Prompt requested: ${promptName} - database integration pending`);
+      return null;
+      
+      /*
       // Check cache first
       if (this.isCacheValid(promptName)) {
         const cached = this.cache.get(promptName);
@@ -85,6 +91,7 @@ class PromptService {
       this.setCacheEntry(promptName, promptData);
 
       return latestVersion.content;
+      */
     } catch (error) {
       console.error(`Error fetching prompt '${promptName}':`, error);
       return null;

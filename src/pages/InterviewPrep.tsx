@@ -3,6 +3,7 @@ import React from 'react';
 import { MessageSquare } from 'lucide-react';
 import EmbeddedAuth from '@/components/auth/EmbeddedAuth';
 import ServiceExplanation from '@/components/common/ServiceExplanation';
+import QuickActions from '@/components/common/QuickActions';
 
 const InterviewPrep = () => {
   const interviewPrepExplanation = {
@@ -63,6 +64,9 @@ const InterviewPrep = () => {
           </div>
         </div>
       </div>
+      
+      {/* Quick Actions */}
+      <QuickActions />
     </div>
   );
 };
