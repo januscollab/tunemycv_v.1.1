@@ -1,10 +1,17 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, LogOut, ChevronDown, Shield } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { toast } from 'sonner';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface UserProfileDropdownProps {
   userDisplayName: string;
@@ -13,8 +20,7 @@ interface UserProfileDropdownProps {
 
 const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({ userDisplayName, isActive }) => {
   const navigate = useNavigate();
-  const [isOpen, setIsOpen] = useState(false);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = React.useState(false);
   const { signOut } = useAuth();
   const { isAdmin } = useAdminAuth();
 
@@ -37,63 +43,52 @@ const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({ userDisplayNa
   };
 
   return (
-    <div className="relative">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center px-3 py-2 text-sm font-semibold transition-colors relative ${
-          isActive('/profile')
-            ? 'text-zapier-orange'
-            : 'text-earth dark:text-white hover:text-zapier-orange'
-        }`}
-      >
-        <User className="h-4 w-4 mr-2" />
-        Profile
-        <ChevronDown className="h-4 w-4 ml-1" />
-        {isActive('/profile') && (
-          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-zapier-orange"></div>
-        )}
-      </button>
-
-      {isOpen && (
-        <>
-          <div 
-            className="fixed inset-0 z-10" 
-            onClick={() => setIsOpen(false)}
-          />
-           <div className="absolute right-0 top-full mt-1 w-48 bg-card dark:bg-surface border border-card-border rounded-lg shadow-lg z-20">
-            <Link
-              to="/profile"
-              onClick={() => setIsOpen(false)}
-              className="block px-4 py-3 text-sm text-card-foreground hover:bg-surface-hover transition-colors"
-            >
-              <User className="h-4 w-4 mr-2 inline" />
-              Profile Settings
-            </Link>
-            {isAdmin && (
-              <Link
-                to="/admin"
-                onClick={() => setIsOpen(false)}
-                className="block px-4 py-3 text-sm text-card-foreground hover:bg-surface-hover transition-colors border-t border-card-border"
-              >
-                <Shield className="h-4 w-4 mr-2 inline" />
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          className={`flex items-center px-3 py-2 text-sm font-semibold transition-colors relative ${
+            isActive('/profile')
+              ? 'text-zapier-orange'
+              : 'text-earth dark:text-white hover:text-zapier-orange'
+          }`}
+        >
+          <User className="h-4 w-4 mr-2" />
+          Profile
+          <ChevronDown className="h-4 w-4 ml-1" />
+          {isActive('/profile') && (
+            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-zapier-orange"></div>
+          )}
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-48">
+        <DropdownMenuItem asChild>
+          <Link to="/profile" className="flex items-center">
+            <User className="h-4 w-4 mr-2" />
+            Profile Settings
+          </Link>
+        </DropdownMenuItem>
+        {isAdmin && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link to="/admin" className="flex items-center">
+                <Shield className="h-4 w-4 mr-2" />
                 Admin Dashboard
               </Link>
-            )}
-            <button
-              onClick={() => {
-                setIsOpen(false);
-                handleLogout();
-              }}
-              disabled={isLoggingOut}
-              className="w-full text-left px-4 py-3 text-sm text-card-foreground hover:bg-surface-hover transition-colors border-t border-card-border disabled:opacity-50"
-            >
-              <LogOut className="h-4 w-4 mr-2 inline" />
-              {isLoggingOut ? 'Logging out...' : 'Logout'}
-            </button>
-          </div>
-        </>
-      )}
-    </div>
+            </DropdownMenuItem>
+          </>
+        )}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onClick={handleLogout}
+          disabled={isLoggingOut}
+          className="flex items-center"
+        >
+          <LogOut className="h-4 w-4 mr-2" />
+          {isLoggingOut ? 'Logging out...' : 'Logout'}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 
