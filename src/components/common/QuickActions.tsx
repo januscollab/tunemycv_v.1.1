@@ -1,0 +1,208 @@
+import React, { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { 
+  Plus, 
+  FileText, 
+  Edit, 
+  MessageSquare, 
+  ArrowLeft, 
+  ArrowRight,
+  Menu,
+  X,
+  Zap
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
+interface QuickAction {
+  id: string;
+  label: string;
+  icon: React.ReactNode;
+  href?: string;
+  onClick?: () => void;
+  variant?: 'default' | 'secondary' | 'outline';
+  requiresAuth?: boolean;
+}
+
+interface QuickActionsProps {
+  customActions?: QuickAction[];
+  position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left';
+  showBackForward?: boolean;
+  className?: string;
+}
+
+export const QuickActions: React.FC<QuickActionsProps> = ({
+  customActions,
+  position = 'bottom-right',
+  showBackForward = true,
+  className
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { user } = useAuth();
+
+  const defaultActions: QuickAction[] = [
+    {
+      id: 'analyze',
+      label: 'Analyze CV',
+      icon: <FileText className="w-5 h-5" />,
+      href: '/analyze',
+      variant: 'default',
+      requiresAuth: true
+    },
+    {
+      id: 'cover-letter',
+      label: 'Cover Letter',
+      icon: <Edit className="w-5 h-5" />,
+      href: '/cover-letter',
+      variant: 'secondary',
+      requiresAuth: true
+    },
+    {
+      id: 'interview-prep',
+      label: 'Interview Prep',
+      icon: <MessageSquare className="w-5 h-5" />,
+      href: '/analyze?tab=interview-prep',
+      variant: 'secondary',
+      requiresAuth: true
+    }
+  ];
+
+  const actions = customActions || defaultActions;
+  const filteredActions = actions.filter(action => 
+    !action.requiresAuth || (action.requiresAuth && user)
+  );
+
+  const positionClasses = {
+    'bottom-right': 'bottom-6 right-6',
+    'bottom-left': 'bottom-6 left-6',
+    'top-right': 'top-20 right-6',
+    'top-left': 'top-20 left-6'
+  };
+
+  const handleAction = (action: QuickAction) => {
+    if (action.onClick) {
+      action.onClick();
+    } else if (action.href) {
+      navigate(action.href);
+    }
+    setIsOpen(false);
+  };
+
+  const handleBack = () => {
+    window.history.back();
+  };
+
+  const handleForward = () => {
+    window.history.forward();
+  };
+
+  // Don't show quick actions on auth page or home page for non-authenticated users
+  if (location.pathname === '/auth' || (location.pathname === '/' && !user)) {
+    return null;
+  }
+
+  return (
+    <TooltipProvider>
+      <div className={cn("fixed z-40", positionClasses[position], className)}>
+        <div className="flex flex-col items-end space-y-3">
+          {/* Back/Forward Navigation */}
+          {showBackForward && (
+            <div className="flex space-x-2 mb-2">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    onClick={handleBack}
+                    className="w-10 h-10 rounded-full shadow-lg hover:scale-110 transition-transform duration-200"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="left">
+                  <p>Go Back</p>
+                </TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    onClick={handleForward}
+                    className="w-10 h-10 rounded-full shadow-lg hover:scale-110 transition-transform duration-200"
+                  >
+                    <ArrowRight className="w-4 h-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="left">
+                  <p>Go Forward</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+          )}
+
+          {/* Quick Actions */}
+          {filteredActions.length > 0 && (
+            <>
+              {/* Action Items */}
+              <div className={cn(
+                "flex flex-col items-end space-y-3 transition-all duration-300 transform origin-bottom-right",
+                isOpen ? "scale-100 opacity-100" : "scale-0 opacity-0"
+              )}>
+                {filteredActions.map((action) => (
+                  <Tooltip key={action.id}>
+                    <TooltipTrigger asChild>
+                      <Button
+                      variant={action.variant || 'secondary'}
+                        size="icon"
+                        onClick={() => handleAction(action)}
+                        className="w-12 h-12 rounded-full shadow-lg hover:scale-110 transition-all duration-200"
+                      >
+                        {action.icon}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="left">
+                      <p>{action.label}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                ))}
+              </div>
+
+              {/* Main Toggle Button */}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    size="icon"
+                    onClick={() => setIsOpen(!isOpen)}
+                    className={cn(
+                      "w-14 h-14 rounded-full shadow-lg transition-all duration-300",
+                      isOpen 
+                        ? "bg-destructive hover:bg-destructive/90 rotate-180" 
+                        : "bg-primary hover:bg-primary/90 hover:scale-110"
+                    )}
+                  >
+                    {isOpen ? (
+                      <X className="w-6 h-6" />
+                    ) : (
+                      <Zap className="w-6 h-6" />
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="left">
+                  <p>{isOpen ? 'Close Quick Actions' : 'Quick Actions'}</p>
+                </TooltipContent>
+              </Tooltip>
+            </>
+          )}
+        </div>
+      </div>
+    </TooltipProvider>
+  );
+};
+
+export default QuickActions;
