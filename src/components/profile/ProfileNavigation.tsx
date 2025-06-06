@@ -80,10 +80,10 @@ const ProfileNavigation: React.FC<ProfileNavigationProps> = ({ activeTab, onTabC
             <button
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
-              className={`w-full flex items-center px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-200 ${
+              className={`w-full flex items-center px-4 py-3 text-sm font-semibold rounded-lg transition-colors ${
                 activeTab === tab.id
-                  ? 'bg-primary text-primary-foreground shadow-md scale-[1.02]'
-                  : 'text-foreground hover:text-primary hover:bg-accent/50 hover:scale-[1.01]'
+                  ? 'bg-white text-zapier-orange border border-border'
+                  : 'text-earth hover:text-zapier-orange hover:bg-cream/30'
               }`}
             >
               <Icon className="h-5 w-5 mr-3" />

@@ -52,8 +52,8 @@ const Navigation = () => {
   };
 
   return (
-    <nav className={`bg-background/95 border-b border-border transition-all duration-300 backdrop-blur-md ${
-      isSticky ? 'fixed top-0 left-0 right-0 z-50 shadow-lg bg-background/98' : 'relative'
+    <nav className={`bg-background border-b border-border transition-all duration-300 backdrop-blur-sm ${
+      isSticky ? 'fixed top-0 left-0 right-0 z-50 shadow-lg bg-background/95' : 'relative'
     }`}>
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex justify-between items-center h-16">

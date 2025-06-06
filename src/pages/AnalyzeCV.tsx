@@ -18,7 +18,7 @@ import { useSoftSkills } from '@/hooks/useSoftSkills';
 import { useAnalysis } from '@/hooks/useAnalysis';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { FileText, History, MessageSquare, Target, Calendar, Building, CheckCircle, FileUp, Search, Clock, Eye, Users, Upload, BarChart3 } from 'lucide-react';
+import { FileText, History, MessageSquare, Target, Calendar, Building, CheckCircle, FileUp, Search, Clock, Eye, Users } from 'lucide-react';
 import EmbeddedAuth from '@/components/auth/EmbeddedAuth';
 import ServiceExplanation from '@/components/common/ServiceExplanation';
 import { UploadedFile } from '@/types/fileTypes';
@@ -29,9 +29,6 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import AnalysisHistoryTab from '@/components/profile/AnalysisHistoryTab';
 import { useLocation, useNavigate } from 'react-router-dom';
-import Breadcrumbs from '@/components/navigation/Breadcrumbs';
-import StepIndicator from '@/components/ui/step-indicator';
-import QuickActions from '@/components/common/QuickActions';
 
 const AnalyzeCV = () => {
   const { user } = useAuth();
@@ -404,43 +401,6 @@ const AnalyzeCV = () => {
     );
   }
 
-  // Analysis steps for step indicator
-  const analysisSteps = [
-    {
-      id: 'upload',
-      title: 'Upload Files',
-      description: 'Upload CV and job description',
-      icon: <Upload className="w-4 h-4" />
-    },
-    {
-      id: 'analyze',
-      title: 'AI Analysis',
-      description: 'Process compatibility and keywords',
-      icon: <BarChart3 className="w-4 h-4" />
-    },
-    {
-      id: 'results',
-      title: 'View Results',
-      description: 'Review recommendations',
-      icon: <Eye className="w-4 h-4" />
-    }
-  ];
-
-  const getCurrentStep = () => {
-    if (viewedAnalysis || analysisResult) return 'results';
-    if (uploadedFiles.cv || uploadedFiles.jobDescription) return 'analyze';
-    return 'upload';
-  };
-
-  const getCompletedSteps = () => {
-    const completed = [];
-    if (uploadedFiles.cv || uploadedFiles.jobDescription) completed.push('upload');
-    if (viewedAnalysis || analysisResult) {
-      completed.push('analyze', 'results');
-    }
-    return completed;
-  };
-
   return (
     <div className={`min-h-screen bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5 ${analyzing ? 'pointer-events-none' : ''}`}>
       {/* Loading overlay */}
@@ -457,29 +417,18 @@ const AnalyzeCV = () => {
       )}
       
       <div className="max-w-wider mx-auto px-4 py-8">
-        {/* Breadcrumbs */}
-        <Breadcrumbs />
-        
-        {/* Step Indicator for Analysis Tab */}
-        {activeTab === 'analysis' && (
-          <div className="mb-8">
-            <StepIndicator
-              steps={analysisSteps}
-              currentStep={getCurrentStep()}
-              completedSteps={getCompletedSteps()}
-              className="max-w-2xl mx-auto"
-            />
-          </div>
-        )}
         {/* Header Section */}
         <div className="mb-6">
-          <div>
-            <h1 className="text-3xl font-bold text-earth dark:text-white">
-              Analyze Your CV & Interview Prep
-            </h1>
-            <p className="text-lg text-earth/70 dark:text-white/70 max-w-2xl mt-1">
-              Upload your CV and job description to get comprehensive compatibility analysis with actionable recommendations.
-            </p>
+          <div className="flex items-start mb-3">
+            <FileText className="h-8 w-8 text-zapier-orange mr-3 mt-1" />
+            <div>
+              <h1 className="text-3xl font-bold text-earth dark:text-white">
+                Analyze Your CV & Interview Prep
+              </h1>
+              <p className="text-lg text-earth/70 dark:text-white/70 max-w-2xl mt-1">
+                Upload your CV and job description to get comprehensive compatibility analysis with actionable recommendations.
+              </p>
+            </div>
           </div>
         </div>
 
@@ -875,19 +824,6 @@ const AnalyzeCV = () => {
       <InterviewPrepModal
         isOpen={showInterviewPrepModal}
         onClose={() => setShowInterviewPrepModal(false)}
-      />
-
-      {/* Quick Actions */}
-      <QuickActions 
-        customActions={[
-          {
-            id: 'new-analysis',
-            label: 'Start New Analysis',
-            icon: <FileText className="w-5 h-5" />,
-            onClick: handleStartNew,
-            variant: 'default'
-          }
-        ]}
       />
     </div>
   );
