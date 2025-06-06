@@ -256,7 +256,7 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
             variant="outline" 
             size="sm"
             onClick={onClose}
-            className="font-normal hover:bg-muted hover:scale-105 transition-all duration-200"
+            className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200"
           >
             <X className="h-4 w-4 mr-2" />
             Cancel
@@ -270,16 +270,17 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
                 description: "AI review feature will be available soon.",
               });
             }}
-            className="font-normal hover:bg-muted hover:scale-105 transition-all duration-200"
+            className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200"
           >
             <WandSparkles className="h-4 w-4 mr-2" />
             Ask AI to Review It
           </Button>
           <Button 
+            variant="outline"
             onClick={handleSave}
             disabled={isSaving}
             size="sm"
-            className="font-normal bg-primary hover:bg-primary/90 text-primary-foreground hover:scale-105 transition-all duration-200 disabled:hover:scale-100"
+            className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200 disabled:hover:scale-100 disabled:hover:bg-background disabled:hover:text-foreground disabled:hover:border-input"
           >
             {isSaving ? (
               <>
