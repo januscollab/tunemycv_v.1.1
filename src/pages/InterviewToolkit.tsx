@@ -382,7 +382,8 @@ const InterviewToolkit = () => {
   };
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5 ${analyzing ? 'pointer-events-none' : ''}`}>
+    <>
+      <div className={`min-h-screen bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5 ${analyzing ? 'pointer-events-none' : ''}`}>
       {/* Loading overlay */}
       {analyzing && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
@@ -668,6 +669,7 @@ const InterviewToolkit = () => {
         isOpen={showInterviewPrepModal}
         onClose={() => setShowInterviewPrepModal(false)}
       />
+      </div>
 
       {/* Quick Actions */}
       <QuickActions 
@@ -681,7 +683,7 @@ const InterviewToolkit = () => {
           }
         ]}
       />
-    </div>
+    </>
   );
 };
 
