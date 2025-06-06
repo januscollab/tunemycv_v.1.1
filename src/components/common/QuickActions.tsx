@@ -46,10 +46,10 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
 
   const defaultActions: QuickAction[] = [
     {
-      id: 'interview-prep',
-      label: 'Interview Prep',
+      id: 'interview-toolkit',
+      label: 'Interview Toolkit',
       icon: <MessageSquare className="w-5 h-5" />,
-      href: '/analyze?tab=interview-prep',
+      href: '/interview-toolkit',
       variant: 'secondary',
       requiresAuth: true
     },

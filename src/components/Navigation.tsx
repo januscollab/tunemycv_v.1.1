@@ -33,20 +33,14 @@ const Navigation = () => {
       label: 'Analyze CV' 
     },
     { path: '/cover-letter', label: 'Cover Letter' },
-    { path: user ? '/analyze?tab=interview-prep' : '/interview-prep', label: 'Interview Prep' },
+    { path: '/interview-toolkit', label: 'Interview Toolkit' },
     ...(user ? [{ path: '/pricing-scale', label: 'Pricing' }] : []),
     { path: '/resources', label: 'Resources' },
   ];
 
   const isActive = (path: string) => {
-    if (path === '/analyze?tab=interview-prep' || path.includes('tab=interview-prep')) {
-      return location.pathname === '/analyze' && location.search.includes('tab=interview-prep');
-    }
     if (path === '/analyze?tab=analysis') {
       return location.pathname === '/analyze' && (location.search.includes('tab=analysis') || location.search === '');
-    }
-    if (path === '/interview-prep') {
-      return location.pathname === '/interview-prep';
     }
     return location.pathname === path;
   };

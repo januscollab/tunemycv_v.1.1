@@ -33,7 +33,7 @@ import Breadcrumbs from '@/components/navigation/Breadcrumbs';
 import StepIndicator from '@/components/ui/step-indicator';
 import QuickActions from '@/components/common/QuickActions';
 
-const AnalyzeCV = () => {
+const InterviewToolkit = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const location = useLocation();
@@ -71,7 +71,7 @@ const AnalyzeCV = () => {
   // Get initial tab from URL parameter or location state
   const urlParams = new URLSearchParams(location.search);
   const tabFromUrl = urlParams.get('tab');
-  const initialTab = tabFromUrl || 'analysis';
+  const initialTab = tabFromUrl || 'interview-prep';
   const [activeTab, setActiveTab] = useState(initialTab);
 
   // Handle pre-loaded analysis from navigation state
@@ -83,16 +83,16 @@ const AnalyzeCV = () => {
 
   // Humorous loading messages
   const loadingMessages = [
-    "Deconstructing your CV...",
-    "Decoding job description secrets...",
-    "Feeding the analysis gremlins...",
-    "Teaching robots to read between the lines...",
-    "Matching your skills with cosmic precision...",
-    "Calculating your career compatibility...",
-    "Unleashing the keyword detectives...",
-    "Analyzing with the power of a thousand spreadsheets...",
-    "Consulting the CV oracle...",
-    "Performing digital alchemy on your resume..."
+    "Preparing your interview strategy...",
+    "Researching company insights...",
+    "Generating winning answers...",
+    "Teaching robots to interview like pros...",
+    "Crafting your competitive edge...",
+    "Calculating confidence boosters...",
+    "Unleashing the interview ninjas...",
+    "Analyzing with the power of a thousand interviews...",
+    "Consulting the interview oracle...",
+    "Performing digital magic on your prep..."
   ];
 
   // Rotate loading messages
@@ -260,7 +260,7 @@ const AnalyzeCV = () => {
     setJobTitle('');
     setPreloadedAnalysis(null);
     setViewedAnalysis(null);
-    setActiveTab('analysis');
+    setActiveTab('interview-prep');
     setSurveyResponses(null);
   };
 
@@ -336,103 +336,47 @@ const AnalyzeCV = () => {
     setShowInterviewPrepModal(true);
   };
 
-  const canAnalyze = !!uploadedFiles.jobDescription; // Fixed: properly check if job description exists
+  const canAnalyze = !!uploadedFiles.jobDescription;
   const hasCreditsForAI = userCredits?.credits && userCredits.credits > 0;
 
-
-  // Logged-out user experience
+  // Logged-out user experience - use the exact InterviewPrepLoggedOut component
   if (!user) {
-    const analyzeExplanation = {
-      title: '',
-      subtitle: '',
-      benefits: [
-        'Advanced AI-powered analysis that evaluates your CV against specific job requirements',
-        'Detailed compatibility scoring to understand how well you match the role',
-        'Keyword optimization recommendations to improve ATS compatibility'
-      ],
-      features: [
-        'Upload your CV in PDF, DOCX, or TXT format for instant analysis',
-        'Paste or upload the job description you\'re targeting',
-        'Our AI analyzes compatibility, keywords, and alignment between your experience and the role'
-      ]
-    };
-
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
-        <div className="max-w-5xl mx-auto px-4 py-12">
-          <div className="flex items-start mb-8">
-            <FileText className="h-12 w-12 text-zapier-orange mr-6 mt-2" />
-            <div>
-              <h1 className="text-4xl md:text-5xl font-bold text-earth dark:text-white mb-4">
-                Analyze Your CV
-              </h1>
-              <p className="text-xl text-earth/70 dark:text-white/70 max-w-3xl font-normal">
-                Get comprehensive compatibility analysis with actionable recommendations to improve your job application success.
-              </p>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-[500px] mt-12 w-4/5 mx-auto">
-            <div className="flex items-start">
-              <ServiceExplanation
-                title={analyzeExplanation.title}
-                subtitle={analyzeExplanation.subtitle}
-                benefits={analyzeExplanation.benefits}
-                features={analyzeExplanation.features}
-                icon={<FileText className="h-8 w-8 text-zapier-orange" />}
-                compact={true}
-              />
-            </div>
-            <div className="flex flex-col justify-end">
-              <div className="flex justify-center">
-                <div className="w-full max-w-sm">
-                  <EmbeddedAuth
-                    title="Login to Get Started"
-                    description="CV analysis requires an account to ensure personalized results and save your analysis history."
-                    icon={<FileText className="h-6 w-6 text-zapier-orange mr-2" />}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    return <InterviewPrepLoggedOut />;
   }
 
-  // Analysis steps for step indicator
-  const analysisSteps = [
+  // Interview prep steps for step indicator
+  const interviewSteps = [
     {
-      id: 'upload',
-      title: 'Upload Files',
-      description: 'Upload CV and job description',
-      icon: <Upload className="w-4 h-4" />
+      id: 'setup',
+      title: 'Setup Details',
+      description: 'Enter job and company information',
+      icon: <Building className="w-4 h-4" />
     },
     {
-      id: 'analyze',
-      title: 'AI Analysis',
-      description: 'Process compatibility and keywords',
-      icon: <BarChart3 className="w-4 h-4" />
+      id: 'generate',
+      title: 'Generate Prep',
+      description: 'Create personalized materials',
+      icon: <MessageSquare className="w-4 h-4" />
     },
     {
-      id: 'results',
-      title: 'View Results',
-      description: 'Review recommendations',
+      id: 'review',
+      title: 'Review & Download',
+      description: 'Study your prep materials',
       icon: <Eye className="w-4 h-4" />
     }
   ];
 
   const getCurrentStep = () => {
-    if (viewedAnalysis || analysisResult) return 'results';
-    if (uploadedFiles.cv || uploadedFiles.jobDescription) return 'analyze';
-    return 'upload';
+    if (viewedAnalysis || analysisResult) return 'review';
+    if (interviewJobDescription || selectedAnalysisId) return 'generate';
+    return 'setup';
   };
 
   const getCompletedSteps = () => {
     const completed = [];
-    if (uploadedFiles.cv || uploadedFiles.jobDescription) completed.push('upload');
+    if (interviewJobDescription || selectedAnalysisId) completed.push('setup');
     if (viewedAnalysis || analysisResult) {
-      completed.push('analyze', 'results');
+      completed.push('generate', 'review');
     }
     return completed;
   };
@@ -444,7 +388,7 @@ const AnalyzeCV = () => {
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
           <div className="bg-white dark:bg-blueberry/90 rounded-lg p-6 text-center max-w-md">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-apricot mx-auto mb-4"></div>
-            <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-2">Analyzing Your CV</h3>
+            <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-2">Preparing Interview Toolkit</h3>
             <p className="text-blueberry/70 dark:text-apple-core/80 min-h-[1.5rem] transition-opacity duration-500 text-sm">
               {currentLoadingMessage}
             </p>
@@ -459,13 +403,13 @@ const AnalyzeCV = () => {
         {/* Header Section */}
         <div className="mb-6">
           <div className="flex items-start">
-            <Zap className="h-10 w-10 text-zapier-orange mr-4 mt-1" />
+            <MessageSquare className="h-10 w-10 text-zapier-orange mr-4 mt-1" />
             <div>
               <h1 className="text-3xl font-bold text-earth dark:text-white">
-                Analyze Your CV
+                Interview Toolkit
               </h1>
               <p className="text-lg text-earth/70 dark:text-white/70 max-w-2xl mt-1">
-                Upload your CV and job description to get comprehensive compatibility analysis with actionable recommendations.
+                Generate personalized interview preparation notes with company insights, strategic questions, and professional tips to ace your next interview.
               </p>
             </div>
           </div>
@@ -478,13 +422,13 @@ const AnalyzeCV = () => {
             {/* Tabs Navigation */}
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-3 mb-6">
-                <TabsTrigger value="analysis" className="flex items-center space-x-2 text-sm">
-                  <FileText className="h-4 w-4" />
-                  <span>Analyze CV</span>
+                <TabsTrigger value="interview-prep" className="flex items-center space-x-2 text-sm">
+                  <MessageSquare className="h-4 w-4" />
+                  <span>Interview Prep</span>
                 </TabsTrigger>
                 <TabsTrigger value="view-analysis" className="flex items-center space-x-2 text-sm">
                   <Eye className="h-4 w-4" />
-                  <span>View Analysis</span>
+                  <span>View Results</span>
                 </TabsTrigger>
                 <TabsTrigger value="history" className="flex items-center space-x-2 text-sm">
                   <History className="h-4 w-4" />
@@ -492,99 +436,218 @@ const AnalyzeCV = () => {
                 </TabsTrigger>
               </TabsList>
 
-              {/* CV Analysis Tab */}
-              <TabsContent value="analysis" className="mt-0">
-                <div className="space-y-5">
-                  {/* Job Title */}
-                  <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-5 border border-apple-core/20 dark:border-citrus/20">
-                    <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-3">Job Title</h3>
-                    <input
-                      type="text"
-                      value={jobTitle}
-                      onChange={(e) => setJobTitle(e.target.value)}
-                      placeholder="e.g., Senior Software Engineer (auto-extracted from job description)"
-                      className="w-full px-3 py-2 border border-apple-core/30 dark:border-citrus/30 rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange focus:border-transparent bg-white dark:bg-blueberry/10 text-blueberry dark:text-apple-core text-sm hover:border-zapier-orange/50 transition-colors"
-                      disabled={analyzing}
-                    />
-                    <p className="text-xs text-blueberry/60 dark:text-apple-core/70 mt-2">
-                      Job title will be automatically extracted from the job description if not provided.
-                    </p>
-                  </div>
-
-                  {/* Job Description Input - Required */}
-                  <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-5 border border-apple-core/20 dark:border-citrus/20">
-                    <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-3">
-                      Job Description <span className="text-red-500">*</span>
-                    </h3>
-                    <p className="text-xs text-blueberry/60 dark:text-apple-core/70 mb-3">
-                      Upload a file (PDF, DOCX, TXT) or paste the text directly
-                    </p>
-                    
-                    <JobDescriptionUpload
-                      onJobDescriptionSet={handleJobDescriptionSet}
-                      uploadedFile={uploadedFiles.jobDescription}
-                      disabled={uploading || analyzing}
-                    />
-                  </div>
-
-                  {/* CV Selection - Optional */}
-                  <CVSelector
-                    onCVSelect={handleCVSelect}
-                    selectedCV={uploadedFiles.cv}
-                    uploading={uploading || analyzing}
+              {/* Interview Prep Tab */}
+              <TabsContent value="interview-prep" className="mt-0">
+                <div className="space-y-6">
+                  {/* Step Indicator */}
+                  <StepIndicator
+                    steps={interviewSteps}
+                    currentStep={getCurrentStep()}
+                    completedSteps={getCompletedSteps()}
                   />
 
-                  {/* Let's Get Personal Section */}
-                  <div className="bg-gradient-to-br from-zapier-orange/5 via-white to-apricot/5 dark:from-zapier-orange/10 dark:via-blueberry/10 dark:to-apricot/10 rounded-lg shadow-sm p-5 border border-zapier-orange/20 dark:border-zapier-orange/30">
-                    <div className="flex items-start space-x-3 mb-4">
-                      <div className="w-8 h-8 bg-zapier-orange/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Users className="h-4 w-4 text-zapier-orange" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-2">
-                          Let's Get Personal (Optional)
-                        </h3>
-                        <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mb-4 leading-relaxed">
-                          Every role is unique. Share additional insights about your motivation and goals to enhance your CV analysis with our Advanced Recruitment Models.
-                        </p>
-                        
-                        {surveyResponses ? (
-                          <div className="flex items-center space-x-2 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-                            <CheckCircle className="h-4 w-4 text-green-600" />
-                            <span className="text-sm font-medium text-green-800 dark:text-green-200">
-                              Survey completed! Your responses will enhance the analysis.
-                            </span>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setShowPersonalizationSurvey(true)}
-                              className="text-green-600 hover:text-green-700 ml-auto"
-                            >
-                              Retake Survey
-                            </Button>
+                  {/* Coming Soon Banner */}
+                  <Alert className="border-orange-200 bg-orange-50 dark:bg-orange-950 dark:border-orange-800">
+                    <Clock className="h-4 w-4 text-orange-600" />
+                    <AlertDescription className="text-orange-800 dark:text-orange-200">
+                      This feature is coming soon! We're working hard to bring you comprehensive interview preparation tools.
+                    </AlertDescription>
+                  </Alert>
+
+                  {/* Generation Method Selection */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-xl font-bold text-blueberry dark:text-citrus">
+                        Generate Interview Prep Notes
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <button
+                          onClick={() => setInterviewPrepMethod('input')}
+                          className={`p-4 border-2 rounded-lg transition-all ${
+                            interviewPrepMethod === 'input'
+                              ? 'border-zapier-orange bg-zapier-orange/10'
+                              : 'border-gray-200 hover:border-zapier-orange/50'
+                          }`}
+                        >
+                          <div className="flex items-center space-x-3">
+                            <FileUp className={`h-5 w-5 ${
+                              interviewPrepMethod === 'input' ? 'text-zapier-orange' : 'text-gray-500'
+                            }`} />
+                            <div className="text-left">
+                              <h3 className="font-semibold text-blueberry dark:text-citrus">Generate From Input</h3>
+                              <p className="text-sm text-blueberry/70 dark:text-apple-core/80">Enter job details manually</p>
+                            </div>
                           </div>
-                        ) : (
-                          <Button
-                            onClick={() => setShowPersonalizationSurvey(true)}
-                            variant="outline"
-                            className="border-zapier-orange text-zapier-orange hover:bg-zapier-orange hover:text-white transition-all duration-200"
-                            disabled={uploading || analyzing}
-                          >
-                            <MessageSquare className="h-4 w-4 mr-2" />
-                            Take Survey
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+                        </button>
 
-                  {/* Analyze Button */}
-                  <AnalyzeButton
-                    onAnalyze={handleAnalysis}
-                    canAnalyze={canAnalyze}
-                    analyzing={analyzing}
-                    hasCreditsForAI={hasCreditsForAI}
-                  />
+                        <button
+                          onClick={() => setInterviewPrepMethod('analysis')}
+                          className={`p-4 border-2 rounded-lg transition-all ${
+                            interviewPrepMethod === 'analysis'
+                              ? 'border-zapier-orange bg-zapier-orange/10'
+                              : 'border-gray-200 hover:border-zapier-orange/50'
+                          }`}
+                        >
+                          <div className="flex items-center space-x-3">
+                            <Search className={`h-5 w-5 ${
+                              interviewPrepMethod === 'analysis' ? 'text-zapier-orange' : 'text-gray-500'
+                            }`} />
+                            <div className="text-left">
+                              <h3 className="font-semibold text-blueberry dark:text-citrus">Generate from Existing Analysis</h3>
+                              <p className="text-sm text-blueberry/70 dark:text-apple-core/80">Use a previous CV analysis</p>
+                            </div>
+                          </div>
+                        </button>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Job Details Section */}
+                  {interviewPrepMethod === 'input' && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-lg font-semibold text-blueberry dark:text-citrus flex items-center">
+                          <Building className="h-5 w-5 text-zapier-orange mr-2" />
+                          Job Details
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        {/* Job Description Input */}
+                        <div>
+                          <label className="block text-sm font-medium text-blueberry dark:text-citrus mb-1">
+                            Job Description <span className="text-red-500">*</span>
+                          </label>
+                          <p className="text-xs text-blueberry/60 dark:text-apple-core/70 mb-3">
+                            Upload a file (PDF, DOCX, TXT) or paste the text directly
+                          </p>
+                          <JobDescriptionUpload
+                            onJobDescriptionSet={handleInterviewJobDescriptionSet}
+                            uploadedFile={interviewJobDescription}
+                            disabled={false}
+                          />
+                        </div>
+                        
+                        {/* Job Title */}
+                        <div>
+                          <label className="block text-sm font-medium text-blueberry dark:text-citrus mb-1">
+                            Job Title <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={interviewJobTitle}
+                            onChange={(e) => setInterviewJobTitle(e.target.value)}
+                            placeholder="e.g., Senior Software Engineer (auto-extracted from job description)"
+                            className="w-full px-3 py-2 border border-apple-core/30 dark:border-citrus/30 rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange focus:border-transparent bg-white dark:bg-blueberry/10 text-blueberry dark:text-apple-core"
+                          />
+                        </div>
+                        
+                        {/* Company Name */}
+                        <div>
+                          <label className="block text-sm font-medium text-blueberry dark:text-citrus mb-1">
+                            Company Name <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={interviewCompanyName}
+                            onChange={(e) => setInterviewCompanyName(e.target.value)}
+                            placeholder="e.g., Tech Corp Inc."
+                            className="w-full px-3 py-2 border border-apple-core/30 dark:border-citrus/30 rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange focus:border-transparent bg-white dark:bg-blueberry/10 text-blueberry dark:text-apple-core"
+                          />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Select Analysis Section */}
+                  {interviewPrepMethod === 'analysis' && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-lg font-semibold text-blueberry dark:text-citrus flex items-center">
+                          <Target className="h-5 w-5 text-zapier-orange mr-2" />
+                          Select Analysis
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <AnalysisSelector
+                          onAnalysisSelect={setSelectedAnalysisId}
+                          selectedAnalysisId={selectedAnalysisId}
+                        />
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* What should we include Section */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg font-semibold text-blueberry dark:text-citrus flex items-center">
+                        <CheckCircle className="h-5 w-5 text-zapier-orange mr-2" />
+                        What should we include
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="flex items-center space-x-3">
+                          <Checkbox
+                            id="companyProfile"
+                            checked={interviewPrepIncludes.companyProfile}
+                            onCheckedChange={(checked) => handleInterviewPrepIncludeChange('companyProfile', checked as boolean)}
+                          />
+                          <label htmlFor="companyProfile" className="text-sm font-medium text-blueberry dark:text-citrus cursor-pointer">
+                            Company Profile
+                          </label>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                          <Checkbox
+                            id="recentPressReleases"
+                            checked={interviewPrepIncludes.recentPressReleases}
+                            onCheckedChange={(checked) => handleInterviewPrepIncludeChange('recentPressReleases', checked as boolean)}
+                          />
+                          <label htmlFor="recentPressReleases" className="text-sm font-medium text-blueberry dark:text-citrus cursor-pointer">
+                            Recent Press Releases
+                          </label>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                          <Checkbox
+                            id="interviewTips"
+                            checked={interviewPrepIncludes.interviewTips}
+                            onCheckedChange={(checked) => handleInterviewPrepIncludeChange('interviewTips', checked as boolean)}
+                          />
+                          <label htmlFor="interviewTips" className="text-sm font-medium text-blueberry dark:text-citrus cursor-pointer">
+                            Interview Tips
+                          </label>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                          <Checkbox
+                            id="getNoticedQuestions"
+                            checked={interviewPrepIncludes.getNoticedQuestions}
+                            onCheckedChange={(checked) => handleInterviewPrepIncludeChange('getNoticedQuestions', checked as boolean)}
+                          />
+                          <label htmlFor="getNoticedQuestions" className="text-sm font-medium text-blueberry dark:text-citrus cursor-pointer">
+                            Get Noticed Questions
+                          </label>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Generate Button Card */}
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="flex justify-center">
+                        <Button
+                          onClick={handleGenerateInterviewPrep}
+                          className="bg-zapier-orange hover:bg-zapier-orange/90 text-white px-8 py-3 text-lg font-semibold flex items-center space-x-2"
+                          size="lg"
+                          disabled
+                        >
+                          <MessageSquare className="h-5 w-5" />
+                          <span>Generate Interview Prep Notes</span>
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
               </TabsContent>
 
@@ -599,18 +662,17 @@ const AnalyzeCV = () => {
                 ) : (
                   <Card className="border border-gray-200 dark:border-gray-700">
                     <CardContent className="text-center py-8">
-                      <FileText className="h-12 w-12 text-zapier-orange mx-auto mb-4" />
+                      <MessageSquare className="h-12 w-12 text-zapier-orange mx-auto mb-4" />
                       <p className="text-gray-600 dark:text-gray-400 mb-2 font-normal">
-                        No analysis generated yet.
+                        No interview prep generated yet.
                       </p>
                       <p className="text-sm font-normal text-gray-500">
-                        Create one in the <Button variant="link" onClick={() => setActiveTab('analysis')} className="text-zapier-orange hover:text-zapier-orange/80 p-0 h-auto font-normal text-sm">Analyze CV</Button> tab or view previous analysis in <Button variant="link" onClick={() => setActiveTab('history')} className="text-zapier-orange hover:text-zapier-orange/80 p-0 h-auto font-normal text-sm">History</Button>.
+                        Create one in the <Button variant="link" onClick={() => setActiveTab('interview-prep')} className="text-zapier-orange hover:text-zapier-orange/80 p-0 h-auto font-normal text-sm">Interview Prep</Button> tab or view previous results in <Button variant="link" onClick={() => setActiveTab('history')} className="text-zapier-orange hover:text-zapier-orange/80 p-0 h-auto font-normal text-sm">History</Button>.
                       </p>
                     </CardContent>
                   </Card>
                 )}
               </TabsContent>
-
 
               {/* Analysis History Tab */}
               <TabsContent value="history" className="mt-0">
@@ -658,9 +720,9 @@ const AnalyzeCV = () => {
       <QuickActions 
         customActions={[
           {
-            id: 'new-analysis',
-            label: 'Start New Analysis',
-            icon: <FileText className="w-5 h-5" />,
+            id: 'new-prep',
+            label: 'Start New Prep',
+            icon: <MessageSquare className="w-5 h-5" />,
             onClick: handleStartNew,
             variant: 'default'
           }
@@ -670,4 +732,4 @@ const AnalyzeCV = () => {
   );
 };
 
-export default AnalyzeCV;
+export default InterviewToolkit;
