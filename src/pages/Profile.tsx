@@ -4,7 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useUserData } from '@/hooks/useUserData';
 import ProfileContainer from '@/components/profile/ProfileContainer';
 import Breadcrumbs from '@/components/navigation/Breadcrumbs';
-import QuickActions from '@/components/common/QuickActions';
+
 
 const Profile = () => {
   const [searchParams] = useSearchParams();
@@ -30,7 +30,7 @@ const Profile = () => {
         credits={credits}
         memberSince={memberSince}
       />
-      <QuickActions showBackForward={true} />
+      
     </div>
   );
 };

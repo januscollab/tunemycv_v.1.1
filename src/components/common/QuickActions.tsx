@@ -68,6 +68,17 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
       href: '/analyze?tab=interview-prep',
       variant: 'secondary',
       requiresAuth: true
+    },
+    {
+      id: 'feedback',
+      label: 'Feedback',
+      icon: <MessageSquare className="w-5 h-5" />,
+      onClick: () => {
+        // Create and dispatch a custom event to open feedback
+        window.dispatchEvent(new CustomEvent('openFeedback'));
+      },
+      variant: 'outline',
+      requiresAuth: false
     }
   ];
 
@@ -109,42 +120,6 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
     <TooltipProvider>
       <div className={cn("fixed z-40", positionClasses[position], className)}>
         <div className="flex flex-col items-end space-y-3">
-          {/* Back/Forward Navigation */}
-          {showBackForward && (
-            <div className="flex space-x-2 mb-2">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    size="icon"
-                    variant="outline"
-                    onClick={handleBack}
-                    className="w-10 h-10 rounded-full shadow-lg hover:scale-110 transition-transform duration-200"
-                  >
-                    <ArrowLeft className="w-4 h-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="left">
-                  <p>Go Back</p>
-                </TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    size="icon"
-                    variant="outline"
-                    onClick={handleForward}
-                    className="w-10 h-10 rounded-full shadow-lg hover:scale-110 transition-transform duration-200"
-                  >
-                    <ArrowRight className="w-4 h-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="left">
-                  <p>Go Forward</p>
-                </TooltipContent>
-              </Tooltip>
-            </div>
-          )}
 
           {/* Quick Actions */}
           {filteredActions.length > 0 && (
