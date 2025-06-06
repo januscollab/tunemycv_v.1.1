@@ -137,10 +137,9 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
                   <Tooltip key={action.id}>
                     <TooltipTrigger asChild>
                       <Button
-                      variant={action.variant || 'secondary'}
                         size="icon"
                         onClick={() => handleAction(action)}
-                        className="w-12 h-12 rounded-full shadow-lg hover:scale-110 transition-all duration-200"
+                        className="w-12 h-12 rounded-full shadow-lg hover:scale-110 transition-all duration-200 bg-zapier-orange hover:bg-zapier-orange/90 text-white"
                       >
                         {action.icon}
                       </Button>

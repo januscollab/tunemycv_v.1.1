@@ -18,7 +18,7 @@ import { useSoftSkills } from '@/hooks/useSoftSkills';
 import { useAnalysis } from '@/hooks/useAnalysis';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { FileText, History, MessageSquare, Target, Calendar, Building, CheckCircle, FileUp, Search, Clock, Eye, Users, Upload, BarChart3 } from 'lucide-react';
+import { FileText, History, MessageSquare, Target, Calendar, Building, CheckCircle, FileUp, Search, Clock, Eye, Users, Upload, BarChart3, Zap } from 'lucide-react';
 import EmbeddedAuth from '@/components/auth/EmbeddedAuth';
 import ServiceExplanation from '@/components/common/ServiceExplanation';
 import { UploadedFile } from '@/types/fileTypes';
@@ -462,13 +462,16 @@ const AnalyzeCV = () => {
         
         {/* Header Section */}
         <div className="mb-6">
-          <div>
-            <h1 className="text-3xl font-bold text-earth dark:text-white">
-              Analyze Your CV & Interview Prep
-            </h1>
-            <p className="text-lg text-earth/70 dark:text-white/70 max-w-2xl mt-1">
-              Upload your CV and job description to get comprehensive compatibility analysis with actionable recommendations.
-            </p>
+          <div className="flex items-start">
+            <Zap className="h-10 w-10 text-zapier-orange mr-4 mt-1" />
+            <div>
+              <h1 className="text-3xl font-bold text-earth dark:text-white">
+                Analyze Your CV & Interview Prep
+              </h1>
+              <p className="text-lg text-earth/70 dark:text-white/70 max-w-2xl mt-1">
+                Upload your CV and job description to get comprehensive compatibility analysis with actionable recommendations.
+              </p>
+            </div>
           </div>
         </div>
 
