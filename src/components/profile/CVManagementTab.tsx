@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { FileText, Upload, Trash2, Edit, Plus, Check, X } from 'lucide-react';
+import { FileText, Trash2, Edit } from 'lucide-react';
+import { DragDropZone } from '@/components/ui/drag-drop-zone';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -133,24 +134,15 @@ const CVManagementTab: React.FC<CVManagementTabProps> = ({ credits, memberSince 
       
       {cvs.length < 5 && (
         <div className="mb-6">
-          <label className="cursor-pointer">
-            <div className="border-2 border-dashed border-apple-core/30 dark:border-citrus/30 rounded-lg p-6 text-center hover:border-apricot hover:bg-apricot/5 transition-colors">
-              <Upload className="mx-auto h-8 w-8 text-slate-600 dark:text-apple-core/60 mb-2" />
-              <p className="text-slate-900 dark:text-apple-core font-medium">
-                {uploading ? 'Uploading...' : 'Upload New CV'}
-              </p>
-              <p className="text-sm text-slate-600 dark:text-apple-core/80 mt-1">
-                PDF or DOCX, max 5MB
-              </p>
-            </div>
-            <input
-              type="file"
-              className="hidden"
-              accept=".pdf,.docx"
-              onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0])}
-              disabled={uploading}
-            />
-          </label>
+          <DragDropZone
+            onDrop={(files) => handleFileUpload(files[0])}
+            accept=".pdf,.docx"
+            maxSize={5 * 1024 * 1024}
+            disabled={uploading}
+            placeholder={uploading ? "Uploading..." : "Upload New CV"}
+            description="PDF or DOCX • Max 5MB"
+            className="border-apple-core/30 dark:border-citrus/30 hover:border-apricot hover:bg-apricot/5"
+          />
         </div>
       )}
 

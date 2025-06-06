@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
-import { Upload, X, Check } from 'lucide-react';
+import { X, Check } from 'lucide-react';
+import { DragDropZone } from '@/components/ui/drag-drop-zone';
 import { validateFile, extractTextFromFile } from '@/utils/fileUtils';
 import { useToast } from '@/hooks/use-toast';
 import { UploadedFile } from '@/types/fileTypes';
@@ -96,23 +97,15 @@ const JobDescriptionUpload: React.FC<JobDescriptionUploadProps> = ({
   return (
     <div className="space-y-4">
       {/* File Upload Option */}
-      <div className="border-2 border-dashed border-apple-core/30 dark:border-citrus/30 rounded-lg p-6 text-center">
-        <Upload className="mx-auto h-8 w-8 text-blueberry/60 dark:text-apple-core/60 mb-2" />
-        <label className="cursor-pointer">
-          <span className="text-apricot hover:text-apricot/80 font-medium">Upload Job Description</span>
-          <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mt-1">PDF, DOCX, TXT - max 5MB</p>
-          <input
-            type="file"
-            className="hidden"
-            accept=".pdf,.docx,.txt"
-            onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0])}
-            disabled={uploading || disabled}
-          />
-        </label>
-        {uploading && (
-          <div className="mt-2 text-sm text-blue-600">Processing file...</div>
-        )}
-      </div>
+      <DragDropZone
+        onDrop={(files) => handleFileUpload(files[0])}
+        accept=".pdf,.docx,.txt"
+        maxSize={maxSize}
+        disabled={uploading || disabled}
+        placeholder={uploading ? "Processing file..." : "Upload Job Description"}
+        description="PDF, DOCX, TXT • Max 5MB"
+        className="border-apple-core/30 dark:border-citrus/30"
+      />
       
       <div className="text-center text-blueberry/60 dark:text-apple-core/60">or</div>
       
