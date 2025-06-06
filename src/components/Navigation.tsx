@@ -52,8 +52,8 @@ const Navigation = () => {
   };
 
   return (
-    <nav className={`bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 transition-all duration-300 ${
-      isSticky ? 'fixed top-0 left-0 right-0 z-50 shadow-lg' : 'relative'
+    <nav className={`bg-background/95 border-b border-border transition-all duration-300 backdrop-blur-md ${
+      isSticky ? 'fixed top-0 left-0 right-0 z-50 shadow-lg bg-background/98' : 'relative'
     }`}>
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex justify-between items-center h-16">
@@ -66,11 +66,14 @@ const Navigation = () => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`text-earth dark:text-white hover:text-zapier-orange transition-colors font-medium ${
-                  isActive(item.path) ? 'text-zapier-orange' : ''
+                className={`text-foreground hover:text-primary transition-all duration-normal font-medium relative group ${
+                  isActive(item.path) ? 'text-primary' : ''
                 }`}
               >
                 {item.label}
+                <span className={`absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-normal group-hover:w-full ${
+                  isActive(item.path) ? 'w-full' : ''
+                }`} />
               </Link>
             ))}
           </div>
@@ -93,7 +96,8 @@ const Navigation = () => {
             <ThemeToggle />
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="text-earth dark:text-white hover:text-zapier-orange transition-colors"
+              className="text-foreground hover:text-primary transition-all duration-normal p-2 rounded-md hover:bg-accent active:scale-95"
+              aria-label={isOpen ? 'Close menu' : 'Open menu'}
             >
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
@@ -102,16 +106,19 @@ const Navigation = () => {
 
         {/* Mobile Navigation Menu */}
         {isOpen && (
-          <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
-              {navItems.map((item) => (
+          <div className="md:hidden animate-fade-in">
+            <div className="px-2 pt-2 pb-3 space-y-1 bg-background border-t border-border">
+              {navItems.map((item, index) => (
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`block px-3 py-2 text-earth dark:text-white hover:text-zapier-orange transition-colors font-medium ${
-                    isActive(item.path) ? 'text-zapier-orange bg-zapier-orange/10' : 'hover:bg-gray-50 dark:hover:bg-gray-800'
+                  className={`block px-3 py-3 text-foreground hover:text-primary transition-all duration-normal font-medium rounded-md ${
+                    isActive(item.path) ? 'text-primary bg-primary/10 border-l-4 border-primary' : 'hover:bg-accent'
                   }`}
                   onClick={() => setIsOpen(false)}
+                  style={{
+                    animationDelay: `${index * 50}ms`
+                  }}
                 >
                   {item.label}
                 </Link>

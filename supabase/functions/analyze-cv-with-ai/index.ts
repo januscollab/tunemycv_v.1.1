@@ -380,15 +380,44 @@ serve(async (req) => {
       );
     }
 
-    // Create comprehensive AI prompt
-    prompt = `
-You are a senior career consultant and CV optimization expert. Analyze the CV against the job description and provide detailed insights.
+    // Get AI prompt from database or use fallback
+    let promptTemplate = '';
+    try {
+      const { data: promptData, error: promptError } = await supabase
+        .from('ai_prompt_versions')
+        .select('content')
+        .eq('prompt_id', (
+          await supabase
+            .from('ai_prompts')
+            .select('id')
+            .eq('name', 'cv_analysis')
+            .eq('is_active', true)
+            .single()
+        ).data?.id)
+        .order('version_number', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (promptData && !promptError) {
+        promptTemplate = promptData.content;
+      }
+    } catch (error) {
+      console.log('Using fallback prompt for CV analysis');
+    }
+
+    // Fallback prompt if database prompt not available
+    if (!promptTemplate) {
+      promptTemplate = `You are a senior career consultant and CV optimization expert. Analyze the CV against the job description and provide detailed insights.
 
 CRITICAL REQUIREMENTS:
 1. Provide 3-7 detailed items for each analysis section
 2. Be thorough and comprehensive - this is professional career consulting
 3. Respond ONLY with valid JSON in the exact structure below
-4. Extract 15-25+ relevant keywords from the job description
+4. Extract 15-25+ relevant keywords from the job description`;
+    }
+
+    // Create comprehensive AI prompt
+    prompt = `${promptTemplate}
 
 CV TO ANALYZE:
 ${sanitizedCvText}

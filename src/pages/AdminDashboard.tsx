@@ -1,9 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
-import { Users, CreditCard, FileText, Settings, ChevronLeft, ChevronRight, Mail } from 'lucide-react';
+import { Users, CreditCard, FileText, Settings, ChevronLeft, ChevronRight, Mail, BrainCircuit } from 'lucide-react';
 import UserManagement from '@/components/admin/UserManagement';
 import CreditManagement from '@/components/admin/CreditManagement';
 import AnalysisLogsManagement from '@/components/admin/AnalysisLogsManagement';
+import AIPromptsManagement from '@/components/admin/AIPromptsManagement';
 
 import AdminNavigation from '@/components/admin/AdminNavigation';
 import { Button } from '@/components/ui/button';
@@ -61,6 +62,8 @@ const AdminDashboard = () => {
         return <CreditManagement />;
       case 'logs':
         return <AnalysisLogsManagement />;
+      case 'ai-prompts':
+        return <AIPromptsManagement />;
       case 'site-settings':
         return (
           <div className="bg-white rounded-lg shadow-sm p-6">
@@ -159,6 +162,18 @@ const AdminDashboard = () => {
                 >
                   <FileText className={`h-5 w-5 text-apricot ${sidebarCollapsed ? '' : 'mr-3'}`} />
                   {!sidebarCollapsed && 'Analysis Logs'}
+                </button>
+                <button
+                  onClick={() => setActiveTab('ai-prompts')}
+                  className={`w-full flex items-center ${sidebarCollapsed ? 'px-2 justify-center' : 'px-3'} py-2 text-left rounded-md transition-colors ${
+                    activeTab === 'ai-prompts'
+                      ? 'bg-citrus/20 text-blueberry border border-citrus/30'
+                      : 'text-blueberry/70 hover:bg-apple-core/20'
+                  }`}
+                  title={sidebarCollapsed ? 'AI Prompts' : undefined}
+                >
+                  <BrainCircuit className={`h-5 w-5 text-apricot ${sidebarCollapsed ? '' : 'mr-3'}`} />
+                  {!sidebarCollapsed && 'AI Prompts'}
                 </button>
                 <button
                   onClick={() => setActiveTab('email-templates')}

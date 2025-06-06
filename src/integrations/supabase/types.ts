@@ -42,6 +42,71 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_prompt_versions: {
+        Row: {
+          content: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          prompt_id: string
+          version_number: number
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          prompt_id: string
+          version_number: number
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          prompt_id?: string
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_prompt_versions_prompt_id_fkey"
+            columns: ["prompt_id"]
+            isOneToOne: false
+            referencedRelation: "ai_prompts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_prompts: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       analysis_logs: {
         Row: {
           analysis_result_id: string | null

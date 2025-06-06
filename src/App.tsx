@@ -21,7 +21,7 @@ import PricingScale from './pages/PricingScale';
 import Navigation from './components/Navigation';
 import Footer from './components/Footer';
 import EnhancedSecurityHeaders from './components/security/EnhancedSecurityHeaders';
-import FloatingFeedback from '@/components/common/FloatingFeedback';
+import FeedbackIntegration from '@/components/common/FeedbackIntegration';
 import { Toaster } from "@/components/ui/toaster"
 
 // Create a client
@@ -62,7 +62,7 @@ function AppContent() {
         </Routes>
       </main>
       <Footer />
-      <FloatingFeedback />
+      <FeedbackIntegration />
       <Toaster />
     </div>
   );

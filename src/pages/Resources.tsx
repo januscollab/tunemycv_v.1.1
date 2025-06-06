@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { FileText, Users, BookOpen, Target, TrendingUp, CheckCircle, AlertCircle } from 'lucide-react';
+import QuickActions from '@/components/common/QuickActions';
 
 const Resources = () => {
   const resources = [
@@ -235,6 +236,9 @@ const Resources = () => {
           </p>
         </div>
       </section>
+      
+      {/* Quick Actions */}
+      <QuickActions />
     </div>
   );
 };
