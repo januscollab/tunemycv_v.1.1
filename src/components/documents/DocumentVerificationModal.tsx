@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { X, Save, AlertTriangle, CheckCircle, Info, ChevronDown, ChevronUp } from 'lucide-react';
+import { X, Save, AlertTriangle, CheckCircle, Info, ChevronDown, ChevronUp, WandSparkles } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -122,126 +122,112 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
           </div>
         </DialogHeader>
 
-        {/* Two-Column Layout: 40% Information, 60% Text Editor */}
+        {/* Two-Column Layout: 30% Information, 70% Text Editor */}
         <div className="flex-1 flex min-h-0">
-          {/* Left Panel - Document Information (40%) */}
-          <div className="w-2/5 border-r border-border bg-muted/5 flex flex-col">
-            {/* Quality Assessment Panel */}
-            <Collapsible open={qualityExpanded} onOpenChange={setQualityExpanded}>
-              <CollapsibleTrigger asChild>
-                <div className="px-4 py-3 border-b border-border bg-muted/20 cursor-pointer hover:bg-muted/40 transition-colors">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <h3 className="text-sm font-medium text-foreground">Quality Assessment</h3>
-                      <div className={`text-sm font-bold ${getQualityColor(quality.score)}`}>
-                        {quality.score}%
+          {/* Left Panel - Document Information (30%) */}
+          <div className="w-[30%] border-r border-border bg-muted/5 flex flex-col overflow-hidden">
+            <ScrollArea className="flex-1">
+              <div className="space-y-0">
+                {/* Quality Assessment Panel */}
+                <Collapsible open={qualityExpanded} onOpenChange={setQualityExpanded}>
+                  <CollapsibleTrigger asChild>
+                    <div className="px-4 py-3 border-b border-border bg-muted/20 cursor-pointer hover:bg-muted/40 transition-colors">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <h3 className="text-sm font-medium text-foreground">Quality Assessment</h3>
+                          <div className={`text-sm font-bold ${getQualityColor(quality.score)}`}>
+                            {quality.score}%
+                          </div>
+                        </div>
+                        {qualityExpanded ? (
+                          <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                        )}
                       </div>
                     </div>
-                    {qualityExpanded ? (
-                      <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                  </CollapsibleTrigger>
+                  
+                  <CollapsibleContent>
+                    <div className="p-4 border-b border-border bg-muted/10">
+                      {/* Document Stats */}
+                      <div className="grid grid-cols-3 gap-4 mb-4">
+                        <div className="text-center">
+                          <div className="text-lg font-bold text-foreground">{quality.wordCount}</div>
+                          <div className="text-xs text-muted-foreground">Words</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-lg font-bold text-foreground">{Math.round(quality.characterCount / 1000)}k</div>
+                          <div className="text-xs text-muted-foreground">Characters</div>
+                        </div>
+                        <div className="text-center">
+                          <div className={`text-lg font-bold ${getQualityColor(quality.score)}`}>{quality.score}%</div>
+                          <div className="text-xs text-muted-foreground">Quality</div>
+                        </div>
+                      </div>
+
+                      {/* Quality Notes */}
+                      <div className="space-y-2">
+                        {quality.issues.length === 0 ? (
+                          <div className="text-sm text-muted-foreground italic">Perfect extraction - no issues detected</div>
+                        ) : (
+                          <>
+                            {quality.issues.map((issue, index) => (
+                              <div key={index} className="flex items-start space-x-2 text-xs">
+                                {getIssueIcon(issue.type)}
+                                <div className="flex-1">
+                                  <span className="font-medium">{issue.title}:</span>{' '}
+                                  <span className="text-muted-foreground">{issue.description}</span>
+                                </div>
+                              </div>
+                            ))}
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+
+                {/* File Information */}
+                <div className="p-4 border-b border-border">
+                  <h3 className="text-sm font-medium text-foreground mb-3">File Information</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Name:</span>
+                      <span className="font-medium text-foreground truncate ml-2">{fileName}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Size:</span>
+                      <span className="font-medium text-foreground">{formatFileSize(fileSize)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Type:</span>
+                      <span className="font-medium text-foreground capitalize">{documentType.replace('_', ' ')}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Auto-save Status */}
+                <div className="p-4">
+                  <div className="text-xs text-muted-foreground">
+                    {isAutoSaving ? (
+                      <div className="flex items-center space-x-2">
+                        <div className="animate-spin rounded-full h-3 w-3 border border-current border-t-transparent" />
+                        <span>Auto-saving...</span>
+                      </div>
+                    ) : lastSaved ? (
+                      <span>Last saved: {lastSaved.toLocaleTimeString()}</span>
                     ) : (
-                      <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                      <span>Auto-save enabled</span>
                     )}
                   </div>
                 </div>
-              </CollapsibleTrigger>
-              
-              <CollapsibleContent>
-                <div className="p-4 border-b border-border bg-muted/10">
-                  {/* Document Stats */}
-                  <div className="grid grid-cols-3 gap-4 mb-4">
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-foreground">{quality.wordCount}</div>
-                      <div className="text-xs text-muted-foreground">Words</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-foreground">{Math.round(quality.characterCount / 1000)}k</div>
-                      <div className="text-xs text-muted-foreground">Characters</div>
-                    </div>
-                    <div className="text-center">
-                      <div className={`text-lg font-bold ${getQualityColor(quality.score)}`}>{quality.score}%</div>
-                      <div className="text-xs text-muted-foreground">Quality</div>
-                    </div>
-                  </div>
-
-                  {/* Quality Notes */}
-                  <div className="space-y-2">
-                    {quality.issues.length === 0 ? (
-                      <div className="text-sm text-muted-foreground italic">Perfect extraction - no issues detected</div>
-                    ) : (
-                      <>
-                        {quality.issues.map((issue, index) => (
-                          <div key={index} className="flex items-start space-x-2 text-xs">
-                            {getIssueIcon(issue.type)}
-                            <div className="flex-1">
-                              <span className="font-medium">{issue.title}:</span>{' '}
-                              <span className="text-muted-foreground">{issue.description}</span>
-                            </div>
-                          </div>
-                        ))}
-                      </>
-                    )}
-                  </div>
-                </div>
-              </CollapsibleContent>
-            </Collapsible>
-
-            {/* File Information */}
-            <div className="p-4 border-b border-border">
-              <h3 className="text-sm font-medium text-foreground mb-3">File Information</h3>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Name:</span>
-                  <span className="font-medium text-foreground truncate ml-2">{fileName}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Size:</span>
-                  <span className="font-medium text-foreground">{formatFileSize(fileSize)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Type:</span>
-                  <span className="font-medium text-foreground capitalize">{documentType.replace('_', ' ')}</span>
-                </div>
               </div>
-            </div>
-
-            {/* AI Enhancement */}
-            <div className="p-4 border-b border-border">
-              <h3 className="text-sm font-medium text-foreground mb-3">AI Enhancement</h3>
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full text-xs"
-                onClick={() => {
-                  toast({
-                    title: "Coming Soon!",
-                    description: "This feature will automatically format and clean up your document text using AI for 1 credit.",
-                  });
-                }}
-              >
-                ✨ Let AI Fix It (1 credit)
-              </Button>
-            </div>
-
-            {/* Auto-save Status */}
-            <div className="p-4 flex-1 flex flex-col justify-end">
-              <div className="text-xs text-muted-foreground">
-                {isAutoSaving ? (
-                  <div className="flex items-center space-x-2">
-                    <div className="animate-spin rounded-full h-3 w-3 border border-current border-t-transparent" />
-                    <span>Auto-saving...</span>
-                  </div>
-                ) : lastSaved ? (
-                  <span>Last saved: {lastSaved.toLocaleTimeString()}</span>
-                ) : (
-                  <span>Auto-save enabled</span>
-                )}
-              </div>
-            </div>
+            </ScrollArea>
           </div>
 
-          {/* Right Panel - Text Editor (60%) */}
-          <div className="w-3/5 flex flex-col">
+          {/* Right Panel - Text Editor (70%) */}
+          <div className="w-[70%] flex flex-col">
             <div className="px-4 py-3 border-b border-border bg-background">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-medium text-foreground">Extracted Text</h3>
@@ -264,19 +250,36 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
           </div>
         </div>
 
-        {/* Clean Footer */}
+        {/* Footer with 3 buttons */}
         <div className="flex items-center justify-end space-x-3 px-6 py-4 border-t border-border bg-background">
           <Button 
             variant="outline" 
+            size="sm"
             onClick={onClose}
-            className="hover:bg-muted"
+            className="font-normal hover:bg-muted hover:scale-105 transition-all duration-200"
           >
+            <X className="h-4 w-4 mr-2" />
             Cancel
+          </Button>
+          <Button 
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              toast({
+                title: "Coming Soon!",
+                description: "AI review feature will be available soon.",
+              });
+            }}
+            className="font-normal hover:bg-muted hover:scale-105 transition-all duration-200"
+          >
+            <WandSparkles className="h-4 w-4 mr-2" />
+            Ask AI to Review It
           </Button>
           <Button 
             onClick={handleSave}
             disabled={isSaving}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground"
+            size="sm"
+            className="font-normal bg-primary hover:bg-primary/90 text-primary-foreground hover:scale-105 transition-all duration-200 disabled:hover:scale-100"
           >
             {isSaving ? (
               <>
