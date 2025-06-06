@@ -119,7 +119,7 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
   return (
     <TooltipProvider>
       <div 
-        className={cn("fixed z-40", positionClasses[position], className)}
+        className={cn("fixed z-60", positionClasses[position], className)}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
