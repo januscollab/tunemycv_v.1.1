@@ -1,4 +1,4 @@
-import { supabase } from '@/integrations/supabase/client';
+// import { supabase } from '@/integrations/supabase/client'; // Temporarily disabled
 
 export interface PromptVersion {
   id: string;
@@ -49,49 +49,8 @@ class PromptService {
       console.log(`Prompt requested: ${promptName} - database integration pending`);
       return null;
       
-      /*
-      // Check cache first
-      if (this.isCacheValid(promptName)) {
-        const cached = this.cache.get(promptName);
-        return cached?.latest_version?.content || null;
-      }
-
-      // Fetch from database
-      const { data: prompt, error: promptError } = await supabase
-        .from('ai_prompts')
-        .select('*')
-        .eq('name', promptName)
-        .eq('is_active', true)
-        .single();
-
-      if (promptError || !prompt) {
-        console.warn(`Prompt '${promptName}' not found in database`);
-        return null;
-      }
-
-      // Get latest version
-      const { data: latestVersion, error: versionError } = await supabase
-        .from('ai_prompt_versions')
-        .select('*')
-        .eq('prompt_id', prompt.id)
-        .order('version_number', { ascending: false })
-        .limit(1)
-        .single();
-
-      if (versionError || !latestVersion) {
-        console.warn(`No versions found for prompt '${promptName}'`);
-        return null;
-      }
-
-      // Cache the result
-      const promptData: PromptData = {
-        ...prompt,
-        latest_version: latestVersion
-      };
-      this.setCacheEntry(promptName, promptData);
-
-      return latestVersion.content;
-      */
+      // Database integration will be enabled once types are regenerated
+      // This will include cache checking, prompt fetching, and version management
     } catch (error) {
       console.error(`Error fetching prompt '${promptName}':`, error);
       return null;
