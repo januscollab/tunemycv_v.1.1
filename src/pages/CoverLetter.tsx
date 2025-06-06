@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FileText, Sparkles, Trash2, RefreshCw, Clock, FileUp, Search, AlertCircle, Eye, Edit, Download, History, RotateCcw, Edit2 } from 'lucide-react';
+import Breadcrumbs from '@/components/navigation/Breadcrumbs';
+import QuickActions from '@/components/common/QuickActions';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCoverLetter } from '@/hooks/useCoverLetter';
 import { useUserData } from '@/hooks/useUserData';
@@ -359,6 +361,7 @@ const AuthenticatedCoverLetter = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5 py-6">
       <div className="max-w-wider mx-auto px-4">
+        <Breadcrumbs />
         <div className="mb-6">
           <div className="flex items-start mb-6">
             <Edit className="h-8 w-8 text-zapier-orange mr-3 flex-shrink-0" />
@@ -959,6 +962,9 @@ const AuthenticatedCoverLetter = () => {
           titleType="cover-letter"
         />
       </div>
+      
+      {/* Quick Actions */}
+      <QuickActions showBackForward={true} />
     </div>
   );
 };
