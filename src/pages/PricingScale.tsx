@@ -88,148 +88,151 @@ const PricingScale = () => {
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Pricing Slider */}
-        <div className="mb-16 w-4/5 mx-auto">
-          <Card className="bg-white dark:bg-blueberry/20 border-2 border-zapier-orange/50 dark:border-zapier-orange/60 p-8 shadow-xl shadow-zapier-orange/20 hover:shadow-2xl hover:shadow-zapier-orange/30 transition-all duration-500 hover:scale-[1.02] relative overflow-hidden group">
-            {/* Animated background gradient */}
-            <div className="absolute inset-0 bg-gradient-to-br from-zapier-orange/5 via-transparent to-citrus/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-            <div className="relative z-10">
-            <CardHeader className="pb-6 pt-1">
-              <CardTitle className="text-2xl font-bold text-earth dark:text-white text-left">
-                Simple Pay As you go Pricing
-              </CardTitle>
-              <div className="mt-4">
-                <h3 className="text-lg font-semibold text-earth dark:text-white mb-4">
-                  Why We're Just Better Than The Others? We Give You More!
-                </h3>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-3">
-                    <div className="flex items-center space-x-2">
-                      <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-earth/80 dark:text-white/80">Pay for what you use, no sneaky recurring subscriptions</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-earth/80 dark:text-white/80">Access to all features all of the time, no gate keeping the good stuff</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-earth/80 dark:text-white/80">Clean, watermark-free downloads in popular PDF, Word or TXT formats</span>
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="flex items-center space-x-2">
-                      <X className="h-4 w-4 text-red-500" />
-                      <span className="text-earth/80 dark:text-white/80">No throttling AI model responses – you paid for it, you get the good stuff</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <X className="h-4 w-4 text-red-500" />
-                      <span className="text-earth/80 dark:text-white/80">No limits on your documents length - it's your info</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <X className="h-4 w-4 text-red-500" />
-                      <span className="text-earth/80 dark:text-white/80">We will never share or sell your data. It goes against our core values</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-8 pt-5">
-              {/* Slider */}
-              <div className="px-4">
-                <Slider
-                  value={[selectedTier]}
-                  onValueChange={handleSliderChange}
-                  max={4}
-                  min={0}
-                  step={1}
-                  className="w-full [&>*:first-child]:bg-gray-200 dark:[&>*:first-child]:bg-gray-700 [&_[role=slider]]:h-5 [&_[role=slider]]:w-5 [&>*:first-child]:h-1 [&_[role=slider]]:shadow-lg [&_[role=slider]]:transition-all [&_[role=slider]]:duration-200 [&_[role=slider]]:hover:scale-110"
-                />
-              </div>
-
-              {/* Tier Labels Below Slider - Positioned to align with slider stops */}
-              <div className="px-4 relative">
-                <div className="relative flex">
-                  {pricingTiers.map((tier, index) => {
-                    // Calculate position: 0%, 25%, 50%, 75%, 100%
-                    const leftPosition = (index / (pricingTiers.length - 1)) * 100;
-                    return (
-                      <div 
-                        key={index} 
-                        className="absolute transform -translate-x-1/2"
-                        style={{ left: `${leftPosition}%` }}
-                      >
-                        {tier.isEnterprise ? (
-                          <div className="space-y-1 text-center cursor-pointer group hover:scale-105 transition-transform duration-200" onClick={() => setSelectedTier(index)}>
-                            <div className="text-lg font-bold text-earth dark:text-white group-hover:text-zapier-orange transition-colors">Enterprise</div>
-                            <div className="text-base text-earth/70 dark:text-white/70 group-hover:text-zapier-orange/70 transition-colors">Let's talk</div>
-                          </div>
-                        ) : (
-                          <div 
-                            className="space-y-1 text-center cursor-pointer group hover:scale-110 transition-all duration-300 hover:transform hover:-translate-y-1"
-                            onClick={() => setSelectedTier(index)}
-                          >
-                            <div className="text-lg font-bold text-earth dark:text-white group-hover:text-zapier-orange transition-all duration-300 group-hover:scale-110">${tier.price}</div>
-                            <div className="text-base text-earth/70 dark:text-white/70 group-hover:text-zapier-orange/70 transition-all duration-300">{tier.credits} Credits</div>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-                {/* Spacer to maintain height */}
-                <div className="h-16 mt-5"></div>
-              </div>
-
-              {/* Selected Tier Display */}
-              <div className="text-left space-y-6">
+      {/* Pricing Slider - Break out of container for full width */}
+      <div className="mb-16 w-4/5 mx-auto px-4">
+        <Card className="bg-white dark:bg-blueberry/20 border-2 border-zapier-orange/50 dark:border-zapier-orange/60 p-8 shadow-xl shadow-zapier-orange/20 hover:shadow-2xl hover:shadow-zapier-orange/30 transition-all duration-500 hover:scale-[1.02] relative overflow-hidden group">
+          {/* Animated background gradient */}
+          <div className="absolute inset-0 bg-gradient-to-br from-zapier-orange/5 via-transparent to-citrus/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div className="relative z-10">
+          <CardHeader className="pb-6 pt-1">
+            <CardTitle className="text-2xl font-bold text-earth dark:text-white text-left">
+              Simple Pay As you go Pricing
+            </CardTitle>
+            <div className="mt-4">
+              <h3 className="text-lg font-semibold text-earth dark:text-white mb-4">
+                Why We're Just Better Than The Others? We Give You More!
+              </h3>
+              <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-3">
-                  {currentTier.isEnterprise ? (
-                    <>
-                      <h3 className="text-4xl text-zapier-orange mb-2">
-                        Enterprise
-                      </h3>
-                      <div className="text-lg text-earth/70 dark:text-white/70">
-                        Let's talk
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                       <div className="flex items-baseline space-x-2 animate-fade-in">
-                         <span className="text-2xl text-earth dark:text-white font-bold transition-all duration-300 hover:text-zapier-orange hover:scale-110">${currentTier.price}</span>
-                         <span className="text-xl text-earth dark:text-white">for</span>
-                         <span className="text-2xl text-earth dark:text-white font-bold transition-all duration-300 hover:text-zapier-orange hover:scale-110">{currentTier.credits} Credits</span>
-                        {currentTier.savings && (
-                          <Badge className="bg-green-100 text-green-800 ml-3 px-4 py-1.5 text-sm animate-pulse hover:animate-none hover:scale-110 transition-transform duration-200">
-                            {currentTier.savings}
-                          </Badge>
-                        )}
-                      </div>
-                      <div className="text-lg font-medium text-earth/80 dark:text-white/80">
-                        Apply for {currentTier.roles} Roles
-                      </div>
-                    </>
-                  )}
+                  <div className="flex items-center space-x-2">
+                    <Check className="h-4 w-4 text-green-600" />
+                    <span className="text-earth/80 dark:text-white/80">Pay for what you use, no sneaky recurring subscriptions</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Check className="h-4 w-4 text-green-600" />
+                    <span className="text-earth/80 dark:text-white/80">Access to all features all of the time, no gate keeping the good stuff</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Check className="h-4 w-4 text-green-600" />
+                    <span className="text-earth/80 dark:text-white/80">Clean, watermark-free downloads in popular PDF, Word or TXT formats</span>
+                  </div>
                 </div>
-
-                <Button 
-                  onClick={handleBuyCredits}
-                  variant="outline"
-                  className="border-2 border-zapier-orange bg-white hover:bg-zapier-orange hover:text-white text-zapier-orange px-8 py-3 text-lg font-normal transition-all duration-300 hover:shadow-xl hover:shadow-zapier-orange/30 hover:scale-105 group relative overflow-hidden"
-                >
-                  <span className="relative z-10 flex items-center">
-                    {currentTier.isEnterprise ? 'Contact Sales' : 'Buy Now'}
-                    <ArrowRight className="ml-2 h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
-                  </span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-zapier-orange to-apricot opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                </Button>
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-2">
+                    <X className="h-4 w-4 text-red-500" />
+                    <span className="text-earth/80 dark:text-white/80">No throttling AI model responses – you paid for it, you get the good stuff</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <X className="h-4 w-4 text-red-500" />
+                    <span className="text-earth/80 dark:text-white/80">No limits on your documents length - it's your info</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <X className="h-4 w-4 text-red-500" />
+                    <span className="text-earth/80 dark:text-white/80">We will never share or sell your data. It goes against our core values</span>
+                  </div>
+                </div>
               </div>
-            </CardContent>
             </div>
-          </Card>
-        </div>
+          </CardHeader>
+          <CardContent className="space-y-8 pt-5">
+            {/* Slider */}
+            <div className="px-4">
+              <Slider
+                value={[selectedTier]}
+                onValueChange={handleSliderChange}
+                max={4}
+                min={0}
+                step={1}
+                className="w-full [&>*:first-child]:bg-gray-200 dark:[&>*:first-child]:bg-gray-700 [&_[role=slider]]:h-5 [&_[role=slider]]:w-5 [&>*:first-child]:h-1 [&_[role=slider]]:shadow-lg [&_[role=slider]]:transition-all [&_[role=slider]]:duration-200 [&_[role=slider]]:hover:scale-110"
+              />
+            </div>
 
+            {/* Tier Labels Below Slider - Positioned to align with slider stops */}
+            <div className="px-4 relative">
+              <div className="relative flex">
+                {pricingTiers.map((tier, index) => {
+                  // Calculate position: 0%, 25%, 50%, 75%, 100%
+                  const leftPosition = (index / (pricingTiers.length - 1)) * 100;
+                  return (
+                    <div 
+                      key={index} 
+                      className="absolute transform -translate-x-1/2"
+                      style={{ left: `${leftPosition}%` }}
+                    >
+                      {tier.isEnterprise ? (
+                        <div className="space-y-1 text-center cursor-pointer group hover:scale-105 transition-transform duration-200" onClick={() => setSelectedTier(index)}>
+                          <div className="text-lg font-bold text-earth dark:text-white group-hover:text-zapier-orange transition-colors">Enterprise</div>
+                          <div className="text-base text-earth/70 dark:text-white/70 group-hover:text-zapier-orange/70 transition-colors">Let's talk</div>
+                        </div>
+                      ) : (
+                        <div 
+                          className="space-y-1 text-center cursor-pointer group hover:scale-110 transition-all duration-300 hover:transform hover:-translate-y-1"
+                          onClick={() => setSelectedTier(index)}
+                        >
+                          <div className="text-lg font-bold text-earth dark:text-white group-hover:text-zapier-orange transition-all duration-300 group-hover:scale-110">${tier.price}</div>
+                          <div className="text-base text-earth/70 dark:text-white/70 group-hover:text-zapier-orange/70 transition-all duration-300">{tier.credits} Credits</div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+              {/* Spacer to maintain height */}
+              <div className="h-16 mt-5"></div>
+            </div>
+
+            {/* Selected Tier Display */}
+            <div className="text-left space-y-6">
+              <div className="space-y-3">
+                {currentTier.isEnterprise ? (
+                  <>
+                    <h3 className="text-4xl text-zapier-orange mb-2">
+                      Enterprise
+                    </h3>
+                    <div className="text-lg text-earth/70 dark:text-white/70">
+                      Let's talk
+                    </div>
+                  </>
+                ) : (
+                  <>
+                     <div className="flex items-baseline space-x-2 animate-fade-in">
+                       <span className="text-2xl text-earth dark:text-white font-bold transition-all duration-300 hover:text-zapier-orange hover:scale-110">${currentTier.price}</span>
+                       <span className="text-xl text-earth dark:text-white">for</span>
+                       <span className="text-2xl text-earth dark:text-white font-bold transition-all duration-300 hover:text-zapier-orange hover:scale-110">{currentTier.credits} Credits</span>
+                      {currentTier.savings && (
+                        <Badge className="bg-green-100 text-green-800 ml-3 px-4 py-1.5 text-sm animate-pulse hover:animate-none hover:scale-110 transition-transform duration-200">
+                          {currentTier.savings}
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="text-lg font-medium text-earth/80 dark:text-white/80">
+                      Apply for {currentTier.roles} Roles
+                    </div>
+                  </>
+                )}
+              </div>
+
+              <Button 
+                onClick={handleBuyCredits}
+                variant="outline"
+                className="border-2 border-zapier-orange bg-white hover:bg-zapier-orange hover:text-white text-zapier-orange px-8 py-3 text-lg font-normal transition-all duration-300 hover:shadow-xl hover:shadow-zapier-orange/30 hover:scale-105 group relative overflow-hidden"
+              >
+                <span className="relative z-10 flex items-center">
+                  {currentTier.isEnterprise ? 'Contact Sales' : 'Buy Now'}
+                  <ArrowRight className="ml-2 h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-zapier-orange to-apricot opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </Button>
+            </div>
+          </CardContent>
+          </div>
+        </Card>
+      </div>
+
+      {/* Back to constrained container for remaining content */}
+      <div className="max-w-wider mx-auto px-4">
         {/* End-to-End Journey Section */}
         <div className="mb-16">
           <div className="text-center mb-8">
