@@ -90,7 +90,7 @@ const PricingScale = () => {
         </div>
 
         {/* Pricing Slider */}
-        <div className="mb-16 max-w-4xl mx-auto">
+        <div className="mb-16 w-4/5 mx-auto">
           <Card className="bg-white dark:bg-blueberry/20 border-2 border-zapier-orange/50 dark:border-zapier-orange/60 p-8 shadow-xl shadow-zapier-orange/20 hover:shadow-2xl hover:shadow-zapier-orange/30 transition-all duration-500 hover:scale-[1.02] relative overflow-hidden group">
             {/* Animated background gradient */}
             <div className="absolute inset-0 bg-gradient-to-br from-zapier-orange/5 via-transparent to-citrus/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -196,10 +196,10 @@ const PricingScale = () => {
                     </>
                   ) : (
                     <>
-                      <div className="flex items-baseline space-x-2 animate-fade-in">
-                        <span className="text-2xl text-zapier-orange font-bold transition-all duration-300 hover:scale-110">${currentTier.price}</span>
-                        <span className="text-xl text-earth dark:text-white">for</span>
-                        <span className="text-2xl text-zapier-orange font-bold transition-all duration-300 hover:scale-110">{currentTier.credits} Credits</span>
+                       <div className="flex items-baseline space-x-2 animate-fade-in">
+                         <span className="text-2xl text-earth dark:text-white font-bold transition-all duration-300 hover:text-zapier-orange hover:scale-110">${currentTier.price}</span>
+                         <span className="text-xl text-earth dark:text-white">for</span>
+                         <span className="text-2xl text-earth dark:text-white font-bold transition-all duration-300 hover:text-zapier-orange hover:scale-110">{currentTier.credits} Credits</span>
                         {currentTier.savings && (
                           <Badge className="bg-green-100 text-green-800 ml-3 px-4 py-1.5 text-sm animate-pulse hover:animate-none hover:scale-110 transition-transform duration-200">
                             {currentTier.savings}
