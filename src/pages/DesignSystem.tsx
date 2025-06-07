@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Eye, Code, Palette, Type, Square, Circle, Triangle, Zap, AlertTriangle, Search, Star, Heart, Award, Sparkles, Layers, Grid, Layout, MousePointer, Users, TrendingUp } from 'lucide-react';
+import { ArrowLeft, Eye, Code, Palette, Type, Square, Circle, Triangle, Zap, AlertTriangle, Search, Star, Heart, Award, Sparkles, Layers, Grid, Layout, MousePointer, Users, TrendingUp, Menu, ChevronDown, Info, Download, Settings, Bell, MessageSquare, Play, Pause, Volume2, RefreshCw, Camera, Clock, MapPin, Shield, Unlock, Lock, Mail, Upload } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -8,6 +8,9 @@ import { Separator } from '@/components/ui/separator';
 import { UnifiedInput } from '@/components/ui/unified-input';
 import { FloatingLabelInput } from '@/components/common/FloatingLabelInput';
 import { FloatingLabelTextarea } from '@/components/common/FloatingLabelTextarea';
+import { QuickActions } from '@/components/common/QuickActions';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel } from '@/components/ui/dropdown-menu';
 
 const DesignSystem = () => {
   const colorTokens = [
@@ -173,6 +176,90 @@ const DesignSystem = () => {
     { name: 'Micro', element: <small className="text-micro text-muted-foreground">Micro text for timestamps and metadata</small>, usage: '156 usages', semantic: 'text-micro' },
   ];
 
+  // Interaction Examples
+  const interactionExamples = [
+    {
+      name: 'Quick Actions Menu',
+      component: (
+        <div className="relative">
+          <QuickActions position="bottom-right" className="relative" showBackForward={false} />
+        </div>
+      ),
+      usage: '1 usage',
+      description: 'Floating action menu with multiple quick actions'
+    },
+    {
+      name: 'Dropdown Menu',
+      component: (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm">
+              <ChevronDown className="h-4 w-4 ml-1" />
+              Options
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-48">
+            <DropdownMenuLabel>Account</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>
+              <Settings className="h-4 w-4 mr-2" />
+              Settings
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Bell className="h-4 w-4 mr-2" />
+              Notifications
+            </DropdownMenuItem>
+            <DropdownMenuItem className="text-destructive">
+              <Download className="h-4 w-4 mr-2" />
+              Download
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ),
+      usage: '67 usages',
+      description: 'Contextual dropdown menus with proper background and high z-index'
+    },
+    {
+      name: 'Tooltip System',
+      component: (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="outline" size="sm">
+                <Info className="h-4 w-4 mr-1" />
+                Hover for tooltip
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>This is a helpful tooltip message</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      ),
+      usage: '89 usages',
+      description: 'Accessible tooltips with proper z-index and positioning'
+    },
+    {
+      name: 'Menu Text Animation',
+      component: (
+        <div className="space-y-2">
+          <div className="group cursor-pointer">
+            <span className="relative inline-block text-body text-foreground after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:bg-primary after:origin-bottom-right after:transition-transform after:duration-300 group-hover:after:scale-x-100 group-hover:after:origin-bottom-left">
+              Animated Menu Item
+            </span>
+          </div>
+          <div className="group cursor-pointer">
+            <span className="text-body text-muted-foreground transition-colors duration-200 group-hover:text-primary">
+              Color Transition Menu
+            </span>
+          </div>
+        </div>
+      ),
+      usage: '23 usages',
+      description: 'Animated menu items with underline and color transitions'
+    }
+  ];
+
   // Experimental Components
   const experimentalColorElements = [
     {
@@ -217,6 +304,92 @@ const DesignSystem = () => {
         <div className="flex gap-2 items-center">
           <div className="w-3 h-3 bg-success rounded-full animate-pulse" />
           <span className="text-caption">Online</span>
+        </div>
+      )
+    },
+    {
+      name: 'Color Picker Palette',
+      component: (
+        <div className="grid grid-cols-5 gap-1">
+          {['bg-primary', 'bg-success', 'bg-warning', 'bg-destructive', 'bg-info'].map((color, i) => (
+            <div key={i} className={`w-6 h-6 rounded-full ${color} cursor-pointer hover:scale-110 transition-transform`} />
+          ))}
+        </div>
+      )
+    },
+    {
+      name: 'Gradient Progress Bar',
+      component: (
+        <div className="w-full h-3 bg-muted rounded-full overflow-hidden">
+          <div className="h-full w-3/4 bg-gradient-to-r from-primary via-warning to-success rounded-full" />
+        </div>
+      )
+    },
+    {
+      name: 'Mood Color Ring',
+      component: (
+        <div className="relative w-16 h-16">
+          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-primary via-warning via-success to-info animate-spin" style={{ animationDuration: '4s' }} />
+          <div className="absolute inset-1 rounded-full bg-background" />
+        </div>
+      )
+    },
+    {
+      name: 'Color Blend Card',
+      component: (
+        <div className="relative overflow-hidden rounded-lg h-20">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-l from-success/20 to-transparent" />
+          <div className="relative p-3 text-caption text-foreground">Blended Colors</div>
+        </div>
+      )
+    },
+    {
+      name: 'Dynamic Shadow',
+      component: (
+        <div className="bg-card p-4 rounded-lg border border-border hover:shadow-lg hover:shadow-primary/20 transition-all duration-300 cursor-pointer">
+          <div className="text-caption text-foreground">Hover for colored shadow</div>
+        </div>
+      )
+    },
+    {
+      name: 'Color Pulse Animation',
+      component: (
+        <div className="w-12 h-12 bg-primary rounded-full animate-pulse opacity-80 relative">
+          <div className="absolute inset-2 bg-primary-foreground rounded-full animate-ping" />
+        </div>
+      )
+    },
+    {
+      name: 'Spectrum Gradient',
+      component: (
+        <div className="w-full h-8 rounded-lg bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500" />
+      )
+    },
+    {
+      name: 'Accent Border Card',
+      component: (
+        <div className="p-4 border-2 border-transparent bg-gradient-to-r from-primary to-success rounded-lg bg-clip-border">
+          <div className="bg-background rounded p-2 text-caption text-foreground">Gradient Border</div>
+        </div>
+      )
+    },
+    {
+      name: 'Color Feedback Button',
+      component: (
+        <button className="px-4 py-2 bg-muted text-foreground rounded transition-all duration-300 hover:bg-success hover:text-success-foreground active:bg-warning active:text-warning-foreground">
+          Interactive Colors
+        </button>
+      )
+    },
+    {
+      name: 'Theme Color Display',
+      component: (
+        <div className="flex gap-1">
+          <div className="w-4 h-4 bg-primary rounded" title="Primary" />
+          <div className="w-4 h-4 bg-success rounded" title="Success" />
+          <div className="w-4 h-4 bg-warning rounded" title="Warning" />
+          <div className="w-4 h-4 bg-destructive rounded" title="Error" />
         </div>
       )
     }
@@ -273,6 +446,112 @@ const DesignSystem = () => {
           </div>
         </div>
       )
+    },
+    {
+      name: 'Rotate on Hover',
+      component: (
+        <div className="bg-warning text-warning-foreground p-3 rounded-lg transition-transform hover:rotate-12 cursor-pointer">
+          <Settings className="h-5 w-5" />
+        </div>
+      )
+    },
+    {
+      name: 'Floating Animation',
+      component: (
+        <div className="bg-info text-info-foreground p-2 rounded-full animate-bounce" style={{ animationDuration: '2s' }}>
+          <MessageSquare className="h-4 w-4" />
+        </div>
+      )
+    },
+    {
+      name: 'Morphing Loader',
+      component: (
+        <div className="flex gap-1">
+          {[0, 1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="w-3 h-3 bg-primary rounded-full opacity-60 animate-pulse"
+              style={{ animationDelay: `${i * 0.2}s`, animationDuration: '1s' }}
+            />
+          ))}
+        </div>
+      )
+    },
+    {
+      name: 'Elastic Scale',
+      component: (
+        <button className="bg-success text-success-foreground p-3 rounded-lg transition-transform hover:scale-125 active:scale-95">
+          <Play className="h-4 w-4" />
+        </button>
+      )
+    },
+    {
+      name: 'Pendulum Swing',
+      component: (
+        <div className="relative w-16 h-8">
+          <div className="absolute top-0 left-1/2 w-0.5 h-6 bg-muted transform -translate-x-0.5" />
+          <div className="absolute bottom-0 left-1/2 w-3 h-3 bg-primary rounded-full animate-pulse transform -translate-x-1/2" style={{ animationDuration: '1.5s' }} />
+        </div>
+      )
+    },
+    {
+      name: 'Wave Effect',
+      component: (
+        <div className="flex gap-1">
+          {[0, 1, 2, 3, 4].map((i) => (
+            <div
+              key={i}
+              className="w-1 bg-primary animate-pulse"
+              style={{ 
+                height: `${8 + Math.sin(i * 0.5) * 4}px`,
+                animationDelay: `${i * 0.1}s`,
+                animationDuration: '0.8s'
+              }}
+            />
+          ))}
+        </div>
+      )
+    },
+    {
+      name: 'Heartbeat Pulse',
+      component: (
+        <div className="relative">
+          <Heart className="h-6 w-6 text-destructive animate-pulse" style={{ animationDuration: '1s' }} />
+          <div className="absolute inset-0 animate-ping opacity-30">
+            <Heart className="h-6 w-6 text-destructive" />
+          </div>
+        </div>
+      )
+    },
+    {
+      name: 'Rotation Loader',
+      component: (
+        <div className="relative w-8 h-8">
+          <RefreshCw className="h-8 w-8 text-primary animate-spin" />
+        </div>
+      )
+    },
+    {
+      name: 'Fade In Up',
+      component: (
+        <div className="bg-card border border-border p-3 rounded-lg animate-slide-up opacity-0" style={{ animation: 'slide-up 0.5s ease-out forwards' }}>
+          <span className="text-caption text-foreground">Slides up on load</span>
+        </div>
+      )
+    },
+    {
+      name: 'Stagger Animation',
+      component: (
+        <div className="space-y-1">
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className="w-full h-2 bg-primary/60 rounded animate-pulse"
+              style={{ animationDelay: `${i * 0.2}s` }}
+            />
+          ))}
+        </div>
+      )
     }
   ];
 
@@ -298,7 +577,7 @@ const DesignSystem = () => {
     {
       name: 'Floating Panel',
       component: (
-        <div className="fixed bottom-4 right-4 bg-card border border-border p-3 rounded-lg shadow-lg">
+        <div className="bg-card border border-border p-3 rounded-lg shadow-lg relative">
           <div className="text-caption">Floating Action</div>
         </div>
       )
@@ -318,6 +597,103 @@ const DesignSystem = () => {
         <div className="border border-border rounded">
           <div className="p-2 bg-muted text-caption font-medium">Expandable Section</div>
           <div className="p-2 text-micro text-muted-foreground">Hidden content here</div>
+        </div>
+      )
+    },
+    {
+      name: 'Card Stack',
+      component: (
+        <div className="relative">
+          <div className="absolute top-0 left-2 w-full h-12 bg-muted/50 rounded border" />
+          <div className="absolute top-1 left-1 w-full h-12 bg-muted/70 rounded border" />
+          <div className="relative w-full h-12 bg-card rounded border border-border p-2 text-caption">Top Card</div>
+        </div>
+      )
+    },
+    {
+      name: 'Sidebar Layout',
+      component: (
+        <div className="flex h-16 rounded border border-border overflow-hidden">
+          <div className="w-16 bg-muted border-r border-border p-2 text-micro">Nav</div>
+          <div className="flex-1 bg-card p-2 text-caption">Content Area</div>
+        </div>
+      )
+    },
+    {
+      name: 'Hero Section',
+      component: (
+        <div className="bg-gradient-to-r from-primary/10 to-warning/10 p-4 rounded-lg text-center">
+          <div className="text-heading font-bold text-foreground">Hero Title</div>
+          <div className="text-caption text-muted-foreground">Subtitle text here</div>
+        </div>
+      )
+    },
+    {
+      name: 'Flex Wrap Grid',
+      component: (
+        <div className="flex flex-wrap gap-2">
+          {[1, 2, 3, 4, 5].map(i => (
+            <div key={i} className="flex-shrink-0 w-8 h-8 bg-primary/20 rounded text-micro text-center leading-8">{i}</div>
+          ))}
+        </div>
+      )
+    },
+    {
+      name: 'Responsive Columns',
+      component: (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-micro">
+          <div className="bg-card border border-border p-2 rounded">Col 1</div>
+          <div className="bg-card border border-border p-2 rounded">Col 2</div>
+          <div className="bg-card border border-border p-2 rounded">Col 3</div>
+        </div>
+      )
+    },
+    {
+      name: 'Fixed Header Layout',
+      component: (
+        <div className="relative h-20 border border-border rounded overflow-hidden">
+          <div className="sticky top-0 bg-primary text-primary-foreground p-2 text-micro">Fixed Header</div>
+          <div className="p-2 text-caption">Scrollable content below header</div>
+        </div>
+      )
+    },
+    {
+      name: 'Card Grid Auto-fit',
+      component: (
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(60px,1fr))] gap-2">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="bg-success/20 p-2 rounded text-micro text-center">{i}</div>
+          ))}
+        </div>
+      )
+    },
+    {
+      name: 'Overlay Layout',
+      component: (
+        <div className="relative h-16 bg-gradient-to-r from-info/20 to-warning/20 rounded">
+          <div className="absolute inset-0 bg-foreground/10 rounded" />
+          <div className="relative p-2 text-caption text-foreground">Overlay Content</div>
+        </div>
+      )
+    },
+    {
+      name: 'Tab Container',
+      component: (
+        <div className="border border-border rounded">
+          <div className="flex border-b border-border">
+            <div className="px-3 py-1 bg-muted text-micro">Tab 1</div>
+            <div className="px-3 py-1 text-micro">Tab 2</div>
+          </div>
+          <div className="p-2 text-caption">Tab content here</div>
+        </div>
+      )
+    },
+    {
+      name: 'Center Stack',
+      component: (
+        <div className="flex flex-col items-center justify-center h-16 bg-muted/20 rounded space-y-1">
+          <div className="text-caption font-medium text-foreground">Centered</div>
+          <div className="text-micro text-muted-foreground">Stack Layout</div>
         </div>
       )
     }
@@ -371,6 +747,108 @@ const DesignSystem = () => {
           ))}
         </div>
       )
+    },
+    {
+      name: 'Slider Range',
+      component: (
+        <div className="w-full">
+          <div className="relative h-2 bg-muted rounded-full">
+            <div className="absolute left-0 h-2 w-3/5 bg-primary rounded-full" />
+            <div className="absolute top-1/2 left-3/5 w-3 h-3 bg-primary rounded-full transform -translate-x-1/2 -translate-y-1/2 cursor-pointer" />
+          </div>
+        </div>
+      )
+    },
+    {
+      name: 'Checkbox Custom',
+      component: (
+        <div className="flex items-center space-x-2">
+          <div className="w-4 h-4 border border-border rounded bg-primary flex items-center justify-center">
+            <div className="w-2 h-2 bg-primary-foreground rounded" />
+          </div>
+          <span className="text-caption">Custom checkbox</span>
+        </div>
+      )
+    },
+    {
+      name: 'Radio Group',
+      component: (
+        <div className="space-y-2">
+          <div className="flex items-center space-x-2">
+            <div className="w-4 h-4 border border-border rounded-full bg-primary flex items-center justify-center">
+              <div className="w-1.5 h-1.5 bg-primary-foreground rounded-full" />
+            </div>
+            <span className="text-micro">Option 1</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <div className="w-4 h-4 border border-border rounded-full" />
+            <span className="text-micro">Option 2</span>
+          </div>
+        </div>
+      )
+    },
+    {
+      name: 'File Upload Zone',
+      component: (
+        <div className="border-2 border-dashed border-muted p-4 rounded text-center hover:border-primary transition-colors cursor-pointer">
+          <Upload className="h-4 w-4 mx-auto mb-1 text-muted-foreground" />
+          <div className="text-micro text-muted-foreground">Drop files here</div>
+        </div>
+      )
+    },
+    {
+      name: 'Modal Trigger',
+      component: (
+        <button className="px-3 py-1 bg-warning text-warning-foreground rounded text-caption hover:bg-warning/90 transition-colors">
+          Open Modal
+        </button>
+      )
+    },
+    {
+      name: 'Stepper Control',
+      component: (
+        <div className="flex items-center border border-border rounded">
+          <button className="px-2 py-1 hover:bg-muted text-muted-foreground">-</button>
+          <span className="px-3 py-1 text-caption">3</span>
+          <button className="px-2 py-1 hover:bg-muted text-muted-foreground">+</button>
+        </div>
+      )
+    },
+    {
+      name: 'Color Picker',
+      component: (
+        <div className="relative">
+          <div className="w-8 h-8 bg-primary rounded border border-border cursor-pointer" />
+          <div className="absolute top-0 right-0 w-2 h-2 bg-warning rounded-full border border-background" />
+        </div>
+      )
+    },
+    {
+      name: 'Keyboard Shortcut',
+      component: (
+        <div className="flex items-center space-x-1">
+          <kbd className="px-1 py-0.5 bg-muted border border-border rounded text-micro">⌘</kbd>
+          <kbd className="px-1 py-0.5 bg-muted border border-border rounded text-micro">K</kbd>
+        </div>
+      )
+    },
+    {
+      name: 'Context Menu',
+      component: (
+        <div className="bg-card border border-border rounded shadow-lg p-1 min-w-[120px]">
+          <div className="px-2 py-1 hover:bg-muted rounded text-micro cursor-pointer">Cut</div>
+          <div className="px-2 py-1 hover:bg-muted rounded text-micro cursor-pointer">Copy</div>
+          <div className="px-2 py-1 hover:bg-muted rounded text-micro cursor-pointer">Paste</div>
+        </div>
+      )
+    },
+    {
+      name: 'Pin Button',
+      component: (
+        <button className="p-1 rounded hover:bg-muted transition-colors">
+          <MapPin className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+        </button>
+      )
     }
   ];
 
@@ -419,6 +897,118 @@ const DesignSystem = () => {
         <div className="text-center">
           <div className="text-title font-bold text-primary">1,234</div>
           <div className="text-caption text-muted-foreground">Users</div>
+        </div>
+      )
+    },
+    {
+      name: 'Alert Banner',
+      component: (
+        <div className="bg-warning/10 border border-warning/20 p-3 rounded flex items-start gap-2">
+          <AlertTriangle className="h-4 w-4 text-warning mt-0.5" />
+          <div>
+            <div className="text-caption font-medium text-foreground">Warning</div>
+            <div className="text-micro text-muted-foreground">This action cannot be undone</div>
+          </div>
+        </div>
+      )
+    },
+    {
+      name: 'Breadcrumb Trail',
+      component: (
+        <div className="flex items-center space-x-2 text-micro text-muted-foreground">
+          <span>Home</span>
+          <ChevronDown className="h-3 w-3 rotate-[-90deg]" />
+          <span>Products</span>
+          <ChevronDown className="h-3 w-3 rotate-[-90deg]" />
+          <span className="text-foreground">Details</span>
+        </div>
+      )
+    },
+    {
+      name: 'Tag Cloud',
+      component: (
+        <div className="flex flex-wrap gap-1">
+          {['React', 'TypeScript', 'Tailwind'].map(tag => (
+            <span key={tag} className="px-2 py-1 bg-muted text-micro rounded hover:bg-primary/20 cursor-pointer">
+              {tag}
+            </span>
+          ))}
+        </div>
+      )
+    },
+    {
+      name: 'Progress Steps',
+      component: (
+        <div className="flex items-center space-x-2">
+          <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center text-micro text-primary-foreground">1</div>
+          <div className="w-8 h-0.5 bg-primary" />
+          <div className="w-6 h-6 bg-muted rounded-full flex items-center justify-center text-micro">2</div>
+          <div className="w-8 h-0.5 bg-muted" />
+          <div className="w-6 h-6 bg-muted rounded-full flex items-center justify-center text-micro">3</div>
+        </div>
+      )
+    },
+    {
+      name: 'User Avatar',
+      component: (
+        <div className="relative">
+          <div className="w-10 h-10 bg-gradient-to-br from-primary to-warning rounded-full flex items-center justify-center text-caption font-medium text-primary-foreground">
+            JD
+          </div>
+          <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-success rounded-full border-2 border-background" />
+        </div>
+      )
+    },
+    {
+      name: 'Notification Badge',
+      component: (
+        <div className="relative">
+          <Bell className="h-6 w-6 text-muted-foreground" />
+          <div className="absolute -top-1 -right-1 w-4 h-4 bg-destructive rounded-full flex items-center justify-center text-micro text-destructive-foreground">
+            3
+          </div>
+        </div>
+      )
+    },
+    {
+      name: 'Search Result',
+      component: (
+        <div className="border border-border rounded p-3 hover:bg-muted/20 cursor-pointer">
+          <div className="text-caption font-medium text-foreground">Search Result Title</div>
+          <div className="text-micro text-muted-foreground mt-1">Brief description of the search result...</div>
+          <div className="text-micro text-primary mt-1">example.com</div>
+        </div>
+      )
+    },
+    {
+      name: 'Loading Card',
+      component: (
+        <div className="border border-border rounded p-4 space-y-2">
+          <div className="h-4 bg-muted rounded animate-pulse" />
+          <div className="h-3 bg-muted rounded animate-pulse w-3/4" />
+          <div className="h-3 bg-muted rounded animate-pulse w-1/2" />
+        </div>
+      )
+    },
+    {
+      name: 'Empty State',
+      component: (
+        <div className="text-center p-6 border border-dashed border-muted rounded">
+          <Search className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+          <div className="text-caption text-muted-foreground">No results found</div>
+          <div className="text-micro text-muted-foreground">Try adjusting your search</div>
+        </div>
+      )
+    },
+    {
+      name: 'Metric Card',
+      component: (
+        <div className="bg-gradient-to-br from-success/10 to-success/5 border border-success/20 p-3 rounded">
+          <div className="flex items-center justify-between">
+            <div className="text-title font-bold text-success">+12%</div>
+            <TrendingUp className="h-4 w-4 text-success" />
+          </div>
+          <div className="text-micro text-muted-foreground">vs last month</div>
         </div>
       )
     }
@@ -508,7 +1098,7 @@ const DesignSystem = () => {
               <div className="flex items-center gap-2">
                 <Sparkles className="h-5 w-5 text-destructive" />
                 <div>
-                  <p className="text-title font-bold text-foreground">25</p>
+                  <p className="text-title font-bold text-foreground">75</p>
                   <p className="text-caption text-muted-foreground">Experimental</p>
                 </div>
               </div>
@@ -723,6 +1313,36 @@ const DesignSystem = () => {
           </CardContent>
         </Card>
 
+        {/* Interaction Examples */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <MousePointer className="h-5 w-5" />
+              Interaction Examples
+              <Badge variant="default" className="text-micro">LIVE COMPONENTS</Badge>
+            </CardTitle>
+            <p className="text-caption text-muted-foreground mt-2">
+              Interactive components including quick actions, dropdowns, tooltips, and menu animations
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {interactionExamples.map((interaction, index) => (
+                <div key={interaction.name} className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-medium text-foreground text-body">{interaction.name}</h4>
+                    <Badge variant="outline" className="text-micro">{interaction.usage}</Badge>
+                  </div>
+                  <div className="border border-border rounded-lg p-4 bg-card flex items-center justify-center min-h-[100px]">
+                    {interaction.component}
+                  </div>
+                  <p className="text-caption text-muted-foreground">{interaction.description}</p>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Experimental Section */}
         <div className="space-y-8">
           <div className="text-center">
@@ -738,7 +1358,7 @@ const DesignSystem = () => {
               <CardTitle className="flex items-center gap-2">
                 <Palette className="h-5 w-5" />
                 Color Experiments
-                <Badge variant="secondary" className="text-micro">5 NEW ELEMENTS</Badge>
+                 <Badge variant="secondary" className="text-micro">15 NEW ELEMENTS</Badge>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -761,7 +1381,7 @@ const DesignSystem = () => {
               <CardTitle className="flex items-center gap-2">
                 <Zap className="h-5 w-5" />
                 Animation Experiments
-                <Badge variant="secondary" className="text-micro">5 NEW ELEMENTS</Badge>
+                 <Badge variant="secondary" className="text-micro">15 NEW ELEMENTS</Badge>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -784,7 +1404,7 @@ const DesignSystem = () => {
               <CardTitle className="flex items-center gap-2">
                 <Layout className="h-5 w-5" />
                 Layout Experiments
-                <Badge variant="secondary" className="text-micro">5 NEW ELEMENTS</Badge>
+                 <Badge variant="secondary" className="text-micro">15 NEW ELEMENTS</Badge>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -807,7 +1427,7 @@ const DesignSystem = () => {
               <CardTitle className="flex items-center gap-2">
                 <MousePointer className="h-5 w-5" />
                 Interaction Experiments
-                <Badge variant="secondary" className="text-micro">5 NEW ELEMENTS</Badge>
+                 <Badge variant="secondary" className="text-micro">15 NEW ELEMENTS</Badge>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -830,7 +1450,7 @@ const DesignSystem = () => {
               <CardTitle className="flex items-center gap-2">
                 <Grid className="h-5 w-5" />
                 Content Experiments
-                <Badge variant="secondary" className="text-micro">5 NEW ELEMENTS</Badge>
+                <Badge variant="secondary" className="text-micro">15 NEW ELEMENTS</Badge>
               </CardTitle>
             </CardHeader>
             <CardContent>
