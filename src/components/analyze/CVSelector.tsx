@@ -252,6 +252,34 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
               documentType="cv"
               onOpenVerification={() => setShowVerificationModal(true)}
               onRemove={() => window.location.reload()}
+              onSaveToCVs={async () => {
+                if (user?.id && savedCVs.length < 5) {
+                  try {
+                    const { error: saveError } = await supabase
+                      .from('uploads')
+                      .insert({
+                        user_id: user.id,
+                        file_name: selectedCV.file.name,
+                        file_type: selectedCV.file.type,
+                        file_size: selectedCV.file.size,
+                        upload_type: 'cv',
+                        extracted_text: selectedCV.extractedText
+                      });
+
+                    if (saveError) {
+                      toast({ title: 'Error', description: 'Failed to save CV', variant: 'destructive' });
+                    } else {
+                      toast({ title: 'Success', description: 'CV added to your saved CVs!' });
+                      refetch();
+                    }
+                  } catch (error) {
+                    toast({ title: 'Error', description: 'Failed to save CV', variant: 'destructive' });
+                  }
+                } else if (savedCVs.length >= 5) {
+                  toast({ title: 'Limit Reached', description: 'You can save up to 5 CVs. Please delete one first.', variant: 'destructive' });
+                }
+              }}
+              canSaveToCVs={savedCVs.length < 5}
             />
             
             <DocumentVerificationModal
@@ -263,46 +291,6 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
               documentType="cv"
               onSave={handleVerificationSave}
             />
-            
-            {/* Add to Saved CVs Button */}
-            <div className="mt-4 flex justify-center">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={async () => {
-                  if (user?.id && savedCVs.length < 5) {
-                    try {
-                      const { error: saveError } = await supabase
-                        .from('uploads')
-                        .insert({
-                          user_id: user.id,
-                          file_name: selectedCV.file.name,
-                          file_type: selectedCV.file.type,
-                          file_size: selectedCV.file.size,
-                          upload_type: 'cv',
-                          extracted_text: selectedCV.extractedText
-                        });
-
-                      if (saveError) {
-                        toast({ title: 'Error', description: 'Failed to save CV', variant: 'destructive' });
-                      } else {
-                        toast({ title: 'Success', description: 'CV added to your saved CVs!' });
-                        refetch();
-                      }
-                    } catch (error) {
-                      toast({ title: 'Error', description: 'Failed to save CV', variant: 'destructive' });
-                    }
-                  } else if (savedCVs.length >= 5) {
-                    toast({ title: 'Limit Reached', description: 'You can save up to 5 CVs. Please delete one first.', variant: 'destructive' });
-                  }
-                }}
-                disabled={savedCVs.length >= 5}
-                className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200"
-              >
-                <Heart className="h-3 w-3 mr-2" />
-                Add to My Saved CVs
-              </Button>
-            </div>
           </>
         ) : (
           <div className="space-y-4">

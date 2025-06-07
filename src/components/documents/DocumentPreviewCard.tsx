@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileText, Edit, AlertTriangle, CheckCircle, Info, X } from 'lucide-react';
+import { FileText, Edit, AlertTriangle, CheckCircle, Info, X, Heart } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -14,6 +14,8 @@ interface DocumentPreviewCardProps {
   documentType: 'cv' | 'job_description';
   onOpenVerification: () => void;
   onRemove: () => void;
+  onSaveToCVs?: () => void;
+  canSaveToCVs?: boolean;
 }
 
 const DocumentPreviewCard: React.FC<DocumentPreviewCardProps> = ({
@@ -22,7 +24,9 @@ const DocumentPreviewCard: React.FC<DocumentPreviewCardProps> = ({
   extractedText,
   documentType,
   onOpenVerification,
-  onRemove
+  onRemove,
+  onSaveToCVs,
+  canSaveToCVs = false
 }) => {
   const quality = assessDocumentQuality(extractedText, fileName, documentType);
   
@@ -108,6 +112,18 @@ const DocumentPreviewCard: React.FC<DocumentPreviewCardProps> = ({
             <Edit className="h-3 w-3 mr-2" />
             Review & Edit
           </Button>
+          {onSaveToCVs && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onSaveToCVs}
+              disabled={!canSaveToCVs}
+              className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200"
+            >
+              <Heart className="h-3 w-3 mr-2" />
+              Add to Saved CVs
+            </Button>
+          )}
           <Button
             variant="outline"
             size="sm"
