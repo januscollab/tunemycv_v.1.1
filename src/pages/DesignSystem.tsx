@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Eye, Code, Palette, Type, Square, Circle, Triangle } from 'lucide-react';
+import { ArrowLeft, Eye, Code, Palette, Type, Square, Circle, Triangle, Zap } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -15,16 +15,70 @@ import { FloatingLabelTextarea } from '@/components/common/FloatingLabelTextarea
 
 const DesignSystem = () => {
   const colorTokens = [
-    { name: 'Primary', class: 'bg-primary', usage: '127 usages' },
-    { name: 'Zapier Orange', class: 'bg-zapier-orange', usage: '89 usages' },
-    { name: 'Earth', class: 'bg-earth', usage: '156 usages' },
-    { name: 'Blueberry', class: 'bg-blueberry', usage: '94 usages' },
-    { name: 'Apple Core', class: 'bg-apple-core', usage: '78 usages' },
-    { name: 'Citrus', class: 'bg-citrus', usage: '45 usages' },
-    { name: 'Apricot', class: 'bg-apricot', usage: '23 usages' },
-    { name: 'Cream', class: 'bg-cream', usage: '34 usages' },
-    { name: 'Surface', class: 'bg-surface', usage: '67 usages' },
-    { name: 'Background', class: 'bg-background', usage: '89 usages' },
+    { 
+      name: 'Primary', 
+      class: 'bg-primary', 
+      usage: '127 usages',
+      lightHex: '#FF4A00',
+      darkHex: '#FF4A00',
+      description: 'Main brand color for CTAs and primary actions'
+    },
+    { 
+      name: 'Background', 
+      class: 'bg-background', 
+      usage: '89 usages',
+      lightHex: '#FFFFFF',
+      darkHex: '#09090B',
+      description: 'Main background color with theme variants'
+    },
+    { 
+      name: 'Foreground', 
+      class: 'bg-foreground', 
+      usage: '234 usages',
+      lightHex: '#0F172A',
+      darkHex: '#FAFAFA',
+      description: 'Primary text color'
+    },
+    { 
+      name: 'Surface', 
+      class: 'bg-surface', 
+      usage: '67 usages',
+      lightHex: '#FFFFFF',
+      darkHex: '#18181B',
+      description: 'Elevated surfaces and cards'
+    },
+    { 
+      name: 'Success', 
+      class: 'bg-success', 
+      usage: '45 usages',
+      lightHex: '#22C55E',
+      darkHex: '#22C55E',
+      description: 'Success states and positive feedback'
+    },
+    { 
+      name: 'Warning', 
+      class: 'bg-warning', 
+      usage: '23 usages',
+      lightHex: '#F59E0B',
+      darkHex: '#F59E0B',
+      description: 'Warning states and caution alerts'
+    },
+    { 
+      name: 'Destructive', 
+      class: 'bg-destructive', 
+      usage: '34 usages',
+      lightHex: '#EF4444',
+      darkHex: '#F87171',
+      description: 'Error states and destructive actions'
+    },
+    { 
+      name: 'Muted', 
+      class: 'bg-muted', 
+      usage: '156 usages',
+      lightHex: '#F8FAFC',
+      darkHex: '#272729',
+      description: 'Subtle backgrounds and disabled states'
+    },
   ];
 
   const inputComponents = [
@@ -32,54 +86,106 @@ const DesignSystem = () => {
       name: 'Standard Input', 
       component: <Input placeholder="Standard input" />, 
       usage: '23 usages',
-      description: 'Basic input component with standard styling'
+      description: 'Basic input component with standard styling',
+      status: 'deprecated',
+      migration: 'Use Floating Label Input instead'
     },
     { 
       name: 'Secure Input', 
       component: <SecureInput placeholder="Secure input with sanitization" />, 
       usage: '18 usages',
-      description: 'Input with built-in sanitization and security features'
+      description: 'Input with built-in sanitization and security features',
+      status: 'deprecated', 
+      migration: 'Use Floating Label Input with secure=true'
     },
     { 
       name: 'Textarea', 
       component: <Textarea placeholder="Standard textarea" rows={3} />, 
       usage: '15 usages',
-      description: 'Multi-line text input component'
+      description: 'Multi-line text input component',
+      status: 'deprecated',
+      migration: 'Use Floating Label Textarea instead'
     },
     { 
       name: 'Secure Textarea', 
       component: <SecureTextarea placeholder="Secure textarea" rows={3} />, 
       usage: '12 usages',
-      description: 'Secure multi-line text input with sanitization'
+      description: 'Secure multi-line text input with sanitization',
+      status: 'deprecated',
+      migration: 'Use Floating Label Textarea with secure=true'
     },
     { 
       name: 'Floating Label Input', 
       component: <FloatingLabelInput label="Floating label" />, 
       usage: '8 usages',
-      description: 'Input with animated floating label'
+      description: 'Input with animated floating label',
+      status: 'recommended',
+      migration: 'Current recommended approach for new components'
     },
     { 
       name: 'Floating Label Textarea', 
       component: <FloatingLabelTextarea label="Floating label" rows={3} />, 
       usage: '5 usages',
-      description: 'Textarea with animated floating label'
+      description: 'Textarea with animated floating label',
+      status: 'recommended',
+      migration: 'Current recommended approach for new components'
     },
     { 
-      name: 'NEW: Unified Input', 
-      component: <UnifiedInput placeholder="Unified input system" variant="standard" />, 
-      usage: '0 usages (New)',
-      description: 'New unified input system combining all variants'
+      name: 'Unified Input', 
+      component: <UnifiedInput placeholder="Unified input system" variant="floating" label="Unified label" />, 
+      usage: '0 usages (Future)',
+      description: 'Next-generation unified input system with all variants',
+      status: 'future',
+      migration: 'Will replace all input types when ready'
     },
   ];
 
   const buttonVariants = [
-    { name: 'Default', variant: 'default', usage: '89 usages' },
-    { name: 'Primary', variant: 'default', usage: '67 usages' },
-    { name: 'Secondary', variant: 'secondary', usage: '45 usages' },
-    { name: 'Destructive', variant: 'destructive', usage: '23 usages' },
-    { name: 'Outline', variant: 'outline', usage: '34 usages' },
-    { name: 'Ghost', variant: 'ghost', usage: '56 usages' },
-    { name: 'Link', variant: 'link', usage: '12 usages' },
+    { name: 'Primary (Default)', variant: 'default', usage: '156 usages', description: 'Main CTA button with primary styling' },
+    { name: 'Secondary', variant: 'secondary', usage: '45 usages', description: 'Secondary actions with muted styling' },
+    { name: 'Destructive', variant: 'destructive', usage: '23 usages', description: 'Dangerous actions like delete' },
+    { name: 'Outline', variant: 'outline', usage: '34 usages', description: 'Subtle emphasis with border' },
+    { name: 'Ghost', variant: 'ghost', usage: '56 usages', description: 'Minimal styling for subtle actions' },
+    { name: 'Link', variant: 'link', usage: '12 usages', description: 'Text-style buttons for inline actions' },
+  ];
+
+  const animationTypes = [
+    { 
+      name: 'Hover Effects', 
+      example: <Button className="transition-all hover:scale-105" size="sm">Hover me</Button>,
+      usage: '120+ usages',
+      description: 'Scale, shadow, and color transitions on interactive elements'
+    },
+    { 
+      name: 'Focus States', 
+      example: <Button size="sm" className="focus-visible:ring-2 focus-visible:ring-primary">Focus me</Button>,
+      usage: '89 usages',
+      description: 'Accessibility-focused ring animations for keyboard navigation'
+    },
+    { 
+      name: 'Theme Transitions', 
+      example: <div className="w-16 h-8 bg-background border rounded transition-all duration-300">Theme</div>,
+      usage: '45+ usages',
+      description: 'Smooth color transitions when switching light/dark themes'
+    },
+    { 
+      name: 'Loading States', 
+      example: <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin">Loading</div>,
+      usage: '12 usages',
+      description: 'Spinner and pulse animations for loading feedback'
+    },
+    { 
+      name: 'Micro-interactions', 
+      example: <Button size="sm" className="active:scale-95 transition-transform">Click me</Button>,
+      usage: '67 usages',
+      description: 'Subtle feedback on user interactions like clicks'
+    },
+    { 
+      name: 'Page Transitions', 
+      example: <div className="opacity-100 transform translate-y-0 transition-all">Fade in</div>,
+      usage: '23 usages',
+      description: 'Entrance and exit animations for page/component changes'
+    },
   ];
 
   const typographyElements = [
@@ -110,14 +216,14 @@ const DesignSystem = () => {
         </div>
 
         {/* Summary Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center gap-2">
-                <Palette className="h-5 w-5 text-zapier-orange" />
+                <Palette className="h-5 w-5 text-primary" />
                 <div>
-                  <p className="text-2xl font-bold text-earth dark:text-white">10</p>
-                  <p className="text-sm text-earth/60 dark:text-white/60">Color Tokens</p>
+                  <p className="text-2xl font-bold text-foreground">8</p>
+                  <p className="text-sm text-muted-foreground">Color Tokens</p>
                 </div>
               </div>
             </CardContent>
@@ -125,10 +231,10 @@ const DesignSystem = () => {
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center gap-2">
-                <Square className="h-5 w-5 text-primary" />
+                <Square className="h-5 w-5 text-warning" />
                 <div>
-                  <p className="text-2xl font-bold text-earth dark:text-white">7</p>
-                  <p className="text-sm text-earth/60 dark:text-white/60">Input Types</p>
+                  <p className="text-2xl font-bold text-foreground">7</p>
+                  <p className="text-sm text-muted-foreground">Input Types</p>
                 </div>
               </div>
             </CardContent>
@@ -136,10 +242,10 @@ const DesignSystem = () => {
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center gap-2">
-                <Circle className="h-5 w-5 text-apricot" />
+                <Circle className="h-5 w-5 text-success" />
                 <div>
-                  <p className="text-2xl font-bold text-earth dark:text-white">7</p>
-                  <p className="text-sm text-earth/60 dark:text-white/60">Button Variants</p>
+                  <p className="text-2xl font-bold text-foreground">6</p>
+                  <p className="text-sm text-muted-foreground">Button Variants</p>
                 </div>
               </div>
             </CardContent>
@@ -147,10 +253,21 @@ const DesignSystem = () => {
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center gap-2">
-                <Type className="h-5 w-5 text-citrus" />
+                <Type className="h-5 w-5 text-destructive" />
                 <div>
-                  <p className="text-2xl font-bold text-earth dark:text-white">6</p>
-                  <p className="text-sm text-earth/60 dark:text-white/60">Typography Styles</p>
+                  <p className="text-2xl font-bold text-foreground">6</p>
+                  <p className="text-sm text-muted-foreground">Typography Styles</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2">
+                <Zap className="h-5 w-5 text-primary" />
+                <div>
+                  <p className="text-2xl font-bold text-foreground">6</p>
+                  <p className="text-sm text-muted-foreground">Animation Types</p>
                 </div>
               </div>
             </CardContent>
@@ -164,16 +281,30 @@ const DesignSystem = () => {
               <Palette className="h-5 w-5" />
               Color System
             </CardTitle>
+            <p className="text-sm text-muted-foreground mt-2">
+              Semantic color tokens with light/dark mode HEX values for design handoff
+            </p>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {colorTokens.map((color) => (
-                <div key={color.name} className="space-y-2">
-                  <div className={`w-full h-16 rounded-lg ${color.class} border border-border`} />
-                  <div>
-                    <p className="font-medium text-earth dark:text-white">{color.name}</p>
-                    <p className="text-sm text-earth/60 dark:text-white/60">{color.class}</p>
-                    <Badge variant="secondary" className="text-xs mt-1">{color.usage}</Badge>
+                <div key={color.name} className="space-y-3">
+                  <div className={`w-full h-20 rounded-lg ${color.class} border border-border shadow-sm`} />
+                  <div className="space-y-2">
+                    <p className="font-semibold text-foreground">{color.name}</p>
+                    <p className="text-xs font-mono text-muted-foreground">{color.class}</p>
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-muted-foreground">Light:</span>
+                        <code className="text-xs font-mono bg-muted px-2 py-1 rounded">{color.lightHex}</code>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-muted-foreground">Dark:</span>
+                        <code className="text-xs font-mono bg-muted px-2 py-1 rounded">{color.darkHex}</code>
+                      </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground">{color.description}</p>
+                    <Badge variant="secondary" className="text-xs">{color.usage}</Badge>
                   </div>
                 </div>
               ))}
@@ -189,20 +320,33 @@ const DesignSystem = () => {
               Input System
               <Badge variant="destructive" className="text-xs">FRAGMENTED</Badge>
             </CardTitle>
-            <p className="text-sm text-earth/60 dark:text-white/60 mt-2">
-              Currently using 6 different input implementations. NEW: Unified Input system consolidates all variants.
+            <p className="text-sm text-muted-foreground mt-2">
+              Migration path to unified input system with clear deprecation warnings
             </p>
           </CardHeader>
           <CardContent>
             <div className="space-y-6">
               {inputComponents.map((input, index) => (
-                <div key={input.name} className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium text-earth dark:text-white">{input.name}</h4>
-                      <p className="text-sm text-earth/60 dark:text-white/60">{input.description}</p>
+                <div key={input.name} className="space-y-3">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h4 className="font-medium text-foreground">{input.name}</h4>
+                        <Badge 
+                          variant={
+                            input.status === 'deprecated' ? 'destructive' : 
+                            input.status === 'recommended' ? 'default' : 
+                            'secondary'
+                          } 
+                          className="text-xs"
+                        >
+                          {input.status.toUpperCase()}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-1">{input.description}</p>
+                      <p className="text-xs text-muted-foreground italic">{input.migration}</p>
                     </div>
-                    <Badge variant={input.name.includes('NEW') ? 'default' : 'secondary'}>
+                    <Badge variant="outline" className="text-xs ml-4">
                       {input.usage}
                     </Badge>
                   </div>
@@ -242,6 +386,41 @@ const DesignSystem = () => {
           </CardContent>
         </Card>
 
+        {/* Animation System */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Zap className="h-5 w-5" />
+              Animation System
+              <Badge variant="default" className="text-xs">COMPREHENSIVE</Badge>
+            </CardTitle>
+            <p className="text-sm text-muted-foreground mt-2">
+              Rich animation library covering hover effects, transitions, and micro-interactions
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {animationTypes.map((animation, index) => (
+                <div key={animation.name} className="space-y-3">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <h4 className="font-medium text-foreground mb-1">{animation.name}</h4>
+                      <p className="text-sm text-muted-foreground">{animation.description}</p>
+                    </div>
+                    <Badge variant="outline" className="text-xs ml-4">
+                      {animation.usage}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-center p-4 border border-border rounded-lg bg-muted/10">
+                    {animation.example}
+                  </div>
+                  {index < animationTypes.length - 1 && <Separator />}
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Typography System */}
         <Card className="mb-8">
           <CardHeader>
@@ -250,7 +429,7 @@ const DesignSystem = () => {
               Typography System
               <Badge variant="destructive" className="text-xs">NEEDS STANDARDIZATION</Badge>
             </CardTitle>
-            <p className="text-sm text-earth/60 dark:text-white/60 mt-2">
+            <p className="text-sm text-muted-foreground mt-2">
               Found 694+ hardcoded text sizes. Needs semantic typography classes.
             </p>
           </CardHeader>
@@ -259,7 +438,7 @@ const DesignSystem = () => {
               {typographyElements.map((typo, index) => (
                 <div key={typo.name} className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="font-medium text-earth dark:text-white">{typo.name}</span>
+                    <span className="font-medium text-foreground">{typo.name}</span>
                     <Badge variant="secondary" className="text-xs">{typo.usage}</Badge>
                   </div>
                   {typo.element}
