@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { CheckCircle, Download, ArrowLeft, Bug } from 'lucide-react';
 
@@ -45,10 +44,10 @@ const BugReportModal: React.FC<BugReportModalProps> = ({ isOpen, onClose, transa
               <Bug className="h-5 w-5 text-red-500" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-blueberry dark:text-citrus">
+              <h2 className="text-subheading font-semibold text-blueberry dark:text-citrus">
                 Report Analysis Error
               </h2>
-              <p className="text-sm text-blueberry/60 dark:text-apple-core/60">
+              <p className="text-caption text-blueberry/60 dark:text-apple-core/60">
                 Help us improve by reporting issues
               </p>
             </div>
@@ -124,10 +123,10 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
               </button>
             )}
             <div>
-              <h1 className="text-xl font-semibold text-gray-900 dark:text-citrus">
+              <h1 className="text-heading font-semibold text-gray-900 dark:text-citrus">
                 {companyName} - {position}
               </h1>
-              <div className="flex items-center gap-4 mt-2 text-sm text-gray-600 dark:text-apple-core/70">
+              <div className="flex items-center gap-4 mt-2 text-caption text-gray-600 dark:text-apple-core/70">
                 <div className="flex items-center gap-1">
                   <span>Analyzed on {analysisDate}</span>
                 </div>
@@ -214,7 +213,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
         <div className="mt-12 mb-8 bg-gray-50 dark:bg-blueberry/10 border border-gray-200 dark:border-citrus/20 rounded-lg p-4">
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <p className="text-sm text-blueberry/70 dark:text-apple-core/80">
+              <p className="text-caption text-blueberry/70 dark:text-apple-core/80">
                 <strong>Note:</strong> While our AI models are well-trained, occasional errors may occur. 
                 If you believe there's an error in your report, please contact us at{' '}
                 <a href="mailto:hello@tunemycv.com" className="text-apricot hover:text-apricot/80 underline">
@@ -225,7 +224,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
             </div>
             <button
               onClick={() => setShowBugReport(true)}
-              className="ml-4 p-2 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 rounded-lg transition-colors flex items-center gap-1 text-sm font-medium"
+              className="ml-4 p-2 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 rounded-lg transition-colors flex items-center gap-1 text-caption font-medium"
               title="Report an error in this analysis"
             >
               <Bug className="h-4 w-4" />

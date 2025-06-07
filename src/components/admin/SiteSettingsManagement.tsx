@@ -123,7 +123,7 @@ const SiteSettingsManagement: React.FC = () => {
     <div className="space-y-6">
       <Card className="border border-apple-core/20 dark:border-citrus/20">
         <CardHeader>
-          <CardTitle className="flex items-center text-xl font-semibold text-blueberry dark:text-citrus">
+          <CardTitle className="flex items-center text-heading font-semibold text-blueberry dark:text-citrus">
             <Settings className="h-5 w-5 text-apricot mr-2" />
             Site Settings
           </CardTitle>
@@ -131,7 +131,7 @@ const SiteSettingsManagement: React.FC = () => {
         <CardContent className="space-y-6">
           <div className="space-y-4">
             <div>
-              <Label htmlFor="admin_email" className="text-sm font-medium text-blueberry dark:text-apple-core">
+              <Label htmlFor="admin_email" className="text-caption font-medium text-blueberry dark:text-apple-core">
                 Admin Email
               </Label>
               <div className="mt-1 relative">
@@ -147,13 +147,13 @@ const SiteSettingsManagement: React.FC = () => {
                   secure={true}
                 />
               </div>
-              <p className="text-xs text-blueberry/60 dark:text-apple-core/60 mt-1">
+              <p className="text-micro text-blueberry/60 dark:text-apple-core/60 mt-1">
                 Email address for administrative notifications and error reports
               </p>
             </div>
 
             <div>
-              <Label htmlFor="support_email" className="text-sm font-medium text-blueberry dark:text-apple-core">
+              <Label htmlFor="support_email" className="text-caption font-medium text-blueberry dark:text-apple-core">
                 Support Email
               </Label>
               <div className="mt-1 relative">
@@ -169,14 +169,14 @@ const SiteSettingsManagement: React.FC = () => {
                   secure={true}
                 />
               </div>
-              <p className="text-xs text-blueberry/60 dark:text-apple-core/60 mt-1">
+              <p className="text-micro text-blueberry/60 dark:text-apple-core/60 mt-1">
                 Email address for customer support and feedback forms
               </p>
             </div>
           </div>
 
           <div className="flex items-center justify-between pt-4 border-t border-apple-core/20 dark:border-citrus/20">
-            <div className="text-sm text-blueberry/60 dark:text-apple-core/60">
+            <div className="text-caption text-blueberry/60 dark:text-apple-core/60">
               {settings && (
                 <span>Last updated: {new Date(settings.updated_at).toLocaleDateString()}</span>
               )}

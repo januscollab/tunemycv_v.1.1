@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Search, Eye, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -138,7 +137,7 @@ const UserManagement = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-title font-bold text-foreground">User Management</h1>
-        <div className="text-sm text-gray-500">
+        <div className="text-caption text-gray-500">
           Total Users: {users.length}
         </div>
       </div>
@@ -181,7 +180,7 @@ const UserManagement = () => {
                 </TableCell>
                 <TableCell className="text-gray-600">{user.email}</TableCell>
                 <TableCell>
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-micro font-medium bg-blue-100 text-blue-800">
                     {user.credits} credits
                   </span>
                 </TableCell>
