@@ -19,6 +19,7 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
 import Template from './pages/Template';
 import PricingScale from './pages/PricingScale';
+import DesignSystem from './pages/DesignSystem';
 import Navigation from './components/Navigation';
 import Footer from './components/Footer';
 import EnhancedSecurityHeaders from './components/security/EnhancedSecurityHeaders';
@@ -61,6 +62,7 @@ function AppContent() {
           <Route path="/help-centre" element={<HelpCentre />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-of-service" element={<TermsOfService />} />
+          <Route path="/design-system" element={<DesignSystem />} />
         </Routes>
       </main>
       <Footer />

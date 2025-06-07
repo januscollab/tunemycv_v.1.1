@@ -5,6 +5,7 @@ import UserManagement from '@/components/admin/UserManagement';
 import CreditManagement from '@/components/admin/CreditManagement';
 import AnalysisLogsManagement from '@/components/admin/AnalysisLogsManagement';
 import AIPromptsManagement from '@/components/admin/AIPromptsManagement';
+import SiteSettingsManagement from '@/components/admin/SiteSettingsManagement';
 
 import AdminNavigation from '@/components/admin/AdminNavigation';
 import { Button } from '@/components/ui/button';
@@ -65,16 +66,11 @@ const AdminDashboard = () => {
       case 'ai-prompts':
         return <AIPromptsManagement />;
       case 'site-settings':
-        return (
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-xl font-semibold text-blueberry mb-4">Site Settings</h2>
-            <p className="text-blueberry/70">Site settings functionality will be added here.</p>
-          </div>
-        );
+        return <SiteSettingsManagement />;
       case 'email-templates':
         return (
           <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-xl font-semibold text-blueberry mb-4">Email Templates</h2>
+            <h2 className="text-title font-semibold text-blueberry mb-4">Email Templates</h2>
             <p className="text-blueberry/70">Email template management will be added here.</p>
           </div>
         );
@@ -95,7 +91,7 @@ const AdminDashboard = () => {
     return (
       <div className="min-h-screen bg-apple-core/10 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
+          <h1 className="text-display font-bold text-gray-900 mb-4">Access Denied</h1>
           <p className="text-gray-600">You need admin privileges to access this dashboard.</p>
         </div>
       </div>
@@ -123,7 +119,7 @@ const AdminDashboard = () => {
           
           <div className="p-6 flex flex-col h-full">
             {!sidebarCollapsed && (
-              <h2 className="text-lg font-semibold text-blueberry mb-6">Admin Dashboard</h2>
+              <h2 className="text-heading font-semibold text-blueberry mb-6">Admin Dashboard</h2>
             )}
             <nav className="flex flex-col h-full">
               <div className="space-y-2 flex-1">

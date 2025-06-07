@@ -48,7 +48,7 @@ const AnalysisSelector: React.FC<AnalysisSelectorProps> = ({
   if (isLoading) {
     return (
       <div className="p-4 border border-gray-200 rounded-lg bg-gray-50">
-        <div className="text-sm text-gray-600">Loading your analyses...</div>
+        <div className="text-caption text-gray-600">Loading your analyses...</div>
       </div>
     );
   }
@@ -56,7 +56,7 @@ const AnalysisSelector: React.FC<AnalysisSelectorProps> = ({
   if (!analyses || analyses.length === 0) {
     return (
       <div className="p-4 border border-gray-200 rounded-lg bg-gray-50">
-        <div className="flex items-center space-x-2 text-sm text-gray-600">
+        <div className="flex items-center space-x-2 text-caption text-gray-600">
           <FileText className="h-4 w-4" />
           <span>No previous analyses found. Analyze a CV first to generate cover letters from your analysis history.</span>
         </div>
@@ -78,7 +78,7 @@ const AnalysisSelector: React.FC<AnalysisSelectorProps> = ({
                   <span className="font-medium">
                     {analysis.job_title} at {analysis.company_name}
                   </span>
-                  <div className="flex items-center space-x-2 text-xs text-gray-500">
+                  <div className="flex items-center space-x-2 text-micro text-gray-500">
                     <Calendar className="h-3 w-3" />
                     <span>{formatDate(analysis.created_at!)}</span>
                     <span>•</span>
@@ -92,7 +92,7 @@ const AnalysisSelector: React.FC<AnalysisSelectorProps> = ({
       </Select>
       
       {selectedAnalysisId && (
-        <div className="text-sm text-green-600 bg-green-50 p-2 rounded">
+        <div className="text-caption text-green-600 bg-green-50 p-2 rounded">
           ✓ CV and job description will be used from your selected analysis
         </div>
       )}

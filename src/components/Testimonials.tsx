@@ -58,10 +58,10 @@ const Testimonials = () => {
     <section className="py-20 px-4 bg-gray-50 dark:bg-gray-800">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-blueberry dark:text-citrus mb-4">
+          <h2 className="text-display font-bold text-foreground mb-4">
             What Our Users Say
           </h2>
-          <p className="text-xl text-blueberry/80 dark:text-apple-core max-w-3xl mx-auto">
+          <p className="text-heading text-foreground-secondary max-w-3xl mx-auto">
             Join thousands of professionals who have transformed their careers with <span className="text-zapier-orange">Tune</span>MyCV
           </p>
         </div>
@@ -95,8 +95,8 @@ const Testimonials = () => {
                 />
                 <div>
                   <h4 className="font-semibold text-blueberry dark:text-black">{testimonial.name}</h4>
-                  <p className="text-sm text-blueberry/70 dark:text-black/80">{testimonial.role}</p>
-                  <p className="text-sm text-apricot font-medium">{testimonial.company}</p>
+                  <p className="text-caption text-blueberry/70 dark:text-black/80">{testimonial.role}</p>
+                  <p className="text-caption text-apricot font-medium">{testimonial.company}</p>
                 </div>
               </div>
             </div>

@@ -30,14 +30,14 @@ const PersonalizedMatchMessage: React.FC<PersonalizedMatchMessageProps> = ({
 
   return (
     <div className="text-center py-6">
-      <h2 className="text-2xl font-bold text-blueberry dark:text-citrus mb-2">
+      <h2 className="text-title font-bold text-blueberry dark:text-citrus mb-2">
         You are a{' '}
         <span className={getMessageColor(percentageScore)}>
           {matchLevel}
         </span>
         {' '}for the role of
       </h2>
-      <p className="text-xl font-semibold text-blueberry/90 dark:text-apple-core">
+      <p className="text-heading font-semibold text-blueberry/90 dark:text-apple-core">
         <span className="text-apricot">{jobTitle}</span> at{' '}
         <span className="text-apricot">{formatCompanyName(companyName)}</span>
       </p>

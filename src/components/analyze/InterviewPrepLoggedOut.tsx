@@ -29,10 +29,10 @@ const InterviewPrepLoggedOut = () => {
           <div className="flex items-start">
             <MessageSquare className="h-12 w-12 text-zapier-orange mr-6 mt-0" />
             <div>
-              <h1 className="text-4xl md:text-5xl font-bold text-earth dark:text-white mb-4">
+              <h1 className="text-display font-bold text-foreground mb-4">
                 Interview Prep Generator
               </h1>
-              <p className="text-xl text-earth/70 dark:text-white/70 max-w-3xl font-normal">
+              <p className="text-heading text-earth/70 dark:text-white/70 max-w-3xl font-normal">
                 Generate personalized interview preparation notes with company insights, strategic questions, and professional tips to ace your next interview.
               </p>
             </div>

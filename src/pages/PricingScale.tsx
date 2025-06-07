@@ -79,7 +79,7 @@ const PricingScale = () => {
           <div className="flex items-start mb-6">
             <CreditCard className="h-8 w-8 text-zapier-orange mr-3 flex-shrink-0" />
             <div>
-              <h1 className="text-3xl font-bold text-earth dark:text-white">
+              <h1 className="text-display font-bold text-foreground">
                 Choose Your <span className="text-zapier-orange">Tune</span>MyCV Credits
               </h1>
               <p className="text-lg text-earth/70 dark:text-white/70 max-w-2xl mt-2">
@@ -91,7 +91,7 @@ const PricingScale = () => {
 
         {/* Pricing Slider */}
         <div className="mb-16 w-full">
-          <Card className="bg-white dark:bg-blueberry/20 border-2 border-zapier-orange/50 dark:border-zapier-orange/60 p-8 shadow-xl shadow-zapier-orange/20 hover:shadow-2xl hover:shadow-zapier-orange/30 transition-all duration-500 hover:scale-[1.02] relative overflow-hidden group">
+          <Card className="bg-white dark:bg-blueberry/20 border-2 border-zapier-orange/50 dark:border-zapier-orange/60 p-8 shadow-xl shadow-zapier-orange/20 hover:shadow-2xl hover:shadow-zapier-orange/30 transition-all duration-500 hover:scale-[1.02] relative overflow-hidden group [&:hover_button_span]:text-white">
             {/* Animated background gradient */}
             <div className="absolute inset-0 bg-gradient-to-br from-zapier-orange/5 via-transparent to-citrus/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             <div className="relative z-10">
@@ -188,7 +188,7 @@ const PricingScale = () => {
                   {currentTier.isEnterprise ? (
                     <>
                       <div className="space-y-1">
-                        <h3 className="text-4xl text-earth dark:text-white hover:text-zapier-orange transition-colors duration-300 mb-2">
+                        <h3 className="text-display text-foreground hover:text-primary transition-colors duration-300 mb-2">
                           Enterprise
                         </h3>
                         <div className="text-lg text-earth/70 dark:text-white/70 hover:text-zapier-orange/70 transition-colors duration-300">
@@ -218,9 +218,9 @@ const PricingScale = () => {
                 <Button 
                   onClick={handleBuyCredits}
                   variant="outline"
-                  className="border-2 border-zapier-orange bg-white hover:bg-zapier-orange hover:text-white text-zapier-orange px-8 py-3 text-lg font-normal transition-all duration-300 hover:shadow-xl hover:shadow-zapier-orange/30 hover:scale-105 group relative overflow-hidden"
+                  className="border-2 border-zapier-orange bg-white hover:bg-zapier-orange text-zapier-orange px-8 py-3 text-lg font-normal transition-all duration-300 hover:shadow-xl hover:shadow-zapier-orange/30 hover:scale-105 group relative overflow-hidden group-hover:text-white"
                 >
-                  <span className="relative z-10 flex items-center">
+                  <span className="relative z-10 flex items-center group-hover:text-white transition-colors duration-300">
                     {currentTier.isEnterprise ? 'Contact Sales' : 'Buy Now'}
                     <ArrowRight className="ml-2 h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
                   </span>
@@ -235,7 +235,7 @@ const PricingScale = () => {
         {/* End-to-End Journey Section */}
         <div className="mb-16">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-earth dark:text-white mb-4">
+            <h2 className="text-display font-bold text-foreground mb-4">
               Your Complete Job Application Journey
             </h2>
             <p className="text-lg text-earth/70 dark:text-white/70 max-w-2xl mx-auto">
@@ -329,7 +329,7 @@ const PricingScale = () => {
 
         {/* FAQ Section */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-earth dark:text-white mb-8">
+          <h2 className="text-display font-bold text-foreground mb-8">
             Some Common Credit Questions
           </h2>
           <div className="grid md:grid-cols-2 gap-8 text-left">

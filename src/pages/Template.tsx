@@ -5,7 +5,7 @@ const Template = () => {
     <div className="min-h-screen bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5 py-6">
       <div className="max-w-wider mx-auto px-4">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-earth dark:text-white mb-6">
+          <h1 className="text-display font-bold text-foreground mb-6">
             Lorem Ipsum Template
           </h1>
           

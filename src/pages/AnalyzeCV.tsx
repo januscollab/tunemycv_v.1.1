@@ -363,10 +363,10 @@ const AnalyzeCV = () => {
           <div className="flex items-start mb-8">
             <FileText className="h-12 w-12 text-zapier-orange mr-6 mt-2" />
             <div>
-              <h1 className="text-4xl md:text-5xl font-bold text-earth dark:text-white mb-4">
+              <h1 className="text-display font-bold text-foreground mb-4">
                 Analyze Your CV
               </h1>
-              <p className="text-xl text-earth/70 dark:text-white/70 max-w-3xl font-normal">
+              <p className="text-subheading text-earth/70 dark:text-white/70 max-w-3xl font-normal">
                 Get comprehensive compatibility analysis with actionable recommendations to improve your job application success.
               </p>
             </div>
@@ -445,8 +445,8 @@ const AnalyzeCV = () => {
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
           <div className="bg-white dark:bg-blueberry/90 rounded-lg p-6 text-center max-w-md">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-apricot mx-auto mb-4"></div>
-            <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-2">Analyzing Your CV</h3>
-            <p className="text-blueberry/70 dark:text-apple-core/80 min-h-[1.5rem] transition-opacity duration-500 text-sm">
+            <h3 className="text-heading font-semibold text-blueberry dark:text-citrus mb-2">Analyzing Your CV</h3>
+            <p className="text-blueberry/70 dark:text-apple-core/80 min-h-[1.5rem] transition-opacity duration-500 text-caption">
               {currentLoadingMessage}
             </p>
           </div>
@@ -462,10 +462,10 @@ const AnalyzeCV = () => {
           <div className="flex items-start">
             <Zap className="h-10 w-10 text-zapier-orange mr-4 mt-1" />
             <div>
-              <h1 className="text-3xl font-bold text-earth dark:text-white">
+              <h1 className="text-display font-bold text-foreground">
                 Analyze Your CV
               </h1>
-              <p className="text-lg text-earth/70 dark:text-white/70 max-w-2xl mt-1">
+              <p className="text-subheading text-earth/70 dark:text-white/70 max-w-2xl mt-1">
                 Upload your CV and job description to get comprehensive compatibility analysis with actionable recommendations.
               </p>
             </div>
@@ -479,15 +479,15 @@ const AnalyzeCV = () => {
             {/* Tabs Navigation */}
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-3 mb-6">
-                <TabsTrigger value="analysis" className="flex items-center space-x-2 text-sm">
+                <TabsTrigger value="analysis" className="flex items-center space-x-2 text-caption">
                   <FileText className="h-4 w-4" />
                   <span>Analyze CV</span>
                 </TabsTrigger>
-                <TabsTrigger value="view-analysis" className="flex items-center space-x-2 text-sm">
+                <TabsTrigger value="view-analysis" className="flex items-center space-x-2 text-caption">
                   <Eye className="h-4 w-4" />
                   <span>View Analysis</span>
                 </TabsTrigger>
-                <TabsTrigger value="history" className="flex items-center space-x-2 text-sm">
+                <TabsTrigger value="history" className="flex items-center space-x-2 text-caption">
                   <History className="h-4 w-4" />
                   <span>History</span>
                 </TabsTrigger>
@@ -498,26 +498,26 @@ const AnalyzeCV = () => {
                 <div className="space-y-5">
                   {/* Job Title */}
                   <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-5 border border-apple-core/20 dark:border-citrus/20">
-                    <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-3">Job Title</h3>
+                    <h3 className="text-heading font-semibold text-blueberry dark:text-citrus mb-3">Job Title</h3>
                     <input
                       type="text"
                       value={jobTitle}
                       onChange={(e) => setJobTitle(e.target.value)}
                       placeholder="e.g., Senior Software Engineer (auto-extracted from job description)"
-                      className="w-full px-3 py-2 border border-apple-core/30 dark:border-citrus/30 rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange focus:border-transparent bg-white dark:bg-blueberry/10 text-blueberry dark:text-apple-core text-sm hover:border-zapier-orange/50 transition-colors"
+                      className="w-full px-3 py-2 border border-apple-core/30 dark:border-citrus/30 rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange focus:border-transparent bg-white dark:bg-blueberry/10 text-blueberry dark:text-apple-core text-caption hover:border-zapier-orange/50 transition-colors"
                       disabled={analyzing}
                     />
-                    <p className="text-xs text-blueberry/60 dark:text-apple-core/70 mt-2">
+                    <p className="text-micro text-blueberry/60 dark:text-apple-core/70 mt-2">
                       Job title will be automatically extracted from the job description if not provided.
                     </p>
                   </div>
 
                   {/* Job Description Input - Required */}
                   <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-5 border border-apple-core/20 dark:border-citrus/20">
-                    <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-3">
+                    <h3 className="text-heading font-semibold text-blueberry dark:text-citrus mb-3">
                       Job Description <span className="text-red-500">*</span>
                     </h3>
-                    <p className="text-xs text-blueberry/60 dark:text-apple-core/70 mb-3">
+                    <p className="text-micro text-blueberry/60 dark:text-apple-core/70 mb-3">
                       Upload a file (PDF, DOCX, TXT) or paste the text directly
                     </p>
                     
@@ -543,10 +543,10 @@ const AnalyzeCV = () => {
                       </div>
                       <div className="flex-1">
                         <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-2">
-                          Let's Get Personal (Optional)
+                          Motivation Matters (Optional)
                         </h3>
                         <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mb-4 leading-relaxed">
-                          Every role is unique. Share additional insights about your motivation and goals to enhance your CV analysis with our Advanced Recruitment Models.
+                          Each role application is unique for you. Share your motivations for applying, beyond your achievements and work history from your CV, to help us better match through analysis.
                         </p>
                         
                         {surveyResponses ? (
@@ -568,7 +568,7 @@ const AnalyzeCV = () => {
                           <Button
                             onClick={() => setShowPersonalizationSurvey(true)}
                             variant="outline"
-                            className="border-zapier-orange text-zapier-orange hover:bg-zapier-orange hover:text-white transition-all duration-200"
+                            className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200"
                             disabled={uploading || analyzing}
                           >
                             <MessageSquare className="h-4 w-4 mr-2" />

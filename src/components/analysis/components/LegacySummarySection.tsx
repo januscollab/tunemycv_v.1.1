@@ -8,7 +8,7 @@ interface LegacySummarySectionProps {
 const LegacySummarySection: React.FC<LegacySummarySectionProps> = ({ result }) => {
   return (
     <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
-      <h2 className="text-2xl font-semibold text-blueberry dark:text-citrus mb-4">Executive Summary</h2>
+      <h2 className="text-title font-semibold text-blueberry dark:text-citrus mb-4">Executive Summary</h2>
       <p className="text-blueberry/80 dark:text-apple-core leading-relaxed mb-6">
         {result.executive_summary}
       </p>
@@ -20,14 +20,14 @@ const LegacySummarySection: React.FC<LegacySummarySectionProps> = ({ result }) =
           {result.strengths && result.strengths.length > 0 ? (
             <ul className="space-y-2">
               {result.strengths.slice(0, 4).map((strength: string, index: number) => (
-                <li key={index} className="flex items-start text-sm">
+                <li key={index} className="flex items-start text-caption">
                   <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 mr-2 flex-shrink-0"></div>
                   <span className="text-blueberry/80 dark:text-apple-core">{strength}</span>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="text-blueberry/60 dark:text-apple-core/60 text-sm">No specific strengths identified.</p>
+            <p className="text-blueberry/60 dark:text-apple-core/60 text-caption">No specific strengths identified.</p>
           )}
         </div>
 
@@ -36,14 +36,14 @@ const LegacySummarySection: React.FC<LegacySummarySectionProps> = ({ result }) =
           {result.weaknesses && result.weaknesses.length > 0 ? (
             <ul className="space-y-2">
               {result.weaknesses.slice(0, 4).map((weakness: string, index: number) => (
-                <li key={index} className="flex items-start text-sm">
+                <li key={index} className="flex items-start text-caption">
                   <div className="w-1.5 h-1.5 bg-red-500 rounded-full mt-2 mr-2 flex-shrink-0"></div>
                   <span className="text-blueberry/80 dark:text-apple-core">{weakness}</span>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="text-blueberry/60 dark:text-apple-core/60 text-sm">No specific areas for improvement identified.</p>
+            <p className="text-blueberry/60 dark:text-apple-core/60 text-caption">No specific areas for improvement identified.</p>
           )}
         </div>
       </div>

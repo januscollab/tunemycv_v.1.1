@@ -3,8 +3,7 @@ import React, { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { UnifiedInput, UnifiedTextarea } from '@/components/ui/unified-input';
 import { Label } from '@/components/ui/label';
 import { Mail, MessageSquare, Users, Target, HelpCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -67,8 +66,8 @@ const ContactUs = () => {
       <div className="max-w-4xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-blueberry dark:text-citrus mb-4">Contact Us</h1>
-          <p className="text-xl text-blueberry/80 dark:text-apple-core max-w-2xl mx-auto">
+          <h1 className="text-display font-bold text-foreground mb-4">Contact Us</h1>
+          <p className="text-subheading text-blueberry/80 dark:text-apple-core max-w-2xl mx-auto">
             Get in touch with the TuneMyCV team. We're here to help you optimize your career journey.
           </p>
         </div>
@@ -78,8 +77,8 @@ const ContactUs = () => {
           <Card className="bg-white dark:bg-blueberry/20 border border-apple-core/20 dark:border-citrus/20">
             <CardContent className="p-6 text-center">
               <Target className="h-12 w-12 text-apricot mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-2">AI-Powered Analysis</h3>
-              <p className="text-sm text-blueberry/70 dark:text-apple-core/80">
+              <h3 className="text-heading font-semibold text-blueberry dark:text-citrus mb-2">AI-Powered Analysis</h3>
+              <p className="text-caption text-blueberry/70 dark:text-apple-core/80">
                 Advanced algorithms analyze your CV against job requirements for maximum compatibility.
               </p>
             </CardContent>
@@ -88,8 +87,8 @@ const ContactUs = () => {
           <Card className="bg-white dark:bg-blueberry/20 border border-apple-core/20 dark:border-citrus/20">
             <CardContent className="p-6 text-center">
               <Users className="h-12 w-12 text-apricot mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-2">Trusted by Thousands</h3>
-              <p className="text-sm text-blueberry/70 dark:text-apple-core/80">
+              <h3 className="text-heading font-semibold text-blueberry dark:text-citrus mb-2">Trusted by Thousands</h3>
+              <p className="text-caption text-blueberry/70 dark:text-apple-core/80">
                 Join thousands of professionals who have improved their job prospects with TuneMyCV.
               </p>
             </CardContent>
@@ -98,8 +97,8 @@ const ContactUs = () => {
           <Card className="bg-white dark:bg-blueberry/20 border border-apple-core/20 dark:border-citrus/20">
             <CardContent className="p-6 text-center">
               <MessageSquare className="h-12 w-12 text-apricot mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-2">Expert Support</h3>
-              <p className="text-sm text-blueberry/70 dark:text-apple-core/80">
+              <h3 className="text-heading font-semibold text-blueberry dark:text-citrus mb-2">Expert Support</h3>
+              <p className="text-caption text-blueberry/70 dark:text-apple-core/80">
                 Our team of career experts and AI specialists are dedicated to your success.
               </p>
             </CardContent>
@@ -111,7 +110,7 @@ const ContactUs = () => {
           <CardContent className="p-6">
             <div className="flex items-center mb-4">
               <HelpCircle className="h-6 w-6 text-blueberry mr-3" />
-              <h3 className="text-lg font-semibold text-blueberry dark:text-citrus">Need Quick Answers?</h3>
+              <h3 className="text-heading font-semibold text-blueberry dark:text-citrus">Need Quick Answers?</h3>
             </div>
             <p className="text-blueberry/80 dark:text-apple-core mb-4">
               Before reaching out, check our comprehensive Help Centre. Most questions can be answered instantly!
@@ -128,11 +127,11 @@ const ContactUs = () => {
         {/* Contact Form */}
         <Card className="bg-white dark:bg-blueberry/20 border border-apple-core/20 dark:border-citrus/20">
           <CardHeader>
-            <CardTitle className="text-xl font-semibold text-blueberry dark:text-citrus flex items-center">
+            <CardTitle className="text-title font-semibold text-blueberry dark:text-citrus flex items-center">
               <Mail className="h-5 w-5 mr-2" />
               Send us a Message
             </CardTitle>
-            <p className="text-sm text-blueberry/70 dark:text-apple-core/80">
+            <p className="text-caption text-blueberry/70 dark:text-apple-core/80">
               We typically respond within 24 hours during business days.
             </p>
           </CardHeader>
@@ -141,54 +140,58 @@ const ContactUs = () => {
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">Full Name *</Label>
-                  <Input
+                  <UnifiedInput
                     id="name"
-                    name="name"
                     value={formData.name}
-                    onChange={handleInputChange}
+                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                     placeholder="Your full name"
                     required
                     disabled={isSubmitting}
+                    maxLength={100}
+                    secure={true}
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">Email Address *</Label>
-                  <Input
+                  <UnifiedInput
                     id="email"
-                    name="email"
                     type="email"
                     value={formData.email}
-                    onChange={handleInputChange}
+                    onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                     placeholder="your.email@example.com"
                     required
                     disabled={isSubmitting}
+                    maxLength={100}
+                    secure={true}
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="subject">Subject</Label>
-                <Input
+                <UnifiedInput
                   id="subject"
-                  name="subject"
                   value={formData.subject}
-                  onChange={handleInputChange}
+                  onChange={(e) => setFormData(prev => ({ ...prev, subject: e.target.value }))}
                   placeholder="Brief description of your inquiry"
                   disabled={isSubmitting}
+                  maxLength={200}
+                  secure={true}
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="message">Message *</Label>
-                <Textarea
+                <UnifiedTextarea
                   id="message"
-                  name="message"
                   value={formData.message}
-                  onChange={handleInputChange}
+                  onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
                   placeholder="Please provide details about your question or feedback..."
-                  rows={6}
+                  className="min-h-[120px]"
                   required
                   disabled={isSubmitting}
+                  maxLength={2000}
+                  secure={true}
                 />
               </div>
 

@@ -24,14 +24,14 @@ const LoginOptions: React.FC<LoginOptionsProps> = ({
           checked={rememberMe}
           onCheckedChange={(checked) => setRememberMe(checked === true)}
         />
-        <Label htmlFor="remember-me" className="ml-2 text-sm text-blueberry">
+        <Label htmlFor="remember-me" className="ml-2 text-caption text-blueberry">
           Remember me
         </Label>
       </div>
       <button
         type="button"
         onClick={() => switchMode('forgot-password')}
-        className="text-sm text-apricot hover:text-apricot/80"
+        className="text-caption text-apricot hover:text-apricot/80"
       >
         Forgot password?
       </button>

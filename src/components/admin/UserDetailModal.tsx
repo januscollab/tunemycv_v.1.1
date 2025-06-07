@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { X, CreditCard, FileText, Calendar } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -77,7 +76,7 @@ const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, onClose, onUpda
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center p-6 border-b">
-          <h2 className="text-xl font-semibold text-gray-900">User Details</h2>
+          <h2 className="text-heading font-semibold text-gray-900">User Details</h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600"
@@ -89,21 +88,21 @@ const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, onClose, onUpda
         <div className="p-6 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Profile Information</h3>
+              <h3 className="text-subheading font-medium text-gray-900 mb-4">Profile Information</h3>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Name</label>
-                  <p className="mt-1 text-sm text-gray-900">
+                  <label className="block text-caption font-medium text-gray-700">Name</label>
+                  <p className="mt-1 text-caption text-gray-900">
                     {user.first_name || 'N/A'} {user.last_name || ''}
                   </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Email</label>
-                  <p className="mt-1 text-sm text-gray-900">{user.email}</p>
+                  <label className="block text-caption font-medium text-gray-700">Email</label>
+                  <p className="mt-1 text-caption text-gray-900">{user.email}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Member Since</label>
-                  <p className="mt-1 text-sm text-gray-900">
+                  <label className="block text-caption font-medium text-gray-700">Member Since</label>
+                  <p className="mt-1 text-caption text-gray-900">
                     {new Date(user.created_at).toLocaleDateString()}
                   </p>
                 </div>
@@ -111,23 +110,23 @@ const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, onClose, onUpda
             </div>
 
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Account Stats</h3>
+              <h3 className="text-subheading font-medium text-gray-900 mb-4">Account Stats</h3>
               <div className="space-y-3">
                 <div className="flex items-center">
                   <CreditCard className="h-5 w-5 text-blue-500 mr-2" />
-                  <span className="text-sm text-gray-700">
+                  <span className="text-caption text-gray-700">
                     {user.credits} credits remaining
                   </span>
                 </div>
                 <div className="flex items-center">
                   <FileText className="h-5 w-5 text-green-500 mr-2" />
-                  <span className="text-sm text-gray-700">
+                  <span className="text-caption text-gray-700">
                     {user.total_analyses} total analyses
                   </span>
                 </div>
                 <div className="flex items-center">
                   <Calendar className="h-5 w-5 text-purple-500 mr-2" />
-                  <span className="text-sm text-gray-700">
+                  <span className="text-caption text-gray-700">
                     Last activity: {user.last_analysis 
                       ? new Date(user.last_analysis).toLocaleDateString()
                       : 'Never'
@@ -139,7 +138,7 @@ const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, onClose, onUpda
           </div>
 
           <div>
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Credit Management</h3>
+            <h3 className="text-subheading font-medium text-gray-900 mb-4">Credit Management</h3>
             <div className="flex items-center space-x-3">
               <input
                 type="number"
@@ -159,7 +158,7 @@ const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, onClose, onUpda
           </div>
 
           <div>
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Recent Analysis History</h3>
+            <h3 className="text-subheading font-medium text-gray-900 mb-4">Recent Analysis History</h3>
             <div className="space-y-3">
               {analysisHistory.length > 0 ? (
                 analysisHistory.map((analysis) => (
@@ -169,15 +168,15 @@ const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, onClose, onUpda
                         <h4 className="font-medium text-gray-900">
                           {analysis.job_title || 'Untitled Position'}
                         </h4>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-caption text-gray-600">
                           Company: {analysis.company_name || 'Not specified'}
                         </p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-caption text-gray-500">
                           {new Date(analysis.created_at).toLocaleDateString()}
                         </p>
                       </div>
                       <div className="text-right">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-micro font-medium bg-green-100 text-green-800">
                           {analysis.compatibility_score}% match
                         </span>
                       </div>

@@ -27,10 +27,10 @@ const CoverLetterLoggedOut = () => {
           <div className="flex items-start text-left">
             <Edit className="h-12 w-12 text-zapier-orange mr-6 mt-0" />
             <div className="text-left">
-              <h1 className="text-4xl md:text-5xl font-bold text-earth dark:text-white mb-4 text-left">
+              <h1 className="text-display font-bold text-foreground mb-4 text-left">
                 Generate Cover Letter
               </h1>
-              <p className="text-xl text-earth/70 dark:text-white/70 max-w-3xl font-normal text-left">
+              <p className="text-subheading text-earth/70 dark:text-white/70 max-w-3xl font-normal text-left">
                 Create tailored cover letters that highlight your strengths and align perfectly with specific job requirements.
               </p>
             </div>

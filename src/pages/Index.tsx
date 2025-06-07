@@ -15,17 +15,17 @@ const Index = () => {
       {/* Hero Section */}
       <section className="py-10 px-4 bg-gradient-to-br from-white via-cream/30 to-apple-core/10 dark:from-gray-900 dark:via-blueberry/20 dark:to-citrus/5">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center bg-zapier-orange/10 text-zapier-orange px-4 py-2 rounded-full text-sm font-medium mb-6">
+          <div className="inline-flex items-center bg-primary/10 text-primary px-4 py-2 rounded-full text-body font-medium mb-6">
             <Sparkles className="h-4 w-4 mr-2" />
             AI-Powered Career Optimization
           </div>
           
-          <h1 className="text-5xl md:text-6xl font-bold text-earth dark:text-white mb-6 leading-tight">
+          <h1 className="text-display md:text-6xl font-sans font-bold text-earth dark:text-white mb-6 leading-tight">
             Turn Your CV Into a
-            <span className="text-zapier-orange"> Job-Winning</span> Asset
+            <span className="text-primary"> Job-Winning</span> Asset
           </h1>
           
-          <p className="text-xl text-earth/70 dark:text-white/70 mb-8 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-subheading text-earth/70 dark:text-white/70 mb-8 max-w-3xl mx-auto leading-relaxed">
             Get AI-powered analysis, personalized recommendations, and professional cover letters 
             that help you stand out from the competition and land your dream job.
           </p>
@@ -33,14 +33,14 @@ const Index = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <Link
               to={user ? "/analyze" : "/analyze"}
-              className="bg-zapier-orange text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange/90 transition-colors flex items-center justify-center"
+              className="bg-primary text-primary-foreground px-8 py-4 rounded-lg text-subheading font-semibold hover:bg-primary/90 transition-colors flex items-center justify-center"
             >
               Start Free Analysis
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
             <Link
               to={user ? "/cover-letter" : "/cover-letter"}
-              className="border border-earth/20 dark:border-white/20 text-earth dark:text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-earth/5 dark:hover:bg-white/5 transition-colors"
+              className="border border-foreground/20 text-foreground px-8 py-4 rounded-lg text-subheading font-semibold hover:bg-foreground/5 transition-colors"
             >
               Create Cover Letter
             </Link>
@@ -67,110 +67,29 @@ const Index = () => {
       {/* Main Features Section */}
       <MainFeaturesSection />
 
-      {/* Features Grid */}
-      <section className="py-10 px-4 bg-gradient-to-br from-cream/40 via-white to-zapier-orange/5 dark:from-blueberry/15 dark:via-gray-900 dark:to-zapier-orange/10">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-earth dark:text-white mb-4">
-              Everything You Need to Succeed
-            </h2>
-            <p className="text-xl text-earth/70 dark:text-white/70 max-w-2xl mx-auto">
-              Our comprehensive suite of tools helps you optimize every aspect of your job application
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="bg-white dark:bg-earth/10 rounded-2xl p-8 hover:shadow-lg transition-shadow border border-earth/10 dark:border-white/10">
-              <div className="bg-zapier-orange/10 rounded-full w-16 h-16 flex items-center justify-center mb-6">
-                <FileText className="h-8 w-8 text-zapier-orange" />
-              </div>
-              <h3 className="text-2xl font-bold text-earth dark:text-white mb-4">CV Analysis</h3>
-              <p className="text-earth/70 dark:text-white/70 leading-relaxed mb-6">
-                Our advanced AI analyzes your CV against the role you're applying for, identifying strengths and areas for improvement.
-              </p>
-              <Link
-                to={user ? "/analyze" : "/auth"}
-                className="text-zapier-orange font-semibold hover:text-zapier-orange/80 transition-colors inline-flex items-center"
-              >
-                Start Analysis <ArrowRight className="ml-1 h-4 w-4" />
-              </Link>
-            </div>
-
-            <div className="bg-white dark:bg-earth/10 rounded-2xl p-8 hover:shadow-lg transition-shadow border border-earth/10 dark:border-white/10">
-              <div className="bg-zapier-orange/10 rounded-full w-16 h-16 flex items-center justify-center mb-6">
-                <Users className="h-8 w-8 text-zapier-orange" />
-              </div>
-              <h3 className="text-2xl font-bold text-earth dark:text-white mb-4">Cover Letters</h3>
-              <p className="text-earth/70 dark:text-white/70 leading-relaxed mb-6">
-                Generate personalized, compelling cover letters that highlight your strengths and align with job requirements.
-              </p>
-              <Link
-                to={user ? "/cover-letter" : "/auth"}
-                state={user ? undefined : { from: '/cover-letter' }}
-                className="text-zapier-orange font-semibold hover:text-zapier-orange/80 transition-colors inline-flex items-center"
-              >
-                Generate Letter <ArrowRight className="ml-1 h-4 w-4" />
-              </Link>
-            </div>
-
-            <div className="bg-white dark:bg-earth/10 rounded-2xl p-8 hover:shadow-lg transition-shadow border border-earth/10 dark:border-white/10">
-              <div className="bg-zapier-orange/10 rounded-full w-16 h-16 flex items-center justify-center mb-6">
-                <MessageSquare className="h-8 w-8 text-zapier-orange" />
-              </div>
-              <h3 className="text-2xl font-bold text-earth dark:text-white mb-4">Interview Prep</h3>
-              <p className="text-earth/70 dark:text-white/70 leading-relaxed mb-6">
-                Our Interview Toolkit will help you with a tailored cover letter and a complete interview prep pack — so you're fully equipped to succeed
-              </p>
-              <Link
-                to={user ? "/analyze?tab=interview-prep" : "/auth"}
-                className="text-zapier-orange font-semibold hover:text-zapier-orange/80 transition-colors inline-flex items-center"
-              >
-                Prepare Now <ArrowRight className="ml-1 h-4 w-4" />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works Section */}
-      <section className="py-16 bg-gradient-to-br from-apple-core/10 via-cream/20 to-earth/5 dark:from-blueberry/20 dark:via-gray-900 dark:to-earth/10">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-earth dark:text-white mb-4">
-              How <span className="text-zapier-orange">Tune</span>MyCV Works
-            </h2>
-            <p className="text-xl text-earth/70 dark:text-white/70 max-w-3xl mx-auto">
-              Our AI-powered platform streamlines your job search with intelligent analysis and personalized recommendations
-            </p>
-          </div>
-          
-          <HowItWorks />
-        </div>
-      </section>
-
       {/* Testimonials */}
       <Testimonials />
 
       {/* CTA Section - Updated background color to match Resources page */}
       <section className="py-16 bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-earth dark:text-white mb-6">
+          <h2 className="text-title md:text-display font-sans font-bold text-earth dark:text-white mb-6">
             Ready to Transform Your Career?
           </h2>
-          <p className="text-xl text-earth/70 dark:text-white/70 mb-8 max-w-2xl mx-auto">
+          <p className="text-subheading text-earth/70 dark:text-white/70 mb-8 max-w-2xl mx-auto">
             Join thousands of job seekers who have successfully landed their dream jobs with TuneMyCV
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
               to="/analyze"
-              className="bg-zapier-orange text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange/90 transition-colors inline-flex items-center justify-center"
+              className="bg-primary text-primary-foreground px-8 py-4 rounded-lg text-subheading font-semibold hover:bg-primary/90 transition-colors inline-flex items-center justify-center"
             >
               <Zap className="mr-2 h-5 w-5" />
               Start Free Analysis
             </Link>
             <Link 
               to="/resources"
-              className="border-2 border-zapier-orange text-zapier-orange px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange hover:text-white transition-colors inline-flex items-center justify-center"
+              className="border-2 border-primary text-primary px-8 py-4 rounded-lg text-subheading font-semibold hover:bg-primary hover:text-primary-foreground transition-colors inline-flex items-center justify-center"
             >
               <BookOpen className="mr-2 h-5 w-5" />
               Explore Resources

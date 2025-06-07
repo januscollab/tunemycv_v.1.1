@@ -9,17 +9,17 @@ interface ProcessingModalProps {
 
 const ProcessingModal: React.FC<ProcessingModalProps> = ({ 
   isOpen, 
-  title = "Processing", 
-  message = "Please wait while we process your request..." 
+  title = "Processing Document", 
+  message = "Extracting text from your document..." 
 }) => {
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-      <div className="bg-white dark:bg-blueberry/90 rounded-lg p-6 text-center max-w-md">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-apricot mx-auto mb-4"></div>
-        <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-2">{title}</h3>
-        <p className="text-blueberry/70 dark:text-apple-core/80 min-h-[1.5rem] transition-opacity duration-500 text-sm">
+      <div className="bg-background dark:bg-card rounded-lg p-8 text-center max-w-md shadow-lg border">
+        <div className="animate-spin rounded-full h-12 w-12 border-3 border-primary/20 border-t-primary mx-auto mb-6"></div>
+        <h3 className="text-xl font-semibold text-foreground mb-3">{title}</h3>
+        <p className="text-muted-foreground min-h-[1.5rem] transition-opacity duration-500">
           {message}
         </p>
       </div>

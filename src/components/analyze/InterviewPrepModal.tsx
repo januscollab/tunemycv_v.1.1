@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -14,7 +13,7 @@ const InterviewPrepModal: React.FC<InterviewPrepModalProps> = ({ isOpen, onClose
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="flex items-center text-xl font-bold text-blueberry dark:text-citrus">
+          <DialogTitle className="flex items-center text-heading font-bold text-blueberry dark:text-citrus">
             <MessageSquare className="h-6 w-6 text-zapier-orange mr-2" />
             Interview Prep Generator
           </DialogTitle>
@@ -26,7 +25,7 @@ const InterviewPrepModal: React.FC<InterviewPrepModalProps> = ({ isOpen, onClose
               </div>
             </div>
             
-            <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-2">
+            <h3 className="text-subheading font-semibold text-blueberry dark:text-citrus mb-2">
               Coming Soon!
             </h3>
             
@@ -37,10 +36,10 @@ const InterviewPrepModal: React.FC<InterviewPrepModalProps> = ({ isOpen, onClose
             </p>
             
             <div className="bg-zapier-orange/10 rounded-lg p-3 mb-4">
-              <p className="text-sm text-blueberry dark:text-citrus font-medium">
+              <p className="text-caption text-blueberry dark:text-citrus font-medium">
                 Expected features:
               </p>
-              <ul className="text-xs text-blueberry/80 dark:text-apple-core/80 mt-2 space-y-1">
+              <ul className="text-micro text-blueberry/80 dark:text-apple-core/80 mt-2 space-y-1">
                 <li>• Company research and profile insights</li>
                 <li>• Recent press releases and news</li>
                 <li>• Tailored interview questions and answers</li>

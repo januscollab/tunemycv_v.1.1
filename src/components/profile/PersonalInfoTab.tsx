@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { User, Mail, Lock, Linkedin, Phone, Globe, Building, MapPin } from 'lucide-react';
 import CountryCodeSelect from './CountryCodeSelect';
-import SecureInput from '@/components/security/SecureInput';
+import { UnifiedInput } from '@/components/ui/unified-input';
 
 interface PersonalInfoTabProps {
   credits: number;
@@ -185,7 +185,7 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
               <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
                 First Name
               </label>
-              <SecureInput
+              <UnifiedInput
                 id="firstName"
                 type="text"
                 value={profile.first_name}
@@ -193,6 +193,7 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
                 className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
                 placeholder="Enter your first name"
                 maxLength={50}
+                secure={true}
               />
             </div>
 
@@ -200,7 +201,7 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
               <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
                 Last Name
               </label>
-              <SecureInput
+              <UnifiedInput
                 id="lastName"
                 type="text"
                 value={profile.last_name}
@@ -208,6 +209,7 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
                 className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
                 placeholder="Enter your last name"
                 maxLength={50}
+                secure={true}
               />
             </div>
           </div>
@@ -218,7 +220,7 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
                 <Mail className="h-4 w-4 inline mr-1" />
                 Email Address
               </label>
-              <SecureInput
+              <UnifiedInput
                 id="email"
                 type="email"
                 value={profile.email}
@@ -226,6 +228,7 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
                 className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
                 placeholder="Enter your email address"
                 maxLength={255}
+                secure={true}
               />
             </div>
 
@@ -240,7 +243,7 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
                   onChange={(value) => setProfile({ ...profile, country_code: value })}
                   className="w-32"
                 />
-                <SecureInput
+                <UnifiedInput
                   id="phoneNumber"
                   type="tel"
                   value={profile.phone_number}
@@ -248,6 +251,7 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
                   className="flex-1 px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
                   placeholder="123 456 7890"
                   maxLength={20}
+                  secure={true}
                 />
               </div>
             </div>
@@ -259,7 +263,7 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
                 <Linkedin className="h-4 w-4 inline mr-1" />
                 LinkedIn Profile URL
               </label>
-              <SecureInput
+              <UnifiedInput
                 id="linkedinUrl"
                 type="url"
                 value={profile.linkedin_url}
@@ -267,6 +271,7 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
                 className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
                 placeholder="https://linkedin.com/in/yourprofile"
                 maxLength={500}
+                secure={true}
               />
             </div>
 
@@ -275,7 +280,7 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
                 <Globe className="h-4 w-4 inline mr-1" />
                 Personal Website/Portfolio URL
               </label>
-              <SecureInput
+              <UnifiedInput
                 id="personalWebsiteUrl"
                 type="url"
                 value={profile.personal_website_url}
@@ -283,6 +288,7 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
                 className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
                 placeholder="https://yourportfolio.com"
                 maxLength={500}
+                secure={true}
               />
             </div>
           </div>
@@ -375,7 +381,7 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
               <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
                 New Password
               </label>
-              <SecureInput
+              <UnifiedInput
                 id="newPassword"
                 type="password"
                 value={passwords.new}
@@ -383,6 +389,7 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
                 className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
                 placeholder="Enter new password"
                 maxLength={128}
+                secure={true}
               />
             </div>
 
@@ -390,7 +397,7 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
                 Confirm New Password
               </label>
-              <SecureInput
+              <UnifiedInput
                 id="confirmPassword"
                 type="password"
                 value={passwords.confirm}
@@ -398,6 +405,7 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
                 className="w-full px-3 py-2 border border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
                 placeholder="Confirm new password"
                 maxLength={128}
+                secure={true}
               />
             </div>
 

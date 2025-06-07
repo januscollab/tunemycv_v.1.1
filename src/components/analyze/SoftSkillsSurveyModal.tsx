@@ -80,10 +80,10 @@ const SoftSkillsSurveyModal: React.FC<SoftSkillsSurveyModalProps> = ({
           {Object.entries(skillDefinitions).map(([key, label]) => (
             <div key={key} className="space-y-2">
               <div className="flex justify-between items-center">
-                <label className="text-sm font-medium text-blueberry dark:text-white">
+                <label className="text-caption font-medium text-blueberry dark:text-white">
                   {label}
                 </label>
-                <span className="text-sm text-blueberry/60 dark:text-white/60 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                <span className="text-caption text-blueberry/60 dark:text-white/60 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
                   {skills[key as keyof SoftSkillsData]}/10
                 </span>
               </div>
@@ -95,7 +95,7 @@ const SoftSkillsSurveyModal: React.FC<SoftSkillsSurveyModalProps> = ({
                 step={1}
                 className="w-full"
               />
-              <div className="flex justify-between text-xs text-blueberry/40 dark:text-white/40">
+              <div className="flex justify-between text-micro text-blueberry/40 dark:text-white/40">
                 <span>Beginner</span>
                 <span>Expert</span>
               </div>

@@ -156,7 +156,7 @@ function SortableItem({ id, archetype, index, isMobile, onMoveUp, onMoveDown, ca
         )}
         
         {/* Icon */}
-        <span className="text-2xl">{archetype.icon}</span>
+        <span className="text-display">{archetype.icon}</span>
         
         {/* Content */}
         <div className="flex-1">
@@ -170,8 +170,8 @@ function SortableItem({ id, archetype, index, isMobile, onMoveUp, onMoveDown, ca
                 <TooltipContent side="left" className="max-w-sm p-4">
                   <div className="space-y-3">
                     <div>
-                      <h5 className="font-semibold text-sm mb-2">Traits:</h5>
-                      <ul className="text-xs space-y-1">
+                      <h5 className="font-semibold text-caption mb-2">Traits:</h5>
+                      <ul className="text-micro space-y-1">
                         {ARCHETYPE_DETAILS[archetype.id as keyof typeof ARCHETYPE_DETAILS]?.traits.map((trait, i) => (
                           <li key={i} className="flex items-start">
                             <span className="mr-1">•</span>
@@ -180,7 +180,7 @@ function SortableItem({ id, archetype, index, isMobile, onMoveUp, onMoveDown, ca
                         ))}
                       </ul>
                     </div>
-                    <div className="text-xs">
+                    <div className="text-micro">
                       <p><strong>Common in:</strong> {ARCHETYPE_DETAILS[archetype.id as keyof typeof ARCHETYPE_DETAILS]?.commonIn}</p>
                       <p className="mt-1"><strong>Pros:</strong> {ARCHETYPE_DETAILS[archetype.id as keyof typeof ARCHETYPE_DETAILS]?.pros}</p>
                       <p className="mt-1"><strong>Cons:</strong> {ARCHETYPE_DETAILS[archetype.id as keyof typeof ARCHETYPE_DETAILS]?.cons}</p>
@@ -190,7 +190,7 @@ function SortableItem({ id, archetype, index, isMobile, onMoveUp, onMoveDown, ca
               </Tooltip>
             </TooltipProvider>
           </div>
-          <p className="text-sm text-gray-500 dark:text-apple-core/60 mt-1">{archetype.description}</p>
+          <p className="text-caption text-gray-500 dark:text-apple-core/60 mt-1">{archetype.description}</p>
         </div>
 
         {/* Mobile controls on the right */}
@@ -344,14 +344,14 @@ const CompanyCulturePreferences: React.FC = () => {
     <div className="bg-white dark:bg-surface rounded-lg border border-gray-200 dark:border-border p-6">
       <div className="flex items-center mb-6">
         <Building2 className="h-5 w-5 text-gray-500 dark:text-apple-core/60 mr-2" />
-        <h3 className="text-lg font-medium text-gray-900 dark:text-citrus">Company Culture Preferences</h3>
+        <h3 className="text-heading font-medium text-gray-900 dark:text-citrus">Company Culture Preferences</h3>
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
               <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:text-apple-core/60 dark:hover:text-apple-core/80 cursor-help ml-2" />
             </TooltipTrigger>
             <TooltipContent side="bottom" className="max-w-sm">
-              <p className="text-sm">
+              <p className="text-caption">
                 <strong>Stop Wasting Time on Wrong-Fit Companies</strong> - Rank these culture types to get matched with companies where you'll be happiest and most successful.
               </p>
             </TooltipContent>
@@ -360,7 +360,7 @@ const CompanyCulturePreferences: React.FC = () => {
       </div>
 
       <div className="mb-4">
-        <p className="text-sm text-gray-600 dark:text-apple-core/70">
+        <p className="text-caption text-gray-600 dark:text-apple-core/70">
           {isMobile 
             ? "Rank your preferred company cultures from most important (1) to least important (6). Use the arrows to reorder."
             : "Drag and drop to rank your preferred company cultures from most important (top) to least important (bottom)."
