@@ -3,6 +3,7 @@ import React from 'react';
 import { MessageSquare } from 'lucide-react';
 import EmbeddedAuth from '@/components/auth/EmbeddedAuth';
 import ServiceExplanation from '@/components/common/ServiceExplanation';
+import QuickActions from '@/components/common/QuickActions';
 
 const InterviewPrep = () => {
   const interviewPrepExplanation = {
@@ -29,7 +30,7 @@ const InterviewPrep = () => {
           <div className="flex items-start">
             <MessageSquare className="h-12 w-12 text-zapier-orange mr-6 mt-0" />
             <div>
-              <h1 className="text-4xl md:text-5xl font-bold text-earth dark:text-white mb-4">
+              <h1 className="text-display font-bold text-foreground mb-4">
                 Interview Prep Toolkit
               </h1>
               <p className="text-xl text-earth/70 dark:text-white/70 max-w-3xl font-normal">
@@ -63,6 +64,9 @@ const InterviewPrep = () => {
           </div>
         </div>
       </div>
+      
+      {/* Quick Actions */}
+      <QuickActions />
     </div>
   );
 };

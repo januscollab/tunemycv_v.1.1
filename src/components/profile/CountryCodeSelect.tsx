@@ -225,8 +225,8 @@ const CountryCodeSelect: React.FC<CountryCodeSelectProps> = ({ value, onChange, 
         {COUNTRY_CODES.map((country) => (
           <SelectItem key={country.code} value={country.code}>
             <span className="flex items-center">
-              <span className="font-mono text-sm mr-2">{country.code}</span>
-              <span className="text-xs text-gray-500">{country.country}</span>
+              <span className="font-mono text-caption mr-2">{country.code}</span>
+              <span className="text-micro text-gray-500">{country.country}</span>
             </span>
           </SelectItem>
         ))}

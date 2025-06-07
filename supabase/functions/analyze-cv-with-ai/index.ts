@@ -6,6 +6,10 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'DENY',
+  'X-XSS-Protection': '1; mode=block',
+  'Referrer-Policy': 'strict-origin-when-cross-origin'
 };
 
 interface AnalysisRequest {
@@ -380,15 +384,44 @@ serve(async (req) => {
       );
     }
 
-    // Create comprehensive AI prompt
-    prompt = `
-You are a senior career consultant and CV optimization expert. Analyze the CV against the job description and provide detailed insights.
+    // Get AI prompt from database or use fallback
+    let promptTemplate = '';
+    try {
+      const { data: promptData, error: promptError } = await supabase
+        .from('ai_prompt_versions')
+        .select('content')
+        .eq('prompt_id', (
+          await supabase
+            .from('ai_prompts')
+            .select('id')
+            .eq('name', 'cv_analysis')
+            .eq('is_active', true)
+            .single()
+        ).data?.id)
+        .order('version_number', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (promptData && !promptError) {
+        promptTemplate = promptData.content;
+      }
+    } catch (error) {
+      console.log('Using fallback prompt for CV analysis');
+    }
+
+    // Fallback prompt if database prompt not available
+    if (!promptTemplate) {
+      promptTemplate = `You are a senior career consultant and CV optimization expert. Analyze the CV against the job description and provide detailed insights.
 
 CRITICAL REQUIREMENTS:
 1. Provide 3-7 detailed items for each analysis section
 2. Be thorough and comprehensive - this is professional career consulting
 3. Respond ONLY with valid JSON in the exact structure below
-4. Extract 15-25+ relevant keywords from the job description
+4. Extract 15-25+ relevant keywords from the job description`;
+    }
+
+    // Create comprehensive AI prompt
+    prompt = `${promptTemplate}
 
 CV TO ANALYZE:
 ${sanitizedCvText}
@@ -649,13 +682,33 @@ INSTRUCTIONS:
       });
     }
     
+    // Sanitize error message to prevent information disclosure
+    let sanitizedError = 'An error occurred during analysis. Please try again.';
+    
+    // Only include specific error details for certain safe error types
+    if (error.message.includes('Rate limit exceeded') || 
+        error.message.includes('Insufficient credits') ||
+        error.message.includes('Invalid content detected') ||
+        error.message.includes('required and must be a string') ||
+        error.message.includes('exceeds maximum length') ||
+        error.message.includes('must be at least') ||
+        error.message.includes('cannot be empty')) {
+      sanitizedError = error.message;
+    }
+    
+    // Determine appropriate HTTP status code
+    let statusCode = 500;
+    if (error.message.includes('Rate limit exceeded')) statusCode = 429;
+    if (error.message.includes('Insufficient credits')) statusCode = 402;
+    if (error.message.includes('Invalid content detected')) statusCode = 400;
+    if (error.message.includes('required') || error.message.includes('exceeds maximum')) statusCode = 400;
+
     return new Response(
       JSON.stringify({ 
-        error: error.message,
-        fallback: true
+        error: sanitizedError // Only return sanitized error to user
       }),
       { 
-        status: 500, 
+        status: statusCode, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       }
     );

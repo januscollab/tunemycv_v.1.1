@@ -11,7 +11,7 @@ const PrivacyPolicy = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow-sm border border-apple-core/20 dark:border-citrus/20 p-8">
           <div className="prose prose-lg max-w-none dark:prose-invert">
-            <h1 className="text-3xl font-bold text-blueberry dark:text-citrus mb-8">PRIVACY POLICY</h1>
+            <h1 className="text-display font-bold text-foreground mb-8">PRIVACY POLICY</h1>
             
             <div className="bg-citrus/10 dark:bg-citrus/20 p-6 rounded-lg mb-8">
               <h2 className="text-xl font-semibold text-blueberry dark:text-citrus mb-4">PRIVACY POLICY HIGHLIGHTS</h2>

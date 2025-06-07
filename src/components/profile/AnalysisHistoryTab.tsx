@@ -219,14 +219,14 @@ const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ credits, member
     <div className="space-y-6">
       <div className="flex items-center justify-between">
       <div className="mb-6">
-        <h2 className="text-xl font-semibold text-gray-900">Analysis History</h2>
-        <div className="text-sm text-gray-500 mt-1">
+        <h2 className="text-heading font-semibold text-gray-900">Analysis History</h2>
+        <div className="text-caption text-gray-500 mt-1">
           {analyses.length} {analyses.length === 1 ? 'analysis' : 'analyses'}
         </div>
       </div>
         {analyses.length > 0 && (
           <div className="flex items-center space-x-2">
-            <span className="text-sm text-gray-600">Show:</span>
+            <span className="text-caption text-gray-600">Show:</span>
             <Select value={itemsPerPage.toString()} onValueChange={(value) => setItemsPerPage(Number(value))}>
               <SelectTrigger className="w-20">
                 <SelectValue />
@@ -237,7 +237,7 @@ const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ credits, member
                 <SelectItem value="30">30</SelectItem>
               </SelectContent>
             </Select>
-            <span className="text-sm text-gray-600">per page</span>
+            <span className="text-caption text-gray-600">per page</span>
           </div>
         )}
       </div>
@@ -272,7 +272,7 @@ const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ credits, member
                         e.preventDefault();
                         if (currentPage > 1) setCurrentPage(currentPage - 1);
                       }}
-                      className={`${currentPage <= 1 ? 'pointer-events-none opacity-50' : ''} text-sm font-normal`}
+                      className={`${currentPage <= 1 ? 'pointer-events-none opacity-50' : ''} text-body font-normal`}
                     />
                   </PaginationItem>
                   
@@ -285,7 +285,7 @@ const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ credits, member
                           setCurrentPage(page);
                         }}
                         isActive={currentPage === page}
-                        className="text-sm font-normal"
+                        className="text-body font-normal"
                       >
                         {page}
                       </PaginationLink>
@@ -299,7 +299,7 @@ const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ credits, member
                         e.preventDefault();
                         if (currentPage < totalPages) setCurrentPage(currentPage + 1);
                       }}
-                      className={`${currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''} text-sm font-normal`}
+                      className={`${currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''} text-body font-normal`}
                     />
                   </PaginationItem>
                 </PaginationContent>

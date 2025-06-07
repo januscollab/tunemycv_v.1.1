@@ -7,7 +7,7 @@ const TermsOfService = () => {
       <div className="max-w-4xl mx-auto px-4">
         <div className="bg-white dark:bg-blueberry/90 rounded-lg shadow-lg p-8">
           <div className="prose prose-lg max-w-none text-blueberry/80 dark:text-apple-core/90">
-            <h1 className="text-4xl font-bold text-blueberry dark:text-citrus mb-8">
+            <h1 className="text-display font-bold text-foreground mb-8">
               Terms of Service - TuneMyCV
             </h1>
 

@@ -71,7 +71,7 @@ const UpcomingFeatureModal: React.FC<UpcomingFeatureModalProps> = ({ isOpen, onC
               </div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-gray-900 mb-2">{featureInfo.cost} Credit{featureInfo.cost > 1 ? 's' : ''}</div>
+              <div className="text-display font-bold text-foreground mb-2">{featureInfo.cost} Credit{featureInfo.cost > 1 ? 's' : ''}</div>
               <div className="text-sm text-gray-600">Required to use this feature</div>
             </div>
           </div>

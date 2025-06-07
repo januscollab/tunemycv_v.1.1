@@ -9,7 +9,7 @@ interface FileValidationResult {
 }
 
 // Comprehensive file type validation
-const ALLOWED_CV_EXTENSIONS = ['pdf', 'docx'];
+const ALLOWED_CV_EXTENSIONS = ['pdf', 'docx', 'txt'];
 const ALLOWED_JOB_DESC_EXTENSIONS = ['pdf', 'docx', 'txt'];
 const DANGEROUS_EXTENSIONS = ['exe', 'bat', 'cmd', 'com', 'scr', 'vbs', 'js', 'jar'];
 

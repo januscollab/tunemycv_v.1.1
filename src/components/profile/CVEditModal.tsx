@@ -48,7 +48,7 @@ const CVEditModal: React.FC<CVEditModalProps> = ({ cv, onClose, onUpdate }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white dark:bg-blueberry rounded-lg max-w-md w-full p-6">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-blueberry dark:text-citrus">Edit CV Name</h3>
+          <h3 className="text-heading font-semibold text-blueberry dark:text-citrus">Edit CV Name</h3>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
@@ -59,7 +59,7 @@ const CVEditModal: React.FC<CVEditModalProps> = ({ cv, onClose, onUpdate }) => {
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-blueberry dark:text-apple-core mb-2">
+            <label className="block text-caption font-medium text-blueberry dark:text-apple-core mb-2">
               CV Name
             </label>
             <input

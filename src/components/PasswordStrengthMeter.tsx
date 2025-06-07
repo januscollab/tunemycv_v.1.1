@@ -59,7 +59,7 @@ const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({ password 
                 className={`h-full transition-all duration-300 ${getStrengthColor()} ${getStrengthWidth()}`}
               />
             </div>
-            <span className={`text-sm font-medium ${
+            <span className={`text-caption font-medium ${
               validation.strength === 'weak' ? 'text-red-600' :
               validation.strength === 'medium' ? 'text-yellow-600' :
               'text-green-600'
@@ -71,7 +71,7 @@ const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({ password 
           {validation.errors.length > 0 && (
             <div className="space-y-1">
               {validation.errors.map((error, index) => (
-                <p key={index} className="text-xs text-red-600 flex items-center">
+                <p key={index} className="text-micro text-red-600 flex items-center">
                   <span className="w-1 h-1 bg-red-600 rounded-full mr-2"></span>
                   {error}
                 </p>
@@ -80,7 +80,7 @@ const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({ password 
           )}
           
           {validation.isValid && (
-            <p className="text-xs text-green-600 flex items-center">
+            <p className="text-micro text-green-600 flex items-center">
               <span className="w-1 h-1 bg-green-600 rounded-full mr-2"></span>
               Password meets all requirements
             </p>

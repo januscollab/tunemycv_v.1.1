@@ -34,13 +34,13 @@ const EmbeddedAuth: React.FC<EmbeddedAuthProps> = ({ title, description, icon })
   return (
     <Card className="max-w-sm w-full border border-border">
       <CardHeader className="py-4 px-6">
-        <CardTitle className="flex items-center justify-center text-xl font-bold">
+        <CardTitle className="flex items-center justify-center text-heading font-bold">
           {icon || <User className="h-5 w-5 text-zapier-orange mr-2" />}
           {title}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4 px-6 pb-6">
-        <p className="text-earth/70 dark:text-white/70 text-center text-sm font-normal mb-4">
+        <p className="text-earth/70 dark:text-white/70 text-center text-caption font-normal mb-4">
           {description}
         </p>
         

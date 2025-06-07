@@ -20,45 +20,170 @@ export const validateFileSecure = (file: File, type: 'cv' | 'job_description') =
   return validateFileSecurely(file, type);
 };
 
+// Smart text formatting cleanup that preserves document structure
+const cleanExtractedText = (text: string): string => {
+  return text
+    // Fix smart quotes but preserve formatting
+    .replace(/[""]/g, '"')
+    .replace(/['']/g, "'")
+    // Normalize bullet points while preserving their structure
+    .replace(/[•·‐−]/g, '• ')
+    .replace(/[–—]/g, '- ')
+    // Clean up excessive blank lines (more than 2 consecutive)
+    .replace(/\n\s*\n\s*\n\s*\n+/g, '\n\n\n')
+    // Remove trailing spaces from lines but preserve line structure
+    .split('\n').map(line => line.replace(/\s+$/, '')).join('\n')
+    // Clean up excessive spaces within lines (but keep intentional spacing)
+    .replace(/ {3,}/g, '  ')
+    // Preserve headers and sections by detecting patterns
+    .replace(/^([A-Z][A-Z\s]{2,})$/gm, '\n$1\n')
+    // Ensure proper spacing around section headers
+    .replace(/\n\n\n([A-Z][A-Z\s]{2,})\n\n\n/g, '\n\n$1\n\n')
+    .trim();
+};
+
 export const extractTextFromFile = async (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    
-    reader.onload = () => {
-      try {
-        if (file.type === 'text/plain') {
-          const content = reader.result as string;
+  if (file.type === 'application/pdf') {
+    try {
+      console.log(`Extracting text from PDF: ${file.name}`);
+      
+      // Import pdfjs-dist for better browser compatibility
+      const pdfjsLib = await import('pdfjs-dist');
+      
+      // Set up worker with local fallback and better error handling
+      if (!pdfjsLib.GlobalWorkerOptions.workerSrc) {
+        try {
+          // Try local worker first (more reliable)
+          pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
+          console.log('Using local PDF.js worker');
+        } catch (error) {
+          console.warn('Local PDF worker failed, trying CDN:', error);
+          // Fallback to CDN with correct version
+          pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+        }
+      }
+      
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      
+      let extractedText = '';
+      
+      // Extract text from all pages
+      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        const page = await pdf.getPage(pageNum);
+        const textContent = await page.getTextContent();
+        
+        // Combine text items with proper spacing
+        const pageText = textContent.items
+          .map((item: any) => item.str)
+          .join(' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+          
+        if (pageText) {
+          extractedText += (extractedText ? '\n\n' : '') + pageText;
+        }
+      }
+      
+      if (!extractedText || extractedText.trim().length === 0) {
+        throw new Error('No text content could be extracted from the PDF');
+      }
+      
+      // Apply smart formatting cleanup
+      extractedText = cleanExtractedText(extractedText);
+      
+      console.log(`Successfully extracted ${extractedText.split(/\s+/).length} words from ${file.name}`);
+      return extractedText;
+      
+    } catch (error) {
+      console.error('PDF extraction error:', error);
+      
+      // Provide more specific error messages
+      if (error instanceof Error) {
+        if (error.message.includes('worker') || error.message.includes('Worker')) {
+          throw new Error('PDF processing failed: Unable to load PDF worker. Please try again or use a different file format.');
+        }
+        if (error.message.includes('InvalidPDFException') || error.message.includes('corrupted')) {
+          throw new Error('PDF file appears to be corrupted or invalid. Please try a different PDF file.');
+        }
+        if (error.message.includes('PasswordException')) {
+          throw new Error('PDF file is password protected. Please use an unprotected PDF file.');
+        }
+      }
+      
+      throw new Error(`Failed to extract text from PDF: ${error instanceof Error ? error.message : 'Unknown error occurred while processing PDF'}`);
+    }
+  }
+  
+  if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+    try {
+      console.log(`Extracting text from DOCX: ${file.name}`);
+      
+      // Import mammoth dynamically
+      const mammoth = await import('mammoth');
+      const arrayBuffer = await file.arrayBuffer();
+      
+      const result = await mammoth.extractRawText({ arrayBuffer });
+      let extractedText = result.value;
+      
+      if (!extractedText || extractedText.trim().length === 0) {
+        throw new Error('No text content could be extracted from the DOCX');
+      }
+      
+      // Apply smart formatting cleanup
+      extractedText = cleanExtractedText(extractedText);
+      
+      console.log(`Successfully extracted ${extractedText.split(/\s+/).length} words from ${file.name}`);
+      return extractedText;
+      
+    } catch (error) {
+      console.error('DOCX extraction error:', error);
+      throw new Error(`Failed to extract text from DOCX: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+  
+  // For text files, use the existing file reader approach
+  if (file.type === 'text/plain') {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      
+      reader.onload = () => {
+        try {
+          let content = reader.result as string;
           // Basic content validation
           if (content.length === 0) {
             reject(new Error('File appears to be empty'));
             return;
           }
-          if (content.length > 100000) { // 100KB text limit
+          if (content.length > 500000) { // 500KB text limit to match edge function
             reject(new Error('Text content too large'));
             return;
           }
+          
+          // Apply smart formatting cleanup
+          content = cleanExtractedText(content);
+          
           resolve(content);
-        } else {
-          // For PDF and DOCX files, return placeholder
-          const content = `[Extracted text from ${file.name}]\n\nThis is a placeholder for the actual extracted text content from the ${file.type} file.`;
-          resolve(content);
+        } catch (error) {
+          reject(new Error('Failed to process file content'));
         }
-      } catch (error) {
-        reject(new Error('Failed to process file content'));
-      }
-    };
-    
-    reader.onerror = () => {
-      reject(new Error('Failed to read file'));
-    };
-    
-    // Set a timeout for file reading
-    setTimeout(() => {
-      reject(new Error('File reading timed out'));
-    }, 30000); // 30 second timeout
-    
-    reader.readAsText(file);
-  });
+      };
+      
+      reader.onerror = () => {
+        reject(new Error('Failed to read file'));
+      };
+      
+      // Set a timeout for file reading
+      setTimeout(() => {
+        reject(new Error('File reading timed out'));
+      }, 30000); // 30 second timeout
+      
+      reader.readAsText(file);
+    });
+  }
+  
+  // Unsupported file type
+  throw new Error(`Unsupported file type: ${file.type}. Please use PDF, DOCX, or TXT files.`);
 };
 
 export const formatFileSize = (bytes: number): string => {

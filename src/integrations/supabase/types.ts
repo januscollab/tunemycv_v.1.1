@@ -42,6 +42,71 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_prompt_versions: {
+        Row: {
+          content: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          prompt_id: string
+          version_number: number
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          prompt_id: string
+          version_number: number
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          prompt_id?: string
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_prompt_versions_prompt_id_fkey"
+            columns: ["prompt_id"]
+            isOneToOne: false
+            referencedRelation: "ai_prompts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_prompts: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       analysis_logs: {
         Row: {
           analysis_result_id: string | null
@@ -364,37 +429,79 @@ export type Database = {
         }
         Relationships: []
       }
+      site_settings: {
+        Row: {
+          admin_email: string | null
+          created_at: string
+          id: string
+          support_email: string | null
+          updated_at: string
+        }
+        Insert: {
+          admin_email?: string | null
+          created_at?: string
+          id?: string
+          support_email?: string | null
+          updated_at?: string
+        }
+        Update: {
+          admin_email?: string | null
+          created_at?: string
+          id?: string
+          support_email?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       uploads: {
         Row: {
           created_at: string | null
+          detected_document_type: string | null
           extracted_text: string | null
           file_name: string
           file_size: number
           file_type: string
           id: string
           job_title: string | null
+          needs_type_confirmation: boolean | null
+          original_file_content: string | null
+          quality_assessment: Json | null
+          quality_score: number | null
+          type_detection_confidence: number | null
           upload_type: string
           user_id: string
         }
         Insert: {
           created_at?: string | null
+          detected_document_type?: string | null
           extracted_text?: string | null
           file_name: string
           file_size: number
           file_type: string
           id?: string
           job_title?: string | null
+          needs_type_confirmation?: boolean | null
+          original_file_content?: string | null
+          quality_assessment?: Json | null
+          quality_score?: number | null
+          type_detection_confidence?: number | null
           upload_type: string
           user_id: string
         }
         Update: {
           created_at?: string | null
+          detected_document_type?: string | null
           extracted_text?: string | null
           file_name?: string
           file_size?: number
           file_type?: string
           id?: string
           job_title?: string | null
+          needs_type_confirmation?: boolean | null
+          original_file_content?: string | null
+          quality_assessment?: Json | null
+          quality_score?: number | null
+          type_detection_confidence?: number | null
           upload_type?: string
           user_id?: string
         }
