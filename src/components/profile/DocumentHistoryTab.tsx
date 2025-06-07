@@ -231,7 +231,7 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Document History</h2>
+          <h2 className="text-title font-bold text-gray-900">Document History</h2>
           <p className="text-gray-600 mt-1">
             {filteredDocuments.length} total
           </p>
@@ -239,7 +239,7 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
         
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
-            <span className="text-sm text-gray-600">Filter:</span>
+            <span className="text-caption text-gray-600">Filter:</span>
             <Select value={filterType} onValueChange={(value: any) => setFilterType(value)}>
               <SelectTrigger className="w-40">
                 <SelectValue />
@@ -254,7 +254,7 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
           
           {filteredDocuments.length > 0 && (
             <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-600">Show:</span>
+              <span className="text-caption text-gray-600">Show:</span>
               <Select value={itemsPerPage.toString()} onValueChange={(value) => setItemsPerPage(Number(value))}>
                 <SelectTrigger className="w-20">
                   <SelectValue />
@@ -265,7 +265,7 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
                   <SelectItem value="30">30</SelectItem>
                 </SelectContent>
               </Select>
-              <span className="text-sm text-gray-600">per page</span>
+              <span className="text-caption text-gray-600">per page</span>
             </div>
           )}
         </div>
@@ -274,7 +274,7 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
       {filteredDocuments.length === 0 ? (
         <div className="text-center py-12">
           <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No documents found</h3>
+          <h3 className="text-heading font-medium text-gray-900 mb-2">No documents found</h3>
           <p className="text-gray-600">
             {filterType === 'all' 
               ? "You haven't created any analyses or cover letters yet."
@@ -290,7 +290,7 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
                 <div className="flex justify-between items-start">
                   <div className="flex-1 pr-4">
                     <div className="flex items-center space-x-3 mb-2">
-                      <h3 className="text-lg font-medium text-gray-900">
+                      <h3 className="text-heading font-medium text-gray-900">
                         {document.job_title || 'Untitled'}
                       </h3>
                       <button
@@ -309,19 +309,19 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
                       </button>
                       
                       {document.type === 'analysis' && document.compatibility_score && (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-micro font-medium bg-green-100 text-green-800">
                           {document.compatibility_score}% match
                         </span>
                       )}
                       
                       {document.type === 'cover_letter' && (document.regeneration_count || 0) > 0 && (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-zapier-orange/10 text-zapier-orange">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-micro font-medium bg-zapier-orange/10 text-zapier-orange">
                           v{(document.regeneration_count || 0) + 1}
                         </span>
                       )}
                     </div>
                     
-                    <div className="flex items-center text-sm text-gray-600 mb-1">
+                    <div className="flex items-center text-caption text-gray-600 mb-1">
                       <Building className="h-4 w-4 mr-1" />
                       <span>{document.company_name || 'Company not specified'}</span>
                       <span className="mx-2">•</span>
@@ -331,7 +331,7 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
                   </div>
                   
                   {/* Document type identifier on the right */}
-                  <div className="text-xs uppercase font-medium text-gray-500 flex items-center">
+                  <div className="text-micro uppercase font-medium text-gray-500 flex items-center">
                     {document.type === 'analysis' ? (
                       <span className="flex items-center">
                         <FileText className="h-3 w-3 mr-1 text-zapier-orange" />
@@ -354,7 +354,7 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
                         e.stopPropagation();
                         handleView(document);
                       }}
-                      className="flex items-center px-2 py-1 text-xs text-black hover:text-zapier-orange transition-colors"
+                      className="flex items-center px-2 py-1 text-micro text-black hover:text-zapier-orange transition-colors"
                     >
                       <Eye className="h-3 w-3 mr-1" />
                       View
@@ -373,7 +373,7 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
                                }
                              });
                            }}
-                           className={`flex items-center px-2 py-1 text-xs rounded-md transition-colors ${
+                           className={`flex items-center px-2 py-1 text-micro rounded-md transition-colors ${
                              document.has_cover_letter
                                ? 'text-green-600 hover:text-green-700 hover:bg-green-50'
                                : 'text-black hover:text-zapier-orange hover:bg-zapier-orange/10'
@@ -394,7 +394,7 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
                               }
                             });
                           }}
-                          className="flex items-center px-2 py-1 text-xs text-black hover:text-zapier-orange hover:bg-zapier-orange/10 rounded-md transition-colors"
+                          className="flex items-center px-2 py-1 text-micro text-black hover:text-zapier-orange hover:bg-zapier-orange/10 rounded-md transition-colors"
                         >
                           <MessageSquare className="h-3 w-3 mr-1" />
                           Create Interview Prep
@@ -409,7 +409,7 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
                           // Fallback navigation to CV Analysis History tab
                           navigate('/analyze?tab=history');
                         }}
-                        className="flex items-center px-2 py-1 text-xs text-green-600 hover:text-green-700 hover:bg-green-50 rounded-md transition-colors"
+                        className="flex items-center px-2 py-1 text-micro text-green-600 hover:text-green-700 hover:bg-green-50 rounded-md transition-colors"
                       >
                         <FileText className="h-3 w-3 mr-1" />
                         View CV Analysis
@@ -442,26 +442,28 @@ RECOMMENDATIONS
 ===============
 ${document.recommendations?.map((rec, index) => `${index + 1}. ${rec}`).join('\n') || 'No recommendations available'}
 
-Generated by TuneMyCV` 
-                         : document.content || `Cover Letter for ${document.job_title}`
+---
+Generated by TuneMyCV - Your AI-Powered Career Assistant`
+                         : document.content || ''
                        }
-                       fileName={`${document.type === 'analysis' ? 'CV_Analysis' : 'Cover_Letter'}_${document.job_title?.replace(/[^a-zA-Z0-9]/g, '_') || 'Document'}_${new Date().toISOString().split('T')[0]}`}
-                       triggerComponent={
-                         <button className="flex items-center px-2 py-1 text-xs text-black hover:text-zapier-orange hover:bg-zapier-orange/10 rounded-md transition-colors">
-                           <Download className="h-3 w-3 mr-1" />
-                           Download
-                         </button>
+                       fileName={document.type === 'analysis' 
+                         ? `CV_Analysis_${document.job_title?.replace(/\s+/g, '_') || 'Untitled'}_${document.company_name?.replace(/\s+/g, '_') || 'Company'}`
+                         : `Cover_Letter_${document.job_title?.replace(/\s+/g, '_') || 'Untitled'}_${document.company_name?.replace(/\s+/g, '_') || 'Company'}`
                        }
-                     />
+                     >
+                       <button className="flex items-center px-2 py-1 text-micro text-black hover:text-zapier-orange hover:bg-zapier-orange/10 rounded-md transition-colors">
+                         <Download className="h-3 w-3 mr-1" />
+                         Download
+                       </button>
+                     </DownloadOptions>
                   </div>
                   
-                  {/* Delete button in bottom right */}
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       handleDelete(document.id, document.type);
                     }}
-                    className="p-1 text-xs text-red-600 hover:text-zapier-orange transition-colors"
+                    className="p-1 text-micro text-red-600 hover:text-zapier-orange transition-colors"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -482,7 +484,7 @@ Generated by TuneMyCV`
                         e.preventDefault();
                         if (currentPage > 1) setCurrentPage(currentPage - 1);
                       }}
-                      className={`${currentPage <= 1 ? 'pointer-events-none opacity-50' : ''} text-sm font-normal`}
+                      className={`${currentPage <= 1 ? 'pointer-events-none opacity-50' : ''} text-caption font-normal`}
                     />
                   </PaginationItem>
                   
@@ -495,7 +497,7 @@ Generated by TuneMyCV`
                           setCurrentPage(page);
                         }}
                         isActive={currentPage === page}
-                        className="text-sm font-normal"
+                        className="text-caption font-normal"
                       >
                         {page}
                       </PaginationLink>
@@ -509,7 +511,7 @@ Generated by TuneMyCV`
                         e.preventDefault();
                         if (currentPage < totalPages) setCurrentPage(currentPage + 1);
                       }}
-                      className={`${currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''} text-sm font-normal`}
+                      className={`${currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''} text-caption font-normal`}
                     />
                   </PaginationItem>
                 </PaginationContent>

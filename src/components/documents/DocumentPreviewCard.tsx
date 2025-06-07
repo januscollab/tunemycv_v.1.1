@@ -46,19 +46,19 @@ const DocumentPreviewCard: React.FC<DocumentPreviewCardProps> = ({
           <div className="flex items-start space-x-3">
             <FileText className="h-6 w-6 text-apricot mt-1" />
             <div className="min-w-0 flex-1">
-              <CardTitle className="text-base font-medium text-blueberry dark:text-citrus truncate">
+              <CardTitle className="text-body font-medium text-blueberry dark:text-citrus truncate">
                 {fileName}
               </CardTitle>
               <div className="flex items-center space-x-3 mt-1">
-                <span className="text-sm text-blueberry/60 dark:text-apple-core/60">
+                <span className="text-caption text-blueberry/60 dark:text-apple-core/60">
                   {formatFileSize(fileSize)}
                 </span>
-                <span className="text-sm text-blueberry/60 dark:text-apple-core/60">
+                <span className="text-caption text-blueberry/60 dark:text-apple-core/60">
                   {quality.wordCount} words
                 </span>
                 <Badge 
                   variant="outline" 
-                  className={`text-xs ${getQualityColor(quality.score)} border-current`}
+                  className={`text-micro ${getQualityColor(quality.score)} border-current`}
                 >
                   {getQualityBadge(quality.score)}
                 </Badge>
@@ -76,10 +76,10 @@ const DocumentPreviewCard: React.FC<DocumentPreviewCardProps> = ({
               <div className="flex items-start space-x-2">
                 {getIssueIcon(issue.type)}
                 <div className="flex-1 min-w-0">
-                  <AlertDescription className="text-sm">
+                  <AlertDescription className="text-caption">
                     <span className="font-medium">{issue.title}:</span> {issue.description}
                     {issue.suggestion && (
-                      <div className="mt-1 text-xs text-blueberry/70 dark:text-apple-core/70">
+                      <div className="mt-1 text-micro text-blueberry/70 dark:text-apple-core/70">
                         💡 {issue.suggestion}
                       </div>
                     )}
@@ -94,7 +94,7 @@ const DocumentPreviewCard: React.FC<DocumentPreviewCardProps> = ({
               variant="link"
               size="sm"
               onClick={onOpenVerification}
-              className="text-xs text-zapier-orange hover:text-zapier-orange/80 p-0 h-auto"
+              className="text-micro text-zapier-orange hover:text-zapier-orange/80 p-0 h-auto"
             >
               View {quality.issues.length - 2} more issues
             </Button>
