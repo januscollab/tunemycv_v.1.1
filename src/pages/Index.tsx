@@ -20,12 +20,12 @@ const Index = () => {
             AI-Powered Career Optimization
           </div>
           
-          <h1 className="text-5xl md:text-6xl font-bold text-earth dark:text-white mb-6 leading-tight">
+          <h1 className="text-display md:text-6xl font-display font-bold text-earth dark:text-white mb-6 leading-tight">
             Turn Your CV Into a
             <span className="text-zapier-orange"> Job-Winning</span> Asset
           </h1>
           
-          <p className="text-xl text-earth/70 dark:text-white/70 mb-8 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-subheading text-earth/70 dark:text-white/70 mb-8 max-w-3xl mx-auto leading-relaxed">
             Get AI-powered analysis, personalized recommendations, and professional cover letters 
             that help you stand out from the competition and land your dream job.
           </p>
@@ -73,10 +73,10 @@ const Index = () => {
       {/* CTA Section - Updated background color to match Resources page */}
       <section className="py-16 bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-earth dark:text-white mb-6">
+          <h2 className="text-title md:text-display font-display font-bold text-earth dark:text-white mb-6">
             Ready to Transform Your Career?
           </h2>
-          <p className="text-xl text-earth/70 dark:text-white/70 mb-8 max-w-2xl mx-auto">
+          <p className="text-subheading text-earth/70 dark:text-white/70 mb-8 max-w-2xl mx-auto">
             Join thousands of job seekers who have successfully landed their dream jobs with TuneMyCV
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

@@ -23,6 +23,16 @@ export default {
 				sans: ['Poppins', 'system-ui', 'sans-serif'],
 				display: ['Playfair Display', 'serif'],
 			},
+			fontSize: {
+				// Semantic typography scale with clear hierarchy
+				'micro': ['0.75rem', { lineHeight: '1rem' }],      // 12px - timestamps, badges, footnotes
+				'caption': ['0.875rem', { lineHeight: '1.25rem' }], // 14px - secondary text, metadata, helper text
+				'body': ['1rem', { lineHeight: '1.5rem' }],         // 16px - main content, form inputs, descriptions
+				'subheading': ['1.125rem', { lineHeight: '1.75rem' }], // 18px - section introductions, callouts
+				'heading': ['1.25rem', { lineHeight: '1.75rem' }],  // 20px - component titles, card headers
+				'title': ['1.5rem', { lineHeight: '2rem' }],        // 24px - page headers, main titles
+				'display': ['1.875rem', { lineHeight: '2.25rem' }], // 30px - hero titles, major headings
+			},
 			maxWidth: {
 				'wider': '1076px', // 20% increase from max-w-4xl (896px)
 			},
