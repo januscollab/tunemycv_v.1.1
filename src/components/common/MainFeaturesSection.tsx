@@ -112,7 +112,7 @@ const MainFeaturesSection = () => {
 
         {/* Header */}
         <div className="text-center mb-12">
-          <h2 className="text-xl font-bold text-earth dark:text-white leading-tight">
+          <h2 className="text-2xl font-bold text-earth dark:text-white leading-tight">
             Three Powerful Tools,
             <span className="text-zapier-orange"> One Career Goal</span>
           </h2>
