@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Upload, FileText, Check, X, Plus, FolderOpen, FilePlus } from 'lucide-react';
+import { Upload, FileText, Check, X, Plus, FolderOpen, FilePlus, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
@@ -13,6 +13,8 @@ import FileUploadWithSave from './upload/FileUploadWithSave';
 import SavedCVList from './upload/SavedCVList';
 import DocumentPreviewCard from '@/components/documents/DocumentPreviewCard';
 import DocumentVerificationModal from '@/components/documents/DocumentVerificationModal';
+import DocumentValidationDialog from '@/components/ui/document-validation-dialog';
+import { validateCV } from '@/utils/documentValidation';
 
 interface UploadedFile {
   file: File;
@@ -41,6 +43,8 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
   const [selectedCVId, setSelectedCVId] = useState<string | null>(null);
   const [fileUploading, setFileUploading] = useState(false);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
+  const [showValidationDialog, setShowValidationDialog] = useState(false);
+  const [pendingFile, setPendingFile] = useState<{ file: File; extractedText: string } | null>(null);
 
   // Fetch saved CVs from database
   const { data: savedCVs = [], isLoading, refetch } = useQuery({
@@ -86,6 +90,79 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
       return;
     }
 
+    // Validate if this looks like a CV
+    const validation = validateCV(extractedText, file.name);
+    
+    if (!validation.isValid) {
+      setPendingFile({ file, extractedText });
+      setShowValidationDialog(true);
+      return;
+    }
+
+    // Check if we're at the 5 CV limit when trying to save
+    if (shouldSave && savedCVs.length >= 5) {
+      toast({ title: 'Limit Reached', description: 'You can save up to 5 CVs. Please delete one first.', variant: 'destructive' });
+      return;
+    }
+
+    try {
+      setFileUploading(true);
+      
+      // Only save to database if user explicitly requested it AND we're under the limit
+      if (shouldSave && user?.id && savedCVs.length < 5) {
+        const { error: saveError } = await supabase
+          .from('uploads')
+          .insert({
+            user_id: user.id,
+            file_name: file.name,
+            file_type: file.type,
+            file_size: file.size,
+            upload_type: 'cv',
+            extracted_text: extractedText
+          });
+
+        if (saveError) {
+          console.error('Error saving CV:', saveError);
+          toast({ title: 'Warning', description: 'CV uploaded but not saved for future use', variant: 'destructive' });
+        } else {
+          toast({ title: 'Success', description: 'CV uploaded and saved for future use!' });
+          // Refetch saved CVs to update the list
+          refetch();
+        }
+      } else if (!shouldSave) {
+        toast({ title: 'Success', description: 'CV uploaded for one-time use!' });
+      }
+
+      const uploadedFile: UploadedFile = {
+        file,
+        extractedText,
+        type: 'cv'
+      };
+
+      onCVSelect(uploadedFile);
+    } catch (error) {
+      toast({ title: 'Error', description: 'Failed to process CV file', variant: 'destructive' });
+    } finally {
+      setFileUploading(false);
+    }
+  };
+
+  const handleValidationConfirm = async () => {
+    if (pendingFile) {
+      // User confirmed, proceed with upload using existing logic
+      const shouldSave = false; // Default to not saving when validation failed
+      await finalizeUpload(pendingFile.file, pendingFile.extractedText, shouldSave);
+    }
+    setShowValidationDialog(false);
+    setPendingFile(null);
+  };
+
+  const handleValidationCancel = () => {
+    setShowValidationDialog(false);
+    setPendingFile(null);
+  };
+
+  const finalizeUpload = async (file: File, extractedText: string, shouldSave: boolean) => {
     // Check if we're at the 5 CV limit when trying to save
     if (shouldSave && savedCVs.length >= 5) {
       toast({ title: 'Limit Reached', description: 'You can save up to 5 CVs. Please delete one first.', variant: 'destructive' });
@@ -186,6 +263,46 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
               documentType="cv"
               onSave={handleVerificationSave}
             />
+            
+            {/* Add to Saved CVs Button */}
+            <div className="mt-4 flex justify-center">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={async () => {
+                  if (user?.id && savedCVs.length < 5) {
+                    try {
+                      const { error: saveError } = await supabase
+                        .from('uploads')
+                        .insert({
+                          user_id: user.id,
+                          file_name: selectedCV.file.name,
+                          file_type: selectedCV.file.type,
+                          file_size: selectedCV.file.size,
+                          upload_type: 'cv',
+                          extracted_text: selectedCV.extractedText
+                        });
+
+                      if (saveError) {
+                        toast({ title: 'Error', description: 'Failed to save CV', variant: 'destructive' });
+                      } else {
+                        toast({ title: 'Success', description: 'CV added to your saved CVs!' });
+                        refetch();
+                      }
+                    } catch (error) {
+                      toast({ title: 'Error', description: 'Failed to save CV', variant: 'destructive' });
+                    }
+                  } else if (savedCVs.length >= 5) {
+                    toast({ title: 'Limit Reached', description: 'You can save up to 5 CVs. Please delete one first.', variant: 'destructive' });
+                  }
+                }}
+                disabled={savedCVs.length >= 5}
+                className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200"
+              >
+                <Heart className="h-3 w-3 mr-2" />
+                Add to My Saved CVs
+              </Button>
+            </div>
           </>
         ) : (
           <div className="space-y-4">
@@ -236,6 +353,18 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
               />
             )}
           </div>
+        )}
+        
+        {/* Validation Dialog */}
+        {pendingFile && (
+          <DocumentValidationDialog
+            isOpen={showValidationDialog}
+            onClose={handleValidationCancel}
+            onConfirm={handleValidationConfirm}
+            documentType="cv"
+            fileName={pendingFile.file.name}
+            validationResult={validateCV(pendingFile.extractedText, pendingFile.file.name)}
+          />
         )}
       </CardContent>
     </Card>

@@ -217,9 +217,7 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
                       </div>
                     ) : lastSaved ? (
                       <span>Last saved: {lastSaved.toLocaleTimeString()}</span>
-                    ) : (
-                      <span>Auto-save enabled</span>
-                    )}
+                    ) : null}
                   </div>
                 </div>
               </div>
@@ -261,20 +259,22 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
             <X className="h-4 w-4 mr-2" />
             Cancel
           </Button>
-          <Button 
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              toast({
-                title: "Coming Soon!",
-                description: "AI review feature will be available soon.",
-              });
-            }}
-            className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200"
-          >
-            <WandSparkles className="h-4 w-4 mr-2" />
-            Ask AI to Review It
-          </Button>
+{documentType === 'cv' ? (
+            <Button 
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                toast({
+                  title: "Coming Soon!",
+                  description: "AI CV review feature will be available soon and will cost 2 Credits.",
+                });
+              }}
+              className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200"
+            >
+              <WandSparkles className="h-4 w-4 mr-2" />
+              Ask AI to Review My CV
+            </Button>
+          ) : null}
           <Button 
             variant="outline"
             onClick={handleSave}

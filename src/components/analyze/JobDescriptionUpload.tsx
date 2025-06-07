@@ -8,6 +8,8 @@ import { UploadedFile } from '@/types/fileTypes';
 import JobDescriptionTextInput from './JobDescriptionTextInput';
 import DocumentPreviewCard from '@/components/documents/DocumentPreviewCard';
 import DocumentVerificationModal from '@/components/documents/DocumentVerificationModal';
+import DocumentValidationDialog from '@/components/ui/document-validation-dialog';
+import { validateJobDescription } from '@/utils/documentValidation';
 
 interface JobDescriptionUploadProps {
   onJobDescriptionSet: (file: UploadedFile) => void;
@@ -22,6 +24,8 @@ const JobDescriptionUpload: React.FC<JobDescriptionUploadProps> = ({
 }) => {
   const [uploading, setUploading] = useState(false);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
+  const [showValidationDialog, setShowValidationDialog] = useState(false);
+  const [pendingFile, setPendingFile] = useState<{ file: File; extractedText: string } | null>(null);
   const { toast } = useToast();
 
   const jobDescTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
@@ -39,6 +43,16 @@ const JobDescriptionUpload: React.FC<JobDescriptionUploadProps> = ({
       setUploading(true);
       const extractedText = await extractTextFromFile(file);
       
+      // Validate if this looks like a job description
+      const validation = validateJobDescription(extractedText, file.name);
+      
+      if (!validation.isValid) {
+        setPendingFile({ file, extractedText });
+        setShowValidationDialog(true);
+        setUploading(false);
+        return;
+      }
+      
       const uploadedFileData: UploadedFile = {
         file,
         extractedText,
@@ -52,6 +66,25 @@ const JobDescriptionUpload: React.FC<JobDescriptionUploadProps> = ({
     } finally {
       setUploading(false);
     }
+  };
+
+  const handleValidationConfirm = () => {
+    if (pendingFile) {
+      const uploadedFileData: UploadedFile = {
+        file: pendingFile.file,
+        extractedText: pendingFile.extractedText,
+        type: 'job_description'
+      };
+      onJobDescriptionSet(uploadedFileData);
+      toast({ title: 'Success', description: 'Job description uploaded successfully!' });
+    }
+    setShowValidationDialog(false);
+    setPendingFile(null);
+  };
+
+  const handleValidationCancel = () => {
+    setShowValidationDialog(false);
+    setPendingFile(null);
   };
 
   const handleJobDescriptionText = (text: string) => {
@@ -111,6 +144,17 @@ const JobDescriptionUpload: React.FC<JobDescriptionUploadProps> = ({
           documentType="job_description"
           onSave={handleVerificationSave}
         />
+        
+        {pendingFile && (
+          <DocumentValidationDialog
+            isOpen={showValidationDialog}
+            onClose={handleValidationCancel}
+            onConfirm={handleValidationConfirm}
+            documentType="job_description"
+            fileName={pendingFile.file.name}
+            validationResult={validateJobDescription(pendingFile.extractedText, pendingFile.file.name)}
+          />
+        )}
       </>
     );
   }

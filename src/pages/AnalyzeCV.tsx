@@ -543,10 +543,10 @@ const AnalyzeCV = () => {
                       </div>
                       <div className="flex-1">
                         <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-2">
-                          Let's Get Personal (Optional)
+                          Motivation Matters (Optional)
                         </h3>
                         <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mb-4 leading-relaxed">
-                          Every role is unique. Share additional insights about your motivation and goals to enhance your CV analysis with our Advanced Recruitment Models.
+                          Each role is unique. Share your motivations for applying - beyond the information in your CV - help in our analysis.
                         </p>
                         
                         {surveyResponses ? (
@@ -568,7 +568,7 @@ const AnalyzeCV = () => {
                           <Button
                             onClick={() => setShowPersonalizationSurvey(true)}
                             variant="outline"
-                            className="border-zapier-orange text-zapier-orange hover:bg-zapier-orange hover:text-white transition-all duration-200"
+                            className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200"
                             disabled={uploading || analyzing}
                           >
                             <MessageSquare className="h-4 w-4 mr-2" />

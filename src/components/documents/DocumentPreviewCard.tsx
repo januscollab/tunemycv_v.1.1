@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileText, Edit, AlertTriangle, CheckCircle, Info } from 'lucide-react';
+import { FileText, Edit, AlertTriangle, CheckCircle, Info, X } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -98,22 +98,23 @@ const DocumentPreviewCard: React.FC<DocumentPreviewCardProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-2">
           <Button
             variant="outline"
             size="sm"
             onClick={onOpenVerification}
-            className="text-zapier-orange border-zapier-orange hover:bg-zapier-orange hover:text-white"
+            className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200"
           >
-            <Edit className="h-4 w-4 mr-1" />
+            <Edit className="h-3 w-3 mr-2" />
             Review & Edit
           </Button>
           <Button
-            variant="ghost"
+            variant="outline"
             size="sm"
             onClick={onRemove}
-            className="text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+            className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200"
           >
+            <X className="h-3 w-3 mr-2" />
             Remove
           </Button>
         </div>
