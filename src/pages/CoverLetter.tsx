@@ -367,7 +367,7 @@ const AuthenticatedCoverLetter = () => {
           <div className="flex items-start mb-6">
             <Edit className="h-8 w-8 text-zapier-orange mr-3 flex-shrink-0" />
             <div>
-              <h1 className="text-3xl font-bold text-earth dark:text-white">
+              <h1 className="text-display font-bold text-foreground">
                 Generate Cover Letter
               </h1>
               <p className="text-lg text-earth/70 dark:text-white/70 max-w-2xl mt-2">

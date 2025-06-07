@@ -58,7 +58,7 @@ const Testimonials = () => {
     <section className="py-20 px-4 bg-gray-50 dark:bg-gray-800">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-blueberry dark:text-citrus mb-4">
+          <h2 className="text-display font-bold text-foreground mb-4">
             What Our Users Say
           </h2>
           <p className="text-heading text-foreground-secondary max-w-3xl mx-auto">

@@ -7,7 +7,7 @@ const Contact = () => {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
       <div className="max-w-4xl mx-auto px-4">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-blueberry dark:text-citrus mb-4">
+          <h1 className="text-display font-bold text-foreground mb-4">
             Contact Us
           </h1>
           <p className="text-lg text-blueberry/70 dark:text-apple-core/80">

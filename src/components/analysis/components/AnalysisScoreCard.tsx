@@ -35,7 +35,7 @@ const AnalysisScoreCard: React.FC<AnalysisScoreCardProps> = ({
       <div className="flex items-center justify-center mb-4">
         <div className={`relative w-32 h-32 ${getScoreColor(percentageScore)} rounded-full flex items-center justify-center`}>
           <div className="text-white text-center">
-            <div className="text-3xl font-bold">{percentageScore}%</div>
+            <div className="text-display font-bold">{percentageScore}%</div>
             <div className="text-sm">Match</div>
           </div>
         </div>

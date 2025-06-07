@@ -66,7 +66,7 @@ const ContactUs = () => {
       <div className="max-w-4xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-blueberry dark:text-citrus mb-4">Contact Us</h1>
+          <h1 className="text-display font-bold text-foreground mb-4">Contact Us</h1>
           <p className="text-xl text-blueberry/80 dark:text-apple-core max-w-2xl mx-auto">
             Get in touch with the TuneMyCV team. We're here to help you optimize your career journey.
           </p>

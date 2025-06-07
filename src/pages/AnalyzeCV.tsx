@@ -363,7 +363,7 @@ const AnalyzeCV = () => {
           <div className="flex items-start mb-8">
             <FileText className="h-12 w-12 text-zapier-orange mr-6 mt-2" />
             <div>
-              <h1 className="text-4xl md:text-5xl font-bold text-earth dark:text-white mb-4">
+              <h1 className="text-display font-bold text-foreground mb-4">
                 Analyze Your CV
               </h1>
               <p className="text-xl text-earth/70 dark:text-white/70 max-w-3xl font-normal">
@@ -462,7 +462,7 @@ const AnalyzeCV = () => {
           <div className="flex items-start">
             <Zap className="h-10 w-10 text-zapier-orange mr-4 mt-1" />
             <div>
-              <h1 className="text-3xl font-bold text-earth dark:text-white">
+              <h1 className="text-display font-bold text-foreground">
                 Analyze Your CV
               </h1>
               <p className="text-lg text-earth/70 dark:text-white/70 max-w-2xl mt-1">

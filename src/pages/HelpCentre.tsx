@@ -228,7 +228,7 @@ const HelpCentre = () => {
       <div className="max-w-6xl mx-auto px-4 py-12">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-blueberry dark:text-citrus mb-4">Help Centre</h1>
+          <h1 className="text-display font-bold text-foreground mb-4">Help Centre</h1>
           <p className="text-xl text-blueberry/80 dark:text-apple-core max-w-2xl mx-auto">
             Find answers to common questions or get in touch with our support team.
           </p>

@@ -57,7 +57,7 @@ const AuthHeader: React.FC<AuthHeaderProps> = ({ mode, fromAnalyze }) => {
       )}
       
       {mode !== 'login' && (
-        <h2 className="text-4xl font-bold text-earth dark:text-white">
+        <h2 className="text-display font-bold text-foreground">
           {getTitle()}
         </h2>
       )}

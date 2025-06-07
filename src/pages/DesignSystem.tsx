@@ -211,8 +211,8 @@ const DesignSystem = () => {
   ];
 
   const typographyElements = [
-    { name: 'Heading 1', element: <h1 className="text-4xl font-bold text-earth dark:text-white">Heading 1</h1>, usage: '15 usages' },
-    { name: 'Heading 2', element: <h2 className="text-3xl font-bold text-earth dark:text-white">Heading 2</h2>, usage: '67 usages' },
+     { name: 'Heading 1', element: <h1 className="text-display font-bold text-foreground">Heading 1</h1>, usage: '15 usages' },
+     { name: 'Heading 2', element: <h2 className="text-display font-bold text-foreground">Heading 2</h2>, usage: '67 usages' },
     { name: 'Heading 3', element: <h3 className="text-2xl font-bold text-earth dark:text-white">Heading 3</h3>, usage: '89 usages' },
     { name: 'Body Text', element: <p className="text-base text-earth/70 dark:text-white/70">Body text content</p>, usage: '234 usages' },
     { name: 'Small Text', element: <small className="text-sm text-earth/60 dark:text-white/60">Small text</small>, usage: '156 usages' },
@@ -230,7 +230,7 @@ const DesignSystem = () => {
           </Link>
           <Separator orientation="vertical" className="h-6" />
           <div className="flex-1">
-            <h1 className="text-4xl font-bold text-earth dark:text-white">Design System</h1>
+            <h1 className="text-display font-bold text-foreground">Design System</h1>
             <p className="text-earth/70 dark:text-white/70 mt-2">
               Complete visual reference of design tokens, components, and usage statistics
             </p>
