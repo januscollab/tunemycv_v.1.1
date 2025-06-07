@@ -1,15 +1,12 @@
 
 import React, { useState } from 'react';
-import { X, Check } from 'lucide-react';
-import { DragDropZone } from '@/components/ui/drag-drop-zone';
-import { validateFile, extractTextFromFile } from '@/utils/fileUtils';
+import FileUploadArea from './upload/FileUploadArea';
 import { useToast } from '@/hooks/use-toast';
 import { UploadedFile } from '@/types/fileTypes';
 import JobDescriptionTextInput from './JobDescriptionTextInput';
 import DocumentPreviewCard from '@/components/documents/DocumentPreviewCard';
 import DocumentVerificationModal from '@/components/documents/DocumentVerificationModal';
-import DocumentValidationDialog from '@/components/ui/document-validation-dialog';
-import { validateJobDescription } from '@/utils/documentValidation';
+import DocumentTypeConfirmationModal from '@/components/ui/document-type-confirmation-modal';
 
 interface JobDescriptionUploadProps {
   onJobDescriptionSet: (file: UploadedFile) => void;
@@ -22,69 +19,58 @@ const JobDescriptionUpload: React.FC<JobDescriptionUploadProps> = ({
   uploadedFile,
   disabled = false
 }) => {
-  const [uploading, setUploading] = useState(false);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
-  const [showValidationDialog, setShowValidationDialog] = useState(false);
-  const [pendingFile, setPendingFile] = useState<{ file: File; extractedText: string } | null>(null);
+  const [showTypeConfirmation, setShowTypeConfirmation] = useState(false);
+  const [pendingFileData, setPendingFileData] = useState<{
+    file: File;
+    extractedText: string;
+    typeDetection: any;
+    qualityAssessment: any;
+  } | null>(null);
   const { toast } = useToast();
 
-  const jobDescTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
-  const maxSize = 5 * 1024 * 1024; // 5MB
-
-  const handleFileUpload = async (file: File) => {
-    const errors = validateFile(file, jobDescTypes, maxSize);
-    
-    if (errors.length > 0) {
-      toast({ title: 'Upload Error', description: errors.join('. '), variant: 'destructive' });
+  const handleFileSelect = (file: File, extractedText: string, typeDetection: any, qualityAssessment: any) => {
+    // Check if document type confirmation is needed
+    if (typeDetection?.needsUserConfirmation) {
+      setPendingFileData({ file, extractedText, typeDetection, qualityAssessment });
+      setShowTypeConfirmation(true);
       return;
     }
 
-    try {
-      setUploading(true);
-      const extractedText = await extractTextFromFile(file);
-      
-      // Validate if this looks like a job description
-      const validation = validateJobDescription(extractedText, file.name);
-      
-      if (!validation.isValid) {
-        setPendingFile({ file, extractedText });
-        setShowValidationDialog(true);
-        setUploading(false);
-        return;
-      }
-      
+    // Proceed with upload if type is confirmed as job description or highly confident
+    if (typeDetection?.detectedType === 'job_description' || typeDetection?.jobDescriptionConfidence >= 70) {
       const uploadedFileData: UploadedFile = {
         file,
         extractedText,
         type: 'job_description'
       };
-
       onJobDescriptionSet(uploadedFileData);
       toast({ title: 'Success', description: 'Job description uploaded successfully!' });
-    } catch (error) {
-      toast({ title: 'Error', description: 'Failed to process file', variant: 'destructive' });
-    } finally {
-      setUploading(false);
+    } else {
+      // Show confirmation for uncertain cases
+      setPendingFileData({ file, extractedText, typeDetection, qualityAssessment });
+      setShowTypeConfirmation(true);
     }
   };
 
-  const handleValidationConfirm = () => {
-    if (pendingFile) {
+  const handleTypeConfirmation = (confirmedType: 'cv' | 'job_description') => {
+    if (pendingFileData && confirmedType === 'job_description') {
       const uploadedFileData: UploadedFile = {
-        file: pendingFile.file,
-        extractedText: pendingFile.extractedText,
+        file: pendingFileData.file,
+        extractedText: pendingFileData.extractedText,
         type: 'job_description'
       };
       onJobDescriptionSet(uploadedFileData);
       toast({ title: 'Success', description: 'Job description uploaded successfully!' });
+    } else if (confirmedType === 'cv') {
+      toast({ 
+        title: 'Wrong document type', 
+        description: 'Please upload a job description, not a CV/Resume.', 
+        variant: 'destructive' 
+      });
     }
-    setShowValidationDialog(false);
-    setPendingFile(null);
-  };
-
-  const handleValidationCancel = () => {
-    setShowValidationDialog(false);
-    setPendingFile(null);
+    setShowTypeConfirmation(false);
+    setPendingFileData(null);
   };
 
   const handleJobDescriptionText = (text: string) => {
@@ -144,17 +130,6 @@ const JobDescriptionUpload: React.FC<JobDescriptionUploadProps> = ({
           documentType="job_description"
           onSave={handleVerificationSave}
         />
-        
-        {pendingFile && (
-          <DocumentValidationDialog
-            isOpen={showValidationDialog}
-            onClose={handleValidationCancel}
-            onConfirm={handleValidationConfirm}
-            documentType="job_description"
-            fileName={pendingFile.file.name}
-            validationResult={validateJobDescription(pendingFile.extractedText, pendingFile.file.name)}
-          />
-        )}
       </>
     );
   }
@@ -162,19 +137,35 @@ const JobDescriptionUpload: React.FC<JobDescriptionUploadProps> = ({
   return (
     <div className="space-y-4">
       {/* File Upload Option */}
-      <DragDropZone
-        onDrop={(files) => handleFileUpload(files[0])}
+      <FileUploadArea
+        onFileSelect={handleFileSelect}
+        uploading={false}
         accept=".pdf,.docx,.txt"
-        maxSize={maxSize}
-        disabled={uploading || disabled}
-        placeholder={uploading ? "Processing file..." : "Upload Job Description"}
-        description="PDF, DOCX, TXT • Max 5MB"
-        className="border-apple-core/30 dark:border-citrus/30"
+        maxSize="5MB"
+        label="Upload Job Description"
+        fileType="job_description"
       />
       
       <div className="text-center text-blueberry/60 dark:text-apple-core/60">or</div>
       
-      <JobDescriptionTextInput onSubmit={handleJobDescriptionText} disabled={uploading || disabled} />
+      <JobDescriptionTextInput onSubmit={handleJobDescriptionText} disabled={disabled} />
+      
+      {/* Document Type Confirmation Modal */}
+      {pendingFileData && (
+        <DocumentTypeConfirmationModal
+          isOpen={showTypeConfirmation}
+          onClose={() => {
+            setShowTypeConfirmation(false);
+            setPendingFileData(null);
+          }}
+          fileName={pendingFileData.file.name}
+          detectedType={pendingFileData.typeDetection?.detectedType || 'unknown'}
+          confidence={pendingFileData.typeDetection?.confidence || 0}
+          cvConfidence={pendingFileData.typeDetection?.cvConfidence || 0}
+          jobDescriptionConfidence={pendingFileData.typeDetection?.jobDescriptionConfidence || 0}
+          onConfirm={handleTypeConfirmation}
+        />
+      )}
     </div>
   );
 };
