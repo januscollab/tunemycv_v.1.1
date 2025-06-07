@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Settings, Mail, Save, RefreshCw } from 'lucide-react';
+import { Save, Mail, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -18,8 +18,10 @@ const SiteSettingsManagement: React.FC = () => {
   const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [adminEmail, setAdminEmail] = useState('');
-  const [supportEmail, setSupportEmail] = useState('');
+  const [formData, setFormData] = useState({
+    admin_email: '',
+    support_email: ''
+  });
   const { toast } = useToast();
 
   useEffect(() => {
@@ -28,7 +30,6 @@ const SiteSettingsManagement: React.FC = () => {
 
   const loadSettings = async () => {
     try {
-      setLoading(true);
       const { data, error } = await supabase
         .from('site_settings')
         .select('*')
@@ -41,8 +42,10 @@ const SiteSettingsManagement: React.FC = () => {
 
       if (data) {
         setSettings(data);
-        setAdminEmail(data.admin_email || '');
-        setSupportEmail(data.support_email || '');
+        setFormData({
+          admin_email: data.admin_email || '',
+          support_email: data.support_email || ''
+        });
       }
     } catch (error) {
       console.error('Error loading site settings:', error);
@@ -56,38 +59,39 @@ const SiteSettingsManagement: React.FC = () => {
     }
   };
 
-  const saveSettings = async () => {
+  const handleSave = async () => {
+    setSaving(true);
     try {
-      setSaving(true);
-      
-      const settingsData = {
-        admin_email: adminEmail,
-        support_email: supportEmail
-      };
+      if (settings) {
+        // Update existing settings
+        const { error } = await supabase
+          .from('site_settings')
+          .update({
+            admin_email: formData.admin_email,
+            support_email: formData.support_email
+          })
+          .eq('id', settings.id);
 
-      let result;
-      if (settings?.id) {
-        result = await supabase
-          .from('site_settings')
-          .update(settingsData)
-          .eq('id', settings.id)
-          .select()
-          .single();
+        if (error) throw error;
       } else {
-        result = await supabase
+        // Create new settings
+        const { error } = await supabase
           .from('site_settings')
-          .insert([settingsData])
-          .select()
-          .single();
+          .insert({
+            admin_email: formData.admin_email,
+            support_email: formData.support_email
+          });
+
+        if (error) throw error;
       }
 
-      if (result.error) throw result.error;
-
-      setSettings(result.data);
       toast({
         title: 'Success',
-        description: 'Site settings updated successfully'
+        description: 'Site settings saved successfully'
       });
+
+      // Reload settings to get updated data
+      await loadSettings();
     } catch (error) {
       console.error('Error saving site settings:', error);
       toast({
@@ -100,102 +104,88 @@ const SiteSettingsManagement: React.FC = () => {
     }
   };
 
-  const handleReset = () => {
-    if (settings) {
-      setAdminEmail(settings.admin_email || '');
-      setSupportEmail(settings.support_email || '');
-    }
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center p-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-zapier-orange"></div>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center space-x-2">
-        <Settings className="h-6 w-6 text-apricot" />
-        <h1 className="text-2xl font-bold text-blueberry">Site Settings</h1>
-      </div>
-
-      <Card className="border border-apple-core/20">
+      <Card className="border border-apple-core/20 dark:border-citrus/20">
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Mail className="h-5 w-5 text-apricot" />
-            <span>Email Configuration</span>
+          <CardTitle className="flex items-center text-xl font-semibold text-blueberry dark:text-citrus">
+            <Settings className="h-5 w-5 text-apricot mr-2" />
+            Site Settings
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="adminEmail">Admin Email</Label>
-              <Input
-                id="adminEmail"
-                type="email"
-                value={adminEmail}
-                onChange={(e) => setAdminEmail(e.target.value)}
-                placeholder="admin@example.com"
-                className="border-apple-core/30 focus:border-citrus"
-              />
-              <p className="text-xs text-blueberry/60">
-                Email address for administrative communications and error reports
+        <CardContent className="space-y-6">
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="admin_email" className="text-sm font-medium text-blueberry dark:text-apple-core">
+                Admin Email
+              </Label>
+              <div className="mt-1 relative">
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-blueberry/60 dark:text-apple-core/60" />
+                <Input
+                  id="admin_email"
+                  type="email"
+                  value={formData.admin_email}
+                  onChange={(e) => handleInputChange('admin_email', e.target.value)}
+                  placeholder="admin@company.com"
+                  className="pl-10"
+                />
+              </div>
+              <p className="text-xs text-blueberry/60 dark:text-apple-core/60 mt-1">
+                Email address for administrative notifications and error reports
               </p>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="supportEmail">Support Email</Label>
-              <Input
-                id="supportEmail"
-                type="email"
-                value={supportEmail}
-                onChange={(e) => setSupportEmail(e.target.value)}
-                placeholder="support@example.com"
-                className="border-apple-core/30 focus:border-citrus"
-              />
-              <p className="text-xs text-blueberry/60">
+            <div>
+              <Label htmlFor="support_email" className="text-sm font-medium text-blueberry dark:text-apple-core">
+                Support Email
+              </Label>
+              <div className="mt-1 relative">
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-blueberry/60 dark:text-apple-core/60" />
+                <Input
+                  id="support_email"
+                  type="email"
+                  value={formData.support_email}
+                  onChange={(e) => handleInputChange('support_email', e.target.value)}
+                  placeholder="support@company.com"
+                  className="pl-10"
+                />
+              </div>
+              <p className="text-xs text-blueberry/60 dark:text-apple-core/60 mt-1">
                 Email address for customer support and feedback forms
               </p>
             </div>
           </div>
 
-          <div className="flex items-center space-x-3 pt-4">
-            <Button
-              onClick={saveSettings}
-              disabled={saving}
-              className="bg-citrus text-blueberry hover:bg-citrus/90 border border-citrus"
-            >
-              {saving ? (
-                <>
-                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Save className="h-4 w-4 mr-2" />
-                  Save Changes
-                </>
+          <div className="flex items-center justify-between pt-4 border-t border-apple-core/20 dark:border-citrus/20">
+            <div className="text-sm text-blueberry/60 dark:text-apple-core/60">
+              {settings && (
+                <span>Last updated: {new Date(settings.updated_at).toLocaleDateString()}</span>
               )}
-            </Button>
-
+            </div>
             <Button
-              variant="outline"
-              onClick={handleReset}
+              onClick={handleSave}
               disabled={saving}
-              className="border-apple-core/30 hover:bg-apple-core/10"
+              className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200"
             >
-              Reset
+              <Save className="h-4 w-4 mr-2" />
+              {saving ? 'Saving...' : 'Save Settings'}
             </Button>
           </div>
-
-          {settings?.updated_at && (
-            <p className="text-xs text-blueberry/60 pt-2">
-              Last updated: {new Date(settings.updated_at).toLocaleString()}
-            </p>
-          )}
         </CardContent>
       </Card>
     </div>
