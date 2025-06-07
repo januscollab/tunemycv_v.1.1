@@ -50,7 +50,7 @@ const AuthHeader: React.FC<AuthHeaderProps> = ({ mode, fromAnalyze }) => {
       
       {fromAnalyze && (
         <div className="bg-cream dark:bg-surface border border-cream dark:border-border rounded-lg p-4 mb-8">
-          <div className="text-sm text-earth dark:text-white">
+          <div className="text-caption text-earth dark:text-white">
             <strong>Login Required:</strong> You need to sign in to analyze your CV and access personalized insights.
           </div>
         </div>
@@ -61,7 +61,7 @@ const AuthHeader: React.FC<AuthHeaderProps> = ({ mode, fromAnalyze }) => {
           {getTitle()}
         </h2>
       )}
-      <p className="mt-3 text-earth/70 dark:text-white/70 font-normal text-lg">
+      <p className="mt-3 text-earth/70 dark:text-white/70 font-normal text-subheading">
         {getSubtitle()}
       </p>
     </div>

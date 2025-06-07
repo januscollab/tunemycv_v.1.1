@@ -16,7 +16,7 @@ const AuthSidebar: React.FC<AuthSidebarProps> = ({ title, description, icon }) =
     <div className="lg:col-span-1">
       <Card className="sticky top-6 border border-gray-200 dark:border-gray-700">
         <CardHeader>
-          <CardTitle className="flex items-center justify-center text-xl font-semibold">
+          <CardTitle className="flex items-center justify-center text-heading font-semibold">
             {icon || <User className="h-6 w-6 text-apricot mr-2" />}
             {title}
           </CardTitle>

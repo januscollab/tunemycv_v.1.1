@@ -20,7 +20,7 @@ const Index = () => {
             AI-Powered Career Optimization
           </div>
           
-          <h1 className="text-display md:text-6xl font-display font-bold text-earth dark:text-white mb-6 leading-tight">
+          <h1 className="text-display md:text-6xl font-sans font-bold text-earth dark:text-white mb-6 leading-tight">
             Turn Your CV Into a
             <span className="text-primary"> Job-Winning</span> Asset
           </h1>
