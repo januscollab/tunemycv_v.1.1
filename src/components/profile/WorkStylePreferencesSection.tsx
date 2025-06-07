@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { Settings, Users, Zap, MessageSquare, Target, Lightbulb } from 'lucide-react';
+import { Settings, Users, Zap, MessageSquare, Target, Lightbulb, Info } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -21,6 +22,7 @@ const WorkStylePreferencesSection: React.FC = () => {
   const { toast } = useToast();
   const [workStyle, setWorkStyle] = useState<WorkStyleData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [initialWorkStyle, setInitialWorkStyle] = useState<WorkStyleData | null>(null);
 
   const defaultWorkStyle: WorkStyleData = {
     autonomy_vs_structure: '',
@@ -48,9 +50,12 @@ const WorkStylePreferencesSection: React.FC = () => {
       if (error && error.code !== 'PGRST116') throw error;
 
       if (data?.work_style_preferences && typeof data.work_style_preferences === 'object') {
-        setWorkStyle(data.work_style_preferences as unknown as WorkStyleData);
+        const loadedStyle = data.work_style_preferences as unknown as WorkStyleData;
+        setWorkStyle(loadedStyle);
+        setInitialWorkStyle(loadedStyle);
       } else {
         setWorkStyle(defaultWorkStyle);
+        setInitialWorkStyle(defaultWorkStyle);
       }
     } catch (error) {
       console.error('Error loading work style preferences:', error);
@@ -60,16 +65,19 @@ const WorkStylePreferencesSection: React.FC = () => {
     }
   };
 
-  // Auto-save with debounce
+  // Auto-save with debounce - only if work style actually changed
   useEffect(() => {
-    if (!workStyle || loading) return;
+    if (!workStyle || loading || !initialWorkStyle) return;
+
+    // Only save if work style actually changed
+    if (JSON.stringify(workStyle) === JSON.stringify(initialWorkStyle)) return;
 
     const timeoutId = setTimeout(() => {
       saveWorkStylePreferences();
     }, 1000);
 
     return () => clearTimeout(timeoutId);
-  }, [workStyle, loading]);
+  }, [workStyle, loading, initialWorkStyle]);
 
   const saveWorkStylePreferences = async () => {
     if (!workStyle) return;
@@ -172,19 +180,31 @@ const WorkStylePreferencesSection: React.FC = () => {
   }
 
   return (
-    <div className="bg-white dark:bg-surface rounded-lg border border-gray-200 dark:border-border p-6">
-      <div className="flex items-center mb-6">
+    <div className="bg-white dark:bg-surface rounded-lg border border-gray-200 dark:border-border p-8">
+      <div className="flex items-center mb-8">
         <Settings className="h-5 w-5 text-gray-500 dark:text-apple-core/60 mr-2" />
         <h3 className="text-lg font-medium text-gray-900 dark:text-citrus">Work Style Preferences</h3>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:text-apple-core/60 dark:hover:text-apple-core/80 cursor-help ml-2" />
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="max-w-sm">
+              <p className="text-sm">
+                <strong>Find Companies That Actually Fit You</strong> - Answer 6 quick questions to discover work environments where you'll thrive and avoid toxic workplaces.
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
-      <p className="text-sm text-gray-500 dark:text-apple-core/60 mb-6">
+      <p className="text-sm text-gray-500 dark:text-apple-core/60 mb-8">
         Help us understand your preferred working style to better match you with company cultures
       </p>
 
       {!workStyle ? (
-        <div className="text-center py-6">
-          <Settings className="h-12 w-12 text-zapier-orange mx-auto mb-4" />
-          <p className="text-gray-500 dark:text-apple-core/60 mb-4">
+        <div className="text-center py-8">
+          <Settings className="h-12 w-12 text-zapier-orange mx-auto mb-6" />
+          <p className="text-gray-500 dark:text-apple-core/60 mb-6">
             No work style preferences found. Complete this assessment to improve your job matching.
           </p>
           <button 
@@ -195,34 +215,34 @@ const WorkStylePreferencesSection: React.FC = () => {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {questions.map((question) => (
-            <div key={question.key} className="space-y-2">
-              <div className="flex items-center space-x-2 mb-2">
+            <div key={question.key} className="space-y-3 p-4 border border-gray-100 dark:border-border rounded-lg">
+              <div className="flex items-center space-x-2 mb-3">
                 <div className="text-zapier-orange">{question.icon}</div>
-                <h4 className="font-medium text-gray-900 dark:text-apple-core/90 text-sm">
+                <h4 className="font-medium text-gray-900 dark:text-citrus">
                   {question.title}
                 </h4>
               </div>
-              <p className="text-xs text-gray-600 dark:text-apple-core/70 mb-3">
+              <p className="text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-4">
                 {question.question}
               </p>
               
               <RadioGroup
                 value={workStyle[question.key]}
                 onValueChange={(value) => handlePreferenceChange(question.key, value)}
-                className="space-y-1"
+                className="space-y-2"
               >
                 {question.options.map((option) => (
-                  <div key={option.value} className="flex items-center space-x-2">
+                  <div key={option.value} className="flex items-center space-x-3">
                     <RadioGroupItem 
                       value={option.value} 
                       id={`${question.key}-${option.value}`}
-                      className="text-zapier-orange h-3 w-3"
+                      className="text-zapier-orange h-4 w-4"
                     />
                     <Label 
                       htmlFor={`${question.key}-${option.value}`}
-                      className="text-xs text-gray-700 dark:text-apple-core/80 cursor-pointer"
+                      className="text-sm text-gray-700 dark:text-apple-core/80 cursor-pointer leading-relaxed"
                     >
                       {option.label}
                     </Label>

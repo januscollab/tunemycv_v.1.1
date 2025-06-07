@@ -127,7 +127,7 @@ const PersonalizationSurveyModal: React.FC<PersonalizationSurveyModalProps> = ({
             </div>
             <div>
               <h2 className="text-xl font-bold text-blueberry dark:text-citrus">
-                Let's Get Personal
+                Motivation Matters
               </h2>
               <p className="text-sm text-blueberry/60 dark:text-apple-core/60">
                 Question {currentQuestion + 1} of {questions.length}

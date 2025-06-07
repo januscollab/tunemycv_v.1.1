@@ -1,10 +1,14 @@
 
 import React, { useState } from 'react';
-import { Upload, Link } from 'lucide-react';
+import { DragDropZone } from '@/components/ui/drag-drop-zone';
+import ProcessingModal from '@/components/ui/processing-modal';
 import { useAuth } from '@/contexts/AuthContext';
+import { useDocumentExtraction } from '@/hooks/useDocumentExtraction';
+import { useToast } from '@/hooks/use-toast';
+import { validateFileSecurely, createSecureFileObject } from '@/utils/secureFileValidation';
 
 interface FileUploadWithSaveProps {
-  onFileSelect: (file: File, shouldSave: boolean) => void;
+  onFileSelect: (file: File, extractedText: string, shouldSave: boolean) => void;
   uploading: boolean;
   accept: string;
   maxSize: string;
@@ -24,14 +28,34 @@ const FileUploadWithSave: React.FC<FileUploadWithSaveProps> = ({
 }) => {
   const [shouldSave, setShouldSave] = useState(false);
   const { user } = useAuth();
+  const { toast } = useToast();
+  const { isExtracting, progress, extractText } = useDocumentExtraction();
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  const handleDrop = async (files: File[]) => {
+    const file = files[0];
     if (file) {
-      onFileSelect(file, shouldSave);
-      // Reset the input and checkbox
-      e.target.value = '';
-      setShouldSave(false);
+      // Perform security validation
+      const validation = validateFileSecurely(file, 'cv');
+      
+      if (!validation.isValid) {
+        toast({
+          title: "File validation failed",
+          description: validation.errors[0],
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      // Create secure file object with sanitized name
+      const secureFile = createSecureFileObject(file, validation.sanitizedName!);
+      
+      // Extract text from the file
+      const extractedText = await extractText(secureFile);
+      
+      if (extractedText) {
+        onFileSelect(secureFile, extractedText, shouldSave);
+        setShouldSave(false);
+      }
     }
   };
 
@@ -39,20 +63,21 @@ const FileUploadWithSave: React.FC<FileUploadWithSaveProps> = ({
 
   return (
     <div>
-      <div className="border-2 border-dashed border-apple-core/30 dark:border-citrus/30 rounded-lg p-6 text-center">
-        <Upload className="mx-auto h-8 w-8 text-blueberry/60 dark:text-apple-core/60 mb-2" />
-        <label className="cursor-pointer">
-          <span className="text-apricot hover:text-apricot/80 font-medium">{label}</span>
-          <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mt-1">{accept}, max {maxSize}</p>
-          <input
-            type="file"
-            className="hidden"
-            accept={accept}
-            onChange={handleFileChange}
-            disabled={uploading}
-          />
-        </label>
-      </div>
+      <DragDropZone
+        onDrop={handleDrop}
+        accept={accept}
+        maxSize={parseFloat(maxSize) * 1024 * 1024}
+        disabled={uploading || isExtracting}
+        placeholder={isExtracting ? progress : (uploading ? "Uploading..." : label)}
+        description={`${accept} • Max ${maxSize}`}
+        className="border-apple-core/30 dark:border-citrus/30"
+      />
+      
+      <ProcessingModal
+        isOpen={isExtracting}
+        title="Processing CV"
+        message={progress}
+      />
 
       {user && (
         <div className="mt-4 space-y-2">

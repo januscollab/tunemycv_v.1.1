@@ -9,6 +9,104 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      admin_audit_logs: {
+        Row: {
+          action: string
+          admin_user_id: string
+          created_at: string
+          details: Json | null
+          id: string
+          ip_address: unknown | null
+          target_user_id: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          action: string
+          admin_user_id: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: unknown | null
+          target_user_id?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          action?: string
+          admin_user_id?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: unknown | null
+          target_user_id?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
+      ai_prompt_versions: {
+        Row: {
+          content: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          prompt_id: string
+          version_number: number
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          prompt_id: string
+          version_number: number
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          prompt_id?: string
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_prompt_versions_prompt_id_fkey"
+            columns: ["prompt_id"]
+            isOneToOne: false
+            referencedRelation: "ai_prompts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_prompts: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       analysis_logs: {
         Row: {
           analysis_result_id: string | null
@@ -276,8 +374,10 @@ export type Database = {
       }
       profiles: {
         Row: {
+          company_size_preference: string | null
           country_code: string | null
           created_at: string | null
+          culture_preferences_order: Json | null
           email: string | null
           first_name: string | null
           id: string
@@ -288,11 +388,14 @@ export type Database = {
           soft_skills: Json | null
           survey_preferences: Json | null
           updated_at: string | null
+          work_location_preference: string | null
           work_style_preferences: Json | null
         }
         Insert: {
+          company_size_preference?: string | null
           country_code?: string | null
           created_at?: string | null
+          culture_preferences_order?: Json | null
           email?: string | null
           first_name?: string | null
           id: string
@@ -303,11 +406,14 @@ export type Database = {
           soft_skills?: Json | null
           survey_preferences?: Json | null
           updated_at?: string | null
+          work_location_preference?: string | null
           work_style_preferences?: Json | null
         }
         Update: {
+          company_size_preference?: string | null
           country_code?: string | null
           created_at?: string | null
+          culture_preferences_order?: Json | null
           email?: string | null
           first_name?: string | null
           id?: string
@@ -318,7 +424,32 @@ export type Database = {
           soft_skills?: Json | null
           survey_preferences?: Json | null
           updated_at?: string | null
+          work_location_preference?: string | null
           work_style_preferences?: Json | null
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          admin_email: string | null
+          created_at: string
+          id: string
+          support_email: string | null
+          updated_at: string
+        }
+        Insert: {
+          admin_email?: string | null
+          created_at?: string
+          id?: string
+          support_email?: string | null
+          updated_at?: string
+        }
+        Update: {
+          admin_email?: string | null
+          created_at?: string
+          id?: string
+          support_email?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -492,12 +623,24 @@ export type Database = {
         Args: { _user_id: string }
         Returns: boolean
       }
+      delete_user_admin_secure: {
+        Args: { _user_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _user_id: string
           _role: Database["public"]["Enums"]["user_role"]
         }
         Returns: boolean
+      }
+      log_admin_action: {
+        Args: {
+          action_type: string
+          target_user?: string
+          action_details?: Json
+        }
+        Returns: undefined
       }
     }
     Enums: {

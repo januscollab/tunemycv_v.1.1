@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { MockPaymentModal } from '@/components/ui/mock-payment-modal';
 import { ContactSalesModal } from '@/components/ui/contact-sales-modal';
+import QuickActions from '@/components/common/QuickActions';
 
 const PricingScale = () => {
   const [selectedTier, setSelectedTier] = useState(0);
@@ -89,8 +90,11 @@ const PricingScale = () => {
         </div>
 
         {/* Pricing Slider */}
-        <div className="mb-16 max-w-4xl mx-auto">
-          <Card className="bg-white dark:bg-blueberry/20 border-2 border-zapier-orange/50 dark:border-zapier-orange/60 p-8 shadow-xl shadow-zapier-orange/20">
+        <div className="mb-16 w-full">
+          <Card className="bg-white dark:bg-blueberry/20 border-2 border-zapier-orange/50 dark:border-zapier-orange/60 p-8 shadow-xl shadow-zapier-orange/20 hover:shadow-2xl hover:shadow-zapier-orange/30 transition-all duration-500 hover:scale-[1.02] relative overflow-hidden group [&:hover_button_span]:text-white">
+            {/* Animated background gradient */}
+            <div className="absolute inset-0 bg-gradient-to-br from-zapier-orange/5 via-transparent to-citrus/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="relative z-10">
             <CardHeader className="pb-6 pt-1">
               <CardTitle className="text-2xl font-bold text-earth dark:text-white text-left">
                 Simple Pay As you go Pricing
@@ -107,7 +111,7 @@ const PricingScale = () => {
                     </div>
                     <div className="flex items-center space-x-2">
                       <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-earth/80 dark:text-white/80">Access to all features all of the time, no gate keeping the good stuff</span>
+                      <span className="text-earth/80 dark:text-white/80">Access all features all of the time, no gate keeping</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <Check className="h-4 w-4 text-green-600" />
@@ -140,7 +144,7 @@ const PricingScale = () => {
                   max={4}
                   min={0}
                   step={1}
-                  className="w-full [&>*:first-child]:bg-gray-200 dark:[&>*:first-child]:bg-gray-700 [&_[role=slider]]:h-4 [&_[role=slider]]:w-4 [&>*:first-child]:h-0.5"
+                  className="w-full [&>*:first-child]:bg-gray-200 dark:[&>*:first-child]:bg-gray-700 [&_[role=slider]]:h-5 [&_[role=slider]]:w-5 [&>*:first-child]:h-1 [&_[role=slider]]:shadow-lg [&_[role=slider]]:transition-all [&_[role=slider]]:duration-200 [&_[role=slider]]:hover:scale-110"
                 />
               </div>
 
@@ -158,16 +162,16 @@ const PricingScale = () => {
                       >
                         {tier.isEnterprise ? (
                           <div className="space-y-1 text-center cursor-pointer group hover:scale-105 transition-transform duration-200" onClick={() => setSelectedTier(index)}>
-                            <div className="text-lg font-bold text-earth dark:text-white group-hover:text-zapier-orange transition-colors">Enterprise</div>
-                            <div className="text-base text-earth/70 dark:text-white/70 group-hover:text-zapier-orange/70 transition-colors">Let's talk</div>
+                            <div className="text-lg font-bold text-earth dark:text-white hover:text-zapier-orange transition-colors">Enterprise</div>
+                            <div className="text-base text-earth/70 dark:text-white/70 hover:text-zapier-orange/70 transition-colors">Let's talk</div>
                           </div>
                         ) : (
                           <div 
-                            className="space-y-1 text-center cursor-pointer group hover:scale-105 transition-transform duration-200"
+                            className="space-y-1 text-center cursor-pointer group hover:scale-110 transition-all duration-300 hover:transform hover:-translate-y-1"
                             onClick={() => setSelectedTier(index)}
                           >
-                            <div className="text-lg font-bold text-earth dark:text-white group-hover:text-zapier-orange transition-colors">${tier.price}</div>
-                            <div className="text-base text-earth/70 dark:text-white/70 group-hover:text-zapier-orange/70 transition-colors">{tier.credits} Credits</div>
+                            <div className="text-lg font-bold text-earth dark:text-white hover:text-zapier-orange transition-all duration-300 hover:scale-110">${tier.price}</div>
+                            <div className="text-base text-earth/70 dark:text-white/70 hover:text-zapier-orange/70 transition-all duration-300">{tier.credits} Credits</div>
                           </div>
                         )}
                       </div>
@@ -183,24 +187,26 @@ const PricingScale = () => {
                 <div className="space-y-3">
                   {currentTier.isEnterprise ? (
                     <>
-                      <h3 className="text-4xl text-zapier-orange mb-2">
-                        Enterprise
-                      </h3>
-                      <div className="text-lg text-earth/70 dark:text-white/70">
-                        Let's talk
+                      <div className="space-y-1">
+                        <h3 className="text-4xl text-earth dark:text-white hover:text-zapier-orange transition-colors duration-300 mb-2">
+                          Enterprise
+                        </h3>
+                        <div className="text-lg text-earth/70 dark:text-white/70 hover:text-zapier-orange/70 transition-colors duration-300">
+                          Let's talk
+                        </div>
                       </div>
                     </>
                   ) : (
                     <>
-                      <div className="flex items-baseline space-x-2">
-                        <span className="text-xl text-zapier-orange font-bold">${currentTier.price}</span>
-                        <span className="text-xl text-earth dark:text-white">for</span>
-                        <span className="text-xl text-zapier-orange font-bold">{currentTier.credits} Credits</span>
-                        {currentTier.savings && (
-                          <Badge className="bg-green-100 text-green-800 ml-3 px-4 py-1.5 text-sm">
-                            {currentTier.savings}
-                          </Badge>
-                        )}
+                       <div className="flex items-baseline space-x-2 animate-fade-in">
+                         <span className="text-2xl text-earth dark:text-white font-bold transition-all duration-300 hover:text-zapier-orange hover:scale-110">${currentTier.price}</span>
+                         <span className="text-xl text-earth dark:text-white">for</span>
+                         <span className="text-2xl text-earth dark:text-white font-bold transition-all duration-300 hover:text-zapier-orange hover:scale-110">{currentTier.credits} Credits</span>
+                         {currentTier.savings && (
+                           <Badge className="bg-green-100 text-green-800 ml-3 px-4 py-1.5 text-sm hover:scale-110 transition-transform duration-200">
+                             {currentTier.savings}
+                           </Badge>
+                         )}
                       </div>
                       <div className="text-lg font-medium text-earth/80 dark:text-white/80">
                         Apply for {currentTier.roles} Roles
@@ -212,13 +218,17 @@ const PricingScale = () => {
                 <Button 
                   onClick={handleBuyCredits}
                   variant="outline"
-                  className="border-2 border-zapier-orange bg-white hover:bg-zapier-orange/5 text-zapier-orange hover:text-zapier-orange px-8 py-3 text-lg font-normal transition-all duration-200 hover:shadow-lg hover:shadow-zapier-orange/20"
+                  className="border-2 border-zapier-orange bg-white hover:bg-zapier-orange text-zapier-orange px-8 py-3 text-lg font-normal transition-all duration-300 hover:shadow-xl hover:shadow-zapier-orange/30 hover:scale-105 group relative overflow-hidden group-hover:text-white"
                 >
-                  {currentTier.isEnterprise ? 'Contact Sales' : 'Buy Now'}
-                  <ArrowRight className="ml-2 h-5 w-5" />
+                  <span className="relative z-10 flex items-center group-hover:text-white transition-colors duration-300">
+                    {currentTier.isEnterprise ? 'Contact Sales' : 'Buy Now'}
+                    <ArrowRight className="ml-2 h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
+                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-zapier-orange to-apricot opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </Button>
               </div>
             </CardContent>
+            </div>
           </Card>
         </div>
 
@@ -418,6 +428,9 @@ const PricingScale = () => {
           onClose={() => setIsContactModalOpen(false)}
         />
       </div>
+      
+      {/* Quick Actions */}
+      <QuickActions />
     </div>
   );
 };

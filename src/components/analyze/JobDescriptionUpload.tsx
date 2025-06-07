@@ -1,10 +1,15 @@
 
 import React, { useState } from 'react';
-import { Upload, X, Check } from 'lucide-react';
+import { X, Check } from 'lucide-react';
+import { DragDropZone } from '@/components/ui/drag-drop-zone';
 import { validateFile, extractTextFromFile } from '@/utils/fileUtils';
 import { useToast } from '@/hooks/use-toast';
 import { UploadedFile } from '@/types/fileTypes';
 import JobDescriptionTextInput from './JobDescriptionTextInput';
+import DocumentPreviewCard from '@/components/documents/DocumentPreviewCard';
+import DocumentVerificationModal from '@/components/documents/DocumentVerificationModal';
+import DocumentValidationDialog from '@/components/ui/document-validation-dialog';
+import { validateJobDescription } from '@/utils/documentValidation';
 
 interface JobDescriptionUploadProps {
   onJobDescriptionSet: (file: UploadedFile) => void;
@@ -18,6 +23,9 @@ const JobDescriptionUpload: React.FC<JobDescriptionUploadProps> = ({
   disabled = false
 }) => {
   const [uploading, setUploading] = useState(false);
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
+  const [showValidationDialog, setShowValidationDialog] = useState(false);
+  const [pendingFile, setPendingFile] = useState<{ file: File; extractedText: string } | null>(null);
   const { toast } = useToast();
 
   const jobDescTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
@@ -35,6 +43,16 @@ const JobDescriptionUpload: React.FC<JobDescriptionUploadProps> = ({
       setUploading(true);
       const extractedText = await extractTextFromFile(file);
       
+      // Validate if this looks like a job description
+      const validation = validateJobDescription(extractedText, file.name);
+      
+      if (!validation.isValid) {
+        setPendingFile({ file, extractedText });
+        setShowValidationDialog(true);
+        setUploading(false);
+        return;
+      }
+      
       const uploadedFileData: UploadedFile = {
         file,
         extractedText,
@@ -48,6 +66,25 @@ const JobDescriptionUpload: React.FC<JobDescriptionUploadProps> = ({
     } finally {
       setUploading(false);
     }
+  };
+
+  const handleValidationConfirm = () => {
+    if (pendingFile) {
+      const uploadedFileData: UploadedFile = {
+        file: pendingFile.file,
+        extractedText: pendingFile.extractedText,
+        type: 'job_description'
+      };
+      onJobDescriptionSet(uploadedFileData);
+      toast({ title: 'Success', description: 'Job description uploaded successfully!' });
+    }
+    setShowValidationDialog(false);
+    setPendingFile(null);
+  };
+
+  const handleValidationCancel = () => {
+    setShowValidationDialog(false);
+    setPendingFile(null);
   };
 
   const handleJobDescriptionText = (text: string) => {
@@ -72,47 +109,68 @@ const JobDescriptionUpload: React.FC<JobDescriptionUploadProps> = ({
     onJobDescriptionSet(undefined as any);
   };
 
+  const handleVerificationSave = (updatedText: string) => {
+    if (!uploadedFile) return;
+    
+    const updatedFile = new File([updatedText], uploadedFile.file.name, { type: uploadedFile.file.type });
+    const updatedUploadedFile: UploadedFile = {
+      file: updatedFile,
+      extractedText: updatedText,
+      type: 'job_description'
+    };
+    
+    onJobDescriptionSet(updatedUploadedFile);
+    toast({ title: 'Success', description: 'Job description updated successfully!' });
+  };
+
   if (uploadedFile) {
     return (
-      <div className="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
-        <div className="flex items-center space-x-3">
-          <Check className="h-5 w-5 text-green-600" />
-          <div>
-            <p className="font-medium text-green-900">{uploadedFile.file.name}</p>
-            <p className="text-sm text-green-700">Job description ready</p>
-          </div>
-        </div>
-        <button
-          onClick={removeFile}
-          className="p-2 text-red-600 hover:bg-red-100 rounded-md"
-          disabled={disabled}
-        >
-          <X className="h-4 w-4" />
-        </button>
-      </div>
+      <>
+        <DocumentPreviewCard
+          fileName={uploadedFile.file.name}
+          fileSize={uploadedFile.file.size}
+          extractedText={uploadedFile.extractedText}
+          documentType="job_description"
+          onOpenVerification={() => setShowVerificationModal(true)}
+          onRemove={removeFile}
+        />
+        
+        <DocumentVerificationModal
+          isOpen={showVerificationModal}
+          onClose={() => setShowVerificationModal(false)}
+          fileName={uploadedFile.file.name}
+          fileSize={uploadedFile.file.size}
+          extractedText={uploadedFile.extractedText}
+          documentType="job_description"
+          onSave={handleVerificationSave}
+        />
+        
+        {pendingFile && (
+          <DocumentValidationDialog
+            isOpen={showValidationDialog}
+            onClose={handleValidationCancel}
+            onConfirm={handleValidationConfirm}
+            documentType="job_description"
+            fileName={pendingFile.file.name}
+            validationResult={validateJobDescription(pendingFile.extractedText, pendingFile.file.name)}
+          />
+        )}
+      </>
     );
   }
 
   return (
     <div className="space-y-4">
       {/* File Upload Option */}
-      <div className="border-2 border-dashed border-apple-core/30 dark:border-citrus/30 rounded-lg p-6 text-center">
-        <Upload className="mx-auto h-8 w-8 text-blueberry/60 dark:text-apple-core/60 mb-2" />
-        <label className="cursor-pointer">
-          <span className="text-apricot hover:text-apricot/80 font-medium">Upload Job Description</span>
-          <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mt-1">PDF, DOCX, TXT - max 5MB</p>
-          <input
-            type="file"
-            className="hidden"
-            accept=".pdf,.docx,.txt"
-            onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0])}
-            disabled={uploading || disabled}
-          />
-        </label>
-        {uploading && (
-          <div className="mt-2 text-sm text-blue-600">Processing file...</div>
-        )}
-      </div>
+      <DragDropZone
+        onDrop={(files) => handleFileUpload(files[0])}
+        accept=".pdf,.docx,.txt"
+        maxSize={maxSize}
+        disabled={uploading || disabled}
+        placeholder={uploading ? "Processing file..." : "Upload Job Description"}
+        description="PDF, DOCX, TXT • Max 5MB"
+        className="border-apple-core/30 dark:border-citrus/30"
+      />
       
       <div className="text-center text-blueberry/60 dark:text-apple-core/60">or</div>
       

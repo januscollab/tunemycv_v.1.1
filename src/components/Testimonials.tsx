@@ -71,7 +71,7 @@ const Testimonials = () => {
             <div 
               key={index} 
               className={`bg-white dark:bg-blueberry/20 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow border border-apple-core/20 dark:border-citrus/20 ${
-                index >= 2 ? 'hidden md:block' : ''
+                index >= 3 ? 'hidden md:block' : ''
               } ${index >= 3 ? 'lg:block' : ''}`}
             >
               <div className="flex items-center mb-4">
