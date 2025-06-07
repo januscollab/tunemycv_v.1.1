@@ -465,7 +465,7 @@ const AnalyzeCV = () => {
               <h1 className="text-display font-bold text-foreground">
                 Analyze Your CV
               </h1>
-              <p className="text-lg text-earth/70 dark:text-white/70 max-w-2xl mt-1">
+              <p className="text-subheading text-earth/70 dark:text-white/70 max-w-2xl mt-1">
                 Upload your CV and job description to get comprehensive compatibility analysis with actionable recommendations.
               </p>
             </div>
@@ -514,10 +514,10 @@ const AnalyzeCV = () => {
 
                   {/* Job Description Input - Required */}
                   <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-5 border border-apple-core/20 dark:border-citrus/20">
-                    <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-3">
+                    <h3 className="text-heading font-semibold text-blueberry dark:text-citrus mb-3">
                       Job Description <span className="text-red-500">*</span>
                     </h3>
-                    <p className="text-xs text-blueberry/60 dark:text-apple-core/70 mb-3">
+                    <p className="text-micro text-blueberry/60 dark:text-apple-core/70 mb-3">
                       Upload a file (PDF, DOCX, TXT) or paste the text directly
                     </p>
                     

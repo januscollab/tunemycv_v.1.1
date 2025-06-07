@@ -46,7 +46,7 @@ const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({ userDisplayNa
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className={`flex items-center px-3 py-2 text-sm font-semibold transition-colors relative ${
+          className={`flex items-center px-3 py-2 text-caption font-semibold transition-colors relative ${
             isActive('/profile')
               ? 'text-zapier-orange'
               : 'text-earth dark:text-white hover:text-zapier-orange'

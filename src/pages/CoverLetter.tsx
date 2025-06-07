@@ -370,7 +370,7 @@ const AuthenticatedCoverLetter = () => {
               <h1 className="text-display font-bold text-foreground">
                 Generate Cover Letter
               </h1>
-              <p className="text-lg text-earth/70 dark:text-white/70 max-w-2xl mt-2">
+              <p className="text-subheading text-earth/70 dark:text-white/70 max-w-2xl mt-2">
                 Create tailored cover letters that highlight your strengths and align perfectly with specific job requirements.
               </p>
             </div>
@@ -401,15 +401,15 @@ const AuthenticatedCoverLetter = () => {
           <div>
             <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
               <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="create" className="flex items-center space-x-2 text-sm">
+                <TabsTrigger value="create" className="flex items-center space-x-2 text-caption">
                   <Sparkles className="h-4 w-4" />
                   <span>Generate New</span>
                 </TabsTrigger>
-                <TabsTrigger value="result" className="flex items-center space-x-2 text-sm">
+                <TabsTrigger value="result" className="flex items-center space-x-2 text-caption">
                   <Eye className="h-4 w-4" />
                   <span>View Letter</span>
                 </TabsTrigger>
-                <TabsTrigger value="history" className="flex items-center space-x-2 text-sm">
+                <TabsTrigger value="history" className="flex items-center space-x-2 text-caption">
                   <History className="h-4 w-4" />
                   <span>History</span>
                 </TabsTrigger>

@@ -49,12 +49,12 @@ const AdvancedGenerationOptions: React.FC<AdvancedGenerationOptionsProps> = ({ v
     <div className="space-y-4">
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-zapier-orange/5 hover:bg-zapier-orange/10 dark:bg-zapier-orange/5 dark:hover:bg-zapier-orange/10 rounded-lg transition-colors">
-          <span className="text-sm font-medium text-black dark:text-black">Advanced Options</span>
+          <span className="text-caption font-medium text-black dark:text-black">Advanced Options</span>
           <ChevronDown className={`h-4 w-4 text-orange-600 dark:text-orange-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
         </CollapsibleTrigger>
         <CollapsibleContent className="space-y-4 mt-3">
           <div>
-            <Label htmlFor="workHighlights" className="text-sm font-medium">
+            <Label htmlFor="workHighlights" className="text-caption font-medium">
               Key Work Experience Highlights
             </Label>
             <Textarea
@@ -68,7 +68,7 @@ const AdvancedGenerationOptions: React.FC<AdvancedGenerationOptionsProps> = ({ v
           </div>
 
           <div>
-            <Label htmlFor="customHook" className="text-sm font-medium">
+            <Label htmlFor="customHook" className="text-caption font-medium">
               Custom Opening Hook
             </Label>
             <Textarea
@@ -82,7 +82,7 @@ const AdvancedGenerationOptions: React.FC<AdvancedGenerationOptionsProps> = ({ v
           </div>
 
           <div>
-            <Label htmlFor="personalValues" className="text-sm font-medium">
+            <Label htmlFor="personalValues" className="text-caption font-medium">
               Personal Values & Motivations
             </Label>
             <Textarea

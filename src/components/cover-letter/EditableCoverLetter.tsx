@@ -84,7 +84,7 @@ const EditableCoverLetter: React.FC<EditableCoverLetterProps> = ({ content, onSa
           ref={textareaRef}
           value={editedContent}
           onChange={handleContentChange}
-          className="w-full font-sans text-sm leading-relaxed resize-none border-0 focus:ring-0 bg-transparent"
+          className="w-full font-sans text-caption leading-relaxed resize-none border-0 focus:ring-0 bg-transparent"
           style={{ minHeight: '400px' }}
           placeholder="Edit your cover letter content here..."
         />

@@ -67,7 +67,7 @@ const ContactUs = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-display font-bold text-foreground mb-4">Contact Us</h1>
-          <p className="text-xl text-blueberry/80 dark:text-apple-core max-w-2xl mx-auto">
+          <p className="text-subheading text-blueberry/80 dark:text-apple-core max-w-2xl mx-auto">
             Get in touch with the TuneMyCV team. We're here to help you optimize your career journey.
           </p>
         </div>
@@ -77,8 +77,8 @@ const ContactUs = () => {
           <Card className="bg-white dark:bg-blueberry/20 border border-apple-core/20 dark:border-citrus/20">
             <CardContent className="p-6 text-center">
               <Target className="h-12 w-12 text-apricot mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-2">AI-Powered Analysis</h3>
-              <p className="text-sm text-blueberry/70 dark:text-apple-core/80">
+              <h3 className="text-heading font-semibold text-blueberry dark:text-citrus mb-2">AI-Powered Analysis</h3>
+              <p className="text-caption text-blueberry/70 dark:text-apple-core/80">
                 Advanced algorithms analyze your CV against job requirements for maximum compatibility.
               </p>
             </CardContent>
@@ -87,8 +87,8 @@ const ContactUs = () => {
           <Card className="bg-white dark:bg-blueberry/20 border border-apple-core/20 dark:border-citrus/20">
             <CardContent className="p-6 text-center">
               <Users className="h-12 w-12 text-apricot mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-2">Trusted by Thousands</h3>
-              <p className="text-sm text-blueberry/70 dark:text-apple-core/80">
+              <h3 className="text-heading font-semibold text-blueberry dark:text-citrus mb-2">Trusted by Thousands</h3>
+              <p className="text-caption text-blueberry/70 dark:text-apple-core/80">
                 Join thousands of professionals who have improved their job prospects with TuneMyCV.
               </p>
             </CardContent>
@@ -97,8 +97,8 @@ const ContactUs = () => {
           <Card className="bg-white dark:bg-blueberry/20 border border-apple-core/20 dark:border-citrus/20">
             <CardContent className="p-6 text-center">
               <MessageSquare className="h-12 w-12 text-apricot mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-2">Expert Support</h3>
-              <p className="text-sm text-blueberry/70 dark:text-apple-core/80">
+              <h3 className="text-heading font-semibold text-blueberry dark:text-citrus mb-2">Expert Support</h3>
+              <p className="text-caption text-blueberry/70 dark:text-apple-core/80">
                 Our team of career experts and AI specialists are dedicated to your success.
               </p>
             </CardContent>
@@ -110,7 +110,7 @@ const ContactUs = () => {
           <CardContent className="p-6">
             <div className="flex items-center mb-4">
               <HelpCircle className="h-6 w-6 text-blueberry mr-3" />
-              <h3 className="text-lg font-semibold text-blueberry dark:text-citrus">Need Quick Answers?</h3>
+              <h3 className="text-heading font-semibold text-blueberry dark:text-citrus">Need Quick Answers?</h3>
             </div>
             <p className="text-blueberry/80 dark:text-apple-core mb-4">
               Before reaching out, check our comprehensive Help Centre. Most questions can be answered instantly!
@@ -127,11 +127,11 @@ const ContactUs = () => {
         {/* Contact Form */}
         <Card className="bg-white dark:bg-blueberry/20 border border-apple-core/20 dark:border-citrus/20">
           <CardHeader>
-            <CardTitle className="text-xl font-semibold text-blueberry dark:text-citrus flex items-center">
+            <CardTitle className="text-title font-semibold text-blueberry dark:text-citrus flex items-center">
               <Mail className="h-5 w-5 mr-2" />
               Send us a Message
             </CardTitle>
-            <p className="text-sm text-blueberry/70 dark:text-apple-core/80">
+            <p className="text-caption text-blueberry/70 dark:text-apple-core/80">
               We typically respond within 24 hours during business days.
             </p>
           </CardHeader>

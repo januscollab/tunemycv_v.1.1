@@ -128,8 +128,8 @@ const CVManagementTab: React.FC<CVManagementTabProps> = ({ credits, memberSince 
   return (
     <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold text-slate-900 dark:text-citrus">My CVs</h2>
-        <span className="text-sm text-slate-600 dark:text-apple-core/80">{cvs.length}/5 CVs uploaded</span>
+        <h2 className="text-title font-semibold text-slate-900 dark:text-citrus">My CVs</h2>
+        <span className="text-caption text-slate-600 dark:text-apple-core/80">{cvs.length}/5 CVs uploaded</span>
       </div>
       
       {cvs.length < 5 && (
@@ -149,7 +149,7 @@ const CVManagementTab: React.FC<CVManagementTabProps> = ({ credits, memberSince 
       {cvs.length === 0 ? (
         <div className="text-center py-8">
           <FileText className="mx-auto h-12 w-12 text-blueberry/40 dark:text-apple-core/40 mb-4" />
-          <h3 className="text-lg font-medium text-slate-900 dark:text-citrus mb-2">No CVs uploaded</h3>
+          <h3 className="text-heading font-medium text-slate-900 dark:text-citrus mb-2">No CVs uploaded</h3>
           <p className="text-slate-600 dark:text-apple-core/80">
             Upload your first CV to get started with analysis.
           </p>
@@ -163,7 +163,7 @@ const CVManagementTab: React.FC<CVManagementTabProps> = ({ credits, memberSince 
                   <FileText className="h-8 w-8 text-apricot" />
                   <div>
                     <h3 className="font-medium text-slate-900 dark:text-citrus">{cv.file_name}</h3>
-                    <p className="text-sm text-slate-600 dark:text-apple-core/80">
+                    <p className="text-caption text-slate-600 dark:text-apple-core/80">
                       {formatFileSize(cv.file_size)} • {new Date(cv.created_at).toLocaleDateString()}
                     </p>
                   </div>

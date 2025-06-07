@@ -30,7 +30,7 @@ const CoverLetterLoggedOut = () => {
               <h1 className="text-display font-bold text-foreground mb-4 text-left">
                 Generate Cover Letter
               </h1>
-              <p className="text-xl text-earth/70 dark:text-white/70 max-w-3xl font-normal text-left">
+              <p className="text-subheading text-earth/70 dark:text-white/70 max-w-3xl font-normal text-left">
                 Create tailored cover letters that highlight your strengths and align perfectly with specific job requirements.
               </p>
             </div>
