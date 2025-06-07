@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
+import { UnifiedInput, UnifiedTextarea } from '@/components/ui/unified-input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
@@ -262,12 +261,14 @@ const AIPromptsManagement: React.FC = () => {
 
                 <div className="space-y-2">
                   <Label htmlFor={`prompt-${tab.id}`}>Prompt Content</Label>
-                  <Textarea
+                  <UnifiedTextarea
                     id={`prompt-${tab.id}`}
                     value={currentContent[tab.id] || ''}
                     onChange={(e) => handleContentChange(tab.id, e.target.value)}
-                    className="min-h-[400px] font-mono text-sm"
+                    className="min-h-[400px] font-mono text-body"
                     placeholder="Enter your AI prompt here..."
+                    maxLength={50000}
+                    secure={false}
                   />
                 </div>
 
@@ -296,12 +297,14 @@ const AIPromptsManagement: React.FC = () => {
           <div className="space-y-4">
             <div>
               <Label htmlFor="save-description">Version Description</Label>
-              <Input
+              <UnifiedInput
                 id="save-description"
                 value={saveDescription}
                 onChange={(e) => setSaveDescription(e.target.value)}
                 placeholder="e.g., Updated to include new keyword analysis"
                 className="mt-1"
+                maxLength={200}
+                secure={true}
               />
             </div>
           </div>

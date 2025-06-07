@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import { X, Mail, Send } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { UnifiedInput, UnifiedTextarea } from '@/components/ui/unified-input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 
 interface ContactSalesModalProps {
   isOpen: boolean;
@@ -76,37 +75,43 @@ export const ContactSalesModal: React.FC<ContactSalesModalProps> = ({
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <Label htmlFor="name">Name</Label>
-                  <Input
+                  <UnifiedInput
                     id="name"
                     type="text"
                     value={formData.name}
                     onChange={(e) => handleInputChange('name', e.target.value)}
                     placeholder="Your full name"
                     required
+                    maxLength={100}
+                    secure={true}
                   />
                 </div>
 
                 <div>
                   <Label htmlFor="email">Email Address</Label>
-                  <Input
+                  <UnifiedInput
                     id="email"
                     type="email"
                     value={formData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
                     placeholder="your@company.com"
                     required
+                    maxLength={100}
+                    secure={true}
                   />
                 </div>
 
                 <div>
                   <Label htmlFor="message">Tell us how we can help you</Label>
-                  <Textarea
+                  <UnifiedTextarea
                     id="message"
                     value={formData.message}
                     onChange={(e) => handleInputChange('message', e.target.value)}
                     placeholder="Please describe your requirements, team size, or any specific questions you have about our enterprise solutions..."
                     className="min-h-[100px]"
                     required
+                    maxLength={2000}
+                    secure={true}
                   />
                 </div>
 

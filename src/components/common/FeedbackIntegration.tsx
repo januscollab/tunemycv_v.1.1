@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { MessageSquare, Send } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { UnifiedInput, UnifiedTextarea } from '@/components/ui/unified-input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
@@ -164,24 +163,28 @@ const FeedbackIntegration = () => {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <Label htmlFor="name">Name</Label>
-                  <Input
+                  <UnifiedInput
                     id="name"
                     type="text"
                     value={formData.name}
                     onChange={(e) => handleInputChange('name', e.target.value)}
                     placeholder="Your full name (optional)"
+                    maxLength={100}
+                    secure={true}
                   />
                 </div>
 
                 <div>
                   <Label htmlFor="email">Email Address</Label>
-                  <Input
+                  <UnifiedInput
                     id="email"
                     type="email"
                     value={formData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
                     placeholder={allowContact ? "your@email.com (required)" : "your@email.com (optional)"}
                     required={allowContact}
+                    maxLength={100}
+                    secure={true}
                   />
                 </div>
 
@@ -204,20 +207,22 @@ const FeedbackIntegration = () => {
                 {selectedCategory === 'custom' && (
                   <div>
                     <Label htmlFor="customSubject">Custom Subject</Label>
-                    <Input
+                    <UnifiedInput
                       id="customSubject"
                       type="text"
                       value={formData.customSubject || ''}
                       onChange={(e) => handleInputChange('customSubject', e.target.value)}
                       placeholder="Enter your custom subject"
                       required
+                      maxLength={200}
+                      secure={true}
                     />
                   </div>
                 )}
 
                 <div>
                   <Label htmlFor="message">Your Feedback</Label>
-                  <Textarea
+                  <UnifiedTextarea
                     id="message"
                     value={formData.message}
                     onChange={(e) => handleInputChange('message', e.target.value)}
@@ -225,6 +230,7 @@ const FeedbackIntegration = () => {
                     className="min-h-[100px]"
                     required
                     maxLength={maxCharacters}
+                    secure={true}
                   />
                   <div className="flex justify-between items-center mt-2">
                     <div className="text-xs text-muted-foreground">

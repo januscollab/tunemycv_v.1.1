@@ -2,9 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, MessageSquare, Lightbulb, Bug, Heart, Zap, Brain } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
+import { UnifiedInput, UnifiedTextarea } from '@/components/ui/unified-input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -194,57 +193,60 @@ export const FloatingFeedbackForm: React.FC<FloatingFeedbackFormProps> = ({
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label htmlFor="name">Name</Label>
-            <Input
+            <UnifiedInput
               id="name"
               type="text"
-              name="name"
               value={formData.name}
-              onChange={handleInputChange}
+              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
               placeholder="Your full name (optional)"
               disabled={isSubmitting}
+              maxLength={100}
+              secure={true}
             />
           </div>
           <div>
             <Label htmlFor="email">Email Address</Label>
-            <Input
+            <UnifiedInput
               id="email"
               type="email"
-              name="email"
               value={formData.email}
-              onChange={handleInputChange}
+              onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
               placeholder={allowContact ? "your@email.com (required)" : "your@email.com (optional)"}
               required={allowContact}
               disabled={isSubmitting}
+              maxLength={100}
+              secure={true}
             />
           </div>
         </div>
 
         <div>
           <Label htmlFor="subject">Subject</Label>
-          <Input
+          <UnifiedInput
             id="subject"
             type="text"
-            name="subject"
             value={formData.subject}
-            onChange={handleInputChange}
+            onChange={(e) => setFormData(prev => ({ ...prev, subject: e.target.value }))}
             placeholder="Enter subject"
             required
             disabled={isSubmitting}
+            maxLength={200}
+            secure={true}
           />
         </div>
 
         <div>
           <Label htmlFor="message">Your Feedback</Label>
-          <Textarea
+          <UnifiedTextarea
             id="message"
-            name="message"
             value={formData.message}
-            onChange={handleInputChange}
+            onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
             placeholder="Please share your feedback, ideas, or issues..."
             className="min-h-[100px]"
             required
             disabled={isSubmitting}
             maxLength={maxCharacters}
+            secure={true}
           />
           <div className="flex justify-between items-center mt-2">
             <div className="text-xs text-muted-foreground">

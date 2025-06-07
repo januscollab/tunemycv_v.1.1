@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, CreditCard, CheckCircle } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { UnifiedInput } from '@/components/ui/unified-input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfileData } from '@/hooks/useProfileData';
@@ -176,35 +176,41 @@ export const MockPaymentModal: React.FC<MockPaymentModalProps> = ({
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="firstName">First Name</Label>
-                    <Input
+                    <UnifiedInput
                       id="firstName"
                       placeholder="John"
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
                       required
+                      maxLength={50}
+                      secure={true}
                     />
                   </div>
                   <div>
                     <Label htmlFor="lastName">Last Name</Label>
-                    <Input
+                    <UnifiedInput
                       id="lastName"
                       placeholder="Doe"
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
                       required
+                      maxLength={50}
+                      secure={true}
                     />
                   </div>
                 </div>
 
                 <div>
                   <Label htmlFor="email">Email</Label>
-                  <Input
+                  <UnifiedInput
                     id="email"
                     type="email"
                     placeholder="your@email.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
+                    maxLength={100}
+                    secure={true}
                   />
                 </div>
               </div>
@@ -213,34 +219,37 @@ export const MockPaymentModal: React.FC<MockPaymentModalProps> = ({
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="cardNumber">Card Number</Label>
-                  <Input
+                  <UnifiedInput
                     id="cardNumber"
                     placeholder="4242 4242 4242 4242"
                     value="4242 4242 4242 4242"
                     readOnly
                     className="bg-gray-50 dark:bg-gray-800"
+                    secure={false}
                   />
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="expiry">Expiry</Label>
-                    <Input
+                    <UnifiedInput
                       id="expiry"
                       placeholder="12/28"
                       value="12/28"
                       readOnly
                       className="bg-gray-50 dark:bg-gray-800"
+                      secure={false}
                     />
                   </div>
                   <div>
                     <Label htmlFor="cvc">CVC</Label>
-                    <Input
+                    <UnifiedInput
                       id="cvc"
                       placeholder="123"
                       value="123"
                       readOnly
                       className="bg-gray-50 dark:bg-gray-800"
+                      secure={false}
                     />
                   </div>
                 </div>
