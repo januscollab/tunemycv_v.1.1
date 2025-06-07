@@ -36,9 +36,9 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
   const isCV = type === 'cv';
   const title = isCV ? 'Upload Your CV' : 'Job Description';
   const subtitle = isCV 
-    ? 'Supported formats: PDF, DOCX (Max 5MB)'
+    ? 'Supported formats: PDF, DOCX, TXT (Max 5MB)'
     : 'Upload a file (PDF, DOCX, TXT) or paste the text directly';
-  const acceptTypes = isCV ? '.pdf,.docx' : '.pdf,.docx,.txt';
+  const acceptTypes = isCV ? '.pdf,.docx,.txt' : '.pdf,.docx,.txt';
   const Icon = isCV ? FileText : Briefcase;
   
   const handleFileSelect = (file: File) => {

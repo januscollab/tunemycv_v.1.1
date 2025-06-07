@@ -98,7 +98,7 @@ const DocumentPreviewCard: React.FC<DocumentPreviewCardProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center justify-end space-x-2">
           <Button
             variant="outline"
             size="sm"

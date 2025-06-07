@@ -429,6 +429,30 @@ export type Database = {
         }
         Relationships: []
       }
+      site_settings: {
+        Row: {
+          admin_email: string | null
+          created_at: string
+          id: string
+          support_email: string | null
+          updated_at: string
+        }
+        Insert: {
+          admin_email?: string | null
+          created_at?: string
+          id?: string
+          support_email?: string | null
+          updated_at?: string
+        }
+        Update: {
+          admin_email?: string | null
+          created_at?: string
+          id?: string
+          support_email?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       uploads: {
         Row: {
           created_at: string | null

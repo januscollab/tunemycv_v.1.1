@@ -546,7 +546,7 @@ const AnalyzeCV = () => {
                           Motivation Matters (Optional)
                         </h3>
                         <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mb-4 leading-relaxed">
-                          Each role is unique. Share your motivations for applying - beyond the information in your CV - help in our analysis.
+                          Each role application is unique for you. Share your motivations for applying, beyond your achievements and work history from your CV, to help us better match through analysis.
                         </p>
                         
                         {surveyResponses ? (

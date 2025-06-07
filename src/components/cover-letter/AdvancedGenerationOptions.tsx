@@ -46,12 +46,21 @@ const AdvancedGenerationOptions: React.FC<AdvancedGenerationOptionsProps> = ({ v
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-      <CollapsibleTrigger className="w-full flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-        <span className="font-medium text-left">Advanced Generation Options (Optional)</span>
-        {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+      <CollapsibleTrigger className="w-full flex items-start space-x-3 p-4 bg-card border border-card-border rounded-lg hover:bg-accent/20 transition-all duration-normal group">
+        <div className="w-8 h-8 bg-zapier-orange/20 rounded-lg flex items-center justify-center flex-shrink-0">
+          {isOpen ? <ChevronUp className="h-4 w-4 text-zapier-orange" /> : <ChevronDown className="h-4 w-4 text-zapier-orange" />}
+        </div>
+        <div className="flex-1">
+          <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-2">
+            Generation Settings (Optional)
+          </h3>
+          <p className="text-sm text-blueberry/70 dark:text-apple-core/80 leading-relaxed">
+            Customize your cover letter generation with advanced options for a more personalized result.
+          </p>
+        </div>
       </CollapsibleTrigger>
       
-      <CollapsibleContent className="mt-4 space-y-2 p-3 bg-gray-50/50 dark:bg-gray-800/50 rounded-lg border">
+      <CollapsibleContent className="mt-4 space-y-4 p-4 bg-card/50 border border-card-border rounded-lg">
         <div>
           <Label htmlFor="workHighlights" className="text-sm font-medium">
             Key Work Experience Highlights

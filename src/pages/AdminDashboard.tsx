@@ -5,6 +5,7 @@ import UserManagement from '@/components/admin/UserManagement';
 import CreditManagement from '@/components/admin/CreditManagement';
 import AnalysisLogsManagement from '@/components/admin/AnalysisLogsManagement';
 import AIPromptsManagement from '@/components/admin/AIPromptsManagement';
+import SiteSettingsManagement from '@/components/admin/SiteSettingsManagement';
 
 import AdminNavigation from '@/components/admin/AdminNavigation';
 import { Button } from '@/components/ui/button';
@@ -65,12 +66,7 @@ const AdminDashboard = () => {
       case 'ai-prompts':
         return <AIPromptsManagement />;
       case 'site-settings':
-        return (
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-xl font-semibold text-blueberry mb-4">Site Settings</h2>
-            <p className="text-blueberry/70">Site settings functionality will be added here.</p>
-          </div>
-        );
+        return <SiteSettingsManagement />;
       case 'email-templates':
         return (
           <div className="bg-white rounded-lg shadow-sm p-6">
