@@ -61,7 +61,7 @@ const AnalysisLogDetailModal: React.FC<AnalysisLogDetailModalProps> = ({ log, on
       <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b flex-shrink-0">
-          <h2 className="text-xl font-semibold text-gray-900">Analysis Log Details</h2>
+          <h2 className="text-heading font-semibold text-gray-900">Analysis Log Details</h2>
           <button
             onClick={onClose}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -74,7 +74,7 @@ const AnalysisLogDetailModal: React.FC<AnalysisLogDetailModalProps> = ({ log, on
         <div className="flex border-b flex-shrink-0">
           <button
             onClick={() => setActiveTab('overview')}
-            className={`px-6 py-3 font-medium text-sm transition-colors ${
+            className={`px-6 py-3 font-medium text-caption transition-colors ${
               activeTab === 'overview'
                 ? 'border-b-2 border-blue-500 text-blue-600'
                 : 'text-gray-500 hover:text-gray-700'
@@ -85,7 +85,7 @@ const AnalysisLogDetailModal: React.FC<AnalysisLogDetailModalProps> = ({ log, on
           </button>
           <button
             onClick={() => setActiveTab('prompt')}
-            className={`px-6 py-3 font-medium text-sm transition-colors ${
+            className={`px-6 py-3 font-medium text-caption transition-colors ${
               activeTab === 'prompt'
                 ? 'border-b-2 border-blue-500 text-blue-600'
                 : 'text-gray-500 hover:text-gray-700'
@@ -96,7 +96,7 @@ const AnalysisLogDetailModal: React.FC<AnalysisLogDetailModalProps> = ({ log, on
           </button>
           <button
             onClick={() => setActiveTab('response')}
-            className={`px-6 py-3 font-medium text-sm transition-colors ${
+            className={`px-6 py-3 font-medium text-caption transition-colors ${
               activeTab === 'response'
                 ? 'border-b-2 border-blue-500 text-blue-600'
                 : 'text-gray-500 hover:text-gray-700'
@@ -118,7 +118,7 @@ const AnalysisLogDetailModal: React.FC<AnalysisLogDetailModalProps> = ({ log, on
                     <User className="h-4 w-4 mr-2" />
                     User Information
                   </h3>
-                  <div className="space-y-2 text-sm">
+                  <div className="space-y-2 text-caption">
                     <div><span className="font-medium">Name:</span> {log.first_name || 'N/A'} {log.last_name || ''}</div>
                     <div><span className="font-medium">Email:</span> {log.user_email || 'N/A'}</div>
                     <div><span className="font-medium">CV File:</span> {log.cv_file_name || 'N/A'}</div>
@@ -131,13 +131,13 @@ const AnalysisLogDetailModal: React.FC<AnalysisLogDetailModalProps> = ({ log, on
                     <Briefcase className="h-4 w-4 mr-2" />
                     Job Analysis
                   </h3>
-                  <div className="space-y-2 text-sm">
+                  <div className="space-y-2 text-caption">
                     <div><span className="font-medium">Job Title:</span> {log.job_title || 'Not specified'}</div>
                     <div><span className="font-medium">Company:</span> {log.company_name || 'Not specified'}</div>
                     <div><span className="font-medium">Compatibility Score:</span> {log.compatibility_score ? `${log.compatibility_score}%` : 'Not available'}</div>
                     <div>
                       <span className="font-medium">Status:</span>
-                      <span className={`ml-2 px-2 py-1 rounded text-xs ${
+                      <span className={`ml-2 px-2 py-1 rounded text-micro ${
                         log.status === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                       }`}>
                         {log.status}
@@ -153,7 +153,7 @@ const AnalysisLogDetailModal: React.FC<AnalysisLogDetailModalProps> = ({ log, on
                   <Clock className="h-4 w-4 mr-2" />
                   Technical Details
                 </h3>
-                <div className="grid md:grid-cols-2 gap-4 text-sm">
+                <div className="grid md:grid-cols-2 gap-4 text-caption">
                   <div><span className="font-medium">Model:</span> {log.openai_model}</div>
                   <div><span className="font-medium">Processing Time:</span> {log.processing_time_ms}ms</div>
                   <div><span className="font-medium">Tokens Used:</span> {log.tokens_used || 'N/A'}</div>
@@ -165,7 +165,7 @@ const AnalysisLogDetailModal: React.FC<AnalysisLogDetailModalProps> = ({ log, on
               {log.error_message && (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                   <h3 className="font-semibold text-red-900 mb-2">Error Details</h3>
-                  <p className="text-sm text-red-700 font-mono">{log.error_message}</p>
+                  <p className="text-caption text-red-700 font-mono">{log.error_message}</p>
                 </div>
               )}
             </div>
@@ -178,14 +178,14 @@ const AnalysisLogDetailModal: React.FC<AnalysisLogDetailModalProps> = ({ log, on
                 <div className="flex space-x-2">
                   <button
                     onClick={() => copyToClipboard(log.prompt_text, 'Prompt')}
-                    className="flex items-center px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded transition-colors"
+                    className="flex items-center px-3 py-1 text-caption bg-gray-100 hover:bg-gray-200 rounded transition-colors"
                   >
                     <Copy className="h-4 w-4 mr-1" />
                     Copy
                   </button>
                   <button
                     onClick={() => downloadAsFile(log.prompt_text, `prompt-${log.id}.txt`)}
-                    className="flex items-center px-3 py-1 text-sm bg-blue-100 hover:bg-blue-200 text-blue-700 rounded transition-colors"
+                    className="flex items-center px-3 py-1 text-caption bg-blue-100 hover:bg-blue-200 text-blue-700 rounded transition-colors"
                   >
                     <Download className="h-4 w-4 mr-1" />
                     Download
@@ -193,7 +193,7 @@ const AnalysisLogDetailModal: React.FC<AnalysisLogDetailModalProps> = ({ log, on
                 </div>
               </div>
               <div className="flex-1 bg-gray-50 rounded-lg p-4 overflow-y-auto">
-                <pre className="text-sm text-gray-700 whitespace-pre-wrap font-mono">
+                <pre className="text-caption text-gray-700 whitespace-pre-wrap font-mono">
                   {log.prompt_text}
                 </pre>
               </div>
@@ -207,14 +207,14 @@ const AnalysisLogDetailModal: React.FC<AnalysisLogDetailModalProps> = ({ log, on
                 <div className="flex space-x-2">
                   <button
                     onClick={() => copyToClipboard(log.response_text, 'Response')}
-                    className="flex items-center px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded transition-colors"
+                    className="flex items-center px-3 py-1 text-caption bg-gray-100 hover:bg-gray-200 rounded transition-colors"
                   >
                     <Copy className="h-4 w-4 mr-1" />
                     Copy
                   </button>
                   <button
                     onClick={() => downloadAsFile(formatJSON(log.response_text), `response-${log.id}.json`)}
-                    className="flex items-center px-3 py-1 text-sm bg-green-100 hover:bg-green-200 text-green-700 rounded transition-colors"
+                    className="flex items-center px-3 py-1 text-caption bg-green-100 hover:bg-green-200 text-green-700 rounded transition-colors"
                   >
                     <Download className="h-4 w-4 mr-1" />
                     Download JSON
@@ -222,7 +222,7 @@ const AnalysisLogDetailModal: React.FC<AnalysisLogDetailModalProps> = ({ log, on
                 </div>
               </div>
               <div className="flex-1 bg-gray-50 rounded-lg p-4 overflow-y-auto">
-                <pre className="text-sm text-gray-700 whitespace-pre-wrap font-mono">
+                <pre className="text-caption text-gray-700 whitespace-pre-wrap font-mono">
                   {formatJSON(log.response_text)}
                 </pre>
               </div>

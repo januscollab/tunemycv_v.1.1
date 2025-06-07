@@ -207,7 +207,7 @@ const AIPromptsManagement: React.FC = () => {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl font-bold text-blueberry flex items-center gap-2">
+          <CardTitle className="text-title font-bold text-blueberry flex items-center gap-2">
             <BrainCircuit className="h-6 w-6 text-zapier-orange" />
             AI Prompts Management
           </CardTitle>
@@ -230,8 +230,8 @@ const AIPromptsManagement: React.FC = () => {
               <TabsContent key={tab.id} value={tab.id} className="space-y-4">
                 <div className="flex justify-between items-center">
                   <div>
-                    <h3 className="text-lg font-semibold text-blueberry">{tab.label} Prompt</h3>
-                    <p className="text-sm text-blueberry/70">{prompts[tab.id]?.description}</p>
+                    <h3 className="text-subheading font-semibold text-blueberry">{tab.label} Prompt</h3>
+                    <p className="text-caption text-blueberry/70">{prompts[tab.id]?.description}</p>
                   </div>
                   <div className="flex gap-2">
                     <Select
@@ -273,7 +273,7 @@ const AIPromptsManagement: React.FC = () => {
                 </div>
 
                 {promptVersions[tab.id]?.length > 0 && (
-                  <div className="text-sm text-blueberry/70">
+                  <div className="text-caption text-blueberry/70">
                     Total versions: {promptVersions[tab.id].length} | 
                     Current: v{promptVersions[tab.id].find(v => v.id === selectedVersions[tab.id])?.version_number || 1} | 
                     Last updated: {formatDate(promptVersions[tab.id][0]?.created_at || '')}

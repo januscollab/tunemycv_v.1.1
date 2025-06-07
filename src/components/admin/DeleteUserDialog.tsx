@@ -44,10 +44,10 @@ const DeleteUserDialog: React.FC<DeleteUserDialogProps> = ({
             <p className="text-red-800 dark:text-red-200 font-medium mb-2">
               This action cannot be undone!
             </p>
-            <p className="text-red-700 dark:text-red-300 text-sm">
+            <p className="text-red-700 dark:text-red-300 text-caption">
               This will permanently delete the user account and all associated data including:
             </p>
-            <ul className="text-red-700 dark:text-red-300 text-sm mt-2 ml-4 list-disc">
+            <ul className="text-red-700 dark:text-red-300 text-caption mt-2 ml-4 list-disc">
               <li>Profile information</li>
               <li>CV uploads and analysis results</li>
               <li>Cover letters</li>
@@ -58,7 +58,7 @@ const DeleteUserDialog: React.FC<DeleteUserDialogProps> = ({
 
           <div className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800">
             <h4 className="font-medium text-gray-900 dark:text-white mb-2">User Details:</h4>
-            <div className="space-y-1 text-sm text-gray-700 dark:text-gray-300">
+            <div className="space-y-1 text-caption text-gray-700 dark:text-gray-300">
               <p><span className="font-medium">Name:</span> {user.first_name || 'N/A'} {user.last_name || ''}</p>
               <p><span className="font-medium">Email:</span> {user.email}</p>
               <p><span className="font-medium">Credits:</span> {user.credits}</p>
@@ -67,7 +67,7 @@ const DeleteUserDialog: React.FC<DeleteUserDialogProps> = ({
             </div>
           </div>
 
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-caption text-gray-600 dark:text-gray-400">
             Type the user's email address to confirm deletion:
           </p>
         </div>

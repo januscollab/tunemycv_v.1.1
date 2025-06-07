@@ -77,7 +77,7 @@ const CreditManagement = () => {
           <div className="flex items-center">
             <Users className="h-8 w-8 text-blue-500" />
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Total Users</p>
+              <p className="text-caption font-medium text-gray-600">Total Users</p>
               <p className="text-title font-bold text-foreground">{stats.totalUsers}</p>
             </div>
           </div>
@@ -87,7 +87,7 @@ const CreditManagement = () => {
           <div className="flex items-center">
             <CreditCard className="h-8 w-8 text-green-500" />
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Total Credits</p>
+              <p className="text-caption font-medium text-gray-600">Total Credits</p>
               <p className="text-title font-bold text-foreground">{stats.totalCredits}</p>
             </div>
           </div>
@@ -97,7 +97,7 @@ const CreditManagement = () => {
           <div className="flex items-center">
             <TrendingUp className="h-8 w-8 text-purple-500" />
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Avg Credits/User</p>
+              <p className="text-caption font-medium text-gray-600">Avg Credits/User</p>
               <p className="text-title font-bold text-foreground">{stats.averageCredits}</p>
             </div>
           </div>
@@ -107,7 +107,7 @@ const CreditManagement = () => {
           <div className="flex items-center">
             <DollarSign className="h-8 w-8 text-orange-500" />
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Total Analyses</p>
+              <p className="text-caption font-medium text-gray-600">Total Analyses</p>
               <p className="text-title font-bold text-foreground">{stats.totalAnalyses}</p>
             </div>
           </div>

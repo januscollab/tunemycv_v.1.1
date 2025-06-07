@@ -28,7 +28,7 @@ const HowItWorks = () => {
           <div className="flex justify-center mb-6">
             <div className="relative">
               {step.icon}
-              <div className="absolute -top-2 -right-2 bg-zapier-orange text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">
+              <div className="absolute -top-2 -right-2 bg-zapier-orange text-white rounded-full w-6 h-6 flex items-center justify-center text-caption font-bold">
                 {index + 1}
               </div>
             </div>

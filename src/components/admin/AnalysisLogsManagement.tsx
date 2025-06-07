@@ -148,7 +148,7 @@ const AnalysisLogsManagement = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-title font-bold text-foreground">Analysis Logs</h1>
-        <div className="text-sm text-gray-500">
+        <div className="text-caption text-gray-500">
           Total Logs: {logs.length} | Filtered: {filteredLogs.length} | Page: {currentPage} of {totalPages}
         </div>
       </div>
@@ -239,33 +239,33 @@ const AnalysisLogsManagement = () => {
                     <div className="font-medium text-gray-900">
                       {log.first_name || 'N/A'} {log.last_name || ''}
                     </div>
-                    <div className="text-sm text-gray-500">{log.user_email}</div>
+                    <div className="text-caption text-gray-500">{log.user_email}</div>
                   </div>
                 </TableCell>
                 <TableCell>
                   <div>
                     <div className="font-medium text-gray-900">{log.job_title || 'N/A'}</div>
-                    <div className="text-sm text-gray-500">{log.company_name || 'N/A'}</div>
+                    <div className="text-caption text-gray-500">{log.company_name || 'N/A'}</div>
                     {log.compatibility_score && (
-                      <div className="text-xs text-blue-600">Score: {log.compatibility_score}%</div>
+                      <div className="text-micro text-blue-600">Score: {log.compatibility_score}%</div>
                     )}
                   </div>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center space-x-2">
                     <span className="text-subheading">{getOperationTypeIcon(log.operation_type)}</span>
-                    <span className="text-sm font-medium capitalize">
+                    <span className="text-caption font-medium capitalize">
                       {log.operation_type === 'cover_letter_generation' ? 'Cover Letter' : log.operation_type === 'cv_analysis' ? 'CV Analysis' : (log.operation_type?.replace('_', ' ') || 'Analysis')}
                     </span>
                   </div>
                 </TableCell>
                 <TableCell>
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-micro font-medium bg-blue-100 text-blue-800">
                     {log.openai_model}
                   </span>
                 </TableCell>
                 <TableCell>
-                  <div className="text-sm">
+                  <div className="text-caption">
                     <div>{log.processing_time_ms}ms</div>
                     {log.tokens_used && (
                       <div className="text-gray-500">{log.tokens_used} tokens</div>
@@ -275,7 +275,7 @@ const AnalysisLogsManagement = () => {
                 <TableCell>
                   <div className="flex items-center space-x-2">
                     {getStatusIcon(log.status)}
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(log.status)}`}>
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-micro font-medium ${getStatusColor(log.status)}`}>
                       {log.status}
                     </span>
                   </div>
@@ -286,11 +286,11 @@ const AnalysisLogsManagement = () => {
                 <TableCell className="text-gray-600">
                   <div className="flex items-center space-x-1">
                     <Calendar className="h-3 w-3" />
-                    <span className="text-sm">
+                    <span className="text-caption">
                       {new Date(log.created_at).toLocaleDateString()}
                     </span>
                   </div>
-                  <div className="text-xs text-gray-500">
+                  <div className="text-micro text-gray-500">
                     {new Date(log.created_at).toLocaleTimeString()}
                   </div>
                 </TableCell>
@@ -312,7 +312,7 @@ const AnalysisLogsManagement = () => {
       {/* Pagination */}
       {pageSize !== 999999 && totalPages > 1 && (
         <div className="flex items-center justify-between">
-          <div className="text-sm text-gray-500">
+          <div className="text-caption text-gray-500">
             Showing {startIndex + 1}-{Math.min(endIndex, filteredLogs.length)} of {filteredLogs.length} entries
           </div>
           <div className="flex items-center space-x-2">

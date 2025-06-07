@@ -95,8 +95,8 @@ const Testimonials = () => {
                 />
                 <div>
                   <h4 className="font-semibold text-blueberry dark:text-black">{testimonial.name}</h4>
-                  <p className="text-sm text-blueberry/70 dark:text-black/80">{testimonial.role}</p>
-                  <p className="text-sm text-apricot font-medium">{testimonial.company}</p>
+                  <p className="text-caption text-blueberry/70 dark:text-black/80">{testimonial.role}</p>
+                  <p className="text-caption text-apricot font-medium">{testimonial.company}</p>
                 </div>
               </div>
             </div>
