@@ -1,6 +1,6 @@
 
 import React from 'react';
-import SecureInput from '@/components/security/SecureInput';
+import { UnifiedInput } from '@/components/ui/unified-input';
 import { Label } from '@/components/ui/label';
 
 interface NameFieldsProps {
@@ -22,7 +22,7 @@ const NameFields: React.FC<NameFieldsProps> = ({
         <Label htmlFor="firstName" className="text-blueberry">
           First name
         </Label>
-        <SecureInput
+        <UnifiedInput
           id="firstName"
           name="firstName"
           type="text"
@@ -31,13 +31,14 @@ const NameFields: React.FC<NameFieldsProps> = ({
           onChange={onFirstNameChange}
           className="mt-1"
           maxLength={50}
+          secure={true}
         />
       </div>
       <div>
         <Label htmlFor="lastName" className="text-blueberry">
           Last name
         </Label>
-        <SecureInput
+        <UnifiedInput
           id="lastName"
           name="lastName"
           type="text"
@@ -46,6 +47,7 @@ const NameFields: React.FC<NameFieldsProps> = ({
           onChange={onLastNameChange}
           className="mt-1"
           maxLength={50}
+          secure={true}
         />
       </div>
     </div>
