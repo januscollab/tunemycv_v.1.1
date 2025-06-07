@@ -48,9 +48,9 @@ const AdvancedGenerationOptions: React.FC<AdvancedGenerationOptionsProps> = ({ v
   return (
     <div className="space-y-4">
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-        <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
-          <span className="text-sm font-medium">Advanced Options</span>
-          <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-orange-50 hover:bg-orange-100 dark:bg-orange-950/50 dark:hover:bg-orange-950/70 rounded-lg transition-colors border border-orange-200 dark:border-orange-800">
+          <span className="text-sm font-medium text-orange-700 dark:text-orange-300">Advanced Options</span>
+          <ChevronDown className={`h-4 w-4 text-orange-600 dark:text-orange-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
         </CollapsibleTrigger>
         <CollapsibleContent className="space-y-4 mt-3">
           <div>
@@ -94,20 +94,20 @@ const AdvancedGenerationOptions: React.FC<AdvancedGenerationOptionsProps> = ({ v
               className="mt-1"
             />
           </div>
+
+          <div className="flex items-center space-x-2 pt-2 border-t border-border/50">
+            <Checkbox
+              id="includeLinkedIn"
+              checked={value.includeLinkedInUrl}
+              onCheckedChange={(checked) => handleChange('includeLinkedInUrl', Boolean(checked))}
+            />
+            <Label htmlFor="includeLinkedIn" className="text-sm font-medium flex items-center">
+              <Linkedin className="h-4 w-4 mr-1" />
+              Include my LinkedIn profile URL in the cover letter
+            </Label>
+          </div>
         </CollapsibleContent>
       </Collapsible>
-
-      <div className="flex items-center space-x-2 pt-1">
-        <Checkbox
-          id="includeLinkedIn"
-          checked={value.includeLinkedInUrl}
-          onCheckedChange={(checked) => handleChange('includeLinkedInUrl', Boolean(checked))}
-        />
-        <Label htmlFor="includeLinkedIn" className="text-sm font-medium flex items-center">
-          <Linkedin className="h-4 w-4 mr-1" />
-          Include my LinkedIn profile URL in the cover letter
-        </Label>
-      </div>
     </div>
   );
 };

@@ -91,7 +91,7 @@ const PricingScale = () => {
 
         {/* Pricing Slider */}
         <div className="mb-16 w-full">
-          <Card className="bg-white dark:bg-blueberry/20 border-2 border-zapier-orange/50 dark:border-zapier-orange/60 p-8 shadow-xl shadow-zapier-orange/20 hover:shadow-2xl hover:shadow-zapier-orange/30 transition-all duration-500 hover:scale-[1.02] relative overflow-hidden group">
+          <Card className="bg-white dark:bg-blueberry/20 border-2 border-zapier-orange/50 dark:border-zapier-orange/60 p-8 shadow-xl shadow-zapier-orange/20 hover:shadow-2xl hover:shadow-zapier-orange/30 transition-all duration-500 hover:scale-[1.02] relative overflow-hidden group [&:hover_button_span]:text-white">
             {/* Animated background gradient */}
             <div className="absolute inset-0 bg-gradient-to-br from-zapier-orange/5 via-transparent to-citrus/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             <div className="relative z-10">
@@ -218,9 +218,9 @@ const PricingScale = () => {
                 <Button 
                   onClick={handleBuyCredits}
                   variant="outline"
-                  className="border-2 border-zapier-orange bg-white hover:bg-zapier-orange hover:text-white text-zapier-orange px-8 py-3 text-lg font-normal transition-all duration-300 hover:shadow-xl hover:shadow-zapier-orange/30 hover:scale-105 group relative overflow-hidden"
+                  className="border-2 border-zapier-orange bg-white hover:bg-zapier-orange text-zapier-orange px-8 py-3 text-lg font-normal transition-all duration-300 hover:shadow-xl hover:shadow-zapier-orange/30 hover:scale-105 group relative overflow-hidden group-hover:text-white"
                 >
-                  <span className="relative z-10 flex items-center">
+                  <span className="relative z-10 flex items-center group-hover:text-white transition-colors duration-300">
                     {currentTier.isEnterprise ? 'Contact Sales' : 'Buy Now'}
                     <ArrowRight className="ml-2 h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
                   </span>

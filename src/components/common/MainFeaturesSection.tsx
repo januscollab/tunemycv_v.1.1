@@ -54,19 +54,6 @@ const MainFeaturesSection = () => {
   return (
     <section className="py-16 bg-gradient-to-br from-cream/20 via-white to-primary-50/10 dark:from-background-secondary/30 dark:via-background dark:to-primary-50/5">
       <div className="max-w-6xl mx-auto px-4">
-        {/* Header */}
-        <div className="text-center mb-16">
-          
-          <h2 className="text-4xl md:text-5xl font-bold text-earth dark:text-white mb-6 leading-tight">
-            Three Powerful Tools,
-            <span className="text-zapier-orange"> One Career Goal</span>
-          </h2>
-          
-          <p className="text-xl text-earth/70 dark:text-white/70 max-w-3xl mx-auto leading-relaxed">
-            Our integrated suite of AI-powered tools works together to optimize every aspect of your job search—from CV analysis to interview success.
-          </p>
-        </div>
-
         {/* Features Grid */}
         <div className="grid lg:grid-cols-3 gap-8 mb-16">
           {features.map((feature, index) => (
@@ -116,6 +103,18 @@ const MainFeaturesSection = () => {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h2 className="text-base font-bold text-earth dark:text-white mb-6 leading-tight">
+            Three Powerful Tools,
+            <span className="text-zapier-orange"> One Career Goal</span>
+          </h2>
+          
+          <p className="text-xl text-earth/70 dark:text-white/70 max-w-3xl mx-auto leading-relaxed">
+            Our integrated suite of AI-powered tools works together to optimize every aspect of your job search—from CV analysis to interview success.
+          </p>
         </div>
 
         {/* Bottom CTA */}
