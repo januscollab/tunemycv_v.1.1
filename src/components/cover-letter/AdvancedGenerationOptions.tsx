@@ -48,7 +48,7 @@ const AdvancedGenerationOptions: React.FC<AdvancedGenerationOptionsProps> = ({ v
   return (
     <div className="space-y-4">
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-        <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-orange-100 hover:bg-orange-200 dark:bg-orange-100 dark:hover:bg-orange-200 rounded-lg transition-colors">
+        <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-zapier-orange/5 hover:bg-zapier-orange/10 dark:bg-zapier-orange/5 dark:hover:bg-zapier-orange/10 rounded-lg transition-colors">
           <span className="text-sm font-medium text-black dark:text-black">Advanced Options</span>
           <ChevronDown className={`h-4 w-4 text-orange-600 dark:text-orange-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
         </CollapsibleTrigger>
