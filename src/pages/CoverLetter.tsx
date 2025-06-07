@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FileText, Sparkles, Trash2, RefreshCw, Clock, FileUp, Search, AlertCircle, Eye, Edit, Download, History, RotateCcw, Edit2 } from 'lucide-react';
+import { FileText, Sparkles, Trash2, RefreshCw, Clock, FileUp, Search, AlertCircle, Eye, Edit, Download, History, RotateCcw, Edit2, Linkedin } from 'lucide-react';
 import Breadcrumbs from '@/components/navigation/Breadcrumbs';
 import QuickActions from '@/components/common/QuickActions';
 import { useAuth } from '@/contexts/AuthContext';
@@ -14,6 +14,7 @@ import EditTitleDialog from '@/components/ui/edit-title-dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -594,6 +595,24 @@ const AuthenticatedCoverLetter = () => {
                             </SelectContent>
                           </Select>
                         </div>
+                      </div>
+
+                      {/* LinkedIn Profile Option */}
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="includeLinkedIn"
+                          checked={advancedOptions.includeLinkedInUrl}
+                          onCheckedChange={(checked) => 
+                            setAdvancedOptions(prev => ({ 
+                              ...prev, 
+                              includeLinkedInUrl: Boolean(checked) 
+                            }))
+                          }
+                        />
+                        <Label htmlFor="includeLinkedIn" className="text-sm font-medium flex items-center">
+                          <Linkedin className="h-4 w-4 mr-1" />
+                          Include my LinkedIn profile URL in the cover letter
+                        </Label>
                       </div>
                     </CardContent>
                   </Card>
