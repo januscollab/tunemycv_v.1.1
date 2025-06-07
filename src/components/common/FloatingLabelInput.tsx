@@ -45,21 +45,21 @@ export const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
           "peer w-full h-12 px-4 pt-6 pb-2 bg-white dark:bg-surface border-2 rounded-lg",
           "border-apple-core/20 dark:border-citrus/20",
           "focus:border-zapier-orange focus:ring-0 focus:outline-none",
-          "text-blueberry dark:text-citrus text-sm",
-          "transition-all duration-200",
-          "disabled:opacity-50 disabled:cursor-not-allowed",
-          className
-        )}
-        {...props}
-      />
-      <label
-        onClick={handleLabelClick}
-        className={cn(
-          "absolute left-4 cursor-text transition-all duration-200 pointer-events-none",
-          "text-blueberry/60 dark:text-apple-core/60",
-          isFloating
-            ? "top-1.5 text-xs font-medium text-zapier-orange"
-            : "top-1/2 -translate-y-1/2 text-sm"
+           "text-blueberry dark:text-citrus text-caption",
+           "transition-all duration-200",
+           "disabled:opacity-50 disabled:cursor-not-allowed",
+           className
+         )}
+         {...props}
+       />
+       <label
+         onClick={handleLabelClick}
+         className={cn(
+           "absolute left-4 cursor-text transition-all duration-200 pointer-events-none",
+           "text-blueberry/60 dark:text-apple-core/60",
+           isFloating
+             ? "top-1.5 text-micro font-medium text-zapier-orange"
+             : "top-1/2 -translate-y-1/2 text-caption"
         )}
       >
         {label}
