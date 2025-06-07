@@ -21,7 +21,7 @@ const AnalyzeButton: React.FC<AnalyzeButtonProps> = ({
         <button
           onClick={onAnalyze}
           disabled={!canAnalyze || analyzing}
-          className={`w-full py-4 px-6 rounded-lg text-lg font-semibold transition-all duration-normal group ${
+          className={`w-full py-4 px-6 rounded-lg text-subheading font-semibold transition-all duration-normal group ${
             canAnalyze && !analyzing
               ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98]'
               : 'bg-muted text-muted-foreground cursor-not-allowed'
@@ -40,7 +40,7 @@ const AnalyzeButton: React.FC<AnalyzeButtonProps> = ({
           )}
         </button>
         
-        <p className="text-sm text-muted-foreground mt-3 transition-colors duration-normal">
+        <p className="text-body text-muted-foreground mt-3 transition-colors duration-normal">
           {hasCreditsForAI 
             ? "Get detailed AI-powered insights and recommendations"
             : "Receive comprehensive analysis with actionable feedback"
@@ -49,7 +49,7 @@ const AnalyzeButton: React.FC<AnalyzeButtonProps> = ({
         
         {!canAnalyze && !analyzing && (
           <div className="mt-3">
-            <p className="text-sm text-destructive font-medium">
+            <p className="text-body text-destructive font-medium">
               Please upload both CV and job description to continue
             </p>
           </div>

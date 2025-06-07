@@ -228,11 +228,11 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
   return (
     <Card className="bg-white dark:bg-blueberry/20 border border-apple-core/20 dark:border-citrus/20">
       <CardHeader>
-        <CardTitle className="text-lg font-semibold text-blueberry dark:text-citrus flex items-center">
+        <CardTitle className="text-heading font-semibold text-blueberry dark:text-citrus flex items-center">
           <FileText className="h-5 w-5 text-apricot mr-2" />
           Your CV
         </CardTitle>
-        <p className="text-sm text-blueberry/70 dark:text-apple-core/80">
+        <p className="text-body text-blueberry/70 dark:text-apple-core/80">
           Upload a new CV or select from your saved CVs. 
           <Link 
             to="/profile?tab=files" 
