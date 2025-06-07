@@ -33,7 +33,7 @@ const CVSelectorDropdown: React.FC<CVSelectorDropdownProps> = ({
 
   return (
     <div className="mb-4">
-      <h4 className="text-sm font-medium text-blueberry dark:text-citrus mb-3">Saved CVs</h4>
+      <h4 className="text-caption font-medium text-blueberry dark:text-citrus mb-3">Saved CVs</h4>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button className="w-full flex items-center justify-between p-3 border border-apple-core/30 dark:border-citrus/30 rounded-lg bg-white dark:bg-blueberry/10 hover:border-apricot transition-colors">
@@ -59,7 +59,7 @@ const CVSelectorDropdown: React.FC<CVSelectorDropdownProps> = ({
                 <FileText className="h-4 w-4 text-apricot" />
                 <div>
                   <p className="font-medium text-blueberry dark:text-citrus">{cv.file_name}</p>
-                  <p className="text-xs text-blueberry/70 dark:text-apple-core/80">
+                  <p className="text-micro text-blueberry/70 dark:text-apple-core/80">
                     {new Date(cv.created_at).toLocaleDateString()}
                   </p>
                 </div>

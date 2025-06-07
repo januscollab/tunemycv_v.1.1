@@ -49,7 +49,7 @@ const NextStepsSection: React.FC<NextStepsSectionProps> = ({ onStartNew }) => {
     <>
       <Card className="bg-white dark:bg-blueberry/20 border border-apple-core/20 dark:border-citrus/20">
         <CardHeader>
-          <CardTitle className="text-xl font-semibold text-blueberry dark:text-citrus flex items-center">
+          <CardTitle className="text-heading font-semibold text-blueberry dark:text-citrus flex items-center">
             <Info className="h-5 w-5 mr-2" />
             What's Next?
           </CardTitle>

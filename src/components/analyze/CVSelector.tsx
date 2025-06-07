@@ -298,7 +298,7 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
             <div className="grid grid-cols-2 gap-2 bg-apple-core/10 dark:bg-citrus/10 p-1 rounded-lg">
               <button
                 onClick={() => setActiveTab('saved')}
-                className={`px-3 py-2 text-sm font-medium rounded-md transition-colors flex items-center justify-center space-x-2 ${
+                className={`px-3 py-2 text-caption font-medium rounded-md transition-colors flex items-center justify-center space-x-2 ${
                   activeTab === 'saved'
                     ? 'text-zapier-orange border-b-2 border-zapier-orange bg-transparent'
                     : 'text-blueberry/70 dark:text-apple-core/70 hover:bg-apple-core/10 dark:hover:bg-citrus/10'
@@ -310,7 +310,7 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
               </button>
               <button
                 onClick={() => setActiveTab('upload')}
-                className={`px-3 py-2 text-sm font-medium rounded-md transition-colors flex items-center justify-center space-x-2 ${
+                className={`px-3 py-2 text-caption font-medium rounded-md transition-colors flex items-center justify-center space-x-2 ${
                   activeTab === 'upload'
                     ? 'text-zapier-orange border-b-2 border-zapier-orange bg-transparent'
                     : 'text-blueberry/70 dark:text-apple-core/70 hover:bg-apple-core/10 dark:hover:bg-citrus/10'
