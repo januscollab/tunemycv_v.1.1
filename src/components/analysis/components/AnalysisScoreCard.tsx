@@ -36,18 +36,18 @@ const AnalysisScoreCard: React.FC<AnalysisScoreCardProps> = ({
         <div className={`relative w-32 h-32 ${getScoreColor(percentageScore)} rounded-full flex items-center justify-center`}>
           <div className="text-white text-center">
             <div className="text-display font-bold">{percentageScore}%</div>
-            <div className="text-sm">Match</div>
+            <div className="text-caption">Match</div>
           </div>
         </div>
       </div>
       
-      <h3 className="text-xl font-semibold text-blueberry dark:text-citrus mb-2">Compatibility Score</h3>
+      <h3 className="text-heading font-semibold text-blueberry dark:text-citrus mb-2">Compatibility Score</h3>
       <p className={`font-medium mb-4 ${getTextColor(percentageScore)}`}>
         {getMatchLevel(percentageScore)}
       </p>
       
       {jobTitle && (
-        <div className="text-sm text-blueberry/60 dark:text-apple-core/60">
+        <div className="text-caption text-blueberry/60 dark:text-apple-core/60">
           <p>for the <span className="font-medium">{jobTitle}</span> position</p>
           {companyName && companyName !== 'the Company' && (
             <p>at <span className="font-medium">{companyName}</span></p>
