@@ -50,10 +50,10 @@ const FileUploadWithSave: React.FC<FileUploadWithSaveProps> = ({
       const secureFile = createSecureFileObject(file, validation.sanitizedName!);
       
       // Extract text from the file
-      const extractedText = await extractText(secureFile);
+      const result = await extractText(secureFile, 'cv');
       
-      if (extractedText) {
-        onFileSelect(secureFile, extractedText, shouldSave);
+      if (result) {
+        onFileSelect(secureFile, result.extractedText, shouldSave);
         setShouldSave(false);
       }
     }

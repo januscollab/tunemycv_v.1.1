@@ -456,34 +456,52 @@ export type Database = {
       uploads: {
         Row: {
           created_at: string | null
+          detected_document_type: string | null
           extracted_text: string | null
           file_name: string
           file_size: number
           file_type: string
           id: string
           job_title: string | null
+          needs_type_confirmation: boolean | null
+          original_file_content: string | null
+          quality_assessment: Json | null
+          quality_score: number | null
+          type_detection_confidence: number | null
           upload_type: string
           user_id: string
         }
         Insert: {
           created_at?: string | null
+          detected_document_type?: string | null
           extracted_text?: string | null
           file_name: string
           file_size: number
           file_type: string
           id?: string
           job_title?: string | null
+          needs_type_confirmation?: boolean | null
+          original_file_content?: string | null
+          quality_assessment?: Json | null
+          quality_score?: number | null
+          type_detection_confidence?: number | null
           upload_type: string
           user_id: string
         }
         Update: {
           created_at?: string | null
+          detected_document_type?: string | null
           extracted_text?: string | null
           file_name?: string
           file_size?: number
           file_type?: string
           id?: string
           job_title?: string | null
+          needs_type_confirmation?: boolean | null
+          original_file_content?: string | null
+          quality_assessment?: Json | null
+          quality_score?: number | null
+          type_detection_confidence?: number | null
           upload_type?: string
           user_id?: string
         }

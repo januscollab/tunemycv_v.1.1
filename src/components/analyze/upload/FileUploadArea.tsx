@@ -7,7 +7,7 @@ import { useDocumentExtraction } from '@/hooks/useDocumentExtraction';
 import { useToast } from '@/hooks/use-toast';
 
 interface FileUploadAreaProps {
-  onFileSelect: (file: File, extractedText: string) => void;
+  onFileSelect: (file: File, extractedText: string, typeDetection: any, qualityAssessment: any) => void;
   uploading: boolean;
   accept: string;
   maxSize: string;
@@ -46,11 +46,11 @@ const FileUploadArea: React.FC<FileUploadAreaProps> = ({
       // Create secure file object with sanitized name
       const secureFile = createSecureFileObject(file, validation.sanitizedName!);
       
-      // Extract text from the file
-      const extractedText = await extractText(secureFile);
+      // Extract text from the file with type detection
+      const result = await extractText(secureFile, fileType);
       
-      if (extractedText) {
-        onFileSelect(secureFile, extractedText);
+      if (result) {
+        onFileSelect(secureFile, result.extractedText, result.typeDetection, result.qualityAssessment);
       }
     }
   };
