@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { X, MessageSquare, Target, Heart, Lightbulb, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
+import { UnifiedTextarea } from '@/components/ui/unified-input';
 import { useToast } from '@/hooks/use-toast';
 
 interface PersonalizationSurveyModalProps {
@@ -178,11 +178,13 @@ const PersonalizationSurveyModal: React.FC<PersonalizationSurveyModalProps> = ({
               </div>
             </CardHeader>
             <CardContent className="px-0">
-              <Textarea
+              <UnifiedTextarea
+                variant="floating"
+                label={currentQ.title}
                 value={responses[currentQ.id as keyof SurveyResponses]}
                 onChange={(e) => handleResponseChange(e.target.value)}
                 placeholder={currentQ.placeholder}
-                className="min-h-[120px] resize-none border-apple-core/30 dark:border-citrus/30 focus:border-zapier-orange focus:ring-zapier-orange/20"
+                className="min-h-[120px]"
                 autoFocus
               />
               <p className="text-micro text-blueberry/50 dark:text-apple-core/50 mt-2">

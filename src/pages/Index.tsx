@@ -73,7 +73,7 @@ const Index = () => {
       {/* CTA Section - Updated background color to match Resources page */}
       <section className="py-16 bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-title md:text-display font-display font-bold text-earth dark:text-white mb-6">
+          <h2 className="text-title md:text-display font-sans font-bold text-earth dark:text-white mb-6">
             Ready to Transform Your Career?
           </h2>
           <p className="text-subheading text-earth/70 dark:text-white/70 mb-8 max-w-2xl mx-auto">

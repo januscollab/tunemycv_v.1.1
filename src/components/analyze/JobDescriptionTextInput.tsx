@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { Check, Clock } from 'lucide-react';
-import SecureTextarea from '@/components/security/SecureTextarea';
+import { UnifiedTextarea } from '@/components/ui/unified-input';
 import { sanitizeText } from '@/utils/inputSanitization';
 
 interface JobDescriptionTextInputProps {
@@ -70,14 +70,17 @@ const JobDescriptionTextInput: React.FC<JobDescriptionTextInputProps> = ({ onSub
 
   return (
     <div>
-      <SecureTextarea
+      <UnifiedTextarea
+        variant="floating"
+        label="Job Description"
         value={text}
         onSecureChange={handleSecureChange}
         placeholder="Paste the job description here... (auto-saves after 2 seconds, minimum 50 characters)"
         rows={8}
         maxLength={10000}
         disabled={disabled}
-        className="w-full px-3 py-2 border-2 border-gray-300 dark:border-border rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange/50 focus:border-transparent bg-white dark:bg-surface text-gray-900 dark:text-apple-core/90"
+        secure
+        className="w-full"
       />
       <div className="flex justify-between items-center mt-2">
         <div className="flex flex-col space-y-1">
