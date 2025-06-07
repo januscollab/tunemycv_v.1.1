@@ -61,7 +61,7 @@ const Testimonials = () => {
           <h2 className="text-4xl font-bold text-blueberry dark:text-citrus mb-4">
             What Our Users Say
           </h2>
-          <p className="text-xl text-blueberry/80 dark:text-apple-core max-w-3xl mx-auto">
+          <p className="text-heading text-foreground-secondary max-w-3xl mx-auto">
             Join thousands of professionals who have transformed their careers with <span className="text-zapier-orange">Tune</span>MyCV
           </p>
         </div>

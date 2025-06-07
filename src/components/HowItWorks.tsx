@@ -33,10 +33,10 @@ const HowItWorks = () => {
               </div>
             </div>
           </div>
-          <h3 className="text-xl font-semibold text-earth dark:text-white mb-4">
+          <h3 className="text-heading font-semibold text-foreground mb-4">
             {step.title}
           </h3>
-          <p className="text-earth/70 dark:text-white/70">
+          <p className="text-foreground-secondary">
             {step.description}
           </p>
         </div>

@@ -61,21 +61,21 @@ const EnhancedKeywordAnalysis: React.FC<EnhancedKeywordAnalysisProps> = ({ keywo
     <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
       <div className="flex items-center mb-6">
         <CheckCircle className="h-5 w-5 text-apricot mr-2" />
-        <h2 className="text-lg font-semibold text-blueberry dark:text-citrus">Enhanced Keyword Analysis</h2>
+        <h2 className="text-subheading font-semibold text-foreground">Enhanced Keyword Analysis</h2>
       </div>
 
       {/* Summary Stats */}
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-3 text-center">
-          <div className="text-2xl font-bold text-green-600">{matchedKeywords}</div>
+          <div className="text-title font-bold text-success">{matchedKeywords}</div>
           <div className="text-sm text-green-700 dark:text-green-400">Found</div>
         </div>
         <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-3 text-center">
-          <div className="text-2xl font-bold text-red-600">{missingKeywords}</div>
+          <div className="text-title font-bold text-destructive">{missingKeywords}</div>
           <div className="text-sm text-red-700 dark:text-red-400">Missing</div>
         </div>
         <div className="bg-citrus/20 dark:bg-citrus/10 rounded-lg p-3 text-center">
-          <div className="text-2xl font-bold text-blueberry dark:text-citrus">{keywordMatchPercentage}%</div>
+          <div className="text-title font-bold text-primary">{keywordMatchPercentage}%</div>
           <div className="text-sm text-blueberry/70 dark:text-citrus/80">Match Rate</div>
         </div>
       </div>

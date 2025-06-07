@@ -147,7 +147,7 @@ const AnalysisLogsManagement = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">Analysis Logs</h1>
+        <h1 className="text-title font-bold text-foreground">Analysis Logs</h1>
         <div className="text-sm text-gray-500">
           Total Logs: {logs.length} | Filtered: {filteredLogs.length} | Page: {currentPage} of {totalPages}
         </div>
@@ -253,7 +253,7 @@ const AnalysisLogsManagement = () => {
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center space-x-2">
-                    <span className="text-lg">{getOperationTypeIcon(log.operation_type)}</span>
+                    <span className="text-subheading">{getOperationTypeIcon(log.operation_type)}</span>
                     <span className="text-sm font-medium capitalize">
                       {log.operation_type === 'cover_letter_generation' ? 'Cover Letter' : log.operation_type === 'cv_analysis' ? 'CV Analysis' : (log.operation_type?.replace('_', ' ') || 'Analysis')}
                     </span>

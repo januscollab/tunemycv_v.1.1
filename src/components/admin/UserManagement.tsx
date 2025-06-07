@@ -137,7 +137,7 @@ const UserManagement = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
+        <h1 className="text-title font-bold text-foreground">User Management</h1>
         <div className="text-sm text-gray-500">
           Total Users: {users.length}
         </div>
