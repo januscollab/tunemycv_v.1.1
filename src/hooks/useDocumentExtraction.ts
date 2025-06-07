@@ -22,6 +22,7 @@ export const useDocumentExtraction = () => {
     error: null,
     progress: 'Ready'
   });
+  const [abortController, setAbortController] = useState<AbortController | null>(null);
   const { toast } = useToast();
 
   const extractText = async (file: File, expectedDocumentType?: 'cv' | 'job_description'): Promise<{
@@ -38,7 +39,17 @@ export const useDocumentExtraction = () => {
       progress: `Extracting text from ${file.type.includes('pdf') ? 'PDF' : 'DOCX'}...`
     });
 
+    const extractionStartTime = Date.now();
+    let timeoutId: NodeJS.Timeout;
+
     try {
+      // Create timeout promise that rejects after 60 seconds
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        timeoutId = setTimeout(() => {
+          reject(new Error('Document processing timed out. The file may be too large or complex.'));
+        }, 60000);
+      });
+
       // Update progress based on file type
       const fileType = file.type;
       if (fileType === 'application/pdf') {
@@ -49,8 +60,13 @@ export const useDocumentExtraction = () => {
         setState(prev => ({ ...prev, progress: 'Reading text file...' }));
       }
 
-      const extractedText = await extractTextFromFile(file);
+      // Race between extraction and timeout
+      const extractedText = await Promise.race([
+        extractTextFromFile(file),
+        timeoutPromise
+      ]);
       
+      clearTimeout(timeoutId);
       setState(prev => ({ ...prev, progress: 'Analyzing document type and quality...' }));
       
       // Detect document type
@@ -71,14 +87,16 @@ export const useDocumentExtraction = () => {
         progress: 'Complete'
       });
 
+      const processingTime = Date.now() - extractionStartTime;
       toast({
         title: "Document processed successfully",
-        description: `Extracted ${extractedText.split(/\s+/).length} words with ${qualityAssessment.score}% quality score`,
+        description: `Extracted ${extractedText.split(/\s+/).length} words with ${qualityAssessment.score}% quality score in ${(processingTime / 1000).toFixed(1)}s`,
       });
 
       return { extractedText, typeDetection, qualityAssessment };
 
     } catch (error) {
+      clearTimeout(timeoutId!);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       
       setState({
@@ -100,7 +118,30 @@ export const useDocumentExtraction = () => {
     }
   };
 
+  const cancel = () => {
+    if (abortController) {
+      abortController.abort();
+    }
+    setState({
+      isExtracting: false,
+      extractedText: null,
+      typeDetection: null,
+      qualityAssessment: null,
+      error: 'Upload cancelled by user',
+      progress: 'Cancelled'
+    });
+    setAbortController(null);
+    toast({
+      title: "Upload cancelled",
+      description: "Document processing was cancelled.",
+      variant: "destructive"
+    });
+  };
+
   const reset = () => {
+    if (abortController) {
+      abortController.abort();
+    }
     setState({
       isExtracting: false,
       extractedText: null,
@@ -109,11 +150,13 @@ export const useDocumentExtraction = () => {
       error: null,
       progress: 'Ready'
     });
+    setAbortController(null);
   };
 
   return {
     ...state,
     extractText,
+    cancel,
     reset
   };
 };

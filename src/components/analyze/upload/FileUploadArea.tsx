@@ -24,7 +24,7 @@ const FileUploadArea: React.FC<FileUploadAreaProps> = ({
   fileType
 }) => {
   const { toast } = useToast();
-  const { isExtracting, progress, extractText } = useDocumentExtraction();
+  const { isExtracting, progress, extractText, cancel } = useDocumentExtraction();
   const maxSizeBytes = parseFloat(maxSize) * 1024 * 1024; // Convert MB to bytes
 
   const handleDrop = async (files: File[]) => {
@@ -71,6 +71,7 @@ const FileUploadArea: React.FC<FileUploadAreaProps> = ({
         isOpen={isExtracting}
         title="Processing Document"
         message={progress}
+        onCancel={cancel}
       />
     </>
   );

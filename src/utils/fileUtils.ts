@@ -96,22 +96,55 @@ export const extractTextFromFile = async (file: File): Promise<string> => {
       return extractedText;
       
     } catch (error) {
-      console.error('PDF extraction error:', error);
+      console.error('Client-side PDF extraction failed, trying server-side fallback:', error);
       
-      // Provide more specific error messages
-      if (error instanceof Error) {
-        if (error.message.includes('worker') || error.message.includes('Worker')) {
-          throw new Error('PDF processing failed: Unable to load PDF worker. Please try again or use a different file format.');
+      try {
+        // Server-side fallback using Supabase Edge Function
+        const { supabase } = await import('@/integrations/supabase/client');
+        
+        // Convert file to base64 for server processing
+        const arrayBuffer = await file.arrayBuffer();
+        const uint8Array = new Uint8Array(arrayBuffer);
+        const base64String = btoa(String.fromCharCode(...uint8Array));
+        
+        console.log('Attempting server-side PDF extraction...');
+        
+        const { data, error: serverError } = await supabase.functions.invoke('extract-pdf-text', {
+          body: {
+            fileData: base64String,
+            fileName: file.name
+          }
+        });
+        
+        if (serverError) {
+          throw new Error(`Server-side extraction failed: ${serverError.message}`);
         }
-        if (error.message.includes('InvalidPDFException') || error.message.includes('corrupted')) {
-          throw new Error('PDF file appears to be corrupted or invalid. Please try a different PDF file.');
+        
+        if (!data?.success) {
+          throw new Error(data?.error || 'Server-side extraction returned no data');
         }
-        if (error.message.includes('PasswordException')) {
-          throw new Error('PDF file is password protected. Please use an unprotected PDF file.');
+        
+        console.log(`Server-side extraction successful: ${data.wordCount} words extracted`);
+        return cleanExtractedText(data.extractedText);
+        
+      } catch (serverError) {
+        console.error('Server-side PDF extraction also failed:', serverError);
+        
+        // Final fallback error message
+        if (error instanceof Error) {
+          if (error.message.includes('worker') || error.message.includes('Worker')) {
+            throw new Error('PDF processing failed on both client and server. Please try converting your PDF to a Word document or text file.');
+          }
+          if (error.message.includes('InvalidPDFException') || error.message.includes('corrupted')) {
+            throw new Error('PDF file appears to be corrupted or invalid. Please try a different PDF file.');
+          }
+          if (error.message.includes('PasswordException')) {
+            throw new Error('PDF file is password protected. Please use an unprotected PDF file.');
+          }
         }
+        
+        throw new Error(`Failed to extract text from PDF using both client and server methods. Please try converting to a Word document or text file.`);
       }
-      
-      throw new Error(`Failed to extract text from PDF: ${error instanceof Error ? error.message : 'Unknown error occurred while processing PDF'}`);
     }
   }
   

@@ -29,7 +29,7 @@ const FileUploadWithSave: React.FC<FileUploadWithSaveProps> = ({
   const [shouldSave, setShouldSave] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
-  const { isExtracting, progress, extractText } = useDocumentExtraction();
+  const { isExtracting, progress, extractText, cancel } = useDocumentExtraction();
 
   const handleDrop = async (files: File[]) => {
     const file = files[0];
@@ -77,6 +77,7 @@ const FileUploadWithSave: React.FC<FileUploadWithSaveProps> = ({
         isOpen={isExtracting}
         title="Processing CV"
         message={progress}
+        onCancel={cancel}
       />
 
       {user && (
