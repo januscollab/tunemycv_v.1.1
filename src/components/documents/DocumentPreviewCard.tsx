@@ -16,6 +16,7 @@ interface DocumentPreviewCardProps {
   onRemove: () => void;
   onSaveToCVs?: () => void;
   canSaveToCVs?: boolean;
+  onConfirmDocumentType?: (confirmedType: 'cv' | 'job_description') => void;
 }
 
 const DocumentPreviewCard: React.FC<DocumentPreviewCardProps> = ({
@@ -26,7 +27,8 @@ const DocumentPreviewCard: React.FC<DocumentPreviewCardProps> = ({
   onOpenVerification,
   onRemove,
   onSaveToCVs,
-  canSaveToCVs = false
+  canSaveToCVs = false,
+  onConfirmDocumentType
 }) => {
   const quality = assessDocumentQuality(extractedText, fileName, documentType);
   
@@ -62,6 +64,11 @@ const DocumentPreviewCard: React.FC<DocumentPreviewCardProps> = ({
                 >
                   {getQualityBadge(quality.score)}
                 </Badge>
+                {quality.typeDetection && quality.typeDetection.needsUserConfirmation && (
+                  <Badge variant="outline" className="text-micro text-yellow-600 dark:text-yellow-400 border-yellow-500">
+                    Type Confirmation Needed
+                  </Badge>
+                )}
               </div>
             </div>
           </div>
@@ -69,6 +76,31 @@ const DocumentPreviewCard: React.FC<DocumentPreviewCardProps> = ({
       </CardHeader>
       
       <CardContent className="pt-0">
+        {/* Document Type Detection Info */}
+        {quality.typeDetection && quality.typeDetection.needsUserConfirmation && onConfirmDocumentType && (
+          <div className="mb-4">
+            <Alert className="py-2 border-yellow-200 dark:border-yellow-800">
+              <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
+              <AlertDescription className="text-caption">
+                <span className="font-medium">Document type confirmation needed:</span> 
+                {quality.typeDetection.detectedType === 'unknown' ? (
+                  ' Unable to automatically determine document type.'
+                ) : (
+                  ` Detected as ${quality.typeDetection.detectedType === 'cv' ? 'CV/Resume' : 'Job Description'} with ${quality.typeDetection.confidence}% confidence.`
+                )}
+                <Button
+                  variant="link"
+                  size="sm"
+                  onClick={() => onConfirmDocumentType(quality.typeDetection!.detectedType === 'unknown' ? 'cv' : quality.typeDetection!.detectedType)}
+                  className="text-micro text-yellow-600 dark:text-yellow-400 hover:text-yellow-700 p-0 h-auto ml-1"
+                >
+                  Click to confirm →
+                </Button>
+              </AlertDescription>
+            </Alert>
+          </div>
+        )}
+
         {/* Quality Issues */}
         <div className="space-y-2 mb-4">
           {quality.issues.slice(0, 2).map((issue, index) => (

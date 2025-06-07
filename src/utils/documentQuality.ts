@@ -12,6 +12,11 @@ export interface QualityAssessment {
   isAcceptable: boolean;
   wordCount: number;
   characterCount: number;
+  typeDetection?: {
+    detectedType: 'cv' | 'job_description' | 'unknown';
+    confidence: number;
+    needsUserConfirmation: boolean;
+  };
 }
 
 // Separate quality assessment functions for different document types
@@ -142,12 +147,31 @@ const assessJobDescriptionQuality = (extractedText: string, wordCount: number): 
   return { score, issues };
 };
 
+import { detectDocumentType } from './documentValidation';
+
 export const assessDocumentQuality = (
   extractedText: string,
   fileName: string,
-  documentType: 'cv' | 'job_description'
+  expectedDocumentType?: 'cv' | 'job_description'
 ): QualityAssessment => {
   const issues: QualityIssue[] = [];
+  
+  // Detect document type automatically if not provided
+  const typeDetection = detectDocumentType(extractedText, fileName);
+  
+  // Use detected type if no expected type provided, otherwise validate against expected type
+  const documentType = expectedDocumentType || typeDetection.detectedType;
+  
+  // Add type mismatch warning if expected type differs from detected type
+  if (expectedDocumentType && typeDetection.detectedType !== 'unknown' && 
+      typeDetection.detectedType !== expectedDocumentType && typeDetection.confidence > 60) {
+    issues.push({
+      type: 'warning',
+      title: 'Document type mismatch detected',
+      description: `Expected ${expectedDocumentType === 'cv' ? 'CV/Resume' : 'Job Description'}, but content appears to be ${typeDetection.detectedType === 'cv' ? 'CV/Resume' : 'Job Description'}.`,
+      suggestion: `Please verify you've uploaded the correct document type.`
+    });
+  }
   
   // Check for extraction failure first
   const isExtractionFailure = /\[Text extraction from .+ failed\]/.test(extractedText) || 
@@ -196,10 +220,19 @@ export const assessDocumentQuality = (
     const cvAssessment = assessCVQuality(extractedText, wordCount);
     score = cvAssessment.score;
     documentIssues = cvAssessment.issues;
-  } else {
+  } else if (documentType === 'job_description') {
     const jdAssessment = assessJobDescriptionQuality(extractedText, wordCount);
     score = jdAssessment.score;
     documentIssues = jdAssessment.issues;
+  } else {
+    // Unknown document type - use generic assessment
+    score = 70;
+    documentIssues = [{
+      type: 'warning',
+      title: 'Unable to determine document type',
+      description: 'Could not automatically identify if this is a CV or Job Description.',
+      suggestion: 'Please verify the document content and format.'
+    }];
   }
 
   issues.push(...documentIssues);
@@ -252,7 +285,12 @@ export const assessDocumentQuality = (
     issues,
     isAcceptable,
     wordCount,
-    characterCount
+    characterCount,
+    typeDetection: {
+      detectedType: typeDetection.detectedType,
+      confidence: typeDetection.confidence,
+      needsUserConfirmation: typeDetection.needsUserConfirmation
+    }
   };
 };
 
