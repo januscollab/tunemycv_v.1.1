@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Eye, Code, Palette, Type, Square, Circle, Triangle, Zap } from 'lucide-react';
+import { ArrowLeft, Eye, Code, Palette, Type, Square, Circle, Triangle, Zap, AlertTriangle, Search } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -24,12 +24,13 @@ const DesignSystem = () => {
       description: 'Main brand color for CTAs and primary actions'
     },
     { 
-      name: 'Background', 
+      name: 'Background/Surface', 
       class: 'bg-background', 
-      usage: '89 usages',
+      usage: '156 usages (combined)',
       lightHex: '#FFFFFF',
-      darkHex: '#09090B',
-      description: 'Main background color with theme variants'
+      darkHex: '#09090B / #18181B',
+      description: 'Background and elevated surfaces (unified tokens)',
+      note: 'Surface uses slightly different dark mode value but serves same purpose'
     },
     { 
       name: 'Foreground', 
@@ -38,14 +39,6 @@ const DesignSystem = () => {
       lightHex: '#0F172A',
       darkHex: '#FAFAFA',
       description: 'Primary text color'
-    },
-    { 
-      name: 'Surface', 
-      class: 'bg-surface', 
-      usage: '67 usages',
-      lightHex: '#FFFFFF',
-      darkHex: '#18181B',
-      description: 'Elevated surfaces and cards'
     },
     { 
       name: 'Success', 
@@ -151,6 +144,18 @@ const DesignSystem = () => {
 
   const animationTypes = [
     { 
+      name: 'Mobile Menu Toggle', 
+      example: <Button size="sm" className="text-foreground hover:text-primary transition-all duration-normal p-2 rounded-md hover:bg-accent active:scale-95">☰</Button>,
+      usage: '5 usages',
+      description: 'Mobile navigation menu open/close with fade and scale effects'
+    },
+    { 
+      name: 'Document Action Buttons', 
+      example: <Button size="sm" variant="outline" className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200">Review & Edit</Button>,
+      usage: '8 usages',
+      description: 'CV/document action buttons with multi-property hover transitions'
+    },
+    { 
       name: 'Hover Effects', 
       example: <Button className="transition-all hover:scale-105" size="sm">Hover me</Button>,
       usage: '120+ usages',
@@ -188,6 +193,23 @@ const DesignSystem = () => {
     },
   ];
 
+  const fontFamilies = [
+    { 
+      name: 'Poppins (Sans)', 
+      element: <div className="font-sans text-lg">Aa Bb Cc 123 - The quick brown fox jumps over the lazy dog</div>, 
+      usage: 'Primary body text',
+      cssClass: 'font-sans',
+      fallbacks: 'system-ui, sans-serif'
+    },
+    { 
+      name: 'Playfair Display (Serif)', 
+      element: <div className="font-display text-lg">Aa Bb Cc 123 - The quick brown fox jumps over the lazy dog</div>, 
+      usage: 'Display headings and emphasis',
+      cssClass: 'font-display',
+      fallbacks: 'serif'
+    },
+  ];
+
   const typographyElements = [
     { name: 'Heading 1', element: <h1 className="text-4xl font-bold text-earth dark:text-white">Heading 1</h1>, usage: '15 usages' },
     { name: 'Heading 2', element: <h2 className="text-3xl font-bold text-earth dark:text-white">Heading 2</h2>, usage: '67 usages' },
@@ -207,11 +229,15 @@ const DesignSystem = () => {
             Back to Home
           </Link>
           <Separator orientation="vertical" className="h-6" />
-          <div>
+          <div className="flex-1">
             <h1 className="text-4xl font-bold text-earth dark:text-white">Design System</h1>
             <p className="text-earth/70 dark:text-white/70 mt-2">
               Complete visual reference of design tokens, components, and usage statistics
             </p>
+          </div>
+          <div className="flex items-center gap-2 px-3 py-2 bg-destructive/10 border border-destructive/20 rounded-lg">
+            <AlertTriangle className="h-4 w-4 text-destructive" />
+            <span className="text-sm font-medium text-destructive">DEV ONLY - Never Publish</span>
           </div>
         </div>
 
@@ -222,7 +248,7 @@ const DesignSystem = () => {
               <div className="flex items-center gap-2">
                 <Palette className="h-5 w-5 text-primary" />
                 <div>
-                  <p className="text-2xl font-bold text-foreground">8</p>
+                  <p className="text-2xl font-bold text-foreground">7</p>
                   <p className="text-sm text-muted-foreground">Color Tokens</p>
                 </div>
               </div>
@@ -255,8 +281,8 @@ const DesignSystem = () => {
               <div className="flex items-center gap-2">
                 <Type className="h-5 w-5 text-destructive" />
                 <div>
-                  <p className="text-2xl font-bold text-foreground">6</p>
-                  <p className="text-sm text-muted-foreground">Typography Styles</p>
+                  <p className="text-2xl font-bold text-foreground">2</p>
+                  <p className="text-sm text-muted-foreground">Font Families</p>
                 </div>
               </div>
             </CardContent>
@@ -266,7 +292,7 @@ const DesignSystem = () => {
               <div className="flex items-center gap-2">
                 <Zap className="h-5 w-5 text-primary" />
                 <div>
-                  <p className="text-2xl font-bold text-foreground">6</p>
+                  <p className="text-2xl font-bold text-foreground">8</p>
                   <p className="text-sm text-muted-foreground">Animation Types</p>
                 </div>
               </div>
@@ -430,21 +456,126 @@ const DesignSystem = () => {
               <Badge variant="destructive" className="text-xs">NEEDS STANDARDIZATION</Badge>
             </CardTitle>
             <p className="text-sm text-muted-foreground mt-2">
-              Found 694+ hardcoded text sizes. Needs semantic typography classes.
+              Found 873+ hardcoded text sizes across 149 files. Needs semantic typography classes.
             </p>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {typographyElements.map((typo, index) => (
-                <div key={typo.name} className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium text-foreground">{typo.name}</span>
-                    <Badge variant="secondary" className="text-xs">{typo.usage}</Badge>
-                  </div>
-                  {typo.element}
-                  {index < typographyElements.length - 1 && <Separator />}
+            <div className="space-y-6">
+              {/* Font Families */}
+              <div>
+                <h4 className="font-medium text-foreground mb-3">Font Families</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {fontFamilies.map((font, index) => (
+                    <div key={font.name} className="space-y-2 p-4 border border-border rounded-lg">
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium text-foreground">{font.name}</span>
+                        <code className="text-xs font-mono bg-muted px-2 py-1 rounded">{font.cssClass}</code>
+                      </div>
+                      {font.element}
+                      <div className="text-xs text-muted-foreground space-y-1">
+                        <p>Usage: {font.usage}</p>
+                        <p>Fallbacks: {font.fallbacks}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
+
+              <Separator />
+
+              {/* Typography Styles */}
+              <div>
+                <h4 className="font-medium text-foreground mb-3">Typography Styles</h4>
+                <div className="space-y-4">
+                  {typographyElements.map((typo, index) => (
+                    <div key={typo.name} className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium text-foreground">{typo.name}</span>
+                        <Badge variant="secondary" className="text-xs">{typo.usage}</Badge>
+                      </div>
+                      {typo.element}
+                      {index < typographyElements.length - 1 && <Separator />}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Typography Analysis */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Search className="h-5 w-5" />
+              Typography Analysis
+              <Badge variant="destructive" className="text-xs">ACTION REQUIRED</Badge>
+            </CardTitle>
+            <p className="text-sm text-muted-foreground mt-2">
+              Comprehensive analysis of hardcoded text sizes requiring review and consolidation
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="p-4 border border-border rounded-lg">
+                <h5 className="font-medium text-foreground mb-2">Most Common Sizes</h5>
+                <div className="space-y-1 text-sm">
+                  <div className="flex justify-between">
+                    <span>text-sm</span>
+                    <Badge variant="outline" className="text-xs">156 uses</Badge>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>text-base</span>
+                    <Badge variant="outline" className="text-xs">134 uses</Badge>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>text-xs</span>
+                    <Badge variant="outline" className="text-xs">98 uses</Badge>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>text-lg</span>
+                    <Badge variant="outline" className="text-xs">67 uses</Badge>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="p-4 border border-border rounded-lg">
+                <h5 className="font-medium text-foreground mb-2">Critical Issues</h5>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-destructive rounded-full"></div>
+                    <span>149 files affected</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-warning rounded-full"></div>
+                    <span>No semantic hierarchy</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-destructive rounded-full"></div>
+                    <span>Inconsistent responsive</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-warning rounded-full"></div>
+                    <span>Mixed font usage</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-4 border border-border rounded-lg">
+                <h5 className="font-medium text-foreground mb-2">Recommended Action</h5>
+                <div className="space-y-2 text-sm">
+                  <p className="text-muted-foreground">Create semantic classes:</p>
+                  <code className="block text-xs bg-muted p-2 rounded">
+                    .text-display<br/>
+                    .text-heading<br/>
+                    .text-body<br/>
+                    .text-caption
+                  </code>
+                  <Button size="sm" variant="outline" className="w-full mt-2">
+                    Start Standardization
+                  </Button>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -473,7 +604,7 @@ const DesignSystem = () => {
                 <div>
                   <p className="font-medium text-earth dark:text-white">Phase 2: Typography Standardization</p>
                   <p className="text-sm text-earth/60 dark:text-white/60">
-                    Create semantic typography classes to replace 694+ hardcoded sizes. Status: <Badge variant="secondary">Planned</Badge>
+                    Create semantic typography classes to replace 873+ hardcoded sizes. Status: <Badge variant="secondary">Planned</Badge>
                   </p>
                 </div>
               </div>
