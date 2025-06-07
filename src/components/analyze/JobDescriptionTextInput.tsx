@@ -49,7 +49,7 @@ const JobDescriptionTextInput: React.FC<JobDescriptionTextInputProps> = ({ onSub
   const getStatusMessage = () => {
     if (isAutoSaving) {
       return (
-        <div className="flex items-center text-sm text-blue-600 dark:text-blue-400">
+        <div className="flex items-center text-caption text-blue-600 dark:text-blue-400">
           <Clock className="h-3 w-3 mr-1 animate-spin" />
           Auto-saving...
         </div>
@@ -58,7 +58,7 @@ const JobDescriptionTextInput: React.FC<JobDescriptionTextInputProps> = ({ onSub
     
     if (lastSaved && text.length >= 50) {
       return (
-        <div className="flex items-center text-sm text-green-600 dark:text-green-400">
+        <div className="flex items-center text-caption text-green-600 dark:text-green-400">
           <Check className="h-3 w-3 mr-1" />
           Saved at {lastSaved}
         </div>
@@ -81,7 +81,7 @@ const JobDescriptionTextInput: React.FC<JobDescriptionTextInputProps> = ({ onSub
       />
       <div className="flex justify-between items-center mt-2">
         <div className="flex flex-col space-y-1">
-          <span className="text-sm text-gray-500">
+          <span className="text-caption text-gray-500">
             {text.length}/10000 characters {text.length < 50 && text.length > 0 && '(minimum 50 required)'}
           </span>
           {getStatusMessage()}

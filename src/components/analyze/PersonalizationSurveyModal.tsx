@@ -126,10 +126,10 @@ const PersonalizationSurveyModal: React.FC<PersonalizationSurveyModalProps> = ({
               <MessageSquare className="h-5 w-5 text-zapier-orange" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-blueberry dark:text-citrus">
+              <h2 className="text-heading font-bold text-blueberry dark:text-citrus">
                 Motivation Matters
               </h2>
-              <p className="text-sm text-blueberry/60 dark:text-apple-core/60">
+              <p className="text-caption text-blueberry/60 dark:text-apple-core/60">
                 Question {currentQuestion + 1} of {questions.length}
               </p>
             </div>
@@ -160,15 +160,15 @@ const PersonalizationSurveyModal: React.FC<PersonalizationSurveyModalProps> = ({
               <div className="flex items-start space-x-3">
                 {currentQ.icon}
                 <div className="flex-1">
-                  <CardTitle className="text-lg font-semibold text-blueberry dark:text-citrus mb-2">
+                  <CardTitle className="text-subheading font-semibold text-blueberry dark:text-citrus mb-2">
                     {currentQ.title}
                   </CardTitle>
-                  <p className="text-sm text-blueberry/70 dark:text-apple-core/70">
+                  <p className="text-caption text-blueberry/70 dark:text-apple-core/70">
                     {currentQ.subtitle}
                   </p>
                   {currentQ.isPersonal && (
                     <div className="mt-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-                      <p className="text-xs text-yellow-800 dark:text-yellow-200 font-medium flex items-center">
+                      <p className="text-micro text-yellow-800 dark:text-yellow-200 font-medium flex items-center">
                         <Heart className="h-3 w-3 mr-1" />
                         This question is deeply personal and completely optional. Feel free to skip if you prefer.
                       </p>
@@ -185,7 +185,7 @@ const PersonalizationSurveyModal: React.FC<PersonalizationSurveyModalProps> = ({
                 className="min-h-[120px] resize-none border-apple-core/30 dark:border-citrus/30 focus:border-zapier-orange focus:ring-zapier-orange/20"
                 autoFocus
               />
-              <p className="text-xs text-blueberry/50 dark:text-apple-core/50 mt-2">
+              <p className="text-micro text-blueberry/50 dark:text-apple-core/50 mt-2">
                 Share as much or as little as you'd like. Every detail helps us provide better insights.
               </p>
             </CardContent>

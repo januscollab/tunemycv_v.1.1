@@ -32,7 +32,7 @@ const InterviewPrepLoggedOut = () => {
               <h1 className="text-display font-bold text-foreground mb-4">
                 Interview Prep Generator
               </h1>
-              <p className="text-xl text-earth/70 dark:text-white/70 max-w-3xl font-normal">
+              <p className="text-heading text-earth/70 dark:text-white/70 max-w-3xl font-normal">
                 Generate personalized interview preparation notes with company insights, strategic questions, and professional tips to ace your next interview.
               </p>
             </div>

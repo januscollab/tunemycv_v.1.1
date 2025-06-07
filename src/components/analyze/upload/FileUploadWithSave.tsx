@@ -92,14 +92,14 @@ const FileUploadWithSave: React.FC<FileUploadWithSaveProps> = ({
             />
             <label 
               htmlFor="save-cv" 
-              className={`text-sm ${isAtLimit ? 'text-gray-400' : 'text-blueberry dark:text-apple-core'}`}
+              className={`text-caption ${isAtLimit ? 'text-gray-400' : 'text-blueberry dark:text-apple-core'}`}
             >
               Save this CV for future use
             </label>
           </div>
           
           {isAtLimit && (
-            <div className="text-sm text-red-600 dark:text-red-400">
+            <div className="text-caption text-red-600 dark:text-red-400">
               You've reached the maximum of {maxCVCount} saved CVs.{' '}
               <a href="/profile" className="text-apricot hover:text-apricot/80 underline">
                 Manage your CVs in your Profile
@@ -109,7 +109,7 @@ const FileUploadWithSave: React.FC<FileUploadWithSaveProps> = ({
           )}
           
           {!isAtLimit && (
-            <p className="text-xs text-blueberry/70 dark:text-apple-core/80">
+            <p className="text-micro text-blueberry/70 dark:text-apple-core/80">
               {currentCVCount}/{maxCVCount} CV slots used
             </p>
           )}
