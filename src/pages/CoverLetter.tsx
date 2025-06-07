@@ -11,9 +11,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import EditTitleDialog from '@/components/ui/edit-title-dialog';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { UnifiedInput, UnifiedTextarea } from '@/components/ui/unified-input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -490,8 +489,9 @@ const AuthenticatedCoverLetter = () => {
                       <CardContent className="space-y-4 pt-0">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <Label htmlFor="jobTitle">Job Title *</Label>
-                            <Input
+                            <UnifiedInput
+                              variant="floating"
+                              label="Job Title *"
                               id="jobTitle"
                               placeholder="e.g., Marketing Manager"
                               value={formData.jobTitle}
@@ -500,8 +500,9 @@ const AuthenticatedCoverLetter = () => {
                             />
                           </div>
                           <div>
-                            <Label htmlFor="companyName">Company Name *</Label>
-                            <Input
+                            <UnifiedInput
+                              variant="floating"
+                              label="Company Name *"
                               id="companyName"
                               placeholder="e.g., TechCorp"
                               value={formData.companyName}
@@ -512,8 +513,9 @@ const AuthenticatedCoverLetter = () => {
                         </div>
 
                         <div>
-                          <Label htmlFor="jobDescription">Job Description *</Label>
-                          <Textarea
+                          <UnifiedTextarea
+                            variant="floating"
+                            label="Job Description *"
                             id="jobDescription"
                             placeholder="Paste the complete job description here for the most tailored results..."
                             value={formData.jobDescription}

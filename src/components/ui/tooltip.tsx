@@ -20,10 +20,10 @@ const TooltipContent = React.forwardRef<
     <TooltipPrimitive.Content
       ref={ref}
       sideOffset={sideOffset}
-      className={cn(
-        "z-[10001] overflow-hidden rounded-md border bg-popover px-3 py-1.5 text-sm text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 duration-200",
-        className
-      )}
+  className={cn(
+    "z-[10001] overflow-hidden rounded-md bg-zapier-orange px-3 py-1.5 text-caption text-white shadow-md animate-in slide-in-from-right-2 fade-in-0 data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right-2 data-[state=closed]:fade-out-0 duration-200",
+    className
+  )}
       {...props}
     />
   </TooltipPrimitive.Portal>

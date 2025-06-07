@@ -2,9 +2,8 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { UnifiedInput, UnifiedTextarea } from '@/components/ui/unified-input';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useToast } from '@/hooks/use-toast';
 import { Mail, MessageCircle, HelpCircle, CreditCard, FileText, Search, Zap } from 'lucide-react';
@@ -284,8 +283,9 @@ const HelpCentre = () => {
               <CardContent>
                 <form onSubmit={handleContactSubmit} className="space-y-4">
                   <div>
-                    <Label htmlFor="name">Name</Label>
-                    <Input
+                    <UnifiedInput
+                      variant="floating"
+                      label="Name"
                       id="name"
                       value={contactForm.name}
                       onChange={(e) => setContactForm({...contactForm, name: e.target.value})}
@@ -294,8 +294,9 @@ const HelpCentre = () => {
                   </div>
                   
                   <div>
-                    <Label htmlFor="email">Email</Label>
-                    <Input
+                    <UnifiedInput
+                      variant="floating"
+                      label="Email"
                       id="email"
                       type="email"
                       value={contactForm.email}
@@ -305,8 +306,9 @@ const HelpCentre = () => {
                   </div>
                   
                   <div>
-                    <Label htmlFor="subject">Subject</Label>
-                    <Input
+                    <UnifiedInput
+                      variant="floating"
+                      label="Subject"
                       id="subject"
                       value={contactForm.subject}
                       onChange={(e) => setContactForm({...contactForm, subject: e.target.value})}
@@ -315,8 +317,9 @@ const HelpCentre = () => {
                   </div>
                   
                   <div>
-                    <Label htmlFor="message">Message</Label>
-                    <Textarea
+                    <UnifiedTextarea
+                      variant="floating"
+                      label="Message"
                       id="message"
                       rows={4}
                       value={contactForm.message}

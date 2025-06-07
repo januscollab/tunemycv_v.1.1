@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { X, Save, AlertTriangle, CheckCircle, Info, ChevronDown, ChevronUp, WandSparkles } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+import { UnifiedTextarea } from '@/components/ui/unified-input';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -237,7 +237,8 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
             
             <div className="flex-1 p-4">
               <ScrollArea className="h-[calc(100vh-300px)] border rounded-md">
-                <Textarea
+                <UnifiedTextarea
+                  variant="standard"
                   value={editedText}
                   onChange={(e) => setEditedText(e.target.value)}
                   className="min-h-[calc(100vh-320px)] font-mono text-caption resize-none border-0 focus:border-0 focus:outline-none bg-background p-4"

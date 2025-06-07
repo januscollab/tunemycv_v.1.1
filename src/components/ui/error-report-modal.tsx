@@ -3,7 +3,7 @@ import { AlertTriangle, Send, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { UnifiedTextarea } from '@/components/ui/unified-input';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -96,10 +96,9 @@ const ErrorReportModal: React.FC<ErrorReportModalProps> = ({
           </div>
           
           <div>
-            <Label htmlFor="description" className="text-sm font-medium">
-              Describe the issue you encountered *
-            </Label>
-            <Textarea
+            <UnifiedTextarea
+              variant="floating"
+              label="Describe the issue you encountered *"
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}

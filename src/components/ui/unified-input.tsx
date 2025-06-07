@@ -143,8 +143,8 @@ const UnifiedInput = React.forwardRef<HTMLInputElement, UnifiedInputProps>(
               "absolute left-4 cursor-text transition-all duration-200 pointer-events-none",
               "text-blueberry/60 dark:text-apple-core/60",
               shouldFloat
-                ? "top-1.5 text-xs font-medium text-zapier-orange"
-                : "top-1/2 -translate-y-1/2 text-sm"
+                ? "top-1.5 text-micro font-medium text-zapier-orange"
+                : "top-1/2 -translate-y-1/2 text-caption"
             )}
           >
             {label}
@@ -263,8 +263,8 @@ const UnifiedTextarea = React.forwardRef<HTMLTextAreaElement, UnifiedTextareaPro
               "absolute left-4 cursor-text transition-all duration-200 pointer-events-none",
               "text-blueberry/60 dark:text-apple-core/60",
               shouldFloat
-                ? "top-1.5 text-xs font-medium text-zapier-orange"
-                : "top-6 text-sm"
+                ? "top-1.5 text-micro font-medium text-zapier-orange"
+                : "top-6 text-caption"
             )}
           >
             {label}
