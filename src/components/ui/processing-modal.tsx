@@ -46,10 +46,10 @@ const ProcessingModal: React.FC<ProcessingModalProps> = ({
   if (!isOpen) return null;
 
   const getTimeBasedMessage = () => {
-    if (timeElapsed > 30) {
-      return "We apologize for the delay. This document is taking longer than expected to process. You can continue waiting or try again later.";
-    } else if (timeElapsed > 15) {
-      return "Taking longer than expected... Please bear with us while we process your document.";
+    if (timeElapsed > 15) {
+      return "Taking longer than expected... Trying alternative processing method.";
+    } else if (timeElapsed > 10) {
+      return "Processing is taking a bit longer than usual. Please wait...";
     }
     return message;
   };
@@ -88,7 +88,7 @@ const ProcessingModal: React.FC<ProcessingModalProps> = ({
           {getTimeBasedMessage()}
         </p>
 
-        {timeElapsed > 30 && onCancel && (
+        {timeElapsed > 10 && onCancel && (
           <Button
             variant="outline"
             onClick={onCancel}

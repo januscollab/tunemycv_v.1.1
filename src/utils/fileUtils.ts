@@ -42,7 +42,7 @@ const cleanExtractedText = (text: string): string => {
     .trim();
 };
 
-export const extractTextFromFile = async (file: File): Promise<string> => {
+export const extractTextFromFile = async (file: File, signal?: AbortSignal): Promise<string> => {
   if (file.type === 'application/pdf') {
     try {
       console.log(`Extracting text from PDF: ${file.name}`);
@@ -50,26 +50,30 @@ export const extractTextFromFile = async (file: File): Promise<string> => {
       // Import pdfjs-dist for better browser compatibility
       const pdfjsLib = await import('pdfjs-dist');
       
-      // Set up worker with local fallback and better error handling
+      // Set up worker with CDN for better reliability
       if (!pdfjsLib.GlobalWorkerOptions.workerSrc) {
-        try {
-          // Try local worker first (more reliable)
-          pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
-          console.log('Using local PDF.js worker');
-        } catch (error) {
-          console.warn('Local PDF worker failed, trying CDN:', error);
-          // Fallback to CDN with correct version
-          pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
-        }
+        // Use CDN worker for better compatibility
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+        console.log('Using CDN PDF.js worker');
       }
       
+      // Check for cancellation before starting
+      if (signal?.aborted) {
+        throw new Error('Processing cancelled by user');
+      }
+
       const arrayBuffer = await file.arrayBuffer();
       const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
       
       let extractedText = '';
       
-      // Extract text from all pages
+      // Extract text from all pages with cancellation checks
       for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        // Check for cancellation before each page
+        if (signal?.aborted) {
+          throw new Error('Processing cancelled by user');
+        }
+
         const page = await pdf.getPage(pageNum);
         const textContent = await page.getTextContent();
         

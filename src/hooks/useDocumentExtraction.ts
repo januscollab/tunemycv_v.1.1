@@ -30,6 +30,10 @@ export const useDocumentExtraction = () => {
     typeDetection: DocumentTypeDetection;
     qualityAssessment: QualityAssessment;
   } | null> => {
+    // Create new abort controller for this extraction
+    const controller = new AbortController();
+    setAbortController(controller);
+
     setState({
       isExtracting: true,
       extractedText: null,
@@ -43,11 +47,18 @@ export const useDocumentExtraction = () => {
     let timeoutId: NodeJS.Timeout;
 
     try {
-      // Create timeout promise that rejects after 60 seconds
+      // Create timeout promise that rejects after 15 seconds for faster fallback
       const timeoutPromise = new Promise<never>((_, reject) => {
         timeoutId = setTimeout(() => {
-          reject(new Error('Document processing timed out. The file may be too large or complex.'));
-        }, 60000);
+          reject(new Error('Client-side processing timed out. Trying server-side fallback...'));
+        }, 15000);
+      });
+
+      // Create cancellation promise
+      const cancellationPromise = new Promise<never>((_, reject) => {
+        controller.signal.addEventListener('abort', () => {
+          reject(new Error('Processing cancelled by user'));
+        });
       });
 
       // Update progress based on file type
@@ -60,10 +71,11 @@ export const useDocumentExtraction = () => {
         setState(prev => ({ ...prev, progress: 'Reading text file...' }));
       }
 
-      // Race between extraction and timeout
+      // Race between extraction, timeout, and cancellation
       const extractedText = await Promise.race([
-        extractTextFromFile(file),
-        timeoutPromise
+        extractTextFromFile(file, controller.signal),
+        timeoutPromise,
+        cancellationPromise
       ]);
       
       clearTimeout(timeoutId);
