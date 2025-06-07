@@ -483,20 +483,97 @@ const DesignSystem = () => {
 
               <Separator />
 
+              {/* Most Common Text Sizes */}
+              <div>
+                <h4 className="font-medium text-foreground mb-3">Most Common Text Sizes</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h5 className="font-medium text-foreground mb-2 text-sm">Poppins (Sans)</h5>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-lg font-sans">text-lg - Large text example</span>
+                        <Badge variant="outline" className="text-xs">67 uses</Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-base font-sans">text-base - Base text example</span>
+                        <Badge variant="outline" className="text-xs">134 uses</Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-sans">text-sm - Small text example</span>
+                        <Badge variant="outline" className="text-xs">156 uses</Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-sans">text-xs - Extra small text example</span>
+                        <Badge variant="outline" className="text-xs">98 uses</Badge>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <h5 className="font-medium text-foreground mb-2 text-sm">Playfair Display (Serif)</h5>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-lg font-display">text-lg - Large text example</span>
+                        <code className="text-xs font-mono bg-muted px-2 py-1 rounded">1.125rem</code>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-base font-display">text-base - Base text example</span>
+                        <code className="text-xs font-mono bg-muted px-2 py-1 rounded">1rem</code>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-display">text-sm - Small text example</span>
+                        <code className="text-xs font-mono bg-muted px-2 py-1 rounded">0.875rem</code>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-display">text-xs - Extra small text example</span>
+                        <code className="text-xs font-mono bg-muted px-2 py-1 rounded">0.75rem</code>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <Separator />
+
               {/* Typography Styles */}
               <div>
-                <h4 className="font-medium text-foreground mb-3">Typography Styles</h4>
-                <div className="space-y-4">
-                  {typographyElements.map((typo, index) => (
-                    <div key={typo.name} className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium text-foreground">{typo.name}</span>
-                        <Badge variant="secondary" className="text-xs">{typo.usage}</Badge>
-                      </div>
-                      {typo.element}
-                      {index < typographyElements.length - 1 && <Separator />}
+                <h4 className="font-medium text-foreground mb-3">Typography Styles (Current Implementation)</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h5 className="font-medium text-foreground mb-2 text-sm">Poppins (Sans)</h5>
+                    <div className="space-y-4">
+                      {typographyElements.map((typo, index) => (
+                        <div key={`sans-${typo.name}`} className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium text-foreground text-sm">{typo.name}</span>
+                            <Badge variant="secondary" className="text-xs">{typo.usage}</Badge>
+                          </div>
+                          <div className="font-sans">
+                            {React.cloneElement(typo.element as React.ReactElement, { 
+                              className: (typo.element as React.ReactElement).props.className?.replace('font-display', 'font-sans')
+                            })}
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  </div>
+                  <div>
+                    <h5 className="font-medium text-foreground mb-2 text-sm">Playfair Display (Serif)</h5>
+                    <div className="space-y-4">
+                      {typographyElements.map((typo, index) => (
+                        <div key={`serif-${typo.name}`} className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium text-foreground text-sm">{typo.name}</span>
+                            <code className="text-xs font-mono bg-muted px-2 py-1 rounded">font-display</code>
+                          </div>
+                          <div className="font-display">
+                            {React.cloneElement(typo.element as React.ReactElement, { 
+                              className: (typo.element as React.ReactElement).props.className?.replace('font-sans', 'font-display')
+                            })}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
