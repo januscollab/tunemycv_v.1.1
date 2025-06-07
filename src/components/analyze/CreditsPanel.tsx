@@ -14,7 +14,7 @@ const CreditsPanel: React.FC<CreditsPanelProps> = ({ credits, hasCreditsForAI })
       <div className="text-center">
         <div className="flex items-center justify-center mb-4">
           <CreditCard className="h-5 w-5 text-zapier-orange mr-2" />
-          <h3 className="text-lg font-semibold text-earth dark:text-white">
+          <h3 className="text-subheading font-semibold text-earth dark:text-white">
             Your Credits
           </h3>
         </div>
@@ -22,16 +22,16 @@ const CreditsPanel: React.FC<CreditsPanelProps> = ({ credits, hasCreditsForAI })
         <div className="mb-4">
           <div className="flex items-center justify-center space-x-2">
             <Zap className="h-6 w-6 text-zapier-orange" />
-            <span className="text-2xl font-bold text-zapier-orange">
+            <span className="text-title font-bold text-zapier-orange">
               {credits}
             </span>
-            <span className="text-sm text-earth/70 dark:text-white/70">
+            <span className="text-caption text-earth/70 dark:text-white/70">
               Credits
             </span>
           </div>
         </div>
 
-        <div className="space-y-2 text-xs text-earth/70 dark:text-white/70">
+        <div className="space-y-2 text-micro text-earth/70 dark:text-white/70">
           <div className="flex items-center justify-between">
             <span>CV Analysis</span>
             <span className="text-zapier-orange font-medium">2 Credits</span>
@@ -51,12 +51,12 @@ const CreditsPanel: React.FC<CreditsPanelProps> = ({ credits, hasCreditsForAI })
             <div className="flex items-start space-x-2">
               <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-xs text-yellow-800 dark:text-yellow-200 font-medium mb-1">
+                <p className="text-micro text-yellow-800 dark:text-yellow-200 font-medium mb-1">
                   You're running low on credits!
                 </p>
                 <Link 
                   to="/pricing" 
-                  className="text-xs text-yellow-800 dark:text-yellow-200 hover:text-yellow-900 dark:hover:text-yellow-100 underline flex items-center space-x-1"
+                  className="text-micro text-yellow-800 dark:text-yellow-200 hover:text-yellow-900 dark:hover:text-yellow-100 underline flex items-center space-x-1"
                 >
                   <span>Top up your credits</span>
                   <ExternalLink className="h-3 w-3" />
@@ -64,7 +64,7 @@ const CreditsPanel: React.FC<CreditsPanelProps> = ({ credits, hasCreditsForAI })
               </div>
             </div>
           ) : (
-            <p className="text-xs text-earth dark:text-white">
+            <p className="text-micro text-earth dark:text-white">
               {hasCreditsForAI 
                 ? "You have credits available for AI analysis with multiple free AI iterations"
                 : "Purchase credits to unlock AI-powered features"

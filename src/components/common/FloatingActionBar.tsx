@@ -53,7 +53,7 @@ const FloatingActionBar: React.FC<FloatingActionBarProps> = ({
         </Button>
         
         {credits < creditCost && (
-          <p className="text-xs text-red-600 mt-2 text-center">
+          <p className="text-micro text-red-600 mt-2 text-center">
             Insufficient credits
           </p>
         )}

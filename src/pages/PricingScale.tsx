@@ -79,7 +79,7 @@ const PricingScale = () => {
           <div className="flex items-start mb-6">
             <CreditCard className="h-8 w-8 text-zapier-orange mr-3 flex-shrink-0" />
             <div>
-              <h1 className="text-3xl font-bold text-earth dark:text-white">
+              <h1 className="text-display font-bold text-foreground">
                 Choose Your <span className="text-zapier-orange">Tune</span>MyCV Credits
               </h1>
               <p className="text-lg text-earth/70 dark:text-white/70 max-w-2xl mt-2">
@@ -188,7 +188,7 @@ const PricingScale = () => {
                   {currentTier.isEnterprise ? (
                     <>
                       <div className="space-y-1">
-                        <h3 className="text-4xl text-earth dark:text-white hover:text-zapier-orange transition-colors duration-300 mb-2">
+                        <h3 className="text-display text-foreground hover:text-primary transition-colors duration-300 mb-2">
                           Enterprise
                         </h3>
                         <div className="text-lg text-earth/70 dark:text-white/70 hover:text-zapier-orange/70 transition-colors duration-300">
@@ -235,7 +235,7 @@ const PricingScale = () => {
         {/* End-to-End Journey Section */}
         <div className="mb-16">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-earth dark:text-white mb-4">
+            <h2 className="text-display font-bold text-foreground mb-4">
               Your Complete Job Application Journey
             </h2>
             <p className="text-lg text-earth/70 dark:text-white/70 max-w-2xl mx-auto">
@@ -329,7 +329,7 @@ const PricingScale = () => {
 
         {/* FAQ Section */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-earth dark:text-white mb-8">
+          <h2 className="text-display font-bold text-foreground mb-8">
             Some Common Credit Questions
           </h2>
           <div className="grid md:grid-cols-2 gap-8 text-left">

@@ -16,6 +16,7 @@ interface DocumentPreviewCardProps {
   onRemove: () => void;
   onSaveToCVs?: () => void;
   canSaveToCVs?: boolean;
+  onConfirmDocumentType?: (confirmedType: 'cv' | 'job_description') => void;
 }
 
 const DocumentPreviewCard: React.FC<DocumentPreviewCardProps> = ({
@@ -26,7 +27,8 @@ const DocumentPreviewCard: React.FC<DocumentPreviewCardProps> = ({
   onOpenVerification,
   onRemove,
   onSaveToCVs,
-  canSaveToCVs = false
+  canSaveToCVs = false,
+  onConfirmDocumentType
 }) => {
   const quality = assessDocumentQuality(extractedText, fileName, documentType);
   
@@ -46,22 +48,27 @@ const DocumentPreviewCard: React.FC<DocumentPreviewCardProps> = ({
           <div className="flex items-start space-x-3">
             <FileText className="h-6 w-6 text-apricot mt-1" />
             <div className="min-w-0 flex-1">
-              <CardTitle className="text-base font-medium text-blueberry dark:text-citrus truncate">
+              <CardTitle className="text-body font-medium text-blueberry dark:text-citrus truncate">
                 {fileName}
               </CardTitle>
               <div className="flex items-center space-x-3 mt-1">
-                <span className="text-sm text-blueberry/60 dark:text-apple-core/60">
+                <span className="text-caption text-blueberry/60 dark:text-apple-core/60">
                   {formatFileSize(fileSize)}
                 </span>
-                <span className="text-sm text-blueberry/60 dark:text-apple-core/60">
+                <span className="text-caption text-blueberry/60 dark:text-apple-core/60">
                   {quality.wordCount} words
                 </span>
                 <Badge 
                   variant="outline" 
-                  className={`text-xs ${getQualityColor(quality.score)} border-current`}
+                  className={`text-micro ${getQualityColor(quality.score)} border-current`}
                 >
                   {getQualityBadge(quality.score)}
                 </Badge>
+                {quality.typeDetection && quality.typeDetection.needsUserConfirmation && (
+                  <Badge variant="outline" className="text-micro text-yellow-600 dark:text-yellow-400 border-yellow-500">
+                    Type Confirmation Needed
+                  </Badge>
+                )}
               </div>
             </div>
           </div>
@@ -69,6 +76,31 @@ const DocumentPreviewCard: React.FC<DocumentPreviewCardProps> = ({
       </CardHeader>
       
       <CardContent className="pt-0">
+        {/* Document Type Detection Info */}
+        {quality.typeDetection && quality.typeDetection.needsUserConfirmation && onConfirmDocumentType && (
+          <div className="mb-4">
+            <Alert className="py-2 border-yellow-200 dark:border-yellow-800">
+              <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
+              <AlertDescription className="text-caption">
+                <span className="font-medium">Document type confirmation needed:</span> 
+                {quality.typeDetection.detectedType === 'unknown' ? (
+                  ' Unable to automatically determine document type.'
+                ) : (
+                  ` Detected as ${quality.typeDetection.detectedType === 'cv' ? 'CV/Resume' : 'Job Description'} with ${quality.typeDetection.confidence}% confidence.`
+                )}
+                <Button
+                  variant="link"
+                  size="sm"
+                  onClick={() => onConfirmDocumentType(quality.typeDetection!.detectedType === 'unknown' ? 'cv' : quality.typeDetection!.detectedType)}
+                  className="text-micro text-yellow-600 dark:text-yellow-400 hover:text-yellow-700 p-0 h-auto ml-1"
+                >
+                  Click to confirm →
+                </Button>
+              </AlertDescription>
+            </Alert>
+          </div>
+        )}
+
         {/* Quality Issues */}
         <div className="space-y-2 mb-4">
           {quality.issues.slice(0, 2).map((issue, index) => (
@@ -76,10 +108,10 @@ const DocumentPreviewCard: React.FC<DocumentPreviewCardProps> = ({
               <div className="flex items-start space-x-2">
                 {getIssueIcon(issue.type)}
                 <div className="flex-1 min-w-0">
-                  <AlertDescription className="text-sm">
+                  <AlertDescription className="text-caption">
                     <span className="font-medium">{issue.title}:</span> {issue.description}
                     {issue.suggestion && (
-                      <div className="mt-1 text-xs text-blueberry/70 dark:text-apple-core/70">
+                      <div className="mt-1 text-micro text-blueberry/70 dark:text-apple-core/70">
                         💡 {issue.suggestion}
                       </div>
                     )}
@@ -94,7 +126,7 @@ const DocumentPreviewCard: React.FC<DocumentPreviewCardProps> = ({
               variant="link"
               size="sm"
               onClick={onOpenVerification}
-              className="text-xs text-zapier-orange hover:text-zapier-orange/80 p-0 h-auto"
+              className="text-micro text-zapier-orange hover:text-zapier-orange/80 p-0 h-auto"
             >
               View {quality.issues.length - 2} more issues
             </Button>

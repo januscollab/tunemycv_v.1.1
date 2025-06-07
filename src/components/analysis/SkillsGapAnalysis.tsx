@@ -37,7 +37,7 @@ const SkillsGapAnalysis: React.FC<SkillsGapAnalysisProps> = ({ skillsGapAnalysis
     <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
       <div className="flex items-center mb-6">
         <Target className="h-5 w-5 text-apricot mr-2" />
-        <h2 className="text-lg font-semibold text-blueberry dark:text-citrus">Skills Gap Analysis</h2>
+        <h2 className="text-heading font-semibold text-blueberry dark:text-citrus">Skills Gap Analysis</h2>
       </div>
 
       {/* Critical Gaps and Development Areas Side by Side */}
@@ -55,17 +55,17 @@ const SkillsGapAnalysis: React.FC<SkillsGapAnalysisProps> = ({ skillsGapAnalysis
                   <div key={index} className={`border rounded-lg p-4 ${getImportanceColor(gap.importance)}`}>
                     <div className="flex items-center justify-between mb-2">
                       <h4 className="font-medium text-blueberry dark:text-citrus">{gap.skill}</h4>
-                      <span className="text-xs px-2 py-1 rounded bg-white/50">
+                      <span className="text-micro px-2 py-1 rounded bg-white/50">
                         {gap.importance} priority
                       </span>
                     </div>
-                    <p className="text-sm text-blueberry/80 dark:text-apple-core mb-3">{gap.description}</p>
+                    <p className="text-caption text-blueberry/80 dark:text-apple-core mb-3">{gap.description}</p>
                     <div className="bg-white/70 dark:bg-gray-800/50 rounded p-3">
                       <div className="flex items-start">
                         <TrendingUp className="h-4 w-4 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
                         <div>
-                          <h5 className="text-xs font-medium text-blue-800 dark:text-blue-400 mb-1">Bridging Strategy:</h5>
-                          <p className="text-xs text-blue-700 dark:text-blue-500">{gap.bridgingStrategy}</p>
+                          <h5 className="text-micro font-medium text-blue-800 dark:text-blue-400 mb-1">Bridging Strategy:</h5>
+                          <p className="text-micro text-blue-700 dark:text-blue-500">{gap.bridgingStrategy}</p>
                         </div>
                       </div>
                     </div>
@@ -77,7 +77,7 @@ const SkillsGapAnalysis: React.FC<SkillsGapAnalysisProps> = ({ skillsGapAnalysis
             <div className="text-center py-8">
               <AlertTriangle className="h-8 w-8 text-gray-400 mx-auto mb-2" />
               <h3 className="font-semibold text-red-600 mb-2">Critical Skills Gaps</h3>
-              <p className="text-sm text-blueberry/60 dark:text-apple-core/60">
+              <p className="text-caption text-blueberry/60 dark:text-apple-core/60">
                 No critical skills gaps identified.
               </p>
             </div>
@@ -96,16 +96,16 @@ const SkillsGapAnalysis: React.FC<SkillsGapAnalysisProps> = ({ skillsGapAnalysis
                 {developmentAreas.map((area, index) => (
                   <div key={index} className="border border-blue-200 rounded-lg p-4 bg-blue-50 dark:bg-blue-900/20">
                     <h4 className="font-medium text-blueberry dark:text-citrus mb-2">{area.area}</h4>
-                    <p className="text-sm text-blueberry/80 dark:text-apple-core mb-2">{area.description}</p>
+                    <p className="text-caption text-blueberry/80 dark:text-apple-core mb-2">{area.description}</p>
                     
                     <div className="mb-3">
-                      <h5 className="text-xs font-medium text-blue-800 dark:text-blue-400 mb-1">Relevance:</h5>
-                      <p className="text-xs text-blue-700 dark:text-blue-500">{area.relevance}</p>
+                      <h5 className="text-micro font-medium text-blue-800 dark:text-blue-400 mb-1">Relevance:</h5>
+                      <p className="text-micro text-blue-700 dark:text-blue-500">{area.relevance}</p>
                     </div>
                     
                     <div className="bg-white/70 dark:bg-gray-800/50 rounded p-3">
-                      <h5 className="text-xs font-medium text-green-800 dark:text-green-400 mb-1">Action Plan:</h5>
-                      <p className="text-xs text-green-700 dark:text-green-500">{area.actionPlan}</p>
+                      <h5 className="text-micro font-medium text-green-800 dark:text-green-400 mb-1">Action Plan:</h5>
+                      <p className="text-micro text-green-700 dark:text-green-500">{area.actionPlan}</p>
                     </div>
                   </div>
                 ))}
@@ -115,7 +115,7 @@ const SkillsGapAnalysis: React.FC<SkillsGapAnalysisProps> = ({ skillsGapAnalysis
             <div className="text-center py-8">
               <Lightbulb className="h-8 w-8 text-gray-400 mx-auto mb-2" />
               <h3 className="font-semibold text-blue-600 mb-2">Development Areas</h3>
-              <p className="text-sm text-blueberry/60 dark:text-apple-core/60">
+              <p className="text-caption text-blueberry/60 dark:text-apple-core/60">
                 No specific development areas identified.
               </p>
             </div>

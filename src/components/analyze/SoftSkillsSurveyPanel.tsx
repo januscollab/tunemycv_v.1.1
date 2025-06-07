@@ -21,7 +21,7 @@ const SoftSkillsSurveyPanel: React.FC<SoftSkillsSurveyPanelProps> = ({
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center">
             <Brain className="h-5 w-5 text-zapier-orange mr-2" />
-            <h3 className="text-lg font-semibold text-earth dark:text-white">
+            <h3 className="text-subheading font-semibold text-earth dark:text-white">
               Soft Skills Survey
             </h3>
           </div>
@@ -34,7 +34,7 @@ const SoftSkillsSurveyPanel: React.FC<SoftSkillsSurveyPanelProps> = ({
           </button>
         </div>
         
-        <p className="text-sm text-earth/70 dark:text-white/70 mb-4">
+        <p className="text-caption text-earth/70 dark:text-white/70 mb-4">
           Help us improve your CV analysis by sharing your soft skills profile
         </p>
 
@@ -46,7 +46,7 @@ const SoftSkillsSurveyPanel: React.FC<SoftSkillsSurveyPanelProps> = ({
           <ChevronRight className="h-4 w-4" />
         </Button>
 
-        <p className="text-xs text-earth/50 dark:text-white/50 mt-2">
+        <p className="text-micro text-earth/50 dark:text-white/50 mt-2">
           This will enhance your analysis results
         </p>
       </div>

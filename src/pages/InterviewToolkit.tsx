@@ -406,7 +406,7 @@ const InterviewToolkit = () => {
           <div className="flex items-start">
             <MessageSquare className="h-10 w-10 text-zapier-orange mr-4 mt-1" />
             <div>
-              <h1 className="text-3xl font-bold text-earth dark:text-white">
+              <h1 className="text-display font-bold text-foreground">
                 Interview Toolkit
               </h1>
               <p className="text-lg text-earth/70 dark:text-white/70 max-w-2xl mt-1">

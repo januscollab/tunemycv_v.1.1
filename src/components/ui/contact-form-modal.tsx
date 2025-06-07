@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import { X, Mail, Send } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { UnifiedInput, UnifiedTextarea } from '@/components/ui/unified-input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface ContactFormModalProps {
@@ -88,25 +87,29 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <Label htmlFor="name">Name</Label>
-                  <Input
+                  <UnifiedInput
                     id="name"
                     type="text"
                     value={formData.name}
                     onChange={(e) => handleInputChange('name', e.target.value)}
                     placeholder="Your full name"
                     required
+                    maxLength={100}
+                    secure={true}
                   />
                 </div>
 
                 <div>
                   <Label htmlFor="email">Email Address</Label>
-                  <Input
+                  <UnifiedInput
                     id="email"
                     type="email"
                     value={formData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
                     placeholder="your@email.com"
                     required
+                    maxLength={100}
+                    secure={true}
                   />
                 </div>
 
@@ -129,26 +132,30 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
                 {formData.subject === 'custom' && (
                   <div>
                     <Label htmlFor="customSubject">Custom Subject</Label>
-                    <Input
+                    <UnifiedInput
                       id="customSubject"
                       type="text"
                       value={formData.customSubject || ''}
                       onChange={(e) => handleInputChange('customSubject', e.target.value)}
                       placeholder="Enter your custom subject"
                       required
+                      maxLength={200}
+                      secure={true}
                     />
                   </div>
                 )}
 
                 <div>
                   <Label htmlFor="message">Message</Label>
-                  <Textarea
+                  <UnifiedTextarea
                     id="message"
                     value={formData.message}
                     onChange={(e) => handleInputChange('message', e.target.value)}
                     placeholder="Please share your message, question, or feedback..."
                     className="min-h-[100px]"
                     required
+                    maxLength={2000}
+                    secure={true}
                   />
                 </div>
 

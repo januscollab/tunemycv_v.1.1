@@ -1,6 +1,6 @@
 
 import React from 'react';
-import SecureInput from '@/components/security/SecureInput';
+import { UnifiedInput } from '@/components/ui/unified-input';
 import { Label } from '@/components/ui/label';
 import PasswordStrengthMeter from '@/components/PasswordStrengthMeter';
 
@@ -29,7 +29,7 @@ const PasswordFields: React.FC<PasswordFieldsProps> = ({
         <Label htmlFor="password" className="text-blueberry">
           Password
         </Label>
-        <SecureInput
+        <UnifiedInput
           id="password"
           name="password"
           type="password"
@@ -39,6 +39,7 @@ const PasswordFields: React.FC<PasswordFieldsProps> = ({
           onChange={onPasswordChange}
           className="mt-1"
           maxLength={128}
+          secure={true}
         />
         {mode === 'register' && password && (
           <div className="mt-2">
@@ -52,7 +53,7 @@ const PasswordFields: React.FC<PasswordFieldsProps> = ({
           <Label htmlFor="confirmPassword" className="text-blueberry">
             Confirm password
           </Label>
-          <SecureInput
+          <UnifiedInput
             id="confirmPassword"
             name="confirmPassword"
             type="password"
@@ -62,6 +63,7 @@ const PasswordFields: React.FC<PasswordFieldsProps> = ({
             onChange={onConfirmPasswordChange}
             className="mt-1"
             maxLength={128}
+            secure={true}
           />
         </div>
       )}

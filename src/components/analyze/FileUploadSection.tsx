@@ -64,8 +64,8 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
 
   return (
     <div className="bg-card rounded-lg shadow-sm p-6 border border-card-border transition-all duration-normal hover:shadow-md">
-      <h3 className="text-lg font-semibold text-card-foreground mb-4">{title}</h3>
-      <p className="text-sm text-muted-foreground mb-4">{subtitle}</p>
+      <h3 className="text-subheading font-semibold text-card-foreground mb-4">{title}</h3>
+      <p className="text-caption text-muted-foreground mb-4">{subtitle}</p>
       
       {!uploadedFile ? (
         <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary/50 hover:bg-accent/20 transition-all duration-normal group">
@@ -90,7 +90,7 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
             </div>
             <div className="min-w-0 flex-1">
               <p className="font-medium text-success-foreground truncate">{uploadedFile.file.name}</p>
-              <p className="text-sm text-success/80">{formatFileSize(uploadedFile.file.size)}</p>
+              <p className="text-caption text-success/80">{formatFileSize(uploadedFile.file.size)}</p>
             </div>
           </div>
           <div className="flex items-center space-x-2 flex-shrink-0">
@@ -117,8 +117,8 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
           <div className="flex items-start space-x-2">
             <AlertTriangle className="h-4 w-4 text-destructive mt-0.5 flex-shrink-0" />
             <div className="flex-1">
-              <p className="text-sm font-medium text-destructive mb-1">File validation errors:</p>
-              <ul className="text-sm text-destructive/80 list-disc list-inside space-y-1">
+              <p className="text-caption font-medium text-destructive mb-1">File validation errors:</p>
+              <ul className="text-caption text-destructive/80 list-disc list-inside space-y-1">
                 {validationErrors.map((error, index) => (
                   <li key={index}>{error}</li>
                 ))}
@@ -130,7 +130,7 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
       
       {showPreview && uploadedFile && (
         <div className="mt-6 bg-muted rounded-md p-4 max-h-64 overflow-y-auto border border-border animate-fade-in">
-          <pre className="whitespace-pre-wrap text-sm text-muted-foreground leading-relaxed">
+          <pre className="whitespace-pre-wrap text-caption text-muted-foreground leading-relaxed">
             {uploadedFile.extractedText}
           </pre>
         </div>

@@ -50,9 +50,17 @@ export const extractTextFromFile = async (file: File): Promise<string> => {
       // Import pdfjs-dist for better browser compatibility
       const pdfjsLib = await import('pdfjs-dist');
       
-      // Set up worker if not already configured
+      // Set up worker with local fallback and better error handling
       if (!pdfjsLib.GlobalWorkerOptions.workerSrc) {
-        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js`;
+        try {
+          // Try local worker first (more reliable)
+          pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
+          console.log('Using local PDF.js worker');
+        } catch (error) {
+          console.warn('Local PDF worker failed, trying CDN:', error);
+          // Fallback to CDN with correct version
+          pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+        }
       }
       
       const arrayBuffer = await file.arrayBuffer();
@@ -89,7 +97,21 @@ export const extractTextFromFile = async (file: File): Promise<string> => {
       
     } catch (error) {
       console.error('PDF extraction error:', error);
-      throw new Error(`Failed to extract text from PDF: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      
+      // Provide more specific error messages
+      if (error instanceof Error) {
+        if (error.message.includes('worker') || error.message.includes('Worker')) {
+          throw new Error('PDF processing failed: Unable to load PDF worker. Please try again or use a different file format.');
+        }
+        if (error.message.includes('InvalidPDFException') || error.message.includes('corrupted')) {
+          throw new Error('PDF file appears to be corrupted or invalid. Please try a different PDF file.');
+        }
+        if (error.message.includes('PasswordException')) {
+          throw new Error('PDF file is password protected. Please use an unprotected PDF file.');
+        }
+      }
+      
+      throw new Error(`Failed to extract text from PDF: ${error instanceof Error ? error.message : 'Unknown error occurred while processing PDF'}`);
     }
   }
   

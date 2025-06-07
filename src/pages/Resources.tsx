@@ -112,7 +112,7 @@ const Resources = () => {
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-apple-core/30 via-white to-citrus/20 dark:from-blueberry/30 dark:via-gray-900 dark:to-citrus/10 py-10 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-5xl font-bold text-blueberry dark:text-citrus mb-6">
+          <h1 className="text-display font-bold text-foreground mb-6">
             Career Resources
           </h1>
           <p className="text-xl text-blueberry/80 dark:text-apple-core mb-4">
@@ -125,7 +125,7 @@ const Resources = () => {
       <section className="py-12 px-4 bg-white dark:bg-gray-800">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-earth dark:text-white mb-4">
+            <h2 className="text-display font-bold text-foreground mb-4">
               Our Top 3 Must Reads
             </h2>
             <p className="text-xl text-earth/70 dark:text-white/70">
@@ -215,7 +215,7 @@ const Resources = () => {
       {/* Newsletter Section */}
       <section className="py-20 px-4 bg-cream/30 dark:bg-surface-secondary">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-6 text-earth dark:text-white">Stay Updated</h2>
+          <h2 className="text-display font-bold mb-6 text-foreground">Stay Updated</h2>
           <p className="text-xl mb-8 text-earth/70 dark:text-white/70">
             Get the latest career tips, CV trends, and job market insights delivered to your inbox
           </p>

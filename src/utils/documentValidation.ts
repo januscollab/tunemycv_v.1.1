@@ -5,6 +5,16 @@ export interface ValidationResult {
   suggestions: string[];
 }
 
+export interface DocumentTypeDetection {
+  detectedType: 'cv' | 'job_description' | 'unknown';
+  confidence: number; // 0-100
+  cvConfidence: number; // 0-100  
+  jobDescriptionConfidence: number; // 0-100
+  needsUserConfirmation: boolean; // true if confidence < 70%
+  issues: string[];
+  suggestions: string[];
+}
+
 export const validateJobDescription = (extractedText: string, fileName: string): ValidationResult => {
   const lowerText = extractedText.toLowerCase();
   const wordCount = extractedText.split(/\s+/).filter(word => word.length > 0).length;
@@ -176,6 +186,56 @@ export const validateCV = (extractedText: string, fileName: string): ValidationR
   return {
     isValid: confidence >= 60,
     confidence,
+    issues,
+    suggestions
+  };
+};
+
+// Automatic document type detection function
+export const detectDocumentType = (extractedText: string, fileName: string): DocumentTypeDetection => {
+  const cvValidation = validateCV(extractedText, fileName);
+  const jobDescValidation = validateJobDescription(extractedText, fileName);
+  
+  const cvConfidence = cvValidation.confidence;
+  const jobDescriptionConfidence = jobDescValidation.confidence;
+  
+  // Determine the most likely document type
+  let detectedType: 'cv' | 'job_description' | 'unknown' = 'unknown';
+  let confidence = 0;
+  
+  if (cvConfidence > jobDescriptionConfidence && cvConfidence >= 60) {
+    detectedType = 'cv';
+    confidence = cvConfidence;
+  } else if (jobDescriptionConfidence > cvConfidence && jobDescriptionConfidence >= 60) {
+    detectedType = 'job_description';
+    confidence = jobDescriptionConfidence;
+  } else {
+    // Neither type has high confidence
+    detectedType = 'unknown';
+    confidence = Math.max(cvConfidence, jobDescriptionConfidence);
+  }
+  
+  const needsUserConfirmation = confidence < 70 || detectedType === 'unknown';
+  
+  const issues: string[] = [];
+  const suggestions: string[] = [];
+  
+  if (needsUserConfirmation) {
+    if (detectedType === 'unknown') {
+      issues.push('Unable to automatically determine document type');
+      suggestions.push('Please confirm if this is a CV/Resume or Job Description');
+    } else {
+      issues.push(`Detected as ${detectedType === 'cv' ? 'CV/Resume' : 'Job Description'} with ${confidence}% confidence`);
+      suggestions.push('Please confirm if this document type is correct');
+    }
+  }
+  
+  return {
+    detectedType,
+    confidence,
+    cvConfidence,
+    jobDescriptionConfidence,
+    needsUserConfirmation,
     issues,
     suggestions
   };

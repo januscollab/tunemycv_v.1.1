@@ -55,7 +55,7 @@ const MainFeaturesSection = () => {
     <section className="py-16 bg-gradient-to-br from-cream/20 via-white to-primary-50/10 dark:from-background-secondary/30 dark:via-background dark:to-primary-50/5">
       <div className="max-w-6xl mx-auto px-4">
         {/* Introduction Text */}
-        <p className="text-xl text-earth/70 dark:text-white/70 max-w-3xl mx-auto leading-relaxed mb-12 text-center">
+        <p className="text-subheading text-earth/70 dark:text-white/70 max-w-3xl mx-auto leading-relaxed mb-12 text-center">
           Our integrated suite of AI-powered tools works together to optimize every aspect of your job search—from CV analysis to interview success.
         </p>
         
@@ -73,10 +73,10 @@ const MainFeaturesSection = () => {
 
               {/* Content */}
               <div className="mb-6">
-                <h3 className="text-2xl font-bold text-earth dark:text-white mb-2">
+                <h3 className="text-title font-bold text-earth dark:text-white mb-2">
                   {feature.title}
                 </h3>
-                <p className="text-sm font-medium text-zapier-orange mb-3">
+                <p className="text-caption font-medium text-zapier-orange mb-3">
                   {feature.subtitle}
                 </p>
                 <p className="text-earth/70 dark:text-white/70 leading-relaxed mb-4">
@@ -86,7 +86,7 @@ const MainFeaturesSection = () => {
                 {/* Benefits */}
                 <ul className="space-y-2 mb-6">
                   {feature.benefits.map((benefit, idx) => (
-                    <li key={idx} className="flex items-start text-sm text-earth/60 dark:text-white/60">
+                    <li key={idx} className="flex items-start text-caption text-earth/60 dark:text-white/60">
                       <Zap className="h-3 w-3 text-zapier-orange mr-2 mt-0.5 flex-shrink-0" />
                       {benefit}
                     </li>
@@ -104,7 +104,7 @@ const MainFeaturesSection = () => {
 
               {/* Number indicator */}
               <div className="absolute top-4 right-4 w-8 h-8 bg-zapier-orange/10 rounded-full flex items-center justify-center">
-                <span className="text-xs font-bold text-zapier-orange">{index + 1}</span>
+                <span className="text-micro font-bold text-zapier-orange">{index + 1}</span>
               </div>
             </div>
           ))}
@@ -112,7 +112,7 @@ const MainFeaturesSection = () => {
 
         {/* Header */}
         <div className="text-center mb-12">
-          <h2 className="text-2xl font-bold text-earth dark:text-white leading-tight">
+          <h2 className="text-title font-bold text-earth dark:text-white leading-tight">
             Three Powerful Tools,
             <span className="text-zapier-orange"> One Career Goal</span>
           </h2>
@@ -122,7 +122,7 @@ const MainFeaturesSection = () => {
         <div className="text-center">
           <div className="inline-flex items-center space-x-3 bg-white dark:bg-surface-secondary rounded-full px-6 py-3 shadow-md border border-border/50">
             <Users className="h-5 w-5 text-zapier-orange" />
-            <span className="text-sm text-earth/70 dark:text-white/70">
+            <span className="text-caption text-earth/70 dark:text-white/70">
               Join 10,000+ professionals who've landed their dream jobs
             </span>
           </div>

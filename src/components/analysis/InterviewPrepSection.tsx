@@ -27,7 +27,7 @@ const InterviewPrepSection: React.FC<InterviewPrepSectionProps> = ({ interviewPr
     <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
       <div className="flex items-center mb-6">
         <MessageSquare className="h-5 w-5 text-apricot mr-2" />
-        <h2 className="text-lg font-semibold text-blueberry dark:text-citrus">Interview Preparation</h2>
+        <h2 className="text-heading font-semibold text-blueberry dark:text-citrus">Interview Preparation</h2>
       </div>
 
       <div className="space-y-6">
@@ -41,7 +41,7 @@ const InterviewPrepSection: React.FC<InterviewPrepSectionProps> = ({ interviewPr
             <div className="space-y-2">
               {likelyQuestions.map((question, index) => (
                 <div key={index} className="border border-blue-200 rounded-lg p-3 bg-blue-50 dark:bg-blue-900/20">
-                  <p className="text-sm text-blueberry dark:text-citrus">{question}</p>
+                  <p className="text-caption text-blueberry dark:text-citrus">{question}</p>
                 </div>
               ))}
             </div>
@@ -59,10 +59,10 @@ const InterviewPrepSection: React.FC<InterviewPrepSectionProps> = ({ interviewPr
               {suggestedAnswers.map((answer, index) => (
                 <div key={index} className="border border-green-200 rounded-lg p-4 bg-green-50 dark:bg-green-900/20">
                   <h4 className="font-medium text-blueberry dark:text-citrus mb-2">{answer.question}</h4>
-                  <p className="text-sm text-blueberry/80 dark:text-apple-core mb-3">{answer.approach}</p>
+                  <p className="text-caption text-blueberry/80 dark:text-apple-core mb-3">{answer.approach}</p>
                   <div>
-                    <h5 className="text-xs font-medium text-green-800 dark:text-green-400 mb-2">Key Points to Cover:</h5>
-                    <ul className="text-xs text-green-700 dark:text-green-500 space-y-1">
+                    <h5 className="text-micro font-medium text-green-800 dark:text-green-400 mb-2">Key Points to Cover:</h5>
+                    <ul className="text-micro text-green-700 dark:text-green-500 space-y-1">
                       {answer.keyPoints.map((point, idx) => (
                         <li key={idx} className="flex items-start">
                           <span className="mr-2">•</span>
@@ -90,13 +90,13 @@ const InterviewPrepSection: React.FC<InterviewPrepSectionProps> = ({ interviewPr
                   <h4 className="font-medium text-blueberry dark:text-citrus mb-2">{situation.scenario}</h4>
                   
                   <div className="mb-3">
-                    <h5 className="text-xs font-medium text-purple-800 dark:text-purple-400 mb-1">Framework:</h5>
-                    <p className="text-xs text-purple-700 dark:text-purple-500">{situation.framework}</p>
+                    <h5 className="text-micro font-medium text-purple-800 dark:text-purple-400 mb-1">Framework:</h5>
+                    <p className="text-micro text-purple-700 dark:text-purple-500">{situation.framework}</p>
                   </div>
                   
                   <div className="bg-white/70 dark:bg-gray-800/50 rounded p-3">
-                    <h5 className="text-xs font-medium text-gray-800 dark:text-gray-400 mb-1">Example Response:</h5>
-                    <p className="text-xs text-gray-700 dark:text-gray-500 italic">"{situation.exampleResponse}"</p>
+                    <h5 className="text-micro font-medium text-gray-800 dark:text-gray-400 mb-1">Example Response:</h5>
+                    <p className="text-micro text-gray-700 dark:text-gray-500 italic">"{situation.exampleResponse}"</p>
                   </div>
                 </div>
               ))}

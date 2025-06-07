@@ -15,7 +15,7 @@ const UploadedFileDisplay: React.FC<UploadedFileDisplayProps> = ({ uploadedFile,
         <Check className="h-5 w-5 text-apricot" />
         <div>
           <p className="font-medium text-blueberry dark:text-citrus">{uploadedFile.file.name}</p>
-          <p className="text-xs text-blueberry/70 dark:text-apple-core/80">{title}</p>
+          <p className="text-micro text-blueberry/70 dark:text-apple-core/80">{title}</p>
         </div>
       </div>
     </div>

@@ -3,7 +3,7 @@ import { Save, Mail, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
+import { UnifiedInput } from '@/components/ui/unified-input';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -123,7 +123,7 @@ const SiteSettingsManagement: React.FC = () => {
     <div className="space-y-6">
       <Card className="border border-apple-core/20 dark:border-citrus/20">
         <CardHeader>
-          <CardTitle className="flex items-center text-xl font-semibold text-blueberry dark:text-citrus">
+          <CardTitle className="flex items-center text-heading font-semibold text-blueberry dark:text-citrus">
             <Settings className="h-5 w-5 text-apricot mr-2" />
             Site Settings
           </CardTitle>
@@ -131,48 +131,52 @@ const SiteSettingsManagement: React.FC = () => {
         <CardContent className="space-y-6">
           <div className="space-y-4">
             <div>
-              <Label htmlFor="admin_email" className="text-sm font-medium text-blueberry dark:text-apple-core">
+              <Label htmlFor="admin_email" className="text-caption font-medium text-blueberry dark:text-apple-core">
                 Admin Email
               </Label>
               <div className="mt-1 relative">
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-blueberry/60 dark:text-apple-core/60" />
-                <Input
+                <UnifiedInput
                   id="admin_email"
                   type="email"
                   value={formData.admin_email}
                   onChange={(e) => handleInputChange('admin_email', e.target.value)}
                   placeholder="admin@company.com"
                   className="pl-10"
+                  maxLength={100}
+                  secure={true}
                 />
               </div>
-              <p className="text-xs text-blueberry/60 dark:text-apple-core/60 mt-1">
+              <p className="text-micro text-blueberry/60 dark:text-apple-core/60 mt-1">
                 Email address for administrative notifications and error reports
               </p>
             </div>
 
             <div>
-              <Label htmlFor="support_email" className="text-sm font-medium text-blueberry dark:text-apple-core">
+              <Label htmlFor="support_email" className="text-caption font-medium text-blueberry dark:text-apple-core">
                 Support Email
               </Label>
               <div className="mt-1 relative">
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-blueberry/60 dark:text-apple-core/60" />
-                <Input
+                <UnifiedInput
                   id="support_email"
                   type="email"
                   value={formData.support_email}
                   onChange={(e) => handleInputChange('support_email', e.target.value)}
                   placeholder="support@company.com"
                   className="pl-10"
+                  maxLength={100}
+                  secure={true}
                 />
               </div>
-              <p className="text-xs text-blueberry/60 dark:text-apple-core/60 mt-1">
+              <p className="text-micro text-blueberry/60 dark:text-apple-core/60 mt-1">
                 Email address for customer support and feedback forms
               </p>
             </div>
           </div>
 
           <div className="flex items-center justify-between pt-4 border-t border-apple-core/20 dark:border-citrus/20">
-            <div className="text-sm text-blueberry/60 dark:text-apple-core/60">
+            <div className="text-caption text-blueberry/60 dark:text-apple-core/60">
               {settings && (
                 <span>Last updated: {new Date(settings.updated_at).toLocaleDateString()}</span>
               )}

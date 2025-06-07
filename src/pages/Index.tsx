@@ -15,17 +15,17 @@ const Index = () => {
       {/* Hero Section */}
       <section className="py-10 px-4 bg-gradient-to-br from-white via-cream/30 to-apple-core/10 dark:from-gray-900 dark:via-blueberry/20 dark:to-citrus/5">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center bg-zapier-orange/10 text-zapier-orange px-4 py-2 rounded-full text-sm font-medium mb-6">
+          <div className="inline-flex items-center bg-primary/10 text-primary px-4 py-2 rounded-full text-body font-medium mb-6">
             <Sparkles className="h-4 w-4 mr-2" />
             AI-Powered Career Optimization
           </div>
           
-          <h1 className="text-5xl md:text-6xl font-bold text-earth dark:text-white mb-6 leading-tight">
+          <h1 className="text-display md:text-6xl font-sans font-bold text-earth dark:text-white mb-6 leading-tight">
             Turn Your CV Into a
-            <span className="text-zapier-orange"> Job-Winning</span> Asset
+            <span className="text-primary"> Job-Winning</span> Asset
           </h1>
           
-          <p className="text-xl text-earth/70 dark:text-white/70 mb-8 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-subheading text-earth/70 dark:text-white/70 mb-8 max-w-3xl mx-auto leading-relaxed">
             Get AI-powered analysis, personalized recommendations, and professional cover letters 
             that help you stand out from the competition and land your dream job.
           </p>
@@ -33,14 +33,14 @@ const Index = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <Link
               to={user ? "/analyze" : "/analyze"}
-              className="bg-zapier-orange text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange/90 transition-colors flex items-center justify-center"
+              className="bg-primary text-primary-foreground px-8 py-4 rounded-lg text-subheading font-semibold hover:bg-primary/90 transition-colors flex items-center justify-center"
             >
               Start Free Analysis
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
             <Link
               to={user ? "/cover-letter" : "/cover-letter"}
-              className="border border-earth/20 dark:border-white/20 text-earth dark:text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-earth/5 dark:hover:bg-white/5 transition-colors"
+              className="border border-foreground/20 text-foreground px-8 py-4 rounded-lg text-subheading font-semibold hover:bg-foreground/5 transition-colors"
             >
               Create Cover Letter
             </Link>
@@ -73,23 +73,23 @@ const Index = () => {
       {/* CTA Section - Updated background color to match Resources page */}
       <section className="py-16 bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-earth dark:text-white mb-6">
+          <h2 className="text-title md:text-display font-sans font-bold text-earth dark:text-white mb-6">
             Ready to Transform Your Career?
           </h2>
-          <p className="text-xl text-earth/70 dark:text-white/70 mb-8 max-w-2xl mx-auto">
+          <p className="text-subheading text-earth/70 dark:text-white/70 mb-8 max-w-2xl mx-auto">
             Join thousands of job seekers who have successfully landed their dream jobs with TuneMyCV
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
               to="/analyze"
-              className="bg-zapier-orange text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange/90 transition-colors inline-flex items-center justify-center"
+              className="bg-primary text-primary-foreground px-8 py-4 rounded-lg text-subheading font-semibold hover:bg-primary/90 transition-colors inline-flex items-center justify-center"
             >
               <Zap className="mr-2 h-5 w-5" />
               Start Free Analysis
             </Link>
             <Link 
               to="/resources"
-              className="border-2 border-zapier-orange text-zapier-orange px-8 py-4 rounded-lg text-lg font-semibold hover:bg-zapier-orange hover:text-white transition-colors inline-flex items-center justify-center"
+              className="border-2 border-primary text-primary px-8 py-4 rounded-lg text-subheading font-semibold hover:bg-primary hover:text-primary-foreground transition-colors inline-flex items-center justify-center"
             >
               <BookOpen className="mr-2 h-5 w-5" />
               Explore Resources

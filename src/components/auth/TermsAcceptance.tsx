@@ -31,7 +31,7 @@ const TermsAcceptance: React.FC<TermsAcceptanceProps> = ({
         }
         required
       />
-      <Label htmlFor="accept-terms" className="ml-2 text-sm text-blueberry">
+      <Label htmlFor="accept-terms" className="ml-2 text-caption text-blueberry">
         I agree to the{' '}
         <a href="/terms" className="text-apricot hover:text-apricot/80">
           Terms of Service

@@ -2,9 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, MessageSquare, Lightbulb, Bug, Heart, Zap, Brain } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
+import { UnifiedInput, UnifiedTextarea } from '@/components/ui/unified-input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -132,13 +131,13 @@ export const FloatingFeedbackForm: React.FC<FloatingFeedbackFormProps> = ({
       <div className="space-y-6 text-center">
         <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-6">
           <Send className="h-12 w-12 text-green-600 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-earth dark:text-white mb-2">
+          <h3 className="text-subheading font-semibold text-earth dark:text-white mb-2">
             Thank you for your feedback!
           </h3>
           <p className="text-earth/70 dark:text-white/70">
             Your feedback has been sent successfully. We truly appreciate you helping us improve TuneMyCV!
           </p>
-          <div className="text-sm text-muted-foreground mt-2">
+          <div className="text-caption text-muted-foreground mt-2">
             This window will close automatically...
           </div>
         </div>
@@ -172,7 +171,7 @@ export const FloatingFeedbackForm: React.FC<FloatingFeedbackFormProps> = ({
                   <div className={`w-6 h-6 rounded-full ${category.color} flex items-center justify-center`}>
                     <Icon className="w-3 h-3 text-white" />
                   </div>
-                  <span className="text-xs font-medium group-hover:text-zapier-orange transition-colors">
+                  <span className="text-micro font-medium group-hover:text-zapier-orange transition-colors">
                     {category.label}
                   </span>
                 </div>
@@ -186,7 +185,7 @@ export const FloatingFeedbackForm: React.FC<FloatingFeedbackFormProps> = ({
       {/* Form Fields */}
       <div className="space-y-4 flex-1">
         <div className="bg-zapier-orange/10 dark:bg-zapier-orange/5 border border-zapier-orange/20 rounded-lg p-3 mb-6">
-          <p className="text-sm text-earth dark:text-white">
+          <p className="text-caption text-earth dark:text-white">
             {getContextualMessage()}
           </p>
         </div>
@@ -194,63 +193,66 @@ export const FloatingFeedbackForm: React.FC<FloatingFeedbackFormProps> = ({
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label htmlFor="name">Name</Label>
-            <Input
+            <UnifiedInput
               id="name"
               type="text"
-              name="name"
               value={formData.name}
-              onChange={handleInputChange}
+              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
               placeholder="Your full name (optional)"
               disabled={isSubmitting}
+              maxLength={100}
+              secure={true}
             />
           </div>
           <div>
             <Label htmlFor="email">Email Address</Label>
-            <Input
+            <UnifiedInput
               id="email"
               type="email"
-              name="email"
               value={formData.email}
-              onChange={handleInputChange}
+              onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
               placeholder={allowContact ? "your@email.com (required)" : "your@email.com (optional)"}
               required={allowContact}
               disabled={isSubmitting}
+              maxLength={100}
+              secure={true}
             />
           </div>
         </div>
 
         <div>
           <Label htmlFor="subject">Subject</Label>
-          <Input
+          <UnifiedInput
             id="subject"
             type="text"
-            name="subject"
             value={formData.subject}
-            onChange={handleInputChange}
+            onChange={(e) => setFormData(prev => ({ ...prev, subject: e.target.value }))}
             placeholder="Enter subject"
             required
             disabled={isSubmitting}
+            maxLength={200}
+            secure={true}
           />
         </div>
 
         <div>
           <Label htmlFor="message">Your Feedback</Label>
-          <Textarea
+          <UnifiedTextarea
             id="message"
-            name="message"
             value={formData.message}
-            onChange={handleInputChange}
+            onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
             placeholder="Please share your feedback, ideas, or issues..."
             className="min-h-[100px]"
             required
             disabled={isSubmitting}
             maxLength={maxCharacters}
+            secure={true}
           />
           <div className="flex justify-between items-center mt-2">
-            <div className="text-xs text-muted-foreground">
+            <div className="text-micro text-muted-foreground">
               Share your thoughts, ideas, or issues...
             </div>
-            <div className={`text-xs transition-colors ${
+            <div className={`text-micro transition-colors ${
               characterCount > maxCharacters * 0.9 
                 ? 'text-red-500' 
                 : 'text-muted-foreground'
@@ -271,10 +273,10 @@ export const FloatingFeedbackForm: React.FC<FloatingFeedbackFormProps> = ({
           />
           <label 
             htmlFor="allowContact" 
-            className="text-sm leading-relaxed cursor-pointer"
+            className="text-caption leading-relaxed cursor-pointer"
           >
             Yes, you can contact me about my feedback
-            <span className="text-xs text-muted-foreground block mt-1">
+            <span className="text-micro text-muted-foreground block mt-1">
               We'll only reach out if we need clarification or have updates to share
             </span>
           </label>

@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Building, MapPin, Info } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import SecureInput from '@/components/security/SecureInput';
+import { UnifiedInput } from '@/components/ui/unified-input';
 
 const WorkEnvironmentPreferences: React.FC = () => {
   const { user } = useAuth();

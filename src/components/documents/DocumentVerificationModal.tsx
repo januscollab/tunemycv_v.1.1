@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { X, Save, AlertTriangle, CheckCircle, Info, ChevronDown, ChevronUp, WandSparkles } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+import { UnifiedTextarea } from '@/components/ui/unified-input';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -102,10 +102,10 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
         <DialogHeader className="px-6 py-3 border-b border-border bg-background">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <DialogTitle className="text-lg font-semibold text-foreground">
+              <DialogTitle className="text-heading font-semibold text-foreground">
                 Review Document
               </DialogTitle>
-              <div className="flex items-center space-x-3 text-sm text-muted-foreground">
+              <div className="flex items-center space-x-3 text-caption text-muted-foreground">
                 <span className="font-medium">{fileName}</span>
                 <span>•</span>
                 <span>{formatFileSize(fileSize)}</span>
@@ -134,8 +134,8 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
                     <div className="px-4 py-3 border-b border-border bg-muted/20 cursor-pointer hover:bg-muted/40 transition-colors">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
-                          <h3 className="text-sm font-medium text-foreground">Quality Assessment</h3>
-                          <div className={`text-sm font-bold ${getQualityColor(quality.score)}`}>
+                          <h3 className="text-caption font-medium text-foreground">Quality Assessment</h3>
+                          <div className={`text-caption font-bold ${getQualityColor(quality.score)}`}>
                             {quality.score}%
                           </div>
                         </div>
@@ -153,27 +153,27 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
                       {/* Document Stats */}
                       <div className="grid grid-cols-3 gap-4 mb-4">
                         <div className="text-center">
-                          <div className="text-lg font-bold text-foreground">{quality.wordCount}</div>
-                          <div className="text-xs text-muted-foreground">Words</div>
+                          <div className="text-heading font-bold text-foreground">{quality.wordCount}</div>
+                          <div className="text-micro text-muted-foreground">Words</div>
                         </div>
                         <div className="text-center">
-                          <div className="text-lg font-bold text-foreground">{Math.round(quality.characterCount / 1000)}k</div>
-                          <div className="text-xs text-muted-foreground">Characters</div>
+                          <div className="text-heading font-bold text-foreground">{Math.round(quality.characterCount / 1000)}k</div>
+                          <div className="text-micro text-muted-foreground">Characters</div>
                         </div>
                         <div className="text-center">
-                          <div className={`text-lg font-bold ${getQualityColor(quality.score)}`}>{quality.score}%</div>
-                          <div className="text-xs text-muted-foreground">Quality</div>
+                          <div className={`text-heading font-bold ${getQualityColor(quality.score)}`}>{quality.score}%</div>
+                          <div className="text-micro text-muted-foreground">Quality</div>
                         </div>
                       </div>
 
                       {/* Quality Notes */}
                       <div className="space-y-2">
                         {quality.issues.length === 0 ? (
-                          <div className="text-sm text-muted-foreground italic">Perfect extraction - no issues detected</div>
+                          <div className="text-caption text-muted-foreground italic">Perfect extraction - no issues detected</div>
                         ) : (
                           <>
                             {quality.issues.map((issue, index) => (
-                              <div key={index} className="flex items-start space-x-2 text-xs">
+                              <div key={index} className="flex items-start space-x-2 text-micro">
                                 {getIssueIcon(issue.type)}
                                 <div className="flex-1">
                                   <span className="font-medium">{issue.title}:</span>{' '}
@@ -190,8 +190,8 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
 
                 {/* File Information */}
                 <div className="p-4 border-b border-border">
-                  <h3 className="text-sm font-medium text-foreground mb-3">File Information</h3>
-                  <div className="space-y-2 text-sm">
+                  <h3 className="text-caption font-medium text-foreground mb-3">File Information</h3>
+                  <div className="space-y-2 text-caption">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Name:</span>
                       <span className="font-medium text-foreground truncate ml-2">{fileName}</span>
@@ -209,7 +209,7 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
 
                 {/* Auto-save Status */}
                 <div className="p-4">
-                  <div className="text-xs text-muted-foreground">
+                  <div className="text-micro text-muted-foreground">
                     {isAutoSaving ? (
                       <div className="flex items-center space-x-2">
                         <div className="animate-spin rounded-full h-3 w-3 border border-current border-t-transparent" />
@@ -228,8 +228,8 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
           <div className="w-[70%] flex flex-col">
             <div className="px-4 py-3 border-b border-border bg-background">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-medium text-foreground">Extracted Text</h3>
-                <div className="text-xs text-muted-foreground">
+                <h3 className="text-caption font-medium text-foreground">Extracted Text</h3>
+                <div className="text-micro text-muted-foreground">
                   Click to edit • Changes auto-saved
                 </div>
               </div>
@@ -237,10 +237,11 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
             
             <div className="flex-1 p-4">
               <ScrollArea className="h-[calc(100vh-300px)] border rounded-md">
-                <Textarea
+                <UnifiedTextarea
+                  variant="standard"
                   value={editedText}
                   onChange={(e) => setEditedText(e.target.value)}
-                  className="min-h-[calc(100vh-320px)] font-mono text-sm resize-none border-0 focus:border-0 focus:outline-none bg-background p-4"
+                  className="min-h-[calc(100vh-320px)] font-mono text-caption resize-none border-0 focus:border-0 focus:outline-none bg-background p-4"
                   placeholder="Document text appears here..."
                 />
               </ScrollArea>

@@ -11,9 +11,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import EditTitleDialog from '@/components/ui/edit-title-dialog';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { UnifiedInput, UnifiedTextarea } from '@/components/ui/unified-input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -367,10 +366,10 @@ const AuthenticatedCoverLetter = () => {
           <div className="flex items-start mb-6">
             <Edit className="h-8 w-8 text-zapier-orange mr-3 flex-shrink-0" />
             <div>
-              <h1 className="text-3xl font-bold text-earth dark:text-white">
+              <h1 className="text-display font-bold text-foreground">
                 Generate Cover Letter
               </h1>
-              <p className="text-lg text-earth/70 dark:text-white/70 max-w-2xl mt-2">
+              <p className="text-subheading text-earth/70 dark:text-white/70 max-w-2xl mt-2">
                 Create tailored cover letters that highlight your strengths and align perfectly with specific job requirements.
               </p>
             </div>
@@ -401,15 +400,15 @@ const AuthenticatedCoverLetter = () => {
           <div>
             <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
               <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="create" className="flex items-center space-x-2 text-sm">
+                <TabsTrigger value="create" className="flex items-center space-x-2 text-caption">
                   <Sparkles className="h-4 w-4" />
                   <span>Generate New</span>
                 </TabsTrigger>
-                <TabsTrigger value="result" className="flex items-center space-x-2 text-sm">
+                <TabsTrigger value="result" className="flex items-center space-x-2 text-caption">
                   <Eye className="h-4 w-4" />
                   <span>View Letter</span>
                 </TabsTrigger>
-                <TabsTrigger value="history" className="flex items-center space-x-2 text-sm">
+                <TabsTrigger value="history" className="flex items-center space-x-2 text-caption">
                   <History className="h-4 w-4" />
                   <span>History</span>
                 </TabsTrigger>
@@ -490,8 +489,9 @@ const AuthenticatedCoverLetter = () => {
                       <CardContent className="space-y-4 pt-0">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <Label htmlFor="jobTitle">Job Title *</Label>
-                            <Input
+                            <UnifiedInput
+                              variant="floating"
+                              label="Job Title *"
                               id="jobTitle"
                               placeholder="e.g., Marketing Manager"
                               value={formData.jobTitle}
@@ -500,8 +500,9 @@ const AuthenticatedCoverLetter = () => {
                             />
                           </div>
                           <div>
-                            <Label htmlFor="companyName">Company Name *</Label>
-                            <Input
+                            <UnifiedInput
+                              variant="floating"
+                              label="Company Name *"
                               id="companyName"
                               placeholder="e.g., TechCorp"
                               value={formData.companyName}
@@ -512,8 +513,9 @@ const AuthenticatedCoverLetter = () => {
                         </div>
 
                         <div>
-                          <Label htmlFor="jobDescription">Job Description *</Label>
-                          <Textarea
+                          <UnifiedTextarea
+                            variant="floating"
+                            label="Job Description *"
                             id="jobDescription"
                             placeholder="Paste the complete job description here for the most tailored results..."
                             value={formData.jobDescription}

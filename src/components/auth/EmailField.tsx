@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Label } from '@/components/ui/label';
-import SecureInput from '@/components/security/SecureInput';
+import { UnifiedInput } from '@/components/ui/unified-input';
 
 interface EmailFieldProps {
   email: string;
@@ -14,7 +14,7 @@ const EmailField: React.FC<EmailFieldProps> = ({ email, onChange }) => {
       <Label htmlFor="email" className="text-blueberry">
         Email address
       </Label>
-      <SecureInput
+      <UnifiedInput
         id="email"
         name="email"
         type="email"
@@ -25,6 +25,7 @@ const EmailField: React.FC<EmailFieldProps> = ({ email, onChange }) => {
         className="mt-1"
         maxLength={254}
         placeholder="Enter your email address"
+        secure={true}
       />
     </div>
   );

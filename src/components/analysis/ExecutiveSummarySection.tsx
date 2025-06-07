@@ -28,13 +28,13 @@ const ExecutiveSummarySection: React.FC<ExecutiveSummarySectionProps> = ({ execu
     <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
       <div className="flex items-center mb-6">
         <FileText className="h-5 w-5 text-apricot mr-2" />
-        <h2 className="text-lg font-semibold text-blueberry dark:text-citrus">Executive Summary</h2>
+        <h2 className="text-heading font-semibold text-blueberry dark:text-citrus">Executive Summary</h2>
       </div>
 
       {/* Overview */}
       {overview && (
         <div className="mb-6">
-          <p className="text-blueberry/80 dark:text-apple-core leading-relaxed">{overview}</p>
+          <p className="text-body text-blueberry/80 dark:text-apple-core leading-relaxed">{overview}</p>
         </div>
       )}
 
@@ -52,11 +52,11 @@ const ExecutiveSummarySection: React.FC<ExecutiveSummarySectionProps> = ({ execu
                 <div key={index} className="border border-green-200 rounded-lg p-4 bg-green-50 dark:bg-green-900/20">
                   <div className="flex items-center justify-between mb-2">
                     <h4 className="font-medium text-blueberry dark:text-citrus">{strength.title}</h4>
-                    <span className="text-xs px-2 py-1 rounded bg-green-100 text-green-800">
-                      {strength.relevance}% relevance
-                    </span>
+                     <span className="text-micro px-2 py-1 rounded bg-green-100 text-green-800">
+                       {strength.relevance}% relevance
+                     </span>
                   </div>
-                  <p className="text-sm text-blueberry/80 dark:text-apple-core">{strength.description}</p>
+                  <p className="text-body text-blueberry/80 dark:text-apple-core">{strength.description}</p>
                 </div>
               ))}
             </div>
@@ -75,14 +75,14 @@ const ExecutiveSummarySection: React.FC<ExecutiveSummarySectionProps> = ({ execu
                 <div key={index} className="border border-red-200 rounded-lg p-4 bg-red-50 dark:bg-red-900/20">
                   <div className="flex items-center justify-between mb-2">
                     <h4 className="font-medium text-blueberry dark:text-citrus">{weakness.title}</h4>
-                    <span className="text-xs px-2 py-1 rounded bg-red-100 text-red-800">
-                      {weakness.impact}% impact
-                    </span>
+                     <span className="text-micro px-2 py-1 rounded bg-red-100 text-red-800">
+                       {weakness.impact}% impact
+                     </span>
                   </div>
-                  <p className="text-sm text-blueberry/80 dark:text-apple-core mb-3">{weakness.description}</p>
+                  <p className="text-body text-blueberry/80 dark:text-apple-core mb-3">{weakness.description}</p>
                   <div className="bg-white/70 dark:bg-gray-800/50 rounded p-3">
-                    <h5 className="text-xs font-medium text-blue-800 dark:text-blue-400 mb-1">Recommendation:</h5>
-                    <p className="text-xs text-blue-700 dark:text-blue-500">{weakness.recommendation}</p>
+                     <h5 className="text-caption font-medium text-blue-800 dark:text-blue-400 mb-1">Recommendation:</h5>
+                     <p className="text-caption text-blue-700 dark:text-blue-500">{weakness.recommendation}</p>
                   </div>
                 </div>
               ))}
