@@ -38,6 +38,16 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [qualityExpanded, setQualityExpanded] = useState(true);
   const { toast } = useToast();
+
+  // Sync state when extractedText changes (when modal opens with new content)
+  useEffect(() => {
+    if (isOpen && extractedText !== editedText) {
+      setEditedText(extractedText);
+      setDocumentJson(editorTextToJson(extractedText));
+      setLastSaved(null);
+      setIsAutoSaving(false);
+    }
+  }, [isOpen, extractedText, editedText]);
   
   const quality = assessDocumentQuality(editedText, fileName, documentType);
 
