@@ -361,16 +361,12 @@ async function extractTextWithAdobe(accessToken: string, fileData: string, fileN
         throw new Error('Failed to download extraction result');
       }
 
-      const resultData = await resultResponse.json();
+      // Adobe returns a ZIP file containing structuredData.json
+      const zipBuffer = await resultResponse.arrayBuffer();
+      console.log(`Downloaded ZIP file: ${zipBuffer.byteLength} bytes`);
       
-      let extractedText = '';
-      if (resultData.elements) {
-        for (const element of resultData.elements) {
-          if (element.Text) {
-            extractedText += element.Text + ' ';
-          }
-        }
-      }
+      // Extract and parse the structured data from the ZIP
+      const extractedText = await extractTextFromZip(zipBuffer);
 
       console.log(`Text extraction completed, extracted ${extractedText.split(/\s+/).length} words`);
       return extractedText.trim();
@@ -383,6 +379,51 @@ async function extractTextWithAdobe(accessToken: string, fileData: string, fileN
 
   console.error(`Adobe extraction job timed out after ${maxAttempts} attempts`);
   throw new Error('Adobe extraction job timed out');
+}
+
+async function extractTextFromZip(zipBuffer: ArrayBuffer): Promise<string> {
+  try {
+    // Import ZIP utilities from Deno standard library
+    const { unzip } = await import("https://deno.land/x/zip@v1.2.5/mod.ts");
+    
+    // Convert ArrayBuffer to Uint8Array
+    const zipData = new Uint8Array(zipBuffer);
+    
+    // Extract the ZIP file
+    const extractedFiles = await unzip(zipData);
+    
+    // Look for structuredData.json in the extracted files
+    const structuredDataFile = extractedFiles.find(file => 
+      file.name === 'structuredData.json' || file.name.endsWith('/structuredData.json')
+    );
+    
+    if (!structuredDataFile) {
+      console.error('Available files in ZIP:', extractedFiles.map(f => f.name));
+      throw new Error('structuredData.json not found in Adobe response ZIP');
+    }
+    
+    // Parse the JSON content
+    const jsonContent = new TextDecoder().decode(structuredDataFile.content);
+    const structuredData = JSON.parse(jsonContent);
+    
+    console.log('Successfully extracted structured data from ZIP');
+    
+    // Extract text from the structured data
+    let extractedText = '';
+    if (structuredData.elements) {
+      for (const element of structuredData.elements) {
+        if (element.Text) {
+          extractedText += element.Text + ' ';
+        }
+      }
+    }
+    
+    return extractedText.trim();
+    
+  } catch (error) {
+    console.error('Error extracting text from ZIP:', error);
+    throw new Error(`Failed to extract text from Adobe ZIP response: ${error.message}`);
+  }
 }
 
 serve(handler);
