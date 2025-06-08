@@ -285,7 +285,7 @@ async function processWithAdobe(
     const statusData = await statusResponse.json();
     
     if (statusData.status === 'done') {
-      const resultResponse = await fetch(statusData.asset.downloadUri);
+      const resultResponse = await fetch(statusData.content.downloadUri);
       if (!resultResponse.ok) {
         throw new Error('Failed to download extraction result');
       }

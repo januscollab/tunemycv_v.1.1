@@ -346,7 +346,7 @@ async function extractTextWithAdobe(
     if (statusData.status === 'done') {
       jobComplete = true;
       
-      const resultUrl = statusData.asset.downloadUri;
+      const resultUrl = statusData.content.downloadUri;
       console.log('Job completed, downloading results...');
       
       const resultResponse = await fetch(resultUrl);
