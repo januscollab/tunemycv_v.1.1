@@ -58,7 +58,15 @@ export const extractTextFromFile = async (file: File, signal?: AbortSignal): Pro
       // Convert file to base64 for Adobe processing
       const arrayBuffer = await file.arrayBuffer();
       const uint8Array = new Uint8Array(arrayBuffer);
-      const base64String = btoa(String.fromCharCode(...uint8Array));
+      
+      // Convert to base64 in chunks to avoid stack overflow for large files
+      let binaryString = '';
+      const chunkSize = 8192; // Process in 8KB chunks
+      for (let i = 0; i < uint8Array.length; i += chunkSize) {
+        const chunk = uint8Array.slice(i, i + chunkSize);
+        binaryString += String.fromCharCode(...chunk);
+      }
+      const base64String = btoa(binaryString);
       
       console.log('Processing PDF with Adobe PDF Services...');
       
