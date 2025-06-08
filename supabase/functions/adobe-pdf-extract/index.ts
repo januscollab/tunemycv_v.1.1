@@ -216,14 +216,19 @@ async function extractTextWithAdobe(accessToken: string, fileData: string, fileN
   
   console.log(`Uploading file to Adobe with client_id: ${credentials.client_id.substring(0, 8)}...`);
   
+  // Convert base64 to binary data
+  const binaryData = Uint8Array.from(atob(fileData), c => c.charCodeAt(0));
+  
+  console.log(`Uploading ${binaryData.length} bytes to Adobe...`);
+  
   const uploadResponse = await fetch(uploadUrl, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'X-API-Key': credentials.client_id,
-      'Content-Type': 'application/pdf',
+      'Content-Type': 'application/octet-stream',
     },
-    body: Uint8Array.from(atob(fileData), c => c.charCodeAt(0)),
+    body: binaryData,
   });
 
   if (!uploadResponse.ok) {
