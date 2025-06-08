@@ -8,6 +8,10 @@
 - [x] Add ZIP content validation before extraction attempts  
 - [x] Implement proper error handling for each processing step
 - [x] Create storage bucket for debug files with proper permissions
+- [x] Clean up and recreate adobe-debug-files storage bucket with proper RLS policies
+- [x] Update file extension detection logic (.json/.zip/.txt based on Adobe response)
+- [x] Implement DDMMYY-HHMMSS Original Filename User_ID naming convention
+- [x] Apply non-blocking storage operations to prevent extraction failures
 
 ## Future Enhancements
 - [ ] Add more comprehensive PDF validation

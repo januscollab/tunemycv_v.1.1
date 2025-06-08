@@ -651,7 +651,7 @@ function validateZipContent(zipBuffer: ArrayBuffer): boolean {
 }
 
 async function saveZipToStorage(
-  zipBuffer: ArrayBuffer, 
+  responseBuffer: ArrayBuffer, 
   originalFileName: string, 
   userId?: string,
   status: string = 'downloaded'
@@ -662,49 +662,53 @@ async function saveZipToStorage(
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     );
 
-    // Format timestamp as DD-MM-YYYY-HH-MM-SS
+    // Format timestamp as DDMMYY-HHMMSS
     const now = new Date();
     const day = String(now.getDate()).padStart(2, '0');
     const month = String(now.getMonth() + 1).padStart(2, '0');
-    const year = now.getFullYear();
+    const year = String(now.getFullYear()).slice(-2); // Last 2 digits of year
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
     const seconds = String(now.getSeconds()).padStart(2, '0');
-    const timestamp = `${day}-${month}-${year}-${hours}-${minutes}-${seconds}`;
+    const timestamp = `${day}${month}${year}-${hours}${minutes}${seconds}`;
     
     const baseFileName = originalFileName.replace(/\.[^/.]+$/, "");
-    const userPrefix = userId ? `${userId}_` : '';
+    const userIdSuffix = userId ? ` ${userId}` : '';
     
-    const zipFileName = `${userPrefix}${timestamp}_${baseFileName}_${status}.zip`;
+    // Detect file type and set appropriate extension
+    const isDirectJson = isDirectJsonResponse(responseBuffer);
+    const fileExtension = isDirectJson ? 'json' : 'zip';
     
-    // Save ZIP file
-    const { error: zipError } = await supabase.storage
+    const fileName = `${timestamp} ${baseFileName}${userIdSuffix}_${status}.${fileExtension}`;
+    
+    // Save response file
+    const { error: saveError } = await supabase.storage
       .from('adobe-debug-files')
-      .upload(zipFileName, zipBuffer, {
-        contentType: 'application/zip',
+      .upload(fileName, responseBuffer, {
+        contentType: isDirectJson ? 'application/json' : 'application/zip',
         upsert: true
       });
 
-    if (zipError) {
-      console.error('Failed to save ZIP file:', zipError);
+    if (saveError) {
+      console.error('Failed to save response file:', saveError);
       return {};
     }
 
-    const { data: zipUrlData } = supabase.storage
+    const { data: urlData } = supabase.storage
       .from('adobe-debug-files')
-      .getPublicUrl(zipFileName);
+      .getPublicUrl(fileName);
 
-    // Track ZIP file in database
+    // Track response file in database
     await supabase.from('adobe_debug_files').insert({
       user_id: userId || 'anonymous',
-      file_name: zipFileName,
+      file_name: fileName,
       original_filename: originalFileName,
-      file_type: 'zip',
-      file_size: zipBuffer.byteLength,
-      storage_path: zipFileName
+      file_type: fileExtension,
+      file_size: responseBuffer.byteLength,
+      storage_path: fileName
     });
 
-    return { zipUrl: zipUrlData.publicUrl };
+    return { zipUrl: urlData.publicUrl };
   } catch (error) {
     console.error('Error saving ZIP to storage:', error);
     return {};
@@ -722,20 +726,20 @@ async function saveTextToStorage(
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     );
 
-    // Format timestamp as DD-MM-YYYY-HH-MM-SS
+    // Format timestamp as DDMMYY-HHMMSS
     const now = new Date();
     const day = String(now.getDate()).padStart(2, '0');
     const month = String(now.getMonth() + 1).padStart(2, '0');
-    const year = now.getFullYear();
+    const year = String(now.getFullYear()).slice(-2); // Last 2 digits of year
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
     const seconds = String(now.getSeconds()).padStart(2, '0');
-    const timestamp = `${day}-${month}-${year}-${hours}-${minutes}-${seconds}`;
+    const timestamp = `${day}${month}${year}-${hours}${minutes}${seconds}`;
     
     const baseFileName = originalFileName.replace(/\.[^/.]+$/, "");
-    const userPrefix = userId ? `${userId}_` : '';
+    const userIdSuffix = userId ? ` ${userId}` : '';
     
-    const textFileName = `${userPrefix}${timestamp}_${baseFileName}_extracted.txt`;
+    const textFileName = `${timestamp} ${baseFileName}${userIdSuffix}_extracted.txt`;
     const textBuffer = new TextEncoder().encode(extractedText);
     
     // Save text file
