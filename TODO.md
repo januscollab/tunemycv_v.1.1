@@ -19,6 +19,9 @@
 - [ ] **Floating Label Input**: When user clicks into edit area and label floats to top, it should reduce in text size (smaller than the non-floating state)
 - [ ] **Design System Consistency**: Replicate these floating label improvements throughout the entire site wherever these components are used
 
+## User Management Enhancements
+- [ ] **6-Digit Sequential User ID System**: Replace current 8-character alphanumeric user_id with 6-digit sequential system (000001, 000002, etc.) with alan@januscollab.com assigned 000000
+
 ## Future Enhancements
 - [ ] Add more comprehensive PDF validation
 - [ ] Implement retry logic for failed Adobe API calls
