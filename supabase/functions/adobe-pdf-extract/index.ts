@@ -46,10 +46,24 @@ const handler = async (req: Request): Promise<Response> => {
     
     // Get user ID from JWT if available
     const authHeader = req.headers.get('authorization');
+    console.log(`Authorization header present: ${!!authHeader}`);
+    
     if (authHeader) {
       const token = authHeader.replace('Bearer ', '');
-      const { data: { user } } = await supabase.auth.getUser(token);
-      userId = user?.id || null;
+      console.log(`JWT token length: ${token.length}`);
+      
+      const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+      
+      if (authError) {
+        console.error('JWT authentication error:', authError);
+      } else if (user) {
+        console.log(`Authenticated user: ${user.id}`);
+        userId = user.id;
+      } else {
+        console.log('No user found from JWT token');
+      }
+    } else {
+      console.log('No authorization header provided');
     }
 
     const startTime = Date.now();
@@ -103,7 +117,7 @@ const handler = async (req: Request): Promise<Response> => {
     const accessToken = await getAdobeAccessToken(credentials);
 
     // Extract text using Adobe PDF Services
-    const extractedText = await extractTextWithAdobe(accessToken, fileData, fileName);
+    const extractedText = await extractTextWithAdobe(accessToken, fileData, fileName, credentials);
 
     const processingTime = Date.now() - startTime;
     const wordCount = extractedText.split(/\s+/).filter(word => word.length > 0).length;
@@ -164,9 +178,14 @@ const handler = async (req: Request): Promise<Response> => {
 async function getAdobeAccessToken(credentials: AdobeCredentials): Promise<string> {
   const tokenUrl = 'https://ims-na1.adobelogin.com/ims/token/v3';
   
+  console.log(`Requesting Adobe access token with client_id: ${credentials.client_id.substring(0, 8)}...`);
+  
+  // For now, use the encrypted secret directly - TODO: Implement proper decryption
+  const clientSecret = credentials.client_secret_encrypted;
+  
   const formData = new URLSearchParams();
   formData.append('client_id', credentials.client_id);
-  formData.append('client_secret', credentials.client_secret_encrypted); // TODO: Decrypt this
+  formData.append('client_secret', clientSecret);
   formData.append('grant_type', 'client_credentials');
   formData.append('scope', 'openid,AdobeID,document_generation,document_services');
 
@@ -180,22 +199,28 @@ async function getAdobeAccessToken(credentials: AdobeCredentials): Promise<strin
 
   if (!response.ok) {
     const errorText = await response.text();
+    console.error(`Adobe token request failed: ${response.status} - ${errorText}`);
     throw new Error(`Failed to get Adobe access token: ${errorText}`);
   }
 
   const tokenData = await response.json();
+  console.log('Adobe access token obtained successfully');
   return tokenData.access_token;
 }
 
-async function extractTextWithAdobe(accessToken: string, fileData: string, fileName: string): Promise<string> {
+async function extractTextWithAdobe(accessToken: string, fileData: string, fileName: string, credentials: AdobeCredentials): Promise<string> {
+  console.log(`Starting Adobe PDF extraction for file: ${fileName}`);
+  
   // Upload file to Adobe
   const uploadUrl = 'https://pdf-services.adobe.io/assets';
+  
+  console.log(`Uploading file to Adobe with client_id: ${credentials.client_id.substring(0, 8)}...`);
   
   const uploadResponse = await fetch(uploadUrl, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${accessToken}`,
-      'X-API-Key': Deno.env.get('ADOBE_CLIENT_ID') || '',
+      'X-API-Key': credentials.client_id,
       'Content-Type': 'application/pdf',
     },
     body: Uint8Array.from(atob(fileData), c => c.charCodeAt(0)),
@@ -203,11 +228,13 @@ async function extractTextWithAdobe(accessToken: string, fileData: string, fileN
 
   if (!uploadResponse.ok) {
     const errorText = await uploadResponse.text();
+    console.error(`Adobe file upload failed: ${uploadResponse.status} - ${errorText}`);
     throw new Error(`Failed to upload file to Adobe: ${errorText}`);
   }
 
   const uploadData = await uploadResponse.json();
   const assetId = uploadData.assetID;
+  console.log(`File uploaded successfully, asset ID: ${assetId}`);
 
   // Create extraction job
   const extractUrl = 'https://pdf-services.adobe.io/operation/extractpdf';
@@ -220,11 +247,13 @@ async function extractTextWithAdobe(accessToken: string, fileData: string, fileN
     renditionsToExtract: []
   };
 
+  console.log('Creating Adobe extraction job...');
+  
   const extractResponse = await fetch(extractUrl, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${accessToken}`,
-      'X-API-Key': Deno.env.get('ADOBE_CLIENT_ID') || '',
+      'X-API-Key': credentials.client_id,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(extractPayload),
@@ -232,6 +261,7 @@ async function extractTextWithAdobe(accessToken: string, fileData: string, fileN
 
   if (!extractResponse.ok) {
     const errorText = await extractResponse.text();
+    console.error(`Adobe extraction job creation failed: ${extractResponse.status} - ${errorText}`);
     throw new Error(`Failed to create extraction job: ${errorText}`);
   }
 
@@ -241,6 +271,8 @@ async function extractTextWithAdobe(accessToken: string, fileData: string, fileN
   if (!jobLocation) {
     throw new Error('No job location returned from Adobe');
   }
+
+  console.log(`Extraction job created, polling for completion at: ${jobLocation}`);
 
   // Poll for job completion
   let jobComplete = false;
@@ -254,24 +286,29 @@ async function extractTextWithAdobe(accessToken: string, fileData: string, fileN
     const statusResponse = await fetch(jobLocation, {
       headers: {
         'Authorization': `Bearer ${accessToken}`,
-        'X-API-Key': Deno.env.get('ADOBE_CLIENT_ID') || '',
+        'X-API-Key': credentials.client_id,
       },
     });
 
     if (!statusResponse.ok) {
+      console.error(`Adobe job status check failed: ${statusResponse.status}`);
       throw new Error('Failed to check job status');
     }
 
     const statusData = await statusResponse.json();
+    console.log(`Job status check attempt ${attempts}: ${statusData.status}`);
     
     if (statusData.status === 'done') {
       jobComplete = true;
       
       // Download the result
       const resultUrl = statusData.asset.downloadUri;
+      console.log('Job completed, downloading results...');
+      
       const resultResponse = await fetch(resultUrl);
       
       if (!resultResponse.ok) {
+        console.error(`Adobe result download failed: ${resultResponse.status}`);
         throw new Error('Failed to download extraction result');
       }
 
@@ -287,13 +324,16 @@ async function extractTextWithAdobe(accessToken: string, fileData: string, fileN
         }
       }
 
+      console.log(`Text extraction completed, extracted ${extractedText.split(/\s+/).length} words`);
       return extractedText.trim();
       
     } else if (statusData.status === 'failed') {
+      console.error(`Adobe extraction job failed: ${JSON.stringify(statusData)}`);
       throw new Error(`Adobe extraction job failed: ${statusData.error || 'Unknown error'}`);
     }
   }
 
+  console.error(`Adobe extraction job timed out after ${maxAttempts} attempts`);
   throw new Error('Adobe extraction job timed out');
 }
 
