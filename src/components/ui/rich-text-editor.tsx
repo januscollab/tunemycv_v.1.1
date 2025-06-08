@@ -146,22 +146,27 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     return sections.join('\n\n');
   }, []);
 
-  // Initialize editor content only once
+  // Initialize editor content and handle value changes
   useEffect(() => {
-    if (editorRef.current && lastValueRef.current !== value) {
-      const selection = window.getSelection();
-      const range = selection?.rangeCount ? selection.getRangeAt(0) : null;
-      
-      editorRef.current.innerHTML = textToHtml(value);
-      lastValueRef.current = value;
-      
-      // Restore cursor position if possible
-      if (range && editorRef.current.contains(range.startContainer)) {
-        try {
-          selection?.removeAllRanges();
-          selection?.addRange(range);
-        } catch (e) {
-          // Ignore range restoration errors
+    if (editorRef.current) {
+      // Always update if value has changed, regardless of lastValueRef
+      if (value !== lastValueRef.current) {
+        console.log('RichTextEditor: Updating content with new value:', value?.substring(0, 100) + '...');
+        
+        const selection = window.getSelection();
+        const range = selection?.rangeCount ? selection.getRangeAt(0) : null;
+        
+        editorRef.current.innerHTML = textToHtml(value);
+        lastValueRef.current = value;
+        
+        // Restore cursor position if possible
+        if (range && editorRef.current.contains(range.startContainer)) {
+          try {
+            selection?.removeAllRanges();
+            selection?.addRange(range);
+          } catch (e) {
+            // Ignore range restoration errors
+          }
         }
       }
     }
