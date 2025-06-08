@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { X, Save, AlertTriangle, CheckCircle, Info, ChevronDown, ChevronUp, WandSparkles } from 'lucide-react';
-import { editorTextToJson, editorJsonToText, DocumentJson } from '@/utils/editorJsonUtils';
+import { textToJson, jsonToText, DocumentJson } from '@/utils/documentJsonUtils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { RichTextEditor } from '@/components/ui/rich-text-editor';
+import { UnifiedTextarea } from '@/components/ui/unified-input';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -32,22 +32,12 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
   onSave
 }) => {
   const [editedText, setEditedText] = useState(extractedText);
-  const [documentJson, setDocumentJson] = useState<DocumentJson>(() => editorTextToJson(extractedText));
+  const [documentJson, setDocumentJson] = useState<DocumentJson>(() => textToJson(extractedText));
   const [isSaving, setIsSaving] = useState(false);
   const [isAutoSaving, setIsAutoSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [qualityExpanded, setQualityExpanded] = useState(true);
   const { toast } = useToast();
-
-  // Sync state when extractedText changes (when modal opens with new content)
-  useEffect(() => {
-    if (isOpen && extractedText !== editedText) {
-      setEditedText(extractedText);
-      setDocumentJson(editorTextToJson(extractedText));
-      setLastSaved(null);
-      setIsAutoSaving(false);
-    }
-  }, [isOpen, extractedText, editedText]);
   
   const quality = assessDocumentQuality(editedText, fileName, documentType);
 
@@ -67,7 +57,7 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
 
   // Bidirectional sync: text changes update JSON
   useEffect(() => {
-    const newJson = editorTextToJson(editedText);
+    const newJson = textToJson(editedText);
     setDocumentJson(newJson);
   }, [editedText]);
 
@@ -254,11 +244,12 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
             </div>
             
             <div className="flex-1 p-4">
-              <ScrollArea className="h-[calc(100vh-300px)]">
-                <RichTextEditor
+              <ScrollArea className="h-[calc(100vh-300px)] border rounded-md">
+                <UnifiedTextarea
+                  variant="standard"
                   value={editedText}
-                  onChange={setEditedText}
-                  className="min-h-[calc(100vh-320px)] border-0"
+                  onChange={(e) => setEditedText(e.target.value)}
+                  className="min-h-[calc(100vh-320px)] font-mono text-caption resize-none border-0 focus:border-0 focus:outline-none bg-background p-4"
                   placeholder="Document text appears here..."
                 />
               </ScrollArea>

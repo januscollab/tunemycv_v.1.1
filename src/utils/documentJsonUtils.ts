@@ -1,19 +1,8 @@
-export interface TextFormatting {
-  bold?: boolean;
-}
-
-export interface FormattedText {
-  text: string;
-  formatting?: TextFormatting;
-}
-
 export interface DocumentSection {
   type: 'heading' | 'paragraph' | 'list';
   level?: 1 | 2 | 3;
   content?: string;
-  formattedContent?: FormattedText[];
   items?: string[];
-  formattedItems?: FormattedText[][];
   id: string;
 }
 
