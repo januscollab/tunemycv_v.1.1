@@ -71,11 +71,15 @@ export const extractTextFromFile = async (file: File, signal?: AbortSignal): Pro
       });
       
       if (adobeError) {
-        throw new Error(`Adobe PDF extraction failed: ${adobeError.message}`);
+        console.error('Adobe PDF Services error:', adobeError);
+        // Pass through user-friendly error messages from the Adobe API
+        throw new Error(adobeError.message || 'PDF processing service temporarily unavailable. Please try again.');
       }
       
       if (!data?.success) {
-        throw new Error(data?.error || 'Adobe PDF extraction returned no data');
+        // Use the user-friendly error message from the Adobe API if available
+        const errorMessage = data?.error || 'PDF processing encountered an issue. Please try again or use a different file format.';
+        throw new Error(errorMessage);
       }
       
       console.log(`Adobe PDF extraction successful: ${data.wordCount} words extracted in ${data.processingTime}ms`);
@@ -85,18 +89,37 @@ export const extractTextFromFile = async (file: File, signal?: AbortSignal): Pro
       console.error('Adobe PDF extraction failed:', error);
       
       if (error instanceof Error) {
-        if (error.message.includes('Monthly usage limit exceeded')) {
-          throw new Error('Monthly Adobe PDF extraction limit exceeded. Please try again next month or contact support.');
+        // Check for specific error patterns and provide helpful messages
+        if (error.message.includes('Monthly usage limit exceeded') || error.message.includes('PDF processing limit reached')) {
+          throw new Error('PDF processing limit reached for this month. Please try again next month or contact support.');
         }
-        if (error.message.includes('Adobe API credentials not configured')) {
-          throw new Error('Adobe PDF Services is not properly configured. Please contact support.');
+        if (error.message.includes('Adobe API credentials not configured') || error.message.includes('not properly configured')) {
+          throw new Error('PDF processing service is temporarily unavailable. Please contact support.');
         }
-        if (error.message.includes('not enabled')) {
-          throw new Error('Adobe PDF Services is currently disabled. Please contact support.');
+        if (error.message.includes('not enabled') || error.message.includes('temporarily unavailable')) {
+          throw new Error('PDF processing service is temporarily unavailable. Please try again in a few minutes.');
+        }
+        if (error.message.includes('bucketId is required') || error.message.includes('storage')) {
+          throw new Error('File processing encountered a storage issue. Please try again or contact support if the problem persists.');
+        }
+        if (error.message.includes('password-protected')) {
+          throw new Error('This PDF appears to be password-protected. Please remove the password and try again.');
+        }
+        if (error.message.includes('corrupted')) {
+          throw new Error('This PDF file appears to be corrupted. Please try uploading a different file.');
+        }
+        if (error.message.includes('complex formatting') || error.message.includes('difficult to process')) {
+          throw new Error('PDF processing encountered an issue. PDFs can sometimes be difficult to process due to their complex formatting. We recommend trying a Word document (.docx) or plain text file (.txt) for best results.');
+        }
+        
+        // If it's already a user-friendly message from the Adobe API, pass it through
+        if (error.message && !error.message.includes('Adobe') && !error.message.includes('API')) {
+          throw error;
         }
       }
       
-      throw new Error(`Failed to extract text from PDF: ${error instanceof Error ? error.message : 'Unknown error'}. Please try converting to a Word document or text file.`);
+      // Fallback to a generic but helpful error message
+      throw new Error('PDF processing encountered an issue. We recommend trying a Word document (.docx) or plain text file (.txt) for best results.');
     }
   }
   

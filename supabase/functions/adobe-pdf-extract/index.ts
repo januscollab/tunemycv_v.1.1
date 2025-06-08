@@ -158,7 +158,21 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
   } catch (error: any) {
-    const errorMessage = error.message || 'Unknown error occurred';
+    let userFriendlyMessage = 'PDF processing encountered an issue. We recommend trying a Word document (.docx) or plain text file (.txt) for best results.';
+    
+    // Map specific Adobe errors to user-friendly messages
+    if (error.message?.includes('Failed to get Adobe access token')) {
+      userFriendlyMessage = 'PDF processing service is temporarily unavailable. Please try again in a few minutes.';
+    } else if (error.message?.includes('Failed to upload file')) {
+      userFriendlyMessage = 'File upload failed. Please check your internet connection and try again.';
+    } else if (error.message?.includes('Monthly usage limit exceeded')) {
+      userFriendlyMessage = 'PDF processing limit reached for this month. Please try again next month or contact support.';
+    } else if (error.message?.includes('password-protected')) {
+      userFriendlyMessage = 'This PDF appears to be password-protected. Please remove the password and try again.';
+    } else if (error.message?.includes('corrupted')) {
+      userFriendlyMessage = 'This PDF file appears to be corrupted. Please try uploading a different file.';
+    }
+    
     console.error('Adobe PDF extraction error:', error);
 
     // Update extraction log with error
@@ -167,7 +181,7 @@ const handler = async (req: Request): Promise<Response> => {
         .from('adobe_extraction_logs')
         .update({
           success: false,
-          error_message: errorMessage,
+          error_message: error.message || 'Unknown error occurred',
           processing_time_ms: Date.now() - (Date.now() - 30000) // Approximate
         })
         .eq('id', extractionLogId);
@@ -178,7 +192,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     return new Response(JSON.stringify({
       success: false,
-      error: errorMessage
+      error: userFriendlyMessage
     }), {
       status: 500,
       headers: { 'Content-Type': 'application/json', ...corsHeaders },
@@ -619,7 +633,16 @@ async function saveZipToStorage(
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     );
 
-    const timestamp = new Date().getTime();
+    // Format timestamp as DD-MM-YYYY-HH-MM-SS
+    const now = new Date();
+    const day = String(now.getDate()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const year = now.getFullYear();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    const timestamp = `${day}-${month}-${year}-${hours}-${minutes}-${seconds}`;
+    
     const baseFileName = originalFileName.replace(/\.[^/.]+$/, "");
     const userPrefix = userId ? `${userId}_` : '';
     
@@ -670,7 +693,16 @@ async function saveTextToStorage(
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     );
 
-    const timestamp = new Date().getTime();
+    // Format timestamp as DD-MM-YYYY-HH-MM-SS
+    const now = new Date();
+    const day = String(now.getDate()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const year = now.getFullYear();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    const timestamp = `${day}-${month}-${year}-${hours}-${minutes}-${seconds}`;
+    
     const baseFileName = originalFileName.replace(/\.[^/.]+$/, "");
     const userPrefix = userId ? `${userId}_` : '';
     
