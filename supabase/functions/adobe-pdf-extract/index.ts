@@ -216,24 +216,35 @@ async function extractTextWithAdobe(accessToken: string, fileData: string, fileN
   
   console.log(`Uploading file to Adobe with client_id: ${credentials.client_id.substring(0, 8)}...`);
   
-  // Convert base64 to binary data
+  // Convert base64 to binary data - validate input first
+  console.log(`Base64 data length: ${fileData.length} characters`);
   const binaryData = Uint8Array.from(atob(fileData), c => c.charCodeAt(0));
   
-  console.log(`Uploading ${binaryData.length} bytes to Adobe...`);
+  console.log(`Converted to ${binaryData.length} bytes for upload`);
+  console.log(`File magic bytes: ${Array.from(binaryData.slice(0, 4)).map(b => b.toString(16).padStart(2, '0')).join(' ')}`);
+  
+  // Prepare headers - NO Content-Type to let Adobe auto-detect
+  const uploadHeaders = {
+    'Authorization': `Bearer ${accessToken}`,
+    'X-API-Key': credentials.client_id,
+  };
+  
+  console.log(`Upload headers:`, Object.keys(uploadHeaders));
   
   const uploadResponse = await fetch(uploadUrl, {
     method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${accessToken}`,
-      'X-API-Key': credentials.client_id,
-      'Content-Type': 'application/octet-stream',
-    },
+    headers: uploadHeaders,
     body: binaryData,
   });
 
+  console.log(`Adobe upload response status: ${uploadResponse.status}`);
+  console.log(`Adobe upload response headers:`, Object.fromEntries(uploadResponse.headers.entries()));
+
   if (!uploadResponse.ok) {
     const errorText = await uploadResponse.text();
-    console.error(`Adobe file upload failed: ${uploadResponse.status} - ${errorText}`);
+    console.error(`Adobe file upload failed: ${uploadResponse.status}`);
+    console.error(`Error response body:`, errorText);
+    console.error(`Request details - URL: ${uploadUrl}, Method: POST, Body size: ${binaryData.length}`);
     throw new Error(`Failed to upload file to Adobe: ${errorText}`);
   }
 
