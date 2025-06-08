@@ -120,7 +120,9 @@ const CVManagementTab: React.FC<CVManagementTabProps> = ({ credits, memberSince 
         
         // Trigger background processing
         try {
-          await supabase.functions.invoke('process-adobe-queue');
+          await supabase.functions.invoke('adobe-background-process', {
+            body: { uploadId: data.id }
+          });
         } catch (bgError) {
           console.error('Background processing trigger failed:', bgError);
         }
@@ -151,6 +153,32 @@ const CVManagementTab: React.FC<CVManagementTabProps> = ({ credits, memberSince 
     } catch (error) {
       console.error('Error deleting CV:', error);
       toast({ title: 'Error', description: 'Failed to delete CV', variant: 'destructive' });
+    }
+  };
+
+  const retryProcessing = async (cvId: string) => {
+    try {
+      // Reset status to uploaded
+      const { error: updateError } = await supabase
+        .from('uploads')
+        .update({ processing_status: 'uploaded' })
+        .eq('id', cvId)
+        .eq('user_id', user?.id);
+
+      if (updateError) throw updateError;
+
+      // Trigger background processing
+      await supabase.functions.invoke('adobe-background-process', {
+        body: { uploadId: cvId }
+      });
+
+      // Refresh the list
+      loadCVs();
+      
+      toast({ title: 'Processing Retry', description: 'PDF processing has been restarted' });
+    } catch (error) {
+      console.error('Error retrying processing:', error);
+      toast({ title: 'Error', description: 'Failed to retry processing', variant: 'destructive' });
     }
   };
 
@@ -222,7 +250,14 @@ const CVManagementTab: React.FC<CVManagementTabProps> = ({ credits, memberSince 
                         {cv.processing_status === 'failed' && (
                           <>
                             <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                            <span className="text-xs text-red-600 dark:text-red-400">Processing failed</span>
+                            <span className="text-xs text-red-600 dark:text-red-400">Processing failed - 
+                              <button 
+                                onClick={() => retryProcessing(cv.id)}
+                                className="ml-1 text-blue-600 hover:text-blue-800 underline"
+                              >
+                                retry
+                              </button>
+                            </span>
                           </>
                         )}
                       </div>

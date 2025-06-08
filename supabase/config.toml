@@ -13,6 +13,9 @@ verify_jwt = true
 [functions.adobe-pdf-extract]
 verify_jwt = true
 
+[functions.adobe-background-process]
+verify_jwt = false
+
 [functions.send-usage-alert]
 verify_jwt = false
 
