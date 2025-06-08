@@ -18,7 +18,7 @@ const EditableCoverLetter: React.FC<EditableCoverLetterProps> = ({ content, onSa
     setEditedContent(content);
   }, [content]);
 
-  // Auto-save functionality with debounce
+  // Auto-save functionality with debounce (no toast notifications)
   useEffect(() => {
     if (editedContent !== content && editedContent.trim() !== '') {
       const timeoutId = setTimeout(() => {

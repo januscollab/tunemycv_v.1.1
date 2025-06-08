@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Bold, Heading1, Heading2, Heading3, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { DocumentJson, DocumentSection, FormattedText, textToJson, jsonToText } from '@/utils/documentJsonUtils';
 
 interface RichTextEditorProps {
   value: string;
@@ -20,107 +19,221 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   autoFocus = false
 }) => {
   const editorRef = useRef<HTMLDivElement>(null);
-  const [documentJson, setDocumentJson] = useState<DocumentJson>(() => textToJson(value));
   const [isToolbarVisible, setIsToolbarVisible] = useState(false);
+  const [toolbarPosition, setToolbarPosition] = useState({ x: 0, y: 0 });
+  const lastValueRef = useRef(value);
 
-  // Convert DocumentJson to HTML for display
-  const documentToHtml = useCallback((doc: DocumentJson): string => {
-    return doc.sections.map(section => {
-      switch (section.type) {
-        case 'heading':
-          const headingTag = `h${section.level || 1}`;
-          const headingClass = section.level === 1 ? 'text-xl font-bold mb-4' 
-                            : section.level === 2 ? 'text-lg font-semibold mb-3'
-                            : 'text-base font-medium mb-2';
-          return `<${headingTag} class="${headingClass}" data-section-id="${section.id}">${section.content || ''}</${headingTag}>`;
-        
-        case 'paragraph':
-          return `<p class="mb-4 leading-relaxed" data-section-id="${section.id}">${section.content || ''}</p>`;
-        
-        case 'list':
-          const listItems = section.items?.map(item => `<li class="ml-4">${item}</li>`).join('') || '';
-          return `<ul class="mb-4 list-disc list-inside" data-section-id="${section.id}">${listItems}</ul>`;
-        
-        default:
-          return '';
+  // Convert markdown-style text to formatted HTML
+  const textToHtml = useCallback((text: string): string => {
+    const lines = text.split('\n');
+    const htmlLines: string[] = [];
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const trimmed = line.trim();
+      
+      if (!trimmed) {
+        htmlLines.push('<br>');
+        continue;
       }
-    }).join('');
+      
+      // Handle headings
+      if (trimmed.match(/^#{1,3}\s+/)) {
+        const level = trimmed.match(/^(#{1,3})/)?.[1].length;
+        const content = trimmed.replace(/^#{1,3}\s+/, '');
+        const headingClass = level === 1 ? 'text-xl font-bold mb-4' 
+                           : level === 2 ? 'text-lg font-semibold mb-3'
+                           : 'text-base font-medium mb-2';
+        htmlLines.push(`<h${level} class="${headingClass}">${content}</h${level}>`);
+        continue;
+      }
+      
+      // Handle bullet points
+      if (trimmed.match(/^[-•*]\s+/)) {
+        const content = trimmed.replace(/^[-•*]\s+/, '');
+        htmlLines.push(`<li class="ml-4">${content}</li>`);
+        continue;
+      }
+      
+      // Regular paragraphs - handle bold formatting
+      let formattedLine = line;
+      formattedLine = formattedLine.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      formattedLine = formattedLine.replace(/\*(.*?)\*/g, '<em>$1</em>');
+      
+      htmlLines.push(`<p class="mb-4 leading-relaxed">${formattedLine}</p>`);
+    }
+    
+    // Wrap consecutive list items in ul tags
+    const processedLines: string[] = [];
+    let inList = false;
+    
+    for (const line of htmlLines) {
+      if (line.startsWith('<li')) {
+        if (!inList) {
+          processedLines.push('<ul class="mb-4 list-disc list-inside">');
+          inList = true;
+        }
+        processedLines.push(line);
+      } else {
+        if (inList) {
+          processedLines.push('</ul>');
+          inList = false;
+        }
+        processedLines.push(line);
+      }
+    }
+    
+    if (inList) {
+      processedLines.push('</ul>');
+    }
+    
+    return processedLines.join('');
   }, []);
 
-  // Convert HTML back to text for onChange
+  // Convert HTML back to markdown-style text
   const htmlToText = useCallback((html: string): string => {
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = html;
     
-    // Extract sections and convert back to markdown-like text
-    const sections: string[] = [];
-    const children = Array.from(tempDiv.children);
+    const processNode = (node: Node): string => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        return node.textContent || '';
+      }
+      
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        const element = node as Element;
+        const tagName = element.tagName.toLowerCase();
+        const textContent = element.textContent || '';
+        
+        switch (tagName) {
+          case 'h1':
+            return `# ${textContent}`;
+          case 'h2':
+            return `## ${textContent}`;
+          case 'h3':
+            return `### ${textContent}`;
+          case 'li':
+            return `• ${textContent}`;
+          case 'strong':
+          case 'b':
+            return `**${textContent}**`;
+          case 'em':
+          case 'i':
+            return `*${textContent}*`;
+          case 'p':
+            return textContent;
+          case 'br':
+            return '\n';
+          case 'ul':
+          case 'ol':
+            return Array.from(element.children).map(child => processNode(child)).join('\n');
+          default:
+            return Array.from(element.childNodes).map(child => processNode(child)).join('');
+        }
+      }
+      
+      return '';
+    };
     
-    children.forEach(child => {
-      if (child.tagName === 'H1') {
-        sections.push(`# ${child.textContent}`);
-      } else if (child.tagName === 'H2') {
-        sections.push(`## ${child.textContent}`);
-      } else if (child.tagName === 'H3') {
-        sections.push(`### ${child.textContent}`);
-      } else if (child.tagName === 'P') {
-        sections.push(child.textContent || '');
-      } else if (child.tagName === 'UL') {
-        const listItems = Array.from(child.children).map(li => `• ${li.textContent}`);
-        sections.push(...listItems);
+    const sections: string[] = [];
+    Array.from(tempDiv.childNodes).forEach(node => {
+      const processed = processNode(node);
+      if (processed.trim()) {
+        sections.push(processed);
       }
     });
     
-    return sections.filter(s => s.trim()).join('\n\n');
+    return sections.join('\n\n');
   }, []);
 
-  // Update editor content when value changes
+  // Initialize editor content only once
   useEffect(() => {
-    if (editorRef.current && editorRef.current.innerHTML !== documentToHtml(documentJson)) {
-      const newDoc = textToJson(value);
-      setDocumentJson(newDoc);
-      editorRef.current.innerHTML = documentToHtml(newDoc);
+    if (editorRef.current && lastValueRef.current !== value) {
+      const selection = window.getSelection();
+      const range = selection?.rangeCount ? selection.getRangeAt(0) : null;
+      
+      editorRef.current.innerHTML = textToHtml(value);
+      lastValueRef.current = value;
+      
+      // Restore cursor position if possible
+      if (range && editorRef.current.contains(range.startContainer)) {
+        try {
+          selection?.removeAllRanges();
+          selection?.addRange(range);
+        } catch (e) {
+          // Ignore range restoration errors
+        }
+      }
     }
-  }, [value, documentJson, documentToHtml]);
+  }, [value, textToHtml]);
+
+  // Debounced onChange with proper timing
+  const debouncedOnChange = useCallback(
+    debounce((text: string) => {
+      onChange(text);
+    }, 500),
+    [onChange]
+  );
 
   // Handle content changes
   const handleInput = useCallback(() => {
     if (editorRef.current) {
       const html = editorRef.current.innerHTML;
       const text = htmlToText(html);
-      const newDoc = textToJson(text);
-      setDocumentJson(newDoc);
-      onChange(text);
+      debouncedOnChange(text);
     }
-  }, [htmlToText, onChange]);
+  }, [htmlToText, debouncedOnChange]);
+
+  // Handle selection changes for contextual toolbar
+  const handleSelectionChange = useCallback(() => {
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0 && !selection.isCollapsed) {
+      const range = selection.getRangeAt(0);
+      const rect = range.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0) {
+        setToolbarPosition({
+          x: rect.left + rect.width / 2,
+          y: rect.bottom + window.scrollY + 8
+        });
+        setIsToolbarVisible(true);
+      }
+    } else {
+      setIsToolbarVisible(false);
+    }
+  }, []);
 
   // Handle keyboard shortcuts
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    // Ctrl+Z for undo (browser native)
+    if (e.ctrlKey && e.key === 'z' && !e.shiftKey) {
+      e.preventDefault();
+      document.execCommand('undo');
+      handleInput();
+      return;
+    }
+    
+    // Ctrl+Y or Ctrl+Shift+Z for redo
+    if ((e.ctrlKey && e.key === 'y') || (e.ctrlKey && e.shiftKey && e.key === 'z')) {
+      e.preventDefault();
+      document.execCommand('redo');
+      handleInput();
+      return;
+    }
+    
     // Ctrl+B for bold
     if (e.ctrlKey && e.key === 'b') {
       e.preventDefault();
       document.execCommand('bold');
       handleInput();
+      return;
     }
     
-    // Tab for list creation
-    if (e.key === 'Tab') {
-      const selection = window.getSelection();
-      if (selection && selection.rangeCount > 0) {
-        e.preventDefault();
-        const range = selection.getRangeAt(0);
-        const selectedText = range.toString();
-        
-        if (selectedText) {
-          // Convert selected lines to list
-          const lines = selectedText.split('\n');
-          const listItems = lines.map(line => `• ${line.trim()}`).join('\n');
-          
-          range.deleteContents();
-          range.insertNode(document.createTextNode(listItems));
-          handleInput();
-        }
-      }
+    // Ctrl+I for italic
+    if (e.ctrlKey && e.key === 'i') {
+      e.preventDefault();
+      document.execCommand('italic');
+      handleInput();
+      return;
     }
     
     // Auto-format markdown-style headings
@@ -157,6 +270,25 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         }
       }
     }
+    
+    // Enter key handling for lists
+    if (e.key === 'Enter') {
+      const selection = window.getSelection();
+      if (selection && selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        const container = range.startContainer;
+        const listItem = container.nodeType === Node.TEXT_NODE 
+          ? container.parentElement?.closest('li') 
+          : (container as Element).closest('li');
+        
+        if (listItem && listItem.textContent?.trim() === '') {
+          // Exit list on empty list item
+          e.preventDefault();
+          document.execCommand('outdent');
+          handleInput();
+        }
+      }
+    }
   }, [handleInput]);
 
   // Toolbar actions
@@ -178,21 +310,42 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     editorRef.current?.focus();
   };
 
-  // Focus management
-  const handleFocus = () => {
-    setIsToolbarVisible(true);
-  };
+  // Event listeners for selection
+  useEffect(() => {
+    document.addEventListener('selectionchange', handleSelectionChange);
+    return () => document.removeEventListener('selectionchange', handleSelectionChange);
+  }, [handleSelectionChange]);
 
-  const handleBlur = () => {
-    // Delay hiding toolbar to allow toolbar clicks
-    setTimeout(() => setIsToolbarVisible(false), 150);
-  };
+  // Cleanup debounced function
+  useEffect(() => {
+    return () => {
+      debouncedOnChange.cancel();
+    };
+  }, [debouncedOnChange]);
+
+  // Simple debounce helper
+  function debounce<T extends (...args: any[]) => void>(func: T, delay: number) {
+    let timeoutId: NodeJS.Timeout;
+    const debounced = (...args: Parameters<T>) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => func(...args), delay);
+    };
+    debounced.cancel = () => clearTimeout(timeoutId);
+    return debounced;
+  }
 
   return (
     <div className={cn("relative border rounded-md", className)}>
-      {/* Toolbar */}
+      {/* Contextual Toolbar */}
       {isToolbarVisible && (
-        <div className="absolute top-2 left-2 bg-background border rounded-md shadow-lg p-1 flex items-center space-x-1 z-10">
+        <div 
+          className="fixed bg-background border rounded-md shadow-lg p-1 flex items-center space-x-1 z-50"
+          style={{
+            left: `${toolbarPosition.x}px`,
+            top: `${toolbarPosition.y}px`,
+            transform: 'translateX(-50%)'
+          }}
+        >
           <Button
             variant="ghost"
             size="sm"
@@ -247,9 +400,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         contentEditable
         onInput={handleInput}
         onKeyDown={handleKeyDown}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-        className="p-4 min-h-[200px] outline-none prose prose-sm max-w-none"
+        className="p-4 min-h-[200px] outline-none prose prose-sm max-w-none focus:ring-2 focus:ring-primary/20"
         data-placeholder={placeholder}
         suppressContentEditableWarning={true}
         autoFocus={autoFocus}
