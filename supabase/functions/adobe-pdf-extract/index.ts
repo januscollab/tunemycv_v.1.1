@@ -223,10 +223,11 @@ async function extractTextWithAdobe(accessToken: string, fileData: string, fileN
   console.log(`Converted to ${binaryData.length} bytes for upload`);
   console.log(`File magic bytes: ${Array.from(binaryData.slice(0, 4)).map(b => b.toString(16).padStart(2, '0')).join(' ')}`);
   
-  // Prepare headers - NO Content-Type to let Adobe auto-detect
+  // Prepare headers with explicit Content-Type for PDF
   const uploadHeaders = {
     'Authorization': `Bearer ${accessToken}`,
     'X-API-Key': credentials.client_id,
+    'Content-Type': 'application/pdf',
   };
   
   console.log(`Upload headers:`, Object.keys(uploadHeaders));
