@@ -2,13 +2,13 @@ import { useState } from 'react';
 import { extractTextFromFile } from '@/utils/fileUtils';
 import { detectDocumentType, DocumentTypeDetection } from '@/utils/documentValidation';
 import { assessDocumentQuality, QualityAssessment } from '@/utils/documentQuality';
-import { textToJson, DocumentJson } from '@/utils/documentJsonUtils';
+import { analyzeSimpleDocument, SimpleDocumentStructure } from '@/utils/simpleDocumentUtils';
 import { useToast } from '@/hooks/use-toast';
 
 interface ExtractionState {
   isExtracting: boolean;
   extractedText: string | null;
-  documentJson: DocumentJson | null;
+  documentStructure: SimpleDocumentStructure | null;
   typeDetection: DocumentTypeDetection | null;
   qualityAssessment: QualityAssessment | null;
   error: string | null;
@@ -19,7 +19,7 @@ export const useDocumentExtraction = () => {
   const [state, setState] = useState<ExtractionState>({
     isExtracting: false,
     extractedText: null,
-    documentJson: null,
+    documentStructure: null,
     typeDetection: null,
     qualityAssessment: null,
     error: null,
@@ -30,7 +30,7 @@ export const useDocumentExtraction = () => {
 
   const extractText = async (file: File, expectedDocumentType?: 'cv' | 'job_description'): Promise<{
     extractedText: string;
-    documentJson: DocumentJson;
+    documentStructure: SimpleDocumentStructure;
     typeDetection: DocumentTypeDetection;
     qualityAssessment: QualityAssessment;
   } | null> => {
@@ -41,7 +41,7 @@ export const useDocumentExtraction = () => {
     setState({
       isExtracting: true,
       extractedText: null,
-      documentJson: null,
+      documentStructure: null,
       typeDetection: null,
       qualityAssessment: null,
       error: null,
@@ -92,8 +92,8 @@ export const useDocumentExtraction = () => {
       // Assess document quality
       const qualityAssessment = assessDocumentQuality(extractedText, file.name, expectedDocumentType);
       
-      // Generate structured JSON from text
-      const documentJson = textToJson(extractedText);
+      // Analyze document structure (simple analysis for CV processing)
+      const documentStructure = analyzeSimpleDocument(extractedText);
       
       // Small delay to show analysis step
       await new Promise(resolve => setTimeout(resolve, 500));
@@ -101,7 +101,7 @@ export const useDocumentExtraction = () => {
       setState({
         isExtracting: false,
         extractedText,
-        documentJson,
+        documentStructure,
         typeDetection,
         qualityAssessment,
         error: null,
@@ -114,7 +114,7 @@ export const useDocumentExtraction = () => {
         description: `Extracted ${extractedText.split(/\s+/).length} words with ${qualityAssessment.score}% quality score in ${(processingTime / 1000).toFixed(1)}s`,
       });
 
-      return { extractedText, documentJson, typeDetection, qualityAssessment };
+      return { extractedText, documentStructure, typeDetection, qualityAssessment };
 
     } catch (error) {
       clearTimeout(timeoutId!);
@@ -123,7 +123,7 @@ export const useDocumentExtraction = () => {
       setState({
         isExtracting: false,
         extractedText: null,
-        documentJson: null,
+        documentStructure: null,
         typeDetection: null,
         qualityAssessment: null,
         error: errorMessage,
@@ -147,7 +147,7 @@ export const useDocumentExtraction = () => {
     setState({
       isExtracting: false,
       extractedText: null,
-      documentJson: null,
+      documentStructure: null,
       typeDetection: null,
       qualityAssessment: null,
       error: 'Upload cancelled by user',
@@ -168,7 +168,7 @@ export const useDocumentExtraction = () => {
     setState({
       isExtracting: false,
       extractedText: null,
-      documentJson: null,
+      documentStructure: null,
       typeDetection: null,
       qualityAssessment: null,
       error: null,

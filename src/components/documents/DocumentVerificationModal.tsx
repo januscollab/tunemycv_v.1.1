@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { X, Save, AlertTriangle, CheckCircle, Info, ChevronDown, ChevronUp, WandSparkles } from 'lucide-react';
-import { textToJson, jsonToText, DocumentJson } from '@/utils/documentJsonUtils';
+import { editorTextToJson, editorJsonToText, DocumentJson } from '@/utils/editorJsonUtils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
@@ -32,7 +32,7 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
   onSave
 }) => {
   const [editedText, setEditedText] = useState(extractedText);
-  const [documentJson, setDocumentJson] = useState<DocumentJson>(() => textToJson(extractedText));
+  const [documentJson, setDocumentJson] = useState<DocumentJson>(() => editorTextToJson(extractedText));
   const [isSaving, setIsSaving] = useState(false);
   const [isAutoSaving, setIsAutoSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
@@ -57,7 +57,7 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
 
   // Bidirectional sync: text changes update JSON
   useEffect(() => {
-    const newJson = textToJson(editedText);
+    const newJson = editorTextToJson(editedText);
     setDocumentJson(newJson);
   }, [editedText]);
 
