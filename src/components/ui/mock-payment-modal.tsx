@@ -52,13 +52,13 @@ export const MockPaymentModal: React.FC<MockPaymentModalProps> = ({
           (!profileData?.first_name || !profileData?.last_name)) {
         const { error } = await supabase
           .from('profiles')
-          .upsert({
-            id: user.id,
+          .update({
             first_name: firstName || profileData?.first_name,
             last_name: lastName || profileData?.last_name,
             email: email || user.email,
             updated_at: new Date().toISOString()
-          });
+          })
+          .eq('id', user.id);
         
         if (error) {
           console.error('Error updating profile:', error);

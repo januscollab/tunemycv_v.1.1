@@ -85,11 +85,11 @@ const WorkStylePreferencesSection: React.FC = () => {
     try {
       const { error } = await supabase
         .from('profiles')
-        .upsert({
-          id: user?.id,
+        .update({
           work_style_preferences: workStyle as any,
           updated_at: new Date().toISOString()
-        });
+        })
+        .eq('id', user?.id);
 
       if (error) throw error;
     } catch (error) {

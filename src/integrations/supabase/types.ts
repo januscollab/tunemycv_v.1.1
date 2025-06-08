@@ -72,6 +72,47 @@ export type Database = {
         }
         Relationships: []
       }
+      adobe_debug_files: {
+        Row: {
+          created_at: string
+          file_name: string
+          file_size: number
+          file_type: string
+          id: string
+          original_filename: string
+          storage_path: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          file_name: string
+          file_size: number
+          file_type: string
+          id?: string
+          original_filename: string
+          storage_path: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          file_name?: string
+          file_size?: number
+          file_type?: string
+          id?: string
+          original_filename?: string
+          storage_path?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "adobe_debug_files_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       adobe_extraction_logs: {
         Row: {
           adobe_operation_id: string | null
@@ -484,6 +525,7 @@ export type Database = {
           soft_skills: Json | null
           survey_preferences: Json | null
           updated_at: string | null
+          user_id: string
           work_location_preference: string | null
           work_style_preferences: Json | null
         }
@@ -502,6 +544,7 @@ export type Database = {
           soft_skills?: Json | null
           survey_preferences?: Json | null
           updated_at?: string | null
+          user_id: string
           work_location_preference?: string | null
           work_style_preferences?: Json | null
         }
@@ -520,6 +563,7 @@ export type Database = {
           soft_skills?: Json | null
           survey_preferences?: Json | null
           updated_at?: string | null
+          user_id?: string
           work_location_preference?: string | null
           work_style_preferences?: Json | null
         }
@@ -780,6 +824,10 @@ export type Database = {
       delete_user_admin_secure: {
         Args: { _user_id: string }
         Returns: boolean
+      }
+      generate_user_id: {
+        Args: Record<PropertyKey, never>
+        Returns: string
       }
       get_current_adobe_usage: {
         Args: Record<PropertyKey, never>

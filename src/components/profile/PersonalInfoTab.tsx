@@ -100,8 +100,7 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
     try {
       const { error } = await supabase
         .from('profiles')
-        .upsert({
-          id: user?.id,
+        .update({
           first_name: profile.first_name,
           last_name: profile.last_name,
           email: profile.email,
@@ -112,7 +111,8 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
           company_size_preference: profile.company_size_preference,
           work_location_preference: profile.work_location_preference,
           updated_at: new Date().toISOString()
-        });
+        })
+        .eq('id', user?.id);
 
       if (error) throw error;
 
