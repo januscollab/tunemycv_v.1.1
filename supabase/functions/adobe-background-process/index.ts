@@ -156,16 +156,16 @@ async function processUpload(supabase: any, uploadId: string) {
 
     // Process with Adobe API
     const accessToken = await getAdobeAccessToken(credentials);
-    const extractedText = await extractTextWithAdobe(accessToken, base64String, upload.file_name, credentials);
+    const extractResult = await extractTextWithAdobe(accessToken, base64String, upload.file_name, credentials, false);
 
     // Update with success
     await supabase.rpc('update_processing_status', {
       upload_id: uploadId,
       new_status: 'completed',
-      extracted_text_content: extractedText
+      extracted_text_content: extractResult.extractedText
     });
 
-    console.log(`Successfully processed upload ${uploadId}: ${extractedText.split(/\s+/).length} words extracted`);
+    console.log(`Successfully processed upload ${uploadId}: ${extractResult.extractedText.split(/\s+/).length} words extracted`);
 
   } catch (error: any) {
     console.error(`Failed to process upload ${uploadId}:`, error);
@@ -211,7 +211,13 @@ async function getAdobeAccessToken(credentials: AdobeCredentials): Promise<strin
   return tokenData.access_token;
 }
 
-async function extractTextWithAdobe(accessToken: string, fileData: string, fileName: string, credentials: AdobeCredentials): Promise<string> {
+async function extractTextWithAdobe(
+  accessToken: string, 
+  fileData: string, 
+  fileName: string, 
+  credentials: AdobeCredentials, 
+  debug: boolean = false
+): Promise<{ extractedText: string; debugUrl?: string }> {
   console.log(`Starting Adobe PDF extraction for file: ${fileName}`);
   
   // Step 1: Get presigned URL and assetID
@@ -297,25 +303,14 @@ async function extractTextWithAdobe(accessToken: string, fileData: string, fileN
   console.log(`[${new Date().toISOString()}] Extraction response status: ${extractResponse.status}`);
   console.log(`[${new Date().toISOString()}] Extraction response headers:`, Object.fromEntries(extractResponse.headers.entries()));
   
-  // Log raw response before trying to parse JSON
-  const rawResponseText = await extractResponse.text();
-  console.log(`[${new Date().toISOString()}] Raw extraction response (first 500 chars):`, rawResponseText.substring(0, 500));
-  
   if (!extractResponse.ok) {
+    const errorText = await extractResponse.text();
     console.error(`[${new Date().toISOString()}] Adobe extraction job creation failed: ${extractResponse.status}`);
-    console.error(`[${new Date().toISOString()}] Full error response:`, rawResponseText);
-    throw new Error(`Failed to create extraction job: ${extractResponse.status} - ${rawResponseText.substring(0, 200)}`);
+    console.error(`[${new Date().toISOString()}] Full error response:`, errorText);
+    throw new Error(`Failed to create extraction job: ${extractResponse.status} - ${errorText.substring(0, 200)}`);
   }
 
-  // Check if response is actually JSON
-  const contentType = extractResponse.headers.get('content-type');
-  console.log(`[${new Date().toISOString()}] Response Content-Type: ${contentType}`);
-  
-  if (!contentType || !contentType.includes('application/json')) {
-    console.error(`[${new Date().toISOString()}] Expected JSON response but got: ${contentType}`);
-    throw new Error(`Adobe returned non-JSON response: ${contentType}. Response: ${rawResponseText.substring(0, 200)}`);
-  }
-
+  // For job creation (201 status), Adobe only returns headers, no JSON body
   const jobLocation = extractResponse.headers.get('location');
 
   if (!jobLocation) {
@@ -365,11 +360,22 @@ async function extractTextWithAdobe(accessToken: string, fileData: string, fileN
       const zipBuffer = await resultResponse.arrayBuffer();
       console.log(`Downloaded ZIP file: ${zipBuffer.byteLength} bytes`);
       
+      let debugUrl: string | undefined;
+      
+      // Save ZIP to storage for debugging if requested
+      if (debug) {
+        debugUrl = await saveZipToStorage(zipBuffer, fileName);
+        console.log(`Debug ZIP saved to: ${debugUrl}`);
+      }
+      
       // Extract and parse the structured data from the ZIP
       const extractedText = await extractTextFromZip(zipBuffer);
 
       console.log(`Text extraction completed, extracted ${extractedText.split(/\s+/).length} words`);
-      return extractedText.trim();
+      return { 
+        extractedText: extractedText.trim(),
+        debugUrl 
+      };
       
     } else if (statusData.status === 'failed') {
       console.error(`Adobe extraction job failed: ${JSON.stringify(statusData)}`);
@@ -423,6 +429,40 @@ async function extractTextFromZip(zipBuffer: ArrayBuffer): Promise<string> {
   } catch (error) {
     console.error('Error extracting text from ZIP:', error);
     throw new Error(`Failed to extract text from Adobe ZIP response: ${error.message}`);
+  }
+}
+
+async function saveZipToStorage(zipBuffer: ArrayBuffer, originalFileName: string): Promise<string> {
+  try {
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+    );
+
+    const timestamp = new Date().getTime();
+    const fileName = `${timestamp}-${originalFileName.replace(/\.[^/.]+$/, "")}-adobe-response.zip`;
+    
+    const { data, error } = await supabase.storage
+      .from('adobe-debug-files')
+      .upload(fileName, zipBuffer, {
+        contentType: 'application/zip',
+        upsert: true
+      });
+
+    if (error) {
+      console.error('Failed to save ZIP to storage:', error);
+      throw error;
+    }
+
+    // Get public URL
+    const { data: urlData } = supabase.storage
+      .from('adobe-debug-files')
+      .getPublicUrl(fileName);
+
+    return urlData.publicUrl;
+  } catch (error) {
+    console.error('Error saving ZIP to storage:', error);
+    throw new Error(`Failed to save debug ZIP: ${error.message}`);
   }
 }
 

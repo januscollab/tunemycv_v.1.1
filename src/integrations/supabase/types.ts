@@ -766,6 +766,10 @@ export type Database = {
       }
     }
     Functions: {
+      cleanup_adobe_debug_files: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       delete_user_admin: {
         Args: { _user_id: string }
         Returns: boolean
