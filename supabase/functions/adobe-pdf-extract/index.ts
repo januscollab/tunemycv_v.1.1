@@ -176,15 +176,17 @@ const handler = async (req: Request): Promise<Response> => {
 };
 
 async function getAdobeAccessToken(credentials: AdobeCredentials): Promise<string> {
-  const tokenUrl = 'https://pdf-services.adobe.io/token';
+  const tokenUrl = 'https://ims-na1.adobelogin.com/ims/token';
   
-  console.log(`Requesting Adobe access token with client_id: ${credentials.client_id.substring(0, 8)}...`);
+  console.log(`[${new Date().toISOString()}] Starting token request to: ${tokenUrl}`);
+  console.log(`[${new Date().toISOString()}] Client ID: ${credentials.client_id.substring(0, 8)}...`);
   
   const formData = new URLSearchParams();
   formData.append('client_id', credentials.client_id);
   formData.append('client_secret', credentials.client_secret_encrypted);
   formData.append('grant_type', 'client_credentials');
 
+  console.log(`[${new Date().toISOString()}] Making token request...`);
   const response = await fetch(tokenUrl, {
     method: 'POST',
     headers: {
@@ -193,24 +195,32 @@ async function getAdobeAccessToken(credentials: AdobeCredentials): Promise<strin
     body: formData,
   });
 
+  console.log(`[${new Date().toISOString()}] Token response status: ${response.status}`);
+  console.log(`[${new Date().toISOString()}] Token response headers:`, Object.fromEntries(response.headers.entries()));
+
   if (!response.ok) {
     const errorText = await response.text();
-    console.error(`Adobe token request failed: ${response.status} - ${errorText}`);
+    console.error(`[${new Date().toISOString()}] Adobe token request failed: ${response.status} - ${errorText}`);
     throw new Error(`Failed to get Adobe access token: ${errorText}`);
   }
 
   const tokenData = await response.json();
-  console.log('Adobe access token obtained successfully');
+  console.log(`[${new Date().toISOString()}] Adobe access token obtained successfully`);
+  console.log(`[${new Date().toISOString()}] Token type: ${tokenData.token_type}, expires_in: ${tokenData.expires_in}`);
   return tokenData.access_token;
 }
 
 async function extractTextWithAdobe(accessToken: string, fileData: string, fileName: string, credentials: AdobeCredentials): Promise<string> {
-  console.log(`Starting Adobe PDF extraction for file: ${fileName}`);
+  console.log(`[${new Date().toISOString()}] Starting Adobe PDF extraction for file: ${fileName}`);
+  console.log(`[${new Date().toISOString()}] Access token length: ${accessToken.length}`);
   
   // Step 1: Get presigned URL and assetID
   const assetsUrl = 'https://pdf-services.adobe.io/assets';
   
-  console.log(`Step 1: Getting presigned URL from Adobe...`);
+  console.log(`[${new Date().toISOString()}] Step 1: Getting presigned URL from: ${assetsUrl}`);
+  
+  const presignedPayload = { mediaType: "application/pdf" };
+  console.log(`[${new Date().toISOString()}] Presigned request payload:`, presignedPayload);
   
   const presignedResponse = await fetch(assetsUrl, {
     method: 'POST',
@@ -219,16 +229,15 @@ async function extractTextWithAdobe(accessToken: string, fileData: string, fileN
       'X-API-Key': credentials.client_id,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      mediaType: "application/pdf"
-    }),
+    body: JSON.stringify(presignedPayload),
   });
 
-  console.log(`Presigned URL response status: ${presignedResponse.status}`);
+  console.log(`[${new Date().toISOString()}] Presigned URL response status: ${presignedResponse.status}`);
+  console.log(`[${new Date().toISOString()}] Presigned URL response headers:`, Object.fromEntries(presignedResponse.headers.entries()));
 
   if (!presignedResponse.ok) {
     const errorText = await presignedResponse.text();
-    console.error(`Adobe presigned URL request failed: ${presignedResponse.status} - ${errorText}`);
+    console.error(`[${new Date().toISOString()}] Adobe presigned URL request failed: ${presignedResponse.status} - ${errorText}`);
     throw new Error(`Failed to get presigned URL: ${errorText}`);
   }
 
