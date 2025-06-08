@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Save, Mail, Settings, Calendar, TrendingUp, AlertTriangle, Shield } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Save, Mail, Settings, Calendar, TrendingUp, AlertTriangle, Shield, Check, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -39,6 +39,9 @@ const SiteSettingsManagement: React.FC = () => {
   const [adobeUsage, setAdobeUsage] = useState<AdobeUsage | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [autoSaving, setAutoSaving] = useState(false);
+  const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
+  const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(null);
   const [formData, setFormData] = useState({
     admin_email: '',
     support_email: '',
@@ -134,6 +137,104 @@ const SiteSettingsManagement: React.FC = () => {
       console.error('Error loading Adobe usage:', error);
     }
   };
+
+  // Auto-save function for immediate settings like toggle
+  const autoSaveSettings = useCallback(async (updatedData: Partial<typeof formData>) => {
+    if (autoSaving) return; // Prevent multiple simultaneous saves
+    
+    setAutoSaving(true);
+    setAutoSaveStatus('saving');
+    
+    try {
+      const dataToSave = { ...formData, ...updatedData };
+      
+      if (settings) {
+        // Update existing settings
+        const { error } = await supabase
+          .from('site_settings')
+          .update({
+            admin_email: dataToSave.admin_email,
+            support_email: dataToSave.support_email,
+            monthly_adobe_limit: dataToSave.monthly_adobe_limit,
+            reset_day: dataToSave.reset_day,
+            adobe_api_enabled: dataToSave.adobe_api_enabled
+          })
+          .eq('id', settings.id);
+
+        if (error) throw error;
+      } else {
+        // Create new settings
+        const { error } = await supabase
+          .from('site_settings')
+          .insert({
+            admin_email: dataToSave.admin_email,
+            support_email: dataToSave.support_email,
+            monthly_adobe_limit: dataToSave.monthly_adobe_limit,
+            reset_day: dataToSave.reset_day,
+            adobe_api_enabled: dataToSave.adobe_api_enabled
+          });
+
+        if (error) throw error;
+      }
+
+      setAutoSaveStatus('success');
+      
+      // Update settings state with the saved data
+      await loadSettings();
+      
+      // Show success status briefly
+      setTimeout(() => {
+        setAutoSaveStatus('idle');
+      }, 2000);
+      
+    } catch (error) {
+      console.error('Error auto-saving settings:', error);
+      setAutoSaveStatus('error');
+      
+      // Show error status briefly
+      setTimeout(() => {
+        setAutoSaveStatus('idle');
+      }, 3000);
+    } finally {
+      setAutoSaving(false);
+    }
+  }, [formData, settings, autoSaving]);
+
+  // Debounced auto-save for text fields
+  const debouncedAutoSave = useCallback((updatedData: Partial<typeof formData>, delay: number = 1000) => {
+    if (debounceTimeout) {
+      clearTimeout(debounceTimeout);
+    }
+    
+    const timeout = setTimeout(() => {
+      autoSaveSettings(updatedData);
+    }, delay);
+    
+    setDebounceTimeout(timeout);
+  }, [autoSaveSettings, debounceTimeout]);
+
+  // Clean up timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimeout) {
+        clearTimeout(debounceTimeout);
+      }
+    };
+  }, [debounceTimeout]);
+
+  // Handle Adobe API toggle with immediate auto-save
+  const handleAdobeToggleChange = useCallback(async (enabled: boolean) => {
+    const updatedData = { adobe_api_enabled: enabled };
+    
+    // Update local state immediately for responsive UI
+    setFormData(prev => ({
+      ...prev,
+      adobe_api_enabled: enabled
+    }));
+    
+    // Auto-save immediately for this critical setting
+    await autoSaveSettings(updatedData);
+  }, [autoSaveSettings]);
 
   const handleSave = async () => {
     setSaving(true);
@@ -351,12 +452,37 @@ const SiteSettingsManagement: React.FC = () => {
                 type="checkbox"
                 id="adobe_api_enabled"
                 checked={formData.adobe_api_enabled}
-                onChange={(e) => handleInputChange('adobe_api_enabled', e.target.checked)}
-                className="rounded border-apple-core/30"
+                onChange={(e) => handleAdobeToggleChange(e.target.checked)}
+                disabled={autoSaving}
+                className="rounded border-apple-core/30 disabled:opacity-50"
               />
               <Label htmlFor="adobe_api_enabled" className="text-caption font-medium text-blueberry dark:text-apple-core">
                 Enable Adobe PDF Services API
               </Label>
+              {autoSaveStatus === 'saving' && (
+                <div className="flex items-center ml-2">
+                  <Loader2 className="h-4 w-4 animate-spin text-apricot" />
+                  <span className="text-micro text-blueberry/60 dark:text-apple-core/60 ml-1">
+                    Auto-saving...
+                  </span>
+                </div>
+              )}
+              {autoSaveStatus === 'success' && (
+                <div className="flex items-center ml-2">
+                  <Check className="h-4 w-4 text-green-600" />
+                  <span className="text-micro text-green-600 ml-1">
+                    Auto-saved
+                  </span>
+                </div>
+              )}
+              {autoSaveStatus === 'error' && (
+                <div className="flex items-center ml-2">
+                  <AlertTriangle className="h-4 w-4 text-red-500" />
+                  <span className="text-micro text-red-500 ml-1">
+                    Auto-save failed
+                  </span>
+                </div>
+              )}
             </div>
 
             {formData.adobe_api_enabled && (
@@ -529,11 +655,11 @@ const SiteSettingsManagement: React.FC = () => {
             </div>
             <Button
               onClick={handleSave}
-              disabled={saving}
+              disabled={saving || autoSaving}
               className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200"
             >
               <Save className="h-4 w-4 mr-2" />
-              {saving ? 'Saving...' : 'Save Settings'}
+              {saving ? 'Saving...' : autoSaving ? 'Auto-saving...' : 'Save Settings'}
             </Button>
           </div>
         </CardContent>
