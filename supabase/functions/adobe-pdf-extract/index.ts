@@ -278,6 +278,8 @@ async function extractTextWithAdobe(accessToken: string, fileData: string, fileN
   
   const extractPayload = {
     assetID: assetID,
+    getCharBounds: false,
+    includeStyling: false,
     elementsToExtract: ['text', 'tables'],
     tableOutputFormat: 'xlsx',
     renditionsToExtract: ['tables', 'figures']

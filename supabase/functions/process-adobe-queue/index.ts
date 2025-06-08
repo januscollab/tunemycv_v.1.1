@@ -225,6 +225,8 @@ async function processWithAdobe(
   
   const extractPayload = {
     assetID: assetID,
+    getCharBounds: false,
+    includeStyling: false,
     elementsToExtract: ['text', 'tables'],
     tableOutputFormat: 'xlsx',
     renditionsToExtract: ['tables', 'figures']
