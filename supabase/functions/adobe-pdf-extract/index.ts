@@ -409,10 +409,17 @@ async function extractTextWithAdobe(
         userIdFromProfile = profile?.user_id;
       }
 
-      // Step 1: Save response file immediately (before attempting extraction)
+      // Step 1: Save response file (non-blocking - don't fail extraction if this fails)
       console.log('Saving response file to storage...');
-      const { zipUrl } = await saveZipToStorage(responseBuffer, fileName, userIdFromProfile, 'downloaded');
-      console.log(`Response file saved: ${zipUrl ? 'success' : 'failed'}`);
+      let zipUrl: string | undefined;
+      try {
+        const result = await saveZipToStorage(responseBuffer, fileName, userIdFromProfile, 'downloaded');
+        zipUrl = result.zipUrl;
+        console.log(`Response file saved: ${zipUrl ? 'success' : 'failed'}`);
+      } catch (error) {
+        console.log('Non-critical: Failed to save response file to storage:', error.message);
+        // Continue with extraction even if storage fails
+      }
       
       // Step 2: Determine if response is ZIP or direct JSON and process accordingly
       let extractedText: string;
@@ -423,14 +430,24 @@ async function extractTextWithAdobe(
           console.log(`Direct JSON extraction successful, extracted ${extractedText.split(/\s+/).length} words`);
         } catch (error) {
           console.log('Direct JSON extraction failed:', error.message);
-          await saveZipToStorage(responseBuffer, fileName, userIdFromProfile, 'json_extraction_failed');
+          // Try to save failed response for debugging (non-blocking)
+          try {
+            await saveZipToStorage(responseBuffer, fileName, userIdFromProfile, 'json_extraction_failed');
+          } catch (storageError) {
+            console.log('Non-critical: Failed to save failed response for debugging:', storageError.message);
+          }
           throw new Error('PDF processing encountered an issue. PDFs can sometimes be difficult to process due to their complex formatting. We recommend trying a Word document (.docx) or plain text file (.txt) for best results.');
         }
       } else {
         // Handle ZIP response
         if (!validateZipContent(responseBuffer)) {
           console.log('ZIP content validation failed');
-          await saveZipToStorage(responseBuffer, fileName, userIdFromProfile, 'invalid_zip');
+          // Try to save invalid ZIP for debugging (non-blocking)
+          try {
+            await saveZipToStorage(responseBuffer, fileName, userIdFromProfile, 'invalid_zip');
+          } catch (storageError) {
+            console.log('Non-critical: Failed to save invalid ZIP for debugging:', storageError.message);
+          }
           throw new Error('PDF processing encountered an issue. The document may be corrupted or password-protected. We recommend trying a Word document (.docx) or plain text file (.txt) for best results.');
         }
 
@@ -439,14 +456,26 @@ async function extractTextWithAdobe(
           console.log(`ZIP extraction successful, extracted ${extractedText.split(/\s+/).length} words`);
         } catch (error) {
           console.log('ZIP extraction failed:', error.message);
-          await saveZipToStorage(responseBuffer, fileName, userIdFromProfile, 'zip_extraction_failed');
+          // Try to save failed ZIP for debugging (non-blocking)
+          try {
+            await saveZipToStorage(responseBuffer, fileName, userIdFromProfile, 'zip_extraction_failed');
+          } catch (storageError) {
+            console.log('Non-critical: Failed to save failed ZIP for debugging:', storageError.message);
+          }
           throw new Error('PDF processing encountered an issue. PDFs can sometimes be difficult to process due to their complex formatting. We recommend trying a Word document (.docx) or plain text file (.txt) for best results.');
         }
       }
 
-      // Step 3: Save extracted text file
-      const { textUrl } = await saveTextToStorage(extractedText, fileName, userIdFromProfile);
-      console.log(`Text file saved: ${textUrl ? 'success' : 'failed'}`);
+      // Step 3: Save extracted text file (non-blocking - don't fail extraction if this fails)
+      let textUrl: string | undefined;
+      try {
+        const result = await saveTextToStorage(extractedText, fileName, userIdFromProfile);
+        textUrl = result.textUrl;
+        console.log(`Text file saved: ${textUrl ? 'success' : 'failed'}`);
+      } catch (error) {
+        console.log('Non-critical: Failed to save extracted text to storage:', error.message);
+        // Continue even if text file storage fails
+      }
       
       return { 
         extractedText: extractedText.trim(),
