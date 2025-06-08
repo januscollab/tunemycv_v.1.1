@@ -287,6 +287,9 @@ async function extractTextWithAdobe(accessToken: string, fileData: string, fileN
 
   console.log('Creating Adobe extraction job...');
   
+  console.log(`[${new Date().toISOString()}] Sending extraction request to: ${extractUrl}`);
+  console.log(`[${new Date().toISOString()}] Extraction payload:`, JSON.stringify(extractPayload, null, 2));
+
   const extractResponse = await fetch(extractUrl, {
     method: 'POST',
     headers: {
@@ -297,14 +300,39 @@ async function extractTextWithAdobe(accessToken: string, fileData: string, fileN
     body: JSON.stringify(extractPayload),
   });
 
+  console.log(`[${new Date().toISOString()}] Extraction response status: ${extractResponse.status}`);
+  console.log(`[${new Date().toISOString()}] Extraction response headers:`, Object.fromEntries(extractResponse.headers.entries()));
+  
+  // Log raw response before trying to parse JSON
+  const rawResponseText = await extractResponse.text();
+  console.log(`[${new Date().toISOString()}] Raw extraction response (first 500 chars):`, rawResponseText.substring(0, 500));
+  
   if (!extractResponse.ok) {
-    const errorText = await extractResponse.text();
-    console.error(`Adobe extraction job creation failed: ${extractResponse.status} - ${errorText}`);
-    throw new Error(`Failed to create extraction job: ${errorText}`);
+    console.error(`[${new Date().toISOString()}] Adobe extraction job creation failed: ${extractResponse.status}`);
+    console.error(`[${new Date().toISOString()}] Full error response:`, rawResponseText);
+    throw new Error(`Failed to create extraction job: ${extractResponse.status} - ${rawResponseText.substring(0, 200)}`);
   }
 
-  const extractData = await extractResponse.json();
+  // Check if response is actually JSON
+  const contentType = extractResponse.headers.get('content-type');
+  console.log(`[${new Date().toISOString()}] Response Content-Type: ${contentType}`);
+  
+  if (!contentType || !contentType.includes('application/json')) {
+    console.error(`[${new Date().toISOString()}] Expected JSON response but got: ${contentType}`);
+    throw new Error(`Adobe returned non-JSON response: ${contentType}. Response: ${rawResponseText.substring(0, 200)}`);
+  }
+
+  let extractData;
+  try {
+    extractData = JSON.parse(rawResponseText);
+  } catch (parseError) {
+    console.error(`[${new Date().toISOString()}] JSON parse error:`, parseError);
+    console.error(`[${new Date().toISOString()}] Attempted to parse:`, rawResponseText);
+    throw new Error(`Failed to parse Adobe response as JSON: ${parseError.message}`);
+  }
+
   const jobLocation = extractResponse.headers.get('location');
+  console.log(`[${new Date().toISOString()}] Job location header:`, jobLocation);
 
   if (!jobLocation) {
     throw new Error('No job location returned from Adobe');
