@@ -176,38 +176,58 @@ async function processWithAdobe(
   
   console.log(`Processing ${fileName} with Adobe API (${binaryData.length} bytes)`);
 
-  // Upload file to Adobe
-  const uploadUrl = 'https://pdf-services.adobe.io/assets';
+  // Step 1: Get presigned URL and assetID
+  const assetsUrl = 'https://pdf-services.adobe.io/assets';
   
-  const uploadResponse = await fetch(uploadUrl, {
+  console.log(`Step 1: Getting presigned URL from Adobe...`);
+  
+  const presignedResponse = await fetch(assetsUrl, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'X-API-Key': credentials.client_id,
-      'Content-Type': 'application/pdf',
-      'Content-Disposition': `attachment; filename="${fileName}"`,
+      'Content-Type': 'application/json',
     },
+    body: JSON.stringify({
+      mediaType: "application/pdf"
+    }),
+  });
+
+  if (!presignedResponse.ok) {
+    const errorText = await presignedResponse.text();
+    throw new Error(`Failed to get presigned URL: ${errorText}`);
+  }
+
+  const presignedData = await presignedResponse.json();
+  const { uploadUri, assetID } = presignedData;
+  console.log(`Step 1 complete - Asset ID: ${assetID}`);
+  
+  // Step 2: Upload file to presigned URL
+  console.log(`Step 2: Uploading file to presigned URL...`);
+  
+  const fileUploadResponse = await fetch(uploadUri, {
+    method: 'PUT',
     body: binaryData,
   });
 
-  if (!uploadResponse.ok) {
-    const errorText = await uploadResponse.text();
-    throw new Error(`Failed to upload file to Adobe: ${errorText}`);
+  if (!fileUploadResponse.ok) {
+    const errorText = await fileUploadResponse.text();
+    throw new Error(`Failed to upload file to presigned URL: ${errorText}`);
   }
 
-  const uploadData = await uploadResponse.json();
-  const assetId = uploadData.assetID;
+  console.log(`Step 2 complete - File uploaded successfully`);
 
-  // Create extraction job
+  // Step 3: Create extraction job
   const extractUrl = 'https://pdf-services.adobe.io/operation/extractpdf';
   
   const extractPayload = {
-    assetID: assetId,
-    elementsToExtract: ['text'],
-    elementsToExtractRenditions: [],
-    tableOutputFormat: 'csv',
-    renditionsToExtract: []
+    assetID: assetID,
+    elementsToExtract: ['text', 'tables'],
+    tableOutputFormat: 'xlsx',
+    renditionsToExtract: ['tables', 'figures']
   };
+
+  console.log(`Step 3: Creating extraction job with payload:`, extractPayload);
 
   const extractResponse = await fetch(extractUrl, {
     method: 'POST',
@@ -278,13 +298,12 @@ async function processWithAdobe(
 }
 
 async function getAdobeAccessToken(credentials: AdobeCredentials): Promise<string> {
-  const tokenUrl = 'https://ims-na1.adobelogin.com/ims/token';
+  const tokenUrl = 'https://pdf-services.adobe.io/token';
   
   const formData = new URLSearchParams();
   formData.append('client_id', credentials.client_id);
   formData.append('client_secret', credentials.client_secret_encrypted);
   formData.append('grant_type', 'client_credentials');
-  formData.append('scope', 'openid,AdobeID,DCAPI');
 
   const response = await fetch(tokenUrl, {
     method: 'POST',
