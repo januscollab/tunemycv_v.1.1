@@ -42,7 +42,6 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
   // Sync state when extractedText changes (when modal opens with new content)
   useEffect(() => {
     if (isOpen && extractedText !== editedText) {
-      console.log('Modal: Syncing state with extracted text:', extractedText?.substring(0, 100) + '...');
       setEditedText(extractedText);
       setDocumentJson(editorTextToJson(extractedText));
       setLastSaved(null);
@@ -257,7 +256,6 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
             <div className="flex-1 p-4">
               <ScrollArea className="h-[calc(100vh-300px)]">
                 <RichTextEditor
-                  key={`${fileName}-${isOpen}`}
                   value={editedText}
                   onChange={setEditedText}
                   className="min-h-[calc(100vh-320px)] border-0"
