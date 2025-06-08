@@ -42,76 +42,92 @@ const cleanExtractedText = (text: string): string => {
     .trim();
 };
 
-export const extractTextFromFile = async (file: File): Promise<string> => {
+export const extractTextFromFile = async (file: File, signal?: AbortSignal): Promise<string> => {
   if (file.type === 'application/pdf') {
     try {
-      console.log(`Extracting text from PDF: ${file.name}`);
+      console.log(`Extracting text from PDF using Adobe PDF Services: ${file.name}`);
       
-      // Import pdfjs-dist for better browser compatibility
-      const pdfjsLib = await import('pdfjs-dist');
-      
-      // Set up worker with local fallback and better error handling
-      if (!pdfjsLib.GlobalWorkerOptions.workerSrc) {
-        try {
-          // Try local worker first (more reliable)
-          pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
-          console.log('Using local PDF.js worker');
-        } catch (error) {
-          console.warn('Local PDF worker failed, trying CDN:', error);
-          // Fallback to CDN with correct version
-          pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
-        }
+      // Check for cancellation before starting
+      if (signal?.aborted) {
+        throw new Error('Processing cancelled by user');
       }
+
+      // Use Adobe PDF Services API for all PDF extraction
+      const { supabase } = await import('@/integrations/supabase/client');
       
+      // Convert file to base64 for Adobe processing
       const arrayBuffer = await file.arrayBuffer();
-      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      const uint8Array = new Uint8Array(arrayBuffer);
       
-      let extractedText = '';
+      // Convert to base64 in chunks to avoid stack overflow for large files
+      let binaryString = '';
+      const chunkSize = 8192; // Process in 8KB chunks
+      for (let i = 0; i < uint8Array.length; i += chunkSize) {
+        const chunk = uint8Array.slice(i, i + chunkSize);
+        binaryString += String.fromCharCode(...chunk);
+      }
+      const base64String = btoa(binaryString);
       
-      // Extract text from all pages
-      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-        const page = await pdf.getPage(pageNum);
-        const textContent = await page.getTextContent();
-        
-        // Combine text items with proper spacing
-        const pageText = textContent.items
-          .map((item: any) => item.str)
-          .join(' ')
-          .replace(/\s+/g, ' ')
-          .trim();
-          
-        if (pageText) {
-          extractedText += (extractedText ? '\n\n' : '') + pageText;
+      console.log('Processing PDF with Adobe PDF Services...');
+      
+      const { data, error: adobeError } = await supabase.functions.invoke('adobe-pdf-extract', {
+        body: {
+          fileData: base64String,
+          fileName: file.name,
+          fileSize: file.size
         }
+      });
+      
+      if (adobeError) {
+        console.error('Adobe PDF Services error:', adobeError);
+        // Pass through user-friendly error messages from the Adobe API
+        throw new Error(adobeError.message || 'PDF processing service temporarily unavailable. Please try again.');
       }
       
-      if (!extractedText || extractedText.trim().length === 0) {
-        throw new Error('No text content could be extracted from the PDF');
+      if (!data?.success) {
+        // Use the user-friendly error message from the Adobe API if available
+        const errorMessage = data?.error || 'PDF processing encountered an issue. Please try again or use a different file format.';
+        throw new Error(errorMessage);
       }
       
-      // Apply smart formatting cleanup
-      extractedText = cleanExtractedText(extractedText);
-      
-      console.log(`Successfully extracted ${extractedText.split(/\s+/).length} words from ${file.name}`);
-      return extractedText;
+      console.log(`Adobe PDF extraction successful: ${data.wordCount} words extracted in ${data.processingTime}ms`);
+      return cleanExtractedText(data.extractedText);
       
     } catch (error) {
-      console.error('PDF extraction error:', error);
+      console.error('Adobe PDF extraction failed:', error);
       
-      // Provide more specific error messages
       if (error instanceof Error) {
-        if (error.message.includes('worker') || error.message.includes('Worker')) {
-          throw new Error('PDF processing failed: Unable to load PDF worker. Please try again or use a different file format.');
+        // Check for specific error patterns and provide helpful messages
+        if (error.message.includes('Monthly usage limit exceeded') || error.message.includes('PDF processing limit reached')) {
+          throw new Error('PDF processing limit reached for this month. Please try again next month or contact support.');
         }
-        if (error.message.includes('InvalidPDFException') || error.message.includes('corrupted')) {
-          throw new Error('PDF file appears to be corrupted or invalid. Please try a different PDF file.');
+        if (error.message.includes('Adobe API credentials not configured') || error.message.includes('not properly configured')) {
+          throw new Error('PDF processing service is temporarily unavailable. Please contact support.');
         }
-        if (error.message.includes('PasswordException')) {
-          throw new Error('PDF file is password protected. Please use an unprotected PDF file.');
+        if (error.message.includes('not enabled') || error.message.includes('temporarily unavailable')) {
+          throw new Error('PDF processing service is temporarily unavailable. Please try again in a few minutes.');
+        }
+        if (error.message.includes('bucketId is required') || error.message.includes('storage')) {
+          throw new Error('File processing encountered a storage issue. Please try again or contact support if the problem persists.');
+        }
+        if (error.message.includes('password-protected')) {
+          throw new Error('This PDF appears to be password-protected. Please remove the password and try again.');
+        }
+        if (error.message.includes('corrupted')) {
+          throw new Error('This PDF file appears to be corrupted. Please try uploading a different file.');
+        }
+        if (error.message.includes('complex formatting') || error.message.includes('difficult to process')) {
+          throw new Error('PDF processing encountered an issue. PDFs can sometimes be difficult to process due to their complex formatting. We recommend trying a Word document (.docx) or plain text file (.txt) for best results.');
+        }
+        
+        // If it's already a user-friendly message from the Adobe API, pass it through
+        if (error.message && !error.message.includes('Adobe') && !error.message.includes('API')) {
+          throw error;
         }
       }
       
-      throw new Error(`Failed to extract text from PDF: ${error instanceof Error ? error.message : 'Unknown error occurred while processing PDF'}`);
+      // Fallback to a generic but helpful error message
+      throw new Error('PDF processing encountered an issue. We recommend trying a Word document (.docx) or plain text file (.txt) for best results.');
     }
   }
   

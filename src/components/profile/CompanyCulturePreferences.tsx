@@ -300,11 +300,11 @@ const CompanyCulturePreferences: React.FC = () => {
     try {
       const { error } = await supabase
         .from('profiles')
-        .upsert({
-          id: user.id,
+        .update({
           culture_preferences_order: orderedArchetypes,
           updated_at: new Date().toISOString()
-        });
+        })
+        .eq('id', user.id);
 
       if (error) throw error;
     } catch (error: any) {
