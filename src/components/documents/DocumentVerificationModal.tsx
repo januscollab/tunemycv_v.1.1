@@ -249,7 +249,7 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
           </div>
         </div>
 
-        {/* Footer with 3 buttons */}
+        {/* Footer with 2 buttons */}
         <div className="flex items-center justify-end space-x-3 px-6 py-4 border-t border-border bg-background">
           <Button 
             variant="outline" 
@@ -258,9 +258,9 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
             className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200"
           >
             <X className="h-4 w-4 mr-2" />
-            Cancel
+            Close
           </Button>
-{documentType === 'cv' ? (
+          {documentType === 'cv' ? (
             <Button 
               variant="outline"
               size="sm"
@@ -276,25 +276,6 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
               Ask AI to Review My CV
             </Button>
           ) : null}
-          <Button 
-            variant="outline"
-            onClick={handleSave}
-            disabled={isSaving}
-            size="sm"
-            className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200 disabled:hover:scale-100 disabled:hover:bg-background disabled:hover:text-foreground disabled:hover:border-input"
-          >
-            {isSaving ? (
-              <>
-                <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent mr-2" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <Save className="h-4 w-4 mr-2" />
-                Save Changes
-              </>
-            )}
-          </Button>
         </div>
       </DialogContent>
     </Dialog>
