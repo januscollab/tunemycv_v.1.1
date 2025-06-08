@@ -371,7 +371,7 @@ async function extractTextFromZip(zipBuffer: ArrayBuffer): Promise<string> {
     
     if (!structuredDataFile) {
       console.error('Available files in ZIP:', Object.keys(extractedFiles));
-      throw new Error('structuredData.json not found in Adobe response ZIP');
+      throw new Error('PDF processing encountered an issue. PDFs can sometimes be difficult to process due to their complex formatting. We recommend trying a Word document (.docx) or plain text file (.txt) for best results.');
     }
     
     // Parse the JSON content
@@ -394,7 +394,7 @@ async function extractTextFromZip(zipBuffer: ArrayBuffer): Promise<string> {
     
   } catch (error) {
     console.error('Error extracting text from ZIP:', error);
-    throw new Error(`We're unable to process this PDF file. Please try with a different PDF or contact support if the problem persists. (Error: ${error.message})`);
+    throw new Error('PDF processing encountered an issue. PDFs can sometimes be difficult to process due to their complex formatting. We recommend trying a Word document (.docx) or plain text file (.txt) for best results.');
   }
 }
 

@@ -121,7 +121,7 @@ const handler = async (req: Request): Promise<Response> => {
     const accessToken = await getAdobeAccessToken(credentials);
 
     // Extract text using Adobe PDF Services
-    const extractResult = await extractTextWithAdobe(accessToken, fileData, fileName, credentials, debug);
+    const extractResult = await extractTextWithAdobe(accessToken, fileData, fileName, credentials, debug, userId);
 
     const processingTime = Date.now() - startTime;
     const wordCount = extractResult.extractedText.split(/\s+/).filter(word => word.length > 0).length;
@@ -227,7 +227,8 @@ async function extractTextWithAdobe(
   fileData: string, 
   fileName: string, 
   credentials: AdobeCredentials, 
-  debug: boolean = false
+  debug: boolean = false,
+  userId?: string
 ): Promise<{ extractedText: string; debugUrl?: string }> {
   console.log(`[${new Date().toISOString()}] Starting Adobe PDF extraction for file: ${fileName}`);
   console.log(`[${new Date().toISOString()}] Access token length: ${accessToken.length}`);
@@ -379,21 +380,38 @@ async function extractTextWithAdobe(
       const zipBuffer = await resultResponse.arrayBuffer();
       console.log(`Downloaded ZIP file: ${zipBuffer.byteLength} bytes`);
       
-      let debugUrl: string | undefined;
-      
-      // Save ZIP to storage for debugging if requested
-      if (debug) {
-        debugUrl = await saveZipToStorage(zipBuffer, fileName);
-        console.log(`Debug ZIP saved to: ${debugUrl}`);
-      }
-      
       // Extract and parse the structured data from the ZIP
       const extractedText = await extractTextFromZip(zipBuffer);
 
+      // Get user_id from profile if userId is available
+      let userIdFromProfile: string | undefined;
+      if (userId) {
+        const supabase = createClient(
+          Deno.env.get('SUPABASE_URL') ?? '',
+          Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+        );
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('user_id')
+          .eq('id', userId)
+          .single();
+        userIdFromProfile = profile?.user_id;
+      }
+
+      // Always save both ZIP and extracted text files for troubleshooting
+      const { zipUrl, textUrl } = await saveFilesToStorage(
+        zipBuffer, 
+        extractedText, 
+        fileName, 
+        userIdFromProfile
+      );
+
       console.log(`Text extraction completed, extracted ${extractedText.split(/\s+/).length} words`);
+      console.log(`Files saved - ZIP: ${zipUrl}, Text: ${textUrl}`);
+      
       return { 
         extractedText: extractedText.trim(),
-        debugUrl 
+        debugUrl: zipUrl 
       };
       
     } else if (statusData.status === 'failed') {
@@ -408,27 +426,27 @@ async function extractTextWithAdobe(
 
 async function extractTextFromZip(zipBuffer: ArrayBuffer): Promise<string> {
   try {
-    // Import ZIP utilities from Deno standard library
-    const { unzip } = await import("https://deno.land/x/zip@v1.2.5/mod.ts");
+    // Import fflate for reliable ZIP extraction
+    const { unzipSync } = await import("https://esm.sh/fflate@0.8.2");
     
     // Convert ArrayBuffer to Uint8Array
     const zipData = new Uint8Array(zipBuffer);
     
-    // Extract the ZIP file
-    const extractedFiles = await unzip(zipData);
+    // Extract the ZIP file using fflate
+    const extractedFiles = unzipSync(zipData);
     
     // Look for structuredData.json in the extracted files
-    const structuredDataFile = extractedFiles.find(file => 
-      file.name === 'structuredData.json' || file.name.endsWith('/structuredData.json')
+    const structuredDataFileName = Object.keys(extractedFiles).find(fileName => 
+      fileName === 'structuredData.json' || fileName.endsWith('/structuredData.json')
     );
     
-    if (!structuredDataFile) {
-      console.error('Available files in ZIP:', extractedFiles.map(f => f.name));
-      throw new Error('structuredData.json not found in Adobe response ZIP');
+    if (!structuredDataFileName) {
+      console.error('Available files in ZIP:', Object.keys(extractedFiles));
+      throw new Error('PDF processing encountered an issue. PDFs can sometimes be difficult to process due to their complex formatting. We recommend trying a Word document (.docx) or plain text file (.txt) for best results.');
     }
     
     // Parse the JSON content
-    const jsonContent = new TextDecoder().decode(structuredDataFile.content);
+    const jsonContent = new TextDecoder().decode(extractedFiles[structuredDataFileName]);
     const structuredData = JSON.parse(jsonContent);
     
     console.log('Successfully extracted structured data from ZIP');
@@ -447,7 +465,8 @@ async function extractTextFromZip(zipBuffer: ArrayBuffer): Promise<string> {
     
   } catch (error) {
     console.error('Error extracting text from ZIP:', error);
-    throw new Error(`Failed to extract text from Adobe ZIP response: ${error.message}`);
+    // Return user-friendly error message for PDF processing issues
+    throw new Error('PDF processing encountered an issue. PDFs can sometimes be difficult to process due to their complex formatting. We recommend trying a Word document (.docx) or plain text file (.txt) for best results.');
   }
 }
 
@@ -493,7 +512,12 @@ async function checkAndSendUsageAlerts(supabase: any) {
   }
 }
 
-async function saveZipToStorage(zipBuffer: ArrayBuffer, originalFileName: string): Promise<string> {
+async function saveFilesToStorage(
+  zipBuffer: ArrayBuffer, 
+  extractedText: string, 
+  originalFileName: string, 
+  userId?: string
+): Promise<{ zipUrl?: string; textUrl?: string }> {
   try {
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -501,29 +525,73 @@ async function saveZipToStorage(zipBuffer: ArrayBuffer, originalFileName: string
     );
 
     const timestamp = new Date().getTime();
-    const fileName = `${timestamp}-${originalFileName.replace(/\.[^/.]+$/, "")}-adobe-response.zip`;
+    const baseFileName = originalFileName.replace(/\.[^/.]+$/, "");
+    const userPrefix = userId ? `${userId}_` : '';
     
-    const { data, error } = await supabase.storage
+    const zipFileName = `${userPrefix}${timestamp}_${baseFileName}_adobe_response.zip`;
+    const textFileName = `${userPrefix}${timestamp}_${baseFileName}_extracted_text.txt`;
+    
+    let zipUrl: string | undefined;
+    let textUrl: string | undefined;
+
+    // Save ZIP file
+    const { error: zipError } = await supabase.storage
       .from('adobe-debug-files')
-      .upload(fileName, zipBuffer, {
+      .upload(zipFileName, zipBuffer, {
         contentType: 'application/zip',
         upsert: true
       });
 
-    if (error) {
-      console.error('Failed to save ZIP to storage:', error);
-      throw error;
+    if (!zipError) {
+      const { data: zipUrlData } = supabase.storage
+        .from('adobe-debug-files')
+        .getPublicUrl(zipFileName);
+      zipUrl = zipUrlData.publicUrl;
+
+      // Track ZIP file in database
+      await supabase.from('adobe_debug_files').insert({
+        user_id: userId || 'anonymous',
+        file_name: zipFileName,
+        original_filename: originalFileName,
+        file_type: 'zip',
+        file_size: zipBuffer.byteLength,
+        storage_path: zipFileName
+      });
     }
 
-    // Get public URL
-    const { data: urlData } = supabase.storage
+    // Save extracted text file
+    const textBuffer = new TextEncoder().encode(extractedText);
+    const { error: textError } = await supabase.storage
       .from('adobe-debug-files')
-      .getPublicUrl(fileName);
+      .upload(textFileName, textBuffer, {
+        contentType: 'text/plain',
+        upsert: true
+      });
 
-    return urlData.publicUrl;
+    if (!textError) {
+      const { data: textUrlData } = supabase.storage
+        .from('adobe-debug-files')
+        .getPublicUrl(textFileName);
+      textUrl = textUrlData.publicUrl;
+
+      // Track text file in database
+      await supabase.from('adobe_debug_files').insert({
+        user_id: userId || 'anonymous',
+        file_name: textFileName,
+        original_filename: originalFileName,
+        file_type: 'text',
+        file_size: textBuffer.byteLength,
+        storage_path: textFileName
+      });
+    }
+
+    // Cleanup old files (keep max 100 of each type)
+    await supabase.rpc('cleanup_adobe_debug_files');
+
+    return { zipUrl, textUrl };
   } catch (error) {
-    console.error('Error saving ZIP to storage:', error);
-    throw new Error(`Failed to save debug ZIP: ${error.message}`);
+    console.error('Error saving files to storage:', error);
+    return {};
   }
 }
 
