@@ -570,6 +570,7 @@ export type Database = {
           job_title: string | null
           needs_type_confirmation: boolean | null
           original_file_content: string | null
+          processing_status: string | null
           quality_assessment: Json | null
           quality_score: number | null
           type_detection_confidence: number | null
@@ -587,6 +588,7 @@ export type Database = {
           job_title?: string | null
           needs_type_confirmation?: boolean | null
           original_file_content?: string | null
+          processing_status?: string | null
           quality_assessment?: Json | null
           quality_score?: number | null
           type_detection_confidence?: number | null
@@ -604,6 +606,7 @@ export type Database = {
           job_title?: string | null
           needs_type_confirmation?: boolean | null
           original_file_content?: string | null
+          processing_status?: string | null
           quality_assessment?: Json | null
           quality_score?: number | null
           type_detection_confidence?: number | null
@@ -797,6 +800,19 @@ export type Database = {
           action_type: string
           target_user?: string
           action_details?: Json
+        }
+        Returns: undefined
+      }
+      trigger_adobe_processing: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      update_processing_status: {
+        Args: {
+          upload_id: string
+          new_status: string
+          extracted_text_content?: string
+          error_message_content?: string
         }
         Returns: undefined
       }
