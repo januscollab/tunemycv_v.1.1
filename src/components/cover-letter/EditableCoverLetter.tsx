@@ -1,7 +1,6 @@
 
-import React, { useState, useEffect, useRef } from 'react';
-import { RotateCcw } from 'lucide-react';
-import { UnifiedTextarea } from '@/components/ui/unified-input';
+import React, { useState, useEffect } from 'react';
+import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import { useToast } from '@/hooks/use-toast';
 
 
@@ -13,44 +12,11 @@ interface EditableCoverLetterProps {
 const EditableCoverLetter: React.FC<EditableCoverLetterProps> = ({ content, onSave }) => {
   const [editedContent, setEditedContent] = useState(content);
   const [originalContent] = useState(content);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { toast } = useToast();
-
-  // Auto-resize textarea based on content
-  const adjustTextareaHeight = () => {
-    if (textareaRef.current) {
-      // Reset height to auto to get accurate scrollHeight
-      textareaRef.current.style.height = 'auto';
-      
-      // Use requestAnimationFrame to ensure DOM has updated
-      requestAnimationFrame(() => {
-        if (textareaRef.current) {
-          const scrollHeight = textareaRef.current.scrollHeight;
-          const minHeight = 400; // Minimum height for cover letters
-          // Remove max height constraint to allow unlimited expansion
-          const newHeight = Math.max(minHeight, scrollHeight + 20); // Add small padding
-          textareaRef.current.style.height = `${newHeight}px`;
-        }
-      });
-    }
-  };
 
   useEffect(() => {
     setEditedContent(content);
   }, [content]);
-
-  // Auto-resize textarea when content changes
-  useEffect(() => {
-    adjustTextareaHeight();
-  }, [editedContent]);
-
-  // Auto-resize on component mount and window resize
-  useEffect(() => {
-    adjustTextareaHeight();
-    const handleResize = () => adjustTextareaHeight();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   // Auto-save functionality with debounce
   useEffect(() => {
@@ -71,23 +37,13 @@ const EditableCoverLetter: React.FC<EditableCoverLetterProps> = ({ content, onSa
     });
   };
 
-  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setEditedContent(e.target.value);
-    // Immediately trigger resize for responsive height adjustment
-    adjustTextareaHeight();
-  };
-
   return (
     <div className="space-y-4">
-      <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-        <UnifiedTextarea
-          variant="floating"
-          label="Edit Cover Letter"
-          ref={textareaRef}
+      <div className="bg-muted/20 p-4 rounded-lg">
+        <RichTextEditor
           value={editedContent}
-          onChange={handleContentChange}
-          className="w-full font-sans text-caption leading-relaxed bg-transparent"
-          style={{ minHeight: '400px' }}
+          onChange={setEditedContent}
+          className="w-full min-h-[400px] bg-transparent"
           placeholder="Edit your cover letter content here..."
         />
       </div>
