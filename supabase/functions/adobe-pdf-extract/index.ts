@@ -376,9 +376,9 @@ async function extractTextWithAdobe(
         throw new Error('Failed to download extraction result');
       }
 
-      // Adobe returns a ZIP file containing structuredData.json
-      const zipBuffer = await resultResponse.arrayBuffer();
-      console.log(`Downloaded ZIP file: ${zipBuffer.byteLength} bytes`);
+      // Adobe can return either a ZIP file or direct JSON
+      const responseBuffer = await resultResponse.arrayBuffer();
+      console.log(`Downloaded response: ${responseBuffer.byteLength} bytes`);
       
       // Get user_id from profile if userId is available
       let userIdFromProfile: string | undefined;
@@ -395,30 +395,42 @@ async function extractTextWithAdobe(
         userIdFromProfile = profile?.user_id;
       }
 
-      // Step 1: Save ZIP file immediately (before attempting extraction)
-      console.log('Saving ZIP file to storage...');
-      const { zipUrl } = await saveZipToStorage(zipBuffer, fileName, userIdFromProfile, 'downloaded');
-      console.log(`ZIP file saved: ${zipUrl ? 'success' : 'failed'}`);
+      // Step 1: Save response file immediately (before attempting extraction)
+      console.log('Saving response file to storage...');
+      const { zipUrl } = await saveZipToStorage(responseBuffer, fileName, userIdFromProfile, 'downloaded');
+      console.log(`Response file saved: ${zipUrl ? 'success' : 'failed'}`);
       
-      // Step 2: Validate ZIP content before attempting extraction
-      if (!validateZipContent(zipBuffer)) {
-        console.log('ZIP content validation failed');
-        await saveZipToStorage(zipBuffer, fileName, userIdFromProfile, 'invalid_zip');
-        throw new Error('PDF processing encountered an issue. The document may be corrupted or password-protected. We recommend trying a Word document (.docx) or plain text file (.txt) for best results.');
-      }
-
-      // Step 3: Attempt to extract text from ZIP
+      // Step 2: Determine if response is ZIP or direct JSON and process accordingly
       let extractedText: string;
-      try {
-        extractedText = await extractTextFromZip(zipBuffer);
-        console.log(`Text extraction successful, extracted ${extractedText.split(/\s+/).length} words`);
-      } catch (error) {
-        console.log('Text extraction failed:', error.message);
-        await saveZipToStorage(zipBuffer, fileName, userIdFromProfile, 'extraction_failed');
-        throw new Error('PDF processing encountered an issue. PDFs can sometimes be difficult to process due to their complex formatting. We recommend trying a Word document (.docx) or plain text file (.txt) for best results.');
+      if (isDirectJsonResponse(responseBuffer)) {
+        console.log('Adobe returned direct JSON response');
+        try {
+          extractedText = await extractTextFromDirectJson(responseBuffer);
+          console.log(`Direct JSON extraction successful, extracted ${extractedText.split(/\s+/).length} words`);
+        } catch (error) {
+          console.log('Direct JSON extraction failed:', error.message);
+          await saveZipToStorage(responseBuffer, fileName, userIdFromProfile, 'json_extraction_failed');
+          throw new Error('PDF processing encountered an issue. PDFs can sometimes be difficult to process due to their complex formatting. We recommend trying a Word document (.docx) or plain text file (.txt) for best results.');
+        }
+      } else {
+        // Handle ZIP response
+        if (!validateZipContent(responseBuffer)) {
+          console.log('ZIP content validation failed');
+          await saveZipToStorage(responseBuffer, fileName, userIdFromProfile, 'invalid_zip');
+          throw new Error('PDF processing encountered an issue. The document may be corrupted or password-protected. We recommend trying a Word document (.docx) or plain text file (.txt) for best results.');
+        }
+
+        try {
+          extractedText = await extractTextFromZip(responseBuffer);
+          console.log(`ZIP extraction successful, extracted ${extractedText.split(/\s+/).length} words`);
+        } catch (error) {
+          console.log('ZIP extraction failed:', error.message);
+          await saveZipToStorage(responseBuffer, fileName, userIdFromProfile, 'zip_extraction_failed');
+          throw new Error('PDF processing encountered an issue. PDFs can sometimes be difficult to process due to their complex formatting. We recommend trying a Word document (.docx) or plain text file (.txt) for best results.');
+        }
       }
 
-      // Step 4: Save extracted text file
+      // Step 3: Save extracted text file
       const { textUrl } = await saveTextToStorage(extractedText, fileName, userIdFromProfile);
       console.log(`Text file saved: ${textUrl ? 'success' : 'failed'}`);
       
@@ -522,6 +534,49 @@ async function checkAndSendUsageAlerts(supabase: any) {
     }
   } catch (error) {
     console.error('Failed to check/send usage alerts:', error);
+  }
+}
+
+function isDirectJsonResponse(buffer: ArrayBuffer): boolean {
+  try {
+    // Check if response starts with JSON signature
+    const view = new Uint8Array(buffer.slice(0, 4));
+    const signature = Array.from(view).map(b => b.toString(16).padStart(2, '0')).join('');
+    
+    // JSON starts with '{' which is 0x7B
+    if (signature.startsWith('7b')) {
+      console.log('Detected direct JSON response');
+      return true;
+    }
+    
+    return false;
+  } catch (error) {
+    console.error('Error checking response type:', error);
+    return false;
+  }
+}
+
+async function extractTextFromDirectJson(buffer: ArrayBuffer): Promise<string> {
+  try {
+    const jsonContent = new TextDecoder().decode(buffer);
+    const structuredData = JSON.parse(jsonContent);
+    
+    console.log('Successfully parsed direct JSON response');
+    
+    // Extract text from the structured data
+    let extractedText = '';
+    if (structuredData.elements) {
+      for (const element of structuredData.elements) {
+        if (element.Text) {
+          extractedText += element.Text + ' ';
+        }
+      }
+    }
+    
+    return extractedText.trim();
+  } catch (error) {
+    console.error('Error extracting text from direct JSON:', error);
+    throw new Error('Failed to parse Adobe response as JSON');
   }
 }
 
