@@ -306,17 +306,37 @@ async function processWithAdobe(
       const zipBuffer = await resultResponse.arrayBuffer();
       console.log(`Downloaded ZIP file: ${zipBuffer.byteLength} bytes`);
       
-      // Extract and parse the structured data from the ZIP
-      const extractedText = await extractTextFromZip(zipBuffer);
+      // Step 1: Save ZIP file immediately (before attempting extraction)
+      console.log('Saving ZIP file to storage...');
+      const { zipUrl } = await saveZipToStorage(zipBuffer, fileName, userId, 'downloaded');
+      console.log(`ZIP file saved: ${zipUrl ? 'success' : 'failed'}`);
+      
+      // Step 2: Validate ZIP content before attempting extraction
+      if (!validateZipContent(zipBuffer)) {
+        console.log('ZIP content validation failed');
+        await saveZipToStorage(zipBuffer, fileName, userId, 'invalid_zip');
+        throw new Error('PDF processing encountered an issue. The document may be corrupted or password-protected. We recommend trying a Word document (.docx) or plain text file (.txt) for best results.');
+      }
 
-      // Save both ZIP and extracted text files (always, not just debug mode)
-      const savedFiles = await saveFilesToStorage(zipBuffer, extractedText, fileName, userId);
-      console.log(`Files saved - ZIP: ${savedFiles.zipUrl ? 'yes' : 'no'}, Text: ${savedFiles.textUrl ? 'yes' : 'no'}`);
+      // Step 3: Attempt to extract text from ZIP
+      let extractedText: string;
+      try {
+        extractedText = await extractTextFromZip(zipBuffer);
+        console.log(`Text extraction successful, extracted ${extractedText.split(/\s+/).length} words`);
+      } catch (error) {
+        console.log('Text extraction failed:', error.message);
+        await saveZipToStorage(zipBuffer, fileName, userId, 'extraction_failed');
+        throw new Error('PDF processing encountered an issue. PDFs can sometimes be difficult to process due to their complex formatting. We recommend trying a Word document (.docx) or plain text file (.txt) for best results.');
+      }
+
+      // Step 4: Save extracted text file
+      const { textUrl } = await saveTextToStorage(extractedText, fileName, userId);
+      console.log(`Text file saved: ${textUrl ? 'success' : 'failed'}`);
 
       return { 
         extractedText: extractedText.trim(),
-        debugUrl: savedFiles.zipUrl,
-        textUrl: savedFiles.textUrl
+        debugUrl: zipUrl,
+        textUrl: textUrl
       };
       
     } else if (statusData.status === 'failed') {
@@ -398,12 +418,39 @@ async function extractTextFromZip(zipBuffer: ArrayBuffer): Promise<string> {
   }
 }
 
-async function saveFilesToStorage(
+function validateZipContent(zipBuffer: ArrayBuffer): boolean {
+  try {
+    // Check minimum file size (ZIP files should be at least 22 bytes)
+    if (zipBuffer.byteLength < 22) {
+      console.log(`ZIP too small: ${zipBuffer.byteLength} bytes`);
+      return false;
+    }
+
+    // Check ZIP file signature (PK header)
+    const view = new Uint8Array(zipBuffer.slice(0, 4));
+    const signature = Array.from(view).map(b => b.toString(16).padStart(2, '0')).join('');
+    const isValidZip = signature === '504b0304' || signature === '504b0506' || signature === '504b0708';
+    
+    if (!isValidZip) {
+      console.log(`Invalid ZIP signature: ${signature}`);
+      // Log first 100 bytes for debugging
+      const debugView = new Uint8Array(zipBuffer.slice(0, Math.min(100, zipBuffer.byteLength)));
+      console.log('First 100 bytes:', Array.from(debugView).map(b => b.toString(16).padStart(2, '0')).join(' '));
+    }
+    
+    return isValidZip;
+  } catch (error) {
+    console.error('Error validating ZIP content:', error);
+    return false;
+  }
+}
+
+async function saveZipToStorage(
   zipBuffer: ArrayBuffer, 
-  extractedText: string,
   originalFileName: string, 
-  userId: string
-): Promise<{ zipUrl?: string; textUrl?: string }> {
+  userId: string,
+  status: string = 'downloaded'
+): Promise<{ zipUrl?: string }> {
   try {
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -412,11 +459,9 @@ async function saveFilesToStorage(
 
     const timestamp = new Date().getTime();
     const baseFileName = `${userId}_${timestamp}_${originalFileName.replace(/\.[^/.]+$/, "")}`;
-    
-    const results: { zipUrl?: string; textUrl?: string } = {};
+    const zipFileName = `${baseFileName}_${status}.zip`;
     
     // Save ZIP file
-    const zipFileName = `${baseFileName}_adobe-response.zip`;
     const { error: zipError } = await supabase.storage
       .from('adobe-debug-files')
       .upload(zipFileName, zipBuffer, {
@@ -424,26 +469,49 @@ async function saveFilesToStorage(
         upsert: true
       });
 
-    if (!zipError) {
-      // Track in database
-      await supabase.from('adobe_debug_files').insert({
-        user_id: userId,
-        file_name: zipFileName,
-        original_filename: originalFileName,
-        file_type: 'zip',
-        file_size: zipBuffer.byteLength,
-        storage_path: zipFileName
-      });
-      
-      const { data: zipUrlData } = supabase.storage
-        .from('adobe-debug-files')
-        .getPublicUrl(zipFileName);
-      results.zipUrl = zipUrlData.publicUrl;
+    if (zipError) {
+      console.error('Failed to save ZIP file:', zipError);
+      return {};
     }
+
+    // Track in database
+    await supabase.from('adobe_debug_files').insert({
+      user_id: userId,
+      file_name: zipFileName,
+      original_filename: originalFileName,
+      file_type: 'zip',
+      file_size: zipBuffer.byteLength,
+      storage_path: zipFileName
+    });
     
-    // Save extracted text
+    const { data: zipUrlData } = supabase.storage
+      .from('adobe-debug-files')
+      .getPublicUrl(zipFileName);
+
+    return { zipUrl: zipUrlData.publicUrl };
+  } catch (error) {
+    console.error('Error saving ZIP to storage:', error);
+    return {};
+  }
+}
+
+async function saveTextToStorage(
+  extractedText: string, 
+  originalFileName: string, 
+  userId: string
+): Promise<{ textUrl?: string }> {
+  try {
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+    );
+
+    const timestamp = new Date().getTime();
+    const baseFileName = `${userId}_${timestamp}_${originalFileName.replace(/\.[^/.]+$/, "")}`;
     const textFileName = `${baseFileName}_extracted.txt`;
     const textBuffer = new TextEncoder().encode(extractedText);
+    
+    // Save text file
     const { error: textError } = await supabase.storage
       .from('adobe-debug-files')
       .upload(textFileName, textBuffer, {
@@ -451,29 +519,31 @@ async function saveFilesToStorage(
         upsert: true
       });
 
-    if (!textError) {
-      // Track in database
-      await supabase.from('adobe_debug_files').insert({
-        user_id: userId,
-        file_name: textFileName,
-        original_filename: originalFileName,
-        file_type: 'text',
-        file_size: textBuffer.byteLength,
-        storage_path: textFileName
-      });
-      
-      const { data: textUrlData } = supabase.storage
-        .from('adobe-debug-files')
-        .getPublicUrl(textFileName);
-      results.textUrl = textUrlData.publicUrl;
+    if (textError) {
+      console.error('Failed to save text file:', textError);
+      return {};
     }
+
+    // Track in database
+    await supabase.from('adobe_debug_files').insert({
+      user_id: userId,
+      file_name: textFileName,
+      original_filename: originalFileName,
+      file_type: 'text',
+      file_size: textBuffer.byteLength,
+      storage_path: textFileName
+    });
+    
+    const { data: textUrlData } = supabase.storage
+      .from('adobe-debug-files')
+      .getPublicUrl(textFileName);
     
     // Cleanup old files (keep max 100 of each type)
     await supabase.rpc('cleanup_adobe_debug_files');
 
-    return results;
+    return { textUrl: textUrlData.publicUrl };
   } catch (error) {
-    console.error('Error saving files to storage:', error);
+    console.error('Error saving text to storage:', error);
     return {};
   }
 }
