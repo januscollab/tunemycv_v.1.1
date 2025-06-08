@@ -257,6 +257,9 @@ async function extractTextWithAdobe(accessToken: string, fileData: string, fileN
   
   const fileUploadResponse = await fetch(uploadUri, {
     method: 'PUT',
+    headers: {
+      'Content-Type': 'application/pdf'
+    },
     body: binaryData,
   });
 
