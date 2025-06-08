@@ -42,6 +42,102 @@ export type Database = {
         }
         Relationships: []
       }
+      adobe_credentials: {
+        Row: {
+          client_id: string
+          client_secret_encrypted: string
+          created_at: string
+          id: string
+          is_active: boolean
+          organization_id: string
+          updated_at: string
+        }
+        Insert: {
+          client_id: string
+          client_secret_encrypted: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          organization_id: string
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string
+          client_secret_encrypted?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          organization_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      adobe_extraction_logs: {
+        Row: {
+          adobe_operation_id: string | null
+          cost_estimate: number | null
+          created_at: string
+          error_message: string | null
+          file_name: string
+          file_size: number
+          id: string
+          processing_time_ms: number | null
+          success: boolean
+          user_id: string | null
+        }
+        Insert: {
+          adobe_operation_id?: string | null
+          cost_estimate?: number | null
+          created_at?: string
+          error_message?: string | null
+          file_name: string
+          file_size: number
+          id?: string
+          processing_time_ms?: number | null
+          success?: boolean
+          user_id?: string | null
+        }
+        Update: {
+          adobe_operation_id?: string | null
+          cost_estimate?: number | null
+          created_at?: string
+          error_message?: string | null
+          file_name?: string
+          file_size?: number
+          id?: string
+          processing_time_ms?: number | null
+          success?: boolean
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      adobe_usage_tracking: {
+        Row: {
+          api_calls_count: number
+          created_at: string
+          id: string
+          month_year: string
+          reset_date: string
+          updated_at: string
+        }
+        Insert: {
+          api_calls_count?: number
+          created_at?: string
+          id?: string
+          month_year: string
+          reset_date: string
+          updated_at?: string
+        }
+        Update: {
+          api_calls_count?: number
+          created_at?: string
+          id?: string
+          month_year?: string
+          reset_date?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       ai_prompt_versions: {
         Row: {
           content: string
@@ -432,22 +528,31 @@ export type Database = {
       site_settings: {
         Row: {
           admin_email: string | null
+          adobe_api_enabled: boolean | null
           created_at: string
           id: string
+          monthly_adobe_limit: number | null
+          reset_day: number | null
           support_email: string | null
           updated_at: string
         }
         Insert: {
           admin_email?: string | null
+          adobe_api_enabled?: boolean | null
           created_at?: string
           id?: string
+          monthly_adobe_limit?: number | null
+          reset_day?: number | null
           support_email?: string | null
           updated_at?: string
         }
         Update: {
           admin_email?: string | null
+          adobe_api_enabled?: boolean | null
           created_at?: string
           id?: string
+          monthly_adobe_limit?: number | null
+          reset_day?: number | null
           support_email?: string | null
           updated_at?: string
         }
@@ -504,6 +609,27 @@ export type Database = {
           type_detection_confidence?: number | null
           upload_type?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      usage_alerts_sent: {
+        Row: {
+          id: string
+          month_year: string
+          sent_at: string
+          threshold_percentage: number
+        }
+        Insert: {
+          id?: string
+          month_year: string
+          sent_at?: string
+          threshold_percentage: number
+        }
+        Update: {
+          id?: string
+          month_year?: string
+          sent_at?: string
+          threshold_percentage?: number
         }
         Relationships: []
       }
@@ -645,11 +771,25 @@ export type Database = {
         Args: { _user_id: string }
         Returns: boolean
       }
+      get_current_adobe_usage: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          current_usage: number
+          monthly_limit: number
+          usage_percentage: number
+          days_until_reset: number
+          reset_date: string
+        }[]
+      }
       has_role: {
         Args: {
           _user_id: string
           _role: Database["public"]["Enums"]["user_role"]
         }
+        Returns: boolean
+      }
+      increment_adobe_usage: {
+        Args: Record<PropertyKey, never>
         Returns: boolean
       }
       log_admin_action: {

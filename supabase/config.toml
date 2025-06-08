@@ -10,5 +10,8 @@ max_rows = 1000
 [functions.analyze-cv-with-ai]
 verify_jwt = true
 
-[functions.extract-pdf-text]
+[functions.adobe-pdf-extract]
 verify_jwt = true
+
+[functions.send-usage-alert]
+verify_jwt = false

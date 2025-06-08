@@ -45,110 +45,58 @@ const cleanExtractedText = (text: string): string => {
 export const extractTextFromFile = async (file: File, signal?: AbortSignal): Promise<string> => {
   if (file.type === 'application/pdf') {
     try {
-      console.log(`Extracting text from PDF: ${file.name}`);
-      
-      // Import pdfjs-dist for better browser compatibility
-      const pdfjsLib = await import('pdfjs-dist');
-      
-      // Set up worker with CDN for better reliability
-      if (!pdfjsLib.GlobalWorkerOptions.workerSrc) {
-        // Use CDN worker for better compatibility
-        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
-        console.log('Using CDN PDF.js worker');
-      }
+      console.log(`Extracting text from PDF using Adobe PDF Services: ${file.name}`);
       
       // Check for cancellation before starting
       if (signal?.aborted) {
         throw new Error('Processing cancelled by user');
       }
 
+      // Use Adobe PDF Services API for all PDF extraction
+      const { supabase } = await import('@/integrations/supabase/client');
+      
+      // Convert file to base64 for Adobe processing
       const arrayBuffer = await file.arrayBuffer();
-      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      const uint8Array = new Uint8Array(arrayBuffer);
+      const base64String = btoa(String.fromCharCode(...uint8Array));
       
-      let extractedText = '';
+      console.log('Processing PDF with Adobe PDF Services...');
       
-      // Extract text from all pages with cancellation checks
-      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-        // Check for cancellation before each page
-        if (signal?.aborted) {
-          throw new Error('Processing cancelled by user');
+      const { data, error: adobeError } = await supabase.functions.invoke('adobe-pdf-extract', {
+        body: {
+          fileData: base64String,
+          fileName: file.name,
+          fileSize: file.size
         }
-
-        const page = await pdf.getPage(pageNum);
-        const textContent = await page.getTextContent();
-        
-        // Combine text items with proper spacing
-        const pageText = textContent.items
-          .map((item: any) => item.str)
-          .join(' ')
-          .replace(/\s+/g, ' ')
-          .trim();
-          
-        if (pageText) {
-          extractedText += (extractedText ? '\n\n' : '') + pageText;
-        }
+      });
+      
+      if (adobeError) {
+        throw new Error(`Adobe PDF extraction failed: ${adobeError.message}`);
       }
       
-      if (!extractedText || extractedText.trim().length === 0) {
-        throw new Error('No text content could be extracted from the PDF');
+      if (!data?.success) {
+        throw new Error(data?.error || 'Adobe PDF extraction returned no data');
       }
       
-      // Apply smart formatting cleanup
-      extractedText = cleanExtractedText(extractedText);
-      
-      console.log(`Successfully extracted ${extractedText.split(/\s+/).length} words from ${file.name}`);
-      return extractedText;
+      console.log(`Adobe PDF extraction successful: ${data.wordCount} words extracted in ${data.processingTime}ms`);
+      return cleanExtractedText(data.extractedText);
       
     } catch (error) {
-      console.error('Client-side PDF extraction failed, trying server-side fallback:', error);
+      console.error('Adobe PDF extraction failed:', error);
       
-      try {
-        // Server-side fallback using Supabase Edge Function
-        const { supabase } = await import('@/integrations/supabase/client');
-        
-        // Convert file to base64 for server processing
-        const arrayBuffer = await file.arrayBuffer();
-        const uint8Array = new Uint8Array(arrayBuffer);
-        const base64String = btoa(String.fromCharCode(...uint8Array));
-        
-        console.log('Attempting server-side PDF extraction...');
-        
-        const { data, error: serverError } = await supabase.functions.invoke('extract-pdf-text', {
-          body: {
-            fileData: base64String,
-            fileName: file.name
-          }
-        });
-        
-        if (serverError) {
-          throw new Error(`Server-side extraction failed: ${serverError.message}`);
+      if (error instanceof Error) {
+        if (error.message.includes('Monthly usage limit exceeded')) {
+          throw new Error('Monthly Adobe PDF extraction limit exceeded. Please try again next month or contact support.');
         }
-        
-        if (!data?.success) {
-          throw new Error(data?.error || 'Server-side extraction returned no data');
+        if (error.message.includes('Adobe API credentials not configured')) {
+          throw new Error('Adobe PDF Services is not properly configured. Please contact support.');
         }
-        
-        console.log(`Server-side extraction successful: ${data.wordCount} words extracted`);
-        return cleanExtractedText(data.extractedText);
-        
-      } catch (serverError) {
-        console.error('Server-side PDF extraction also failed:', serverError);
-        
-        // Final fallback error message
-        if (error instanceof Error) {
-          if (error.message.includes('worker') || error.message.includes('Worker')) {
-            throw new Error('PDF processing failed on both client and server. Please try converting your PDF to a Word document or text file.');
-          }
-          if (error.message.includes('InvalidPDFException') || error.message.includes('corrupted')) {
-            throw new Error('PDF file appears to be corrupted or invalid. Please try a different PDF file.');
-          }
-          if (error.message.includes('PasswordException')) {
-            throw new Error('PDF file is password protected. Please use an unprotected PDF file.');
-          }
+        if (error.message.includes('not enabled')) {
+          throw new Error('Adobe PDF Services is currently disabled. Please contact support.');
         }
-        
-        throw new Error(`Failed to extract text from PDF using both client and server methods. Please try converting to a Word document or text file.`);
       }
+      
+      throw new Error(`Failed to extract text from PDF: ${error instanceof Error ? error.message : 'Unknown error'}. Please try converting to a Word document or text file.`);
     }
   }
   
