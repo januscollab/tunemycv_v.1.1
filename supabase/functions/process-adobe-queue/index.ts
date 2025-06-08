@@ -32,10 +32,10 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     console.log('Starting background Adobe PDF processing queue...');
 
-    // Check if Adobe API is enabled
+    // Check if Adobe API is enabled and get debug setting
     const { data: settings } = await supabase
       .from('site_settings')
-      .select('adobe_api_enabled, monthly_adobe_limit')
+      .select('adobe_api_enabled, monthly_adobe_limit, debug_mode')
       .single();
 
     if (!settings?.adobe_api_enabled) {
@@ -45,6 +45,9 @@ const handler = async (req: Request): Promise<Response> => {
         headers: { 'Content-Type': 'application/json', ...corsHeaders },
       });
     }
+
+    // Use debug setting from site settings (default to true if not set)
+    const debug = settings?.debug_mode ?? true;
 
     // Get Adobe credentials
     const { data: credentials, error: credError } = await supabase
@@ -119,7 +122,7 @@ const handler = async (req: Request): Promise<Response> => {
           upload.original_file_content,
           upload.file_name,
           credentials,
-          false
+          debug
         );
 
         // Update with success
@@ -229,9 +232,7 @@ async function processWithAdobe(
     assetID: assetID,
     getCharBounds: false,
     includeStyling: false,
-    elementsToExtract: ['text', 'tables'],
-    tableOutputFormat: 'xlsx',
-    renditionsToExtract: ['tables', 'figures']
+    elementsToExtract: ['text'] // Only extract text, no tables or figures
   };
 
   console.log(`[${new Date().toISOString()}] Sending extraction request to: ${extractUrl}`);

@@ -123,15 +123,18 @@ async function processUpload(supabase: any, uploadId: string) {
       throw new Error('No file content available for processing');
     }
 
-    // Check if Adobe API is enabled
+    // Check if Adobe API is enabled and get debug setting
     const { data: settings } = await supabase
       .from('site_settings')
-      .select('adobe_api_enabled, monthly_adobe_limit')
+      .select('adobe_api_enabled, monthly_adobe_limit, debug_mode')
       .single();
 
     if (!settings?.adobe_api_enabled) {
       throw new Error('Adobe PDF Services API is not enabled');
     }
+
+    // Use debug setting from site settings (default to true if not set)
+    const debug = settings?.debug_mode ?? true;
 
     // Check usage limits
     const usageCheck = await supabase.rpc('increment_adobe_usage');
@@ -156,7 +159,7 @@ async function processUpload(supabase: any, uploadId: string) {
 
     // Process with Adobe API
     const accessToken = await getAdobeAccessToken(credentials);
-    const extractResult = await extractTextWithAdobe(accessToken, base64String, upload.file_name, credentials, false);
+    const extractResult = await extractTextWithAdobe(accessToken, base64String, upload.file_name, credentials, debug);
 
     // Update with success
     await supabase.rpc('update_processing_status', {
@@ -280,9 +283,7 @@ async function extractTextWithAdobe(
     assetID: assetID,
     getCharBounds: false,
     includeStyling: false,
-    elementsToExtract: ['text', 'tables'],
-    tableOutputFormat: 'xlsx',
-    renditionsToExtract: ['tables', 'figures']
+    elementsToExtract: ['text'] // Only extract text, no tables or figures
   };
 
   console.log(`Step 3: Creating extraction job with payload:`, extractPayload);

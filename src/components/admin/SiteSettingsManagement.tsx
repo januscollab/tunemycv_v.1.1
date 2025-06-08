@@ -15,6 +15,7 @@ interface SiteSettings {
   monthly_adobe_limit: number;
   reset_day: number;
   adobe_api_enabled: boolean;
+  debug_mode: boolean;
   updated_at: string;
 }
 
@@ -47,7 +48,8 @@ const SiteSettingsManagement: React.FC = () => {
     support_email: '',
     monthly_adobe_limit: 500,
     reset_day: 1,
-    adobe_api_enabled: false
+    adobe_api_enabled: false,
+    debug_mode: true
   });
   const [adobeFormData, setAdobeFormData] = useState({
     client_id: '',
@@ -81,7 +83,8 @@ const SiteSettingsManagement: React.FC = () => {
           support_email: data.support_email || '',
           monthly_adobe_limit: data.monthly_adobe_limit || 500,
           reset_day: data.reset_day || 1,
-          adobe_api_enabled: data.adobe_api_enabled || false
+          adobe_api_enabled: data.adobe_api_enabled || false,
+          debug_mode: data.debug_mode ?? true
         });
       }
     } catch (error) {
@@ -157,7 +160,8 @@ const SiteSettingsManagement: React.FC = () => {
             support_email: dataToSave.support_email,
             monthly_adobe_limit: dataToSave.monthly_adobe_limit,
             reset_day: dataToSave.reset_day,
-            adobe_api_enabled: dataToSave.adobe_api_enabled
+            adobe_api_enabled: dataToSave.adobe_api_enabled,
+            debug_mode: dataToSave.debug_mode
           })
           .eq('id', settings.id);
 
@@ -171,7 +175,8 @@ const SiteSettingsManagement: React.FC = () => {
             support_email: dataToSave.support_email,
             monthly_adobe_limit: dataToSave.monthly_adobe_limit,
             reset_day: dataToSave.reset_day,
-            adobe_api_enabled: dataToSave.adobe_api_enabled
+            adobe_api_enabled: dataToSave.adobe_api_enabled,
+            debug_mode: dataToSave.debug_mode
           });
 
         if (error) throw error;
@@ -236,6 +241,20 @@ const SiteSettingsManagement: React.FC = () => {
     await autoSaveSettings(updatedData);
   }, [autoSaveSettings]);
 
+  // Handle Debug mode toggle with immediate auto-save
+  const handleDebugToggleChange = useCallback(async (enabled: boolean) => {
+    const updatedData = { debug_mode: enabled };
+    
+    // Update local state immediately for responsive UI
+    setFormData(prev => ({
+      ...prev,
+      debug_mode: enabled
+    }));
+    
+    // Auto-save immediately for this critical setting
+    await autoSaveSettings(updatedData);
+  }, [autoSaveSettings]);
+
   const handleSave = async () => {
     setSaving(true);
     try {
@@ -248,7 +267,8 @@ const SiteSettingsManagement: React.FC = () => {
             support_email: formData.support_email,
             monthly_adobe_limit: formData.monthly_adobe_limit,
             reset_day: formData.reset_day,
-            adobe_api_enabled: formData.adobe_api_enabled
+            adobe_api_enabled: formData.adobe_api_enabled,
+            debug_mode: formData.debug_mode
           })
           .eq('id', settings.id);
 
@@ -262,7 +282,8 @@ const SiteSettingsManagement: React.FC = () => {
             support_email: formData.support_email,
             monthly_adobe_limit: formData.monthly_adobe_limit,
             reset_day: formData.reset_day,
-            adobe_api_enabled: formData.adobe_api_enabled
+            adobe_api_enabled: formData.adobe_api_enabled,
+            debug_mode: formData.debug_mode
           });
 
         if (error) throw error;
@@ -484,6 +505,47 @@ const SiteSettingsManagement: React.FC = () => {
                 </div>
               )}
             </div>
+
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="debug_mode"
+                checked={formData.debug_mode}
+                onChange={(e) => handleDebugToggleChange(e.target.checked)}
+                disabled={autoSaving}
+                className="rounded border-apple-core/30 disabled:opacity-50"
+              />
+              <Label htmlFor="debug_mode" className="text-caption font-medium text-blueberry dark:text-apple-core">
+                Enable Debug Mode
+              </Label>
+              {autoSaveStatus === 'saving' && (
+                <div className="flex items-center ml-2">
+                  <Loader2 className="h-4 w-4 animate-spin text-apricot" />
+                  <span className="text-micro text-blueberry/60 dark:text-apple-core/60 ml-1">
+                    Auto-saving...
+                  </span>
+                </div>
+              )}
+              {autoSaveStatus === 'success' && (
+                <div className="flex items-center ml-2">
+                  <Check className="h-4 w-4 text-green-600" />
+                  <span className="text-micro text-green-600 ml-1">
+                    Auto-saved
+                  </span>
+                </div>
+              )}
+              {autoSaveStatus === 'error' && (
+                <div className="flex items-center ml-2">
+                  <AlertTriangle className="h-4 w-4 text-red-500" />
+                  <span className="text-micro text-red-500 ml-1">
+                    Auto-save failed
+                  </span>
+                </div>
+              )}
+            </div>
+            <p className="text-micro text-blueberry/60 dark:text-apple-core/60 -mt-1">
+              When enabled, Adobe PDF extraction saves debug ZIP files to storage for inspection
+            </p>
 
             {formData.adobe_api_enabled && (
               <>

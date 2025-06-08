@@ -530,6 +530,7 @@ export type Database = {
           admin_email: string | null
           adobe_api_enabled: boolean | null
           created_at: string
+          debug_mode: boolean | null
           id: string
           monthly_adobe_limit: number | null
           reset_day: number | null
@@ -540,6 +541,7 @@ export type Database = {
           admin_email?: string | null
           adobe_api_enabled?: boolean | null
           created_at?: string
+          debug_mode?: boolean | null
           id?: string
           monthly_adobe_limit?: number | null
           reset_day?: number | null
@@ -550,6 +552,7 @@ export type Database = {
           admin_email?: string | null
           adobe_api_enabled?: boolean | null
           created_at?: string
+          debug_mode?: boolean | null
           id?: string
           monthly_adobe_limit?: number | null
           reset_day?: number | null
