@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { X, Save, AlertTriangle, CheckCircle, Info, ChevronDown, ChevronUp, WandSparkles } from 'lucide-react';
+import { textToJson, jsonToText, DocumentJson } from '@/utils/documentJsonUtils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { UnifiedTextarea } from '@/components/ui/unified-input';
@@ -31,6 +32,7 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
   onSave
 }) => {
   const [editedText, setEditedText] = useState(extractedText);
+  const [documentJson, setDocumentJson] = useState<DocumentJson>(() => textToJson(extractedText));
   const [isSaving, setIsSaving] = useState(false);
   const [isAutoSaving, setIsAutoSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
@@ -52,6 +54,12 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
     }, 2000),
     [extractedText, onSave]
   );
+
+  // Bidirectional sync: text changes update JSON
+  useEffect(() => {
+    const newJson = textToJson(editedText);
+    setDocumentJson(newJson);
+  }, [editedText]);
 
   // Auto-save effect
   useEffect(() => {

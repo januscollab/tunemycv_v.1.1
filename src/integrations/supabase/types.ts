@@ -609,6 +609,7 @@ export type Database = {
         Row: {
           created_at: string | null
           detected_document_type: string | null
+          document_content_json: Json | null
           extracted_text: string | null
           file_name: string
           file_size: number
@@ -627,6 +628,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           detected_document_type?: string | null
+          document_content_json?: Json | null
           extracted_text?: string | null
           file_name: string
           file_size: number
@@ -645,6 +647,7 @@ export type Database = {
         Update: {
           created_at?: string | null
           detected_document_type?: string | null
+          document_content_json?: Json | null
           extracted_text?: string | null
           file_name?: string
           file_size?: number

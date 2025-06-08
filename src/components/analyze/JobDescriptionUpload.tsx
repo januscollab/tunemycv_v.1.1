@@ -21,7 +21,7 @@ const JobDescriptionUpload: React.FC<JobDescriptionUploadProps> = ({
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const { toast } = useToast();
 
-  const handleFileSelect = (file: File, extractedText: string, typeDetection: any, qualityAssessment: any) => {
+  const handleFileSelect = (file: File, extractedText: string, documentJson: any, typeDetection: any, qualityAssessment: any) => {
     // Always proceed with upload - type detection warnings will be shown in the document preview
     const uploadedFileData: UploadedFile = {
       file,
