@@ -76,12 +76,12 @@ const WorkEnvironmentPreferences: React.FC = () => {
     try {
       const { error } = await supabase
         .from('profiles')
-        .upsert({
-          id: user.id,
+        .update({
           company_size_preference: preferences.company_size_preference,
           work_location_preference: preferences.work_location_preference,
           updated_at: new Date().toISOString()
-        });
+        })
+        .eq('id', user.id);
 
       if (error) throw error;
     } catch (error: any) {

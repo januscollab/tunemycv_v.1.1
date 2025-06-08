@@ -13,6 +13,7 @@ interface CVUpload {
   file_size: number;
   created_at: string;
   extracted_text: string;
+  processing_status: string;
 }
 
 interface CVManagementTabProps {
@@ -38,7 +39,7 @@ const CVManagementTab: React.FC<CVManagementTabProps> = ({ credits, memberSince 
     try {
       const { data, error } = await supabase
         .from('uploads')
-        .select('id, file_name, file_size, created_at, extracted_text')
+        .select('id, file_name, file_size, created_at, extracted_text, processing_status')
         .eq('user_id', user?.id)
         .eq('upload_type', 'cv')
         .order('created_at', { ascending: false });
@@ -70,7 +71,27 @@ const CVManagementTab: React.FC<CVManagementTabProps> = ({ credits, memberSince 
 
     try {
       setUploading(true);
-      const extractedText = await extractTextFromFile(file);
+      
+      let extractedText = '';
+      let originalFileContent = null;
+      let processingStatus = 'completed';
+
+      if (file.type === 'application/pdf') {
+        // For PDFs, store raw content and process later with Adobe API
+        const arrayBuffer = await file.arrayBuffer();
+        originalFileContent = Array.from(new Uint8Array(arrayBuffer));
+        processingStatus = 'uploaded';
+        
+        // Try local extraction as fallback
+        try {
+          extractedText = await extractTextFromFile(file);
+        } catch (error) {
+          console.log('Local PDF extraction failed, will use Adobe API:', error);
+        }
+      } else {
+        // For DOCX files, extract text immediately
+        extractedText = await extractTextFromFile(file);
+      }
       
       const { data, error } = await supabase
         .from('uploads')
@@ -80,7 +101,9 @@ const CVManagementTab: React.FC<CVManagementTabProps> = ({ credits, memberSince 
           file_type: file.type,
           file_size: file.size,
           upload_type: 'cv',
-          extracted_text: extractedText
+          extracted_text: extractedText || null,
+          original_file_content: originalFileContent,
+          processing_status: processingStatus
         })
         .select()
         .single();
@@ -88,7 +111,25 @@ const CVManagementTab: React.FC<CVManagementTabProps> = ({ credits, memberSince 
       if (error) throw error;
 
       setCvs(prev => [data, ...prev]);
-      toast({ title: 'Success', description: 'CV uploaded successfully!' });
+      
+      if (processingStatus === 'uploaded') {
+        toast({ 
+          title: 'Upload Successful', 
+          description: 'PDF uploaded! Text extraction will complete in the background.' 
+        });
+        
+        // Trigger background processing
+        try {
+          await supabase.functions.invoke('adobe-background-process', {
+            body: { uploadId: data.id }
+          });
+        } catch (bgError) {
+          console.error('Background processing trigger failed:', bgError);
+        }
+      } else {
+        toast({ title: 'Success', description: 'CV uploaded successfully!' });
+      }
+      
     } catch (error) {
       console.error('Error uploading CV:', error);
       toast({ title: 'Error', description: 'Failed to upload CV', variant: 'destructive' });
@@ -112,6 +153,32 @@ const CVManagementTab: React.FC<CVManagementTabProps> = ({ credits, memberSince 
     } catch (error) {
       console.error('Error deleting CV:', error);
       toast({ title: 'Error', description: 'Failed to delete CV', variant: 'destructive' });
+    }
+  };
+
+  const retryProcessing = async (cvId: string) => {
+    try {
+      // Reset status to uploaded
+      const { error: updateError } = await supabase
+        .from('uploads')
+        .update({ processing_status: 'uploaded' })
+        .eq('id', cvId)
+        .eq('user_id', user?.id);
+
+      if (updateError) throw updateError;
+
+      // Trigger background processing
+      await supabase.functions.invoke('adobe-background-process', {
+        body: { uploadId: cvId }
+      });
+
+      // Refresh the list
+      loadCVs();
+      
+      toast({ title: 'Processing Retry', description: 'PDF processing has been restarted' });
+    } catch (error) {
+      console.error('Error retrying processing:', error);
+      toast({ title: 'Error', description: 'Failed to retry processing', variant: 'destructive' });
     }
   };
 
@@ -166,6 +233,35 @@ const CVManagementTab: React.FC<CVManagementTabProps> = ({ credits, memberSince 
                     <p className="text-caption text-slate-600 dark:text-apple-core/80">
                       {formatFileSize(cv.file_size)} • {new Date(cv.created_at).toLocaleDateString()}
                     </p>
+                    {cv.processing_status && cv.processing_status !== 'completed' && (
+                      <div className="flex items-center space-x-1 mt-1">
+                        {cv.processing_status === 'uploaded' && (
+                          <>
+                            <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
+                            <span className="text-xs text-yellow-600 dark:text-yellow-400">Queued for processing</span>
+                          </>
+                        )}
+                        {cv.processing_status === 'processing' && (
+                          <>
+                            <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                            <span className="text-xs text-blue-600 dark:text-blue-400">Processing with Adobe API</span>
+                          </>
+                        )}
+                        {cv.processing_status === 'failed' && (
+                          <>
+                            <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                            <span className="text-xs text-red-600 dark:text-red-400">Processing failed - 
+                              <button 
+                                onClick={() => retryProcessing(cv.id)}
+                                className="ml-1 text-blue-600 hover:text-blue-800 underline"
+                              >
+                                retry
+                              </button>
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">

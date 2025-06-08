@@ -42,6 +42,143 @@ export type Database = {
         }
         Relationships: []
       }
+      adobe_credentials: {
+        Row: {
+          client_id: string
+          client_secret_encrypted: string
+          created_at: string
+          id: string
+          is_active: boolean
+          organization_id: string
+          updated_at: string
+        }
+        Insert: {
+          client_id: string
+          client_secret_encrypted: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          organization_id: string
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string
+          client_secret_encrypted?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          organization_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      adobe_debug_files: {
+        Row: {
+          created_at: string
+          file_name: string
+          file_size: number
+          file_type: string
+          id: string
+          original_filename: string
+          storage_path: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          file_name: string
+          file_size: number
+          file_type: string
+          id?: string
+          original_filename: string
+          storage_path: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          file_name?: string
+          file_size?: number
+          file_type?: string
+          id?: string
+          original_filename?: string
+          storage_path?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "adobe_debug_files_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      adobe_extraction_logs: {
+        Row: {
+          adobe_operation_id: string | null
+          cost_estimate: number | null
+          created_at: string
+          error_message: string | null
+          file_name: string
+          file_size: number
+          id: string
+          processing_time_ms: number | null
+          success: boolean
+          user_id: string | null
+        }
+        Insert: {
+          adobe_operation_id?: string | null
+          cost_estimate?: number | null
+          created_at?: string
+          error_message?: string | null
+          file_name: string
+          file_size: number
+          id?: string
+          processing_time_ms?: number | null
+          success?: boolean
+          user_id?: string | null
+        }
+        Update: {
+          adobe_operation_id?: string | null
+          cost_estimate?: number | null
+          created_at?: string
+          error_message?: string | null
+          file_name?: string
+          file_size?: number
+          id?: string
+          processing_time_ms?: number | null
+          success?: boolean
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      adobe_usage_tracking: {
+        Row: {
+          api_calls_count: number
+          created_at: string
+          id: string
+          month_year: string
+          reset_date: string
+          updated_at: string
+        }
+        Insert: {
+          api_calls_count?: number
+          created_at?: string
+          id?: string
+          month_year: string
+          reset_date: string
+          updated_at?: string
+        }
+        Update: {
+          api_calls_count?: number
+          created_at?: string
+          id?: string
+          month_year?: string
+          reset_date?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       ai_prompt_versions: {
         Row: {
           content: string
@@ -388,6 +525,7 @@ export type Database = {
           soft_skills: Json | null
           survey_preferences: Json | null
           updated_at: string | null
+          user_id: string
           work_location_preference: string | null
           work_style_preferences: Json | null
         }
@@ -406,6 +544,7 @@ export type Database = {
           soft_skills?: Json | null
           survey_preferences?: Json | null
           updated_at?: string | null
+          user_id: string
           work_location_preference?: string | null
           work_style_preferences?: Json | null
         }
@@ -424,6 +563,7 @@ export type Database = {
           soft_skills?: Json | null
           survey_preferences?: Json | null
           updated_at?: string | null
+          user_id?: string
           work_location_preference?: string | null
           work_style_preferences?: Json | null
         }
@@ -432,22 +572,34 @@ export type Database = {
       site_settings: {
         Row: {
           admin_email: string | null
+          adobe_api_enabled: boolean | null
           created_at: string
+          debug_mode: boolean | null
           id: string
+          monthly_adobe_limit: number | null
+          reset_day: number | null
           support_email: string | null
           updated_at: string
         }
         Insert: {
           admin_email?: string | null
+          adobe_api_enabled?: boolean | null
           created_at?: string
+          debug_mode?: boolean | null
           id?: string
+          monthly_adobe_limit?: number | null
+          reset_day?: number | null
           support_email?: string | null
           updated_at?: string
         }
         Update: {
           admin_email?: string | null
+          adobe_api_enabled?: boolean | null
           created_at?: string
+          debug_mode?: boolean | null
           id?: string
+          monthly_adobe_limit?: number | null
+          reset_day?: number | null
           support_email?: string | null
           updated_at?: string
         }
@@ -465,6 +617,7 @@ export type Database = {
           job_title: string | null
           needs_type_confirmation: boolean | null
           original_file_content: string | null
+          processing_status: string | null
           quality_assessment: Json | null
           quality_score: number | null
           type_detection_confidence: number | null
@@ -482,6 +635,7 @@ export type Database = {
           job_title?: string | null
           needs_type_confirmation?: boolean | null
           original_file_content?: string | null
+          processing_status?: string | null
           quality_assessment?: Json | null
           quality_score?: number | null
           type_detection_confidence?: number | null
@@ -499,11 +653,33 @@ export type Database = {
           job_title?: string | null
           needs_type_confirmation?: boolean | null
           original_file_content?: string | null
+          processing_status?: string | null
           quality_assessment?: Json | null
           quality_score?: number | null
           type_detection_confidence?: number | null
           upload_type?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      usage_alerts_sent: {
+        Row: {
+          id: string
+          month_year: string
+          sent_at: string
+          threshold_percentage: number
+        }
+        Insert: {
+          id?: string
+          month_year: string
+          sent_at?: string
+          threshold_percentage: number
+        }
+        Update: {
+          id?: string
+          month_year?: string
+          sent_at?: string
+          threshold_percentage?: number
         }
         Relationships: []
       }
@@ -637,6 +813,10 @@ export type Database = {
       }
     }
     Functions: {
+      cleanup_adobe_debug_files: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       delete_user_admin: {
         Args: { _user_id: string }
         Returns: boolean
@@ -645,6 +825,20 @@ export type Database = {
         Args: { _user_id: string }
         Returns: boolean
       }
+      generate_user_id: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      get_current_adobe_usage: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          current_usage: number
+          monthly_limit: number
+          usage_percentage: number
+          days_until_reset: number
+          reset_date: string
+        }[]
+      }
       has_role: {
         Args: {
           _user_id: string
@@ -652,11 +846,28 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_adobe_usage: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       log_admin_action: {
         Args: {
           action_type: string
           target_user?: string
           action_details?: Json
+        }
+        Returns: undefined
+      }
+      trigger_adobe_processing: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      update_processing_status: {
+        Args: {
+          upload_id: string
+          new_status: string
+          extracted_text_content?: string
+          error_message_content?: string
         }
         Returns: undefined
       }
