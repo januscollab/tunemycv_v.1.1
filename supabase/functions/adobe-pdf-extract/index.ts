@@ -176,7 +176,7 @@ const handler = async (req: Request): Promise<Response> => {
 };
 
 async function getAdobeAccessToken(credentials: AdobeCredentials): Promise<string> {
-  const tokenUrl = 'https://ims-na1.adobelogin.com/ims/token/v3';
+  const tokenUrl = 'https://ims-na1.adobelogin.com/ims/token';
   
   console.log(`Requesting Adobe access token with client_id: ${credentials.client_id.substring(0, 8)}...`);
   
@@ -187,7 +187,7 @@ async function getAdobeAccessToken(credentials: AdobeCredentials): Promise<strin
   formData.append('client_id', credentials.client_id);
   formData.append('client_secret', clientSecret);
   formData.append('grant_type', 'client_credentials');
-  formData.append('scope', 'openid,AdobeID,document_generation,document_services');
+  formData.append('scope', 'openid,AdobeID,DCAPI');
 
   const response = await fetch(tokenUrl, {
     method: 'POST',
@@ -223,33 +223,22 @@ async function extractTextWithAdobe(accessToken: string, fileData: string, fileN
   console.log(`Converted to ${binaryData.length} bytes for upload`);
   console.log(`File magic bytes: ${Array.from(binaryData.slice(0, 4)).map(b => b.toString(16).padStart(2, '0')).join(' ')}`);
   
-  // Create multipart form data as required by Adobe API
-  const formData = new FormData();
-  
-  // Add the PDF file as a blob
-  const pdfBlob = new Blob([binaryData], { type: 'application/pdf' });
-  formData.append('contentAnalyzerRequests', JSON.stringify({
-    cpf:{ 
-      engine: {
-        name: "document-extraction-service"
-      }
-    }
-  }));
-  formData.append('contentAnalyzerRequests', pdfBlob, fileName);
-  
-  // Prepare headers - let FormData set Content-Type with boundary
+  // Upload file directly as binary data with proper headers
   const uploadHeaders = {
     'Authorization': `Bearer ${accessToken}`,
     'X-API-Key': credentials.client_id,
+    'Content-Type': 'application/pdf',
+    'Content-Disposition': `attachment; filename="${fileName}"`,
   };
   
   console.log(`Upload headers:`, Object.keys(uploadHeaders));
-  console.log(`Form data entries:`, Array.from(formData.entries()).map(([key, value]) => `${key}: ${typeof value}`));
+  console.log(`Upload URL: ${uploadUrl}`);
+  console.log(`File size: ${binaryData.length} bytes`);
   
   const uploadResponse = await fetch(uploadUrl, {
     method: 'POST',
     headers: uploadHeaders,
-    body: formData,
+    body: binaryData,
   });
 
   console.log(`Adobe upload response status: ${uploadResponse.status}`);
