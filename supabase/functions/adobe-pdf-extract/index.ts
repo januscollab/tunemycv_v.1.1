@@ -176,7 +176,7 @@ const handler = async (req: Request): Promise<Response> => {
 };
 
 async function getAdobeAccessToken(credentials: AdobeCredentials): Promise<string> {
-  const tokenUrl = 'https://ims-na1.adobelogin.com/ims/token';
+  const tokenUrl = 'https://ims-na1.adobelogin.com/ims/token/v3';
   
   console.log(`[${new Date().toISOString()}] Starting token request to: ${tokenUrl}`);
   console.log(`[${new Date().toISOString()}] Client ID: ${credentials.client_id.substring(0, 8)}...`);
@@ -185,6 +185,7 @@ async function getAdobeAccessToken(credentials: AdobeCredentials): Promise<strin
   formData.append('client_id', credentials.client_id);
   formData.append('client_secret', credentials.client_secret_encrypted);
   formData.append('grant_type', 'client_credentials');
+  formData.append('scope', 'openid,AdobeID,DCAPI');
 
   console.log(`[${new Date().toISOString()}] Making token request...`);
   const response = await fetch(tokenUrl, {
