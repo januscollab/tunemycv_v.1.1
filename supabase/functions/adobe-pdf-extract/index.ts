@@ -211,31 +211,45 @@ async function getAdobeAccessToken(credentials: AdobeCredentials): Promise<strin
 async function extractTextWithAdobe(accessToken: string, fileData: string, fileName: string, credentials: AdobeCredentials): Promise<string> {
   console.log(`Starting Adobe PDF extraction for file: ${fileName}`);
   
-  // Upload file to Adobe
+  // Upload file to Adobe using multipart form data
   const uploadUrl = 'https://pdf-services.adobe.io/assets';
   
   console.log(`Uploading file to Adobe with client_id: ${credentials.client_id.substring(0, 8)}...`);
   
-  // Convert base64 to binary data - validate input first
+  // Convert base64 to binary data
   console.log(`Base64 data length: ${fileData.length} characters`);
   const binaryData = Uint8Array.from(atob(fileData), c => c.charCodeAt(0));
   
   console.log(`Converted to ${binaryData.length} bytes for upload`);
   console.log(`File magic bytes: ${Array.from(binaryData.slice(0, 4)).map(b => b.toString(16).padStart(2, '0')).join(' ')}`);
   
-  // Prepare headers with explicit Content-Type for PDF
+  // Create multipart form data as required by Adobe API
+  const formData = new FormData();
+  
+  // Add the PDF file as a blob
+  const pdfBlob = new Blob([binaryData], { type: 'application/pdf' });
+  formData.append('contentAnalyzerRequests', JSON.stringify({
+    cpf:{ 
+      engine: {
+        name: "document-extraction-service"
+      }
+    }
+  }));
+  formData.append('contentAnalyzerRequests', pdfBlob, fileName);
+  
+  // Prepare headers - let FormData set Content-Type with boundary
   const uploadHeaders = {
     'Authorization': `Bearer ${accessToken}`,
     'X-API-Key': credentials.client_id,
-    'Content-Type': 'application/pdf',
   };
   
   console.log(`Upload headers:`, Object.keys(uploadHeaders));
+  console.log(`Form data entries:`, Array.from(formData.entries()).map(([key, value]) => `${key}: ${typeof value}`));
   
   const uploadResponse = await fetch(uploadUrl, {
     method: 'POST',
     headers: uploadHeaders,
-    body: binaryData,
+    body: formData,
   });
 
   console.log(`Adobe upload response status: ${uploadResponse.status}`);
