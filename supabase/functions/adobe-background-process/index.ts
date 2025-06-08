@@ -182,7 +182,7 @@ async function processUpload(supabase: any, uploadId: string) {
 }
 
 async function getAdobeAccessToken(credentials: AdobeCredentials): Promise<string> {
-  const tokenUrl = 'https://pdf-services.adobe.io/token';
+  const tokenUrl = 'https://ims-na1.adobelogin.com/ims/token/v3';
   
   console.log(`Requesting Adobe access token with client_id: ${credentials.client_id.substring(0, 8)}...`);
   
@@ -190,6 +190,7 @@ async function getAdobeAccessToken(credentials: AdobeCredentials): Promise<strin
   formData.append('client_id', credentials.client_id);
   formData.append('client_secret', credentials.client_secret_encrypted);
   formData.append('grant_type', 'client_credentials');
+  formData.append('scope', 'openid,AdobeID,DCAPI');
 
   const response = await fetch(tokenUrl, {
     method: 'POST',
@@ -250,6 +251,9 @@ async function extractTextWithAdobe(accessToken: string, fileData: string, fileN
   
   const fileUploadResponse = await fetch(uploadUri, {
     method: 'PUT',
+    headers: {
+      'Content-Type': 'application/pdf'
+    },
     body: binaryData,
   });
 
