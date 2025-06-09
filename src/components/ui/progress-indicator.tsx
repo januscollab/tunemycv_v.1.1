@@ -112,3 +112,128 @@ export const LoadingDots: React.FC<LoadingDotsProps> = ({
     </div>
   );
 };
+
+interface BounceLoaderProps {
+  size?: 'sm' | 'md' | 'lg';
+  className?: string;
+}
+
+export const BounceLoader: React.FC<BounceLoaderProps> = ({ 
+  size = 'md', 
+  className 
+}) => {
+  const sizeClasses = {
+    sm: 'w-2 h-2',
+    md: 'w-3 h-3',
+    lg: 'w-4 h-4'
+  };
+
+  return (
+    <div className={cn("flex space-x-1", className)}>
+      {[0, 1, 2].map((i) => (
+        <div
+          key={i}
+          className={cn(
+            "bg-primary rounded-full animate-bounce",
+            sizeClasses[size]
+          )}
+          style={{
+            animationDelay: `${i * 0.1}s`
+          }}
+        />
+      ))}
+    </div>
+  );
+};
+
+interface WaveLoaderProps {
+  size?: 'sm' | 'md' | 'lg';
+  className?: string;
+}
+
+export const WaveLoader: React.FC<WaveLoaderProps> = ({ 
+  size = 'md', 
+  className 
+}) => {
+  const sizeClasses = {
+    sm: 'w-1 h-3',
+    md: 'w-1 h-4',
+    lg: 'w-1.5 h-6'
+  };
+
+  return (
+    <div className={cn("flex items-end space-x-1", className)}>
+      {[0, 1, 2, 3, 4].map((i) => (
+        <div
+          key={i}
+          className={cn(
+            "bg-primary animate-pulse",
+            sizeClasses[size]
+          )}
+          style={{
+            animationDelay: `${i * 0.1}s`,
+            animationDuration: '0.6s'
+          }}
+        />
+      ))}
+    </div>
+  );
+};
+
+interface PulseRingProps {
+  size?: 'sm' | 'md' | 'lg';
+  className?: string;
+}
+
+export const PulseRing: React.FC<PulseRingProps> = ({ 
+  size = 'md', 
+  className 
+}) => {
+  const sizeClasses = {
+    sm: 'w-8 h-8',
+    md: 'w-12 h-12',
+    lg: 'w-16 h-16'
+  };
+
+  return (
+    <div className={cn("relative", sizeClasses[size], className)}>
+      <div className="absolute inset-0 border-2 border-primary rounded-full animate-ping opacity-75" />
+      <div className="absolute inset-2 border-2 border-primary rounded-full animate-ping opacity-50" style={{ animationDelay: '0.3s' }} />
+      <div className="absolute inset-4 bg-primary rounded-full" />
+    </div>
+  );
+};
+
+interface MorphingDotsProps {
+  size?: 'sm' | 'md' | 'lg';
+  className?: string;
+}
+
+export const MorphingDots: React.FC<MorphingDotsProps> = ({ 
+  size = 'md', 
+  className 
+}) => {
+  const sizeClasses = {
+    sm: 'w-2 h-2',
+    md: 'w-3 h-3',
+    lg: 'w-4 h-4'
+  };
+
+  return (
+    <div className={cn("flex space-x-1", className)}>
+      {[0, 1, 2].map((i) => (
+        <div
+          key={i}
+          className={cn(
+            "bg-primary animate-pulse transform-gpu transition-all duration-300",
+            sizeClasses[size]
+          )}
+          style={{
+            animationDelay: `${i * 0.2}s`,
+            borderRadius: i === 1 ? '0%' : '50%'
+          }}
+        />
+      ))}
+    </div>
+  );
+};

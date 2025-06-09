@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Eye, Code, Palette, Type, Square, Circle, Triangle, Zap, AlertTriangle, Search, Star, Heart, Award, Sparkles, Layers, Grid, Layout, MousePointer, Users, TrendingUp, Menu, ChevronDown, Info, Download, Settings, Bell, MessageSquare, Play, Pause, Volume2, RefreshCw, Camera, Clock, MapPin, Shield, Unlock, Lock, Mail, Upload } from 'lucide-react';
+import { ArrowLeft, Eye, Code, Palette, Type, Square, Circle, Triangle, Zap, AlertTriangle, Search, Star, Heart, Award, Sparkles, Layers, Grid, Layout, MousePointer, Users, TrendingUp, Menu, ChevronDown, Info, Download, Settings, Bell, MessageSquare, Play, Pause, Volume2, RefreshCw, Camera, Clock, MapPin, Shield, Unlock, Lock, Mail, Upload, FileText, Loader, Activity } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -11,8 +11,13 @@ import { FloatingLabelTextarea } from '@/components/common/FloatingLabelTextarea
 import { QuickActions } from '@/components/common/QuickActions';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel } from '@/components/ui/dropdown-menu';
+import { LoadingStatesShowcase } from '@/components/ui/loading-states-showcase';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ProgressIndicator, Spinner, LoadingDots, BounceLoader, WaveLoader, PulseRing, MorphingDots } from '@/components/ui/progress-indicator';
+import { MinimalUploadModal, EngagingUploadModal, AnimatedUploadModal } from '@/components/ui/file-upload-modals';
 
 const DesignSystem = () => {
+  const [activeModal, setActiveModal] = useState<string | null>(null);
   const colorTokens = [
     { 
       name: 'Primary', 
@@ -1468,30 +1473,58 @@ const DesignSystem = () => {
           </Card>
         </div>
 
-        {/* Migration Status */}
-        <Card className="mt-8">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5" />
-              Migration Status
-              <Badge variant="default" className="text-micro">IN PROGRESS</Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-body font-medium text-foreground">Typography Migration</span>
-                <span className="text-caption text-muted-foreground">~30% Complete</span>
-              </div>
-              <div className="w-full bg-muted rounded-full h-2">
-                <div className="bg-primary h-2 rounded-full" style={{ width: '30%' }} />
-              </div>
-              <p className="text-caption text-muted-foreground">
-                Converting remaining ~350+ legacy typography instances to semantic tokens across 80+ files
-              </p>
+            {/* Migration Status */}
+            <Card className="mt-8">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  Migration Status
+                  <Badge variant="default" className="text-micro">IN PROGRESS</Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-body font-medium text-foreground">Typography Migration</span>
+                    <span className="text-caption text-muted-foreground">~30% Complete</span>
+                  </div>
+                  <div className="w-full bg-muted rounded-full h-2">
+                    <div className="bg-primary h-2 rounded-full" style={{ width: '30%' }} />
+                  </div>
+                  <p className="text-caption text-muted-foreground">
+                    Converting remaining ~350+ legacy typography instances to semantic tokens across 80+ files
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Components Tab - Placeholder for now */}
+          <TabsContent value="components" className="space-y-8">
+            <div className="text-center py-16">
+              <Layout className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-heading font-semibold mb-2">Components Section</h3>
+              <p className="text-caption text-muted-foreground">Component documentation coming soon</p>
             </div>
-          </CardContent>
-        </Card>
+          </TabsContent>
+
+          {/* Interactions Tab - Placeholder for now */}
+          <TabsContent value="interactions" className="space-y-8">
+            <div className="text-center py-16">
+              <MousePointer className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-heading font-semibold mb-2">Interactions Section</h3>
+              <p className="text-caption text-muted-foreground">Interaction patterns documentation coming soon</p>
+            </div>
+          </TabsContent>
+
+          {/* Loading States Tab */}
+          <TabsContent value="loading" className="space-y-8">
+            <LoadingStatesShowcase 
+              activeModal={activeModal} 
+              setActiveModal={setActiveModal} 
+            />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
