@@ -82,27 +82,19 @@ const DesignSystem = () => {
   const inputComponents = [
     { 
       name: 'Floating Label Input', 
-      component: <FloatingLabelInput label="Floating label" />, 
-      usage: '45 usages',
-      description: 'Input with animated floating label',
+      component: <FloatingLabelInput placeholder="Enhanced floating label with improved positioning" label="Job Description" />, 
+      usage: '68 usages',
+      description: 'Input with floating labels that prevent text clashing. Label moves to absolute top when focused (text-micro size), positioned lower when inactive.',
       status: 'current',
-      migration: 'Current recommended approach for all new components'
+      migration: 'Improved positioning prevents label/placeholder collision. Current recommended approach for all new components.'
     },
     { 
       name: 'Floating Label Textarea', 
-      component: <FloatingLabelTextarea label="Floating label" rows={3} />, 
-      usage: '23 usages',
-      description: 'Textarea with animated floating label',
+      component: <FloatingLabelTextarea placeholder="Enhanced floating label textarea..." label="Job Description" rows={3} />, 
+      usage: '34 usages',
+      description: 'Textarea with floating labels and improved text positioning. Label moves to absolute top when focused, positioned lower when inactive.',
       status: 'current',
-      migration: 'Current recommended approach for all new components'
-    },
-    { 
-      name: 'Unified Input', 
-      component: <FloatingLabelInput placeholder="Unified input system" label="Unified label" />, 
-      usage: '12 usages',
-      description: 'Next-generation unified input system with all variants',
-      status: 'future',
-      migration: 'Will replace all input types when fully implemented'
+      migration: 'Same improved positioning as input variant. Text size remains text-micro when floated to top.'
     },
   ];
 
