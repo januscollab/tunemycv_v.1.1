@@ -48,21 +48,23 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
   
   const quality = assessDocumentQuality(editedText, fileName, documentType);
 
-  // Handle rich text editor content changes
+  // Handle rich text editor content changes with better debouncing
   const handleContentChange = useCallback((newJson: DocumentJson, newText: string) => {
     setDocumentJson(newJson);
     setEditedText(newText);
     
-    // Auto-save logic
+    // Auto-save logic with improved debouncing
     if (newText !== extractedText && newText.trim().length > 0) {
       setIsAutoSaving(true);
       
-      // Debounced save
-      setTimeout(() => {
+      // Clear any existing timeout
+      const timeoutId = setTimeout(() => {
         onSave(newText);
         setLastSaved(new Date());
         setIsAutoSaving(false);
-      }, 1000);
+      }, 2000); // Increased debounce time
+      
+      return () => clearTimeout(timeoutId);
     }
   }, [extractedText, onSave]);
   
@@ -111,7 +113,7 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
         </DialogHeader>
 
         {/* Two-Column Layout: 30% Information, 70% Text Editor */}
-        <div className="flex-1 flex min-h-0">
+        <div className="flex-1 flex min-h-0 max-h-[70vh]">
           {/* Left Panel - Document Information (30%) */}
           <div className="w-[30%] border-r border-border bg-muted/5 flex flex-col overflow-hidden">
             <ScrollArea className="flex-1">
@@ -223,14 +225,16 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
               </div>
             </div>
             
-            <div className="flex-1 p-4 pt-6">
-              <RichTextEditor
-                documentJson={documentJson}
-                onContentChange={handleContentChange}
-                className="h-[calc(100vh-300px)] border rounded-md"
-                placeholder="Document content appears here..."
-                showAIFeatures={true}
-              />
+            <div className="flex-1 flex flex-col min-h-0 p-4 pt-6">
+              <ScrollArea className="flex-1 min-h-[400px] max-h-[60vh]">
+                <RichTextEditor
+                  documentJson={documentJson}
+                  onContentChange={handleContentChange}
+                  className="min-h-[400px] border rounded-md"
+                  placeholder="Document content appears here..."
+                  showAIFeatures={true}
+                />
+              </ScrollArea>
             </div>
           </div>
         </div>

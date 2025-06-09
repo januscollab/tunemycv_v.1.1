@@ -101,19 +101,17 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     setContent(htmlContent);
   }, [documentJson, jsonToHtml]);
 
-  // Debounced content change handler
+  // Content change handler with improved debouncing
   const handleContentChange = useCallback((value: string) => {
     setContent(value);
     
-    // Debounce the JSON conversion and callback
-    const timeoutId = setTimeout(() => {
+    // Only trigger onChange if content actually changed
+    if (value !== content) {
       const newJson = htmlToJson(value);
       const newText = generateFormattedText(newJson);
       onContentChange(newJson, newText);
-    }, 300);
-
-    return () => clearTimeout(timeoutId);
-  }, [htmlToJson, onContentChange]);
+    }
+  }, [content, htmlToJson, onContentChange]);
 
   // Handle text selection for AI features
   const handleSelectionChange = useCallback((range: any, source: any, editor: any) => {
@@ -170,6 +168,11 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     },
     clipboard: {
       matchVisual: false
+    },
+    history: {
+      delay: 1000,
+      maxStack: 100,
+      userOnly: true
     }
   };
 

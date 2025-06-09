@@ -46,11 +46,38 @@ export const textToJson = (text: string): DocumentJson => {
     if (currentParagraph.length > 0) {
       const content = currentParagraph.join('\n').trim();
       if (content) {
-        sections.push({
-          type: 'paragraph',
-          content: applyFormattingRules(content),
-          id: generateId()
-        });
+        // Split very long paragraphs into smaller chunks for better readability
+        if (content.length > 500) {
+          const sentences = content.split(/[.!?]+\s+/);
+          let currentChunk = '';
+          
+          for (const sentence of sentences) {
+            if (currentChunk.length + sentence.length > 400 && currentChunk) {
+              sections.push({
+                type: 'paragraph',
+                content: applyFormattingRules(currentChunk.trim()),
+                id: generateId()
+              });
+              currentChunk = sentence;
+            } else {
+              currentChunk += (currentChunk ? '. ' : '') + sentence;
+            }
+          }
+          
+          if (currentChunk.trim()) {
+            sections.push({
+              type: 'paragraph',
+              content: applyFormattingRules(currentChunk.trim()),
+              id: generateId()
+            });
+          }
+        } else {
+          sections.push({
+            type: 'paragraph',
+            content: applyFormattingRules(content),
+            id: generateId()
+          });
+        }
       }
       currentParagraph = [];
     }
