@@ -55,6 +55,7 @@ export const FloatingLabelTextarea: React.FC<FloatingLabelTextareaProps> = ({
           "border-apple-core/20 dark:border-citrus/20",
           "focus:border-zapier-orange focus:ring-0 focus:outline-none",
            "text-blueberry dark:text-citrus text-caption",
+           "placeholder:text-blueberry/50 dark:placeholder:text-apple-core/50",
            "transition-all duration-200",
            "disabled:opacity-50 disabled:cursor-not-allowed",
            className
@@ -67,8 +68,8 @@ export const FloatingLabelTextarea: React.FC<FloatingLabelTextareaProps> = ({
             "absolute left-4 cursor-text transition-all duration-200 pointer-events-none",
             "text-blueberry/60 dark:text-apple-core/60",
             isFloating
-              ? "top-1.5 text-tiny font-medium text-zapier-orange"
-              : "top-4 text-caption"
+              ? "top-1.5 text-micro font-medium text-zapier-orange"
+              : "top-5 text-caption"
         )}
       >
         {label}

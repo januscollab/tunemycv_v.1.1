@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { User, Mail, Lock, Linkedin, Phone, Globe, Building, MapPin } from 'lucide-react';
 import CountryCodeSelect from './CountryCodeSelect';
-import { FloatingLabelInput } from '@/components/common/FloatingLabelInput';
+import { SavedDataInput } from '@/components/ui/saved-data-input';
 
 interface PersonalInfoTabProps {
   credits: number;
@@ -185,13 +185,12 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
               <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
                 First Name
               </label>
-              <FloatingLabelInput
+              <SavedDataInput
                 id="firstName"
                 label="First Name"
                 type="text"
                 value={profile.first_name}
                 onChange={(e) => setProfile({ ...profile, first_name: e.target.value })}
-                placeholder="Enter your first name"
                 maxLength={50}
               />
             </div>
@@ -200,13 +199,12 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
               <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
                 Last Name
               </label>
-              <FloatingLabelInput
+              <SavedDataInput
                 id="lastName"
                 label="Last Name"
                 type="text"
                 value={profile.last_name}
                 onChange={(e) => setProfile({ ...profile, last_name: e.target.value })}
-                placeholder="Enter your last name"
                 maxLength={50}
               />
             </div>
@@ -218,13 +216,12 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
                 <Mail className="h-4 w-4 inline mr-1" />
                 Email Address
               </label>
-              <FloatingLabelInput
+              <SavedDataInput
                 id="email"
                 label="Email Address"
                 type="email"
                 value={profile.email}
                 onChange={(e) => setProfile({ ...profile, email: e.target.value })}
-                placeholder="Enter your email address"
                 maxLength={255}
               />
             </div>
@@ -240,14 +237,13 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
                   onChange={(value) => setProfile({ ...profile, country_code: value })}
                   className="w-32"
                 />
-                <FloatingLabelInput
+                <SavedDataInput
                   id="phoneNumber"
                   label="Phone Number"
                   type="tel"
                   value={profile.phone_number}
                   onChange={(e) => setProfile({ ...profile, phone_number: e.target.value })}
                   className="flex-1"
-                  placeholder="123 456 7890"
                   maxLength={20}
                 />
               </div>
@@ -260,13 +256,12 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
                 <Linkedin className="h-4 w-4 inline mr-1" />
                 LinkedIn Profile URL
               </label>
-              <FloatingLabelInput
+              <SavedDataInput
                 id="linkedinUrl"
                 label="LinkedIn Profile URL"
                 type="url"
                 value={profile.linkedin_url}
                 onChange={(e) => setProfile({ ...profile, linkedin_url: e.target.value })}
-                placeholder="https://linkedin.com/in/yourprofile"
                 maxLength={500}
               />
             </div>
@@ -276,13 +271,12 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
                 <Globe className="h-4 w-4 inline mr-1" />
                 Personal Website/Portfolio URL
               </label>
-              <FloatingLabelInput
+              <SavedDataInput
                 id="personalWebsiteUrl"
                 label="Personal Website/Portfolio URL"
                 type="url"
                 value={profile.personal_website_url}
                 onChange={(e) => setProfile({ ...profile, personal_website_url: e.target.value })}
-                placeholder="https://yourportfolio.com"
                 maxLength={500}
               />
             </div>
@@ -376,13 +370,12 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
               <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
                 New Password
               </label>
-              <FloatingLabelInput
+              <SavedDataInput
                 id="newPassword"
                 label="New Password"
                 type="password"
                 value={passwords.new}
                 onChange={(e) => setPasswords({ ...passwords, new: e.target.value })}
-                placeholder="Enter new password"
                 maxLength={128}
               />
             </div>
@@ -391,13 +384,12 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
                 Confirm New Password
               </label>
-              <FloatingLabelInput
+              <SavedDataInput
                 id="confirmPassword"
                 label="Confirm New Password"
                 type="password"
                 value={passwords.confirm}
                 onChange={(e) => setPasswords({ ...passwords, confirm: e.target.value })}
-                placeholder="Confirm new password"
                 maxLength={128}
               />
             </div>
