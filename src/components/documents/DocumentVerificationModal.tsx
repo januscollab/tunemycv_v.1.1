@@ -256,14 +256,14 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
           <div className="w-[70%] flex flex-col">
             <div className="px-4 py-3 border-b border-border bg-background">
               <div className="flex items-center justify-between">
-                <h3 className="text-caption font-medium text-foreground">Extracted Text</h3>
+                <h3 className="text-caption font-medium text-foreground">Document Content</h3>
                 <div className="text-micro text-muted-foreground">
                   Click to edit • Changes auto-saved
                 </div>
               </div>
             </div>
             
-            <div className="flex-1 p-4">
+            <div className="flex-1 p-4 pt-6">
               <ScrollArea className="h-[calc(100vh-300px)] border rounded-md">
                 <FloatingLabelTextarea
                   label="Document Content"
