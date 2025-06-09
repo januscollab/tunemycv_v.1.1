@@ -55,6 +55,10 @@
 - [x] **Storage Enhancement**: Save both raw and formatted text versions for backward compatibility
 - [x] **Separation of Concerns**: Maintained procedural integrity by keeping formatting separate from extraction
 
+## High Priority UX Issues
+- [ ] **Fix "Storage failed" Error Message**: CVs are uploading successfully but showing false "Storage failed" error messages in the UI - fix error handling to prevent false negatives
+- [ ] **Fix CV Auto-Save Issue**: CVs uploaded are automatically saving to the saved CV section. The user must explicitly request a save or upload the CV via their profile page > CV management
+- [ ] **"Add to Saved CVs" Button State Management**: When a user uploads a CV they get presented an "Add to Saved CVs" button. If the user chooses to click and add this active CV to their saved CVs, then the "Add to Saved CVs" button should disappear
+- [ ] **Hide "Add to Saved CVs" for Selected CVs**: If a user chooses a CV from their saved CVs to perform the analysis, then the "Add to Saved CVs" button should disappear/be hidden from the user
+
 ## Future Enhancements
-- [ ] Add more comprehensive PDF validation
-- [ ] Add user-facing progress indicators for long-running extractions
