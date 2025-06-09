@@ -1,6 +1,11 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.8";
-import { generateDebugFileName, generateStandardFileName } from "./fileNaming.ts";
+import { 
+  generateAdobeResponseFileName, 
+  generateExtractedTextFileName, 
+  generateFormattedTextFileName,
+  generateUserUploadFileName 
+} from "./fileNaming.ts";
 import { formatExtractedText } from "../shared/adobe-text-formatter.ts";
 
 const corsHeaders = {
@@ -394,8 +399,8 @@ async function extractTextWithAdobe(
         };
       }
 
-      // Save ZIP and both raw/formatted text files
-      const savedFiles = await saveFilesToStorage(zipBuffer, formattingResult, fileName, userId);
+      // Save ZIP and both raw/formatted text files with proper states
+      const savedFiles = await saveFilesToStorage(zipBuffer, formattingResult, fileName, userId, uploadId);
       console.log(`Files saved - ZIP: ${savedFiles.zipUrl ? 'yes' : 'no'}, Raw Text: ${savedFiles.textUrl ? 'yes' : 'no'}, Formatted Text: ${savedFiles.formattedTextUrl ? 'yes' : 'no'}`);
 
       const finalText = formattingResult.formattingApplied ? formattingResult.formattedText : formattingResult.rawText;
@@ -468,7 +473,8 @@ async function saveFilesToStorage(
   zipBuffer: ArrayBuffer, 
   formattingResult: { rawText: string; formattedText: string; formattingApplied: boolean },
   originalFileName: string, 
-  userId: string
+  userId: string,
+  uploadId?: string
 ): Promise<{ zipUrl?: string; textUrl?: string; formattedTextUrl?: string }> {
   try {
     const supabase = createClient(
@@ -478,8 +484,8 @@ async function saveFilesToStorage(
 
     const results: { zipUrl?: string; textUrl?: string; formattedTextUrl?: string } = {};
     
-    // Save ZIP file using standardized naming
-    const zipFileName = generateDebugFileName(userId, originalFileName, 'zip');
+    // Save ZIP file with adobe-response state
+    const zipFileName = generateAdobeResponseFileName(userId, originalFileName);
     const { error: zipError } = await supabase.storage
       .from('adobe-debug-files')
       .upload(zipFileName, zipBuffer, {
@@ -488,14 +494,17 @@ async function saveFilesToStorage(
       });
 
     if (!zipError) {
-      // Track in database
+      // Track in database with state
       await supabase.from('adobe_debug_files').insert({
         user_id: userId,
         file_name: zipFileName,
         original_filename: originalFileName,
         file_type: 'zip',
         file_size: zipBuffer.byteLength,
-        storage_path: zipFileName
+        storage_path: zipFileName,
+        state: 'adobe-response',
+        processing_stage: 'downloaded',
+        job_description_upload_id: uploadId ? uploadId : null
       });
       
       const { data: zipUrlData } = supabase.storage
@@ -504,8 +513,8 @@ async function saveFilesToStorage(
       results.zipUrl = zipUrlData.publicUrl;
     }
     
-    // Save raw text using standardized naming
-    const rawTextFileName = generateDebugFileName(userId, originalFileName, 'text');
+    // Save raw extracted text with extracted state
+    const rawTextFileName = generateExtractedTextFileName(userId, originalFileName);
     const rawTextBuffer = new TextEncoder().encode(formattingResult.rawText);
     const { error: rawTextError } = await supabase.storage
       .from('adobe-debug-files')
@@ -515,14 +524,17 @@ async function saveFilesToStorage(
       });
 
     if (!rawTextError) {
-      // Track in database
+      // Track in database with state
       await supabase.from('adobe_debug_files').insert({
         user_id: userId,
         file_name: rawTextFileName,
         original_filename: originalFileName,
         file_type: 'text',
         file_size: rawTextBuffer.byteLength,
-        storage_path: rawTextFileName
+        storage_path: rawTextFileName,
+        state: 'extracted',
+        processing_stage: 'extracted',
+        job_description_upload_id: uploadId ? uploadId : null
       });
       
       const { data: textUrlData } = supabase.storage
@@ -531,9 +543,9 @@ async function saveFilesToStorage(
       results.textUrl = textUrlData.publicUrl;
     }
 
-    // Save formatted text if different from raw
+    // Save formatted text if different from raw with formatted state
     if (formattingResult.formattingApplied && formattingResult.formattedText !== formattingResult.rawText) {
-      const formattedTextFileName = rawTextFileName.replace('.txt', '_formatted.txt');
+      const formattedTextFileName = generateFormattedTextFileName(userId, originalFileName);
       const formattedTextBuffer = new TextEncoder().encode(formattingResult.formattedText);
       const { error: formattedTextError } = await supabase.storage
         .from('adobe-debug-files')
@@ -543,14 +555,17 @@ async function saveFilesToStorage(
         });
 
       if (!formattedTextError) {
-        // Track in database
+        // Track in database with state
         await supabase.from('adobe_debug_files').insert({
           user_id: userId,
           file_name: formattedTextFileName,
           original_filename: originalFileName,
           file_type: 'text',
           file_size: formattedTextBuffer.byteLength,
-          storage_path: formattedTextFileName
+          storage_path: formattedTextFileName,
+          state: 'formatted',
+          processing_stage: 'formatted',
+          job_description_upload_id: uploadId ? uploadId : null
         });
         
         const { data: formattedTextUrlData } = supabase.storage

@@ -79,7 +79,10 @@ export type Database = {
           file_size: number
           file_type: string
           id: string
+          job_description_upload_id: string | null
           original_filename: string
+          processing_stage: string | null
+          state: string
           storage_path: string
           user_id: string
         }
@@ -89,7 +92,10 @@ export type Database = {
           file_size: number
           file_type: string
           id?: string
+          job_description_upload_id?: string | null
           original_filename: string
+          processing_stage?: string | null
+          state?: string
           storage_path: string
           user_id: string
         }
@@ -99,11 +105,21 @@ export type Database = {
           file_size?: number
           file_type?: string
           id?: string
+          job_description_upload_id?: string | null
           original_filename?: string
+          processing_stage?: string | null
+          state?: string
           storage_path?: string
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "adobe_debug_files_job_description_upload_id_fkey"
+            columns: ["job_description_upload_id"]
+            isOneToOne: false
+            referencedRelation: "uploads"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "adobe_debug_files_user_id_fkey"
             columns: ["user_id"]
