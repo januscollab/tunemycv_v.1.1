@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileText, Check } from 'lucide-react';
+import { FileText, Check, Edit } from 'lucide-react';
 import { formatFileSize } from '@/utils/fileUtils';
 
 interface CVUpload {
@@ -55,9 +55,21 @@ const SavedCVList: React.FC<SavedCVListProps> = ({ savedCVs, selectedCVId, onCVS
                 </p>
               </div>
             </div>
-            {selectedCVId === cv.id && (
-              <Check className="h-5 w-5 text-apricot flex-shrink-0" />
-            )}
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  // Future functionality - edit CV details
+                }}
+                className="p-1 text-blueberry/60 hover:text-apricot dark:text-apple-core/60 dark:hover:text-citrus transition-colors"
+                title="Edit CV (coming soon)"
+              >
+                <Edit className="h-4 w-4" />
+              </button>
+              {selectedCVId === cv.id && (
+                <Check className="h-5 w-5 text-apricot flex-shrink-0" />
+              )}
+            </div>
           </div>
         ))}
       </div>

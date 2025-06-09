@@ -743,6 +743,11 @@ const AuthenticatedCoverLetter = () => {
                                 <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
                                 Regenerating...
                               </>
+                            ) : getRemainingFreeRegenerations(selectedCoverLetter.regeneration_count || 0) > 0 ? (
+                              <>
+                                <RefreshCw className="h-4 w-4 mr-2" />
+                                Free Regeneration
+                              </>
                             ) : (
                               <>
                                 <RefreshCw className="h-4 w-4 mr-2" />

@@ -78,7 +78,7 @@ const EditableCoverLetter: React.FC<EditableCoverLetterProps> = ({ content, onSa
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
         <FloatingLabelTextarea
           label="Edit Cover Letter"
