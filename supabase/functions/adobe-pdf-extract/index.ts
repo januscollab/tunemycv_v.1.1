@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.8";
-import { generateDebugFileName, generateStandardFileName } from "./fileNaming.ts";
+import { generateAdobeResponseFileName, generateExtractedTextFileName, generateFormattedTextFileName } from "../shared/fileNaming.ts";
 import { formatExtractedText } from "../shared/adobe-text-formatter.ts";
 
 const corsHeaders = {
@@ -701,8 +701,8 @@ async function saveZipToStorage(
     const isDirectJson = isDirectJsonResponse(responseBuffer);
     const fileExtension = isDirectJson ? 'json' : 'zip';
     
-    // Use standardized file naming
-    const fileName = generateDebugFileName(userId || 'anonymous', originalFileName, fileExtension as 'zip' | 'json');
+    // Use standardized file naming for Adobe response
+    const fileName = generateAdobeResponseFileName(userId || 'anonymous', originalFileName).replace('.zip', `.${fileExtension}`);
     
     // Save response file
     const { error: saveError } = await supabase.storage
@@ -751,8 +751,9 @@ async function saveTextToStorage(
     );
 
     // Use standardized file naming for text files with type suffix
-    const baseFileName = generateDebugFileName(userId || 'anonymous', originalFileName, 'text');
-    const textFileName = textType === 'formatted' ? baseFileName.replace('.txt', '_formatted.txt') : baseFileName;
+    const textFileName = textType === 'formatted' 
+      ? generateFormattedTextFileName(userId || 'anonymous', originalFileName)
+      : generateExtractedTextFileName(userId || 'anonymous', originalFileName);
     const textBuffer = new TextEncoder().encode(extractedText);
     
     // Save text file

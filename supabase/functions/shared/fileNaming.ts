@@ -76,13 +76,13 @@ export function generateStandardFileName(
 }
 
 /**
- * Generate debug file name for Adobe ZIP responses
+ * Generate debug file name for Adobe responses (JSON format)
  */
 export function generateAdobeResponseFileName(
   userId: string,
   originalFileName: string
 ): string {
-  return generateDebugFileName(userId, originalFileName, 'adobe-response', 'zip');
+  return generateDebugFileName(userId, originalFileName, 'adobe-response', 'json');
 }
 
 /**
