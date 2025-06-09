@@ -34,7 +34,7 @@ const applyFormattingRules = (text: string): string => {
     .trim();
 };
 
-// Convert plain text to structured JSON with better text blob handling
+// Enhanced CV text processing with intelligent structure recognition
 export const textToJson = (text: string): DocumentJson => {
   const cleanedText = applyFormattingRules(text);
   const lines = cleanedText.split('\n');
@@ -42,17 +42,40 @@ export const textToJson = (text: string): DocumentJson => {
   
   let currentParagraph: string[] = [];
   
+  // Improved CV section detection patterns
+  const sectionHeaderPatterns = [
+    /^(professional\s+summary|summary|profile|objective)/i,
+    /^(work\s+experience|experience|employment|career)/i,
+    /^(education|qualifications|academic)/i,
+    /^(skills|technical\s+skills|competencies)/i,
+    /^(achievements|accomplishments)/i,
+    /^(certifications?|licenses?)/i,
+    /^(projects?|portfolio)/i,
+    /^(contact|personal\s+details|references)/i
+  ];
+  
+  const isLikelySectionHeader = (line: string): boolean => {
+    const trimmed = line.trim();
+    // Check for CV section patterns
+    if (sectionHeaderPatterns.some(pattern => pattern.test(trimmed))) return true;
+    // Check for all caps (common in CVs)
+    if (trimmed.length > 3 && trimmed === trimmed.toUpperCase() && /^[A-Z\s&]+$/.test(trimmed)) return true;
+    // Check for standalone short lines that might be headers
+    if (trimmed.length < 50 && !trimmed.includes('.') && !trimmed.includes(',')) return true;
+    return false;
+  };
+  
   const flushParagraph = () => {
     if (currentParagraph.length > 0) {
       const content = currentParagraph.join(' ').trim();
       if (content) {
-        // Split very long paragraphs into readable chunks
-        if (content.length > 800) {
+        // Improved paragraph chunking for better readability
+        if (content.length > 500) {
           const sentences = content.split(/(?<=[.!?])\s+/);
           let currentChunk = '';
           
           for (const sentence of sentences) {
-            if (currentChunk.length + sentence.length > 600 && currentChunk) {
+            if (currentChunk.length + sentence.length > 400 && currentChunk) {
               sections.push({
                 type: 'paragraph',
                 content: applyFormattingRules(currentChunk.trim()),
@@ -83,7 +106,8 @@ export const textToJson = (text: string): DocumentJson => {
     }
   };
   
-  for (const line of lines) {
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
     const trimmed = line.trim();
     
     // Skip empty lines
@@ -94,7 +118,7 @@ export const textToJson = (text: string): DocumentJson => {
       continue;
     }
     
-    // Check for headings (# ## ### only - enforce H1, H2, H3 limit)
+    // Check for explicit markdown headings (# ## ### only)
     if (trimmed.match(/^#{1,3}\s+/)) {
       flushParagraph();
       const level = Math.min(trimmed.match(/^(#{1,3})/)?.[1].length || 1, 3) as 1 | 2 | 3;
@@ -108,24 +132,36 @@ export const textToJson = (text: string): DocumentJson => {
       continue;
     }
     
+    // Intelligent header detection for CV content
+    if (isLikelySectionHeader(trimmed)) {
+      flushParagraph();
+      sections.push({
+        type: 'heading',
+        level: 2, // Default to H2 for CV sections
+        content: applyFormattingRules(trimmed),
+        id: generateId()
+      });
+      continue;
+    }
+    
     // Check for bullet points (normalize all to "-")
-    if (trimmed.match(/^[-•*]\s+/)) {
+    if (trimmed.match(/^[-•*·‐−–—]\s+/)) {
       flushParagraph();
       
-      // Collect consecutive bullet points
+      // Collect consecutive bullet points with lookahead
       const listItems: string[] = [];
-      let i = lines.indexOf(line);
+      let j = i;
       
-      while (i < lines.length) {
-        const currentLine = lines[i].trim();
-        if (currentLine.match(/^[-•*]\s+/)) {
-          const cleanItem = applyFormattingRules(currentLine.replace(/^[-•*]\s+/, ''));
+      while (j < lines.length) {
+        const currentLine = lines[j].trim();
+        if (currentLine.match(/^[-•*·‐−–—]\s+/)) {
+          const cleanItem = applyFormattingRules(currentLine.replace(/^[-•*·‐−–—]\s+/, ''));
           if (cleanItem) {
             listItems.push(cleanItem);
           }
-          i++;
+          j++;
         } else if (currentLine === '') {
-          i++;
+          j++;
         } else {
           break;
         }
@@ -137,6 +173,7 @@ export const textToJson = (text: string): DocumentJson => {
           items: listItems,
           id: generateId()
         });
+        i = j - 1; // Skip processed lines
       }
       continue;
     }

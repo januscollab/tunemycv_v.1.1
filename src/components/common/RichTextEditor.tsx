@@ -98,18 +98,22 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     setContent(htmlContent);
   }, [documentJson, jsonToHtml]);
 
-  // Content change handler with stable conversion
+  // Content change handler with improved stability
   const handleContentChange = useCallback((value: string) => {
     setContent(value);
     
-    // Debounced conversion to prevent loops
+    // Improved debounced conversion with stability checks
     const timeoutId = setTimeout(() => {
-      if (value !== content) {
-        const newJson = htmlToJson(value);
-        const newText = generateFormattedText(newJson);
-        onContentChange(newJson, newText);
+      if (value !== content && value.trim() !== '') {
+        try {
+          const newJson = htmlToJson(value);
+          const newText = generateFormattedText(newJson);
+          onContentChange(newJson, newText);
+        } catch (error) {
+          console.warn('Content conversion error:', error);
+        }
       }
-    }, 100);
+    }, 150);
     
     return () => clearTimeout(timeoutId);
   }, [content, htmlToJson, onContentChange]);
@@ -134,28 +138,13 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     }
   }, [showAIFeatures]);
 
-  // AI improvement handlers
+  // AI improvement handlers - NO TOAST NOTIFICATIONS
   const handleAIImprovement = useCallback((action: 'improve' | 'rewrite' | 'tone') => {
     if (selectionInfo && onAIRequest) {
       onAIRequest(selectionInfo, action);
-      toast({
-        title: "AI Enhancement Coming Soon",
-        description: "This feature will be available in the next update!",
-      });
+      // No toast - feature not implemented yet
     }
-  }, [selectionInfo, onAIRequest, toast]);
-
-  // Revert to original
-  const handleRevert = useCallback(() => {
-    const originalHtml = jsonToHtml(originalJson);
-    setContent(originalHtml);
-    const originalText = generateFormattedText(originalJson);
-    onContentChange(originalJson, originalText);
-    toast({
-      title: "Reverted",
-      description: "Content has been reverted to original state.",
-    });
-  }, [originalJson, jsonToHtml, onContentChange, toast]);
+  }, [selectionInfo, onAIRequest]);
 
   // Quill configuration with custom toolbar
   const modules = {
@@ -215,19 +204,6 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           </Button>
         </div>
       )}
-
-      {/* Revert Button */}
-      <div className="absolute top-2 left-2 z-10">
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={handleRevert}
-          className="text-micro px-2 py-1"
-        >
-          <RotateCcw className="h-3 w-3 mr-1" />
-          Revert
-        </Button>
-      </div>
 
       {/* Quill Editor */}
       <ReactQuill

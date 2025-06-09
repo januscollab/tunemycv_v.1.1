@@ -16,9 +16,13 @@
 }
 
 .rich-text-editor .ql-editor {
-  color: hsl(var(--foreground));
+  color: hsl(var(--foreground)) !important;
   line-height: 1.6;
   padding: 1rem;
+}
+
+.rich-text-editor .ql-editor * {
+  color: hsl(var(--foreground)) !important;
 }
 
 .rich-text-editor .ql-editor.ql-blank::before {

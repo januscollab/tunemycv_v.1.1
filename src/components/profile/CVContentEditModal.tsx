@@ -97,7 +97,7 @@ const CVContentEditModal: React.FC<CVContentEditModalProps> = ({
   const handleContentChange = async (newJson: DocumentJson, newText: string) => {
     setDocumentJson(newJson);
     
-    // Auto-save to database
+    // Silent auto-save to database - NO TOAST NOTIFICATIONS
     try {
       const { error } = await supabase
         .from('uploads')
@@ -111,7 +111,7 @@ const CVContentEditModal: React.FC<CVContentEditModalProps> = ({
       if (error) throw error;
     } catch (error) {
       console.error('Auto-save failed:', error);
-      // Don't show error toast for auto-save failures
+      // Silent failure - no user notification
     }
   };
 

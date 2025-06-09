@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { X, Save, AlertTriangle, CheckCircle, Info, ChevronDown, ChevronUp, WandSparkles } from 'lucide-react';
+import { X, Save, AlertTriangle, CheckCircle, Info, ChevronDown, ChevronUp, WandSparkles, RotateCcw } from 'lucide-react';
 import { 
   textToJson, 
   jsonToText, 
   DocumentJson, 
   updateDocumentContent, 
   syncJsonAndText,
-  isWellStructuredDocument 
+  isWellStructuredDocument,
+  generateFormattedText 
 } from '@/utils/documentJsonUtils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -239,33 +240,51 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
           </div>
         </div>
 
-        {/* Footer with 2 buttons */}
-        <div className="flex items-center justify-end space-x-3 px-6 py-4 border-t border-border bg-background">
+        {/* Footer with 3 buttons */}
+        <div className="flex items-center justify-between px-6 py-4 border-t border-border bg-background">
           <Button 
             variant="outline" 
             size="sm"
-            onClick={onClose}
+            onClick={() => {
+              const originalJson = textToJson(extractedText);
+              const originalText = generateFormattedText(originalJson);
+              setDocumentJson(originalJson);
+              setEditedText(originalText);
+              handleContentChange(originalJson, originalText);
+            }}
             className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200"
           >
-            <X className="h-4 w-4 mr-2" />
-            Close
+            <RotateCcw className="h-4 w-4 mr-2" />
+            Revert to Original
           </Button>
-          {documentType === 'cv' ? (
+          
+          <div className="flex items-center space-x-3">
             <Button 
-              variant="outline"
+              variant="outline" 
               size="sm"
-              onClick={() => {
-                toast({
-                  title: "Coming Soon!",
-                  description: "AI CV review feature will be available soon and will cost 2 Credits.",
-                });
-              }}
+              onClick={onClose}
               className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200"
             >
-              <WandSparkles className="h-4 w-4 mr-2" />
-              Ask AI to Review My CV
+              <X className="h-4 w-4 mr-2" />
+              Close
             </Button>
-          ) : null}
+            {documentType === 'cv' ? (
+              <Button 
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  toast({
+                    title: "Coming Soon!",
+                    description: "AI CV review feature will be available soon and will cost 2 Credits.",
+                  });
+                }}
+                className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200"
+              >
+                <WandSparkles className="h-4 w-4 mr-2" />
+                Ask AI to Review My CV
+              </Button>
+            ) : null}
+          </div>
         </div>
       </DialogContent>
     </Dialog>

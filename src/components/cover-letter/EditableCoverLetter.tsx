@@ -20,15 +20,15 @@ const EditableCoverLetter: React.FC<EditableCoverLetterProps> = ({ content, onSa
     setDocumentJson(textToJson(content));
   }, [content]);
 
-  // Handle rich text editor content changes
+  // Handle rich text editor content changes - NO TOAST NOTIFICATIONS
   const handleContentChange = useCallback((newJson: DocumentJson, newText: string) => {
     setDocumentJson(newJson);
     
-    // Auto-save with debounce
+    // Silent auto-save with debounce
     if (newText !== content && newText.trim() !== '') {
       const timeoutId = setTimeout(() => {
         onSave(newText);
-      }, 2000); // Auto-save after 2 seconds of no typing
+      }, 2000);
 
       return () => clearTimeout(timeoutId);
     }
