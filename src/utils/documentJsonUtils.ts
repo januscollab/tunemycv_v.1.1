@@ -4,6 +4,9 @@ export interface DocumentSection {
   content?: string;
   items?: string[];
   id: string;
+  formatting?: {
+    bold?: boolean; // Only bold formatting allowed
+  };
 }
 
 export interface DocumentJson {
@@ -16,9 +19,25 @@ const generateId = (): string => {
   return `section-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 };
 
-// Convert plain text to structured JSON (limited formatting)
+// Apply JSON formatting rules - strip unwanted formatting
+const applyFormattingRules = (text: string): string => {
+  return text
+    // Remove italics, underlines, and other formatting
+    .replace(/[_*~`]+/g, '')
+    // Normalize bullets to "-" only
+    .replace(/[•·‐−–—]/g, '-')
+    // Remove multiple font information (keep single font type)
+    .replace(/font-family:[^;]+;?/gi, '')
+    .replace(/font-size:[^;]+;?/gi, '')
+    // Clean up excessive whitespace
+    .replace(/\s+/g, ' ')
+    .trim();
+};
+
+// Convert plain text to structured JSON with formatting rules applied
 export const textToJson = (text: string): DocumentJson => {
-  const lines = text.split('\n');
+  const cleanedText = applyFormattingRules(text);
+  const lines = cleanedText.split('\n');
   const sections: DocumentSection[] = [];
   
   let currentParagraph: string[] = [];
@@ -29,7 +48,7 @@ export const textToJson = (text: string): DocumentJson => {
       if (content) {
         sections.push({
           type: 'paragraph',
-          content,
+          content: applyFormattingRules(content),
           id: generateId()
         });
       }
@@ -48,11 +67,11 @@ export const textToJson = (text: string): DocumentJson => {
       continue;
     }
     
-    // Check for headings (# ## ###)
+    // Check for headings (# ## ### only - enforce H1, H2, H3 limit)
     if (trimmed.match(/^#{1,3}\s+/)) {
       flushParagraph();
-      const level = trimmed.match(/^(#{1,3})/)?.[1].length as 1 | 2 | 3;
-      const content = trimmed.replace(/^#{1,3}\s+/, '');
+      const level = Math.min(trimmed.match(/^(#{1,3})/)?.[1].length || 1, 3) as 1 | 2 | 3;
+      const content = applyFormattingRules(trimmed.replace(/^#{1,3}\s+/, ''));
       sections.push({
         type: 'heading',
         level,
@@ -62,7 +81,7 @@ export const textToJson = (text: string): DocumentJson => {
       continue;
     }
     
-    // Check for bullet points (- • *)
+    // Check for bullet points (normalize all to "-")
     if (trimmed.match(/^[-•*]\s+/)) {
       flushParagraph();
       
@@ -73,7 +92,10 @@ export const textToJson = (text: string): DocumentJson => {
       while (i < lines.length) {
         const currentLine = lines[i].trim();
         if (currentLine.match(/^[-•*]\s+/)) {
-          listItems.push(currentLine.replace(/^[-•*]\s+/, ''));
+          const cleanItem = applyFormattingRules(currentLine.replace(/^[-•*]\s+/, ''));
+          if (cleanItem) {
+            listItems.push(cleanItem);
+          }
           i++;
         } else if (currentLine === '') {
           i++;
@@ -101,7 +123,9 @@ export const textToJson = (text: string): DocumentJson => {
   
   return {
     version: '1.0',
-    sections
+    sections: sections.filter(section => 
+      section.content?.trim() || (section.items && section.items.length > 0)
+    )
   };
 };
 
@@ -127,7 +151,7 @@ export const jsonToText = (docJson: DocumentJson): string => {
       case 'list':
         if (section.items) {
           for (const item of section.items) {
-            textLines.push(`• ${item}`);
+            textLines.push(`- ${item}`); // Use "-" bullets as per formatting rules
           }
           textLines.push(''); // Empty line after list
         }
@@ -155,7 +179,7 @@ export const updateJsonContent = (docJson: DocumentJson, sectionId: string, newC
   };
 };
 
-// Validate JSON structure
+// Validate JSON structure and formatting compliance
 export const isValidDocumentJson = (obj: any): obj is DocumentJson => {
   return obj &&
     obj.version === '1.0' &&
@@ -165,4 +189,93 @@ export const isValidDocumentJson = (obj: any): obj is DocumentJson => {
       section.id &&
       ['heading', 'paragraph', 'list'].includes(section.type)
     );
+};
+
+// Enforce JSON formatting rules on existing DocumentJson
+export const enforceFormattingRules = (docJson: DocumentJson): DocumentJson => {
+  return {
+    ...docJson,
+    sections: docJson.sections.map(section => {
+      const cleanedSection = { ...section };
+      
+      // Apply formatting rules to content
+      if (cleanedSection.content) {
+        cleanedSection.content = applyFormattingRules(cleanedSection.content);
+      }
+      
+      // Apply formatting rules to list items
+      if (cleanedSection.items) {
+        cleanedSection.items = cleanedSection.items
+          .map(item => applyFormattingRules(item))
+          .filter(item => item.trim().length > 0);
+      }
+      
+      // Enforce heading level limits (H1, H2, H3 only)
+      if (cleanedSection.type === 'heading' && cleanedSection.level) {
+        cleanedSection.level = Math.min(cleanedSection.level, 3) as 1 | 2 | 3;
+      }
+      
+      // Remove any unsupported formatting
+      delete cleanedSection.formatting;
+      
+      return cleanedSection;
+    }).filter(section => 
+      // Remove empty sections
+      section.content?.trim() || (section.items && section.items.length > 0)
+    )
+  };
+};
+
+// Bidirectional sync - ensure JSON and text are 100% consistent
+export const syncJsonAndText = (
+  json: DocumentJson, 
+  text: string
+): { json: DocumentJson; text: string; isConsistent: boolean } => {
+  // Convert JSON to text (authoritative)
+  const textFromJson = jsonToText(json);
+  
+  // Convert text to JSON (authoritative)
+  const jsonFromText = textToJson(text);
+  
+  // Check consistency
+  const isConsistent = textFromJson === text;
+  
+  // Return synchronized versions
+  return {
+    json: enforceFormattingRules(jsonFromText),
+    text: jsonToText(enforceFormattingRules(jsonFromText)),
+    isConsistent
+  };
+};
+
+// Update both JSON and text maintaining 100% consistency
+export const updateDocumentContent = (
+  currentJson: DocumentJson,
+  currentText: string,
+  updatedText: string
+): { json: DocumentJson; text: string } => {
+  // Create new JSON from updated text
+  const newJson = enforceFormattingRules(textToJson(updatedText));
+  
+  // Generate consistent text from the enforced JSON
+  const consistentText = jsonToText(newJson);
+  
+  return {
+    json: newJson,
+    text: consistentText
+  };
+};
+
+// Validate document structure is well-formed (not a text blob)
+export const isWellStructuredDocument = (docJson: DocumentJson): boolean => {
+  // Must have multiple sections or at least one heading
+  const hasStructure = docJson.sections.length > 1 || 
+    docJson.sections.some(section => section.type === 'heading');
+  
+  // Must not have excessively long paragraphs (indicating text blob)
+  const hasReasonableParagraphs = docJson.sections
+    .filter(section => section.type === 'paragraph')
+    .every(section => (section.content?.length || 0) < 1000);
+  
+  return hasStructure && hasReasonableParagraphs;
 };

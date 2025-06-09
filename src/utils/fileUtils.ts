@@ -20,25 +20,35 @@ export const validateFileSecure = (file: File, type: 'cv' | 'job_description') =
   return validateFileSecurely(file, type);
 };
 
-// Smart text formatting cleanup that preserves document structure
+// Enhanced text formatting cleanup that enforces JSON formatting rules
 const cleanExtractedText = (text: string): string => {
   return text
     // Fix smart quotes but preserve formatting
     .replace(/[""]/g, '"')
     .replace(/['']/g, "'")
-    // Normalize bullet points while preserving their structure
-    .replace(/[•·‐−]/g, '• ')
-    .replace(/[–—]/g, '- ')
+    // Normalize ALL bullet points to "-" as per JSON formatting rules
+    .replace(/[•·‐−–—*]/g, '-')
+    // Remove italics, underlines, and other unsupported formatting
+    .replace(/[_*~`]+/g, '')
+    // Remove font information (single font type rule)
+    .replace(/font-family:[^;]+;?/gi, '')
+    .replace(/font-size:[^;]+;?/gi, '')
+    .replace(/font-weight:[^;]+;?/gi, '')
     // Clean up excessive blank lines (more than 2 consecutive)
     .replace(/\n\s*\n\s*\n\s*\n+/g, '\n\n\n')
     // Remove trailing spaces from lines but preserve line structure
     .split('\n').map(line => line.replace(/\s+$/, '')).join('\n')
-    // Clean up excessive spaces within lines (but keep intentional spacing)
+    // Clean up excessive spaces within lines (keep max 2 spaces)
     .replace(/ {3,}/g, '  ')
+    // Normalize headings to enforce H1, H2, H3 limit
+    .replace(/^#{4,}\s+/gm, '### ')
     // Preserve headers and sections by detecting patterns
-    .replace(/^([A-Z][A-Z\s]{2,})$/gm, '\n$1\n')
+    .replace(/^([A-Z][A-Z\s]{2,})$/gm, '\n# $1\n')
     // Ensure proper spacing around section headers
-    .replace(/\n\n\n([A-Z][A-Z\s]{2,})\n\n\n/g, '\n\n$1\n\n')
+    .replace(/\n\n\n(#{1,3}\s+[^\n]+)\n\n\n/g, '\n\n$1\n\n')
+    // Remove any remaining complex formatting
+    .replace(/<[^>]*>/g, '') // Remove HTML tags
+    .replace(/\{[^}]*\}/g, '') // Remove style blocks
     .trim();
 };
 

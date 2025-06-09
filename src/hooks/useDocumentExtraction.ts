@@ -2,7 +2,13 @@ import { useState } from 'react';
 import { extractTextFromFile } from '@/utils/fileUtils';
 import { detectDocumentType, DocumentTypeDetection } from '@/utils/documentValidation';
 import { assessDocumentQuality, QualityAssessment } from '@/utils/documentQuality';
-import { textToJson, DocumentJson } from '@/utils/documentJsonUtils';
+import { 
+  textToJson, 
+  DocumentJson, 
+  enforceFormattingRules, 
+  syncJsonAndText,
+  isWellStructuredDocument 
+} from '@/utils/documentJsonUtils';
 import { useToast } from '@/hooks/use-toast';
 
 interface ExtractionState {
@@ -84,16 +90,37 @@ export const useDocumentExtraction = () => {
       ]);
       
       clearTimeout(timeoutId);
+      setState(prev => ({ ...prev, progress: 'Applying formatting rules and creating structured document...' }));
+      
+      // Generate structured JSON from text with formatting rules applied
+      const rawDocumentJson = textToJson(extractedText);
+      
+      // Enforce JSON formatting rules (bold only, H1-H3, single font, "-" bullets)
+      const enforcedDocumentJson = enforceFormattingRules(rawDocumentJson);
+      
+      // Ensure bidirectional sync and consistency
+      const { json: documentJson, text: consistentText } = syncJsonAndText(enforcedDocumentJson, extractedText);
+      
+      // Validate document structure (not a text blob)
+      const isWellStructured = isWellStructuredDocument(documentJson);
+      
       setState(prev => ({ ...prev, progress: 'Analyzing document type and quality...' }));
       
-      // Detect document type
-      const typeDetection = detectDocumentType(extractedText, file.name);
+      // Detect document type using the consistent text
+      const typeDetection = detectDocumentType(consistentText, file.name);
       
-      // Assess document quality
-      const qualityAssessment = assessDocumentQuality(extractedText, file.name, expectedDocumentType);
+      // Assess document quality using the consistent text
+      const qualityAssessment = assessDocumentQuality(consistentText, file.name, expectedDocumentType);
       
-      // Generate structured JSON from text
-      const documentJson = textToJson(extractedText);
+      // Add structure warning if document is poorly structured
+      if (!isWellStructured) {
+        qualityAssessment.issues.push({
+          type: 'warning',
+          title: 'Document Structure',
+          description: 'Document appears to be a large text block. Consider adding headings and sections for better organization.',
+          suggestion: 'Add section headings using # for main sections and ## for subsections to improve document structure.'
+        });
+      }
       
       // Small delay to show analysis step
       await new Promise(resolve => setTimeout(resolve, 500));

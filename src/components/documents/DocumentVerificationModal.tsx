@@ -1,6 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { X, Save, AlertTriangle, CheckCircle, Info, ChevronDown, ChevronUp, WandSparkles } from 'lucide-react';
-import { textToJson, jsonToText, DocumentJson } from '@/utils/documentJsonUtils';
+import { 
+  textToJson, 
+  jsonToText, 
+  DocumentJson, 
+  updateDocumentContent, 
+  syncJsonAndText,
+  isWellStructuredDocument 
+} from '@/utils/documentJsonUtils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { UnifiedTextarea } from '@/components/ui/unified-input';
@@ -41,29 +48,42 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
   
   const quality = assessDocumentQuality(editedText, fileName, documentType);
 
-  // Debounced autosave function
+  // Enhanced debounced autosave with bidirectional sync
   const debouncedAutoSave = useCallback(
     debounce(async (text: string) => {
       if (text !== extractedText) {
         setIsAutoSaving(true);
+        
+        // Use new sync functionality to ensure 100% consistency
+        const { json: syncedJson, text: syncedText } = updateDocumentContent(documentJson, editedText, text);
+        
+        // Update both JSON and text with synced versions
+        setDocumentJson(syncedJson);
+        setEditedText(syncedText);
+        
         await new Promise(resolve => setTimeout(resolve, 300)); // Simulate save
-        onSave(text);
+        onSave(syncedText); // Save the consistent text version
         setLastSaved(new Date());
         setIsAutoSaving(false);
       }
     }, 2000),
-    [extractedText, onSave]
+    [extractedText, onSave, documentJson, editedText]
   );
 
-  // Bidirectional sync: text changes update JSON
+  // Enhanced bidirectional sync with formatting rules enforcement
   useEffect(() => {
-    const newJson = textToJson(editedText);
-    setDocumentJson(newJson);
+    // Apply formatting rules and sync JSON/text
+    const { json: syncedJson, isConsistent } = syncJsonAndText(documentJson, editedText);
+    
+    // Only update if there's a meaningful change
+    if (!isConsistent) {
+      setDocumentJson(syncedJson);
+    }
   }, [editedText]);
 
-  // Auto-save effect
+  // Auto-save effect with enhanced validation
   useEffect(() => {
-    if (editedText !== extractedText) {
+    if (editedText !== extractedText && editedText.trim().length > 0) {
       debouncedAutoSave(editedText);
     }
   }, [editedText, debouncedAutoSave, extractedText]);
