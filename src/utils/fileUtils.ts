@@ -26,7 +26,11 @@ const cleanExtractedText = (text: string): string => {
     // Fix smart quotes but preserve formatting
     .replace(/[""]/g, '"')
     .replace(/['']/g, "'")
+    // First pass: normalize line breaks and preserve document structure
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n')
     // Normalize ALL bullet points to "-" as per JSON formatting rules
+    .replace(/^[\s]*[•·‐−–—*]\s+/gm, '- ')
     .replace(/[•·‐−–—*]/g, '-')
     // Remove italics, underlines, and other unsupported formatting
     .replace(/[_*~`]+/g, '')
@@ -34,21 +38,34 @@ const cleanExtractedText = (text: string): string => {
     .replace(/font-family:[^;]+;?/gi, '')
     .replace(/font-size:[^;]+;?/gi, '')
     .replace(/font-weight:[^;]+;?/gi, '')
-    // Clean up excessive blank lines (more than 2 consecutive)
-    .replace(/\n\s*\n\s*\n\s*\n+/g, '\n\n\n')
-    // Remove trailing spaces from lines but preserve line structure
-    .split('\n').map(line => line.replace(/\s+$/, '')).join('\n')
+    // Preserve section breaks and headers
+    .split('\n')
+    .map(line => {
+      const trimmedLine = line.trim();
+      // Detect section headers (all caps lines or lines ending with colon)
+      if (trimmedLine.length > 2 && 
+          (trimmedLine === trimmedLine.toUpperCase() || trimmedLine.endsWith(':'))) {
+        return '\n' + trimmedLine + '\n';
+      }
+      // Preserve indentation for list items
+      if (trimmedLine.startsWith('-')) {
+        return trimmedLine;
+      }
+      // Regular content - preserve but clean
+      return trimmedLine;
+    })
+    .join('\n')
+    // Clean up excessive blank lines but preserve section spacing
+    .replace(/\n{4,}/g, '\n\n\n')
+    .replace(/\n{2,}(\n[A-Z][A-Z\s:]+\n)/g, '\n\n$1')
     // Clean up excessive spaces within lines (keep max 2 spaces)
     .replace(/ {3,}/g, '  ')
-    // Normalize headings to enforce H1, H2, H3 limit
-    .replace(/^#{4,}\s+/gm, '### ')
-    // Preserve headers and sections by detecting patterns
-    .replace(/^([A-Z][A-Z\s]{2,})$/gm, '\n# $1\n')
-    // Ensure proper spacing around section headers
-    .replace(/\n\n\n(#{1,3}\s+[^\n]+)\n\n\n/g, '\n\n$1\n\n')
     // Remove any remaining complex formatting
     .replace(/<[^>]*>/g, '') // Remove HTML tags
     .replace(/\{[^}]*\}/g, '') // Remove style blocks
+    // Final cleanup - ensure proper line spacing
+    .replace(/^\n+/, '') // Remove leading newlines
+    .replace(/\n+$/, '') // Remove trailing newlines
     .trim();
 };
 

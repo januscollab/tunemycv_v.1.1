@@ -31,6 +31,9 @@
 - [x] **Adobe PDF Integration**: Updated to align with new formatting standards
 - [x] **Document Verification Modal**: Enhanced with new sync functionality
 
+## File Management Improvements
+- [ ] Update the naming convention for files stored after upload by user to {user_id} {filename (including file extension)} {timestamp (in ddmmyy-hhmmss format)}
+
 ## Future Enhancements
 - [ ] Add more comprehensive PDF validation
 - [ ] Implement retry logic for failed Adobe API calls
