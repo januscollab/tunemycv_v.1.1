@@ -4,13 +4,14 @@ import { useFileStorage } from './useFileStorage';
 import { useDocumentExtraction } from './useDocumentExtraction';
 import { DocumentTypeDetection } from '@/utils/documentValidation';
 import { QualityAssessment } from '@/utils/documentQuality';
-import { DocumentJson } from '@/utils/documentJsonUtils';
+import { DocumentJson, prettifyDocumentJson } from '@/utils/documentJsonUtils';
 
 interface UploadResult {
   success: boolean;
   file?: File;
   extractedText?: string;
   documentJson?: DocumentJson;
+  prettyJsonString?: string;
   typeDetection?: DocumentTypeDetection;
   qualityAssessment?: QualityAssessment;
   error?: string;
@@ -45,14 +46,7 @@ export const useUploadOrchestrator = () => {
         };
       }
 
-      // Step 2: Store raw original file (ONLY if explicitly requested)
-      if (options.shouldStore === true) {
-        setProgress('Storing original file...');
-        await storage.storeFile(validationResult.secureFile, { uploadType: options.fileType });
-        // Continue even if storage fails - it's for debugging only
-      }
-
-      // Step 3: Extract text and analyze document
+      // Step 2: Extract text and analyze document FIRST
       setProgress('Processing document...');
       const extractionResult = await extraction.extractText(validationResult.secureFile, options.fileType);
       
@@ -63,12 +57,28 @@ export const useUploadOrchestrator = () => {
         };
       }
 
+      // Step 3: Generate pretty JSON string for storage
+      setProgress('Formatting for storage...');
+      const prettyJsonString = prettifyDocumentJson(extractionResult.documentJson);
+
+      // Step 4: Store processed file with both JSON and text (ONLY if explicitly requested)
+      if (options.shouldStore === true) {
+        setProgress('Storing processed file...');
+        await storage.storeFile(validationResult.secureFile, { 
+          uploadType: options.fileType,
+          extractedText: extractionResult.extractedText,
+          prettyJsonString
+        });
+        // Continue even if storage fails - it's for debugging only
+      }
+
       setProgress('Complete');
       return {
         success: true,
         file: validationResult.secureFile,
         extractedText: extractionResult.extractedText,
         documentJson: extractionResult.documentJson,
+        prettyJsonString,
         typeDetection: extractionResult.typeDetection,
         qualityAssessment: extractionResult.qualityAssessment
       };

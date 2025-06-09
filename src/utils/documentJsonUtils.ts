@@ -266,6 +266,65 @@ export const updateDocumentContent = (
   };
 };
 
+// Create pretty, human-readable JSON for database storage
+export const prettifyDocumentJson = (docJson: DocumentJson): string => {
+  return JSON.stringify(docJson, null, 2);
+};
+
+// Parse pretty JSON back to DocumentJson object
+export const parseDocumentJson = (jsonString: string): DocumentJson | null => {
+  try {
+    const parsed = JSON.parse(jsonString);
+    return isValidDocumentJson(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+};
+
+// Enhanced text generation with improved formatting
+export const generateFormattedText = (docJson: DocumentJson): string => {
+  const textLines: string[] = [];
+  
+  for (const section of docJson.sections) {
+    switch (section.type) {
+      case 'heading':
+        // Add proper spacing before headings (except first)
+        if (textLines.length > 0) {
+          textLines.push('');
+        }
+        const hashes = '#'.repeat(section.level || 1);
+        textLines.push(`${hashes} ${section.content}`);
+        textLines.push(''); // Empty line after heading
+        break;
+        
+      case 'paragraph':
+        if (section.content) {
+          // Split long paragraphs into readable chunks
+          const paragraphLines = section.content.split('\n').filter(line => line.trim());
+          textLines.push(...paragraphLines);
+          textLines.push(''); // Empty line after paragraph
+        }
+        break;
+        
+      case 'list':
+        if (section.items) {
+          for (const item of section.items) {
+            textLines.push(`- ${item}`); // Use "-" bullets consistently
+          }
+          textLines.push(''); // Empty line after list
+        }
+        break;
+    }
+  }
+  
+  // Remove trailing empty lines
+  while (textLines.length > 0 && textLines[textLines.length - 1] === '') {
+    textLines.pop();
+  }
+  
+  return textLines.join('\n');
+};
+
 // Validate document structure is well-formed (not a text blob)
 export const isWellStructuredDocument = (docJson: DocumentJson): boolean => {
   // Must have multiple sections or at least one heading
