@@ -18,6 +18,7 @@
 - [x] **Floating Label Textarea**: When user clicks into edit area and label floats to top, it should reduce in text size (smaller than the non-floating state)
 - [x] **Floating Label Input**: When user clicks into edit area and label floats to top, it should reduce in text size (smaller than the non-floating state)
 - [x] **Design System Consistency**: Replicate these floating label improvements throughout the entire site wherever these components are used
+- [x] **Replace UnifiedInput with FloatingLabelInput globally**: Migrated all UnifiedInput/UnifiedTextarea usage to FloatingLabelInput/FloatingLabelTextarea and removed unified-input component
 
 ## User Management Enhancements
 - [x] **6-Digit Sequential User ID System**: Replace current 8-character alphanumeric user_id with 6-digit sequential system (000001, 000002, etc.) with alan@januscollab.com assigned 000000
@@ -32,9 +33,20 @@
 - [x] **Document Verification Modal**: Enhanced with new sync functionality
 
 ## File Management Improvements
-- [ ] Update the naming convention for files stored after upload by user to {user_id} {filename (including file extension)} {timestamp (in ddmmyy-hhmmss format)}
+- [x] **File Upload Error Handling**: Implemented retry mechanism (max 2 attempts) with enhanced error messages and user guidance
+- [x] **BounceLoader Integration**: Added loading states for save operations with duration-based display (>1 second)
+- [x] **Smart "Add to Saved CVs" Button**: Hide button when CV is already saved or after successful save operation
+- [x] **Saved CV List Scrolling**: Limited default view to 3 CVs with scroll capability for additional items
+- [x] Update the naming convention for files stored after upload by user to {user_id} {filename (including file extension)} {timestamp (in ddmmyy-hhmmss format)}
+
+## Edge Function Updates
+- [x] **Adobe PDF Extract**: Updated to use new standardized file naming convention
+- [x] **File Storage Services**: Integrated new naming utility across all file operations
+
+## Code Cleanup
+- [x] **UnifiedInput Component Removal**: Deleted unified-input.tsx component after completing migration
+- [x] **Import Dependencies**: Updated all component imports to use FloatingLabelInput/FloatingLabelTextarea
 
 ## Future Enhancements
 - [ ] Add more comprehensive PDF validation
-- [ ] Implement retry logic for failed Adobe API calls
 - [ ] Add user-facing progress indicators for long-running extractions
