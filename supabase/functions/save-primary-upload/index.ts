@@ -12,6 +12,8 @@ interface SavePrimaryUploadRequest {
   fileType: string;
   uploadType: 'cv' | 'job_description';
   userId: string;
+  extractedText?: string;
+  documentJson?: string; // pretty JSON string
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -35,7 +37,7 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     console.log('Step 1: Parsing request body...');
     const requestBody: SavePrimaryUploadRequest = await req.json();
-    const { fileContent, fileName, fileType, uploadType, userId } = requestBody;
+    const { fileContent, fileName, fileType, uploadType, userId, extractedText, documentJson } = requestBody;
     
     console.log(`Step 2: Processing ${uploadType} upload for user ${userId}, file: ${fileName}, type: ${fileType}`);
 
@@ -57,8 +59,19 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error('File size exceeds 50MB limit');
     }
 
-    // Save to main uploads table
+    // Save to main uploads table with extracted content
     console.log('Step 5: Inserting into uploads table...');
+    
+    // Parse JSON string if provided
+    let parsedDocumentJson = null;
+    if (documentJson) {
+      try {
+        parsedDocumentJson = JSON.parse(documentJson);
+      } catch (error) {
+        console.warn('Failed to parse document JSON, continuing without it:', error);
+      }
+    }
+    
     const { data: uploadData, error: uploadError } = await supabase
       .from('uploads')
       .insert({
@@ -67,8 +80,10 @@ const handler = async (req: Request): Promise<Response> => {
         file_type: fileType,
         file_size: binaryData.byteLength,
         upload_type: uploadType,
-        processing_status: 'uploaded',
-        original_file_content: binaryData
+        processing_status: extractedText ? 'completed' : 'uploaded',
+        original_file_content: binaryData,
+        extracted_text: extractedText || null,
+        document_content_json: parsedDocumentJson
       })
       .select('id')
       .single();

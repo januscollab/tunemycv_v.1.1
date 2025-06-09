@@ -3,6 +3,10 @@
 ## UI/UX Improvements
 - [x] Analyze CV > Paste Job Description edit text area needs to be updated to the correct "Floating Label Textarea"
 - [x] **CV Upload UX**: Remove "Type Confirmation Needed" tag for all CV uploads to streamline the upload process
+- [ ] **Document Modal Enhancement**: Review Document modal > remove "Document Content" from inside the text edit area
+- [ ] **Missing Breadcrumbs**: Add breadcrumbs to pricing scale page
+- [ ] **Auto-Open File Dialog**: When a user clicks the "Upload New CV" tab on the CV analysis page, the file upload dialog should auto-open
+- [ ] **Button State Verification**: Ensure "Add to Saved CV's" button disappears after successfully saving uploaded CV to saved CV log
 
 ## Adobe PDF Processing
 - [x] Fix Adobe ZIP extraction sequence (Download → Save ZIP → Unzip → Save Text)

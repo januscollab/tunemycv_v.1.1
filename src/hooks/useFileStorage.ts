@@ -4,6 +4,8 @@ import { useToast } from '@/hooks/use-toast';
 
 interface StorageOptions {
   uploadType: 'cv' | 'job_description';
+  extractedText?: string;
+  prettyJsonString?: string;
 }
 
 export const useFileStorage = () => {
@@ -35,7 +37,9 @@ export const useFileStorage = () => {
           fileName: file.name,
           fileType: file.type,
           uploadType: options.uploadType,
-          userId: user.id
+          userId: user.id,
+          extractedText: options.extractedText,
+          documentJson: options.prettyJsonString
         }
       });
 

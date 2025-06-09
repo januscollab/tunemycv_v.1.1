@@ -6,7 +6,8 @@ import {
   textToJson, 
   DocumentJson, 
   enforceFormattingRules, 
-  syncJsonAndText,
+  generateFormattedText,
+  prettifyDocumentJson,
   isWellStructuredDocument 
 } from '@/utils/documentJsonUtils';
 import { useToast } from '@/hooks/use-toast';
@@ -82,14 +83,14 @@ export const useDocumentExtraction = () => {
       ]);
       setState(prev => ({ ...prev, progress: 'Applying formatting rules and creating structured document...' }));
       
-      // Generate structured JSON from text with formatting rules applied
+      // JSON AS MASTER: Generate structured JSON from text with formatting rules applied
       const rawDocumentJson = textToJson(extractedText);
       
       // Enforce JSON formatting rules (bold only, H1-H3, single font, "-" bullets)
-      const enforcedDocumentJson = enforceFormattingRules(rawDocumentJson);
+      const documentJson = enforceFormattingRules(rawDocumentJson);
       
-      // Ensure bidirectional sync and consistency
-      const { json: documentJson, text: consistentText } = syncJsonAndText(enforcedDocumentJson, extractedText);
+      // Generate formatted text from JSON (JSON is now the master)
+      const consistentText = generateFormattedText(documentJson);
       
       // Validate document structure (not a text blob)
       const isWellStructured = isWellStructuredDocument(documentJson);
