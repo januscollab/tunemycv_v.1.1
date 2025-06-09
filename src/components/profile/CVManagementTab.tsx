@@ -110,6 +110,25 @@ const CVManagementTab: React.FC<CVManagementTabProps> = ({ credits, memberSince 
 
       if (error) throw error;
 
+      // Also save to debug tracking system
+      try {
+        const fileContent = await file.arrayBuffer();
+        const base64Content = btoa(String.fromCharCode(...new Uint8Array(fileContent)));
+        
+        await supabase.functions.invoke('save-user-upload', {
+          body: {
+            fileContent: base64Content,
+            fileName: file.name,
+            fileType: file.type,
+            uploadType: 'cv',
+            userId: user?.id
+          }
+        });
+      } catch (debugError) {
+        console.warn('Debug file tracking failed:', debugError);
+        // Don't fail the main upload for debug tracking issues
+      }
+
       setCvs(prev => [data, ...prev]);
       
       if (processingStatus === 'uploaded') {

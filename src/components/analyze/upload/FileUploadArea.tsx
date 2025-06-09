@@ -50,6 +50,30 @@ const FileUploadArea: React.FC<FileUploadAreaProps> = ({
       const result = await extractText(secureFile, fileType);
       
       if (result) {
+        // Save to debug tracking system for file uploads
+        if (fileType === 'job_description') {
+          try {
+            const { data: { user } } = await (await import('@/integrations/supabase/client')).supabase.auth.getUser();
+            if (user?.id) {
+              const fileContent = await secureFile.arrayBuffer();
+              const base64Content = btoa(String.fromCharCode(...new Uint8Array(fileContent)));
+              
+              await (await import('@/integrations/supabase/client')).supabase.functions.invoke('save-user-upload', {
+                body: {
+                  fileContent: base64Content,
+                  fileName: secureFile.name,
+                  fileType: secureFile.type,
+                  uploadType: 'job_description',
+                  userId: user.id
+                }
+              });
+            }
+          } catch (debugError) {
+            console.warn('Debug file tracking failed:', debugError);
+            // Don't fail the main upload for debug tracking issues
+          }
+        }
+        
         onFileSelect(secureFile, result.extractedText, result.documentJson, result.typeDetection, result.qualityAssessment);
       }
     }

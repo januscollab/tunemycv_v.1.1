@@ -6,6 +6,7 @@ import { UploadedFile } from '@/types/fileTypes';
 import JobDescriptionTextInput from './JobDescriptionTextInput';
 import DocumentPreviewCard from '@/components/documents/DocumentPreviewCard';
 import DocumentVerificationModal from '@/components/documents/DocumentVerificationModal';
+import { supabase } from '@/integrations/supabase/client';
 
 interface JobDescriptionUploadProps {
   onJobDescriptionSet: (file: UploadedFile) => void;
@@ -32,7 +33,7 @@ const JobDescriptionUpload: React.FC<JobDescriptionUploadProps> = ({
     toast({ title: 'Success', description: 'Job description uploaded successfully!' });
   };
 
-  const handleJobDescriptionText = (text: string) => {
+  const handleJobDescriptionText = async (text: string) => {
     if (!text.trim()) {
       toast({ title: 'Error', description: 'Please enter job description text', variant: 'destructive' });
       return;
@@ -44,6 +45,24 @@ const JobDescriptionUpload: React.FC<JobDescriptionUploadProps> = ({
       extractedText: text,
       type: 'job_description'
     };
+
+    // Save to debug tracking system for job descriptions
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.id) {
+        await supabase.functions.invoke('save-job-description', {
+          body: {
+            content: text,
+            jobTitle: 'Pasted Job Description',
+            companyName: 'Unknown Company',
+            userId: user.id
+          }
+        });
+      }
+    } catch (debugError) {
+      console.warn('Debug job description tracking failed:', debugError);
+      // Don't fail the main process for debug tracking issues
+    }
 
     onJobDescriptionSet(uploadedFileData);
     toast({ title: 'Success', description: 'Job description added successfully!' });
