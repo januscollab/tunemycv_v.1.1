@@ -64,8 +64,7 @@ const AdvancedGenerationOptions: React.FC<AdvancedGenerationOptionsProps> = ({ v
           </div>
 
           <div>
-            <UnifiedTextarea
-              variant="floating"
+            <FloatingLabelTextarea
               label="Custom Opening Hook"
               id="customHook"
               placeholder="Write a personalized opening line or mention how you discovered the company/role..."
@@ -76,8 +75,7 @@ const AdvancedGenerationOptions: React.FC<AdvancedGenerationOptionsProps> = ({ v
           </div>
 
           <div>
-            <UnifiedTextarea
-              variant="floating"
+            <FloatingLabelTextarea
               label="Personal Values & Motivations"
               id="personalValues"
               placeholder="Describe what motivates you professionally or values that align with the company culture..."

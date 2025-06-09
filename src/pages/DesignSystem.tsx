@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { UnifiedInput } from '@/components/ui/unified-input';
 import { FloatingLabelInput } from '@/components/common/FloatingLabelInput';
 import { FloatingLabelTextarea } from '@/components/common/FloatingLabelTextarea';
 import { QuickActions } from '@/components/common/QuickActions';
@@ -94,7 +93,7 @@ const DesignSystem = () => {
     },
     { 
       name: 'Unified Input', 
-      component: <UnifiedInput placeholder="Unified input system" variant="floating" label="Unified label" />, 
+      component: <FloatingLabelInput placeholder="Unified input system" label="Unified label" />, 
       usage: '12 usages',
       description: 'Next-generation unified input system with all variants',
       status: 'future',

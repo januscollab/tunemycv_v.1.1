@@ -3,7 +3,7 @@
  */
 
 /**
- * Generates a standardized filename using the format: {user_id}_{filename}_{timestamp}
+ * Generates a standardized filename using the format: {user_id}-{filename}-{timestamp}
  * @param userId - The user's ID
  * @param originalFilename - The original filename including extension
  * @returns Formatted filename string
@@ -21,9 +21,9 @@ export const generateStandardFileName = (userId: string, originalFilename: strin
   const timestamp = `${day}${month}${year}-${hours}${minutes}${seconds}`;
   
   // Clean the original filename to remove any problematic characters
-  const cleanFilename = originalFilename.replace(/[^a-zA-Z0-9.-]/g, '_');
+  const cleanFilename = originalFilename.replace(/[^a-zA-Z0-9.-]/g, '-');
   
-  return `${userId}_${cleanFilename}_${timestamp}`;
+  return `${userId}-${cleanFilename}-${timestamp}`;
 };
 
 /**
@@ -48,14 +48,23 @@ export const generateDebugFileName = (userId: string, originalFilename: string, 
  * @returns Object containing userId, originalName, and timestamp
  */
 export const parseStandardFileName = (filename: string): { userId: string; originalName: string; timestamp: string } | null => {
-  const parts = filename.split('_');
-  if (parts.length < 3) {
-    return null;
+  // Try new format first (with hyphens)
+  let parts = filename.split('-');
+  if (parts.length >= 3) {
+    const userId = parts[0];
+    const timestamp = parts[parts.length - 1];
+    const originalName = parts.slice(1, -1).join('-');
+    return { userId, originalName, timestamp };
   }
   
-  const userId = parts[0];
-  const timestamp = parts[parts.length - 1];
-  const originalName = parts.slice(1, -1).join('_');
+  // Fallback to old format (with underscores) for backward compatibility
+  parts = filename.split('_');
+  if (parts.length >= 3) {
+    const userId = parts[0];
+    const timestamp = parts[parts.length - 1];
+    const originalName = parts.slice(1, -1).join('_');
+    return { userId, originalName, timestamp };
+  }
   
-  return { userId, originalName, timestamp };
+  return null;
 };

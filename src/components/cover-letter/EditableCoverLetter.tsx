@@ -82,7 +82,6 @@ const EditableCoverLetter: React.FC<EditableCoverLetterProps> = ({ content, onSa
       <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
         <FloatingLabelTextarea
           label="Edit Cover Letter"
-          ref={textareaRef}
           value={editedContent}
           onChange={handleContentChange}
           className="w-full font-sans text-caption leading-relaxed bg-transparent"

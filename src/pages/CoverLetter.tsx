@@ -12,7 +12,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import EditTitleDialog from '@/components/ui/edit-title-dialog';
 import { Label } from '@/components/ui/label';
-import { UnifiedInput, UnifiedTextarea } from '@/components/ui/unified-input';
+import { FloatingLabelInput } from '@/components/common/FloatingLabelInput';
+import { FloatingLabelTextarea } from '@/components/common/FloatingLabelTextarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -489,8 +490,7 @@ const AuthenticatedCoverLetter = () => {
                       <CardContent className="space-y-4 pt-0">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <UnifiedInput
-                              variant="floating"
+                            <FloatingLabelInput
                               label="Job Title *"
                               id="jobTitle"
                               placeholder="e.g., Marketing Manager"
@@ -500,8 +500,7 @@ const AuthenticatedCoverLetter = () => {
                             />
                           </div>
                           <div>
-                            <UnifiedInput
-                              variant="floating"
+                            <FloatingLabelInput
                               label="Company Name *"
                               id="companyName"
                               placeholder="e.g., TechCorp"
@@ -513,8 +512,7 @@ const AuthenticatedCoverLetter = () => {
                         </div>
 
                         <div>
-                          <UnifiedTextarea
-                            variant="floating"
+                          <FloatingLabelTextarea
                             label="Job Description *"
                             id="jobDescription"
                             placeholder="Paste the complete job description here for the most tailored results..."

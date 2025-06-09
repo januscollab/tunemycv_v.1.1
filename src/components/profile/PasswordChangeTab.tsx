@@ -65,15 +65,15 @@ const PasswordChangeTab = () => {
           <div className="space-y-2">
             <Label htmlFor="currentPassword">Current Password</Label>
             <div className="relative">
-              <UnifiedInput
+              <FloatingLabelInput
                 id="currentPassword"
+                label="Current Password"
                 type={showCurrentPassword ? 'text' : 'password'}
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 required
                 className="pr-10"
                 maxLength={128}
-                secure={true}
               />
               <button
                 type="button"
@@ -88,8 +88,9 @@ const PasswordChangeTab = () => {
           <div className="space-y-2">
             <Label htmlFor="newPassword">New Password</Label>
             <div className="relative">
-              <UnifiedInput
+              <FloatingLabelInput
                 id="newPassword"
+                label="New Password"
                 type={showNewPassword ? 'text' : 'password'}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
@@ -97,7 +98,6 @@ const PasswordChangeTab = () => {
                 minLength={6}
                 className="pr-10"
                 maxLength={128}
-                secure={true}
               />
               <button
                 type="button"
@@ -112,8 +112,9 @@ const PasswordChangeTab = () => {
           <div className="space-y-2">
             <Label htmlFor="confirmPassword">Confirm New Password</Label>
             <div className="relative">
-              <UnifiedInput
+              <FloatingLabelInput
                 id="confirmPassword"
+                label="Confirm New Password"
                 type={showConfirmPassword ? 'text' : 'password'}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -121,7 +122,6 @@ const PasswordChangeTab = () => {
                 minLength={6}
                 className="pr-10"
                 maxLength={128}
-                secure={true}
               />
               <button
                 type="button"
