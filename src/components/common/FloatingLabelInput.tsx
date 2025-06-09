@@ -52,15 +52,15 @@ export const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
          )}
          {...props}
        />
-       <label
-         onClick={handleLabelClick}
-         className={cn(
-           "absolute left-4 cursor-text transition-all duration-200 pointer-events-none",
-           "text-blueberry/60 dark:text-apple-core/60",
-           isFloating
-             ? "top-1.5 text-micro font-medium text-zapier-orange"
-             : "top-1/2 -translate-y-1/2 text-caption"
-        )}
+        <label
+          onClick={handleLabelClick}
+          className={cn(
+            "absolute left-4 cursor-text transition-all duration-200 pointer-events-none",
+            "text-blueberry/60 dark:text-apple-core/60",
+            isFloating
+              ? "top-1.5 text-tiny font-medium text-zapier-orange"
+              : "top-1/2 -translate-y-1/2 text-caption"
+         )}
       >
         {label}
         {props.required && <span className="text-zapier-orange ml-1">*</span>}

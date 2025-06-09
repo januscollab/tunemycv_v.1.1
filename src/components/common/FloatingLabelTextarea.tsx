@@ -61,14 +61,14 @@ export const FloatingLabelTextarea: React.FC<FloatingLabelTextareaProps> = ({
          )}
          {...props}
        />
-       <label
-         onClick={handleLabelClick}
-         className={cn(
-           "absolute left-4 cursor-text transition-all duration-200 pointer-events-none",
-           "text-blueberry/60 dark:text-apple-core/60",
-           isFloating
-             ? "top-1.5 text-micro font-medium text-zapier-orange"
-             : "top-6 text-caption"
+        <label
+          onClick={handleLabelClick}
+          className={cn(
+            "absolute left-4 cursor-text transition-all duration-200 pointer-events-none",
+            "text-blueberry/60 dark:text-apple-core/60",
+            isFloating
+              ? "top-1.5 text-tiny font-medium text-zapier-orange"
+              : "top-4 text-caption"
         )}
       >
         {label}

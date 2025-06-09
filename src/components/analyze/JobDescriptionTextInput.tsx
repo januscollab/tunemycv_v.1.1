@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { Check, Clock } from 'lucide-react';
-import { UnifiedTextarea } from '@/components/ui/unified-input';
+import { FloatingLabelTextarea } from '@/components/common/FloatingLabelTextarea';
 import { sanitizeText } from '@/utils/inputSanitization';
 
 interface JobDescriptionTextInputProps {
@@ -41,8 +41,12 @@ const JobDescriptionTextInput: React.FC<JobDescriptionTextInputProps> = ({ onSub
     return () => clearTimeout(timeoutId);
   }, [text, autoSave, disabled]);
 
-  const handleSecureChange = (value: string) => {
-    setText(value);
+  const handleSecureChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const rawValue = e.target.value;
+    const sanitizedValue = sanitizeText(rawValue);
+    const limitedValue = sanitizedValue.slice(0, 10000);
+    
+    setText(limitedValue);
     setLastSaved(null); // Clear saved status when text changes
   };
 
@@ -70,16 +74,14 @@ const JobDescriptionTextInput: React.FC<JobDescriptionTextInputProps> = ({ onSub
 
   return (
     <div>
-      <UnifiedTextarea
-        variant="floating"
+      <FloatingLabelTextarea
         label="Job Description"
         value={text}
-        onSecureChange={handleSecureChange}
+        onChange={handleSecureChange}
         placeholder="Paste the job description here... (auto-saves after 2 seconds, minimum 50 characters)"
         rows={8}
         maxLength={10000}
         disabled={disabled}
-        secure
         className="w-full"
       />
       <div className="flex justify-between items-center mt-2">
