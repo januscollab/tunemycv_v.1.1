@@ -48,7 +48,7 @@ export const useUploadOrchestrator = () => {
       // Step 2: Store raw original file (BEFORE any processing)
       if (options.shouldStore !== false) {
         setProgress('Storing original file...');
-        await storage.storeFile(file, { uploadType: options.fileType });
+        await storage.storeFile(validationResult.secureFile, { uploadType: options.fileType });
         // Continue even if storage fails - it's for debugging only
       }
 
