@@ -34,7 +34,7 @@ const applyFormattingRules = (text: string): string => {
     .trim();
 };
 
-// Convert plain text to structured JSON with formatting rules applied
+// Convert plain text to structured JSON with better text blob handling
 export const textToJson = (text: string): DocumentJson => {
   const cleanedText = applyFormattingRules(text);
   const lines = cleanedText.split('\n');
@@ -44,15 +44,15 @@ export const textToJson = (text: string): DocumentJson => {
   
   const flushParagraph = () => {
     if (currentParagraph.length > 0) {
-      const content = currentParagraph.join('\n').trim();
+      const content = currentParagraph.join(' ').trim();
       if (content) {
-        // Split very long paragraphs into smaller chunks for better readability
-        if (content.length > 500) {
-          const sentences = content.split(/[.!?]+\s+/);
+        // Split very long paragraphs into readable chunks
+        if (content.length > 800) {
+          const sentences = content.split(/(?<=[.!?])\s+/);
           let currentChunk = '';
           
           for (const sentence of sentences) {
-            if (currentChunk.length + sentence.length > 400 && currentChunk) {
+            if (currentChunk.length + sentence.length > 600 && currentChunk) {
               sections.push({
                 type: 'paragraph',
                 content: applyFormattingRules(currentChunk.trim()),
@@ -60,7 +60,7 @@ export const textToJson = (text: string): DocumentJson => {
               });
               currentChunk = sentence;
             } else {
-              currentChunk += (currentChunk ? '. ' : '') + sentence;
+              currentChunk += (currentChunk ? ' ' : '') + sentence;
             }
           }
           

@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import './RichTextEditor.css';
 import { WandSparkles, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -44,37 +45,33 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const [selectionInfo, setSelectionInfo] = useState<AIContext | null>(null);
   const { toast } = useToast();
 
-  // Convert JSON to HTML for Quill display
+  // Convert JSON to stable HTML for Quill display
   const jsonToHtml = useCallback((json: DocumentJson): string => {
-    const textContent = generateFormattedText(json);
-    return textContent
-      .split('\n')
-      .map(line => {
-        const trimmed = line.trim();
-        if (!trimmed) return '<p><br></p>';
-        
-        // Handle headings
-        if (trimmed.match(/^#{3}\s+/)) {
-          return `<h3>${trimmed.replace(/^#{3}\s+/, '')}</h3>`;
-        }
-        if (trimmed.match(/^#{2}\s+/)) {
-          return `<h2>${trimmed.replace(/^#{2}\s+/, '')}</h2>`;
-        }
-        if (trimmed.match(/^#{1}\s+/)) {
-          return `<h1>${trimmed.replace(/^#{1}\s+/, '')}</h1>`;
-        }
-        
-        // Handle lists
-        if (trimmed.match(/^-\s+/)) {
-          return `<li>${trimmed.replace(/^-\s+/, '')}</li>`;
-        }
-        
-        // Regular paragraphs
-        return `<p>${trimmed}</p>`;
-      })
-      .join('')
-      .replace(/(<li>.*<\/li>)/g, '<ul>$1</ul>')
-      .replace(/<\/ul><ul>/g, '');
+    const htmlParts: string[] = [];
+    
+    for (const section of json.sections) {
+      switch (section.type) {
+        case 'heading':
+          const level = Math.min(section.level || 1, 3);
+          htmlParts.push(`<h${level}>${section.content || ''}</h${level}>`);
+          break;
+          
+        case 'paragraph':
+          if (section.content) {
+            htmlParts.push(`<p>${section.content}</p>`);
+          }
+          break;
+          
+        case 'list':
+          if (section.items && section.items.length > 0) {
+            const listItems = section.items.map(item => `<li>${item}</li>`).join('');
+            htmlParts.push(`<ul>${listItems}</ul>`);
+          }
+          break;
+      }
+    }
+    
+    return htmlParts.length > 0 ? htmlParts.join('') : '<p><br></p>';
   }, []);
 
   // Convert HTML back to JSON
@@ -101,16 +98,20 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     setContent(htmlContent);
   }, [documentJson, jsonToHtml]);
 
-  // Content change handler with improved debouncing
+  // Content change handler with stable conversion
   const handleContentChange = useCallback((value: string) => {
     setContent(value);
     
-    // Only trigger onChange if content actually changed
-    if (value !== content) {
-      const newJson = htmlToJson(value);
-      const newText = generateFormattedText(newJson);
-      onContentChange(newJson, newText);
-    }
+    // Debounced conversion to prevent loops
+    const timeoutId = setTimeout(() => {
+      if (value !== content) {
+        const newJson = htmlToJson(value);
+        const newText = generateFormattedText(newJson);
+        onContentChange(newJson, newText);
+      }
+    }, 100);
+    
+    return () => clearTimeout(timeoutId);
   }, [content, htmlToJson, onContentChange]);
 
   // Handle text selection for AI features
@@ -156,7 +157,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     });
   }, [originalJson, jsonToHtml, onContentChange, toast]);
 
-  // Quill configuration
+  // Quill configuration with custom toolbar
   const modules = {
     toolbar: {
       container: [
@@ -170,8 +171,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       matchVisual: false
     },
     history: {
-      delay: 1000,
-      maxStack: 100,
+      delay: 500,
+      maxStack: 50,
       userOnly: true
     }
   };
@@ -239,11 +240,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         placeholder={placeholder}
         modules={modules}
         formats={formats}
-        className="bg-background text-foreground"
-        style={{
-          backgroundColor: 'transparent',
-          color: 'inherit'
-        }}
+        className="rich-text-editor bg-background text-foreground border border-border rounded-md"
       />
 
       {/* Selected Text Info */}

@@ -48,12 +48,12 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
   
   const quality = assessDocumentQuality(editedText, fileName, documentType);
 
-  // Handle rich text editor content changes with better debouncing
+  // Handle rich text editor content changes with improved debouncing
   const handleContentChange = useCallback((newJson: DocumentJson, newText: string) => {
     setDocumentJson(newJson);
     setEditedText(newText);
     
-    // Auto-save logic with improved debouncing
+    // Auto-save logic without toast notifications
     if (newText !== extractedText && newText.trim().length > 0) {
       setIsAutoSaving(true);
       
@@ -62,7 +62,7 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
         onSave(newText);
         setLastSaved(new Date());
         setIsAutoSaving(false);
-      }, 2000); // Increased debounce time
+      }, 2000);
       
       return () => clearTimeout(timeoutId);
     }
