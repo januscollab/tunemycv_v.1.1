@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.8";
+import { generateDebugFileName, generateStandardFileName } from "./fileNaming.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -452,13 +453,10 @@ async function saveFilesToStorage(
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     );
 
-    const timestamp = new Date().getTime();
-    const baseFileName = `${userId}_${timestamp}_${originalFileName.replace(/\.[^/.]+$/, "")}`;
-    
     const results: { zipUrl?: string; textUrl?: string } = {};
     
-    // Save ZIP file
-    const zipFileName = `${baseFileName}_adobe-response.zip`;
+    // Save ZIP file using standardized naming
+    const zipFileName = generateDebugFileName(userId, originalFileName, 'zip');
     const { error: zipError } = await supabase.storage
       .from('adobe-debug-files')
       .upload(zipFileName, zipBuffer, {
@@ -483,8 +481,8 @@ async function saveFilesToStorage(
       results.zipUrl = zipUrlData.publicUrl;
     }
     
-    // Save extracted text
-    const textFileName = `${baseFileName}_extracted.txt`;
+    // Save extracted text using standardized naming
+    const textFileName = generateDebugFileName(userId, originalFileName, 'text');
     const textBuffer = new TextEncoder().encode(extractedText);
     const { error: textError } = await supabase.storage
       .from('adobe-debug-files')

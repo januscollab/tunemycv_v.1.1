@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.8";
+import { generateDebugFileName, generateStandardFileName } from "./fileNaming.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -457,9 +458,8 @@ async function saveZipToStorage(
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     );
 
-    const timestamp = new Date().getTime();
-    const baseFileName = `${userId}_${timestamp}_${originalFileName.replace(/\.[^/.]+$/, "")}`;
-    const zipFileName = `${baseFileName}_${status}.zip`;
+    // Use standardized file naming for ZIP files
+    const zipFileName = generateDebugFileName(userId, originalFileName, 'zip');
     
     // Save ZIP file
     const { error: zipError } = await supabase.storage
@@ -506,9 +506,8 @@ async function saveTextToStorage(
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     );
 
-    const timestamp = new Date().getTime();
-    const baseFileName = `${userId}_${timestamp}_${originalFileName.replace(/\.[^/.]+$/, "")}`;
-    const textFileName = `${baseFileName}_extracted.txt`;
+    // Use standardized file naming for text files
+    const textFileName = generateDebugFileName(userId, originalFileName, 'text');
     const textBuffer = new TextEncoder().encode(extractedText);
     
     // Save text file
