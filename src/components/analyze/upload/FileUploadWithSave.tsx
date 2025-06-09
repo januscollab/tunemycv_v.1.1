@@ -64,6 +64,27 @@ const FileUploadWithSave: React.FC<FileUploadWithSaveProps> = ({
       const result = await extractText(secureFile, 'cv');
       
       if (result) {
+        // Save to debug tracking system for CV uploads
+        if (user?.id) {
+          try {
+            const fileContent = await secureFile.arrayBuffer();
+            const base64Content = btoa(String.fromCharCode(...new Uint8Array(fileContent)));
+            
+            await (await import('@/integrations/supabase/client')).supabase.functions.invoke('save-user-upload', {
+              body: {
+                fileContent: base64Content,
+                fileName: secureFile.name,
+                fileType: secureFile.type,
+                uploadType: 'cv',
+                userId: user.id
+              }
+            });
+          } catch (debugError) {
+            console.warn('Debug CV tracking failed:', debugError);
+            // Don't fail the main upload for debug tracking issues
+          }
+        }
+        
         onFileSelect(secureFile, result.extractedText, shouldSave);
         setShouldSave(false);
         setRetryCount(0);
