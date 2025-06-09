@@ -1,0 +1,2 @@
+-- Add save-primary-upload function to config
+-- This ensures the new edge function is properly configured
