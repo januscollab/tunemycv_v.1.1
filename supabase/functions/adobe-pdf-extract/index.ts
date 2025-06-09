@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.8";
+import { generateDebugFileName, generateStandardFileName } from "./fileNaming.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -662,24 +663,12 @@ async function saveZipToStorage(
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     );
 
-    // Format timestamp as DDMMYY-HHMMSS
-    const now = new Date();
-    const day = String(now.getDate()).padStart(2, '0');
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const year = String(now.getFullYear()).slice(-2); // Last 2 digits of year
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const seconds = String(now.getSeconds()).padStart(2, '0');
-    const timestamp = `${day}${month}${year}-${hours}${minutes}${seconds}`;
-    
-    const baseFileName = originalFileName.replace(/\.[^/.]+$/, "");
-    const userIdSuffix = userId ? ` ${userId}` : '';
-    
     // Detect file type and set appropriate extension
     const isDirectJson = isDirectJsonResponse(responseBuffer);
     const fileExtension = isDirectJson ? 'json' : 'zip';
     
-    const fileName = `${timestamp} ${baseFileName}${userIdSuffix}_${status}.${fileExtension}`;
+    // Use standardized file naming
+    const fileName = generateDebugFileName(userId || 'anonymous', originalFileName, fileExtension as 'zip' | 'json');
     
     // Save response file
     const { error: saveError } = await supabase.storage
@@ -726,20 +715,8 @@ async function saveTextToStorage(
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     );
 
-    // Format timestamp as DDMMYY-HHMMSS
-    const now = new Date();
-    const day = String(now.getDate()).padStart(2, '0');
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const year = String(now.getFullYear()).slice(-2); // Last 2 digits of year
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const seconds = String(now.getSeconds()).padStart(2, '0');
-    const timestamp = `${day}${month}${year}-${hours}${minutes}${seconds}`;
-    
-    const baseFileName = originalFileName.replace(/\.[^/.]+$/, "");
-    const userIdSuffix = userId ? ` ${userId}` : '';
-    
-    const textFileName = `${timestamp} ${baseFileName}${userIdSuffix}_extracted.txt`;
+    // Use standardized file naming for text files
+    const textFileName = generateDebugFileName(userId || 'anonymous', originalFileName, 'text');
     const textBuffer = new TextEncoder().encode(extractedText);
     
     // Save text file
