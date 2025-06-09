@@ -2,6 +2,7 @@
 
 ## UI/UX Improvements
 - [x] Analyze CV > Paste Job Description edit text area needs to be updated to the correct "Floating Label Textarea"
+- [ ] **CV Upload UX**: Remove "Type Confirmation Needed" tag for all CV uploads to streamline the upload process
 
 ## Adobe PDF Processing
 - [x] Fix Adobe ZIP extraction sequence (Download → Save ZIP → Unzip → Save Text)
@@ -46,6 +47,13 @@
 ## Code Cleanup
 - [x] **UnifiedInput Component Removal**: Deleted unified-input.tsx component after completing migration
 - [x] **Import Dependencies**: Updated all component imports to use FloatingLabelInput/FloatingLabelTextarea
+
+## PDF Text Formatting Enhancement ✅
+- [x] **Text Formatter Module**: Created dedicated formatting module with post-processing capabilities
+- [x] **Adobe PDF Extract Integration**: Added formatting step after text extraction without modifying core extraction logic
+- [x] **Adobe Background Process Integration**: Applied same formatting to background processing
+- [x] **Storage Enhancement**: Save both raw and formatted text versions for backward compatibility
+- [x] **Separation of Concerns**: Maintained procedural integrity by keeping formatting separate from extraction
 
 ## Future Enhancements
 - [ ] Add more comprehensive PDF validation

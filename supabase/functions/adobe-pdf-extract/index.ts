@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.8";
 import { generateDebugFileName, generateStandardFileName } from "./fileNaming.ts";
+import { formatExtractedText } from "../shared/adobe-text-formatter.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -467,20 +468,53 @@ async function extractTextWithAdobe(
         }
       }
 
-      // Step 3: Save extracted text file (non-blocking - don't fail extraction if this fails)
-      let textUrl: string | undefined;
+      // Step 3: Apply text formatting (post-processing)
+      let formattingResult;
       try {
-        const result = await saveTextToStorage(extractedText, fileName, userIdFromProfile);
-        textUrl = result.textUrl;
-        console.log(`Text file saved: ${textUrl ? 'success' : 'failed'}`);
+        formattingResult = await formatExtractedText(extractedText, fileName);
+        console.log(`Text formatting completed - Applied: ${formattingResult.formattingApplied}, Well-structured: ${formattingResult.isWellStructured}`);
       } catch (error) {
-        console.log('Non-critical: Failed to save extracted text to storage:', error.message);
+        console.log('Non-critical: Text formatting failed:', error.message);
+        // Create fallback result
+        formattingResult = {
+          rawText: extractedText,
+          formattedText: extractedText,
+          documentJson: { version: '1.0', sections: [] },
+          isWellStructured: false,
+          wordCount: extractedText.split(/\s+/).length,
+          formattingApplied: false
+        };
+      }
+
+      // Step 4: Save both raw and formatted text files (non-blocking - don't fail extraction if this fails)
+      let textUrl: string | undefined;
+      let formattedTextUrl: string | undefined;
+      try {
+        // Save raw text
+        const rawResult = await saveTextToStorage(formattingResult.rawText, fileName, userIdFromProfile, 'raw');
+        textUrl = rawResult.textUrl;
+        
+        // Save formatted text if different from raw
+        if (formattingResult.formattingApplied && formattingResult.formattedText !== formattingResult.rawText) {
+          const formattedResult = await saveTextToStorage(formattingResult.formattedText, fileName, userIdFromProfile, 'formatted');
+          formattedTextUrl = formattedResult.textUrl;
+        }
+        
+        console.log(`Text files saved - Raw: ${textUrl ? 'success' : 'failed'}, Formatted: ${formattedTextUrl ? 'success' : 'not needed'}`);
+      } catch (error) {
+        console.log('Non-critical: Failed to save text files to storage:', error.message);
         // Continue even if text file storage fails
       }
       
+      // Return the extracted text (use formatted version if available)
+      const finalText = formattingResult.formattingApplied ? formattingResult.formattedText : formattingResult.rawText;
       return { 
-        extractedText: extractedText.trim(),
-        debugUrl: zipUrl 
+        extractedText: finalText.trim(),
+        debugUrl: zipUrl,
+        textUrl: formattedTextUrl || textUrl,
+        rawTextUrl: textUrl,
+        formattingApplied: formattingResult.formattingApplied,
+        isWellStructured: formattingResult.isWellStructured
       };
       
     } else if (statusData.status === 'failed') {
@@ -707,7 +741,8 @@ async function saveZipToStorage(
 async function saveTextToStorage(
   extractedText: string, 
   originalFileName: string, 
-  userId?: string
+  userId?: string,
+  textType: 'raw' | 'formatted' = 'raw'
 ): Promise<{ textUrl?: string }> {
   try {
     const supabase = createClient(
@@ -715,8 +750,9 @@ async function saveTextToStorage(
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     );
 
-    // Use standardized file naming for text files
-    const textFileName = generateDebugFileName(userId || 'anonymous', originalFileName, 'text');
+    // Use standardized file naming for text files with type suffix
+    const baseFileName = generateDebugFileName(userId || 'anonymous', originalFileName, 'text');
+    const textFileName = textType === 'formatted' ? baseFileName.replace('.txt', '_formatted.txt') : baseFileName;
     const textBuffer = new TextEncoder().encode(extractedText);
     
     // Save text file
