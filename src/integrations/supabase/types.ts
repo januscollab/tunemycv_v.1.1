@@ -710,6 +710,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_id_sequence: {
+        Row: {
+          created_at: string
+          id: string
+          next_user_id: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          next_user_id?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          next_user_id?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null
@@ -859,6 +880,10 @@ export type Database = {
           target_user?: string
           action_details?: Json
         }
+        Returns: undefined
+      }
+      migrate_to_sequential_user_ids: {
+        Args: Record<PropertyKey, never>
         Returns: undefined
       }
       trigger_adobe_processing: {
