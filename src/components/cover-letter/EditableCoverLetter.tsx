@@ -1,7 +1,7 @@
 
-import React, { useState, useEffect, useRef } from 'react';
-import { RotateCcw } from 'lucide-react';
-import { FloatingLabelTextarea } from '@/components/common/FloatingLabelTextarea';
+import React, { useState, useEffect, useCallback } from 'react';
+import RichTextEditor from '@/components/common/RichTextEditor';
+import { textToJson, DocumentJson, generateFormattedText } from '@/utils/documentJsonUtils';
 import { useToast } from '@/hooks/use-toast';
 
 
@@ -11,85 +11,42 @@ interface EditableCoverLetterProps {
 }
 
 const EditableCoverLetter: React.FC<EditableCoverLetterProps> = ({ content, onSave }) => {
-  const [editedContent, setEditedContent] = useState(content);
+  const [documentJson, setDocumentJson] = useState<DocumentJson>(() => textToJson(content));
   const [originalContent] = useState(content);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { toast } = useToast();
 
-  // Auto-resize textarea based on content
-  const adjustTextareaHeight = () => {
-    if (textareaRef.current) {
-      // Reset height to auto to get accurate scrollHeight
-      textareaRef.current.style.height = 'auto';
-      
-      // Use requestAnimationFrame to ensure DOM has updated
-      requestAnimationFrame(() => {
-        if (textareaRef.current) {
-          const scrollHeight = textareaRef.current.scrollHeight;
-          const minHeight = 400; // Minimum height for cover letters
-          // Remove max height constraint to allow unlimited expansion
-          const newHeight = Math.max(minHeight, scrollHeight + 20); // Add small padding
-          textareaRef.current.style.height = `${newHeight}px`;
-        }
-      });
-    }
-  };
-
+  // Update document JSON when content prop changes
   useEffect(() => {
-    setEditedContent(content);
+    setDocumentJson(textToJson(content));
   }, [content]);
 
-  // Auto-resize textarea when content changes
-  useEffect(() => {
-    adjustTextareaHeight();
-  }, [editedContent]);
-
-  // Auto-resize on component mount and window resize
-  useEffect(() => {
-    adjustTextareaHeight();
-    const handleResize = () => adjustTextareaHeight();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  // Auto-save functionality with debounce
-  useEffect(() => {
-    if (editedContent !== content && editedContent.trim() !== '') {
+  // Handle rich text editor content changes
+  const handleContentChange = useCallback((newJson: DocumentJson, newText: string) => {
+    setDocumentJson(newJson);
+    
+    // Auto-save with debounce
+    if (newText !== content && newText.trim() !== '') {
       const timeoutId = setTimeout(() => {
-        onSave(editedContent);
+        onSave(newText);
       }, 2000); // Auto-save after 2 seconds of no typing
 
       return () => clearTimeout(timeoutId);
     }
-  }, [editedContent, content, onSave]);
-
-  const handleRevert = () => {
-    setEditedContent(originalContent);
-    toast({
-      title: 'Reverted to Original',
-      description: 'Your changes have been reverted to the original generated content.',
-    });
-  };
-
-  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setEditedContent(e.target.value);
-    // Immediately trigger resize for responsive height adjustment
-    adjustTextareaHeight();
-  };
+  }, [content, onSave]);
 
   return (
     <div className="space-y-6">
-      <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+      <div className="bg-muted/20 p-4 rounded-lg">
         <div className="mb-4">
-          <h3 className="text-caption font-medium text-blueberry dark:text-citrus">Edit Cover Letter</h3>
+          <h3 className="text-caption font-medium text-foreground">Edit Cover Letter</h3>
+          <p className="text-micro text-muted-foreground">Use formatting tools and AI assistance to enhance your cover letter</p>
         </div>
-        <FloatingLabelTextarea
-          label="Cover Letter Content"
-          value={editedContent}
-          onChange={handleContentChange}
-          className="w-full font-sans text-caption leading-relaxed bg-transparent"
-          style={{ minHeight: '400px' }}
+        <RichTextEditor
+          documentJson={documentJson}
+          onContentChange={handleContentChange}
+          className="min-h-[400px] bg-background"
           placeholder="Edit your cover letter content here..."
+          showAIFeatures={true}
         />
       </div>
     </div>

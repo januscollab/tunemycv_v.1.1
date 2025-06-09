@@ -10,7 +10,7 @@ import {
 } from '@/utils/documentJsonUtils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { FloatingLabelTextarea } from '@/components/common/FloatingLabelTextarea';
+import RichTextEditor from '@/components/common/RichTextEditor';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -48,52 +48,23 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
   
   const quality = assessDocumentQuality(editedText, fileName, documentType);
 
-  // Enhanced debounced autosave with bidirectional sync
-  const debouncedAutoSave = useCallback(
-    debounce(async (text: string) => {
-      if (text !== extractedText) {
-        setIsAutoSaving(true);
-        
-        // Use new sync functionality to ensure 100% consistency
-        const { json: syncedJson, text: syncedText } = updateDocumentContent(documentJson, editedText, text);
-        
-        // Update both JSON and text with synced versions
-        setDocumentJson(syncedJson);
-        setEditedText(syncedText);
-        
-        await new Promise(resolve => setTimeout(resolve, 300)); // Simulate save
-        onSave(syncedText); // Save the consistent text version
+  // Handle rich text editor content changes
+  const handleContentChange = useCallback((newJson: DocumentJson, newText: string) => {
+    setDocumentJson(newJson);
+    setEditedText(newText);
+    
+    // Auto-save logic
+    if (newText !== extractedText && newText.trim().length > 0) {
+      setIsAutoSaving(true);
+      
+      // Debounced save
+      setTimeout(() => {
+        onSave(newText);
         setLastSaved(new Date());
         setIsAutoSaving(false);
-      }
-    }, 2000),
-    [extractedText, onSave, documentJson, editedText]
-  );
-
-  // Enhanced bidirectional sync with formatting rules enforcement
-  useEffect(() => {
-    // Apply formatting rules and sync JSON/text
-    const { json: syncedJson, isConsistent } = syncJsonAndText(documentJson, editedText);
-    
-    // Only update if there's a meaningful change
-    if (!isConsistent) {
-      setDocumentJson(syncedJson);
+      }, 1000);
     }
-  }, [editedText]);
-
-  // Auto-save effect with enhanced validation
-  useEffect(() => {
-    if (editedText !== extractedText && editedText.trim().length > 0) {
-      debouncedAutoSave(editedText);
-    }
-  }, [editedText, debouncedAutoSave, extractedText]);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      debouncedAutoSave.cancel();
-    };
-  }, [debouncedAutoSave]);
+  }, [extractedText, onSave]);
   
   const handleSave = async () => {
     setIsSaving(true);
@@ -102,17 +73,6 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
     setIsSaving(false);
     onClose();
   };
-
-  // Simple debounce function
-  function debounce<T extends (...args: any[]) => void>(func: T, delay: number) {
-    let timeoutId: NodeJS.Timeout;
-    const debounced = (...args: Parameters<T>) => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => func(...args), delay);
-    };
-    debounced.cancel = () => clearTimeout(timeoutId);
-    return debounced;
-  }
 
   const getIssueIcon = (type: string) => {
     switch (type) {
@@ -264,15 +224,13 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
             </div>
             
             <div className="flex-1 p-4 pt-6">
-              <ScrollArea className="h-[calc(100vh-300px)] border rounded-md">
-                <FloatingLabelTextarea
-                  label="Document Content"
-                  value={editedText}
-                  onChange={(e) => setEditedText(e.target.value)}
-                  className="min-h-[calc(100vh-320px)] font-mono text-caption resize-none border-0 focus:border-0 focus:outline-none bg-background p-4"
-                  placeholder="Document text appears here..."
-                />
-              </ScrollArea>
+              <RichTextEditor
+                documentJson={documentJson}
+                onContentChange={handleContentChange}
+                className="h-[calc(100vh-300px)] border rounded-md"
+                placeholder="Document content appears here..."
+                showAIFeatures={true}
+              />
             </div>
           </div>
         </div>
