@@ -62,7 +62,7 @@ const FileUploadArea: React.FC<FileUploadAreaProps> = ({
                 body: {
                   fileContent: base64Content,
                   fileName: secureFile.name,
-                  fileType: secureFile.type,
+                  fileType: secureFile.type, // Now uses correct MIME type from secure file
                   uploadType: 'job_description',
                   userId: user.id
                 }

@@ -74,7 +74,7 @@ const FileUploadWithSave: React.FC<FileUploadWithSaveProps> = ({
               body: {
                 fileContent: base64Content,
                 fileName: secureFile.name,
-                fileType: secureFile.type,
+                fileType: secureFile.type, // Now uses correct MIME type from secure file
                 uploadType: 'cv',
                 userId: user.id
               }
