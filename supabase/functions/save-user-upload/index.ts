@@ -34,35 +34,69 @@ const handler = async (req: Request): Promise<Response> => {
   );
 
   try {
+    console.log('Step 1: Parsing request body...');
     const requestBody: SaveUploadRequest = await req.json();
     const { fileContent, fileName, fileType, uploadType, userId } = requestBody;
+    
+    console.log(`Step 2: Processing ${uploadType} upload for user ${userId}, file: ${fileName}, type: ${fileType}`);
 
     // Get user_id for file naming
-    const { data: profile } = await supabase
+    console.log('Step 3: Fetching user profile for naming...');
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('user_id')
       .eq('id', userId)
       .single();
 
+    if (profileError) {
+      console.error('Profile lookup failed:', profileError);
+      throw new Error(`Failed to lookup user profile: ${profileError.message}`);
+    }
+
     const userIdForNaming = profile?.user_id || 'unknown';
+    console.log(`Step 4: Using user_id for naming: ${userIdForNaming}`);
 
-    // Convert base64 to binary
-    const binaryData = Uint8Array.from(atob(fileContent), c => c.charCodeAt(0));
+    // Validate and convert base64 to binary
+    console.log('Step 5: Converting base64 to binary...');
+    if (!fileContent || fileContent.length === 0) {
+      throw new Error('File content is empty or invalid');
+    }
+    
+    try {
+      const binaryData = Uint8Array.from(atob(fileContent), c => c.charCodeAt(0));
+      console.log(`Step 6: Binary conversion successful - ${binaryData.byteLength} bytes`);
+      
+      // Validate file size
+      if (binaryData.byteLength === 0) {
+        throw new Error('Converted file is empty');
+      }
+      
+      if (binaryData.byteLength > 50 * 1024 * 1024) { // 50MB limit
+        throw new Error('File size exceeds 50MB limit');
+      }
 
-    // Generate standardized filename for user upload
-    const debugFileName = generateUserUploadFileName(userIdForNaming, fileName);
+      // Generate standardized filename for user upload
+      const debugFileName = generateUserUploadFileName(userIdForNaming, fileName);
+      console.log(`Step 7: Generated debug filename: ${debugFileName}`);
 
-    // Save to debug storage
-    const { error: storageError } = await supabase.storage
-      .from('adobe-debug-files')
-      .upload(debugFileName, binaryData, {
-        contentType: fileType,
-        upsert: true
-      });
+      // Save to debug storage
+      console.log('Step 8: Uploading to storage...');
+      const { data: storageData, error: storageError } = await supabase.storage
+        .from('adobe-debug-files')
+        .upload(debugFileName, binaryData, {
+          contentType: fileType,
+          upsert: true
+        });
 
-    if (!storageError) {
+      if (storageError) {
+        console.error('Storage upload failed:', storageError);
+        throw new Error(`Storage upload failed: ${storageError.message}`);
+      }
+
+      console.log('Step 9: Storage upload successful, inserting database record...');
+      
       // Track in database with uploaded-by-user state
-      await supabase.from('adobe_debug_files').insert({
+      const { error: dbError } = await supabase.from('adobe_debug_files').insert({
         user_id: userIdForNaming,
         file_name: debugFileName,
         original_filename: fileName,
@@ -72,16 +106,38 @@ const handler = async (req: Request): Promise<Response> => {
         state: 'uploaded-by-user',
         processing_stage: 'uploaded'
       });
-    }
 
-    return new Response(JSON.stringify({ 
-      success: true, 
-      fileName: debugFileName,
-      message: 'File saved successfully with debug tracking'
-    }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json', ...corsHeaders },
-    });
+      if (dbError) {
+        console.error('Database insert failed:', dbError);
+        
+        // Attempt to clean up storage file since DB insert failed
+        try {
+          await supabase.storage.from('adobe-debug-files').remove([debugFileName]);
+          console.log('Cleaned up storage file after database failure');
+        } catch (cleanupError) {
+          console.error('Failed to cleanup storage file:', cleanupError);
+        }
+        
+        throw new Error(`Database insert failed: ${dbError.message}`);
+      }
+
+      console.log('Step 10: Database record inserted successfully');
+      console.log(`Upload completed successfully: ${debugFileName} (${binaryData.byteLength} bytes)`);
+
+      return new Response(JSON.stringify({ 
+        success: true, 
+        fileName: debugFileName,
+        fileSize: binaryData.byteLength,
+        message: 'File saved successfully with debug tracking'
+      }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders },
+      });
+      
+    } catch (conversionError) {
+      console.error('Base64 conversion failed:', conversionError);
+      throw new Error(`Invalid base64 content: ${conversionError instanceof Error ? conversionError.message : 'Unknown conversion error'}`);
+    }
 
   } catch (error: any) {
     console.error('Save upload error:', error);
