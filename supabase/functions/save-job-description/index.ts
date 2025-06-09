@@ -71,7 +71,7 @@ const handler = async (req: Request): Promise<Response> => {
         user_id: userIdForNaming,
         file_name: debugFileName,
         original_filename: baseFileName,
-        file_type: 'text',
+        file_type: 'txt',
         file_size: textBuffer.byteLength,
         storage_path: debugFileName,
         state: 'uploaded-by-user',

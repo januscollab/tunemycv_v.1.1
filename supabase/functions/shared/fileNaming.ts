@@ -10,7 +10,7 @@ export type FileState =
   | 'formatted'
   | 'transformed';
 
-export type FileType = 'zip' | 'text' | 'json';
+export type FileType = 'zip' | 'txt' | 'json';
 
 /**
  * Generate timestamp in DDMMYY-HHMMSS format
