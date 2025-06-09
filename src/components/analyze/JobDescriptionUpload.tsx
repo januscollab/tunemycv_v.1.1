@@ -6,7 +6,7 @@ import { UploadedFile } from '@/types/fileTypes';
 import JobDescriptionTextInput from './JobDescriptionTextInput';
 import DocumentPreviewCard from '@/components/documents/DocumentPreviewCard';
 import DocumentVerificationModal from '@/components/documents/DocumentVerificationModal';
-import DocumentTypeConfirmationModal from '@/components/ui/document-type-confirmation-modal';
+import { supabase } from '@/integrations/supabase/client';
 
 interface JobDescriptionUploadProps {
   onJobDescriptionSet: (file: UploadedFile) => void;
@@ -20,60 +20,20 @@ const JobDescriptionUpload: React.FC<JobDescriptionUploadProps> = ({
   disabled = false
 }) => {
   const [showVerificationModal, setShowVerificationModal] = useState(false);
-  const [showTypeConfirmation, setShowTypeConfirmation] = useState(false);
-  const [pendingFileData, setPendingFileData] = useState<{
-    file: File;
-    extractedText: string;
-    typeDetection: any;
-    qualityAssessment: any;
-  } | null>(null);
   const { toast } = useToast();
 
-  const handleFileSelect = (file: File, extractedText: string, typeDetection: any, qualityAssessment: any) => {
-    // Check if document type confirmation is needed
-    if (typeDetection?.needsUserConfirmation) {
-      setPendingFileData({ file, extractedText, typeDetection, qualityAssessment });
-      setShowTypeConfirmation(true);
-      return;
-    }
-
-    // Proceed with upload if type is confirmed as job description or highly confident
-    if (typeDetection?.detectedType === 'job_description' || typeDetection?.jobDescriptionConfidence >= 70) {
-      const uploadedFileData: UploadedFile = {
-        file,
-        extractedText,
-        type: 'job_description'
-      };
-      onJobDescriptionSet(uploadedFileData);
-      toast({ title: 'Success', description: 'Job description uploaded successfully!' });
-    } else {
-      // Show confirmation for uncertain cases
-      setPendingFileData({ file, extractedText, typeDetection, qualityAssessment });
-      setShowTypeConfirmation(true);
-    }
+  const handleFileSelect = (file: File, extractedText: string, documentJson: any, typeDetection: any, qualityAssessment: any) => {
+    // Always proceed with upload - type detection warnings will be shown in the document preview
+    const uploadedFileData: UploadedFile = {
+      file,
+      extractedText,
+      type: 'job_description'
+    };
+    onJobDescriptionSet(uploadedFileData);
+    toast({ title: 'Success', description: 'Job description uploaded successfully!' });
   };
 
-  const handleTypeConfirmation = (confirmedType: 'cv' | 'job_description') => {
-    if (pendingFileData && confirmedType === 'job_description') {
-      const uploadedFileData: UploadedFile = {
-        file: pendingFileData.file,
-        extractedText: pendingFileData.extractedText,
-        type: 'job_description'
-      };
-      onJobDescriptionSet(uploadedFileData);
-      toast({ title: 'Success', description: 'Job description uploaded successfully!' });
-    } else if (confirmedType === 'cv') {
-      toast({ 
-        title: 'Wrong document type', 
-        description: 'Please upload a job description, not a CV/Resume.', 
-        variant: 'destructive' 
-      });
-    }
-    setShowTypeConfirmation(false);
-    setPendingFileData(null);
-  };
-
-  const handleJobDescriptionText = (text: string) => {
+  const handleJobDescriptionText = async (text: string) => {
     if (!text.trim()) {
       toast({ title: 'Error', description: 'Please enter job description text', variant: 'destructive' });
       return;
@@ -85,6 +45,24 @@ const JobDescriptionUpload: React.FC<JobDescriptionUploadProps> = ({
       extractedText: text,
       type: 'job_description'
     };
+
+    // Save to debug tracking system for job descriptions
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.id) {
+        await supabase.functions.invoke('save-job-description', {
+          body: {
+            content: text,
+            jobTitle: 'Pasted Job Description',
+            companyName: 'Unknown Company',
+            userId: user.id
+          }
+        });
+      }
+    } catch (debugError) {
+      console.warn('Debug job description tracking failed:', debugError);
+      // Don't fail the main process for debug tracking issues
+    }
 
     onJobDescriptionSet(uploadedFileData);
     toast({ title: 'Success', description: 'Job description added successfully!' });
@@ -149,23 +127,6 @@ const JobDescriptionUpload: React.FC<JobDescriptionUploadProps> = ({
       <div className="text-center text-blueberry/60 dark:text-apple-core/60">or</div>
       
       <JobDescriptionTextInput onSubmit={handleJobDescriptionText} disabled={disabled} />
-      
-      {/* Document Type Confirmation Modal */}
-      {pendingFileData && (
-        <DocumentTypeConfirmationModal
-          isOpen={showTypeConfirmation}
-          onClose={() => {
-            setShowTypeConfirmation(false);
-            setPendingFileData(null);
-          }}
-          fileName={pendingFileData.file.name}
-          detectedType={pendingFileData.typeDetection?.detectedType || 'unknown'}
-          confidence={pendingFileData.typeDetection?.confidence || 0}
-          cvConfidence={pendingFileData.typeDetection?.cvConfidence || 0}
-          jobDescriptionConfidence={pendingFileData.typeDetection?.jobDescriptionConfidence || 0}
-          onConfirm={handleTypeConfirmation}
-        />
-      )}
     </div>
   );
 };

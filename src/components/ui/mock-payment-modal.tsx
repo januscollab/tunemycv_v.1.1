@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, CreditCard, CheckCircle } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { UnifiedInput } from '@/components/ui/unified-input';
+import { FloatingLabelInput } from '@/components/common/FloatingLabelInput';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfileData } from '@/hooks/useProfileData';
@@ -176,41 +176,41 @@ export const MockPaymentModal: React.FC<MockPaymentModalProps> = ({
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="firstName">First Name</Label>
-                    <UnifiedInput
+                    <FloatingLabelInput
                       id="firstName"
+                      label="First Name"
                       placeholder="John"
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
                       required
                       maxLength={50}
-                      secure={true}
                     />
                   </div>
                   <div>
                     <Label htmlFor="lastName">Last Name</Label>
-                    <UnifiedInput
+                    <FloatingLabelInput
                       id="lastName"
+                      label="Last Name"
                       placeholder="Doe"
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
                       required
                       maxLength={50}
-                      secure={true}
                     />
                   </div>
                 </div>
 
                 <div>
                   <Label htmlFor="email">Email</Label>
-                  <UnifiedInput
+                  <FloatingLabelInput
                     id="email"
+                    label="Email"
                     type="email"
                     placeholder="your@email.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     maxLength={100}
-                    secure={true}
                   />
                 </div>
               </div>
@@ -219,37 +219,37 @@ export const MockPaymentModal: React.FC<MockPaymentModalProps> = ({
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="cardNumber">Card Number</Label>
-                  <UnifiedInput
+                  <FloatingLabelInput
                     id="cardNumber"
+                    label="Card Number"
                     placeholder="4242 4242 4242 4242"
                     value="4242 4242 4242 4242"
                     readOnly
                     className="bg-gray-50 dark:bg-gray-800"
-                    secure={false}
                   />
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="expiry">Expiry</Label>
-                    <UnifiedInput
+                    <FloatingLabelInput
                       id="expiry"
+                      label="Expiry"
                       placeholder="12/28"
                       value="12/28"
                       readOnly
                       className="bg-gray-50 dark:bg-gray-800"
-                      secure={false}
                     />
                   </div>
                   <div>
                     <Label htmlFor="cvc">CVC</Label>
-                    <UnifiedInput
+                    <FloatingLabelInput
                       id="cvc"
+                      label="CVC"
                       placeholder="123"
                       value="123"
                       readOnly
                       className="bg-gray-50 dark:bg-gray-800"
-                      secure={false}
                     />
                   </div>
                 </div>

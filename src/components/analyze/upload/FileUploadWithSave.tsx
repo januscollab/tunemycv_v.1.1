@@ -2,10 +2,9 @@
 import React, { useState } from 'react';
 import { DragDropZone } from '@/components/ui/drag-drop-zone';
 import ProcessingModal from '@/components/ui/processing-modal';
+import { BounceLoader } from '@/components/ui/progress-indicator';
 import { useAuth } from '@/contexts/AuthContext';
-import { useDocumentExtraction } from '@/hooks/useDocumentExtraction';
-import { useToast } from '@/hooks/use-toast';
-import { validateFileSecurely, createSecureFileObject } from '@/utils/secureFileValidation';
+import { useUploadOrchestrator } from '@/hooks/useUploadOrchestrator';
 
 interface FileUploadWithSaveProps {
   onFileSelect: (file: File, extractedText: string, shouldSave: boolean) => void;
@@ -15,6 +14,7 @@ interface FileUploadWithSaveProps {
   label: string;
   currentCVCount: number;
   maxCVCount: number;
+  selectedCVId?: string | null;
 }
 
 const FileUploadWithSave: React.FC<FileUploadWithSaveProps> = ({ 
@@ -24,39 +24,65 @@ const FileUploadWithSave: React.FC<FileUploadWithSaveProps> = ({
   maxSize, 
   label,
   currentCVCount,
-  maxCVCount
+  maxCVCount,
+  selectedCVId
 }) => {
   const [shouldSave, setShouldSave] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+  const [isButtonLoading, setIsButtonLoading] = useState(false);
+  const [hasBeenSaved, setHasBeenSaved] = useState(false);
   const { user } = useAuth();
-  const { toast } = useToast();
-  const { isExtracting, progress, extractText, cancel } = useDocumentExtraction();
+  const orchestrator = useUploadOrchestrator();
 
   const handleDrop = async (files: File[]) => {
     const file = files[0];
     if (file) {
-      // Perform security validation
-      const validation = validateFileSecurely(file, 'cv');
+      await attemptFileProcessing(file, 0);
+    }
+  };
+
+  const attemptFileProcessing = async (file: File, currentRetry: number) => {
+    try {
+      const result = await orchestrator.processFile(file, { 
+        fileType: 'cv',
+        shouldStore: shouldSave // Only store if user explicitly requested it
+      });
       
-      if (!validation.isValid) {
-        toast({
-          title: "File validation failed",
-          description: validation.errors[0],
-          variant: "destructive"
-        });
-        return;
+      if (result.success && result.file && result.extractedText) {
+        onFileSelect(result.file, result.extractedText, shouldSave);
+        if (shouldSave) {
+          setHasBeenSaved(true);
+        }
+        setRetryCount(0);
+      } else {
+        throw new Error(result.error || 'Processing failed');
       }
+    } catch (error) {
+      console.error('File processing error:', error);
       
-      // Create secure file object with sanitized name
-      const secureFile = createSecureFileObject(file, validation.sanitizedName!);
-      
-      // Extract text from the file
-      const result = await extractText(secureFile, 'cv');
-      
-      if (result) {
-        onFileSelect(secureFile, result.extractedText, shouldSave);
-        setShouldSave(false);
+      if (currentRetry < 2) {
+        const nextRetry = currentRetry + 1;
+        setRetryCount(nextRetry);
+        
+        // Retry after a brief delay
+        setTimeout(() => {
+          attemptFileProcessing(file, nextRetry);
+        }, 1000);
+      } else {
+        // Max retries reached
+        setRetryCount(0);
       }
     }
+  };
+
+  const handleSaveButtonClick = () => {
+    setIsButtonLoading(true);
+    
+    // Simulate save operation with minimum 1 second
+    setTimeout(() => {
+      setShouldSave(!shouldSave);
+      setIsButtonLoading(false);
+    }, 1000);
   };
 
   const isAtLimit = currentCVCount >= maxCVCount;
@@ -67,36 +93,47 @@ const FileUploadWithSave: React.FC<FileUploadWithSaveProps> = ({
         onDrop={handleDrop}
         accept={accept}
         maxSize={parseFloat(maxSize) * 1024 * 1024}
-        disabled={uploading || isExtracting}
-        placeholder={isExtracting ? progress : (uploading ? "Uploading..." : label)}
+        disabled={uploading || orchestrator.isProcessing}
+        placeholder={orchestrator.isProcessing ? orchestrator.progress : (uploading ? "Uploading..." : label)}
         description={`${accept} • Max ${maxSize}`}
         className="border-apple-core/30 dark:border-citrus/30"
       />
       
       <ProcessingModal
-        isOpen={isExtracting}
+        isOpen={orchestrator.isProcessing}
         title="Processing CV"
-        message={progress}
-        onCancel={cancel}
+        message={orchestrator.progress}
+        onCancel={orchestrator.cancel}
       />
 
-      {user && (
+      {user && !selectedCVId && !hasBeenSaved && (
         <div className="mt-4 space-y-2">
           <div className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              id="save-cv"
-              checked={shouldSave}
-              onChange={(e) => setShouldSave(e.target.checked)}
-              disabled={isAtLimit}
-              className="w-4 h-4 text-apricot bg-white border-apple-core/30 rounded focus:ring-apricot focus:ring-2"
-            />
-            <label 
-              htmlFor="save-cv" 
-              className={`text-caption ${isAtLimit ? 'text-gray-400' : 'text-blueberry dark:text-apple-core'}`}
-            >
-              Save this CV for future use
-            </label>
+            {isButtonLoading ? (
+              <div className="flex items-center space-x-2">
+                <BounceLoader size="sm" />
+                <span className="text-caption text-blueberry dark:text-apple-core">
+                  {shouldSave ? 'Removing from saved CVs...' : 'Adding to saved CVs...'}
+                </span>
+              </div>
+            ) : (
+              <>
+                <input
+                  type="checkbox"
+                  id="save-cv"
+                  checked={shouldSave}
+                  onChange={handleSaveButtonClick}
+                  disabled={isAtLimit}
+                  className="w-4 h-4 text-apricot bg-white border-apple-core/30 rounded focus:ring-apricot focus:ring-2"
+                />
+                <label 
+                  htmlFor="save-cv" 
+                  className={`text-caption ${isAtLimit ? 'text-gray-400' : 'text-blueberry dark:text-apple-core'}`}
+                >
+                  Save this CV for future use
+                </label>
+              </>
+            )}
           </div>
           
           {isAtLimit && (

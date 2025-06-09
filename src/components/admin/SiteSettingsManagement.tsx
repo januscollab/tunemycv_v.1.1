@@ -3,7 +3,7 @@ import { Save, Mail, Settings, Calendar, TrendingUp, AlertTriangle, Shield, Chec
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { UnifiedInput } from '@/components/ui/unified-input';
+import { FloatingLabelInput } from '@/components/common/FloatingLabelInput';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Progress } from '@/components/ui/progress';
@@ -554,15 +554,15 @@ const SiteSettingsManagement: React.FC = () => {
                     <Label htmlFor="monthly_adobe_limit" className="text-caption font-medium text-blueberry dark:text-apple-core">
                       Monthly Limit
                     </Label>
-                    <UnifiedInput
+                    <FloatingLabelInput
                       id="monthly_adobe_limit"
+                      label="Monthly Limit"
                       type="number"
-                      value={formData.monthly_adobe_limit}
+                      value={formData.monthly_adobe_limit.toString()}
                       onChange={(e) => handleInputChange('monthly_adobe_limit', parseInt(e.target.value))}
                       placeholder="500"
                       min="1"
                       max="10000"
-                      secure={true}
                     />
                     <p className="text-micro text-blueberry/60 dark:text-apple-core/60 mt-1">
                       Maximum API calls per month
@@ -573,15 +573,15 @@ const SiteSettingsManagement: React.FC = () => {
                     <Label htmlFor="reset_day" className="text-caption font-medium text-blueberry dark:text-apple-core">
                       Reset Day
                     </Label>
-                    <UnifiedInput
+                    <FloatingLabelInput
                       id="reset_day"
+                      label="Reset Day"
                       type="number"
-                      value={formData.reset_day}
+                      value={formData.reset_day.toString()}
                       onChange={(e) => handleInputChange('reset_day', parseInt(e.target.value))}
                       placeholder="1"
                       min="1"
                       max="31"
-                      secure={true}
                     />
                     <p className="text-micro text-blueberry/60 dark:text-apple-core/60 mt-1">
                       Day of month to reset usage counter
@@ -598,13 +598,13 @@ const SiteSettingsManagement: React.FC = () => {
                     <Label htmlFor="client_id" className="text-caption font-medium text-blueberry dark:text-apple-core">
                       Client ID
                     </Label>
-                    <UnifiedInput
+                    <FloatingLabelInput
                       id="client_id"
+                      label="Client ID"
                       type="text"
                       value={adobeFormData.client_id}
                       onChange={(e) => handleAdobeInputChange('client_id', e.target.value)}
                       placeholder="Your Adobe Client ID"
-                      secure={true}
                     />
                   </div>
 
@@ -612,13 +612,13 @@ const SiteSettingsManagement: React.FC = () => {
                     <Label htmlFor="client_secret" className="text-caption font-medium text-blueberry dark:text-apple-core">
                       Client Secret
                     </Label>
-                    <UnifiedInput
+                    <FloatingLabelInput
                       id="client_secret"
+                      label="Client Secret"
                       type="password"
                       value={adobeFormData.client_secret}
                       onChange={(e) => handleAdobeInputChange('client_secret', e.target.value)}
                       placeholder={adobeCredentials ? "Enter new secret to update" : "Your Adobe Client Secret"}
-                      secure={true}
                     />
                     <p className="text-micro text-blueberry/60 dark:text-apple-core/60 mt-1">
                       {adobeCredentials ? "Leave blank to keep existing secret" : "This will be encrypted and stored securely"}
@@ -629,13 +629,13 @@ const SiteSettingsManagement: React.FC = () => {
                     <Label htmlFor="organization_id" className="text-caption font-medium text-blueberry dark:text-apple-core">
                       Organization ID
                     </Label>
-                    <UnifiedInput
+                    <FloatingLabelInput
                       id="organization_id"
+                      label="Organization ID"
                       type="text"
                       value={adobeFormData.organization_id}
                       onChange={(e) => handleAdobeInputChange('organization_id', e.target.value)}
                       placeholder="Your Adobe Organization ID"
-                      secure={true}
                     />
                   </div>
 
@@ -670,15 +670,15 @@ const SiteSettingsManagement: React.FC = () => {
               </Label>
               <div className="mt-1 relative">
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-blueberry/60 dark:text-apple-core/60" />
-                <UnifiedInput
+                <FloatingLabelInput
                   id="admin_email"
+                  label="Admin Email"
                   type="email"
                   value={formData.admin_email}
                   onChange={(e) => handleInputChange('admin_email', e.target.value)}
                   placeholder="admin@company.com"
                   className="pl-10"
                   maxLength={100}
-                  secure={true}
                 />
               </div>
               <p className="text-micro text-blueberry/60 dark:text-apple-core/60 mt-1">
@@ -692,15 +692,15 @@ const SiteSettingsManagement: React.FC = () => {
               </Label>
               <div className="mt-1 relative">
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-blueberry/60 dark:text-apple-core/60" />
-                <UnifiedInput
+                <FloatingLabelInput
                   id="support_email"
+                  label="Support Email"
                   type="email"
                   value={formData.support_email}
                   onChange={(e) => handleInputChange('support_email', e.target.value)}
                   placeholder="support@company.com"
                   className="pl-10"
                   maxLength={100}
-                  secure={true}
                 />
               </div>
               <p className="text-micro text-blueberry/60 dark:text-apple-core/60 mt-1">

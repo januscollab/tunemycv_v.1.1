@@ -252,7 +252,7 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
               documentType="cv"
               onOpenVerification={() => setShowVerificationModal(true)}
               onRemove={() => window.location.reload()}
-              onSaveToCVs={async () => {
+               onSaveToCVs={selectedCVId ? undefined : async () => {
                 if (user?.id && savedCVs.length < 5) {
                   try {
                     const { error: saveError } = await supabase
@@ -279,7 +279,7 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
                   toast({ title: 'Limit Reached', description: 'You can save up to 5 CVs. Please delete one first.', variant: 'destructive' });
                 }
               }}
-              canSaveToCVs={savedCVs.length < 5}
+              canSaveToCVs={!selectedCVId && savedCVs.length < 5}
             />
             
             <DocumentVerificationModal

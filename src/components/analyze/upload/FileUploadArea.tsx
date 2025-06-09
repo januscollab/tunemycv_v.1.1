@@ -1,13 +1,11 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { DragDropZone } from '@/components/ui/drag-drop-zone';
 import ProcessingModal from '@/components/ui/processing-modal';
-import { validateFileSecurely, createSecureFileObject } from '@/utils/secureFileValidation';
-import { useDocumentExtraction } from '@/hooks/useDocumentExtraction';
-import { useToast } from '@/hooks/use-toast';
+import { useUploadOrchestrator } from '@/hooks/useUploadOrchestrator';
 
 interface FileUploadAreaProps {
-  onFileSelect: (file: File, extractedText: string, typeDetection: any, qualityAssessment: any) => void;
+  onFileSelect: (file: File, extractedText: string, documentJson: any, typeDetection: any, qualityAssessment: any) => void;
   uploading: boolean;
   accept: string;
   maxSize: string;
@@ -23,34 +21,26 @@ const FileUploadArea: React.FC<FileUploadAreaProps> = ({
   label,
   fileType
 }) => {
-  const { toast } = useToast();
-  const { isExtracting, progress, extractText, cancel } = useDocumentExtraction();
+  const orchestrator = useUploadOrchestrator();
   const maxSizeBytes = parseFloat(maxSize) * 1024 * 1024; // Convert MB to bytes
 
   const handleDrop = async (files: File[]) => {
     if (files.length > 0) {
       const file = files[0];
       
-      // Perform security validation
-      const validation = validateFileSecurely(file, fileType);
+      const result = await orchestrator.processFile(file, { 
+        fileType,
+        shouldStore: fileType === 'job_description' // Only store job descriptions for now
+      });
       
-      if (!validation.isValid) {
-        toast({
-          title: "File validation failed",
-          description: validation.errors[0],
-          variant: "destructive"
-        });
-        return;
-      }
-      
-      // Create secure file object with sanitized name
-      const secureFile = createSecureFileObject(file, validation.sanitizedName!);
-      
-      // Extract text from the file with type detection
-      const result = await extractText(secureFile, fileType);
-      
-      if (result) {
-        onFileSelect(secureFile, result.extractedText, result.typeDetection, result.qualityAssessment);
+      if (result.success && result.file && result.extractedText) {
+        onFileSelect(
+          result.file, 
+          result.extractedText, 
+          result.documentJson!, 
+          result.typeDetection!, 
+          result.qualityAssessment!
+        );
       }
     }
   };
@@ -61,17 +51,17 @@ const FileUploadArea: React.FC<FileUploadAreaProps> = ({
         onDrop={handleDrop}
         accept={accept}
         maxSize={maxSizeBytes}
-        disabled={uploading || isExtracting}
-        placeholder={isExtracting ? progress : (uploading ? "Uploading..." : label)}
+        disabled={uploading || orchestrator.isProcessing}
+        placeholder={orchestrator.isProcessing ? orchestrator.progress : (uploading ? "Uploading..." : label)}
         description={`${accept} • Max ${maxSize}`}
         className="border-apple-core/30 dark:border-citrus/30"
       />
       
       <ProcessingModal
-        isOpen={isExtracting}
+        isOpen={orchestrator.isProcessing}
         title="Processing Document"
-        message={progress}
-        onCancel={cancel}
+        message={orchestrator.progress}
+        onCancel={orchestrator.cancel}
       />
     </>
   );

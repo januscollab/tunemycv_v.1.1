@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FileText, Trash2, Edit } from 'lucide-react';
+import { FileText, Trash2, Edit, Pencil } from 'lucide-react';
 import { DragDropZone } from '@/components/ui/drag-drop-zone';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -109,6 +109,25 @@ const CVManagementTab: React.FC<CVManagementTabProps> = ({ credits, memberSince 
         .single();
 
       if (error) throw error;
+
+      // Also save to debug tracking system
+      try {
+        const fileContent = await file.arrayBuffer();
+        const base64Content = btoa(String.fromCharCode(...new Uint8Array(fileContent)));
+        
+        await supabase.functions.invoke('save-user-upload', {
+          body: {
+            fileContent: base64Content,
+            fileName: file.name,
+            fileType: file.type,
+            uploadType: 'cv',
+            userId: user?.id
+          }
+        });
+      } catch (debugError) {
+        console.warn('Debug file tracking failed:', debugError);
+        // Don't fail the main upload for debug tracking issues
+      }
 
       setCvs(prev => [data, ...prev]);
       
@@ -226,52 +245,32 @@ const CVManagementTab: React.FC<CVManagementTabProps> = ({ credits, memberSince 
           {cvs.map((cv) => (
             <div key={cv.id} className="border border-apple-core/20 dark:border-citrus/20 rounded-lg p-4">
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <FileText className="h-8 w-8 text-apricot" />
-                  <div>
-                    <h3 className="font-medium text-slate-900 dark:text-citrus">{cv.file_name}</h3>
-                    <p className="text-caption text-slate-600 dark:text-apple-core/80">
-                      {formatFileSize(cv.file_size)} • {new Date(cv.created_at).toLocaleDateString()}
-                    </p>
-                    {cv.processing_status && cv.processing_status !== 'completed' && (
-                      <div className="flex items-center space-x-1 mt-1">
-                        {cv.processing_status === 'uploaded' && (
-                          <>
-                            <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
-                            <span className="text-xs text-yellow-600 dark:text-yellow-400">Queued for processing</span>
-                          </>
-                        )}
-                        {cv.processing_status === 'processing' && (
-                          <>
-                            <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                            <span className="text-xs text-blue-600 dark:text-blue-400">Processing with Adobe API</span>
-                          </>
-                        )}
-                        {cv.processing_status === 'failed' && (
-                          <>
-                            <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                            <span className="text-xs text-red-600 dark:text-red-400">Processing failed - 
-                              <button 
-                                onClick={() => retryProcessing(cv.id)}
-                                className="ml-1 text-blue-600 hover:text-blue-800 underline"
-                              >
-                                retry
-                              </button>
-                            </span>
-                          </>
-                        )}
+                  <div className="flex items-center space-x-3">
+                    <FileText className="h-8 w-8 text-apricot" />
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2">
+                        <h3 className="font-medium text-slate-900 dark:text-citrus">{cv.file_name}</h3>
+                        <button
+                          onClick={() => setEditingCV(cv)}
+                          className="p-1 text-blueberry/60 hover:text-apricot dark:text-apple-core/60 dark:hover:text-citrus transition-colors"
+                          title="Edit CV name"
+                        >
+                          <Pencil className="h-3 w-3" />
+                        </button>
                       </div>
-                    )}
+                      <p className="text-caption text-slate-600 dark:text-apple-core/80">
+                        {formatFileSize(cv.file_size)} • {new Date(cv.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => setEditingCV(cv)}
-                    className="p-2 text-zapier-orange hover:bg-zapier-orange/10 rounded-md transition-colors"
-                    title="Edit CV name"
-                  >
-                    <Edit className="h-4 w-4" />
-                  </button>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => {}}
+                      className="p-2 text-zapier-orange hover:bg-zapier-orange/10 rounded-md transition-colors"
+                      title="Edit CV (future functionality)"
+                    >
+                      <Edit className="h-4 w-4" />
+                    </button>
                   <button
                     onClick={() => deleteCV(cv.id)}
                     className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"

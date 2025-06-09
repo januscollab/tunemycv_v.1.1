@@ -3,10 +3,11 @@ import { Save, FileText, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { UnifiedInput } from '@/components/ui/unified-input';
+import { FloatingLabelInput } from '@/components/common/FloatingLabelInput';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { generateStandardFileName } from '@/utils/fileNaming';
 
 interface AddToSavedCVsModalProps {
   isOpen: boolean;
@@ -49,12 +50,27 @@ const AddToSavedCVsModal: React.FC<AddToSavedCVsModalProps> = ({
 
     setSaving(true);
     try {
+      // Get user's profile user_id
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('user_id')
+        .eq('id', user.id)
+        .single();
+
+      if (profileError) throw profileError;
+
+      // Generate standardized filename
+      const standardizedFileName = generateStandardFileName(
+        profile.user_id, 
+        `${cvName.trim()}.txt`
+      );
+
       // Save CV to the uploads table as a saved CV
       const { error } = await supabase
         .from('uploads')
         .insert({
           user_id: user.id,
-          file_name: cvName.trim(),
+          file_name: standardizedFileName,
           extracted_text: fileContent,
           file_size: new Blob([fileContent]).size,
           file_type: 'text/plain',
@@ -111,14 +127,14 @@ const AddToSavedCVsModal: React.FC<AddToSavedCVsModalProps> = ({
             <Label htmlFor="cv_name" className="text-sm font-medium">
               CV Name *
             </Label>
-            <UnifiedInput
+            <FloatingLabelInput
               id="cv_name"
+              label="CV Name"
               value={cvName}
               onChange={(e) => setCvName(e.target.value)}
               placeholder="Enter a name for this CV..."
               className="mt-1"
               maxLength={100}
-              secure={true}
             />
             <p className="text-xs text-muted-foreground mt-1">
               Give your CV a memorable name for easy identification
