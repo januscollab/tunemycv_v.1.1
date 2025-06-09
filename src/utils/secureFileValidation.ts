@@ -1,5 +1,5 @@
 
-import { validateFile, formatFileSize } from '@/utils/fileUtils';
+import { validateFile, formatFileSize, getFileTypeFromExtension } from '@/utils/fileUtils';
 import { sanitizeFileName, isAllowedFileType, isValidFileSize } from '@/utils/inputSanitization';
 
 interface FileValidationResult {
@@ -82,9 +82,10 @@ export const validateFileSecurely = (file: File, type: 'cv' | 'job_description')
 };
 
 export const createSecureFileObject = (file: File, sanitizedName: string): File => {
-  // Create a new File object with sanitized name
+  // Create a new File object with sanitized name and correct MIME type from extension
+  const correctMimeType = getFileTypeFromExtension(sanitizedName);
   return new File([file], sanitizedName, {
-    type: file.type,
+    type: correctMimeType,
     lastModified: file.lastModified
   });
 };

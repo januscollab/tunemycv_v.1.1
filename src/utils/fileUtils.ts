@@ -1,6 +1,22 @@
 
 import { validateFileSecurely, createSecureFileObject } from '@/utils/secureFileValidation';
 
+// File type detection from extension (more reliable than browser MIME types)
+export const getFileTypeFromExtension = (filename: string): string => {
+  const extension = filename.split('.').pop()?.toLowerCase();
+  
+  switch (extension) {
+    case 'pdf':
+      return 'application/pdf';
+    case 'docx':
+      return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+    case 'txt':
+      return 'text/plain';
+    default:
+      return 'application/octet-stream';
+  }
+};
+
 export const validateFile = (file: File, allowedTypes: string[], maxSize: number) => {
   const errors: string[] = [];
   
