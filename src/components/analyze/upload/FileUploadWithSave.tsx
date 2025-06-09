@@ -4,9 +4,7 @@ import { DragDropZone } from '@/components/ui/drag-drop-zone';
 import ProcessingModal from '@/components/ui/processing-modal';
 import { BounceLoader } from '@/components/ui/progress-indicator';
 import { useAuth } from '@/contexts/AuthContext';
-import { useDocumentExtraction } from '@/hooks/useDocumentExtraction';
-import { useToast } from '@/hooks/use-toast';
-import { validateFileSecurely, createSecureFileObject } from '@/utils/secureFileValidation';
+import { useUploadOrchestrator } from '@/hooks/useUploadOrchestrator';
 
 interface FileUploadWithSaveProps {
   onFileSelect: (file: File, extractedText: string, shouldSave: boolean) => void;
@@ -33,8 +31,7 @@ const FileUploadWithSave: React.FC<FileUploadWithSaveProps> = ({
   const [retryCount, setRetryCount] = useState(0);
   const [isButtonLoading, setIsButtonLoading] = useState(false);
   const { user } = useAuth();
-  const { toast } = useToast();
-  const { isExtracting, progress, extractText, cancel } = useDocumentExtraction();
+  const orchestrator = useUploadOrchestrator();
 
   const handleDrop = async (files: File[]) => {
     const file = files[0];
@@ -45,49 +42,17 @@ const FileUploadWithSave: React.FC<FileUploadWithSaveProps> = ({
 
   const attemptFileProcessing = async (file: File, currentRetry: number) => {
     try {
-      // Perform security validation
-      const validation = validateFileSecurely(file, 'cv');
+      const result = await orchestrator.processFile(file, { 
+        fileType: 'cv',
+        shouldStore: true // Always store CV uploads for debugging
+      });
       
-      if (!validation.isValid) {
-        toast({
-          title: "File validation failed",
-          description: validation.errors[0],
-          variant: "destructive"
-        });
-        return;
-      }
-      
-      // Create secure file object with sanitized name
-      const secureFile = createSecureFileObject(file, validation.sanitizedName!);
-      
-      // Extract text from the file
-      const result = await extractText(secureFile, 'cv');
-      
-      if (result) {
-        // Save to debug tracking system for CV uploads
-        if (user?.id) {
-          try {
-            const fileContent = await secureFile.arrayBuffer();
-            const base64Content = btoa(String.fromCharCode(...new Uint8Array(fileContent)));
-            
-            await (await import('@/integrations/supabase/client')).supabase.functions.invoke('save-user-upload', {
-              body: {
-                fileContent: base64Content,
-                fileName: secureFile.name,
-                fileType: secureFile.type, // Now uses correct MIME type from secure file
-                uploadType: 'cv',
-                userId: user.id
-              }
-            });
-          } catch (debugError) {
-            console.warn('Debug CV tracking failed:', debugError);
-            // Don't fail the main upload for debug tracking issues
-          }
-        }
-        
-        onFileSelect(secureFile, result.extractedText, shouldSave);
+      if (result.success && result.file && result.extractedText) {
+        onFileSelect(result.file, result.extractedText, shouldSave);
         setShouldSave(false);
         setRetryCount(0);
+      } else {
+        throw new Error(result.error || 'Processing failed');
       }
     } catch (error) {
       console.error('File processing error:', error);
@@ -96,12 +61,6 @@ const FileUploadWithSave: React.FC<FileUploadWithSaveProps> = ({
         const nextRetry = currentRetry + 1;
         setRetryCount(nextRetry);
         
-        toast({
-          title: "Upload failed",
-          description: `Retrying upload (attempt ${nextRetry}/2)...`,
-          variant: "destructive"
-        });
-        
         // Retry after a brief delay
         setTimeout(() => {
           attemptFileProcessing(file, nextRetry);
@@ -109,11 +68,6 @@ const FileUploadWithSave: React.FC<FileUploadWithSaveProps> = ({
       } else {
         // Max retries reached
         setRetryCount(0);
-        toast({
-          title: "Upload failed",
-          description: "Upload failed after 2 attempts. Please check your file format and try again. Supported formats: PDF, DOCX, TXT.",
-          variant: "destructive"
-        });
       }
     }
   };
@@ -136,17 +90,17 @@ const FileUploadWithSave: React.FC<FileUploadWithSaveProps> = ({
         onDrop={handleDrop}
         accept={accept}
         maxSize={parseFloat(maxSize) * 1024 * 1024}
-        disabled={uploading || isExtracting}
-        placeholder={isExtracting ? progress : (uploading ? "Uploading..." : label)}
+        disabled={uploading || orchestrator.isProcessing}
+        placeholder={orchestrator.isProcessing ? orchestrator.progress : (uploading ? "Uploading..." : label)}
         description={`${accept} • Max ${maxSize}`}
         className="border-apple-core/30 dark:border-citrus/30"
       />
       
       <ProcessingModal
-        isOpen={isExtracting}
+        isOpen={orchestrator.isProcessing}
         title="Processing CV"
-        message={progress}
-        onCancel={cancel}
+        message={orchestrator.progress}
+        onCancel={orchestrator.cancel}
       />
 
       {user && !selectedCVId && (
