@@ -54,8 +54,11 @@ export const useFileStorage = () => {
       
     } catch (error) {
       console.error('File storage error:', error);
-      // Don't show error to user as this is debug storage
-      console.warn('Debug file storage failed, continuing with upload');
+      toast({
+        title: "Storage failed",
+        description: "Failed to save file",
+        variant: "destructive"
+      });
       return false;
     } finally {
       setIsStoring(false);
