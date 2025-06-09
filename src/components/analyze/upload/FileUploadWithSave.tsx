@@ -30,6 +30,7 @@ const FileUploadWithSave: React.FC<FileUploadWithSaveProps> = ({
   const [shouldSave, setShouldSave] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
   const [isButtonLoading, setIsButtonLoading] = useState(false);
+  const [hasBeenSaved, setHasBeenSaved] = useState(false);
   const { user } = useAuth();
   const orchestrator = useUploadOrchestrator();
 
@@ -44,12 +45,14 @@ const FileUploadWithSave: React.FC<FileUploadWithSaveProps> = ({
     try {
       const result = await orchestrator.processFile(file, { 
         fileType: 'cv',
-        shouldStore: true // Always store CV uploads for debugging
+        shouldStore: shouldSave // Only store if user explicitly requested it
       });
       
       if (result.success && result.file && result.extractedText) {
         onFileSelect(result.file, result.extractedText, shouldSave);
-        setShouldSave(false);
+        if (shouldSave) {
+          setHasBeenSaved(true);
+        }
         setRetryCount(0);
       } else {
         throw new Error(result.error || 'Processing failed');
@@ -103,7 +106,7 @@ const FileUploadWithSave: React.FC<FileUploadWithSaveProps> = ({
         onCancel={orchestrator.cancel}
       />
 
-      {user && !selectedCVId && (
+      {user && !selectedCVId && !hasBeenSaved && (
         <div className="mt-4 space-y-2">
           <div className="flex items-center space-x-2">
             {isButtonLoading ? (

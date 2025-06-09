@@ -2,7 +2,7 @@
 
 ## UI/UX Improvements
 - [x] Analyze CV > Paste Job Description edit text area needs to be updated to the correct "Floating Label Textarea"
-- [ ] **CV Upload UX**: Remove "Type Confirmation Needed" tag for all CV uploads to streamline the upload process
+- [x] **CV Upload UX**: Remove "Type Confirmation Needed" tag for all CV uploads to streamline the upload process
 
 ## Adobe PDF Processing
 - [x] Fix Adobe ZIP extraction sequence (Download → Save ZIP → Unzip → Save Text)
@@ -55,10 +55,10 @@
 - [x] **Storage Enhancement**: Save both raw and formatted text versions for backward compatibility
 - [x] **Separation of Concerns**: Maintained procedural integrity by keeping formatting separate from extraction
 
-## High Priority UX Issues
-- [ ] **Fix "Storage failed" Error Message**: CVs are uploading successfully but showing false "Storage failed" error messages in the UI - fix error handling to prevent false negatives
-- [ ] **Fix CV Auto-Save Issue**: CVs uploaded are automatically saving to the saved CV section. The user must explicitly request a save or upload the CV via their profile page > CV management
-- [ ] **"Add to Saved CVs" Button State Management**: When a user uploads a CV they get presented an "Add to Saved CVs" button. If the user chooses to click and add this active CV to their saved CVs, then the "Add to Saved CVs" button should disappear
-- [ ] **Hide "Add to Saved CVs" for Selected CVs**: If a user chooses a CV from their saved CVs to perform the analysis, then the "Add to Saved CVs" button should disappear/be hidden from the user
+## High Priority UX Issues ✅
+- [x] **Fix "Storage failed" Error Message**: CVs are uploading successfully but showing false "Storage failed" error messages in the UI - fix error handling to prevent false negatives
+- [x] **Fix CV Auto-Save Issue**: CVs uploaded are automatically saving to the saved CV section. The user must explicitly request a save or upload the CV via their profile page > CV management
+- [x] **"Add to Saved CVs" Button State Management**: When a user uploads a CV they get presented an "Add to Saved CVs" button. If the user chooses to click and add this active CV to their saved CVs, then the "Add to Saved CVs" button should disappear
+- [x] **Hide "Add to Saved CVs" for Selected CVs**: If a user chooses a CV from their saved CVs to perform the analysis, then the "Add to Saved CVs" button should disappear/be hidden from the user
 
 ## Future Enhancements
