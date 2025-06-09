@@ -29,11 +29,11 @@ export const useFileStorage = () => {
       const base64Content = btoa(String.fromCharCode(...new Uint8Array(fileContent)));
       
       const { supabase } = await import('@/integrations/supabase/client');
-      const { data, error } = await supabase.functions.invoke('save-user-upload', {
+      const { data, error } = await supabase.functions.invoke('save-primary-upload', {
         body: {
           fileContent: base64Content,
-          fileName: file.name, // Use original filename
-          fileType: file.type, // Use original MIME type
+          fileName: file.name,
+          fileType: file.type,
           uploadType: options.uploadType,
           userId: user.id
         }
@@ -43,7 +43,7 @@ export const useFileStorage = () => {
         console.error('File storage failed:', error);
         toast({
           title: "Storage failed",
-          description: "Failed to save file for debugging",
+          description: "Failed to save file to uploads table",
           variant: "destructive"
         });
         return false;
