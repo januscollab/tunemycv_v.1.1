@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { RotateCcw } from 'lucide-react';
-import { UnifiedTextarea } from '@/components/ui/unified-input';
+import { FloatingLabelTextarea } from '@/components/common/FloatingLabelTextarea';
 import { useToast } from '@/hooks/use-toast';
 
 
@@ -80,8 +80,7 @@ const EditableCoverLetter: React.FC<EditableCoverLetterProps> = ({ content, onSa
   return (
     <div className="space-y-4">
       <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-        <UnifiedTextarea
-          variant="floating"
+        <FloatingLabelTextarea
           label="Edit Cover Letter"
           ref={textareaRef}
           value={editedContent}

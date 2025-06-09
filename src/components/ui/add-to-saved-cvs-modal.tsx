@@ -3,7 +3,7 @@ import { Save, FileText, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { UnifiedInput } from '@/components/ui/unified-input';
+import { FloatingLabelInput } from '@/components/common/FloatingLabelInput';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -111,14 +111,14 @@ const AddToSavedCVsModal: React.FC<AddToSavedCVsModalProps> = ({
             <Label htmlFor="cv_name" className="text-sm font-medium">
               CV Name *
             </Label>
-            <UnifiedInput
+            <FloatingLabelInput
               id="cv_name"
+              label="CV Name"
               value={cvName}
               onChange={(e) => setCvName(e.target.value)}
               placeholder="Enter a name for this CV..."
               className="mt-1"
               maxLength={100}
-              secure={true}
             />
             <p className="text-xs text-muted-foreground mt-1">
               Give your CV a memorable name for easy identification

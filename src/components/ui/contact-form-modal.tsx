@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { X, Mail, Send } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { UnifiedInput, UnifiedTextarea } from '@/components/ui/unified-input';
+import { FloatingLabelInput } from '@/components/common/FloatingLabelInput';
+import { FloatingLabelTextarea } from '@/components/common/FloatingLabelTextarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -87,29 +88,29 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <Label htmlFor="name">Name</Label>
-                  <UnifiedInput
+                  <FloatingLabelInput
                     id="name"
+                    label="Name"
                     type="text"
                     value={formData.name}
                     onChange={(e) => handleInputChange('name', e.target.value)}
                     placeholder="Your full name"
                     required
                     maxLength={100}
-                    secure={true}
                   />
                 </div>
 
                 <div>
                   <Label htmlFor="email">Email Address</Label>
-                  <UnifiedInput
+                  <FloatingLabelInput
                     id="email"
+                    label="Email Address"
                     type="email"
                     value={formData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
                     placeholder="your@email.com"
                     required
                     maxLength={100}
-                    secure={true}
                   />
                 </div>
 
@@ -132,30 +133,30 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
                 {formData.subject === 'custom' && (
                   <div>
                     <Label htmlFor="customSubject">Custom Subject</Label>
-                    <UnifiedInput
+                    <FloatingLabelInput
                       id="customSubject"
+                      label="Custom Subject"
                       type="text"
                       value={formData.customSubject || ''}
                       onChange={(e) => handleInputChange('customSubject', e.target.value)}
                       placeholder="Enter your custom subject"
                       required
                       maxLength={200}
-                      secure={true}
                     />
                   </div>
                 )}
 
                 <div>
                   <Label htmlFor="message">Message</Label>
-                  <UnifiedTextarea
+                  <FloatingLabelTextarea
                     id="message"
+                    label="Message"
                     value={formData.message}
                     onChange={(e) => handleInputChange('message', e.target.value)}
                     placeholder="Please share your message, question, or feedback..."
                     className="min-h-[100px]"
                     required
                     maxLength={2000}
-                    secure={true}
                   />
                 </div>
 

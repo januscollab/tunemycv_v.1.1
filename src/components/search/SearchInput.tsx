@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { UnifiedInput } from '@/components/ui/unified-input';
+import { FloatingLabelInput } from '@/components/common/FloatingLabelInput';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
@@ -88,14 +88,14 @@ export const SearchInput: React.FC<SearchInputProps> = ({
           {/* Main Search Input */}
           <div className="flex gap-2">
             <div className="flex-1">
-              <UnifiedInput
+              <FloatingLabelInput
+                label="Search"
                 type="text"
                 placeholder={placeholder}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 className="w-full"
                 maxLength={500}
-                secure={true}
               />
             </div>
             {query && (

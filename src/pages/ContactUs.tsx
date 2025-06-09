@@ -3,7 +3,8 @@ import React, { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { UnifiedInput, UnifiedTextarea } from '@/components/ui/unified-input';
+import { FloatingLabelInput } from '@/components/common/FloatingLabelInput';
+import { FloatingLabelTextarea } from '@/components/common/FloatingLabelTextarea';
 import { Label } from '@/components/ui/label';
 import { Mail, MessageSquare, Users, Target, HelpCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -140,21 +141,22 @@ const ContactUs = () => {
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">Full Name *</Label>
-                  <UnifiedInput
+                  <FloatingLabelInput
                     id="name"
+                    label="Full Name"
                     value={formData.name}
                     onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                     placeholder="Your full name"
                     required
                     disabled={isSubmitting}
                     maxLength={100}
-                    secure={true}
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">Email Address *</Label>
-                  <UnifiedInput
+                  <FloatingLabelInput
                     id="email"
+                    label="Email Address"
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
@@ -162,28 +164,28 @@ const ContactUs = () => {
                     required
                     disabled={isSubmitting}
                     maxLength={100}
-                    secure={true}
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="subject">Subject</Label>
-                <UnifiedInput
+                <FloatingLabelInput
                   id="subject"
+                  label="Subject"
                   value={formData.subject}
                   onChange={(e) => setFormData(prev => ({ ...prev, subject: e.target.value }))}
                   placeholder="Brief description of your inquiry"
                   disabled={isSubmitting}
                   maxLength={200}
-                  secure={true}
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="message">Message *</Label>
-                <UnifiedTextarea
+                <FloatingLabelTextarea
                   id="message"
+                  label="Message"
                   value={formData.message}
                   onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
                   placeholder="Please provide details about your question or feedback..."
@@ -191,7 +193,6 @@ const ContactUs = () => {
                   required
                   disabled={isSubmitting}
                   maxLength={2000}
-                  secure={true}
                 />
               </div>
 
