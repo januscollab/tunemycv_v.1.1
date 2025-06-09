@@ -79,7 +79,10 @@ export type Database = {
           file_size: number
           file_type: string
           id: string
+          job_description_upload_id: string | null
           original_filename: string
+          processing_stage: string | null
+          state: string
           storage_path: string
           user_id: string
         }
@@ -89,7 +92,10 @@ export type Database = {
           file_size: number
           file_type: string
           id?: string
+          job_description_upload_id?: string | null
           original_filename: string
+          processing_stage?: string | null
+          state?: string
           storage_path: string
           user_id: string
         }
@@ -99,11 +105,21 @@ export type Database = {
           file_size?: number
           file_type?: string
           id?: string
+          job_description_upload_id?: string | null
           original_filename?: string
+          processing_stage?: string | null
+          state?: string
           storage_path?: string
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "adobe_debug_files_job_description_upload_id_fkey"
+            columns: ["job_description_upload_id"]
+            isOneToOne: false
+            referencedRelation: "uploads"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "adobe_debug_files_user_id_fkey"
             columns: ["user_id"]
@@ -609,6 +625,7 @@ export type Database = {
         Row: {
           created_at: string | null
           detected_document_type: string | null
+          document_content_json: Json | null
           extracted_text: string | null
           file_name: string
           file_size: number
@@ -627,6 +644,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           detected_document_type?: string | null
+          document_content_json?: Json | null
           extracted_text?: string | null
           file_name: string
           file_size: number
@@ -645,6 +663,7 @@ export type Database = {
         Update: {
           created_at?: string | null
           detected_document_type?: string | null
+          document_content_json?: Json | null
           extracted_text?: string | null
           file_name?: string
           file_size?: number
@@ -704,6 +723,27 @@ export type Database = {
           id?: string
           updated_at?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      user_id_sequence: {
+        Row: {
+          created_at: string
+          id: string
+          next_user_id: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          next_user_id?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          next_user_id?: number
+          updated_at?: string
         }
         Relationships: []
       }
@@ -856,6 +896,10 @@ export type Database = {
           target_user?: string
           action_details?: Json
         }
+        Returns: undefined
+      }
+      migrate_to_sequential_user_ids: {
+        Args: Record<PropertyKey, never>
         Returns: undefined
       }
       trigger_adobe_processing: {

@@ -1,7 +1,6 @@
 
 import React from 'react';
-import { UnifiedInput } from '@/components/ui/unified-input';
-import { Label } from '@/components/ui/label';
+import { FloatingLabelInput } from '@/components/common/FloatingLabelInput';
 import PasswordStrengthMeter from '@/components/PasswordStrengthMeter';
 
 type AuthMode = 'login' | 'register' | 'forgot-password';
@@ -26,20 +25,16 @@ const PasswordFields: React.FC<PasswordFieldsProps> = ({
   return (
     <>
       <div>
-        <Label htmlFor="password" className="text-blueberry">
-          Password
-        </Label>
-        <UnifiedInput
+        <FloatingLabelInput
           id="password"
           name="password"
           type="password"
+          label="Password"
           autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
           required
           value={password}
           onChange={onPasswordChange}
-          className="mt-1"
           maxLength={128}
-          secure={true}
         />
         {mode === 'register' && password && (
           <div className="mt-2">
@@ -49,23 +44,17 @@ const PasswordFields: React.FC<PasswordFieldsProps> = ({
       </div>
 
       {mode === 'register' && (
-        <div>
-          <Label htmlFor="confirmPassword" className="text-blueberry">
-            Confirm password
-          </Label>
-          <UnifiedInput
-            id="confirmPassword"
-            name="confirmPassword"
-            type="password"
-            autoComplete="new-password"
-            required
-            value={confirmPassword}
-            onChange={onConfirmPasswordChange}
-            className="mt-1"
-            maxLength={128}
-            secure={true}
-          />
-        </div>
+        <FloatingLabelInput
+          id="confirmPassword"
+          name="confirmPassword"
+          type="password"
+          label="Confirm password"
+          autoComplete="new-password"
+          required
+          value={confirmPassword}
+          onChange={onConfirmPasswordChange}
+          maxLength={128}
+        />
       )}
     </>
   );

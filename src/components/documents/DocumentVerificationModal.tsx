@@ -1,8 +1,16 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { X, Save, AlertTriangle, CheckCircle, Info, ChevronDown, ChevronUp, WandSparkles } from 'lucide-react';
+import { 
+  textToJson, 
+  jsonToText, 
+  DocumentJson, 
+  updateDocumentContent, 
+  syncJsonAndText,
+  isWellStructuredDocument 
+} from '@/utils/documentJsonUtils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { UnifiedTextarea } from '@/components/ui/unified-input';
+import { FloatingLabelTextarea } from '@/components/common/FloatingLabelTextarea';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -31,6 +39,7 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
   onSave
 }) => {
   const [editedText, setEditedText] = useState(extractedText);
+  const [documentJson, setDocumentJson] = useState<DocumentJson>(() => textToJson(extractedText));
   const [isSaving, setIsSaving] = useState(false);
   const [isAutoSaving, setIsAutoSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
@@ -39,23 +48,42 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
   
   const quality = assessDocumentQuality(editedText, fileName, documentType);
 
-  // Debounced autosave function
+  // Enhanced debounced autosave with bidirectional sync
   const debouncedAutoSave = useCallback(
     debounce(async (text: string) => {
       if (text !== extractedText) {
         setIsAutoSaving(true);
+        
+        // Use new sync functionality to ensure 100% consistency
+        const { json: syncedJson, text: syncedText } = updateDocumentContent(documentJson, editedText, text);
+        
+        // Update both JSON and text with synced versions
+        setDocumentJson(syncedJson);
+        setEditedText(syncedText);
+        
         await new Promise(resolve => setTimeout(resolve, 300)); // Simulate save
-        onSave(text);
+        onSave(syncedText); // Save the consistent text version
         setLastSaved(new Date());
         setIsAutoSaving(false);
       }
     }, 2000),
-    [extractedText, onSave]
+    [extractedText, onSave, documentJson, editedText]
   );
 
-  // Auto-save effect
+  // Enhanced bidirectional sync with formatting rules enforcement
   useEffect(() => {
-    if (editedText !== extractedText) {
+    // Apply formatting rules and sync JSON/text
+    const { json: syncedJson, isConsistent } = syncJsonAndText(documentJson, editedText);
+    
+    // Only update if there's a meaningful change
+    if (!isConsistent) {
+      setDocumentJson(syncedJson);
+    }
+  }, [editedText]);
+
+  // Auto-save effect with enhanced validation
+  useEffect(() => {
+    if (editedText !== extractedText && editedText.trim().length > 0) {
       debouncedAutoSave(editedText);
     }
   }, [editedText, debouncedAutoSave, extractedText]);
@@ -228,17 +256,17 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
           <div className="w-[70%] flex flex-col">
             <div className="px-4 py-3 border-b border-border bg-background">
               <div className="flex items-center justify-between">
-                <h3 className="text-caption font-medium text-foreground">Extracted Text</h3>
+                <h3 className="text-caption font-medium text-foreground">Document Content</h3>
                 <div className="text-micro text-muted-foreground">
                   Click to edit • Changes auto-saved
                 </div>
               </div>
             </div>
             
-            <div className="flex-1 p-4">
+            <div className="flex-1 p-4 pt-6">
               <ScrollArea className="h-[calc(100vh-300px)] border rounded-md">
-                <UnifiedTextarea
-                  variant="standard"
+                <FloatingLabelTextarea
+                  label="Document Content"
                   value={editedText}
                   onChange={(e) => setEditedText(e.target.value)}
                   className="min-h-[calc(100vh-320px)] font-mono text-caption resize-none border-0 focus:border-0 focus:outline-none bg-background p-4"
@@ -249,7 +277,7 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
           </div>
         </div>
 
-        {/* Footer with 3 buttons */}
+        {/* Footer with 2 buttons */}
         <div className="flex items-center justify-end space-x-3 px-6 py-4 border-t border-border bg-background">
           <Button 
             variant="outline" 
@@ -258,9 +286,9 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
             className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200"
           >
             <X className="h-4 w-4 mr-2" />
-            Cancel
+            Close
           </Button>
-{documentType === 'cv' ? (
+          {documentType === 'cv' ? (
             <Button 
               variant="outline"
               size="sm"
@@ -276,25 +304,6 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
               Ask AI to Review My CV
             </Button>
           ) : null}
-          <Button 
-            variant="outline"
-            onClick={handleSave}
-            disabled={isSaving}
-            size="sm"
-            className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200 disabled:hover:scale-100 disabled:hover:bg-background disabled:hover:text-foreground disabled:hover:border-input"
-          >
-            {isSaving ? (
-              <>
-                <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent mr-2" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <Save className="h-4 w-4 mr-2" />
-                Save Changes
-              </>
-            )}
-          </Button>
         </div>
       </DialogContent>
     </Dialog>

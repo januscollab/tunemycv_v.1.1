@@ -40,12 +40,15 @@ export const saveFilesToDatabase = async (
     if (cvFetchError) throw cvFetchError;
     cvUpload = existingCV;
   } else if (options.saveCV && uploadedFiles.cv) {
-    // Save new CV if user chose to save it
+    // Save new CV if user chose to save it with new naming convention
+    const timestamp = new Date().toISOString().slice(0, 19).replace(/[-:]/g, '').replace('T', '-');
+    const formattedFileName = `${userId}_${uploadedFiles.cv.file.name}_${timestamp}`;
+    
     const { data, error: cvError } = await supabase
       .from('uploads')
       .insert({
         user_id: userId,
-        file_name: uploadedFiles.cv.file.name,
+        file_name: formattedFileName,
         file_type: uploadedFiles.cv.file.type,
         file_size: uploadedFiles.cv.file.size,
         upload_type: 'cv',
@@ -62,13 +65,16 @@ export const saveFilesToDatabase = async (
     cvUpload = data;
   }
 
-  // Handle job description saving
+  // Handle job description saving with new naming convention
   if (options.saveJobDescription && uploadedFiles.jobDescription) {
+    const timestamp = new Date().toISOString().slice(0, 19).replace(/[-:]/g, '').replace('T', '-');
+    const formattedFileName = `${userId}_${uploadedFiles.jobDescription.file.name}_${timestamp}`;
+    
     const { data, error: jobError } = await supabase
       .from('uploads')
       .insert({
         user_id: userId,
-        file_name: uploadedFiles.jobDescription.file.name,
+        file_name: formattedFileName,
         file_type: uploadedFiles.jobDescription.file.type,
         file_size: uploadedFiles.jobDescription.file.size,
         upload_type: 'job_description',

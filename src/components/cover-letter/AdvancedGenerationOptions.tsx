@@ -1,7 +1,7 @@
 
 import React, { useEffect } from 'react';
 import { Linkedin } from 'lucide-react';
-import { UnifiedTextarea } from '@/components/ui/unified-input';
+import { FloatingLabelTextarea } from '@/components/common/FloatingLabelTextarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ChevronDown } from 'lucide-react';
@@ -53,8 +53,7 @@ const AdvancedGenerationOptions: React.FC<AdvancedGenerationOptionsProps> = ({ v
         </CollapsibleTrigger>
         <CollapsibleContent className="space-y-4 mt-3">
           <div>
-            <UnifiedTextarea
-              variant="floating"
+            <FloatingLabelTextarea
               label="Key Work Experience Highlights"
               id="workHighlights"
               placeholder="Mention specific achievements, metrics, or experiences you want emphasized in your cover letter..."
@@ -65,8 +64,7 @@ const AdvancedGenerationOptions: React.FC<AdvancedGenerationOptionsProps> = ({ v
           </div>
 
           <div>
-            <UnifiedTextarea
-              variant="floating"
+            <FloatingLabelTextarea
               label="Custom Opening Hook"
               id="customHook"
               placeholder="Write a personalized opening line or mention how you discovered the company/role..."
@@ -77,8 +75,7 @@ const AdvancedGenerationOptions: React.FC<AdvancedGenerationOptionsProps> = ({ v
           </div>
 
           <div>
-            <UnifiedTextarea
-              variant="floating"
+            <FloatingLabelTextarea
               label="Personal Values & Motivations"
               id="personalValues"
               placeholder="Describe what motivates you professionally or values that align with the company culture..."

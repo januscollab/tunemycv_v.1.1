@@ -60,25 +60,22 @@ export function buildSystemPrompt(
 ): string {
   return `You are an expert cover letter writer. ${templatePrompt} ${lengthInstruction}
 
-The cover letter should:
-- Always start with this exact header format:
-  "Hiring Manager  
-  ${companyName}
-  [Company Address]  
-  [City, State, Zip]
-
-  Dear Hiring Manager,"
-- Be tailored specifically to the job and company
+IMPORTANT FORMATTING REQUIREMENTS:
+- Start with the date and company information
+- Write a compelling cover letter body with proper salutation (Dear Hiring Manager, etc.)
 - Highlight relevant experience and skills
 - Show genuine enthusiasm for the role
 - Include a professional opening and closing
 - Be well-structured with clear paragraphs
 - Match the requested length and tone precisely
-- Always end with the following contact information at the bottom before "Sincerely":
-  "${contactHeader}"
+- Do NOT include the candidate's name in the salutation or closing signature
+- ALWAYS end with "Sincerely," followed by a blank line, then the complete contact information footer:
+
+${contactHeader}
+
 ${advancedOptionsText ? `\nAdditional personalization requirements:${advancedOptionsText}` : ''}
 
-Format the response as a complete, ready-to-send cover letter with proper formatting, always starting with the required header format above and ending with the contact information before the signature.`
+Format the response as a complete, ready-to-send cover letter with proper formatting. The contact information should appear as the very last element after "Sincerely," and should not be duplicated elsewhere in the letter.`
 }
 
 export function buildUserPrompt(request: CoverLetterRequest): string {

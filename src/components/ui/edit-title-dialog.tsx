@@ -7,7 +7,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { UnifiedInput } from '@/components/ui/unified-input';
+import { FloatingLabelInput } from '@/components/common/FloatingLabelInput';
 import { Label } from '@/components/ui/label';
 
 interface EditTitleDialogProps {
@@ -60,11 +60,12 @@ const EditTitleDialog: React.FC<EditTitleDialogProps> = ({
             <Label htmlFor="title" className="text-sm font-medium text-gray-700">
               Current title: <span className="font-normal text-gray-600">"{currentTitle}"</span>
             </Label>
-            <UnifiedInput
+            <FloatingLabelInput
               id="title"
+              label="Title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full border-gray-300 focus:ring-1 focus:ring-zapier-orange focus:border-zapier-orange text-sm"
+              className="w-full"
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   handleSave();
@@ -76,7 +77,6 @@ const EditTitleDialog: React.FC<EditTitleDialogProps> = ({
               autoFocus
               placeholder="Enter new title..."
               maxLength={200}
-              secure={true}
             />
           </div>
         </div>

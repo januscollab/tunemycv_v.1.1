@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/pagination';
 import DownloadOptions from '@/components/cover-letter/DownloadOptions';
 import EditTitleDialog from '@/components/ui/edit-title-dialog';
+import CoverLetterVersionBadge from '@/components/cover-letter/CoverLetterVersionBadge';
 
 interface DocumentItem {
   id: string;
@@ -314,10 +315,12 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
                         </span>
                       )}
                       
-                      {document.type === 'cover_letter' && (document.regeneration_count || 0) > 0 && (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-micro font-medium bg-zapier-orange/10 text-zapier-orange">
-                          v{(document.regeneration_count || 0) + 1}
-                        </span>
+                      {document.type === 'cover_letter' && (
+                        <CoverLetterVersionBadge
+                          version={(document.regeneration_count || 0) + 1}
+                          isLatest={true} // In history, all items are considered latest for their specific entry
+                          totalVersions={(document.regeneration_count || 0) + 1}
+                        />
                       )}
                     </div>
                     

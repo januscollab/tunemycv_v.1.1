@@ -3,7 +3,8 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { UnifiedInput, UnifiedTextarea } from '@/components/ui/unified-input';
+import { FloatingLabelInput } from '@/components/common/FloatingLabelInput';
+import { FloatingLabelTextarea } from '@/components/common/FloatingLabelTextarea';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useToast } from '@/hooks/use-toast';
 import { Mail, MessageCircle, HelpCircle, CreditCard, FileText, Search, Zap } from 'lucide-react';
@@ -283,8 +284,7 @@ const HelpCentre = () => {
               <CardContent>
                 <form onSubmit={handleContactSubmit} className="space-y-4">
                   <div>
-                    <UnifiedInput
-                      variant="floating"
+                    <FloatingLabelInput
                       label="Name"
                       id="name"
                       value={contactForm.name}
@@ -294,8 +294,7 @@ const HelpCentre = () => {
                   </div>
                   
                   <div>
-                    <UnifiedInput
-                      variant="floating"
+                    <FloatingLabelInput
                       label="Email"
                       id="email"
                       type="email"
@@ -306,8 +305,7 @@ const HelpCentre = () => {
                   </div>
                   
                   <div>
-                    <UnifiedInput
-                      variant="floating"
+                    <FloatingLabelInput
                       label="Subject"
                       id="subject"
                       value={contactForm.subject}
@@ -317,8 +315,7 @@ const HelpCentre = () => {
                   </div>
                   
                   <div>
-                    <UnifiedTextarea
-                      variant="floating"
+                    <FloatingLabelTextarea
                       label="Message"
                       id="message"
                       rows={4}

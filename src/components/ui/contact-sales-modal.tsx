@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { X, Mail, Send } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { UnifiedInput, UnifiedTextarea } from '@/components/ui/unified-input';
+import { FloatingLabelInput } from '@/components/common/FloatingLabelInput';
+import { FloatingLabelTextarea } from '@/components/common/FloatingLabelTextarea';
 import { Label } from '@/components/ui/label';
 
 interface ContactSalesModalProps {
@@ -75,43 +76,43 @@ export const ContactSalesModal: React.FC<ContactSalesModalProps> = ({
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <Label htmlFor="name">Name</Label>
-                  <UnifiedInput
+                  <FloatingLabelInput
                     id="name"
+                    label="Name"
                     type="text"
                     value={formData.name}
                     onChange={(e) => handleInputChange('name', e.target.value)}
                     placeholder="Your full name"
                     required
                     maxLength={100}
-                    secure={true}
                   />
                 </div>
 
                 <div>
                   <Label htmlFor="email">Email Address</Label>
-                  <UnifiedInput
+                  <FloatingLabelInput
                     id="email"
+                    label="Email Address"
                     type="email"
                     value={formData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
                     placeholder="your@company.com"
                     required
                     maxLength={100}
-                    secure={true}
                   />
                 </div>
 
                 <div>
                   <Label htmlFor="message">Tell us how we can help you</Label>
-                  <UnifiedTextarea
+                  <FloatingLabelTextarea
                     id="message"
+                    label="Tell us how we can help you"
                     value={formData.message}
                     onChange={(e) => handleInputChange('message', e.target.value)}
                     placeholder="Please describe your requirements, team size, or any specific questions you have about our enterprise solutions..."
                     className="min-h-[100px]"
                     required
                     maxLength={2000}
-                    secure={true}
                   />
                 </div>
 

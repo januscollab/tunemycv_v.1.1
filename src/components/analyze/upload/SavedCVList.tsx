@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileText, Check } from 'lucide-react';
+import { FileText, Check, Edit } from 'lucide-react';
 import { formatFileSize } from '@/utils/fileUtils';
 
 interface CVUpload {
@@ -35,7 +35,7 @@ const SavedCVList: React.FC<SavedCVListProps> = ({ savedCVs, selectedCVId, onCVS
   return (
     <div>
       <h4 className="text-caption font-medium text-blueberry dark:text-citrus mb-3">Select a saved CV</h4>
-      <div className="space-y-2 max-h-64 overflow-y-auto">
+      <div className="space-y-2 overflow-y-auto" style={{ maxHeight: '192px' }}>
         {savedCVs.map((cv) => (
           <div
             key={cv.id}
@@ -55,12 +55,31 @@ const SavedCVList: React.FC<SavedCVListProps> = ({ savedCVs, selectedCVId, onCVS
                 </p>
               </div>
             </div>
-            {selectedCVId === cv.id && (
-              <Check className="h-5 w-5 text-apricot flex-shrink-0" />
-            )}
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  // Future functionality - edit CV details
+                }}
+                className="p-1 text-blueberry/60 hover:text-apricot dark:text-apple-core/60 dark:hover:text-citrus transition-colors"
+                title="Edit CV (coming soon)"
+              >
+                <Edit className="h-4 w-4" />
+              </button>
+              {selectedCVId === cv.id && (
+                <Check className="h-5 w-5 text-apricot flex-shrink-0" />
+              )}
+            </div>
           </div>
         ))}
       </div>
+      {savedCVs.length > 3 && (
+        <div className="text-center pt-2">
+          <div className="text-micro text-blueberry/60 dark:text-apple-core/60">
+            Scroll to see all {savedCVs.length} CVs
+          </div>
+        </div>
+      )}
     </div>
   );
 };

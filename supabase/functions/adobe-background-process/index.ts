@@ -1,5 +1,12 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.8";
+import { 
+  generateAdobeResponseFileName, 
+  generateExtractedTextFileName, 
+  generateFormattedTextFileName,
+  generateUserUploadFileName 
+} from "./fileNaming.ts";
+import { formatExtractedText } from "../shared/adobe-text-formatter.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -374,15 +381,37 @@ async function extractTextWithAdobe(
       // Extract and parse the structured data from the ZIP
       const extractedText = await extractTextFromZip(zipBuffer);
 
-      // Save both ZIP and extracted text files (always, not just debug mode)
-      const savedFiles = await saveFilesToStorage(zipBuffer, extractedText, fileName, userId);
-      console.log(`Files saved - ZIP: ${savedFiles.zipUrl ? 'yes' : 'no'}, Text: ${savedFiles.textUrl ? 'yes' : 'no'}`);
+      // Apply text formatting (post-processing)
+      let formattingResult;
+      try {
+        formattingResult = await formatExtractedText(extractedText, fileName);
+        console.log(`Text formatting completed - Applied: ${formattingResult.formattingApplied}, Well-structured: ${formattingResult.isWellStructured}`);
+      } catch (error) {
+        console.log('Non-critical: Text formatting failed:', error.message);
+        // Create fallback result
+        formattingResult = {
+          rawText: extractedText,
+          formattedText: extractedText,
+          documentJson: { version: '1.0', sections: [] },
+          isWellStructured: false,
+          wordCount: extractedText.split(/\s+/).length,
+          formattingApplied: false
+        };
+      }
 
-      console.log(`Text extraction completed, extracted ${extractedText.split(/\s+/).length} words`);
+      // Save ZIP and both raw/formatted text files with proper states
+      const savedFiles = await saveFilesToStorage(zipBuffer, formattingResult, fileName, userId, uploadId);
+      console.log(`Files saved - ZIP: ${savedFiles.zipUrl ? 'yes' : 'no'}, Raw Text: ${savedFiles.textUrl ? 'yes' : 'no'}, Formatted Text: ${savedFiles.formattedTextUrl ? 'yes' : 'no'}`);
+
+      const finalText = formattingResult.formattingApplied ? formattingResult.formattedText : formattingResult.rawText;
+      console.log(`Text extraction completed, extracted ${formattingResult.wordCount} words`);
       return { 
-        extractedText: extractedText.trim(),
+        extractedText: finalText.trim(),
         debugUrl: savedFiles.zipUrl,
-        textUrl: savedFiles.textUrl
+        textUrl: savedFiles.formattedTextUrl || savedFiles.textUrl,
+        rawTextUrl: savedFiles.textUrl,
+        formattingApplied: formattingResult.formattingApplied,
+        isWellStructured: formattingResult.isWellStructured
       };
       
     } else if (statusData.status === 'failed') {
@@ -442,23 +471,21 @@ async function extractTextFromZip(zipBuffer: ArrayBuffer): Promise<string> {
 
 async function saveFilesToStorage(
   zipBuffer: ArrayBuffer, 
-  extractedText: string,
+  formattingResult: { rawText: string; formattedText: string; formattingApplied: boolean },
   originalFileName: string, 
-  userId: string
-): Promise<{ zipUrl?: string; textUrl?: string }> {
+  userId: string,
+  uploadId?: string
+): Promise<{ zipUrl?: string; textUrl?: string; formattedTextUrl?: string }> {
   try {
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     );
 
-    const timestamp = new Date().getTime();
-    const baseFileName = `${userId}_${timestamp}_${originalFileName.replace(/\.[^/.]+$/, "")}`;
+    const results: { zipUrl?: string; textUrl?: string; formattedTextUrl?: string } = {};
     
-    const results: { zipUrl?: string; textUrl?: string } = {};
-    
-    // Save ZIP file
-    const zipFileName = `${baseFileName}_adobe-response.zip`;
+    // Save ZIP file with adobe-response state
+    const zipFileName = generateAdobeResponseFileName(userId, originalFileName);
     const { error: zipError } = await supabase.storage
       .from('adobe-debug-files')
       .upload(zipFileName, zipBuffer, {
@@ -467,14 +494,17 @@ async function saveFilesToStorage(
       });
 
     if (!zipError) {
-      // Track in database
+      // Track in database with state
       await supabase.from('adobe_debug_files').insert({
         user_id: userId,
         file_name: zipFileName,
         original_filename: originalFileName,
         file_type: 'zip',
         file_size: zipBuffer.byteLength,
-        storage_path: zipFileName
+        storage_path: zipFileName,
+        state: 'adobe-response',
+        processing_stage: 'downloaded',
+        job_description_upload_id: uploadId ? uploadId : null
       });
       
       const { data: zipUrlData } = supabase.storage
@@ -483,31 +513,66 @@ async function saveFilesToStorage(
       results.zipUrl = zipUrlData.publicUrl;
     }
     
-    // Save extracted text
-    const textFileName = `${baseFileName}_extracted.txt`;
-    const textBuffer = new TextEncoder().encode(extractedText);
-    const { error: textError } = await supabase.storage
+    // Save raw extracted text with extracted state
+    const rawTextFileName = generateExtractedTextFileName(userId, originalFileName);
+    const rawTextBuffer = new TextEncoder().encode(formattingResult.rawText);
+    const { error: rawTextError } = await supabase.storage
       .from('adobe-debug-files')
-      .upload(textFileName, textBuffer, {
+      .upload(rawTextFileName, rawTextBuffer, {
         contentType: 'text/plain',
         upsert: true
       });
 
-    if (!textError) {
-      // Track in database
+    if (!rawTextError) {
+      // Track in database with state
       await supabase.from('adobe_debug_files').insert({
         user_id: userId,
-        file_name: textFileName,
+        file_name: rawTextFileName,
         original_filename: originalFileName,
-        file_type: 'text',
-        file_size: textBuffer.byteLength,
-        storage_path: textFileName
+        file_type: 'txt',
+        file_size: rawTextBuffer.byteLength,
+        storage_path: rawTextFileName,
+        state: 'extracted',
+        processing_stage: 'extracted',
+        job_description_upload_id: uploadId ? uploadId : null
       });
       
       const { data: textUrlData } = supabase.storage
         .from('adobe-debug-files')
-        .getPublicUrl(textFileName);
+        .getPublicUrl(rawTextFileName);
       results.textUrl = textUrlData.publicUrl;
+    }
+
+    // Save formatted text if different from raw with formatted state
+    if (formattingResult.formattingApplied && formattingResult.formattedText !== formattingResult.rawText) {
+      const formattedTextFileName = generateFormattedTextFileName(userId, originalFileName);
+      const formattedTextBuffer = new TextEncoder().encode(formattingResult.formattedText);
+      const { error: formattedTextError } = await supabase.storage
+        .from('adobe-debug-files')
+        .upload(formattedTextFileName, formattedTextBuffer, {
+          contentType: 'text/plain',
+          upsert: true
+        });
+
+      if (!formattedTextError) {
+        // Track in database with state
+        await supabase.from('adobe_debug_files').insert({
+          user_id: userId,
+          file_name: formattedTextFileName,
+          original_filename: originalFileName,
+          file_type: 'txt',
+          file_size: formattedTextBuffer.byteLength,
+          storage_path: formattedTextFileName,
+          state: 'formatted',
+          processing_stage: 'formatted',
+          job_description_upload_id: uploadId ? uploadId : null
+        });
+        
+        const { data: formattedTextUrlData } = supabase.storage
+          .from('adobe-debug-files')
+          .getPublicUrl(formattedTextFileName);
+        results.formattedTextUrl = formattedTextUrlData.publicUrl;
+      }
     }
     
     // Cleanup old files (keep max 100 of each type)

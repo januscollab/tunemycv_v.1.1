@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, MessageSquare, Lightbulb, Bug, Heart, Zap, Brain } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { UnifiedInput, UnifiedTextarea } from '@/components/ui/unified-input';
+import { FloatingLabelInput } from '@/components/common/FloatingLabelInput';
+import { FloatingLabelTextarea } from '@/components/common/FloatingLabelTextarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -193,21 +194,22 @@ export const FloatingFeedbackForm: React.FC<FloatingFeedbackFormProps> = ({
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label htmlFor="name">Name</Label>
-            <UnifiedInput
+            <FloatingLabelInput
               id="name"
+              label="Name"
               type="text"
               value={formData.name}
               onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
               placeholder="Your full name (optional)"
               disabled={isSubmitting}
               maxLength={100}
-              secure={true}
             />
           </div>
           <div>
             <Label htmlFor="email">Email Address</Label>
-            <UnifiedInput
+            <FloatingLabelInput
               id="email"
+              label="Email Address"
               type="email"
               value={formData.email}
               onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
@@ -215,15 +217,15 @@ export const FloatingFeedbackForm: React.FC<FloatingFeedbackFormProps> = ({
               required={allowContact}
               disabled={isSubmitting}
               maxLength={100}
-              secure={true}
             />
           </div>
         </div>
 
         <div>
           <Label htmlFor="subject">Subject</Label>
-          <UnifiedInput
+          <FloatingLabelInput
             id="subject"
+            label="Subject"
             type="text"
             value={formData.subject}
             onChange={(e) => setFormData(prev => ({ ...prev, subject: e.target.value }))}
@@ -231,14 +233,14 @@ export const FloatingFeedbackForm: React.FC<FloatingFeedbackFormProps> = ({
             required
             disabled={isSubmitting}
             maxLength={200}
-            secure={true}
           />
         </div>
 
         <div>
           <Label htmlFor="message">Your Feedback</Label>
-          <UnifiedTextarea
+          <FloatingLabelTextarea
             id="message"
+            label="Your Feedback"
             value={formData.message}
             onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
             placeholder="Please share your feedback, ideas, or issues..."
@@ -246,7 +248,6 @@ export const FloatingFeedbackForm: React.FC<FloatingFeedbackFormProps> = ({
             required
             disabled={isSubmitting}
             maxLength={maxCharacters}
-            secure={true}
           />
           <div className="flex justify-between items-center mt-2">
             <div className="text-micro text-muted-foreground">

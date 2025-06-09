@@ -25,6 +25,7 @@ export default {
 			},
 			fontSize: {
 				// Semantic typography scale with clear hierarchy
+				'tiny': ['0.6875rem', { lineHeight: '0.875rem' }], // 11px - floating labels when active
 				'micro': ['0.75rem', { lineHeight: '1rem' }],      // 12px - timestamps, badges, footnotes
 				'caption': ['0.875rem', { lineHeight: '1.25rem' }], // 14px - secondary text, metadata, helper text
 				'body': ['1rem', { lineHeight: '1.5rem' }],         // 16px - main content, form inputs, descriptions
