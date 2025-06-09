@@ -128,7 +128,7 @@ const DocumentPreviewCard: React.FC<DocumentPreviewCardProps> = ({
               onClick={onOpenVerification}
               className="text-micro text-zapier-orange hover:text-zapier-orange/80 p-0 h-auto"
             >
-              View {quality.issues.length - 2} more issues
+              View {quality.issues.length - 2} more observations
             </Button>
           )}
         </div>

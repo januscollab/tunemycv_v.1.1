@@ -242,25 +242,6 @@ const CVManagementTab: React.FC<CVManagementTabProps> = ({ credits, memberSince 
                       <p className="text-caption text-slate-600 dark:text-apple-core/80">
                         {formatFileSize(cv.file_size)} • {new Date(cv.created_at).toLocaleDateString()}
                       </p>
-                      {cv.processing_status === 'processing' && (
-                        <div className="flex items-center space-x-1 mt-1">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                          <span className="text-xs text-blue-600 dark:text-blue-400">Processing with Adobe API</span>
-                        </div>
-                      )}
-                      {cv.processing_status === 'failed' && (
-                        <div className="flex items-center space-x-1 mt-1">
-                          <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                          <span className="text-xs text-red-600 dark:text-red-400">Processing failed - 
-                            <button 
-                              onClick={() => retryProcessing(cv.id)}
-                              className="ml-1 text-blue-600 hover:text-blue-800 underline"
-                            >
-                              retry
-                            </button>
-                          </span>
-                        </div>
-                      )}
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
