@@ -1473,6 +1473,17 @@ const DesignSystem = () => {
           </Card>
         </div>
 
+        {/* Tabbed Navigation */}
+        <Tabs defaultValue="foundations" className="mt-8">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="foundations">Foundations</TabsTrigger>
+            <TabsTrigger value="components">Components</TabsTrigger>
+            <TabsTrigger value="interactions">Interactions</TabsTrigger>
+            <TabsTrigger value="loading">Loading States</TabsTrigger>
+          </TabsList>
+
+          {/* Foundations Tab */}
+          <TabsContent value="foundations" className="space-y-8">
             {/* Migration Status */}
             <Card className="mt-8">
               <CardHeader>
