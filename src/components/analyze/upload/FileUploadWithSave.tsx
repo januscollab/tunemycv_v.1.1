@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { DragDropZone } from '@/components/ui/drag-drop-zone';
 import ProcessingModal from '@/components/ui/processing-modal';
+import { BounceLoader } from '@/components/ui/progress-indicator';
 import { useAuth } from '@/contexts/AuthContext';
 import { useDocumentExtraction } from '@/hooks/useDocumentExtraction';
 import { useToast } from '@/hooks/use-toast';
@@ -15,6 +16,7 @@ interface FileUploadWithSaveProps {
   label: string;
   currentCVCount: number;
   maxCVCount: number;
+  selectedCVId?: string | null;
 }
 
 const FileUploadWithSave: React.FC<FileUploadWithSaveProps> = ({ 
@@ -24,9 +26,12 @@ const FileUploadWithSave: React.FC<FileUploadWithSaveProps> = ({
   maxSize, 
   label,
   currentCVCount,
-  maxCVCount
+  maxCVCount,
+  selectedCVId
 }) => {
   const [shouldSave, setShouldSave] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+  const [isButtonLoading, setIsButtonLoading] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
   const { isExtracting, progress, extractText, cancel } = useDocumentExtraction();
@@ -34,6 +39,12 @@ const FileUploadWithSave: React.FC<FileUploadWithSaveProps> = ({
   const handleDrop = async (files: File[]) => {
     const file = files[0];
     if (file) {
+      await attemptFileProcessing(file, 0);
+    }
+  };
+
+  const attemptFileProcessing = async (file: File, currentRetry: number) => {
+    try {
       // Perform security validation
       const validation = validateFileSecurely(file, 'cv');
       
@@ -55,8 +66,45 @@ const FileUploadWithSave: React.FC<FileUploadWithSaveProps> = ({
       if (result) {
         onFileSelect(secureFile, result.extractedText, shouldSave);
         setShouldSave(false);
+        setRetryCount(0);
+      }
+    } catch (error) {
+      console.error('File processing error:', error);
+      
+      if (currentRetry < 2) {
+        const nextRetry = currentRetry + 1;
+        setRetryCount(nextRetry);
+        
+        toast({
+          title: "Upload failed",
+          description: `Retrying upload (attempt ${nextRetry}/2)...`,
+          variant: "destructive"
+        });
+        
+        // Retry after a brief delay
+        setTimeout(() => {
+          attemptFileProcessing(file, nextRetry);
+        }, 1000);
+      } else {
+        // Max retries reached
+        setRetryCount(0);
+        toast({
+          title: "Upload failed",
+          description: "Upload failed after 2 attempts. Please check your file format and try again. Supported formats: PDF, DOCX, TXT.",
+          variant: "destructive"
+        });
       }
     }
+  };
+
+  const handleSaveButtonClick = () => {
+    setIsButtonLoading(true);
+    
+    // Simulate save operation with minimum 1 second
+    setTimeout(() => {
+      setShouldSave(!shouldSave);
+      setIsButtonLoading(false);
+    }, 1000);
   };
 
   const isAtLimit = currentCVCount >= maxCVCount;
@@ -80,23 +128,34 @@ const FileUploadWithSave: React.FC<FileUploadWithSaveProps> = ({
         onCancel={cancel}
       />
 
-      {user && (
+      {user && !selectedCVId && (
         <div className="mt-4 space-y-2">
           <div className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              id="save-cv"
-              checked={shouldSave}
-              onChange={(e) => setShouldSave(e.target.checked)}
-              disabled={isAtLimit}
-              className="w-4 h-4 text-apricot bg-white border-apple-core/30 rounded focus:ring-apricot focus:ring-2"
-            />
-            <label 
-              htmlFor="save-cv" 
-              className={`text-caption ${isAtLimit ? 'text-gray-400' : 'text-blueberry dark:text-apple-core'}`}
-            >
-              Save this CV for future use
-            </label>
+            {isButtonLoading ? (
+              <div className="flex items-center space-x-2">
+                <BounceLoader size="sm" />
+                <span className="text-caption text-blueberry dark:text-apple-core">
+                  {shouldSave ? 'Removing from saved CVs...' : 'Adding to saved CVs...'}
+                </span>
+              </div>
+            ) : (
+              <>
+                <input
+                  type="checkbox"
+                  id="save-cv"
+                  checked={shouldSave}
+                  onChange={handleSaveButtonClick}
+                  disabled={isAtLimit}
+                  className="w-4 h-4 text-apricot bg-white border-apple-core/30 rounded focus:ring-apricot focus:ring-2"
+                />
+                <label 
+                  htmlFor="save-cv" 
+                  className={`text-caption ${isAtLimit ? 'text-gray-400' : 'text-blueberry dark:text-apple-core'}`}
+                >
+                  Save this CV for future use
+                </label>
+              </>
+            )}
           </div>
           
           {isAtLimit && (

@@ -1,7 +1,6 @@
 
 import React from 'react';
-import { UnifiedInput } from '@/components/ui/unified-input';
-import { Label } from '@/components/ui/label';
+import { FloatingLabelInput } from '@/components/common/FloatingLabelInput';
 
 interface NameFieldsProps {
   firstName: string;
@@ -18,38 +17,26 @@ const NameFields: React.FC<NameFieldsProps> = ({
 }) => {
   return (
     <div className="grid grid-cols-2 gap-4">
-      <div>
-        <Label htmlFor="firstName" className="text-blueberry">
-          First name
-        </Label>
-        <UnifiedInput
-          id="firstName"
-          name="firstName"
-          type="text"
-          required
-          value={firstName}
-          onChange={onFirstNameChange}
-          className="mt-1"
-          maxLength={50}
-          secure={true}
-        />
-      </div>
-      <div>
-        <Label htmlFor="lastName" className="text-blueberry">
-          Last name
-        </Label>
-        <UnifiedInput
-          id="lastName"
-          name="lastName"
-          type="text"
-          required
-          value={lastName}
-          onChange={onLastNameChange}
-          className="mt-1"
-          maxLength={50}
-          secure={true}
-        />
-      </div>
+      <FloatingLabelInput
+        id="firstName"
+        name="firstName"
+        type="text"
+        label="First name"
+        required
+        value={firstName}
+        onChange={onFirstNameChange}
+        maxLength={50}
+      />
+      <FloatingLabelInput
+        id="lastName"
+        name="lastName"
+        type="text"
+        label="Last name"
+        required
+        value={lastName}
+        onChange={onLastNameChange}
+        maxLength={50}
+      />
     </div>
   );
 };

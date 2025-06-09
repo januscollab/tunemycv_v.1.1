@@ -35,7 +35,7 @@ const SavedCVList: React.FC<SavedCVListProps> = ({ savedCVs, selectedCVId, onCVS
   return (
     <div>
       <h4 className="text-caption font-medium text-blueberry dark:text-citrus mb-3">Select a saved CV</h4>
-      <div className="space-y-2 max-h-64 overflow-y-auto">
+      <div className="space-y-2 overflow-y-auto" style={{ maxHeight: '192px' }}>
         {savedCVs.map((cv) => (
           <div
             key={cv.id}
@@ -61,6 +61,13 @@ const SavedCVList: React.FC<SavedCVListProps> = ({ savedCVs, selectedCVId, onCVS
           </div>
         ))}
       </div>
+      {savedCVs.length > 3 && (
+        <div className="text-center pt-2">
+          <div className="text-micro text-blueberry/60 dark:text-apple-core/60">
+            Scroll to see all {savedCVs.length} CVs
+          </div>
+        </div>
+      )}
     </div>
   );
 };
