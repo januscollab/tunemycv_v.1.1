@@ -58,13 +58,6 @@ export const useDocumentExtraction = () => {
     let timeoutId: NodeJS.Timeout;
 
     try {
-      // Create timeout promise that rejects after 15 seconds for faster fallback
-      const timeoutPromise = new Promise<never>((_, reject) => {
-        timeoutId = setTimeout(() => {
-          reject(new Error('Client-side processing timed out. Trying server-side fallback...'));
-        }, 15000);
-      });
-
       // Create cancellation promise
       const cancellationPromise = new Promise<never>((_, reject) => {
         controller.signal.addEventListener('abort', () => {
@@ -82,14 +75,11 @@ export const useDocumentExtraction = () => {
         setState(prev => ({ ...prev, progress: 'Reading text file...' }));
       }
 
-      // Race between extraction, timeout, and cancellation
+      // Race between extraction and cancellation only
       const extractedText = await Promise.race([
         extractTextFromFile(file, controller.signal),
-        timeoutPromise,
         cancellationPromise
       ]);
-      
-      clearTimeout(timeoutId);
       setState(prev => ({ ...prev, progress: 'Applying formatting rules and creating structured document...' }));
       
       // Generate structured JSON from text with formatting rules applied
@@ -144,7 +134,6 @@ export const useDocumentExtraction = () => {
       return { extractedText, documentJson, typeDetection, qualityAssessment };
 
     } catch (error) {
-      clearTimeout(timeoutId!);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       
       setState({
