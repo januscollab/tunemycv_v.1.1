@@ -1,11 +1,16 @@
 # To-Do List
 
+## Critical Bugs (Immediate Attention Required)
+- [ ] **Toast Notifications Still Appearing**: Auto-save toast notifications are still showing in the rich text editor despite implementation to remove them
+- [ ] **Ctrl+Z Undo Not Working**: Keyboard shortcut Ctrl+Z for undo functionality is not working in the rich text editor
+
 ## UI/UX Improvements
 - [x] Analyze CV > Paste Job Description edit text area needs to be updated to the correct "Floating Label Textarea"
 - [x] **CV Upload UX**: Remove "Type Confirmation Needed" tag for all CV uploads to streamline the upload process
 - [ ] **Document Modal Enhancement**: Review Document modal > remove "Document Content" from inside the text edit area
 - [ ] **Missing Breadcrumbs**: Add breadcrumbs to pricing scale page
 - [ ] **Auto-Open File Dialog**: When a user clicks the "Upload New CV" tab on the CV analysis page, the file upload dialog should auto-open
+- [ ] **Auto-Open File Dialog on Tab Switch**: When the "Saved CVs" tab is active in the Analyze Your CV section and a user clicks the "Upload New CV" tab, the file upload dialog should automatically open
 - [ ] **Button State Verification**: Ensure "Add to Saved CV's" button disappears after successfully saving uploaded CV to saved CV log
 
 ## Adobe PDF Processing
