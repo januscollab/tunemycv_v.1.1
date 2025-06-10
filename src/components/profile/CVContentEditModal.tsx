@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { X, Save, FileText } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import RichTextEditor from '@/components/common/RichTextEditor';
+import ControlledRichTextEditor from '@/components/common/ControlledRichTextEditor';
+import EditorErrorBoundary from '@/components/common/EditorErrorBoundary';
 import { supabase } from '@/integrations/supabase/client';
 import { 
   DocumentJson, 
@@ -170,13 +171,20 @@ const CVContentEditModal: React.FC<CVContentEditModalProps> = ({
               <span className="ml-3 text-muted-foreground">Loading CV content...</span>
             </div>
           ) : documentJson ? (
-            <RichTextEditor
-              documentJson={documentJson}
-              onContentChange={handleContentChange}
-              className="h-[calc(100vh-200px)]"
-              placeholder="Edit your CV content here..."
-              showAIFeatures={true}
-            />
+            <EditorErrorBoundary
+              fallbackContent={generateFormattedText(documentJson)}
+              onReset={() => setDocumentJson(textToJson(cv.extracted_text || ''))}
+            >
+              <ControlledRichTextEditor
+                initialContent={generateFormattedText(documentJson)}
+                onContentChange={handleContentChange}
+                className="h-[calc(100vh-200px)]"
+                placeholder="Edit your CV content here..."
+                showAIFeatures={true}
+                enableAutoSave={true}
+                debounceMs={1000}
+              />
+            </EditorErrorBoundary>
           ) : null}
         </div>
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FileText, Edit, AlertTriangle, CheckCircle, Info, X, Heart } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { formatFileSize } from '@/utils/fileUtils';
 import { assessDocumentQuality, getQualityColor, getQualityBadge, QualityAssessment } from '@/utils/documentQuality';
+import BounceLoader from '@/components/ui/bounce-loader';
 
 interface DocumentPreviewCardProps {
   fileName: string;
@@ -30,7 +31,42 @@ const DocumentPreviewCard: React.FC<DocumentPreviewCardProps> = ({
   canSaveToCVs = false,
   onConfirmDocumentType
 }) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isRemoving, setIsRemoving] = useState(false);
   const quality = assessDocumentQuality(extractedText, fileName, documentType);
+
+  const handleReviewEdit = async () => {
+    setIsLoading(true);
+    try {
+      await onOpenVerification();
+    } finally {
+      // Keep loading state briefly to show user action was registered
+      setTimeout(() => setIsLoading(false), 500);
+    }
+  };
+
+  const handleSaveToCVs = async () => {
+    if (onSaveToCVs) {
+      setIsSaving(true);
+      try {
+        await onSaveToCVs();
+      } finally {
+        // Keep saving state briefly to show user action was registered
+        setTimeout(() => setIsSaving(false), 500);
+      }
+    }
+  };
+
+  const handleRemove = async () => {
+    setIsRemoving(true);
+    try {
+      await onRemove();
+    } finally {
+      // Keep removing state briefly to show user action was registered
+      setTimeout(() => setIsRemoving(false), 500);
+    }
+  };
   
   const getIssueIcon = (type: string) => {
     switch (type) {
@@ -109,30 +145,45 @@ const DocumentPreviewCard: React.FC<DocumentPreviewCardProps> = ({
           <Button
             variant="outline"
             size="sm"
-            onClick={onOpenVerification}
+            onClick={handleReviewEdit}
+            disabled={isLoading}
             className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200"
           >
-            <Edit className="h-3 w-3 mr-2" />
+            {isLoading ? (
+              <BounceLoader size="sm" className="mr-2" />
+            ) : (
+              <Edit className="h-3 w-3 mr-2" />
+            )}
             Review & Edit
           </Button>
-          {onSaveToCVs && canSaveToCVs && (
+          {onSaveToCVs && canSaveToCVs && !isSaving && (
             <Button
               variant="outline"
               size="sm"
-              onClick={onSaveToCVs}
+              onClick={handleSaveToCVs}
+              disabled={isSaving}
               className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200"
             >
-              <Heart className="h-3 w-3 mr-2" />
+              {isSaving ? (
+                <BounceLoader size="sm" className="mr-2" />
+              ) : (
+                <Heart className="h-3 w-3 mr-2" />
+              )}
               Add to Saved CVs
             </Button>
           )}
           <Button
             variant="outline"
             size="sm"
-            onClick={onRemove}
+            onClick={handleRemove}
+            disabled={isRemoving}
             className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200"
           >
-            <X className="h-3 w-3 mr-2" />
+            {isRemoving ? (
+              <BounceLoader size="sm" className="mr-2" />
+            ) : (
+              <X className="h-3 w-3 mr-2" />
+            )}
             Remove
           </Button>
         </div>
