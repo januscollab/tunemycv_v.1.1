@@ -15,6 +15,7 @@ interface FileUploadWithSaveProps {
   currentCVCount: number;
   maxCVCount: number;
   selectedCVId?: string | null;
+  fileInputRef?: React.RefObject<HTMLInputElement>;
 }
 
 const FileUploadWithSave: React.FC<FileUploadWithSaveProps> = ({ 
@@ -25,7 +26,8 @@ const FileUploadWithSave: React.FC<FileUploadWithSaveProps> = ({
   label,
   currentCVCount,
   maxCVCount,
-  selectedCVId
+  selectedCVId,
+  fileInputRef
 }) => {
   const [shouldSave, setShouldSave] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
@@ -97,6 +99,7 @@ const FileUploadWithSave: React.FC<FileUploadWithSaveProps> = ({
         placeholder={orchestrator.isProcessing ? orchestrator.progress : (uploading ? "Uploading..." : label)}
         description={`${accept} • Max ${maxSize}`}
         className="border-apple-core/30 dark:border-citrus/30"
+        fileInputRef={fileInputRef}
       />
       
       <ProcessingModal

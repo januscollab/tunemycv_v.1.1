@@ -45,6 +45,7 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [showValidationDialog, setShowValidationDialog] = useState(false);
   const [pendingFile, setPendingFile] = useState<{ file: File; extractedText: string } | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   // Fetch saved CVs from database
   const { data: savedCVs = [], isLoading, refetch } = useQuery({
@@ -309,7 +310,18 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
                 <span>Saved CVs ({savedCVs.length})</span>
               </button>
               <button
-                onClick={() => setActiveTab('upload')}
+                onClick={() => {
+                  // If switching from saved CVs to upload, auto-open file dialog
+                  if (activeTab === 'saved') {
+                    setActiveTab('upload');
+                    // Delay to ensure the tab content has rendered
+                    setTimeout(() => {
+                      fileInputRef.current?.click();
+                    }, 100);
+                  } else {
+                    setActiveTab('upload');
+                  }
+                }}
                 className={`px-3 py-2 text-caption font-medium rounded-md transition-colors flex items-center justify-center space-x-2 ${
                   activeTab === 'upload'
                     ? 'text-zapier-orange border-b-2 border-zapier-orange bg-transparent'
@@ -338,6 +350,7 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
                 label="Upload your CV"
                 currentCVCount={savedCVs.length}
                 maxCVCount={5}
+                fileInputRef={fileInputRef}
               />
             )}
           </div>

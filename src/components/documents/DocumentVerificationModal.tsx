@@ -219,9 +219,14 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
           <div className="w-[70%] flex flex-col">
             <div className="px-4 py-3 border-b border-border bg-background">
               <div className="flex items-center justify-between">
-                <h3 className="text-caption font-medium text-foreground">Document Content</h3>
+                <div className="flex items-center space-x-2">
+                  <h3 className="text-caption font-medium text-foreground">Edit Document</h3>
+                  <div className="text-micro px-2 py-0.5 bg-primary/10 rounded-full text-primary">
+                    {documentType === 'cv' ? 'CV' : 'Job Description'}
+                  </div>
+                </div>
                 <div className="text-micro text-muted-foreground">
-                  Click to edit • Changes auto-saved
+                  Changes auto-saved
                 </div>
               </div>
             </div>
