@@ -3,7 +3,6 @@ import { X, Save, FileText } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import RichTextEditor from '@/components/common/RichTextEditor';
-import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { 
   DocumentJson, 
@@ -33,7 +32,6 @@ const CVContentEditModal: React.FC<CVContentEditModalProps> = ({
   const [documentJson, setDocumentJson] = useState<DocumentJson | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const { toast } = useToast();
 
   // Load CV content on modal open
   useEffect(() => {
@@ -83,11 +81,7 @@ const CVContentEditModal: React.FC<CVContentEditModalProps> = ({
       }
     } catch (error) {
       console.error('Error loading CV content:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load CV content for editing",
-        variant: "destructive"
-      });
+      // Silent error handling - no toast notification
       onClose();
     } finally {
       setIsLoading(false);
@@ -133,20 +127,12 @@ const CVContentEditModal: React.FC<CVContentEditModalProps> = ({
 
       if (error) throw error;
 
-      toast({
-        title: "Success",
-        description: "CV content has been updated successfully"
-      });
-      
+      // Silent success - no toast notification
       onUpdate();
       onClose();
     } catch (error) {
       console.error('Error saving CV content:', error);
-      toast({
-        title: "Error",
-        description: "Failed to save CV content",
-        variant: "destructive"
-      });
+      // Silent error handling - no toast notification
     } finally {
       setIsSaving(false);
     }

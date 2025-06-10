@@ -4,7 +4,6 @@ import 'react-quill/dist/quill.snow.css';
 import './RichTextEditor.css';
 import { WandSparkles, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
 import { 
   DocumentJson, 
   jsonToText, 
@@ -43,7 +42,6 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const [originalJson] = useState<DocumentJson>(documentJson);
   const [isAIEnabled, setIsAIEnabled] = useState(false);
   const [selectionInfo, setSelectionInfo] = useState<AIContext | null>(null);
-  const { toast } = useToast();
 
   // Convert JSON to stable HTML for Quill display
   const jsonToHtml = useCallback((json: DocumentJson): string => {
@@ -160,9 +158,30 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       matchVisual: false
     },
     history: {
-      delay: 500,
-      maxStack: 50,
-      userOnly: true
+      delay: 1000,
+      maxStack: 100,
+      userOnly: false
+    },
+    keyboard: {
+      bindings: {
+        undo: {
+          key: 'Z',
+          ctrlKey: true,
+          handler: function(range: any, context: any) {
+            this.quill.history.undo();
+            return false;
+          }
+        },
+        redo: {
+          key: 'Z',
+          ctrlKey: true,
+          shiftKey: true,
+          handler: function(range: any, context: any) {
+            this.quill.history.redo();
+            return false;
+          }
+        }
+      }
     }
   };
 

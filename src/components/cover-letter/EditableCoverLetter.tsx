@@ -2,7 +2,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import RichTextEditor from '@/components/common/RichTextEditor';
 import { textToJson, DocumentJson, generateFormattedText } from '@/utils/documentJsonUtils';
-import { useToast } from '@/hooks/use-toast';
 
 
 interface EditableCoverLetterProps {
@@ -13,7 +12,6 @@ interface EditableCoverLetterProps {
 const EditableCoverLetter: React.FC<EditableCoverLetterProps> = ({ content, onSave }) => {
   const [documentJson, setDocumentJson] = useState<DocumentJson>(() => textToJson(content));
   const [originalContent] = useState(content);
-  const { toast } = useToast();
 
   // Update document JSON when content prop changes
   useEffect(() => {

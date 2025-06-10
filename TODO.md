@@ -1,8 +1,8 @@
 # To-Do List
 
 ## Critical Bugs (Immediate Attention Required)
-- [ ] **Toast Notifications Still Appearing**: Auto-save toast notifications are still showing in the rich text editor despite implementation to remove them
-- [ ] **Ctrl+Z Undo Not Working**: Keyboard shortcut Ctrl+Z for undo functionality is not working in the rich text editor
+- [x] **Toast Notifications Still Appearing**: Auto-save toast notifications are still showing in the rich text editor despite implementation to remove them
+- [x] **Ctrl+Z Undo Not Working**: Keyboard shortcut Ctrl+Z for undo functionality is not working in the rich text editor
 
 ## UI/UX Improvements
 - [x] Analyze CV > Paste Job Description edit text area needs to be updated to the correct "Floating Label Textarea"
