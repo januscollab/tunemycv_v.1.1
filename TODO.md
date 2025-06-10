@@ -4,6 +4,58 @@
 - [x] **Toast Notifications Still Appearing**: Auto-save toast notifications are still showing in the rich text editor despite implementation to remove them
 - [x] **Ctrl+Z Undo Not Working**: Keyboard shortcut Ctrl+Z for undo functionality is not working in the rich text editor
 
+## Immediate Backlog
+
+### Critical Priority: CV Content Not Loading in Rich Text Editor
+
+**Issue:** When users click "Review and Edit" on saved CVs, the content doesn't display in the rich text editor.
+
+**Root Causes Identified:**
+1. `CVContentEditModal` still uses old `RichTextEditor` component
+2. Data type mismatch between stored CV content (string) and new editor expectations (DocumentJson)
+3. Incomplete migration from string-based to JSON-First architecture
+
+**7-Step Fix Plan:**
+
+**Step 1: Immediate Data Flow Fix**
+- Update `CVContentEditModal` to use `ControlledRichTextEditor`
+- Add data type detection and conversion logic
+- Handle both string and DocumentJson input formats
+
+**Step 2: Content Loading Enhancement**
+- Add proper loading states when fetching CV content
+- Implement error boundaries for failed content loading
+- Add fallback mechanisms for corrupted data
+
+**Step 3: Data Type Conversion System**
+- Create utility to convert string content to DocumentJson format
+- Ensure backward compatibility with existing saved CVs
+- Add validation for converted content
+
+**Step 4: Editor Integration**
+- Replace old editor component in CV edit modal
+- Update props and event handlers to match new interface
+- Ensure proper content saving and updating
+
+**Step 5: Error Handling & User Feedback**
+- Add "BounceLoader" for "Review and edit" button clicks
+- Implement retry mechanisms for failed loads
+- Show clear error messages with recovery options
+
+**Step 6: Testing & Validation**
+- Test with various CV formats (TXT, DOCX, JSON)
+- Verify content preservation during editing
+- Ensure proper save/update functionality
+
+**Step 7: Migration Cleanup**
+- Remove old editor dependencies once migration complete
+- Update all related components consistently
+- Add comprehensive logging for debugging
+
+**Priority Level:** CRITICAL - Blocking core functionality
+**Estimated Impact:** Fixes broken CV editing workflow for all users
+**Dependencies:** JSON-First editor architecture completion
+
 ## UI/UX Improvements
 - [x] Analyze CV > Paste Job Description edit text area needs to be updated to the correct "Floating Label Textarea"
 - [x] **CV Upload UX**: Remove "Type Confirmation Needed" tag for all CV uploads to streamline the upload process
