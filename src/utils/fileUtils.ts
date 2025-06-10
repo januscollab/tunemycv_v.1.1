@@ -1,5 +1,6 @@
 
 import { validateFileSecurely, createSecureFileObject } from '@/utils/secureFileValidation';
+import * as mammoth from 'mammoth';
 
 // File type detection from extension (more reliable than browser MIME types)
 export const getFileTypeFromExtension = (filename: string): string => {
@@ -136,8 +137,6 @@ export const extractTextFromFile = async (file: File, signal?: AbortSignal): Pro
     try {
       console.log(`Extracting text from DOCX: ${file.name}`);
       
-      // Import mammoth dynamically
-      const mammoth = await import('mammoth');
       const arrayBuffer = await file.arrayBuffer();
       
       const result = await mammoth.extractRawText({ arrayBuffer });
