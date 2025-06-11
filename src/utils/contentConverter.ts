@@ -2,18 +2,28 @@ import { DocumentJson, textToJson, generateFormattedText } from './documentJsonU
 import { jsonToHtml } from './jsonHtmlConverters';
 
 /**
- * Convert plain text content to HTML format for rich text editors
+ * SIMPLE: Convert plain text directly to HTML for rich text editors
  */
 export const textToHtml = (text: string): string => {
   if (!text || text.trim() === '') {
     return '<p><br></p>';
   }
 
-  // First convert to JSON structure to handle formatting
-  const documentJson = textToJson(text);
+  // Split by double newlines for paragraphs
+  const paragraphs = text.split(/\n\s*\n/);
   
-  // Then convert to HTML
-  return jsonToHtml(documentJson);
+  // Convert each paragraph to HTML
+  const htmlParagraphs = paragraphs.map(paragraph => {
+    if (!paragraph.trim()) return '';
+    
+    // Handle single line breaks within paragraphs
+    const lines = paragraph.split('\n').map(line => line.trim()).filter(Boolean);
+    const content = lines.join('<br>');
+    
+    return `<p>${content}</p>`;
+  }).filter(Boolean);
+  
+  return htmlParagraphs.length > 0 ? htmlParagraphs.join('') : '<p><br></p>';
 };
 
 /**
