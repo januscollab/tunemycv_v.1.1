@@ -3,6 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import ControlledRichTextEditor from '@/components/common/ControlledRichTextEditor';
 import EnhancedEditorErrorBoundary from '@/components/common/EnhancedEditorErrorBoundary';
 import { textToJson, DocumentJson, generateFormattedText } from '@/utils/documentJsonUtils';
+import { initializeEditorContent } from '@/utils/contentConverter';
 
 
 interface EditableCoverLetterProps {
@@ -11,12 +12,16 @@ interface EditableCoverLetterProps {
 }
 
 const EditableCoverLetter: React.FC<EditableCoverLetterProps> = ({ content, onSave }) => {
-  const [documentJson, setDocumentJson] = useState<DocumentJson>(() => textToJson(content));
+  const [documentJson, setDocumentJson] = useState<DocumentJson>(() => {
+    const { json } = initializeEditorContent(content);
+    return json;
+  });
   const [originalContent] = useState(content);
 
   // Update document JSON when content prop changes
   useEffect(() => {
-    setDocumentJson(textToJson(content));
+    const { json } = initializeEditorContent(content);
+    setDocumentJson(json);
   }, [content]);
 
   // Handle rich text editor content changes - NO TOAST NOTIFICATIONS

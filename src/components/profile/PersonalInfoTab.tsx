@@ -182,9 +182,6 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
-                First Name
-              </label>
               <SavedDataInput
                 id="firstName"
                 label="First Name"
@@ -196,9 +193,6 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
             </div>
 
             <div>
-              <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
-                Last Name
-              </label>
               <SavedDataInput
                 id="lastName"
                 label="Last Name"
@@ -212,13 +206,14 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
-                <Mail className="h-4 w-4 inline mr-1" />
-                Email Address
-              </label>
               <SavedDataInput
                 id="email"
-                label="Email Address"
+                label={
+                  <span className="flex items-center">
+                    <Mail className="h-4 w-4 mr-1" />
+                    Email Address
+                  </span>
+                }
                 type="email"
                 value={profile.email}
                 onChange={(e) => setProfile({ ...profile, email: e.target.value })}
@@ -227,10 +222,6 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
             </div>
 
             <div>
-              <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
-                <Phone className="h-4 w-4 inline mr-1" />
-                Phone Number
-              </label>
               <div className="flex gap-2">
                 <CountryCodeSelect
                   value={profile.country_code}
@@ -239,7 +230,12 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
                 />
                 <SavedDataInput
                   id="phoneNumber"
-                  label="Phone Number"
+                  label={
+                    <span className="flex items-center">
+                      <Phone className="h-4 w-4 mr-1" />
+                      Phone Number
+                    </span>
+                  }
                   type="tel"
                   value={profile.phone_number}
                   onChange={(e) => setProfile({ ...profile, phone_number: e.target.value })}
@@ -252,13 +248,14 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="linkedinUrl" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
-                <Linkedin className="h-4 w-4 inline mr-1" />
-                LinkedIn Profile URL
-              </label>
               <SavedDataInput
                 id="linkedinUrl"
-                label="LinkedIn Profile URL"
+                label={
+                  <span className="flex items-center">
+                    <Linkedin className="h-4 w-4 mr-1" />
+                    LinkedIn Profile URL
+                  </span>
+                }
                 type="url"
                 value={profile.linkedin_url}
                 onChange={(e) => setProfile({ ...profile, linkedin_url: e.target.value })}
@@ -267,13 +264,14 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
             </div>
 
             <div>
-              <label htmlFor="personalWebsiteUrl" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
-                <Globe className="h-4 w-4 inline mr-1" />
-                Personal Website/Portfolio URL
-              </label>
               <SavedDataInput
                 id="personalWebsiteUrl"
-                label="Personal Website/Portfolio URL"
+                label={
+                  <span className="flex items-center">
+                    <Globe className="h-4 w-4 mr-1" />
+                    Personal Website/Portfolio URL
+                  </span>
+                }
                 type="url"
                 value={profile.personal_website_url}
                 onChange={(e) => setProfile({ ...profile, personal_website_url: e.target.value })}
@@ -367,9 +365,6 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
 
           <div className="space-y-4">
             <div>
-              <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
-                New Password
-              </label>
               <SavedDataInput
                 id="newPassword"
                 label="New Password"
@@ -381,9 +376,6 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-apple-core/80 mb-1">
-                Confirm New Password
-              </label>
               <SavedDataInput
                 id="confirmPassword"
                 label="Confirm New Password"

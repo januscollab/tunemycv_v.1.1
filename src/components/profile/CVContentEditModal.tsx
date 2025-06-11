@@ -11,7 +11,7 @@ import {
   generateFormattedText,
   parseDocumentJson 
 } from '@/utils/documentJsonUtils';
-import { loadCompatibleContent } from '@/utils/editorDataConverter';
+import { initializeEditorContent } from '@/utils/contentConverter';
 
 interface CVContentEditModalProps {
   isOpen: boolean;
@@ -62,8 +62,8 @@ const CVContentEditModal: React.FC<CVContentEditModalProps> = ({
         documentContentJson = data.document_content_json;
       }
 
-      // Use the robust content loader
-      const { json } = loadCompatibleContent(extractedText, documentContentJson);
+      // Use the robust content initializer
+      const { json } = initializeEditorContent(extractedText, documentContentJson);
       setDocumentJson(json);
     } catch (error) {
       console.error('Error loading CV content:', error);

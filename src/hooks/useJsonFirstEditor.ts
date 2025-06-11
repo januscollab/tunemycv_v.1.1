@@ -28,8 +28,15 @@ export const useJsonFirstEditor = ({
   enableAutoSave = true
 }: UseJsonFirstEditorOptions): UseJsonFirstEditorReturn => {
   // Core state - JSON is the single source of truth
-  const [documentJson, setDocumentJson] = useState<DocumentJson>(() => textToJson(initialContent));
-  const [htmlContent, setHtmlContent] = useState<string>(() => jsonToHtml(textToJson(initialContent)));
+  const [documentJson, setDocumentJson] = useState<DocumentJson>(() => {
+    const cleanContent = initialContent?.trim() || '';
+    return textToJson(cleanContent);
+  });
+  const [htmlContent, setHtmlContent] = useState<string>(() => {
+    const cleanContent = initialContent?.trim() || '';
+    const json = textToJson(cleanContent);
+    return jsonToHtml(json);
+  });
   const [isConverting, setIsConverting] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   
