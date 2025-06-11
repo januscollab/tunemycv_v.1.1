@@ -1,3 +1,5 @@
+import { ProfessionalTextProcessor } from './professionalTextProcessor';
+
 export interface DocumentSection {
   type: 'heading' | 'paragraph' | 'list';
   level?: 1 | 2 | 3;
@@ -7,11 +9,17 @@ export interface DocumentSection {
   formatting?: {
     bold?: boolean; // Only bold formatting allowed
   };
+  confidence?: number; // Quality confidence score
 }
 
 export interface DocumentJson {
   version: '1.0';
   sections: DocumentSection[];
+  metadata?: {
+    structureQuality?: number;
+    processingMethod?: 'professional' | 'legacy';
+    extractedAt?: string;
+  };
 }
 
 // Generate unique ID for sections
@@ -36,6 +44,85 @@ const applyFormattingRules = (text: string): string => {
 
 // Enhanced CV text processing with intelligent structure recognition
 export const textToJson = (text: string): DocumentJson => {
+  console.log('[documentJsonUtils] Starting professional text processing');
+  
+  // Use professional text processor for better structure detection
+  const normalizedText = ProfessionalTextProcessor.normalizeText(text);
+  const structureAnalysis = ProfessionalTextProcessor.structureCVContent(normalizedText);
+  
+  if (structureAnalysis.quality > 0.6) {
+    console.log('[documentJsonUtils] Using professional structure analysis');
+    return professionalTextToJson(structureAnalysis);
+  }
+  
+  console.log('[documentJsonUtils] Falling back to legacy processing');
+  return legacyTextToJson(text);
+};
+
+// Professional text to JSON conversion using NLP analysis
+const professionalTextToJson = (analysis: {
+  sections: Array<{
+    title: string;
+    content: string;
+    type: 'header' | 'paragraph' | 'list';
+    confidence: number;
+  }>;
+  quality: number;
+}): DocumentJson => {
+  const sections: DocumentSection[] = [];
+  
+  for (const section of analysis.sections) {
+    // Add section header
+    sections.push({
+      type: 'heading',
+      level: 2,
+      content: section.title,
+      id: generateId(),
+      confidence: section.confidence
+    });
+    
+    // Process section content
+    if (section.type === 'list') {
+      const items = ProfessionalTextProcessor.structureBulletPoints(section.content);
+      if (items.length > 0) {
+        sections.push({
+          type: 'list',
+          items,
+          id: generateId(),
+          confidence: section.confidence
+        });
+      }
+    } else {
+      // Enhanced paragraph structure
+      const enhancedContent = ProfessionalTextProcessor.enhanceParagraphStructure(section.content);
+      const paragraphs = enhancedContent.split('\n\n').filter(p => p.trim());
+      
+      for (const paragraph of paragraphs) {
+        if (paragraph.trim()) {
+          sections.push({
+            type: 'paragraph',
+            content: paragraph.trim(),
+            id: generateId(),
+            confidence: section.confidence
+          });
+        }
+      }
+    }
+  }
+  
+  return {
+    version: '1.0',
+    sections,
+    metadata: {
+      structureQuality: analysis.quality,
+      processingMethod: 'professional',
+      extractedAt: new Date().toISOString()
+    }
+  };
+};
+
+// Legacy text processing for fallback
+const legacyTextToJson = (text: string): DocumentJson => {
   const cleanedText = applyFormattingRules(text);
   const lines = cleanedText.split('\n');
   const sections: DocumentSection[] = [];
@@ -189,7 +276,12 @@ export const textToJson = (text: string): DocumentJson => {
     version: '1.0',
     sections: sections.filter(section => 
       section.content?.trim() || (section.items && section.items.length > 0)
-    )
+    ),
+    metadata: {
+      structureQuality: 0.5, // Lower quality for legacy processing
+      processingMethod: 'legacy',
+      extractedAt: new Date().toISOString()
+    }
   };
 };
 
@@ -332,7 +424,7 @@ export const updateDocumentContent = (
 
 // Create pretty, human-readable JSON for database storage
 export const prettifyDocumentJson = (docJson: DocumentJson): string => {
-  return JSON.stringify(docJson, null, 2);
+  return ProfessionalTextProcessor.beautifyJSON(docJson);
 };
 
 // Parse pretty JSON back to DocumentJson object
