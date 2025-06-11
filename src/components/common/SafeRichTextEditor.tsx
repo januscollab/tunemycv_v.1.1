@@ -2,8 +2,9 @@ import React, { useRef, useEffect, useState, useCallback, forwardRef, useImperat
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import './RichTextEditor.css';
-import { WandSparkles, RotateCcw } from 'lucide-react';
+import { WandSparkles, RotateCcw, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useJsonFirstEditor } from '@/hooks/useJsonFirstEditor';
 import { DocumentJson } from '@/utils/documentJsonUtils';
 
@@ -13,7 +14,7 @@ interface AIContext {
   fullText: string;
 }
 
-interface ControlledRichTextEditorProps {
+interface SafeRichTextEditorProps {
   initialContent: string | DocumentJson;
   onContentChange: (json: DocumentJson, text: string) => void;
   className?: string;
@@ -25,12 +26,12 @@ interface ControlledRichTextEditorProps {
   debounceMs?: number;
 }
 
-interface ControlledRichTextEditorRef {
+interface SafeRichTextEditorRef {
   htmlContent: string;
   saveChanges: (html: string) => Promise<void>;
 }
 
-const ControlledRichTextEditor = forwardRef<ControlledRichTextEditorRef, ControlledRichTextEditorProps>(({
+const SafeRichTextEditor = forwardRef<SafeRichTextEditorRef, SafeRichTextEditorProps>(({
   initialContent,
   onContentChange,
   className = '',
@@ -44,17 +45,8 @@ const ControlledRichTextEditor = forwardRef<ControlledRichTextEditorRef, Control
   const quillRef = useRef<ReactQuill>(null);
   const [isAIEnabled, setIsAIEnabled] = useState(false);
   const [selectionInfo, setSelectionInfo] = useState<AIContext | null>(null);
-  const updateTimeoutRef = useRef<NodeJS.Timeout>();
-
-  // DIAGNOSTIC: Log what content the editor receives
-  console.log('[ControlledRichTextEditor] Received initialContent:', {
-    type: typeof initialContent,
-    isString: typeof initialContent === 'string',
-    isObject: typeof initialContent === 'object',
-    hasSection: typeof initialContent === 'object' && initialContent?.sections,
-    contentLength: typeof initialContent === 'string' ? initialContent.length : 'N/A',
-    preview: typeof initialContent === 'string' ? initialContent.substring(0, 100) : JSON.stringify(initialContent)?.substring(0, 100)
-  });
+  const [editorError, setEditorError] = useState<string | null>(null);
+  const [isQuillReady, setIsQuillReady] = useState(false);
 
   // Use the HTML-first editor hook
   const {
@@ -70,7 +62,7 @@ const ControlledRichTextEditor = forwardRef<ControlledRichTextEditorRef, Control
     initialContent,
     onContentChange,
     debounceMs,
-    enableAutoSave: false // Disable auto-save for HTML-first approach
+    enableAutoSave: false
   });
 
   // Expose methods through ref
@@ -79,46 +71,79 @@ const ControlledRichTextEditor = forwardRef<ControlledRichTextEditorRef, Control
     saveChanges
   }), [htmlContent, saveChanges]);
 
-  // DIAGNOSTIC: Log HTML content being passed to ReactQuill
-  console.log('[ControlledRichTextEditor] HTML content for ReactQuill:', {
-    htmlLength: htmlContent.length,
-    preview: htmlContent.substring(0, 200),
-    hasContent: htmlContent.length > 0 && htmlContent !== '<p><br></p>'
-  });
+  // Validate HTML content before passing to ReactQuill
+  const validateHtmlContent = useCallback((html: string): string => {
+    try {
+      if (!html || typeof html !== 'string') {
+        return '<p><br></p>';
+      }
+      
+      // Basic validation - ensure it's not empty and has proper structure
+      const trimmed = html.trim();
+      if (!trimmed) {
+        return '<p><br></p>';
+      }
+      
+      // Test if HTML can be parsed safely
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = trimmed;
+      
+      return trimmed;
+    } catch (error) {
+      console.error('HTML validation error:', error);
+      return '<p><br></p>';
+    }
+  }, []);
 
-  // Handle content changes from Quill - HTML-first approach (no auto-save)
+  const validatedHtmlContent = validateHtmlContent(htmlContent);
+
+  // Handle content changes from Quill with error protection
   const handleContentChange = useCallback((value: string) => {
     try {
-      // Validate content before updating
+      setEditorError(null);
+      
       if (typeof value === 'string') {
         updateFromHtml(value);
       } else {
-        console.warn('[ControlledRichTextEditor] Invalid content type received:', typeof value);
+        throw new Error('Invalid content type received from editor');
       }
     } catch (error) {
-      console.error('[ControlledRichTextEditor] Error handling content change:', error);
+      console.error('Editor content change error:', error);
+      setEditorError(error instanceof Error ? error.message : 'Content update failed');
     }
   }, [updateFromHtml]);
 
+  // Handle ReactQuill ready state
+  const handleEditorReady = useCallback(() => {
+    setIsQuillReady(true);
+    setEditorError(null);
+  }, []);
+
   // Handle text selection for AI features
   const handleSelectionChange = useCallback((range: any, source: any, editor: any) => {
-    if (!showAIFeatures || source !== 'user') return;
+    if (!showAIFeatures || source !== 'user' || !isQuillReady) return;
     
-    if (range && range.length > 0) {
-      const selectedText = editor.getText(range.index, range.length);
-      const fullText = getPlainText();
-      
-      setSelectionInfo({
-        selectedText: selectedText.trim(),
-        selectionRange: range,
-        fullText: fullText
-      });
-      setIsAIEnabled(selectedText.trim().length > 10);
-    } else {
+    try {
+      if (range && range.length > 0) {
+        const selectedText = editor.getText(range.index, range.length);
+        const fullText = getPlainText();
+        
+        setSelectionInfo({
+          selectedText: selectedText.trim(),
+          selectionRange: range,
+          fullText: fullText
+        });
+        setIsAIEnabled(selectedText.trim().length > 10);
+      } else {
+        setSelectionInfo(null);
+        setIsAIEnabled(false);
+      }
+    } catch (error) {
+      console.error('Selection change error:', error);
       setSelectionInfo(null);
       setIsAIEnabled(false);
     }
-  }, [showAIFeatures, getPlainText]);
+  }, [showAIFeatures, getPlainText, isQuillReady]);
 
   // AI improvement handlers
   const handleAIImprovement = useCallback((action: 'improve' | 'rewrite' | 'tone') => {
@@ -127,7 +152,13 @@ const ControlledRichTextEditor = forwardRef<ControlledRichTextEditorRef, Control
     }
   }, [selectionInfo, onAIRequest]);
 
-  // Quill configuration with enhanced history and keyboard handling
+  // Reset editor error
+  const handleResetError = useCallback(() => {
+    setEditorError(null);
+    resetToOriginal();
+  }, [resetToOriginal]);
+
+  // Quill configuration with enhanced error handling
   const modules = {
     toolbar: {
       container: [
@@ -144,27 +175,6 @@ const ControlledRichTextEditor = forwardRef<ControlledRichTextEditorRef, Control
       delay: 1000,
       maxStack: 100,
       userOnly: true
-    },
-    keyboard: {
-      bindings: {
-        undo: {
-          key: 'Z',
-          ctrlKey: true,
-          handler: function() {
-            this.quill.history.undo();
-            return false;
-          }
-        },
-        redo: {
-          key: 'Z',
-          ctrlKey: true,
-          shiftKey: true,
-          handler: function() {
-            this.quill.history.redo();
-            return false;
-          }
-        }
-      }
     }
   };
 
@@ -172,14 +182,23 @@ const ControlledRichTextEditor = forwardRef<ControlledRichTextEditorRef, Control
     'header', 'bold', 'list', 'bullet'
   ];
 
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (updateTimeoutRef.current) {
-        clearTimeout(updateTimeoutRef.current);
-      }
-    };
-  }, []);
+  // Show error state
+  if (editorError) {
+    return (
+      <div className={`relative ${className}`}>
+        <Alert className="mb-4">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>
+            Editor error: {editorError}
+          </AlertDescription>
+        </Alert>
+        <Button onClick={handleResetError} variant="outline" size="sm">
+          <RotateCcw className="h-3 w-3 mr-1" />
+          Reset Editor
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className={`relative ${className}`}>
@@ -242,9 +261,10 @@ const ControlledRichTextEditor = forwardRef<ControlledRichTextEditorRef, Control
       <ReactQuill
         ref={quillRef}
         theme="snow"
-        value={htmlContent}
+        value={validatedHtmlContent}
         onChange={handleContentChange}
         onChangeSelection={handleSelectionChange}
+        onFocus={handleEditorReady}
         readOnly={readOnly || isConverting}
         placeholder={placeholder}
         modules={modules}
@@ -271,6 +291,6 @@ const ControlledRichTextEditor = forwardRef<ControlledRichTextEditorRef, Control
   );
 });
 
-ControlledRichTextEditor.displayName = 'ControlledRichTextEditor';
+SafeRichTextEditor.displayName = 'SafeRichTextEditor';
 
-export default ControlledRichTextEditor;
+export default SafeRichTextEditor;

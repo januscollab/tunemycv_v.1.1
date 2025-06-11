@@ -36,29 +36,44 @@ export const useJsonFirstEditor = ({
     preview: typeof initialContent === 'string' ? initialContent?.substring(0, 100) : JSON.stringify(initialContent)?.substring(0, 100)
   });
 
-  // Core state - JSON is the single source of truth
+  // Core state - JSON is the single source of truth with robust validation
   const [documentJson, setDocumentJson] = useState<DocumentJson>(() => {
-    if (typeof initialContent === 'object' && initialContent?.sections) {
-      console.log('[useJsonFirstEditor] Using DocumentJson directly:', initialContent);
-      return initialContent as DocumentJson;
+    try {
+      if (typeof initialContent === 'object' && initialContent?.sections) {
+        console.log('[useJsonFirstEditor] Using DocumentJson directly:', initialContent);
+        return initialContent as DocumentJson;
+      }
+      const cleanContent = (initialContent as string)?.trim() || '';
+      console.log('[useJsonFirstEditor] Converting string to JSON:', { cleanContent: cleanContent.substring(0, 100) });
+      const result = textToJson(cleanContent);
+      console.log('[useJsonFirstEditor] Conversion result:', { sections: result.sections.length });
+      return result;
+    } catch (error) {
+      console.error('[useJsonFirstEditor] Initialization error, using empty document:', error);
+      return textToJson('');
     }
-    const cleanContent = (initialContent as string)?.trim() || '';
-    console.log('[useJsonFirstEditor] Converting string to JSON:', { cleanContent: cleanContent.substring(0, 100) });
-    const result = textToJson(cleanContent);
-    console.log('[useJsonFirstEditor] Conversion result:', { sections: result.sections.length });
-    return result;
   });
+  
   const [htmlContent, setHtmlContent] = useState<string>(() => {
-    if (typeof initialContent === 'object' && initialContent?.sections) {
-      const html = jsonToHtml(initialContent as DocumentJson);
-      console.log('[useJsonFirstEditor] Generated HTML from JSON:', { htmlLength: html.length, preview: html.substring(0, 100) });
-      return html;
+    try {
+      if (typeof initialContent === 'object' && initialContent?.sections) {
+        const html = jsonToHtml(initialContent as DocumentJson);
+        // Validate HTML before setting
+        const validHtml = html && html.trim() ? html : '<p><br></p>';
+        console.log('[useJsonFirstEditor] Generated HTML from JSON:', { htmlLength: validHtml.length, preview: validHtml.substring(0, 100) });
+        return validHtml;
+      }
+      const cleanContent = (initialContent as string)?.trim() || '';
+      const json = textToJson(cleanContent);
+      const html = jsonToHtml(json);
+      // Validate HTML before setting
+      const validHtml = html && html.trim() ? html : '<p><br></p>';
+      console.log('[useJsonFirstEditor] Generated HTML from text:', { htmlLength: validHtml.length, preview: validHtml.substring(0, 100) });
+      return validHtml;
+    } catch (error) {
+      console.error('[useJsonFirstEditor] HTML initialization error, using fallback:', error);
+      return '<p><br></p>';
     }
-    const cleanContent = (initialContent as string)?.trim() || '';
-    const json = textToJson(cleanContent);
-    const html = jsonToHtml(json);
-    console.log('[useJsonFirstEditor] Generated HTML from text:', { htmlLength: html.length, preview: html.substring(0, 100) });
-    return html;
   });
   const [isConverting, setIsConverting] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -79,22 +94,39 @@ export const useJsonFirstEditor = ({
   const updateFromHtml = useCallback((html: string) => {
     console.log('[useJsonFirstEditor] updateFromHtml called (HTML-first mode):', { htmlLength: html.length });
     
-    // Simply update HTML content and mark as unsaved - no conversion during editing
-    setHtmlContent(html);
-    setHasUnsavedChanges(true);
+    try {
+      // Validate HTML content before setting
+      const validHtml = html && typeof html === 'string' ? html : '<p><br></p>';
+      setHtmlContent(validHtml);
+      setHasUnsavedChanges(true);
+    } catch (error) {
+      console.error('[useJsonFirstEditor] Error updating HTML content:', error);
+      // Don't update on error to prevent breaking the editor
+    }
   }, []);
 
   // Update from JSON (programmatic updates)
   const updateFromJson = useCallback((json: DocumentJson) => {
-    setDocumentJson(json);
-    setHtmlContent(jsonToHtml(json)); // Manually sync HTML when JSON is updated
-    setHasUnsavedChanges(true);
-    lastValidJsonRef.current = json;
+    try {
+      if (!json || !json.sections) {
+        console.warn('[useJsonFirstEditor] Invalid JSON provided to updateFromJson');
+        return;
+      }
+      
+      setDocumentJson(json);
+      const html = jsonToHtml(json);
+      const validHtml = html && html.trim() ? html : '<p><br></p>';
+      setHtmlContent(validHtml);
+      setHasUnsavedChanges(true);
+      lastValidJsonRef.current = json;
 
-    if (onContentChange && enableAutoSave) {
-      const text = generateFormattedText(json);
-      onContentChange(json, text);
-      setHasUnsavedChanges(false);
+      if (onContentChange && enableAutoSave) {
+        const text = generateFormattedText(json);
+        onContentChange(json, text);
+        setHasUnsavedChanges(false);
+      }
+    } catch (error) {
+      console.error('[useJsonFirstEditor] Error updating from JSON:', error);
     }
   }, [onContentChange, enableAutoSave]);
 

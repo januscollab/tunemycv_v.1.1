@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
-import ControlledRichTextEditor from '@/components/common/ControlledRichTextEditor';
+import SafeRichTextEditor from '@/components/common/SafeRichTextEditor';
 import EnhancedEditorErrorBoundary from '@/components/common/EnhancedEditorErrorBoundary';
 import { textToJson, DocumentJson, generateFormattedText } from '@/utils/documentJsonUtils';
 import { initializeEditorContent } from '@/utils/contentConverter';
@@ -44,7 +44,7 @@ const EditableCoverLetter: React.FC<EditableCoverLetterProps> = ({ content, onSa
             handleContentChange(json, content);
           }}
         >
-          <ControlledRichTextEditor
+          <SafeRichTextEditor
             initialContent={content}
             onContentChange={handleContentChange}
             className="min-h-[400px] bg-background"
