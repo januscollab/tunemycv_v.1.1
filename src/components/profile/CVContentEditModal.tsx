@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X, Save, FileText } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import ControlledRichTextEditor from '@/components/common/ControlledRichTextEditor';
 import EnhancedEditorErrorBoundary from '@/components/common/EnhancedEditorErrorBoundary';
+import BounceLoader from '@/components/ui/bounce-loader';
 import { supabase } from '@/integrations/supabase/client';
 import { 
   DocumentJson, 
@@ -34,6 +35,7 @@ const CVContentEditModal: React.FC<CVContentEditModalProps> = ({
   const [editorContent, setEditorContent] = useState<string | DocumentJson>('');
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const editorRef = useRef<{ htmlContent: string; saveChanges: (html: string) => Promise<void> }>(null);
 
   // Load CV content on modal open
   useEffect(() => {
@@ -98,36 +100,33 @@ const CVContentEditModal: React.FC<CVContentEditModalProps> = ({
   };
 
   const handleContentChange = async (newJson: DocumentJson, newText: string) => {
-    console.log('[CVContentEditModal] Content change received:', {
+    console.log('[CVContentEditModal] Final save - converting and saving to database:', {
       sectionsCount: newJson.sections.length,
-      textLength: newText.length,
-      preview: newText.substring(0, 100)
+      textLength: newText.length
     });
 
-    // Silent auto-save to database - NO TOAST NOTIFICATIONS
-    try {
-      const { error } = await supabase
-        .from('uploads')
-        .update({
-          extracted_text: newText,
-          document_content_json: newJson as any,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', cv.id);
+    // Save to database (only called on explicit save)
+    const { error } = await supabase
+      .from('uploads')
+      .update({
+        extracted_text: newText,
+        document_content_json: newJson as any,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', cv.id);
 
-      if (error) throw error;
-      console.log('[CVContentEditModal] Auto-save successful');
-    } catch (error) {
-      console.error('[CVContentEditModal] Auto-save failed:', error);
-      // Silent failure - no user notification
-    }
+    if (error) throw error;
+    console.log('[CVContentEditModal] Save successful');
   };
 
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      // The content is already being auto-saved, so this is just a manual trigger
-      // Silent success - no toast notification
+      // Get current HTML content from editor and trigger save
+      if (editorRef.current) {
+        const currentHtml = editorRef.current.htmlContent;
+        await editorRef.current.saveChanges(currentHtml);
+      }
       onUpdate();
       onClose();
     } catch (error) {
@@ -183,12 +182,13 @@ const CVContentEditModal: React.FC<CVContentEditModalProps> = ({
               }}
             >
               <ControlledRichTextEditor
+                ref={editorRef}
                 initialContent={editorContent}
                 onContentChange={handleContentChange}
                 className="h-[calc(100vh-200px)]"
                 placeholder="Edit your CV content here..."
                 showAIFeatures={true}
-                enableAutoSave={true}
+                enableAutoSave={false}
                 debounceMs={1000}
               />
             </EnhancedEditorErrorBoundary>
@@ -210,8 +210,17 @@ const CVContentEditModal: React.FC<CVContentEditModalProps> = ({
             disabled={isSaving}
             className="font-normal hover:scale-105 transition-all duration-200"
           >
-            <Save className="h-4 w-4 mr-2" />
-            {isSaving ? 'Saving...' : 'Save Changes'}
+            {isSaving ? (
+              <>
+                <BounceLoader size="sm" className="mr-2" />
+                Converting & Saving...
+              </>
+            ) : (
+              <>
+                <Save className="h-4 w-4 mr-2" />
+                Save Changes
+              </>
+            )}
           </Button>
         </div>
       </DialogContent>

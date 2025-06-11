@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useEffect, useState, useCallback, forwardRef, useImperativeHandle } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import './RichTextEditor.css';
@@ -25,7 +25,12 @@ interface ControlledRichTextEditorProps {
   debounceMs?: number;
 }
 
-const ControlledRichTextEditor: React.FC<ControlledRichTextEditorProps> = ({
+interface ControlledRichTextEditorRef {
+  htmlContent: string;
+  saveChanges: (html: string) => Promise<void>;
+}
+
+const ControlledRichTextEditor = forwardRef<ControlledRichTextEditorRef, ControlledRichTextEditorProps>(({
   initialContent,
   onContentChange,
   className = '',
@@ -35,7 +40,7 @@ const ControlledRichTextEditor: React.FC<ControlledRichTextEditorProps> = ({
   onAIRequest,
   enableAutoSave = true,
   debounceMs = 300
-}) => {
+}, ref) => {
   const quillRef = useRef<ReactQuill>(null);
   const [isAIEnabled, setIsAIEnabled] = useState(false);
   const [selectionInfo, setSelectionInfo] = useState<AIContext | null>(null);
@@ -51,7 +56,7 @@ const ControlledRichTextEditor: React.FC<ControlledRichTextEditorProps> = ({
     preview: typeof initialContent === 'string' ? initialContent.substring(0, 100) : JSON.stringify(initialContent)?.substring(0, 100)
   });
 
-  // Use the JSON-first editor hook
+  // Use the HTML-first editor hook
   const {
     documentJson,
     htmlContent,
@@ -65,8 +70,14 @@ const ControlledRichTextEditor: React.FC<ControlledRichTextEditorProps> = ({
     initialContent,
     onContentChange,
     debounceMs,
-    enableAutoSave
+    enableAutoSave: false // Disable auto-save for HTML-first approach
   });
+
+  // Expose methods through ref
+  useImperativeHandle(ref, () => ({
+    htmlContent,
+    saveChanges
+  }), [htmlContent, saveChanges]);
 
   // DIAGNOSTIC: Log HTML content being passed to ReactQuill
   console.log('[ControlledRichTextEditor] HTML content for ReactQuill:', {
@@ -75,17 +86,10 @@ const ControlledRichTextEditor: React.FC<ControlledRichTextEditorProps> = ({
     hasContent: htmlContent.length > 0 && htmlContent !== '<p><br></p>'
   });
 
-  // Handle content changes from Quill with controlled debouncing
+  // Handle content changes from Quill - HTML-first approach (no auto-save)
   const handleContentChange = useCallback((value: string) => {
-    // Clear any pending updates
-    if (updateTimeoutRef.current) {
-      clearTimeout(updateTimeoutRef.current);
-    }
-
-    // Debounce the update to prevent excessive conversions
-    updateTimeoutRef.current = setTimeout(() => {
-      updateFromHtml(value);
-    }, 150);
+    // Direct update to HTML state without conversion
+    updateFromHtml(value);
   }, [updateFromHtml]);
 
   // Handle text selection for AI features
@@ -257,6 +261,8 @@ const ControlledRichTextEditor: React.FC<ControlledRichTextEditorProps> = ({
       )}
     </div>
   );
-};
+});
+
+ControlledRichTextEditor.displayName = 'ControlledRichTextEditor';
 
 export default ControlledRichTextEditor;
