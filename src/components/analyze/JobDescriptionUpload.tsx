@@ -27,8 +27,11 @@ const JobDescriptionUpload: React.FC<JobDescriptionUploadProps> = ({
     const uploadedFileData: UploadedFile = {
       file,
       extractedText,
-      type: 'job_description'
-    };
+      type: 'job_description',
+      documentJson,
+      typeDetection,
+      qualityAssessment
+    } as any;
     onJobDescriptionSet(uploadedFileData);
     toast({ title: 'Success', description: 'Job description uploaded successfully!' });
   };
@@ -97,6 +100,8 @@ const JobDescriptionUpload: React.FC<JobDescriptionUploadProps> = ({
           documentType="job_description"
           onOpenVerification={() => setShowVerificationModal(true)}
           onRemove={removeFile}
+          documentJson={(uploadedFile as any).documentJson}
+          showDebugTools={true}
         />
         
         <DocumentVerificationModal
