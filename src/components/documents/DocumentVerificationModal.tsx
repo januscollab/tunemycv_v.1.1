@@ -265,24 +265,23 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
         </div>
 
         {/* Footer with 3 buttons */}
-        <div className="flex items-center justify-between px-6 py-4 border-t border-border bg-background">
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => {
-              const originalJson = textToJson(extractedText);
-              const originalText = generateFormattedText(originalJson);
-              setDocumentJson(originalJson);
-              setEditedText(originalText);
-              handleContentChange(originalJson, originalText);
-            }}
-            className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200"
-          >
-            <RotateCcw className="h-4 w-4 mr-2" />
-            Revert to Original
-          </Button>
-          
+        <div className="flex items-center justify-end px-6 py-4 border-t border-border bg-background">
           <div className="flex items-center space-x-3">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => {
+                const originalJson = textToJson(extractedText);
+                const originalText = generateFormattedText(originalJson);
+                setDocumentJson(originalJson);
+                setEditedText(originalText);
+                handleContentChange(originalJson, originalText);
+              }}
+              className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200"
+            >
+              <RotateCcw className="h-4 w-4 mr-2" />
+              Revert to Original
+            </Button>
             <Button 
               variant="outline" 
               size="sm"

@@ -236,15 +236,15 @@ const UnifiedPhoneInput: React.FC<UnifiedPhoneInputProps> = ({
       </Label>
       <div className="flex">
         <Select value={countryCode} onValueChange={onCountryCodeChange}>
-          <SelectTrigger className="w-32 rounded-r-none border-r-0 focus:border-r-0">
+          <SelectTrigger className="w-24 rounded-r-none border-r-0 focus:border-r-0 bg-white dark:bg-surface">
             <SelectValue />
           </SelectTrigger>
-          <SelectContent className="z-50 bg-background">
+          <SelectContent className="z-50 bg-white dark:bg-surface border border-apple-core/20 dark:border-citrus/20">
             {COUNTRY_CODES.map((country) => (
               <SelectItem key={country.code} value={country.code}>
                 <span className="flex items-center">
                   <span className="font-mono text-caption mr-2">{country.code}</span>
-                  <span className="text-micro text-muted-foreground">{country.country}</span>
+                  <span className="text-tiny text-blueberry/60 dark:text-apple-core/60">{country.country}</span>
                 </span>
               </SelectItem>
             ))}
@@ -254,7 +254,7 @@ const UnifiedPhoneInput: React.FC<UnifiedPhoneInputProps> = ({
           type="tel"
           value={phoneNumber}
           onChange={onPhoneNumberChange}
-          className="flex-1 rounded-l-none focus:border-l-0"
+          className="flex-1 rounded-l-none border-l-0 focus:border-l-0 bg-white dark:bg-surface"
           placeholder="Enter phone number"
           maxLength={20}
         />
