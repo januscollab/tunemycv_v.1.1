@@ -44,6 +44,10 @@ export const useJsonFirstEditor = ({
         return initialContent as DocumentJson;
       }
       const cleanContent = (initialContent as string)?.trim() || '';
+      if (!cleanContent) {
+        console.log('[useJsonFirstEditor] Empty content, creating empty document');
+        return textToJson('');
+      }
       console.log('[useJsonFirstEditor] Converting string to JSON:', { cleanContent: cleanContent.substring(0, 100) });
       const result = textToJson(cleanContent);
       console.log('[useJsonFirstEditor] Conversion result:', { sections: result.sections.length });
@@ -58,21 +62,24 @@ export const useJsonFirstEditor = ({
     try {
       if (typeof initialContent === 'object' && initialContent?.sections) {
         const html = jsonToHtml(initialContent as DocumentJson);
-        // Validate HTML before setting
         const validHtml = html && html.trim() ? html : '<p><br></p>';
         console.log('[useJsonFirstEditor] Generated HTML from JSON:', { htmlLength: validHtml.length, preview: validHtml.substring(0, 100) });
         return validHtml;
       }
       const cleanContent = (initialContent as string)?.trim() || '';
+      if (!cleanContent) {
+        console.log('[useJsonFirstEditor] Empty content, using default HTML');
+        return '<p><br></p>';
+      }
       const json = textToJson(cleanContent);
       const html = jsonToHtml(json);
-      // Validate HTML before setting
-      const validHtml = html && html.trim() ? html : '<p><br></p>';
+      const validHtml = html && html.trim() ? html : `<p>${cleanContent}</p>`;
       console.log('[useJsonFirstEditor] Generated HTML from text:', { htmlLength: validHtml.length, preview: validHtml.substring(0, 100) });
       return validHtml;
     } catch (error) {
       console.error('[useJsonFirstEditor] HTML initialization error, using fallback:', error);
-      return '<p><br></p>';
+      const fallbackContent = typeof initialContent === 'string' ? initialContent : '';
+      return fallbackContent ? `<p>${fallbackContent}</p>` : '<p><br></p>';
     }
   });
   const [isConverting, setIsConverting] = useState(false);

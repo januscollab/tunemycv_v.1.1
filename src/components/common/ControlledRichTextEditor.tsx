@@ -129,14 +129,12 @@ const ControlledRichTextEditor = forwardRef<ControlledRichTextEditorRef, Control
 
   // Quill configuration with enhanced history and keyboard handling
   const modules = {
-    toolbar: {
-      container: [
-        [{ 'header': [1, 2, 3, false] }],
-        ['bold'],
-        [{ 'list': 'bullet' }],
-        ['clean']
-      ]
-    },
+    toolbar: [
+      [{ 'header': [1, 2, 3, false] }],
+      ['bold'],
+      [{ 'list': 'bullet' }],
+      ['clean']
+    ],
     clipboard: {
       matchVisual: false
     },
@@ -144,27 +142,6 @@ const ControlledRichTextEditor = forwardRef<ControlledRichTextEditorRef, Control
       delay: 1000,
       maxStack: 100,
       userOnly: true
-    },
-    keyboard: {
-      bindings: {
-        undo: {
-          key: 'Z',
-          ctrlKey: true,
-          handler: function() {
-            this.quill.history.undo();
-            return false;
-          }
-        },
-        redo: {
-          key: 'Z',
-          ctrlKey: true,
-          shiftKey: true,
-          handler: function() {
-            this.quill.history.redo();
-            return false;
-          }
-        }
-      }
     }
   };
 

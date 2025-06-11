@@ -11,7 +11,7 @@ import {
 } from '@/utils/documentJsonUtils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import ControlledRichTextEditor from '@/components/common/ControlledRichTextEditor';
+import SafeRichTextEditor from '@/components/common/SafeRichTextEditor';
 import EnhancedEditorErrorBoundary from '@/components/common/EnhancedEditorErrorBoundary';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -226,9 +226,7 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
                     {documentType === 'cv' ? 'CV' : 'Job Description'}
                   </div>
                 </div>
-                <div className="text-micro text-muted-foreground">
-                  Changes auto-saved
-                </div>
+                {/* Auto-save status removed per user request */}
               </div>
             </div>
             
@@ -249,13 +247,13 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
                     handleContentChange(json, content);
                   }}
                 >
-                  <ControlledRichTextEditor
+                  <SafeRichTextEditor
                     initialContent={editedText}
                     onContentChange={handleContentChange}
                     className="min-h-[400px] border rounded-md"
                     placeholder="Document content appears here..."
                     showAIFeatures={true}
-                    enableAutoSave={true}
+                    enableAutoSave={false}
                     debounceMs={2000}
                   />
                 </EnhancedEditorErrorBoundary>
