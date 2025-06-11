@@ -27,7 +27,9 @@ export const jsonToHtml = (json: DocumentJson): string => {
             .map(line => line.trim())
             .filter(line => line.length > 0)
             .join('<br>');
-          htmlParts.push(`<p data-section-id="${section.id}">${escapeHtml(contentWithBreaks)}</p>`);
+          // Don't escape the <br> tags we just added
+          const escapedContent = escapeHtml(contentWithBreaks).replace(/&lt;br&gt;/g, '<br>');
+          htmlParts.push(`<p data-section-id="${section.id}">${escapedContent}</p>`);
         }
         break;
         
@@ -56,7 +58,7 @@ export const htmlToJson = (html: string): DocumentJson => {
     return { version: '1.0' as const, sections: [] };
   }
 
-  // Clean up HTML while preserving structure
+  // Clean up HTML while preserving structure but keep intentional <br> tags
   const cleanHtml = html
     .replace(/<br\s*\/?>\s*<br\s*\/?>/gi, '</p><p>') // Double <br> becomes paragraph break
     .replace(/<p[^>]*>\s*<br\s*\/?>/gi, '<p>') // Remove <br> at start of <p>
@@ -91,26 +93,20 @@ export const htmlToJson = (html: string): DocumentJson => {
         break;
         
       case 'p':
-        const textContent = unescapeHtml(element.textContent || '').trim();
-        if (textContent) {
-          // Preserve line structure within paragraphs
-          const lines = textContent.split('\n').filter(line => line.trim());
-          if (lines.length === 1) {
+        // Handle paragraphs with <br> tags for line breaks
+        const innerHTML = element.innerHTML || '';
+        if (innerHTML.trim()) {
+          // Convert <br> tags back to newlines for consistent storage
+          const contentWithNewlines = innerHTML
+            .replace(/<br\s*\/?>/gi, '\n')
+            .replace(/<[^>]*>/g, '') // Remove any other HTML tags
+            .trim();
+          
+          if (contentWithNewlines) {
             sections.push({
               type: 'paragraph',
-              content: textContent,
+              content: contentWithNewlines,
               id: sectionId
-            });
-          } else {
-            // Multiple lines - preserve as separate paragraphs
-            lines.forEach(line => {
-              if (line.trim()) {
-                sections.push({
-                  type: 'paragraph',
-                  content: line.trim(),
-                  id: generateSectionId()
-                });
-              }
             });
           }
         }
@@ -187,7 +183,10 @@ export const htmlToPlainText = (html: string): string => {
     .replace(/<h[1-3][^>]*>(.*?)<\/h[1-3]>/g, '$1\n')
     .replace(/<li[^>]*>(.*?)<\/li>/g, '- $1\n')
     .replace(/<ul[^>]*>|<\/ul>/g, '')
-    .replace(/<p[^>]*>(.*?)<\/p>/g, '$1\n')
+    .replace(/<p[^>]*>(.*?)<\/p>/g, (match, content) => {
+      // Convert <br> to newlines in paragraph content
+      return content.replace(/<br\s*\/?>/g, '\n') + '\n';
+    })
     .replace(/<br\s*\/?>/g, '\n')
     .replace(/<[^>]*>/g, '')
     .replace(/\n\s*\n/g, '\n\n')
