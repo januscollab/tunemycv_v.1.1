@@ -76,17 +76,18 @@ const CVContentEditModal: React.FC<CVContentEditModalProps> = ({
         });
       }
 
-      // Use the robust content initializer - ALWAYS PASS STRING TO EDITOR
-      const { text, contentType } = initializeEditorContent(extractedText, documentContentJson);
+      // Use the robust content initializer - PASS HTML TO RICH TEXT EDITOR
+      const { html, text, contentType } = initializeEditorContent(extractedText, documentContentJson);
       
       console.log('[CVContentEditModal] Content initialization result:', {
         contentType,
+        htmlLength: html.length,
         textLength: text.length,
-        preview: text.substring(0, 100)
+        preview: html.substring(0, 100)
       });
       
-      // CRITICAL FIX: Always pass string content to editor, never DocumentJson objects
-      setEditorContent(text || '');
+      // CRITICAL FIX: Pass HTML content to rich text editor for proper formatting
+      setEditorContent(html || '');
     } catch (error) {
       console.error('Error loading CV content:', error);
       // Silent error handling - no toast notification
@@ -171,7 +172,10 @@ const CVContentEditModal: React.FC<CVContentEditModalProps> = ({
           ) : editorContent ? (
             <EnhancedEditorErrorBoundary
               fallbackContent={typeof editorContent === 'string' ? editorContent : generateFormattedText(editorContent)}
-              onReset={() => setEditorContent(cv.extracted_text || '')}
+              onReset={() => {
+                const resetContent = initializeEditorContent(cv.extracted_text, cv.document_content_json);
+                setEditorContent(resetContent.html || '');
+              }}
               componentName="CV Content Editor"
               onContentRestore={(content) => {
                 const json = textToJson(content);
