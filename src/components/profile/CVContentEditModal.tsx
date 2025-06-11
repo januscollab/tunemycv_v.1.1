@@ -31,7 +31,7 @@ const CVContentEditModal: React.FC<CVContentEditModalProps> = ({
   cv,
   onUpdate
 }) => {
-  const [documentJson, setDocumentJson] = useState<DocumentJson | null>(null);
+  const [editorContent, setEditorContent] = useState<string | DocumentJson>('');
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -62,9 +62,15 @@ const CVContentEditModal: React.FC<CVContentEditModalProps> = ({
         documentContentJson = data.document_content_json;
       }
 
-      // Use the robust content initializer
-      const { json } = initializeEditorContent(extractedText, documentContentJson);
-      setDocumentJson(json);
+      // Use the robust content initializer and pass the right type to editor
+      const { json, contentType } = initializeEditorContent(extractedText, documentContentJson);
+      
+      // Pass DocumentJson directly if we have structured data, otherwise pass text
+      if (contentType === 'json' && documentContentJson) {
+        setEditorContent(json);
+      } else {
+        setEditorContent(extractedText || '');
+      }
     } catch (error) {
       console.error('Error loading CV content:', error);
       // Silent error handling - no toast notification
@@ -75,8 +81,6 @@ const CVContentEditModal: React.FC<CVContentEditModalProps> = ({
   };
 
   const handleContentChange = async (newJson: DocumentJson, newText: string) => {
-    setDocumentJson(newJson);
-    
     // Silent auto-save to database - NO TOAST NOTIFICATIONS
     try {
       const { error } = await supabase
@@ -96,23 +100,9 @@ const CVContentEditModal: React.FC<CVContentEditModalProps> = ({
   };
 
   const handleSave = async () => {
-    if (!documentJson) return;
-
     setIsSaving(true);
     try {
-      const updatedText = generateFormattedText(documentJson);
-      
-      const { error } = await supabase
-        .from('uploads')
-        .update({
-          extracted_text: updatedText,
-          document_content_json: documentJson as any,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', cv.id);
-
-      if (error) throw error;
-
+      // The content is already being auto-saved, so this is just a manual trigger
       // Silent success - no toast notification
       onUpdate();
       onClose();
@@ -124,7 +114,7 @@ const CVContentEditModal: React.FC<CVContentEditModalProps> = ({
     }
   };
 
-  if (!documentJson && !isLoading) {
+  if (!editorContent && !isLoading) {
     return null;
   }
 
@@ -155,19 +145,18 @@ const CVContentEditModal: React.FC<CVContentEditModalProps> = ({
               <div className="animate-spin rounded-full h-8 w-8 border border-primary border-t-transparent"></div>
               <span className="ml-3 text-muted-foreground">Loading CV content...</span>
             </div>
-          ) : documentJson ? (
+          ) : editorContent ? (
             <EnhancedEditorErrorBoundary
-              fallbackContent={generateFormattedText(documentJson)}
-              onReset={() => setDocumentJson(textToJson(cv.extracted_text || ''))}
+              fallbackContent={typeof editorContent === 'string' ? editorContent : generateFormattedText(editorContent)}
+              onReset={() => setEditorContent(cv.extracted_text || '')}
               componentName="CV Content Editor"
               onContentRestore={(content) => {
                 const json = textToJson(content);
-                setDocumentJson(json);
                 handleContentChange(json, content);
               }}
             >
               <ControlledRichTextEditor
-                initialContent={generateFormattedText(documentJson)}
+                initialContent={editorContent}
                 onContentChange={handleContentChange}
                 className="h-[calc(100vh-200px)]"
                 placeholder="Edit your CV content here..."

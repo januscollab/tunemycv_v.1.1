@@ -14,7 +14,7 @@ interface AIContext {
 }
 
 interface ControlledRichTextEditorProps {
-  initialContent: string;
+  initialContent: string | DocumentJson;
   onContentChange: (json: DocumentJson, text: string) => void;
   className?: string;
   placeholder?: string;

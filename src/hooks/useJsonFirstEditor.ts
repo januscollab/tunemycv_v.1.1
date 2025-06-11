@@ -3,7 +3,7 @@ import { DocumentJson, textToJson, generateFormattedText } from '@/utils/documen
 import { jsonToHtml, htmlToJson, validateHtmlCompatibility } from '@/utils/jsonHtmlConverters';
 
 interface UseJsonFirstEditorOptions {
-  initialContent: string;
+  initialContent: string | DocumentJson;
   onContentChange?: (json: DocumentJson, text: string) => void;
   debounceMs?: number;
   enableAutoSave?: boolean;
@@ -29,11 +29,17 @@ export const useJsonFirstEditor = ({
 }: UseJsonFirstEditorOptions): UseJsonFirstEditorReturn => {
   // Core state - JSON is the single source of truth
   const [documentJson, setDocumentJson] = useState<DocumentJson>(() => {
-    const cleanContent = initialContent?.trim() || '';
+    if (typeof initialContent === 'object' && initialContent.sections) {
+      return initialContent as DocumentJson;
+    }
+    const cleanContent = (initialContent as string)?.trim() || '';
     return textToJson(cleanContent);
   });
   const [htmlContent, setHtmlContent] = useState<string>(() => {
-    const cleanContent = initialContent?.trim() || '';
+    if (typeof initialContent === 'object' && initialContent.sections) {
+      return jsonToHtml(initialContent as DocumentJson);
+    }
+    const cleanContent = (initialContent as string)?.trim() || '';
     const json = textToJson(cleanContent);
     return jsonToHtml(json);
   });
@@ -42,7 +48,11 @@ export const useJsonFirstEditor = ({
   
   // References for debouncing and original content
   const debounceTimeoutRef = useRef<NodeJS.Timeout>();
-  const originalJsonRef = useRef<DocumentJson>(textToJson(initialContent));
+  const originalJsonRef = useRef<DocumentJson>(
+    typeof initialContent === 'object' && initialContent.sections
+      ? initialContent as DocumentJson
+      : textToJson((initialContent as string) || '')
+  );
   const lastValidJsonRef = useRef<DocumentJson>(documentJson);
 
   // Sync HTML content when JSON changes (controlled updates)

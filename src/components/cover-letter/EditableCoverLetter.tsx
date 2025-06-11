@@ -12,22 +12,12 @@ interface EditableCoverLetterProps {
 }
 
 const EditableCoverLetter: React.FC<EditableCoverLetterProps> = ({ content, onSave }) => {
-  const [documentJson, setDocumentJson] = useState<DocumentJson>(() => {
-    const { json } = initializeEditorContent(content);
-    return json;
-  });
   const [originalContent] = useState(content);
 
-  // Update document JSON when content prop changes
-  useEffect(() => {
-    const { json } = initializeEditorContent(content);
-    setDocumentJson(json);
-  }, [content]);
+  // No need for local state management - let ControlledRichTextEditor handle it
 
   // Handle rich text editor content changes - NO TOAST NOTIFICATIONS
   const handleContentChange = useCallback((newJson: DocumentJson, newText: string) => {
-    setDocumentJson(newJson);
-    
     // Silent auto-save with debounce
     if (newText !== content && newText.trim() !== '') {
       const timeoutId = setTimeout(() => {
@@ -47,11 +37,10 @@ const EditableCoverLetter: React.FC<EditableCoverLetterProps> = ({ content, onSa
         </div>
         <EnhancedEditorErrorBoundary
           fallbackContent={content}
-          onReset={() => setDocumentJson(textToJson(originalContent))}
+          onReset={() => {}}
           componentName="Cover Letter Editor"
           onContentRestore={(content) => {
             const json = textToJson(content);
-            setDocumentJson(json);
             handleContentChange(json, content);
           }}
         >

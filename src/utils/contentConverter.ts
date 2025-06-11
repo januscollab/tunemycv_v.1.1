@@ -17,45 +17,71 @@ export const textToHtml = (text: string): string => {
 };
 
 /**
- * Safely initialize editor content from various input types
+ * Unified content initializer that handles all input types
  */
 export const initializeEditorContent = (
   extractedText?: string,
   documentJson?: any
-): { html: string; json: DocumentJson; text: string } => {
+): { html: string; json: DocumentJson; text: string; contentType: 'json' | 'text' | 'empty' } => {
   
-  let sourceText = '';
-  
-  // Prioritize structured JSON content if available
+  // Handle DocumentJson directly
   if (documentJson) {
     try {
+      let json: DocumentJson;
+      
       if (typeof documentJson === 'string') {
-        const parsed = JSON.parse(documentJson);
-        sourceText = generateFormattedText(parsed);
+        json = JSON.parse(documentJson);
       } else if (documentJson.sections) {
-        sourceText = generateFormattedText(documentJson);
+        json = documentJson as DocumentJson;
+      } else {
+        throw new Error('Invalid JSON structure');
       }
+      
+      const html = jsonToHtml(json);
+      const text = generateFormattedText(json);
+      
+      return { html, json, text, contentType: 'json' };
     } catch (error) {
       console.warn('Failed to parse document JSON, falling back to text:', error);
     }
   }
   
-  // Fallback to extracted text
-  if (!sourceText && extractedText) {
-    sourceText = extractedText;
+  // Handle text content
+  if (extractedText && extractedText.trim()) {
+    const json = textToJson(extractedText);
+    const html = jsonToHtml(json);
+    const text = generateFormattedText(json);
+    
+    return { html, json, text, contentType: 'text' };
   }
   
-  // Ensure we have some content
-  if (!sourceText) {
-    sourceText = '';
-  }
+  // Handle empty content
+  const emptyJson = textToJson('');
+  const emptyHtml = jsonToHtml(emptyJson);
+  const emptyText = '';
   
-  // Generate all formats
-  const json = textToJson(sourceText);
+  return { html: emptyHtml, json: emptyJson, text: emptyText, contentType: 'empty' };
+};
+
+/**
+ * Initialize editor content for DocumentJson input specifically
+ */
+export const initializeEditorFromJson = (documentJson: DocumentJson): { html: string; json: DocumentJson; text: string } => {
+  const html = jsonToHtml(documentJson);
+  const text = generateFormattedText(documentJson);
+  
+  return { html, json: documentJson, text };
+};
+
+/**
+ * Initialize editor content for text input specifically  
+ */
+export const initializeEditorFromText = (text: string): { html: string; json: DocumentJson; text: string } => {
+  const json = textToJson(text);
   const html = jsonToHtml(json);
-  const text = generateFormattedText(json);
+  const formattedText = generateFormattedText(json);
   
-  return { html, json, text };
+  return { html, json, text: formattedText };
 };
 
 /**
