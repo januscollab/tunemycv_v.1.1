@@ -2,7 +2,8 @@
 import React, { useState, useCallback, useRef } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import { textToHtml } from '@/utils/contentConverter';
+import { jsonToHtml, htmlToJson } from '@/utils/jsonHtmlConverters';
+import { DocumentJson, textToJson, generateFormattedText } from '@/utils/documentJsonUtils';
 
 
 interface EditableCoverLetterProps {
@@ -11,26 +12,41 @@ interface EditableCoverLetterProps {
 }
 
 const EditableCoverLetter: React.FC<EditableCoverLetterProps> = ({ content, onSave }) => {
-  const [htmlContent, setHtmlContent] = useState(() => textToHtml(content));
+  // Initialize HTML from JSON content
+  const [htmlContent, setHtmlContent] = useState(() => {
+    try {
+      // Try to parse as JSON first
+      const jsonData = JSON.parse(content);
+      return jsonToHtml(jsonData);
+    } catch {
+      // Fallback to text if not JSON
+      const jsonData = textToJson(content);
+      return jsonToHtml(jsonData);
+    }
+  });
+  
   const debounceTimeoutRef = useRef<NodeJS.Timeout>();
 
-  // Simple HTML content change handler with debounced save
+  // Handle content changes and convert back to JSON on save
   const handleContentChange = useCallback((html: string) => {
     setHtmlContent(html);
     
-    // Debounced save - convert HTML back to plain text
+    // Debounced save - convert HTML back to JSON
     if (debounceTimeoutRef.current) {
       clearTimeout(debounceTimeoutRef.current);
     }
     
     debounceTimeoutRef.current = setTimeout(() => {
-      // Convert HTML back to plain text for saving
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = html;
-      const plainText = tempDiv.textContent || tempDiv.innerText || '';
-      
-      if (plainText !== content && plainText.trim() !== '') {
-        onSave(plainText);
+      try {
+        // Convert HTML back to JSON and then to text for saving
+        const jsonData = htmlToJson(html);
+        const textContent = generateFormattedText(jsonData);
+        
+        if (textContent !== content && textContent.trim() !== '') {
+          onSave(JSON.stringify(jsonData));
+        }
+      } catch (error) {
+        console.error('Error converting HTML to JSON:', error);
       }
     }, 2000);
   }, [content, onSave]);
