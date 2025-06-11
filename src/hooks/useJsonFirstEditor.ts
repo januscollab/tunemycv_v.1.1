@@ -72,13 +72,8 @@ export const useJsonFirstEditor = ({
   );
   const lastValidJsonRef = useRef<DocumentJson>(documentJson);
 
-  // Sync HTML content when JSON changes (controlled updates)
-  useEffect(() => {
-    const newHtml = jsonToHtml(documentJson);
-    if (newHtml !== htmlContent) {
-      setHtmlContent(newHtml);
-    }
-  }, [documentJson, htmlContent]);
+  // REMOVED: Sync HTML content useEffect that was causing race conditions
+  // HTML content is now managed directly through state updates only
 
   // Update from HTML input (from Quill editor)
   const updateFromHtml = useCallback((html: string) => {
@@ -134,6 +129,7 @@ export const useJsonFirstEditor = ({
   // Update from JSON (programmatic updates)
   const updateFromJson = useCallback((json: DocumentJson) => {
     setDocumentJson(json);
+    setHtmlContent(jsonToHtml(json)); // Manually sync HTML when JSON is updated
     setHasUnsavedChanges(true);
     lastValidJsonRef.current = json;
 
@@ -147,10 +143,12 @@ export const useJsonFirstEditor = ({
   // Reset to original content
   const resetToOriginal = useCallback(() => {
     const originalJson = originalJsonRef.current;
+    const originalHtml = jsonToHtml(originalJson);
     setDocumentJson(originalJson);
-    setHtmlContent(jsonToHtml(originalJson));
+    setHtmlContent(originalHtml);
     setHasUnsavedChanges(false);
     lastValidJsonRef.current = originalJson;
+    console.log('[useJsonFirstEditor] Reset to original:', { originalHtml: originalHtml.substring(0, 100) });
   }, []);
 
   // Manual save

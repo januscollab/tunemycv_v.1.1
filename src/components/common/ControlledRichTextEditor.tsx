@@ -68,6 +68,13 @@ const ControlledRichTextEditor: React.FC<ControlledRichTextEditorProps> = ({
     enableAutoSave
   });
 
+  // DIAGNOSTIC: Log HTML content being passed to ReactQuill
+  console.log('[ControlledRichTextEditor] HTML content for ReactQuill:', {
+    htmlLength: htmlContent.length,
+    preview: htmlContent.substring(0, 200),
+    hasContent: htmlContent.length > 0 && htmlContent !== '<p><br></p>'
+  });
+
   // Handle content changes from Quill with controlled debouncing
   const handleContentChange = useCallback((value: string) => {
     // Clear any pending updates
