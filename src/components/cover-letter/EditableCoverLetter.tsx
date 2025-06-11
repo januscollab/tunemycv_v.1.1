@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import ControlledRichTextEditor from '@/components/common/ControlledRichTextEditor';
-import EditorErrorBoundary from '@/components/common/EditorErrorBoundary';
+import EnhancedEditorErrorBoundary from '@/components/common/EnhancedEditorErrorBoundary';
 import { textToJson, DocumentJson, generateFormattedText } from '@/utils/documentJsonUtils';
 
 
@@ -40,9 +40,15 @@ const EditableCoverLetter: React.FC<EditableCoverLetterProps> = ({ content, onSa
           <h3 className="text-caption font-medium text-foreground">Edit Cover Letter</h3>
           <p className="text-micro text-muted-foreground">Use formatting tools and AI assistance to enhance your cover letter</p>
         </div>
-        <EditorErrorBoundary
+        <EnhancedEditorErrorBoundary
           fallbackContent={content}
           onReset={() => setDocumentJson(textToJson(originalContent))}
+          componentName="Cover Letter Editor"
+          onContentRestore={(content) => {
+            const json = textToJson(content);
+            setDocumentJson(json);
+            handleContentChange(json, content);
+          }}
         >
           <ControlledRichTextEditor
             initialContent={content}
@@ -53,7 +59,7 @@ const EditableCoverLetter: React.FC<EditableCoverLetterProps> = ({ content, onSa
             enableAutoSave={true}
             debounceMs={2000}
           />
-        </EditorErrorBoundary>
+        </EnhancedEditorErrorBoundary>
       </div>
     </div>
   );

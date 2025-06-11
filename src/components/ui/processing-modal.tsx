@@ -18,11 +18,35 @@ const ProcessingModal: React.FC<ProcessingModalProps> = ({
 }) => {
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [progress, setProgress] = useState(0);
+  const [messageIndex, setMessageIndex] = useState(0);
+
+  // Humorous processing messages
+  const humorousMessages = [
+    "CV gremlins are working their magic...",
+    "Teaching robots to read your handwriting...",
+    "Decoding your professional achievements...",
+    "Converting pixels to pure career potential...",
+    "Our AI is putting on reading glasses...",
+    "Translating excellence into analyzable text...",
+    "Extracting awesomeness from your document...",
+    "Digital elves are processing your file...",
+    "Making sense of fonts and formatting...",
+    "Your CV is getting the VIP treatment..."
+  ];
+
+  const patienceMessages = [
+    "Great things take time - we're being extra thorough!",
+    "Quality processing is worth the wait...",
+    "Almost there - your patience is appreciated!",
+    "We're ensuring every detail is captured perfectly.",
+    "Complex documents require special attention."
+  ];
 
   useEffect(() => {
     if (!isOpen) {
       setTimeElapsed(0);
       setProgress(0);
+      setMessageIndex(0);
       return;
     }
 
@@ -30,8 +54,16 @@ const ProcessingModal: React.FC<ProcessingModalProps> = ({
       setTimeElapsed(prev => prev + 1);
     }, 1000);
 
-    return () => clearInterval(interval);
-  }, [isOpen]);
+    // Change humorous message every 3 seconds
+    const messageInterval = setInterval(() => {
+      setMessageIndex(prev => (prev + 1) % humorousMessages.length);
+    }, 3000);
+
+    return () => {
+      clearInterval(interval);
+      clearInterval(messageInterval);
+    };
+  }, [isOpen, humorousMessages.length]);
 
   useEffect(() => {
     if (timeElapsed <= 15) {
@@ -46,10 +78,12 @@ const ProcessingModal: React.FC<ProcessingModalProps> = ({
   if (!isOpen) return null;
 
   const getTimeBasedMessage = () => {
-    if (timeElapsed > 15) {
-      return "Taking longer than expected... Trying alternative processing method.";
-    } else if (timeElapsed > 10) {
-      return "Processing is taking a bit longer than usual. Please wait...";
+    if (timeElapsed > 30) {
+      return patienceMessages[Math.floor(Math.random() * patienceMessages.length)];
+    } else if (timeElapsed > 15) {
+      return "Taking a bit longer - ensuring perfect extraction...";
+    } else if (timeElapsed > 5) {
+      return humorousMessages[messageIndex];
     }
     return message;
   };
@@ -88,14 +122,19 @@ const ProcessingModal: React.FC<ProcessingModalProps> = ({
           {getTimeBasedMessage()}
         </p>
 
-        {timeElapsed > 10 && onCancel && (
-          <Button
-            variant="outline"
-            onClick={onCancel}
-            className="w-full"
-          >
-            Cancel Upload
-          </Button>
+        {timeElapsed > 30 && onCancel && (
+          <div className="space-y-2">
+            <p className="text-micro text-muted-foreground text-center">
+              Still processing? You can cancel and try again if needed.
+            </p>
+            <Button
+              variant="outline"
+              onClick={onCancel}
+              className="w-full"
+            >
+              Cancel Upload
+            </Button>
+          </div>
         )}
       </div>
     </div>

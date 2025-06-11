@@ -11,7 +11,8 @@ import {
 } from '@/utils/documentJsonUtils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import RichTextEditor from '@/components/common/RichTextEditor';
+import ControlledRichTextEditor from '@/components/common/ControlledRichTextEditor';
+import EnhancedEditorErrorBoundary from '@/components/common/EnhancedEditorErrorBoundary';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -233,13 +234,31 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
             
             <div className="flex-1 flex flex-col min-h-0 p-4 pt-6">
               <ScrollArea className="flex-1 min-h-[400px] max-h-[60vh]">
-                <RichTextEditor
-                  documentJson={documentJson}
-                  onContentChange={handleContentChange}
-                  className="min-h-[400px] border rounded-md"
-                  placeholder="Document content appears here..."
-                  showAIFeatures={true}
-                />
+                <EnhancedEditorErrorBoundary
+                  fallbackContent={editedText}
+                  onReset={() => {
+                    const originalJson = textToJson(extractedText);
+                    setDocumentJson(originalJson);
+                    setEditedText(extractedText);
+                  }}
+                  componentName="Document Verification Editor"
+                  onContentRestore={(content) => {
+                    const json = textToJson(content);
+                    setDocumentJson(json);
+                    setEditedText(content);
+                    handleContentChange(json, content);
+                  }}
+                >
+                  <ControlledRichTextEditor
+                    initialContent={editedText}
+                    onContentChange={handleContentChange}
+                    className="min-h-[400px] border rounded-md"
+                    placeholder="Document content appears here..."
+                    showAIFeatures={true}
+                    enableAutoSave={true}
+                    debounceMs={2000}
+                  />
+                </EnhancedEditorErrorBoundary>
               </ScrollArea>
             </div>
           </div>

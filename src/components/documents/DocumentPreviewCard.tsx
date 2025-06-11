@@ -34,6 +34,7 @@ const DocumentPreviewCard: React.FC<DocumentPreviewCardProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isRemoving, setIsRemoving] = useState(false);
+  const [saveButtonVisible, setSaveButtonVisible] = useState(canSaveToCVs);
   const quality = assessDocumentQuality(extractedText, fileName, documentType);
 
   const handleReviewEdit = async () => {
@@ -51,6 +52,8 @@ const DocumentPreviewCard: React.FC<DocumentPreviewCardProps> = ({
       setIsSaving(true);
       try {
         await onSaveToCVs();
+        // Hide button immediately after successful save
+        setSaveButtonVisible(false);
       } finally {
         // Keep saving state briefly to show user action was registered
         setTimeout(() => setIsSaving(false), 500);
@@ -156,7 +159,7 @@ const DocumentPreviewCard: React.FC<DocumentPreviewCardProps> = ({
             )}
             Review & Edit
           </Button>
-          {onSaveToCVs && canSaveToCVs && !isSaving && (
+          {onSaveToCVs && canSaveToCVs && saveButtonVisible && (
             <Button
               variant="outline"
               size="sm"

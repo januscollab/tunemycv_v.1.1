@@ -3,7 +3,7 @@ import { X, Save, FileText } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import ControlledRichTextEditor from '@/components/common/ControlledRichTextEditor';
-import EditorErrorBoundary from '@/components/common/EditorErrorBoundary';
+import EnhancedEditorErrorBoundary from '@/components/common/EnhancedEditorErrorBoundary';
 import { supabase } from '@/integrations/supabase/client';
 import { 
   DocumentJson, 
@@ -11,6 +11,7 @@ import {
   generateFormattedText,
   parseDocumentJson 
 } from '@/utils/documentJsonUtils';
+import { loadCompatibleContent } from '@/utils/editorDataConverter';
 
 interface CVContentEditModalProps {
   isOpen: boolean;
@@ -44,22 +45,11 @@ const CVContentEditModal: React.FC<CVContentEditModalProps> = ({
   const loadCVContent = async () => {
     setIsLoading(true);
     try {
-      // Try to use existing document_content_json first
-      if (cv.document_content_json) {
-        const parsedJson = parseDocumentJson(JSON.stringify(cv.document_content_json));
-        if (parsedJson) {
-          setDocumentJson(parsedJson);
-          setIsLoading(false);
-          return;
-        }
-      }
+      let extractedText = cv.extracted_text;
+      let documentContentJson = cv.document_content_json;
 
-      // Fallback to extracted_text
-      if (cv.extracted_text) {
-        const jsonFromText = textToJson(cv.extracted_text);
-        setDocumentJson(jsonFromText);
-      } else {
-        // Fetch from database if not available
+      // Fetch from database if not available in props
+      if (!extractedText && !documentContentJson) {
         const { data, error } = await supabase
           .from('uploads')
           .select('extracted_text, document_content_json')
@@ -67,19 +57,14 @@ const CVContentEditModal: React.FC<CVContentEditModalProps> = ({
           .single();
 
         if (error) throw error;
-
-        if (data.document_content_json) {
-          const parsedJson = parseDocumentJson(JSON.stringify(data.document_content_json));
-          if (parsedJson) {
-            setDocumentJson(parsedJson);
-          }
-        } else if (data.extracted_text) {
-          const jsonFromText = textToJson(data.extracted_text);
-          setDocumentJson(jsonFromText);
-        } else {
-          throw new Error('No content available for editing');
-        }
+        
+        extractedText = data.extracted_text;
+        documentContentJson = data.document_content_json;
       }
+
+      // Use the robust content loader
+      const { json } = loadCompatibleContent(extractedText, documentContentJson);
+      setDocumentJson(json);
     } catch (error) {
       console.error('Error loading CV content:', error);
       // Silent error handling - no toast notification
@@ -171,9 +156,15 @@ const CVContentEditModal: React.FC<CVContentEditModalProps> = ({
               <span className="ml-3 text-muted-foreground">Loading CV content...</span>
             </div>
           ) : documentJson ? (
-            <EditorErrorBoundary
+            <EnhancedEditorErrorBoundary
               fallbackContent={generateFormattedText(documentJson)}
               onReset={() => setDocumentJson(textToJson(cv.extracted_text || ''))}
+              componentName="CV Content Editor"
+              onContentRestore={(content) => {
+                const json = textToJson(content);
+                setDocumentJson(json);
+                handleContentChange(json, content);
+              }}
             >
               <ControlledRichTextEditor
                 initialContent={generateFormattedText(documentJson)}
@@ -184,7 +175,7 @@ const CVContentEditModal: React.FC<CVContentEditModalProps> = ({
                 enableAutoSave={true}
                 debounceMs={1000}
               />
-            </EditorErrorBoundary>
+            </EnhancedEditorErrorBoundary>
           ) : null}
         </div>
 
