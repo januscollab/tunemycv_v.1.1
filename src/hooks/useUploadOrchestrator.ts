@@ -20,6 +20,7 @@ interface UploadResult {
 interface UploadOptions {
   fileType: 'cv' | 'job_description';
   shouldStore?: boolean;
+  preserveOriginalFormat?: boolean;
 }
 
 export const useUploadOrchestrator = () => {

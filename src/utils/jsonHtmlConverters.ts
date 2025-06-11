@@ -47,7 +47,7 @@ export const jsonToHtml = (json: DocumentJson): string => {
   return result;
 };
 
-// Enhanced HTML to JSON conversion with improved parsing and <br> handling
+// Enhanced HTML to JSON conversion with improved round-trip consistency
 export const htmlToJson = (html: string): DocumentJson => {
   console.log('[jsonHtmlConverters] htmlToJson called:', { htmlLength: html.length, preview: html.substring(0, 100) });
   
@@ -56,16 +56,17 @@ export const htmlToJson = (html: string): DocumentJson => {
     return { version: '1.0' as const, sections: [] };
   }
 
-  // First, convert <br> tags to paragraph breaks for better structure
-  const normalizedHtml = html
-    .replace(/<br\s*\/?>\s*<br\s*\/?>/gi, '</p><p>') // Double <br> to paragraph break
-    .replace(/<p[^>]*>\s*<br\s*\/?>/gi, '<p>') // Remove <br> at start of paragraph
-    .replace(/<br\s*\/?>\s*<\/p>/gi, '</p>') // Remove <br> at end of paragraph
-    .replace(/<br\s*\/?>/gi, '\n'); // Single <br> to newline within paragraphs
+  // Clean up HTML while preserving structure
+  const cleanHtml = html
+    .replace(/<br\s*\/?>\s*<br\s*\/?>/gi, '</p><p>') // Double <br> becomes paragraph break
+    .replace(/<p[^>]*>\s*<br\s*\/?>/gi, '<p>') // Remove <br> at start of <p>
+    .replace(/<br\s*\/?>\s*<\/p>/gi, '</p>') // Remove <br> at end of <p>
+    .replace(/<p[^>]*>\s*<\/p>/gi, '') // Remove empty paragraphs
+    .replace(/<p[^>]*>\s*(&nbsp;|\u00A0|\s)*\s*<\/p>/gi, ''); // Remove paragraphs with only whitespace
 
   // Create a temporary DOM element for parsing
   const tempDiv = document.createElement('div');
-  tempDiv.innerHTML = normalizedHtml;
+  tempDiv.innerHTML = cleanHtml;
   
   const sections: DocumentSection[] = [];
   const elements = Array.from(tempDiv.children);
@@ -78,41 +79,38 @@ export const htmlToJson = (html: string): DocumentJson => {
       case 'h2':
       case 'h3':
         const level = parseInt(element.tagName.charAt(1)) as 1 | 2 | 3;
-        sections.push({
-          type: 'heading',
-          level,
-          content: unescapeHtml(element.textContent || ''),
-          id: sectionId
-        });
+        const headingContent = unescapeHtml(element.textContent || '').trim();
+        if (headingContent) {
+          sections.push({
+            type: 'heading',
+            level,
+            content: headingContent,
+            id: sectionId
+          });
+        }
         break;
         
       case 'p':
-        let paragraphContent = element.innerHTML;
-        // Handle internal newlines from converted <br> tags
-        paragraphContent = paragraphContent.replace(/\n+/g, '\n').trim();
         const textContent = unescapeHtml(element.textContent || '').trim();
-        
-        if (textContent && textContent !== '') {
-          // Split on multiple newlines to create separate paragraphs
-          const paragraphs = textContent.split(/\n\s*\n/).filter(p => p.trim());
-          
-          if (paragraphs.length > 1) {
-            // Multiple paragraphs detected, create separate sections
-            paragraphs.forEach(para => {
-              if (para.trim()) {
+        if (textContent) {
+          // Preserve line structure within paragraphs
+          const lines = textContent.split('\n').filter(line => line.trim());
+          if (lines.length === 1) {
+            sections.push({
+              type: 'paragraph',
+              content: textContent,
+              id: sectionId
+            });
+          } else {
+            // Multiple lines - preserve as separate paragraphs
+            lines.forEach(line => {
+              if (line.trim()) {
                 sections.push({
                   type: 'paragraph',
-                  content: para.trim(),
+                  content: line.trim(),
                   id: generateSectionId()
                 });
               }
-            });
-          } else {
-            // Single paragraph, preserve internal line breaks
-            sections.push({
-              type: 'paragraph',
-              content: textContent.replace(/\n/g, ' '), // Convert internal breaks to spaces for readability
-              id: sectionId
             });
           }
         }
@@ -134,13 +132,11 @@ export const htmlToJson = (html: string): DocumentJson => {
     }
   }
   
-  const filteredSections = sections.filter(section => 
-    section.content?.trim() || (section.items && section.items.length > 0)
-  );
-  
   const result: DocumentJson = {
     version: '1.0' as const,
-    sections: filteredSections
+    sections: sections.filter(section => 
+      section.content?.trim() || (section.items && section.items.length > 0)
+    )
   };
   
   console.log('[jsonHtmlConverters] htmlToJson result:', { sections: result.sections.length });

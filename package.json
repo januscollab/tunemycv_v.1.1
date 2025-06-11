@@ -53,6 +53,7 @@
     "embla-carousel-react": "^8.3.0",
     "fflate": "^0.8.2",
     "input-otp": "^1.2.4",
+    "js-beautify": "^1.15.4",
     "jspdf": "^3.0.1",
     "lucide-react": "^0.462.0",
     "mammoth": "^1.9.1",

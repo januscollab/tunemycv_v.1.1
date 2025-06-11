@@ -17,7 +17,7 @@ export interface DocumentJson {
   sections: DocumentSection[];
   metadata?: {
     structureQuality?: number;
-    processingMethod?: 'professional' | 'legacy';
+    processingMethod?: 'professional' | 'legacy' | 'preserved';
     extractedAt?: string;
   };
 }
@@ -42,21 +42,33 @@ const applyFormattingRules = (text: string): string => {
     .trim();
 };
 
-// Enhanced CV text processing with intelligent structure recognition
-export const textToJson = (text: string): DocumentJson => {
-  console.log('[documentJsonUtils] Starting professional text processing');
+// Enhanced text processing with file-type awareness
+export const textToJson = (text: string, preserveOriginalFormat = false): DocumentJson => {
+  console.log('[documentJsonUtils] Starting text processing', { preserveOriginalFormat });
   
-  // Use professional text processor for better structure detection
+  // If preservation mode is enabled, do minimal processing
+  if (preserveOriginalFormat) {
+    console.log('[documentJsonUtils] Using preservation mode - minimal processing');
+    return preserveOriginalTextStructure(text);
+  }
+  
+  // Check if text looks like a simple document that shouldn't be restructured
+  if (shouldPreserveAsIs(text)) {
+    console.log('[documentJsonUtils] Text appears to be simple format - preserving structure');
+    return preserveOriginalTextStructure(text);
+  }
+  
+  // Use professional text processor for complex CVs only
   const normalizedText = ProfessionalTextProcessor.normalizeText(text);
   const structureAnalysis = ProfessionalTextProcessor.structureCVContent(normalizedText);
   
-  if (structureAnalysis.quality > 0.6) {
+  if (structureAnalysis.quality > 0.7) {
     console.log('[documentJsonUtils] Using professional structure analysis');
     return professionalTextToJson(structureAnalysis);
   }
   
-  console.log('[documentJsonUtils] Falling back to legacy processing');
-  return legacyTextToJson(text);
+  console.log('[documentJsonUtils] Using minimal processing to preserve format');
+  return preserveOriginalTextStructure(text);
 };
 
 // Professional text to JSON conversion using NLP analysis
@@ -424,7 +436,20 @@ export const updateDocumentContent = (
 
 // Create pretty, human-readable JSON for database storage
 export const prettifyDocumentJson = (docJson: DocumentJson): string => {
-  return ProfessionalTextProcessor.beautifyJSON(docJson);
+  try {
+    // Use js-beautify for better JSON formatting
+    const jsBeautify = require('js-beautify').js;
+    return jsBeautify(JSON.stringify(docJson), {
+      indent_size: 2,
+      space_in_empty_paren: false,
+      preserve_newlines: true,
+      max_preserve_newlines: 2,
+      wrap_line_length: 120
+    });
+  } catch (error) {
+    console.warn('[documentJsonUtils] js-beautify failed, using fallback');
+    return ProfessionalTextProcessor.beautifyJSON(docJson);
+  }
 };
 
 // Parse pretty JSON back to DocumentJson object
@@ -479,6 +504,89 @@ export const generateFormattedText = (docJson: DocumentJson): string => {
   }
   
   return textLines.join('\n');
+};
+
+// Check if text should be preserved as-is (TXT files, simple docs)
+const shouldPreserveAsIs = (text: string): boolean => {
+  const lines = text.split('\n');
+  const totalLines = lines.length;
+  
+  // If text has many line breaks and looks formatted, preserve it
+  if (totalLines > 10 && text.includes('\n\n')) {
+    return true;
+  }
+  
+  // If text doesn't have typical CV section headers, preserve it
+  const cvHeaders = ['experience', 'education', 'skills', 'summary', 'objective'];
+  const hasMultipleCVHeaders = cvHeaders.filter(header => 
+    text.toLowerCase().includes(header)
+  ).length >= 2;
+  
+  return !hasMultipleCVHeaders;
+};
+
+// Preserve original text structure with minimal processing
+const preserveOriginalTextStructure = (text: string): DocumentJson => {
+  const lines = text.split('\n');
+  const sections: DocumentSection[] = [];
+  let currentParagraph: string[] = [];
+  
+  const flushParagraph = () => {
+    if (currentParagraph.length > 0) {
+      const content = currentParagraph.join('\n').trim();
+      if (content) {
+        sections.push({
+          type: 'paragraph',
+          content,
+          id: generateId()
+        });
+      }
+      currentParagraph = [];
+    }
+  };
+  
+  for (const line of lines) {
+    const trimmed = line.trim();
+    
+    // Empty line - end current paragraph
+    if (!trimmed) {
+      flushParagraph();
+      continue;
+    }
+    
+    // Check for obvious headings (short lines, all caps, or markdown headers)
+    if (trimmed.match(/^#{1,3}\s+/) || 
+        (trimmed.length < 50 && trimmed === trimmed.toUpperCase() && trimmed.length > 3)) {
+      flushParagraph();
+      const level = trimmed.match(/^(#{1,3})/)?.[1].length || 2;
+      const content = trimmed.replace(/^#{1,3}\s+/, '');
+      sections.push({
+        type: 'heading',
+        level: Math.min(level, 3) as 1 | 2 | 3,
+        content,
+        id: generateId()
+      });
+      continue;
+    }
+    
+    // Add to current paragraph, preserving original line structure
+    currentParagraph.push(line);
+  }
+  
+  // Flush final paragraph
+  flushParagraph();
+  
+  return {
+    version: '1.0',
+    sections: sections.filter(section => 
+      section.content?.trim() || (section.items && section.items.length > 0)
+    ),
+    metadata: {
+      structureQuality: 1.0, // High quality because we preserved original
+      processingMethod: 'preserved',
+      extractedAt: new Date().toISOString()
+    }
+  };
 };
 
 // Validate document structure is well-formed (not a text blob)

@@ -250,7 +250,7 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
                   <SafeRichTextEditor
                     initialContent={editedText}
                     onContentChange={handleContentChange}
-                    className="min-h-[400px] border rounded-md"
+                    className="min-h-[400px] border rounded-md text-black dark:text-white"
                     placeholder="Document content appears here..."
                     showAIFeatures={true}
                     enableAutoSave={false}
@@ -269,7 +269,8 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
               variant="outline" 
               size="sm"
               onClick={() => {
-                const originalJson = textToJson(extractedText);
+                // Preserve original format when reverting
+                const originalJson = textToJson(extractedText, true);
                 const originalText = generateFormattedText(originalJson);
                 setDocumentJson(originalJson);
                 setEditedText(originalText);
@@ -283,11 +284,21 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
             <Button 
               variant="outline" 
               size="sm"
-              onClick={onClose}
+              onClick={async () => {
+                // Save current content before closing
+                if (editedText !== extractedText) {
+                  try {
+                    await handleSave();
+                  } catch (error) {
+                    console.error('Save failed on close:', error);
+                  }
+                }
+                onClose();
+              }}
               className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200"
             >
               <X className="h-4 w-4 mr-2" />
-              Close
+              Save & Close
             </Button>
             {documentType === 'cv' ? (
               <Button 

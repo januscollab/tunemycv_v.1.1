@@ -160,15 +160,16 @@ export const useJsonFirstEditor = ({
       const newJson = htmlToJson(currentHtml);
       const newText = generateFormattedText(newJson);
       
-      // Update internal state
+      // Update internal state BEFORE calling onContentChange
       setDocumentJson(newJson);
+      setHtmlContent(currentHtml); // Keep the current HTML
       lastValidJsonRef.current = newJson;
+      setHasUnsavedChanges(false);
       
       // Save to database
       await onContentChange(newJson, newText);
-      setHasUnsavedChanges(false);
       
-      console.log('[useJsonFirstEditor] Save successful');
+      console.log('[useJsonFirstEditor] Save successful - HTML-JSON sync maintained');
     } catch (error) {
       console.error('[useJsonFirstEditor] Save failed:', error);
       throw error;
