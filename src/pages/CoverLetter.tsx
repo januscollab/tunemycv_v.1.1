@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FileText, Sparkles, Trash2, RefreshCw, Clock, FileUp, Search, AlertCircle, Eye, Edit, Download, History, RotateCcw, Edit2, Linkedin } from 'lucide-react';
 import Breadcrumbs from '@/components/navigation/Breadcrumbs';
@@ -113,6 +113,9 @@ const AuthenticatedCoverLetter = () => {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingCoverLetter, setEditingCoverLetter] = useState<any>(null);
+  
+  // Ref for the editable cover letter to trigger manual saves
+  const editableCoverLetterRef = useRef<{ forceSave: () => Promise<void> }>(null);
 
   const lengthOptions = [
     { value: 'short', label: 'Short (150-200 words)', description: 'Brief and to the point' },
@@ -355,7 +358,18 @@ const AuthenticatedCoverLetter = () => {
     setActiveTab('result');
   };
 
-  const handleTabChange = (newTab: string) => {
+  const handleTabChange = async (newTab: string) => {
+    // If leaving the "result" tab and there's a selected cover letter, trigger save
+    if (activeTab === 'result' && selectedCoverLetter && newTab !== 'result') {
+      console.log('Leaving result tab - triggering save for cover letter:', selectedCoverLetter.id);
+      try {
+        await editableCoverLetterRef.current?.forceSave();
+        console.log('Force save completed successfully');
+      } catch (error) {
+        console.error('Error during force save:', error);
+      }
+    }
+    
     setActiveTab(newTab);
   };
 
@@ -693,6 +707,7 @@ const AuthenticatedCoverLetter = () => {
                       </div>
 
                       <EditableCoverLetter
+                        ref={editableCoverLetterRef}
                         content={selectedCoverLetter.content}
                         onSave={handleUpdateCoverLetter}
                       />

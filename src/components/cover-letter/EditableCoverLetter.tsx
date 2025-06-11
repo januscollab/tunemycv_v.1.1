@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useImperativeHandle, forwardRef } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { jsonToHtml, htmlToJson } from '@/utils/jsonHtmlConverters';
@@ -11,7 +11,11 @@ interface EditableCoverLetterProps {
   onSave: (newContent: string) => void;
 }
 
-const EditableCoverLetter: React.FC<EditableCoverLetterProps> = ({ content, onSave }) => {
+interface EditableCoverLetterRef {
+  forceSave: () => Promise<void>;
+}
+
+const EditableCoverLetter = forwardRef<EditableCoverLetterRef, EditableCoverLetterProps>(({ content, onSave }, ref) => {
   // Initialize HTML from JSON content
   const [htmlContent, setHtmlContent] = useState(() => {
     try {
@@ -26,6 +30,32 @@ const EditableCoverLetter: React.FC<EditableCoverLetterProps> = ({ content, onSa
   });
   
   const debounceTimeoutRef = useRef<NodeJS.Timeout>();
+
+  // Force save function exposed through ref
+  const forceSave = useCallback(async () => {
+    try {
+      // Cancel any pending debounced save
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+      
+      // Convert current HTML to JSON and save immediately
+      const jsonData = htmlToJson(htmlContent);
+      const textContent = generateFormattedText(jsonData);
+      
+      if (textContent !== content && textContent.trim() !== '') {
+        console.log('[EditableCoverLetter] Force saving changes...');
+        await onSave(JSON.stringify(jsonData));
+      }
+    } catch (error) {
+      console.error('Error force saving cover letter:', error);
+    }
+  }, [htmlContent, content, onSave]);
+
+  // Expose force save through ref
+  useImperativeHandle(ref, () => ({
+    forceSave
+  }), [forceSave]);
 
   // Handle content changes and convert back to JSON on save
   const handleContentChange = useCallback((html: string) => {
@@ -87,6 +117,8 @@ const EditableCoverLetter: React.FC<EditableCoverLetterProps> = ({ content, onSa
       </div>
     </div>
   );
-};
+});
+
+EditableCoverLetter.displayName = 'EditableCoverLetter';
 
 export default EditableCoverLetter;

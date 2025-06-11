@@ -21,7 +21,13 @@ export const jsonToHtml = (json: DocumentJson): string => {
         
       case 'paragraph':
         if (section.content) {
-          htmlParts.push(`<p data-section-id="${section.id}">${escapeHtml(section.content)}</p>`);
+          // Preserve line breaks within paragraphs by converting newlines to <br> tags
+          const contentWithBreaks = section.content
+            .split('\n')
+            .map(line => line.trim())
+            .filter(line => line.length > 0)
+            .join('<br>');
+          htmlParts.push(`<p data-section-id="${section.id}">${escapeHtml(contentWithBreaks)}</p>`);
         }
         break;
         
@@ -41,7 +47,7 @@ export const jsonToHtml = (json: DocumentJson): string => {
   return result;
 };
 
-// Enhanced HTML to JSON conversion with improved parsing
+// Enhanced HTML to JSON conversion with improved parsing and <br> handling
 export const htmlToJson = (html: string): DocumentJson => {
   console.log('[jsonHtmlConverters] htmlToJson called:', { htmlLength: html.length, preview: html.substring(0, 100) });
   
@@ -50,9 +56,16 @@ export const htmlToJson = (html: string): DocumentJson => {
     return { version: '1.0' as const, sections: [] };
   }
 
+  // First, convert <br> tags to paragraph breaks for better structure
+  const normalizedHtml = html
+    .replace(/<br\s*\/?>\s*<br\s*\/?>/gi, '</p><p>') // Double <br> to paragraph break
+    .replace(/<p[^>]*>\s*<br\s*\/?>/gi, '<p>') // Remove <br> at start of paragraph
+    .replace(/<br\s*\/?>\s*<\/p>/gi, '</p>') // Remove <br> at end of paragraph
+    .replace(/<br\s*\/?>/gi, '\n'); // Single <br> to newline within paragraphs
+
   // Create a temporary DOM element for parsing
   const tempDiv = document.createElement('div');
-  tempDiv.innerHTML = html;
+  tempDiv.innerHTML = normalizedHtml;
   
   const sections: DocumentSection[] = [];
   const elements = Array.from(tempDiv.children);
@@ -74,13 +87,34 @@ export const htmlToJson = (html: string): DocumentJson => {
         break;
         
       case 'p':
-        const paragraphContent = unescapeHtml(element.textContent || '').trim();
-        if (paragraphContent && paragraphContent !== '') {
-          sections.push({
-            type: 'paragraph',
-            content: paragraphContent,
-            id: sectionId
-          });
+        let paragraphContent = element.innerHTML;
+        // Handle internal newlines from converted <br> tags
+        paragraphContent = paragraphContent.replace(/\n+/g, '\n').trim();
+        const textContent = unescapeHtml(element.textContent || '').trim();
+        
+        if (textContent && textContent !== '') {
+          // Split on multiple newlines to create separate paragraphs
+          const paragraphs = textContent.split(/\n\s*\n/).filter(p => p.trim());
+          
+          if (paragraphs.length > 1) {
+            // Multiple paragraphs detected, create separate sections
+            paragraphs.forEach(para => {
+              if (para.trim()) {
+                sections.push({
+                  type: 'paragraph',
+                  content: para.trim(),
+                  id: generateSectionId()
+                });
+              }
+            });
+          } else {
+            // Single paragraph, preserve internal line breaks
+            sections.push({
+              type: 'paragraph',
+              content: textContent.replace(/\n/g, ' '), // Convert internal breaks to spaces for readability
+              id: sectionId
+            });
+          }
         }
         break;
         
