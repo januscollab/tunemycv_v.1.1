@@ -2,6 +2,13 @@ import { DocumentJson, DocumentSection } from './documentJsonUtils';
 
 // Enhanced JSON to HTML conversion with stability optimizations
 export const jsonToHtml = (json: DocumentJson): string => {
+  console.log('[jsonHtmlConverters] jsonToHtml called:', { sections: json.sections?.length || 0 });
+  
+  if (!json || !json.sections || !Array.isArray(json.sections)) {
+    console.warn('[jsonHtmlConverters] Invalid DocumentJson structure:', json);
+    return '<p><br></p>';
+  }
+
   const htmlParts: string[] = [];
   
   for (const section of json.sections) {
@@ -29,11 +36,20 @@ export const jsonToHtml = (json: DocumentJson): string => {
     }
   }
   
-  return htmlParts.length > 0 ? htmlParts.join('') : '<p><br></p>';
+  const result = htmlParts.length > 0 ? htmlParts.join('') : '<p><br></p>';
+  console.log('[jsonHtmlConverters] jsonToHtml result:', { htmlLength: result.length, preview: result.substring(0, 100) });
+  return result;
 };
 
 // Enhanced HTML to JSON conversion with improved parsing
 export const htmlToJson = (html: string): DocumentJson => {
+  console.log('[jsonHtmlConverters] htmlToJson called:', { htmlLength: html.length, preview: html.substring(0, 100) });
+  
+  if (!html || typeof html !== 'string') {
+    console.warn('[jsonHtmlConverters] Invalid HTML input:', html);
+    return { version: '1.0' as const, sections: [] };
+  }
+
   // Create a temporary DOM element for parsing
   const tempDiv = document.createElement('div');
   tempDiv.innerHTML = html;
@@ -84,12 +100,17 @@ export const htmlToJson = (html: string): DocumentJson => {
     }
   }
   
-  return {
-    version: '1.0',
-    sections: sections.filter(section => 
-      section.content?.trim() || (section.items && section.items.length > 0)
-    )
+  const filteredSections = sections.filter(section => 
+    section.content?.trim() || (section.items && section.items.length > 0)
+  );
+  
+  const result: DocumentJson = {
+    version: '1.0' as const,
+    sections: filteredSections
   };
+  
+  console.log('[jsonHtmlConverters] htmlToJson result:', { sections: result.sections.length });
+  return result;
 };
 
 // Utility functions
@@ -111,11 +132,21 @@ const generateSectionId = (): string => {
 
 // Validation function to check HTML compatibility
 export const validateHtmlCompatibility = (html: string): boolean => {
+  console.log('[jsonHtmlConverters] validateHtmlCompatibility called:', { htmlLength: html?.length || 0 });
+  
+  if (!html || typeof html !== 'string') {
+    console.warn('[jsonHtmlConverters] Invalid HTML input for validation');
+    return false;
+  }
+  
   try {
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = html;
-    return tempDiv.children.length > 0;
-  } catch {
+    const isValid = tempDiv.children.length > 0 || html.trim() === '<p><br></p>';
+    console.log('[jsonHtmlConverters] HTML validation result:', { isValid, childrenCount: tempDiv.children.length });
+    return isValid;
+  } catch (error) {
+    console.error('[jsonHtmlConverters] HTML validation error:', error);
     return false;
   }
 };

@@ -41,6 +41,16 @@ const ControlledRichTextEditor: React.FC<ControlledRichTextEditorProps> = ({
   const [selectionInfo, setSelectionInfo] = useState<AIContext | null>(null);
   const updateTimeoutRef = useRef<NodeJS.Timeout>();
 
+  // DIAGNOSTIC: Log what content the editor receives
+  console.log('[ControlledRichTextEditor] Received initialContent:', {
+    type: typeof initialContent,
+    isString: typeof initialContent === 'string',
+    isObject: typeof initialContent === 'object',
+    hasSection: typeof initialContent === 'object' && initialContent?.sections,
+    contentLength: typeof initialContent === 'string' ? initialContent.length : 'N/A',
+    preview: typeof initialContent === 'string' ? initialContent.substring(0, 100) : JSON.stringify(initialContent)?.substring(0, 100)
+  });
+
   // Use the JSON-first editor hook
   const {
     documentJson,

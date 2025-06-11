@@ -44,12 +44,22 @@ const CVContentEditModal: React.FC<CVContentEditModalProps> = ({
 
   const loadCVContent = async () => {
     setIsLoading(true);
+    console.log('[CVContentEditModal] Loading CV content for:', cv.id);
+    
     try {
       let extractedText = cv.extracted_text;
       let documentContentJson = cv.document_content_json;
 
+      console.log('[CVContentEditModal] Initial content state:', {
+        hasExtractedText: !!extractedText,
+        hasDocumentJson: !!documentContentJson,
+        extractedTextLength: extractedText?.length || 0,
+        documentJsonType: typeof documentContentJson
+      });
+
       // Fetch from database if not available in props
       if (!extractedText && !documentContentJson) {
+        console.log('[CVContentEditModal] Fetching from database...');
         const { data, error } = await supabase
           .from('uploads')
           .select('extracted_text, document_content_json')
@@ -60,17 +70,23 @@ const CVContentEditModal: React.FC<CVContentEditModalProps> = ({
         
         extractedText = data.extracted_text;
         documentContentJson = data.document_content_json;
+        console.log('[CVContentEditModal] Fetched from database:', {
+          hasExtractedText: !!extractedText,
+          hasDocumentJson: !!documentContentJson
+        });
       }
 
-      // Use the robust content initializer and pass the right type to editor
-      const { json, contentType } = initializeEditorContent(extractedText, documentContentJson);
+      // Use the robust content initializer - ALWAYS PASS STRING TO EDITOR
+      const { text, contentType } = initializeEditorContent(extractedText, documentContentJson);
       
-      // Pass DocumentJson directly if we have structured data, otherwise pass text
-      if (contentType === 'json' && documentContentJson) {
-        setEditorContent(json);
-      } else {
-        setEditorContent(extractedText || '');
-      }
+      console.log('[CVContentEditModal] Content initialization result:', {
+        contentType,
+        textLength: text.length,
+        preview: text.substring(0, 100)
+      });
+      
+      // CRITICAL FIX: Always pass string content to editor, never DocumentJson objects
+      setEditorContent(text || '');
     } catch (error) {
       console.error('Error loading CV content:', error);
       // Silent error handling - no toast notification
@@ -81,6 +97,12 @@ const CVContentEditModal: React.FC<CVContentEditModalProps> = ({
   };
 
   const handleContentChange = async (newJson: DocumentJson, newText: string) => {
+    console.log('[CVContentEditModal] Content change received:', {
+      sectionsCount: newJson.sections.length,
+      textLength: newText.length,
+      preview: newText.substring(0, 100)
+    });
+
     // Silent auto-save to database - NO TOAST NOTIFICATIONS
     try {
       const { error } = await supabase
@@ -93,8 +115,9 @@ const CVContentEditModal: React.FC<CVContentEditModalProps> = ({
         .eq('id', cv.id);
 
       if (error) throw error;
+      console.log('[CVContentEditModal] Auto-save successful');
     } catch (error) {
-      console.error('Auto-save failed:', error);
+      console.error('[CVContentEditModal] Auto-save failed:', error);
       // Silent failure - no user notification
     }
   };

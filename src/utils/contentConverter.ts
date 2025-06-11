@@ -24,38 +24,62 @@ export const initializeEditorContent = (
   documentJson?: any
 ): { html: string; json: DocumentJson; text: string; contentType: 'json' | 'text' | 'empty' } => {
   
+  console.log('[contentConverter] initializeEditorContent called:', {
+    hasExtractedText: !!extractedText,
+    hasDocumentJson: !!documentJson,
+    extractedTextLength: extractedText?.length || 0,
+    documentJsonType: typeof documentJson
+  });
+
   // Handle DocumentJson directly
   if (documentJson) {
+    console.log('[contentConverter] Processing DocumentJson...');
     try {
       let json: DocumentJson;
       
       if (typeof documentJson === 'string') {
+        console.log('[contentConverter] Parsing JSON string');
         json = JSON.parse(documentJson);
       } else if (documentJson.sections) {
+        console.log('[contentConverter] Using DocumentJson object directly');
         json = documentJson as DocumentJson;
       } else {
-        throw new Error('Invalid JSON structure');
+        throw new Error('Invalid JSON structure - no sections property');
       }
       
       const html = jsonToHtml(json);
       const text = generateFormattedText(json);
       
+      console.log('[contentConverter] DocumentJson processing complete:', {
+        sections: json.sections.length,
+        htmlLength: html.length,
+        textLength: text.length
+      });
+      
       return { html, json, text, contentType: 'json' };
     } catch (error) {
-      console.warn('Failed to parse document JSON, falling back to text:', error);
+      console.warn('[contentConverter] Failed to parse document JSON, falling back to text:', error);
     }
   }
   
   // Handle text content
   if (extractedText && extractedText.trim()) {
+    console.log('[contentConverter] Processing text content:', { length: extractedText.length });
     const json = textToJson(extractedText);
     const html = jsonToHtml(json);
     const text = generateFormattedText(json);
+    
+    console.log('[contentConverter] Text processing complete:', {
+      sections: json.sections.length,
+      htmlLength: html.length,
+      textLength: text.length
+    });
     
     return { html, json, text, contentType: 'text' };
   }
   
   // Handle empty content
+  console.log('[contentConverter] No content provided, returning empty');
   const emptyJson = textToJson('');
   const emptyHtml = jsonToHtml(emptyJson);
   const emptyText = '';

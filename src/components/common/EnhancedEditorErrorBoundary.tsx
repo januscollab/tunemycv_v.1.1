@@ -3,6 +3,7 @@ import { AlertTriangle, RotateCcw, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { validateEditorContent, sanitizeEditorContent } from '@/utils/editorValidation';
 
 interface Props {
   children: ReactNode;
@@ -40,15 +41,39 @@ class EnhancedEditorErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: any) {
-    console.error('Editor Error Boundary caught an error:', error, errorInfo);
+    console.error(`[EnhancedEditorErrorBoundary] Error in ${this.props.componentName}:`, error, errorInfo);
+    
+    // Enhanced error logging for debugging
+    console.error('[EnhancedEditorErrorBoundary] Error boundary triggered:', {
+      component: this.props.componentName,
+      error: error.message,
+      stack: error.stack,
+      componentStack: errorInfo.componentStack,
+      timestamp: new Date().toISOString(),
+      fallbackContent: this.props.fallbackContent?.substring(0, 100),
+      retryCount: this.state.retryCount
+    });
+
     this.setState({
       error,
       errorInfo,
       retryCount: this.state.retryCount + 1
     });
 
+    // Attempt to restore content if restoration callback is provided
+    if (this.props.onContentRestore && this.props.fallbackContent) {
+      try {
+        const sanitizedContent = sanitizeEditorContent(this.props.fallbackContent);
+        console.log('[EnhancedEditorErrorBoundary] Attempting automatic content restoration with sanitized content');
+        this.props.onContentRestore(sanitizedContent);
+      } catch (restoreError) {
+        console.error('[EnhancedEditorErrorBoundary] Automatic content restoration failed:', restoreError);
+      }
+    }
+
     // Auto-retry for certain types of errors
     if (this.state.retryCount < this.maxRetries && this.isRetryableError(error)) {
+      console.log('[EnhancedEditorErrorBoundary] Scheduling auto-retry...');
       setTimeout(() => {
         this.handleRetry();
       }, 1000);
@@ -87,8 +112,27 @@ class EnhancedEditorErrorBoundary extends Component<Props, State> {
   };
 
   handleRestoreContent = () => {
-    if (this.props.onContentRestore) {
-      this.props.onContentRestore(this.props.fallbackContent);
+    console.log('[EnhancedEditorErrorBoundary] Manual content restoration triggered');
+    
+    if (this.props.onContentRestore && this.props.fallbackContent) {
+      try {
+        // Validate and sanitize content before restoration
+        const validation = validateEditorContent(this.props.fallbackContent);
+        if (!validation.isValid) {
+          console.warn('[EnhancedEditorErrorBoundary] Content validation failed:', validation.errors);
+        }
+        
+        const sanitizedContent = sanitizeEditorContent(this.props.fallbackContent);
+        console.log('[EnhancedEditorErrorBoundary] Restoring content:', { 
+          originalLength: this.props.fallbackContent?.length || 0,
+          sanitizedLength: sanitizedContent.length 
+        });
+        
+        this.props.onContentRestore(sanitizedContent);
+      } catch (error) {
+        console.error('[EnhancedEditorErrorBoundary] Manual restoration failed:', error);
+        return; // Don't reset error state if restoration failed
+      }
     }
     this.handleHardReset();
   };
