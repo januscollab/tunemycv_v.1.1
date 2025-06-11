@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { User, Mail, Lock, Linkedin, Phone, Globe, Building, MapPin } from 'lucide-react';
-import CountryCodeSelect from './CountryCodeSelect';
+import UnifiedPhoneInput from './UnifiedPhoneInput';
 import { SavedDataInput } from '@/components/ui/saved-data-input';
 
 interface PersonalInfoTabProps {
@@ -222,27 +222,12 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ credits, memberSince 
             </div>
 
             <div>
-              <div className="flex gap-2">
-                <CountryCodeSelect
-                  value={profile.country_code}
-                  onChange={(value) => setProfile({ ...profile, country_code: value })}
-                  className="w-32"
-                />
-                <SavedDataInput
-                  id="phoneNumber"
-                  label={
-                    <span className="flex items-center">
-                      <Phone className="h-4 w-4 mr-1" />
-                      Phone Number
-                    </span>
-                  }
-                  type="tel"
-                  value={profile.phone_number}
-                  onChange={(e) => setProfile({ ...profile, phone_number: e.target.value })}
-                  className="flex-1"
-                  maxLength={20}
-                />
-              </div>
+              <UnifiedPhoneInput
+                countryCode={profile.country_code}
+                phoneNumber={profile.phone_number}
+                onCountryCodeChange={(value) => setProfile({ ...profile, country_code: value })}
+                onPhoneNumberChange={(e) => setProfile({ ...profile, phone_number: e.target.value })}
+              />
             </div>
           </div>
 
