@@ -46,10 +46,13 @@ const Navigation = () => {
   };
 
   return (
-    <nav className={`bg-background/95 border-b border-border transition-all duration-300 backdrop-blur-md ${
-      isSticky ? 'fixed top-0 left-0 right-0 z-50 shadow-lg bg-background/98' : 'relative'
-    }`}>
-      <div className="max-w-6xl mx-auto px-4">
+    <>
+      {/* Sticky placeholder to prevent layout jump */}
+      {isSticky && <div className="h-16" />}
+      <nav className={`bg-background/95 border-b border-border transition-all duration-300 backdrop-blur-md ${
+        isSticky ? 'fixed top-0 left-0 right-0 z-50 shadow-lg bg-background/98' : 'relative'
+      }`}>
+        <div className="max-w-6xl mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <NavigationLogo />
@@ -130,8 +133,9 @@ const Navigation = () => {
             </div>
           </div>
         )}
-      </div>
-    </nav>
+        </div>
+      </nav>
+    </>
   );
 };
 

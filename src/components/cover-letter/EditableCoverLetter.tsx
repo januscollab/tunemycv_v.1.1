@@ -1,21 +1,23 @@
 
-import React, { useState, useCallback, useRef, useImperativeHandle, forwardRef } from 'react';
+import React, { useState, useCallback, useRef, useImperativeHandle, forwardRef, useEffect } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { jsonToHtml, htmlToJson } from '@/utils/jsonHtmlConverters';
 import { DocumentJson, textToJson, generateFormattedText } from '@/utils/documentJsonUtils';
+import DownloadOptions from '@/components/cover-letter/DownloadOptions';
 
 
 interface EditableCoverLetterProps {
   content: string;
   onSave: (newContent: string) => void;
+  fileName?: string;
 }
 
 interface EditableCoverLetterRef {
   forceSave: () => Promise<void>;
 }
 
-const EditableCoverLetter = forwardRef<EditableCoverLetterRef, EditableCoverLetterProps>(({ content, onSave }, ref) => {
+const EditableCoverLetter = forwardRef<EditableCoverLetterRef, EditableCoverLetterProps>(({ content, onSave, fileName = 'cover-letter' }, ref) => {
   // Initialize HTML from JSON content
   const [htmlContent, setHtmlContent] = useState(() => {
     try {
@@ -30,6 +32,42 @@ const EditableCoverLetter = forwardRef<EditableCoverLetterRef, EditableCoverLett
   });
   
   const debounceTimeoutRef = useRef<NodeJS.Timeout>();
+  const quillRef = useRef<ReactQuill>(null);
+
+  // Add download button to Quill toolbar
+  useEffect(() => {
+    if (quillRef.current) {
+      const toolbar = quillRef.current.getEditor().getModule('toolbar');
+      if (toolbar && toolbar.container) {
+        // Remove existing download button if any
+        const existingBtn = toolbar.container.querySelector('.ql-download');
+        if (existingBtn) existingBtn.remove();
+
+        // Add download button to the right side of toolbar
+        const downloadBtn = document.createElement('span');
+        downloadBtn.className = 'ql-download';
+        downloadBtn.style.marginLeft = 'auto';
+        downloadBtn.style.display = 'flex';
+        downloadBtn.style.alignItems = 'center';
+        
+        // Create download component container
+        const downloadContainer = document.createElement('div');
+        downloadContainer.style.marginLeft = 'auto';
+        toolbar.container.appendChild(downloadContainer);
+
+        // Render download options
+        import('react-dom/client').then(({ createRoot }) => {
+          const root = createRoot(downloadContainer);
+          root.render(
+            React.createElement(DownloadOptions, {
+              content: generateFormattedText(htmlToJson(htmlContent)),
+              fileName: fileName
+            })
+          );
+        });
+      }
+    }
+  }, [htmlContent, fileName]);
 
   // Force save function exposed through ref
   const forceSave = useCallback(async () => {
@@ -113,14 +151,17 @@ const EditableCoverLetter = forwardRef<EditableCoverLetterRef, EditableCoverLett
     }
   }, [content, onSave]);
 
-  // Quill configuration with AI features and download button
+  // Quill configuration with download button on toolbar
   const modules = {
-    toolbar: [
-      [{ 'header': [1, 2, 3, false] }],
-      ['bold'],
-      [{ 'list': 'bullet' }],
-      ['clean']
-    ],
+    toolbar: {
+      container: [
+        [{ 'header': [1, 2, 3, false] }],
+        ['bold'],
+        [{ 'list': 'bullet' }],
+        ['clean'],
+        ['download'] // Add custom download button
+      ]
+    },
     clipboard: {
       matchVisual: false
     }
@@ -138,6 +179,7 @@ const EditableCoverLetter = forwardRef<EditableCoverLetterRef, EditableCoverLett
           <p className="text-micro text-muted-foreground">Use formatting tools to enhance your cover letter</p>
         </div>
         <ReactQuill
+          ref={quillRef}
           theme="snow"
           value={htmlContent}
           onChange={handleContentChange}

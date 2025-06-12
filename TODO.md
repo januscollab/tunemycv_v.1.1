@@ -27,6 +27,27 @@ All critical blocking issues have been successfully resolved:
 
 ## Backlog
 
+## Phase 3 (Major Features - Requires Planning)
+
+- [ ] **Add "Edit with AI" Toggle Button**: 
+  - Add toggle button to main menu (default: on)
+  - When toggled 'on': AI Context menu appears on text selection
+  - When toggled 'off': AI Context menu is hidden
+  - Add tooltip: "Allows AI interface to improve content"
+  - Requires state management and conditional rendering logic
+
+- [ ] **Fix AI Context Menu Positioning**: 
+  - Position menu slightly BELOW highlighted text (currently covering text)
+  - Ensure menu doesn't collision with selected text
+  - Make text remain editable when menu is visible
+  - Test across different screen sizes and text positions
+
+- [ ] **AI Context Menu in Cover Letter Editor**: 
+  - Make AI context menu visible in Generate Cover Letter > View Letter
+  - Apply "Edit with AI" toggle to cover letter editing
+  - Ensure consistent behavior across all rich text editors
+  - Test integration with cover letter save functionality
+
 - [ ] **Fix Tooltips Site-wide**: Review entire site and implement proper tooltip behavior
   - Default hidden state until hover trigger (300ms delay)
   - Non-interactive popup with contextual information
