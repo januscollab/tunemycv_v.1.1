@@ -6,6 +6,7 @@ interface StorageOptions {
   uploadType: 'cv' | 'job_description';
   extractedText?: string;
   prettyJsonString?: string;
+  saveToUserList?: boolean; // Whether to add CV to user's saved list
 }
 
 export const useFileStorage = () => {
