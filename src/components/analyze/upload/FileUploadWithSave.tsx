@@ -47,7 +47,7 @@ const FileUploadWithSave: React.FC<FileUploadWithSaveProps> = ({
     try {
       const result = await orchestrator.processFile(file, { 
         fileType: 'cv',
-        shouldStore: shouldSave // Only store if user explicitly requested it
+        shouldStore: true // Always store JSON to database for editor functionality
       });
       
       if (result.success && result.file && result.extractedText) {
