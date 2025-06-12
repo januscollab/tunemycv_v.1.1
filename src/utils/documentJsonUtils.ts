@@ -27,19 +27,34 @@ const generateId = (): string => {
   return `section-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 };
 
-// Apply JSON formatting rules - strip unwanted formatting
-const applyFormattingRules = (text: string): string => {
-  return text
-    // Remove italics, underlines, and other formatting
-    .replace(/[_*~`]+/g, '')
-    // Normalize bullets to "-" only
-    .replace(/[•·‐−–—]/g, '-')
-    // Remove multiple font information (keep single font type)
-    .replace(/font-family:[^;]+;?/gi, '')
-    .replace(/font-size:[^;]+;?/gi, '')
-    // Clean up excessive whitespace
-    .replace(/\s+/g, ' ')
-    .trim();
+// Apply JSON formatting rules - preserve bold and line breaks, strip unwanted formatting
+const applyFormattingRules = (text: string, preserveFormatting = true): string => {
+  let processed = text;
+  
+  if (preserveFormatting) {
+    // Preserve intentional line breaks and bold formatting
+    processed = processed
+      // Normalize bullets to "-" only
+      .replace(/[•·‐−–—]/g, '-')
+      // Remove font styling but keep semantic formatting
+      .replace(/font-family:[^;]+;?/gi, '')
+      .replace(/font-size:[^;]+;?/gi, '')
+      // Clean up excessive whitespace but preserve single line breaks
+      .replace(/[ \t]+/g, ' ')
+      .replace(/\n\s*\n\s*\n/g, '\n\n') // Max 2 consecutive newlines
+      .trim();
+  } else {
+    // Legacy mode - strip all formatting
+    processed = processed
+      .replace(/[_*~`]+/g, '')
+      .replace(/[•·‐−–—]/g, '-')
+      .replace(/font-family:[^;]+;?/gi, '')
+      .replace(/font-size:[^;]+;?/gi, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+  
+  return processed;
 };
 
 // Enhanced text processing with file-type awareness
@@ -360,7 +375,13 @@ export const isValidDocumentJson = (obj: any): obj is DocumentJson => {
 };
 
 // Enforce JSON formatting rules on existing DocumentJson
-export const enforceFormattingRules = (docJson: DocumentJson): DocumentJson => {
+export const enforceFormattingRules = (docJson: DocumentJson, preserveFormatting = true): DocumentJson => {
+  console.log('[documentJsonUtils] enforceFormattingRules called:', { 
+    preserveFormatting, 
+    sectionsCount: docJson.sections.length,
+    formattedSections: docJson.sections.filter(s => s.formatting?.bold).length
+  });
+  
   return {
     ...docJson,
     sections: docJson.sections.map(section => {
@@ -368,13 +389,13 @@ export const enforceFormattingRules = (docJson: DocumentJson): DocumentJson => {
       
       // Apply formatting rules to content
       if (cleanedSection.content) {
-        cleanedSection.content = applyFormattingRules(cleanedSection.content);
+        cleanedSection.content = applyFormattingRules(cleanedSection.content, preserveFormatting);
       }
       
       // Apply formatting rules to list items
       if (cleanedSection.items) {
         cleanedSection.items = cleanedSection.items
-          .map(item => applyFormattingRules(item))
+          .map(item => applyFormattingRules(item, preserveFormatting))
           .filter(item => item.trim().length > 0);
       }
       
@@ -383,8 +404,10 @@ export const enforceFormattingRules = (docJson: DocumentJson): DocumentJson => {
         cleanedSection.level = Math.min(cleanedSection.level, 3) as 1 | 2 | 3;
       }
       
-      // Remove any unsupported formatting
-      delete cleanedSection.formatting;
+      // Keep formatting if preserveFormatting is true, otherwise remove it
+      if (!preserveFormatting) {
+        delete cleanedSection.formatting;
+      }
       
       return cleanedSection;
     }).filter(section => 

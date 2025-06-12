@@ -55,6 +55,8 @@ export const useJsonFirstEditor = ({
       console.log('[useJsonFirstEditor] updateFromHtml called:', {
         htmlLength: html.length,
         enableAutoSave,
+        hasBoldElements: html.includes('<strong>') || html.includes('<b>'),
+        hasBreakElements: html.includes('<br>'),
         timestamp: new Date().toISOString()
       });
       
@@ -62,12 +64,23 @@ export const useJsonFirstEditor = ({
       setHtmlContent(validHtml);
       
       const newJson = htmlToJson(validHtml);
+      console.log('[useJsonFirstEditor] HTML→JSON conversion result:', {
+        sectionsCount: newJson.sections.length,
+        formattedSections: newJson.sections.filter(s => s.formatting?.bold).length,
+        sectionsWithLineBreaks: newJson.sections.filter(s => s.content?.includes('\n')).length
+      });
+      
       setDocumentJson(newJson);
       setHasUnsavedChanges(true);
       
       if (onContentChange && enableAutoSave) {
         console.log('[useJsonFirstEditor] Auto-saving changes...');
         const text = generateFormattedText(newJson);
+        console.log('[useJsonFirstEditor] Generated text for auto-save:', {
+          textLength: text.length,
+          preview: text.substring(0, 200),
+          hasFormatting: text.includes('#') || text.includes('\n\n')
+        });
         onContentChange(newJson, text);
         setHasUnsavedChanges(false);
         console.log('[useJsonFirstEditor] Auto-save completed');

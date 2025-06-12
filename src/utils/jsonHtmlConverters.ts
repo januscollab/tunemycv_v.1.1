@@ -1,6 +1,6 @@
 import { DocumentJson, DocumentSection } from './documentJsonUtils';
 
-// Enhanced JSON to HTML conversion with stability optimizations
+// Enhanced JSON to HTML conversion with formatting preservation
 export const jsonToHtml = (json: DocumentJson): string => {
   console.log('[jsonHtmlConverters] jsonToHtml called:', { sections: json.sections?.length || 0 });
   
@@ -16,7 +16,10 @@ export const jsonToHtml = (json: DocumentJson): string => {
       case 'heading':
         const level = Math.min(section.level || 1, 3);
         const content = section.content || '';
-        htmlParts.push(`<h${level} data-section-id="${section.id}">${escapeHtml(content)}</h${level}>`);
+        const formattedContent = section.formatting?.bold 
+          ? `<strong>${escapeHtml(content)}</strong>`
+          : escapeHtml(content);
+        htmlParts.push(`<h${level} data-section-id="${section.id}">${formattedContent}</h${level}>`);
         break;
         
       case 'paragraph':
@@ -27,16 +30,26 @@ export const jsonToHtml = (json: DocumentJson): string => {
             .map(line => line.trim())
             .filter(line => line.length > 0)
             .join('<br>');
-          // Don't escape the <br> tags we just added
-          const escapedContent = escapeHtml(contentWithBreaks).replace(/&lt;br&gt;/g, '<br>');
-          htmlParts.push(`<p data-section-id="${section.id}">${escapedContent}</p>`);
+          
+          // Apply bold formatting if specified
+          let processedContent = escapeHtml(contentWithBreaks).replace(/&lt;br&gt;/g, '<br>');
+          if (section.formatting?.bold) {
+            processedContent = `<strong>${processedContent}</strong>`;
+          }
+          
+          htmlParts.push(`<p data-section-id="${section.id}">${processedContent}</p>`);
         }
         break;
         
       case 'list':
         if (section.items && section.items.length > 0) {
           const listItems = section.items
-            .map((item, index) => `<li data-item-index="${index}">${escapeHtml(item)}</li>`)
+            .map((item, index) => {
+              const formattedItem = section.formatting?.bold 
+                ? `<strong>${escapeHtml(item)}</strong>`
+                : escapeHtml(item);
+              return `<li data-item-index="${index}">${formattedItem}</li>`;
+            })
             .join('');
           htmlParts.push(`<ul data-section-id="${section.id}">${listItems}</ul>`);
         }
@@ -45,7 +58,11 @@ export const jsonToHtml = (json: DocumentJson): string => {
   }
   
   const result = htmlParts.length > 0 ? htmlParts.join('') : '<p><br></p>';
-  console.log('[jsonHtmlConverters] jsonToHtml result:', { htmlLength: result.length, preview: result.substring(0, 100) });
+  console.log('[jsonHtmlConverters] jsonToHtml result:', { 
+    htmlLength: result.length, 
+    preview: result.substring(0, 100),
+    hasBoldElements: result.includes('<strong>')
+  });
   return result;
 };
 
@@ -81,48 +98,73 @@ export const htmlToJson = (html: string): DocumentJson => {
       case 'h2':
       case 'h3':
         const level = parseInt(element.tagName.charAt(1)) as 1 | 2 | 3;
+        const headingHasBold = element.querySelector('strong, b') !== null;
         const headingContent = unescapeHtml(element.textContent || '').trim();
         if (headingContent) {
-          sections.push({
+          const headingSection: DocumentSection = {
             type: 'heading',
             level,
             content: headingContent,
             id: sectionId
-          });
+          };
+          if (headingHasBold) {
+            headingSection.formatting = { bold: true };
+          }
+          sections.push(headingSection);
         }
         break;
         
       case 'p':
-        // Handle paragraphs with <br> tags for line breaks
+        // Handle paragraphs with <br> tags for line breaks and bold formatting
         const innerHTML = element.innerHTML || '';
         if (innerHTML.trim()) {
-          // Convert <br> tags back to newlines for consistent storage
-          const contentWithNewlines = innerHTML
+          const hasBold = element.querySelector('strong, b') !== null;
+          
+          // Convert <br> tags back to newlines, preserve bold content
+          let contentWithNewlines = innerHTML
             .replace(/<br\s*\/?>/gi, '\n')
+            .replace(/<strong[^>]*>(.*?)<\/strong>/gi, '$1') // Extract bold content
+            .replace(/<b[^>]*>(.*?)<\/b>/gi, '$1') // Extract bold content
             .replace(/<[^>]*>/g, '') // Remove any other HTML tags
             .trim();
           
           if (contentWithNewlines) {
-            sections.push({
+            const paragraphSection: DocumentSection = {
               type: 'paragraph',
               content: contentWithNewlines,
               id: sectionId
-            });
+            };
+            if (hasBold) {
+              paragraphSection.formatting = { bold: true };
+            }
+            sections.push(paragraphSection);
           }
         }
         break;
         
       case 'ul':
+        const listHasBold = element.querySelector('strong, b') !== null;
         const listItems = Array.from(element.querySelectorAll('li'))
-          .map(li => unescapeHtml(li.textContent || '').trim())
+          .map(li => {
+            // Extract text content while preserving bold information
+            const liContent = li.innerHTML
+              .replace(/<strong[^>]*>(.*?)<\/strong>/gi, '$1')
+              .replace(/<b[^>]*>(.*?)<\/b>/gi, '$1')
+              .replace(/<[^>]*>/g, '');
+            return unescapeHtml(liContent).trim();
+          })
           .filter(item => item.length > 0);
         
         if (listItems.length > 0) {
-          sections.push({
+          const listSection: DocumentSection = {
             type: 'list',
             items: listItems,
             id: sectionId
-          });
+          };
+          if (listHasBold) {
+            listSection.formatting = { bold: true };
+          }
+          sections.push(listSection);
         }
         break;
     }
