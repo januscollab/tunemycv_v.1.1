@@ -14,14 +14,35 @@ All critical blocking issues have been successfully resolved:
 - [x] **Toast Notifications Still Appearing**: Auto-save toast notifications are still showing in the rich text editor despite implementation to remove them
 - [x] **Ctrl+Z Undo Not Working**: Keyboard shortcut Ctrl+Z for undo functionality is not working in the rich text editor
 
-## UI/UX Improvements
+## UI/UX Improvements - COMPLETED ✅
 - [x] Analyze CV > Paste Job Description edit text area needs to be updated to the correct "Floating Label Textarea"
 - [x] **CV Upload UX**: Remove "Type Confirmation Needed" tag for all CV uploads to streamline the upload process
 - [x] **Document Modal Enhancement**: Review Document modal > remove "Document Content" from inside the text edit area
 - [x] **Missing Breadcrumbs**: Add breadcrumbs to pricing scale page
 - [x] **Auto-Open File Dialog**: When a user clicks the "Upload New CV" tab on the CV analysis page, the file upload dialog should auto-open
 - [x] **Auto-Open File Dialog on Tab Switch**: When the "Saved CVs" tab is active in the Analyze Your CV section and a user clicks the "Upload New CV" tab, the file upload dialog should automatically open
-- [ ] **Button State Verification**: Ensure "Add to Saved CV's" button disappears after successfully saving uploaded CV to saved CV log
+- [x] **Button State Verification**: Ensure "Add to Saved CV's" button disappears after successfully saving uploaded CV to saved CV log
+
+## Next Sprint
+
+## Backlog
+
+- [ ] **Fix Tooltips Site-wide**: Review entire site and implement proper tooltip behavior
+  - Default hidden state until hover trigger (300ms delay)
+  - Non-interactive popup with contextual information
+  - Auto-dismiss when cursor leaves trigger area
+  - Proper positioning (above/below/beside based on space)
+  - Keyboard accessibility (Tab focus support)
+  - Screen reader support via aria-label/aria-describedby
+
+- [ ] **Fix Dropdown Menus Site-wide**: Review entire site and "Dropdown Menu" in design system 
+  - Closed by default until user interaction (click/keyboard)
+  - Opens adjacent to trigger with proper positioning logic
+  - Single open instance (auto-close others)
+  - Dismisses on outside click and Escape key
+  - Full keyboard navigation (arrow keys, Enter, Esc)
+  - Proper z-index and background (non-transparent)
+  - Selectable options that trigger actions/selections
 
 ## Adobe PDF Processing
 - [x] Fix Adobe ZIP extraction sequence (Download → Save ZIP → Unzip → Save Text)
