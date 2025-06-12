@@ -151,19 +151,15 @@ export class ProfessionalTextProcessor {
     return Math.min(avgConfidence + structureBonus, 1);
   }
 
-  // Format JSON with proper beautification
+  // Format JSON with proper beautification - SAFE FALLBACK ONLY
   static beautifyJSON(obj: any): string {
     try {
-      // Custom JSON beautification for professional presentation
-      const jsonString = JSON.stringify(obj, null, 2);
-      return jsonString
-        .replace(/\n\s*\n/g, '\n') // Remove excessive line breaks
-        .replace(/,\n(\s*})/g, '\n$1') // Remove trailing commas before closing braces
-        .replace(/{\n\s*}/g, '{}') // Compact empty objects
-        .replace(/\[\n\s*\]/g, '[]'); // Compact empty arrays
-    } catch (error) {
-      console.warn('[ProfessionalTextProcessor] JSON beautification failed, using standard formatting');
+      // Simple, safe JSON formatting to prevent stack overflow
+      console.log('[ProfessionalTextProcessor] Using safe JSON formatting');
       return JSON.stringify(obj, null, 2);
+    } catch (error) {
+      console.error('[ProfessionalTextProcessor] Even safe JSON formatting failed:', error);
+      return '{}'; // Ultimate fallback
     }
   }
 

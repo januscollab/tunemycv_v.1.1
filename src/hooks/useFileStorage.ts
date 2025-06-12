@@ -27,6 +27,10 @@ export const useFileStorage = () => {
     setIsStoring(true);
     
     try {
+      // Add size validation to prevent stack overflow
+      const jsonSize = options.prettyJsonString ? new Blob([options.prettyJsonString]).size / 1024 : 0;
+      console.log('[useFileStorage] Storing file with JSON size:', jsonSize.toFixed(1), 'KB');
+      
       // Convert original file to base64 for storage
       const fileContent = await file.arrayBuffer();
       const base64Content = btoa(String.fromCharCode(...new Uint8Array(fileContent)));

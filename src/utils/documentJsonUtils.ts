@@ -460,25 +460,42 @@ export const updateDocumentContent = (
 // Create pretty, human-readable JSON for database storage
 export const prettifyDocumentJson = (docJson: DocumentJson): string => {
   try {
-    // Try to use js-beautify with dynamic import for browser compatibility
-    const jsBeautify = (globalThis as any)?.jsBeautify || (window as any)?.js_beautify;
+    // Check document size to prevent stack overflow
+    const jsonString = JSON.stringify(docJson);
+    const sizeInKB = new Blob([jsonString]).size / 1024;
     
-    if (jsBeautify) {
-      const jsonString = jsBeautify(JSON.stringify(docJson), {
-        indent_size: 2,
-        space_in_empty_paren: false,
-        preserve_newlines: true,
-        max_preserve_newlines: 2,
-        wrap_line_length: 120
-      });
-      console.log('[documentJsonUtils] js-beautify successfully formatted JSON');
-      return jsonString;
-    } else {
-      throw new Error('js-beautify not available');
+    console.log('[documentJsonUtils] Prettifying JSON:', { sizeKB: sizeInKB.toFixed(1) });
+    
+    // For very large documents, use simple formatting to prevent stack overflow
+    if (sizeInKB > 500) { // 500KB limit
+      console.log('[documentJsonUtils] Large document detected, using simple formatting');
+      return JSON.stringify(docJson, null, 2);
     }
+    
+    // Try to use js-beautify import
+    import('js-beautify').then(({ js: jsBeautify }) => {
+      if (jsBeautify) {
+        const beautified = jsBeautify(jsonString, {
+          indent_size: 2,
+          space_in_empty_paren: false,
+          preserve_newlines: true,
+          max_preserve_newlines: 2,
+          wrap_line_length: 120
+        });
+        console.log('[documentJsonUtils] js-beautify successfully formatted JSON');
+        return beautified;
+      }
+    }).catch(() => {
+      console.log('[documentJsonUtils] js-beautify import failed, using fallback');
+    });
+    
+    // Safe fallback - never causes recursion
+    return JSON.stringify(docJson, null, 2);
+    
   } catch (error) {
-    console.warn('[documentJsonUtils] js-beautify not available, using professional fallback:', error.message || error);
-    return ProfessionalTextProcessor.beautifyJSON(docJson);
+    console.warn('[documentJsonUtils] Prettification failed, using simple fallback:', error.message || error);
+    // Ultimate safe fallback
+    return JSON.stringify(docJson, null, 2);
   }
 };
 
