@@ -78,18 +78,28 @@ const CVContentEditModal: React.FC<CVContentEditModalProps> = ({
         });
       }
 
-      // Use the robust content initializer - PASS HTML TO RICH TEXT EDITOR
-      const { html, text, contentType } = initializeEditorContent(extractedText, documentContentJson);
+      // Parse JSON content if available, otherwise convert text to JSON
+      let contentToLoad: DocumentJson;
       
-      console.log('[CVContentEditModal] Content initialization result:', {
-        contentType,
-        htmlLength: html.length,
-        textLength: text.length,
-        preview: html.substring(0, 100)
-      });
+      if (documentContentJson && typeof documentContentJson === 'object') {
+        contentToLoad = parseDocumentJson(documentContentJson);
+        console.log('[CVContentEditModal] Using JSON content:', {
+          sectionsCount: contentToLoad.sections.length,
+          source: 'database_json'
+        });
+      } else if (extractedText) {
+        contentToLoad = textToJson(extractedText);
+        console.log('[CVContentEditModal] Converting text to JSON:', {
+          sectionsCount: contentToLoad.sections.length,
+          source: 'extracted_text'
+        });
+      } else {
+        contentToLoad = textToJson('');
+        console.log('[CVContentEditModal] Using empty JSON content');
+      }
       
-      // CRITICAL FIX: Pass HTML content to rich text editor for proper formatting
-      setEditorContent(html || '');
+      // Pass JSON object directly to editor (JSON-first architecture)
+      setEditorContent(contentToLoad);
     } catch (error) {
       console.error('Error loading CV content:', error);
       // Silent error handling - no toast notification
@@ -172,8 +182,10 @@ const CVContentEditModal: React.FC<CVContentEditModalProps> = ({
             <EnhancedEditorErrorBoundary
               fallbackContent={typeof editorContent === 'string' ? editorContent : generateFormattedText(editorContent)}
               onReset={() => {
-                const resetContent = initializeEditorContent(cv.extracted_text, cv.document_content_json);
-                setEditorContent(resetContent.html || '');
+                const resetJson = cv.document_content_json 
+                  ? parseDocumentJson(cv.document_content_json)
+                  : textToJson(cv.extracted_text || '');
+                setEditorContent(resetJson);
               }}
               componentName="CV Content Editor"
               onContentRestore={(content) => {
