@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FileText, Edit, AlertTriangle, CheckCircle, Info, X, Heart, Bug } from 'lucide-react';
+import { FileText, Edit, AlertTriangle, CheckCircle, Info, X, Heart } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -7,7 +7,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { formatFileSize } from '@/utils/fileUtils';
 import { assessDocumentQuality, getQualityColor, getQualityBadge, QualityAssessment } from '@/utils/documentQuality';
 import BounceLoader from '@/components/ui/bounce-loader';
-import { JsonQualityModal } from '@/components/debug/JsonQualityModal';
+
 import { DocumentJson } from '@/utils/documentJsonUtils';
 
 interface DocumentPreviewCardProps {
@@ -41,7 +41,7 @@ const DocumentPreviewCard: React.FC<DocumentPreviewCardProps> = ({
   const [isSaving, setIsSaving] = useState(false);
   const [isRemoving, setIsRemoving] = useState(false);
   const [saveButtonVisible, setSaveButtonVisible] = useState(canSaveToCVs);
-  const [showJsonModal, setShowJsonModal] = useState(false);
+  
   const quality = assessDocumentQuality(extractedText, fileName, documentType);
 
   const handleReviewEdit = async () => {
@@ -150,33 +150,8 @@ const DocumentPreviewCard: React.FC<DocumentPreviewCardProps> = ({
           )}
         </div>
 
-        {/* Action Buttons */}
+        {/* Action Buttons - Reordered: 1. Add to Saved CVs, 2. Review & Edit, 3. Remove */}
         <div className="flex items-center justify-end space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleReviewEdit}
-            disabled={isLoading}
-            className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200"
-          >
-            {isLoading ? (
-              <BounceLoader size="sm" className="mr-2" />
-            ) : (
-              <Edit className="h-3 w-3 mr-2" />
-            )}
-            Review & Edit
-          </Button>
-          {showDebugTools && documentJson && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowJsonModal(true)}
-              className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200"
-            >
-              <Bug className="h-3 w-3 mr-2" />
-              Debug JSON
-            </Button>
-          )}
           {onSaveToCVs && canSaveToCVs && saveButtonVisible && (
             <Button
               variant="outline"
@@ -196,6 +171,20 @@ const DocumentPreviewCard: React.FC<DocumentPreviewCardProps> = ({
           <Button
             variant="outline"
             size="sm"
+            onClick={handleReviewEdit}
+            disabled={isLoading}
+            className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200"
+          >
+            {isLoading ? (
+              <BounceLoader size="sm" className="mr-2" />
+            ) : (
+              <Edit className="h-3 w-3 mr-2" />
+            )}
+            Review & Edit
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
             onClick={handleRemove}
             disabled={isRemoving}
             className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200"
@@ -209,13 +198,6 @@ const DocumentPreviewCard: React.FC<DocumentPreviewCardProps> = ({
           </Button>
         </div>
         
-        {/* Debug Modal */}
-        <JsonQualityModal
-          open={showJsonModal}
-          onOpenChange={setShowJsonModal}
-          documentJson={documentJson}
-          extractedText={extractedText}
-        />
       </CardContent>
     </Card>
   );

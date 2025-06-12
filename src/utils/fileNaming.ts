@@ -20,8 +20,8 @@ export const generateStandardFileName = (userId: string, originalFilename: strin
   
   const timestamp = `${day}${month}${year}-${hours}${minutes}${seconds}`;
   
-  // Clean the original filename to remove any problematic characters
-  const cleanFilename = originalFilename.replace(/[^a-zA-Z0-9.-]/g, '-');
+  // Clean the original filename to remove problematic characters but preserve spaces
+  const cleanFilename = originalFilename.replace(/[^a-zA-Z0-9.\s-]/g, '-');
   
   return `${userId}-${cleanFilename}-${timestamp}`;
 };

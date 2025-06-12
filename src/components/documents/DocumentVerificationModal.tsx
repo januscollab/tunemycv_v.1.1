@@ -50,32 +50,33 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
   
   const quality = assessDocumentQuality(editedText, fileName, documentType);
 
-  // Handle rich text editor content changes with improved debouncing
+  // Handle rich text editor content changes with improved debouncing and manual save support
   const handleContentChange = useCallback((newJson: DocumentJson, newText: string) => {
     setDocumentJson(newJson);
     setEditedText(newText);
     
-    // Auto-save logic without toast notifications
-    if (newText !== extractedText && newText.trim().length > 0) {
-      setIsAutoSaving(true);
-      
-      // Clear any existing timeout
-      const timeoutId = setTimeout(() => {
-        onSave(newText);
-        setLastSaved(new Date());
-        setIsAutoSaving(false);
-      }, 2000);
-      
-      return () => clearTimeout(timeoutId);
+    // Mark as changed but don't auto-save - let user control when to save
+    if (newText !== extractedText) {
+      setIsAutoSaving(false);
+      setLastSaved(null);
     }
-  }, [extractedText, onSave]);
+  }, [extractedText]);
   
-  const handleSave = async () => {
+  const handleSave = async (closeAfterSave = true) => {
     setIsSaving(true);
-    await new Promise(resolve => setTimeout(resolve, 500));
-    onSave(editedText);
-    setIsSaving(false);
-    onClose();
+    try {
+      await onSave(editedText);
+      setLastSaved(new Date());
+      console.log('[DocumentVerificationModal] Document saved successfully');
+      if (closeAfterSave) {
+        onClose();
+      }
+    } catch (error) {
+      console.error('[DocumentVerificationModal] Save failed:', error);
+      throw error;
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const getIssueIcon = (type: string) => {
@@ -87,8 +88,23 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
     }
   };
 
+  // Handle dialog close with auto-save
+  const handleDialogClose = useCallback(async (open: boolean) => {
+    if (!open && editedText !== extractedText && editedText.trim().length > 0) {
+      console.log('[DocumentVerificationModal] Auto-saving on dialog close');
+      try {
+        await handleSave(false);
+      } catch (error) {
+        console.error('[DocumentVerificationModal] Auto-save failed on close:', error);
+      }
+    }
+    if (!open) {
+      onClose();
+    }
+  }, [editedText, extractedText, handleSave, onClose]);
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={handleDialogClose}>
       <DialogContent className="max-w-7xl max-h-[95vh] flex flex-col p-0">
         {/* Compact Header */}
         <DialogHeader className="px-6 py-3 border-b border-border bg-background">
@@ -262,9 +278,25 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
           </div>
         </div>
 
-        {/* Footer with 3 buttons */}
+        {/* Footer with 3 buttons - Reordered: 1. Ask AI to Review My CV, 2. Revert to Original, 3. Save & Close */}
         <div className="flex items-center justify-end px-6 py-4 border-t border-border bg-background">
           <div className="flex items-center space-x-3">
+            {documentType === 'cv' ? (
+              <Button 
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  toast({
+                    title: "Coming Soon!",
+                    description: "AI CV review feature will be available soon and will cost 2 Credits.",
+                  });
+                }}
+                className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200"
+              >
+                <WandSparkles className="h-4 w-4 mr-2" />
+                Ask AI to Review My CV
+              </Button>
+            ) : null}
             <Button 
               variant="outline" 
               size="sm"
@@ -300,22 +332,6 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
               <X className="h-4 w-4 mr-2" />
               Save & Close
             </Button>
-            {documentType === 'cv' ? (
-              <Button 
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  toast({
-                    title: "Coming Soon!",
-                    description: "AI CV review feature will be available soon and will cost 2 Credits.",
-                  });
-                }}
-                className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200"
-              >
-                <WandSparkles className="h-4 w-4 mr-2" />
-                Ask AI to Review My CV
-              </Button>
-            ) : null}
           </div>
         </div>
       </DialogContent>

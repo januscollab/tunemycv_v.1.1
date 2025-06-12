@@ -158,16 +158,14 @@ const SafeRichTextEditor = forwardRef<SafeRichTextEditorRef, SafeRichTextEditorP
     resetToOriginal();
   }, [resetToOriginal]);
 
-  // Quill configuration with enhanced error handling
+  // Quill configuration with enhanced error handling and cleaned toolbar (removed "T" icon)
   const modules = {
-    toolbar: {
-      container: [
-        [{ 'header': [1, 2, 3, false] }],
-        ['bold'],
-        [{ 'list': 'bullet' }],
-        ['clean']
-      ]
-    },
+    toolbar: [
+      [{ 'header': [1, 2, 3, false] }],
+      ['bold'],
+      [{ 'list': 'bullet' }],
+      ['clean']
+    ],
     clipboard: {
       matchVisual: false
     },
@@ -235,20 +233,6 @@ const SafeRichTextEditor = forwardRef<SafeRichTextEditorRef, SafeRichTextEditorP
         </div>
       )}
 
-      {/* Reset Button */}
-      {hasUnsavedChanges && (
-        <div className="absolute top-2 left-2 z-10">
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={resetToOriginal}
-            className="text-micro px-2 py-1"
-          >
-            <RotateCcw className="h-3 w-3 mr-1" />
-            Reset
-          </Button>
-        </div>
-      )}
 
       {/* Loading indicator */}
       {isConverting && (
