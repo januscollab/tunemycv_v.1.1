@@ -1,7 +1,7 @@
 import React from 'react';
 import { User, Upload, Brain, FileText, Info } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface ProfileNavigationProps {
   activeTab: string;
@@ -50,20 +50,18 @@ const ProfileNavigation: React.FC<ProfileNavigationProps> = ({ activeTab, onTabC
                   <span className="hidden lg:inline">{tab.label}</span>
                   <span className="lg:hidden">{tab.label.split(' ')[0]}</span>
                   {tab.tooltip && (
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Info className="h-3 w-3 text-gray-400 hover:text-gray-600 dark:text-apple-core/60 dark:hover:text-apple-core/80 cursor-help" />
-                        </TooltipTrigger>
-                        <TooltipContent 
-                          side="top" 
-                          className="w-max max-w-[280px] whitespace-normal break-words z-50" 
-                          collisionPadding={8}
-                        >
-                          <p className="text-sm leading-relaxed">{tab.tooltip}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Info className="h-3 w-3 text-gray-400 hover:text-gray-600 dark:text-apple-core/60 dark:hover:text-apple-core/80 cursor-help" />
+                      </TooltipTrigger>
+                      <TooltipContent 
+                        side="top" 
+                        className="w-max max-w-[280px] whitespace-normal break-words z-50" 
+                        collisionPadding={8}
+                      >
+                        <p className="text-sm leading-relaxed">{tab.tooltip}</p>
+                      </TooltipContent>
+                    </Tooltip>
                   )}
                 </TabsTrigger>
               );
@@ -89,20 +87,18 @@ const ProfileNavigation: React.FC<ProfileNavigationProps> = ({ activeTab, onTabC
               <Icon className="h-5 w-5 mr-3" />
               <span className="flex-1 text-left">{tab.label}</span>
               {tab.tooltip && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:text-apple-core/60 dark:hover:text-apple-core/80 cursor-help" />
-                    </TooltipTrigger>
-                    <TooltipContent 
-                      side="bottom" 
-                      className="w-max max-w-[280px] whitespace-normal break-words z-50" 
-                      collisionPadding={8}
-                    >
-                      <p className="text-sm leading-relaxed">{tab.tooltip}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:text-apple-core/60 dark:hover:text-apple-core/80 cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent 
+                    side="bottom" 
+                    className="w-max max-w-[280px] whitespace-normal break-words z-50" 
+                    collisionPadding={8}
+                  >
+                    <p className="text-sm leading-relaxed">{tab.tooltip}</p>
+                  </TooltipContent>
+                </Tooltip>
               )}
             </button>
           );

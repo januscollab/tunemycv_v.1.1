@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface QuickAction {
   id: string;
@@ -122,60 +122,29 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <TooltipProvider>
-        <div className="flex flex-col items-end space-y-3">
+      <div className="flex flex-col items-end space-y-3">
 
-          {/* Quick Actions */}
-          {filteredActions.length > 0 && (
-            <>
-              {/* Action Items */}
-              <div className={cn(
-                "flex flex-col items-end space-y-3 transition-all duration-300 transform origin-bottom-right",
-                isHovered ? "scale-100 opacity-100 translate-x-0" : "scale-95 opacity-0 translate-x-2"
-              )}>
-                {filteredActions.map((action, index) => (
-                  <TooltipProvider key={action.id}>
-                    <Tooltip delayDuration={100}>
-                      <TooltipTrigger asChild>
-                        <Button
-                          size="icon"
-                          onClick={() => handleAction(action)}
-                          className="w-12 h-12 rounded-full shadow-lg hover:scale-110 transition-all duration-200 bg-white border-2 border-zapier-orange text-zapier-orange hover:bg-zapier-orange hover:text-white"
-                          style={{ 
-                            zIndex: 10000 + index,
-                            position: 'relative'
-                          }}
-                        >
-                          {action.icon}
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent 
-                        side="left" 
-                        sideOffset={8}
-                        className="bg-popover text-popover-foreground border border-popover-border shadow-md"
-                      >
-                        <p>{action.label}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                ))}
-              </div>
-
-              {/* Main Toggle Button */}
-              <TooltipProvider>
-                <Tooltip delayDuration={100}>
+        {/* Quick Actions */}
+        {filteredActions.length > 0 && (
+          <>
+            {/* Action Items */}
+            <div className={cn(
+              "flex flex-col items-end space-y-3 transition-all duration-300 transform origin-bottom-right",
+              isHovered ? "scale-100 opacity-100 translate-x-0" : "scale-95 opacity-0 translate-x-2"
+            )}>
+              {filteredActions.map((action, index) => (
+                <Tooltip key={action.id}>
                   <TooltipTrigger asChild>
                     <Button
                       size="icon"
-                      className={cn(
-                        "w-14 h-14 rounded-full shadow-lg transition-all duration-300 relative",
-                        isHovered 
-                          ? "bg-zapier-orange hover:bg-zapier-orange/90 scale-110" 
-                          : "bg-zapier-orange hover:bg-zapier-orange/90 hover:scale-110"
-                      )}
-                      style={{ zIndex: 10000 }}
+                      onClick={() => handleAction(action)}
+                      className="w-12 h-12 rounded-full shadow-lg hover:scale-110 transition-all duration-200 bg-white border-2 border-zapier-orange text-zapier-orange hover:bg-zapier-orange hover:text-white"
+                      style={{ 
+                        zIndex: 10000 + index,
+                        position: 'relative'
+                      }}
                     >
-                      <Zap className="w-6 h-6" />
+                      {action.icon}
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent 
@@ -183,14 +152,39 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
                     sideOffset={8}
                     className="bg-popover text-popover-foreground border border-popover-border shadow-md"
                   >
-                    <p>Quick Actions</p>
+                    <p>{action.label}</p>
                   </TooltipContent>
                 </Tooltip>
-              </TooltipProvider>
-            </>
-          )}
-        </div>
-      </TooltipProvider>
+              ))}
+            </div>
+
+            {/* Main Toggle Button */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="icon"
+                  className={cn(
+                    "w-14 h-14 rounded-full shadow-lg transition-all duration-300 relative",
+                    isHovered 
+                      ? "bg-zapier-orange hover:bg-zapier-orange/90 scale-110" 
+                      : "bg-zapier-orange hover:bg-zapier-orange/90 hover:scale-110"
+                  )}
+                  style={{ zIndex: 10000 }}
+                >
+                  <Zap className="w-6 h-6" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent 
+                side="left" 
+                sideOffset={8}
+                className="bg-popover text-popover-foreground border border-popover-border shadow-md"
+              >
+                <p>Quick Actions</p>
+              </TooltipContent>
+            </Tooltip>
+          </>
+        )}
+      </div>
     </div>
   );
 };

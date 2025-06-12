@@ -13,7 +13,7 @@ import { SavedDataInput } from '@/components/ui/saved-data-input';
 import { SavedDataTextarea } from '@/components/ui/saved-data-textarea';
 import { FormTwoColumn, FormSingleColumn, FormSection } from '@/components/ui/form-layouts';
 import { QuickActions } from '@/components/common/QuickActions';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel } from '@/components/ui/dropdown-menu';
 import { LoadingStatesShowcase } from '@/components/ui/loading-states-showcase';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -221,19 +221,17 @@ const DesignSystem = () => {
     {
       name: 'Tooltip System',
       component: (
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="outline" size="sm">
-                <Info className="h-4 w-4 mr-1" />
-                Hover for tooltip
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>This is a helpful tooltip message</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="outline" size="sm">
+              <Info className="h-4 w-4 mr-1" />
+              Hover for tooltip
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>This is a helpful tooltip message</p>
+          </TooltipContent>
+        </Tooltip>
       ),
       usage: '89 usages',
       description: 'Accessible tooltips with proper z-index and positioning'

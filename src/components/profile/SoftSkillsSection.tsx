@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Slider } from '@/components/ui/slider';
 import { Brain, Info } from 'lucide-react';
 import { useSoftSkills } from '@/hooks/useSoftSkills';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface SoftSkillsData extends Record<string, number> {
   communication: number;
@@ -96,18 +96,16 @@ const SoftSkillsSection: React.FC = () => {
         <div className="flex items-center mb-6">
           <Brain className="h-5 w-5 text-gray-500 dark:text-apple-core/60 mr-2" />
           <h3 className="text-lg font-medium text-gray-900 dark:text-citrus">Soft Skills Assessment</h3>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:text-apple-core/60 dark:hover:text-apple-core/80 cursor-help ml-2" />
-              </TooltipTrigger>
-              <TooltipContent side="bottom" className="max-w-sm">
-                <p className="text-sm">
-                  <strong>Boost Your CV Analysis Accuracy by 40%</strong> - Complete this 2-minute assessment to get personalized insights into how your soft skills match specific roles.
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:text-apple-core/60 dark:hover:text-apple-core/80 cursor-help ml-2" />
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="max-w-sm">
+              <p className="text-sm">
+                <strong>Boost Your CV Analysis Accuracy by 40%</strong> - Complete this 2-minute assessment to get personalized insights into how your soft skills match specific roles.
+              </p>
+            </TooltipContent>
+          </Tooltip>
         </div>
         <p className="text-sm text-gray-500 dark:text-apple-core/60 mb-6">
           Your soft skills assessment used to enhance CV analysis

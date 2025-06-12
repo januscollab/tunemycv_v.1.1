@@ -22,7 +22,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, ChevronUp, ChevronDown, Building2, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface CultureArchetype {
   id: string;
@@ -162,33 +162,31 @@ function SortableItem({ id, archetype, index, isMobile, onMoveUp, onMoveDown, ca
         <div className="flex-1">
           <div className="flex items-center justify-between">
             <h4 className="font-medium text-gray-900 dark:text-citrus">{archetype.name}</h4>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:text-apple-core/60 dark:hover:text-apple-core/80 cursor-help" />
-                </TooltipTrigger>
-                <TooltipContent side="left" className="max-w-sm p-4">
-                  <div className="space-y-3">
-                    <div>
-                      <h5 className="font-semibold text-caption mb-2">Traits:</h5>
-                      <ul className="text-micro space-y-1">
-                        {ARCHETYPE_DETAILS[archetype.id as keyof typeof ARCHETYPE_DETAILS]?.traits.map((trait, i) => (
-                          <li key={i} className="flex items-start">
-                            <span className="mr-1">•</span>
-                            <span>{trait}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    <div className="text-micro">
-                      <p><strong>Common in:</strong> {ARCHETYPE_DETAILS[archetype.id as keyof typeof ARCHETYPE_DETAILS]?.commonIn}</p>
-                      <p className="mt-1"><strong>Pros:</strong> {ARCHETYPE_DETAILS[archetype.id as keyof typeof ARCHETYPE_DETAILS]?.pros}</p>
-                      <p className="mt-1"><strong>Cons:</strong> {ARCHETYPE_DETAILS[archetype.id as keyof typeof ARCHETYPE_DETAILS]?.cons}</p>
-                    </div>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:text-apple-core/60 dark:hover:text-apple-core/80 cursor-help" />
+              </TooltipTrigger>
+              <TooltipContent side="left" className="max-w-sm p-4">
+                <div className="space-y-3">
+                  <div>
+                    <h5 className="font-semibold text-caption mb-2">Traits:</h5>
+                    <ul className="text-micro space-y-1">
+                      {ARCHETYPE_DETAILS[archetype.id as keyof typeof ARCHETYPE_DETAILS]?.traits.map((trait, i) => (
+                        <li key={i} className="flex items-start">
+                          <span className="mr-1">•</span>
+                          <span>{trait}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+                  <div className="text-micro">
+                    <p><strong>Common in:</strong> {ARCHETYPE_DETAILS[archetype.id as keyof typeof ARCHETYPE_DETAILS]?.commonIn}</p>
+                    <p className="mt-1"><strong>Pros:</strong> {ARCHETYPE_DETAILS[archetype.id as keyof typeof ARCHETYPE_DETAILS]?.pros}</p>
+                    <p className="mt-1"><strong>Cons:</strong> {ARCHETYPE_DETAILS[archetype.id as keyof typeof ARCHETYPE_DETAILS]?.cons}</p>
+                  </div>
+                </div>
+              </TooltipContent>
+            </Tooltip>
           </div>
           <p className="text-caption text-gray-500 dark:text-apple-core/60 mt-1">{archetype.description}</p>
         </div>
@@ -345,18 +343,16 @@ const CompanyCulturePreferences: React.FC = () => {
       <div className="flex items-center mb-6">
         <Building2 className="h-5 w-5 text-gray-500 dark:text-apple-core/60 mr-2" />
         <h3 className="text-heading font-medium text-gray-900 dark:text-citrus">Company Culture Preferences</h3>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:text-apple-core/60 dark:hover:text-apple-core/80 cursor-help ml-2" />
-            </TooltipTrigger>
-            <TooltipContent side="bottom" className="max-w-sm">
-              <p className="text-caption">
-                <strong>Stop Wasting Time on Wrong-Fit Companies</strong> - Rank these culture types to get matched with companies where you'll be happiest and most successful.
-              </p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:text-apple-core/60 dark:hover:text-apple-core/80 cursor-help ml-2" />
+          </TooltipTrigger>
+          <TooltipContent side="bottom" className="max-w-sm">
+            <p className="text-caption">
+              <strong>Stop Wasting Time on Wrong-Fit Companies</strong> - Rank these culture types to get matched with companies where you'll be happiest and most successful.
+            </p>
+          </TooltipContent>
+        </Tooltip>
       </div>
 
       <div className="mb-4">

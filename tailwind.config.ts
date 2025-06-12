@@ -148,6 +148,12 @@ export default {
 				active: 'rgb(var(--active) / <alpha-value>)',
 				focus: 'rgb(var(--focus) / <alpha-value>)',
 			},
+			zIndex: {
+				'tooltip': '100',
+				'dropdown': '200',
+				'modal': '1000',
+				'notification': '9999',
+			},
 			borderRadius: {
 				lg: '8px',
 				md: '6px',
