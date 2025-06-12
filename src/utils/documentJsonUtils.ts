@@ -437,17 +437,24 @@ export const updateDocumentContent = (
 // Create pretty, human-readable JSON for database storage
 export const prettifyDocumentJson = (docJson: DocumentJson): string => {
   try {
-    // Use js-beautify for better JSON formatting
-    const jsBeautify = require('js-beautify').js;
-    return jsBeautify(JSON.stringify(docJson), {
-      indent_size: 2,
-      space_in_empty_paren: false,
-      preserve_newlines: true,
-      max_preserve_newlines: 2,
-      wrap_line_length: 120
-    });
+    // Try to use js-beautify with dynamic import for browser compatibility
+    const jsBeautify = (globalThis as any)?.jsBeautify || (window as any)?.js_beautify;
+    
+    if (jsBeautify) {
+      const jsonString = jsBeautify(JSON.stringify(docJson), {
+        indent_size: 2,
+        space_in_empty_paren: false,
+        preserve_newlines: true,
+        max_preserve_newlines: 2,
+        wrap_line_length: 120
+      });
+      console.log('[documentJsonUtils] js-beautify successfully formatted JSON');
+      return jsonString;
+    } else {
+      throw new Error('js-beautify not available');
+    }
   } catch (error) {
-    console.warn('[documentJsonUtils] js-beautify failed, using fallback');
+    console.warn('[documentJsonUtils] js-beautify not available, using professional fallback:', error.message || error);
     return ProfessionalTextProcessor.beautifyJSON(docJson);
   }
 };

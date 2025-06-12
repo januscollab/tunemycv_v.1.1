@@ -77,9 +77,15 @@ const EditableCoverLetter = forwardRef<EditableCoverLetterRef, EditableCoverLett
       const textContent = generateFormattedText(jsonData);
       
       if (textContent !== content && textContent.trim() !== '') {
-        console.log('[EditableCoverLetter] Saving changes immediately...');
+        console.log('[EditableCoverLetter] Saving changes immediately...', {
+          htmlLength: html.length,
+          jsonSections: jsonData.sections.length,
+          textLength: textContent.length
+        });
         await onSave(JSON.stringify(jsonData));
-        console.log('[EditableCoverLetter] Save completed');
+        console.log('[EditableCoverLetter] Save completed successfully');
+      } else {
+        console.log('[EditableCoverLetter] No changes detected, skipping save');
       }
     } catch (error) {
       console.error('[EditableCoverLetter] Error saving changes:', error);

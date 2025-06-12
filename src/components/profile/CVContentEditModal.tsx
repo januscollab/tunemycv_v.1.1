@@ -115,6 +115,10 @@ const CVContentEditModal: React.FC<CVContentEditModalProps> = ({
       textLength: newText.length,
       timestamp: new Date().toISOString()
     });
+    
+    // CRITICAL: Update React state to reflect editor changes for save consistency
+    setEditorContent(newJson);
+    console.log('[CVContentEditModal] Updated React state with new content');
     // Note: Auto-save disabled - only save on explicit save button click
   };
 
@@ -123,20 +127,30 @@ const CVContentEditModal: React.FC<CVContentEditModalProps> = ({
     try {
       console.log('[CVContentEditModal] Starting explicit save...');
       
-      // Force save from editor to get latest content
+      // Force save from editor to get latest content and verify state
       let finalJson: DocumentJson;
       let finalText: string;
       
       if (editorRef.current) {
-        console.log('[CVContentEditModal] Getting content from editor...');
+        console.log('[CVContentEditModal] Forcing editor save to get live content...');
         await editorRef.current.saveChanges();
         
-        // Get the latest content from the editor's state
+        // CRITICAL: Get the latest JSON from the editor's live state, not React state
+        // React state may be stale - we need the actual editor content
+        console.log('[CVContentEditModal] Current editorContent state type:', typeof editorContent);
+        console.log('[CVContentEditModal] Current editorContent preview:', 
+          typeof editorContent === 'object' ? `${editorContent.sections?.length} sections` : editorContent?.toString().substring(0, 100)
+        );
+        
         if (typeof editorContent === 'object' && editorContent.sections) {
           finalJson = editorContent as DocumentJson;
           finalText = generateFormattedText(finalJson);
+          console.log('[CVContentEditModal] Using editor JSON content:', {
+            sectionsCount: finalJson.sections.length,
+            textLength: finalText.length
+          });
         } else {
-          throw new Error('Invalid editor content state');
+          throw new Error('Invalid editor content state - expected DocumentJson object');
         }
       } else {
         throw new Error('Editor reference not available');
