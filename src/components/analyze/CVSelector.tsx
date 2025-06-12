@@ -8,6 +8,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { UploadedFile } from '@/types/fileTypes';
+import { DocumentJson, textToJson, generateFormattedText } from '@/utils/documentJsonUtils';
 import { validateFile, extractTextFromFile } from '@/utils/fileUtils';
 import FileUploadWithSave from './upload/FileUploadWithSave';
 import SavedCVList from './upload/SavedCVList';
@@ -15,12 +17,6 @@ import DocumentPreviewCard from '@/components/documents/DocumentPreviewCard';
 import DocumentVerificationModal from '@/components/documents/DocumentVerificationModal';
 import DocumentValidationDialog from '@/components/ui/document-validation-dialog';
 import { validateCV } from '@/utils/documentValidation';
-
-interface UploadedFile {
-  file: File;
-  extractedText: string;
-  type: 'cv' | 'job_description';
-}
 
 interface CVUpload {
   id: string;
@@ -212,13 +208,16 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
     }
   };
 
-  const handleVerificationSave = (updatedText: string) => {
+  const handleVerificationSave = (updatedJson: DocumentJson) => {
     if (!selectedCV) return;
     
+    console.log('[CVSelector] Saving updated CV JSON with', updatedJson.sections?.length || 0, 'sections');
+    const updatedText = generateFormattedText(updatedJson);
     const updatedFile = new File([updatedText], selectedCV.file.name, { type: selectedCV.file.type });
     const updatedUploadedFile: UploadedFile = {
       file: updatedFile,
       extractedText: updatedText,
+      documentJson: updatedJson,
       type: 'cv'
     };
     
@@ -288,9 +287,10 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
               onClose={() => setShowVerificationModal(false)}
               fileName={selectedCV.file.name}
               fileSize={selectedCV.file.size}
-              extractedText={selectedCV.extractedText}
+              documentJson={selectedCV.documentJson || textToJson(selectedCV.extractedText)}
               documentType="cv"
               onSave={handleVerificationSave}
+              extractedText={selectedCV.extractedText}
             />
           </>
         ) : (

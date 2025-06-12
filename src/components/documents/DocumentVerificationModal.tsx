@@ -26,9 +26,11 @@ interface DocumentVerificationModalProps {
   onClose: () => void;
   fileName: string;
   fileSize: number;
-  extractedText: string;
+  documentJson: DocumentJson;
   documentType: 'cv' | 'job_description';
-  onSave: (updatedText: string) => void;
+  onSave: (updatedJson: DocumentJson) => void;
+  // Legacy fallback support
+  extractedText?: string;
 }
 
 const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
@@ -36,12 +38,28 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
   onClose,
   fileName,
   fileSize,
-  extractedText,
+  documentJson: initialDocumentJson,
   documentType,
-  onSave
+  onSave,
+  extractedText // Legacy fallback
 }) => {
-  const [editedText, setEditedText] = useState(extractedText);
-  const [documentJson, setDocumentJson] = useState<DocumentJson>(() => textToJson(extractedText));
+  // Initialize with JSON as master source
+  const [documentJson, setDocumentJson] = useState<DocumentJson>(() => {
+    // Use provided JSON if available, otherwise convert from text as fallback
+    if (initialDocumentJson && initialDocumentJson.sections) {
+      console.log('[DocumentVerificationModal] Using provided JSON as master source');
+      return initialDocumentJson;
+    } else if (extractedText) {
+      console.log('[DocumentVerificationModal] Legacy fallback: converting text to JSON');
+      return textToJson(extractedText);
+    } else {
+      console.log('[DocumentVerificationModal] No content provided, creating empty document');
+      return textToJson('');
+    }
+  });
+  
+  // Text is derived from JSON, not stored separately
+  const [editedText, setEditedText] = useState(() => generateFormattedText(documentJson));
   const [isSaving, setIsSaving] = useState(false);
   const [isAutoSaving, setIsAutoSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
@@ -49,25 +67,33 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
   // Remove toast to prevent interruptions during editing
   
   const quality = assessDocumentQuality(editedText, fileName, documentType);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
-  // Handle rich text editor content changes with improved debouncing and manual save support
+  // Handle rich text editor content changes - JSON is master, text is derived
   const handleContentChange = useCallback((newJson: DocumentJson, newText: string) => {
+    console.log('[DocumentVerificationModal] Content changed:', { 
+      sections: newJson.sections?.length || 0,
+      textLength: newText.length 
+    });
+    
     setDocumentJson(newJson);
     setEditedText(newText);
     
-    // Mark as changed but don't auto-save - let user control when to save
-    if (newText !== extractedText) {
-      setIsAutoSaving(false);
-      setLastSaved(null);
-    }
-  }, [extractedText]);
+    // Mark as changed for unsaved state tracking
+    setHasUnsavedChanges(true);
+    setIsAutoSaving(false);
+    setLastSaved(null);
+  }, []);
   
   const handleSave = async (closeAfterSave = true) => {
     setIsSaving(true);
     try {
-      await onSave(editedText);
+      // Save JSON as master data format
+      console.log('[DocumentVerificationModal] Saving JSON document with', documentJson.sections?.length || 0, 'sections');
+      await onSave(documentJson);
+      setHasUnsavedChanges(false);
       setLastSaved(new Date());
-      console.log('[DocumentVerificationModal] Document saved successfully');
+      console.log('[DocumentVerificationModal] JSON document saved successfully');
       if (closeAfterSave) {
         onClose();
       }
@@ -92,8 +118,8 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
   const editorRef = useRef<{ htmlContent: string; saveChanges: (html: string) => Promise<void> }>(null);
   
   const handleDialogClose = useCallback(async (open: boolean) => {
-    if (!open && editorRef.current && editedText !== extractedText) {
-      console.log('[DocumentVerificationModal] Auto-saving on dialog close');
+    if (!open && editorRef.current && hasUnsavedChanges) {
+      console.log('[DocumentVerificationModal] Auto-saving JSON on dialog close');
       try {
         await editorRef.current.saveChanges(editorRef.current.htmlContent);
         console.log('[DocumentVerificationModal] Auto-save completed');
@@ -104,7 +130,7 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
     if (!open) {
       onClose();
     }
-  }, [editedText, extractedText, onClose]);
+  }, [hasUnsavedChanges, onClose]);
 
   return (
     <Dialog open={isOpen} onOpenChange={handleDialogClose}>
@@ -254,28 +280,31 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
                 <EnhancedEditorErrorBoundary
                   fallbackContent={editedText}
                   onReset={() => {
-                    const originalJson = textToJson(extractedText);
-                    setDocumentJson(originalJson);
-                    setEditedText(extractedText);
+                    console.log('[DocumentVerificationModal] Error boundary reset to original JSON');
+                    const originalText = generateFormattedText(initialDocumentJson);
+                    setDocumentJson(initialDocumentJson);
+                    setEditedText(originalText);
                   }}
                   componentName="Document Verification Editor"
                   onContentRestore={(content) => {
+                    console.log('[DocumentVerificationModal] Content restored from error boundary');
                     const json = textToJson(content);
+                    const formattedText = generateFormattedText(json);
                     setDocumentJson(json);
-                    setEditedText(content);
-                    handleContentChange(json, content);
+                    setEditedText(formattedText);
+                    handleContentChange(json, formattedText);
                   }}
                 >
-                  <SafeRichTextEditor
-                    ref={editorRef}
-                    initialContent={editedText}
-                    onContentChange={handleContentChange}
-                    className="min-h-[400px] border rounded-md text-black dark:text-white"
-                    placeholder="Document content appears here..."
-                    showAIFeatures={true}
-                    enableAutoSave={false}
-                    debounceMs={2000}
-                  />
+              <SafeRichTextEditor
+                ref={editorRef}
+                initialContent={documentJson}
+                onContentChange={handleContentChange}
+                className="min-h-[400px] border rounded-md text-black dark:text-white"
+                placeholder="Document content appears here..."
+                showAIFeatures={true}
+                enableAutoSave={false}
+                debounceMs={2000}
+              />
                 </EnhancedEditorErrorBoundary>
               </ScrollArea>
             </div>
@@ -302,14 +331,15 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
             <Button 
               variant="outline" 
               size="sm"
-              onClick={() => {
-                // Preserve original format when reverting
-                const originalJson = textToJson(extractedText, true);
-                const originalText = generateFormattedText(originalJson);
-                setDocumentJson(originalJson);
-                setEditedText(originalText);
-                handleContentChange(originalJson, originalText);
-              }}
+                onClick={() => {
+                  // Revert to original JSON
+                  console.log('[DocumentVerificationModal] Reverting to original JSON');
+                  const originalText = generateFormattedText(initialDocumentJson);
+                  setDocumentJson(initialDocumentJson);
+                  setEditedText(originalText);
+                  setHasUnsavedChanges(false);
+                  handleContentChange(initialDocumentJson, originalText);
+                }}
               className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200"
             >
               <RotateCcw className="h-4 w-4 mr-2" />

@@ -97,20 +97,39 @@ export const useJsonFirstEditor = ({
   // REMOVED: Sync HTML content useEffect that was causing race conditions
   // HTML content is now managed directly through state updates only
 
-  // Update from HTML input (from Quill editor) - NO AUTO-SAVE
+  // Update from HTML input (from Quill editor) - Convert to JSON immediately 
   const updateFromHtml = useCallback((html: string) => {
-    console.log('[useJsonFirstEditor] updateFromHtml called (HTML-first mode):', { htmlLength: html.length });
+    console.log('[useJsonFirstEditor] updateFromHtml called - converting HTML to JSON:', { htmlLength: html.length });
     
     try {
-      // Validate HTML content before setting
+      // Validate HTML content before converting
       const validHtml = html && typeof html === 'string' ? html : '<p><br></p>';
       setHtmlContent(validHtml);
+      
+      // Convert HTML to JSON immediately - JSON is master
+      const newJson = htmlToJson(validHtml);
+      const newText = generateFormattedText(newJson);
+      
+      console.log('[useJsonFirstEditor] HTML converted to JSON:', { 
+        sections: newJson.sections?.length || 0,
+        textLength: newText.length 
+      });
+      
+      setDocumentJson(newJson);
+      lastValidJsonRef.current = newJson;
       setHasUnsavedChanges(true);
+      
+      // Call onContentChange to notify parent of JSON changes
+      if (onContentChange && enableAutoSave) {
+        console.log('[useJsonFirstEditor] Auto-saving JSON changes');
+        onContentChange(newJson, newText);
+        setHasUnsavedChanges(false);
+      }
     } catch (error) {
-      console.error('[useJsonFirstEditor] Error updating HTML content:', error);
+      console.error('[useJsonFirstEditor] Error updating from HTML:', error);
       // Don't update on error to prevent breaking the editor
     }
-  }, []);
+  }, [onContentChange, enableAutoSave]);
 
   // Update from JSON (programmatic updates)
   const updateFromJson = useCallback((json: DocumentJson) => {
@@ -148,38 +167,40 @@ export const useJsonFirstEditor = ({
     console.log('[useJsonFirstEditor] Reset to original:', { originalHtml: originalHtml.substring(0, 100) });
   }, []);
 
-  // Manual save - Convert HTML to JSON and save
+  // Manual save - Use current JSON state
   const saveChanges = useCallback(async (currentHtml: string) => {
     if (!onContentChange) return;
     
-    console.log('[useJsonFirstEditor] saveChanges called - converting HTML to JSON');
+    console.log('[useJsonFirstEditor] saveChanges called - using current JSON state');
     setIsConverting(true);
     
     try {
-      // Use current HTML content if provided, otherwise use state
-      const htmlToConvert = currentHtml || htmlContent;
+      // If HTML was passed, convert it to JSON first
+      let jsonToSave = documentJson;
+      if (currentHtml && currentHtml !== htmlContent) {
+        console.log('[useJsonFirstEditor] Converting provided HTML to JSON for save');
+        jsonToSave = htmlToJson(currentHtml);
+        setDocumentJson(jsonToSave);
+        setHtmlContent(currentHtml);
+        lastValidJsonRef.current = jsonToSave;
+      }
       
-      // Convert current HTML to JSON
-      const newJson = htmlToJson(htmlToConvert);
-      const newText = generateFormattedText(newJson);
+      // Generate text from JSON
+      const textToSave = generateFormattedText(jsonToSave);
       
-      // Update internal state BEFORE calling onContentChange
-      setDocumentJson(newJson);
-      setHtmlContent(htmlToConvert);
-      lastValidJsonRef.current = newJson;
       setHasUnsavedChanges(false);
       
-      // Save to database
-      await onContentChange(newJson, newText);
+      // Save JSON to database/parent
+      await onContentChange(jsonToSave, textToSave);
       
-      console.log('[useJsonFirstEditor] Save successful - HTML-JSON sync maintained');
+      console.log('[useJsonFirstEditor] Save successful - JSON saved with', jsonToSave.sections?.length || 0, 'sections');
     } catch (error) {
       console.error('[useJsonFirstEditor] Save failed:', error);
       throw error;
     } finally {
       setIsConverting(false);
     }
-  }, [onContentChange, htmlContent]);
+  }, [onContentChange, documentJson, htmlContent]);
 
   // Get plain text representation
   const getPlainText = useCallback(() => {

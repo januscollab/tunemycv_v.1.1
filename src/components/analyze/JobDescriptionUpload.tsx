@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import FileUploadArea from './upload/FileUploadArea';
 import { useToast } from '@/hooks/use-toast';
 import { UploadedFile } from '@/types/fileTypes';
+import { DocumentJson, textToJson, generateFormattedText } from '@/utils/documentJsonUtils';
 import JobDescriptionTextInput from './JobDescriptionTextInput';
 import DocumentPreviewCard from '@/components/documents/DocumentPreviewCard';
 import DocumentVerificationModal from '@/components/documents/DocumentVerificationModal';
@@ -76,13 +77,16 @@ const JobDescriptionUpload: React.FC<JobDescriptionUploadProps> = ({
     onJobDescriptionSet(undefined as any);
   };
 
-  const handleVerificationSave = (updatedText: string) => {
+  const handleVerificationSave = (updatedJson: DocumentJson) => {
     if (!uploadedFile) return;
     
+    console.log('[JobDescriptionUpload] Saving updated job description JSON with', updatedJson.sections?.length || 0, 'sections');
+    const updatedText = generateFormattedText(updatedJson);
     const updatedFile = new File([updatedText], uploadedFile.file.name, { type: uploadedFile.file.type });
     const updatedUploadedFile: UploadedFile = {
       file: updatedFile,
       extractedText: updatedText,
+      documentJson: updatedJson,
       type: 'job_description'
     };
     
@@ -109,9 +113,10 @@ const JobDescriptionUpload: React.FC<JobDescriptionUploadProps> = ({
           onClose={() => setShowVerificationModal(false)}
           fileName={uploadedFile.file.name}
           fileSize={uploadedFile.file.size}
-          extractedText={uploadedFile.extractedText}
+          documentJson={uploadedFile.documentJson || textToJson(uploadedFile.extractedText)}
           documentType="job_description"
           onSave={handleVerificationSave}
+          extractedText={uploadedFile.extractedText}
         />
       </>
     );
