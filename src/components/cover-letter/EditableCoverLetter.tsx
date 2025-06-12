@@ -81,7 +81,7 @@ const EditableCoverLetter = forwardRef<EditableCoverLetterRef, EditableCoverLett
     }, 2000);
   }, [content, onSave]);
 
-  // Quill configuration
+  // Quill configuration with AI features and download button
   const modules = {
     toolbar: [
       [{ 'header': [1, 2, 3, false] }],

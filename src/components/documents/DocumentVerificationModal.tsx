@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { X, Save, AlertTriangle, CheckCircle, Info, ChevronDown, ChevronUp, WandSparkles, RotateCcw } from 'lucide-react';
 import { 
   textToJson, 
@@ -46,7 +46,7 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
   const [isAutoSaving, setIsAutoSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [qualityExpanded, setQualityExpanded] = useState(true);
-  const { toast } = useToast();
+  // Remove toast to prevent interruptions during editing
   
   const quality = assessDocumentQuality(editedText, fileName, documentType);
 
@@ -88,12 +88,15 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
     }
   };
 
-  // Handle dialog close with auto-save
+  // Handle dialog close with auto-save using ref
+  const editorRef = useRef<{ htmlContent: string; saveChanges: (html: string) => Promise<void> }>(null);
+  
   const handleDialogClose = useCallback(async (open: boolean) => {
-    if (!open && editedText !== extractedText && editedText.trim().length > 0) {
+    if (!open && editorRef.current && editedText !== extractedText) {
       console.log('[DocumentVerificationModal] Auto-saving on dialog close');
       try {
-        await handleSave(false);
+        await editorRef.current.saveChanges(editorRef.current.htmlContent);
+        console.log('[DocumentVerificationModal] Auto-save completed');
       } catch (error) {
         console.error('[DocumentVerificationModal] Auto-save failed on close:', error);
       }
@@ -101,7 +104,7 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
     if (!open) {
       onClose();
     }
-  }, [editedText, extractedText, handleSave, onClose]);
+  }, [editedText, extractedText, onClose]);
 
   return (
     <Dialog open={isOpen} onOpenChange={handleDialogClose}>
@@ -264,6 +267,7 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
                   }}
                 >
                   <SafeRichTextEditor
+                    ref={editorRef}
                     initialContent={editedText}
                     onContentChange={handleContentChange}
                     className="min-h-[400px] border rounded-md text-black dark:text-white"
@@ -286,10 +290,8 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                  toast({
-                    title: "Coming Soon!",
-                    description: "AI CV review feature will be available soon and will cost 2 Credits.",
-                  });
+                  // Removed toast notification to prevent interruptions during editing
+                  console.log("AI CV review feature coming soon");
                 }}
                 className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200"
               >
@@ -317,10 +319,11 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
               variant="outline" 
               size="sm"
               onClick={async () => {
-                // Save current content before closing
-                if (editedText !== extractedText) {
+                // Save current content before closing using editor ref
+                if (editorRef.current) {
                   try {
-                    await handleSave();
+                    await editorRef.current.saveChanges(editorRef.current.htmlContent);
+                    console.log('[DocumentVerificationModal] Save completed before close');
                   } catch (error) {
                     console.error('Save failed on close:', error);
                   }

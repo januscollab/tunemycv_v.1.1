@@ -156,13 +156,16 @@ export const useJsonFirstEditor = ({
     setIsConverting(true);
     
     try {
+      // Use current HTML content if provided, otherwise use state
+      const htmlToConvert = currentHtml || htmlContent;
+      
       // Convert current HTML to JSON
-      const newJson = htmlToJson(currentHtml);
+      const newJson = htmlToJson(htmlToConvert);
       const newText = generateFormattedText(newJson);
       
       // Update internal state BEFORE calling onContentChange
       setDocumentJson(newJson);
-      setHtmlContent(currentHtml); // Keep the current HTML
+      setHtmlContent(htmlToConvert);
       lastValidJsonRef.current = newJson;
       setHasUnsavedChanges(false);
       
@@ -176,7 +179,7 @@ export const useJsonFirstEditor = ({
     } finally {
       setIsConverting(false);
     }
-  }, [onContentChange]);
+  }, [onContentChange, htmlContent]);
 
   // Get plain text representation
   const getPlainText = useCallback(() => {

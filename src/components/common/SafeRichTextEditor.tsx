@@ -12,6 +12,7 @@ interface AIContext {
   selectedText: string;
   selectionRange: { index: number; length: number };
   fullText: string;
+  bounds?: { top: number; left: number; width: number; height: number };
 }
 
 interface SafeRichTextEditorProps {
@@ -119,7 +120,7 @@ const SafeRichTextEditor = forwardRef<SafeRichTextEditorRef, SafeRichTextEditorP
     setEditorError(null);
   }, []);
 
-  // Handle text selection for AI features
+  // Handle text selection for AI features with position calculation
   const handleSelectionChange = useCallback((range: any, source: any, editor: any) => {
     if (!showAIFeatures || source !== 'user' || !isQuillReady) return;
     
@@ -128,10 +129,14 @@ const SafeRichTextEditor = forwardRef<SafeRichTextEditorRef, SafeRichTextEditorP
         const selectedText = editor.getText(range.index, range.length);
         const fullText = getPlainText();
         
+        // Get selection position for menu positioning
+        const bounds = quillRef.current?.getEditor().getBounds(range.index, range.length);
+        
         setSelectionInfo({
           selectedText: selectedText.trim(),
           selectionRange: range,
-          fullText: fullText
+          fullText: fullText,
+          bounds: bounds
         });
         setIsAIEnabled(selectedText.trim().length > 10);
       } else {
@@ -200,14 +205,21 @@ const SafeRichTextEditor = forwardRef<SafeRichTextEditorRef, SafeRichTextEditorP
 
   return (
     <div className={`relative ${className}`}>
-      {/* AI Enhancement Toolbar */}
-      {showAIFeatures && isAIEnabled && selectionInfo && (
-        <div className="absolute top-2 right-2 z-10 flex space-x-2 bg-background border border-border rounded-lg p-2 shadow-lg">
+      {/* AI Enhancement Toolbar - Positioned below selection */}
+      {showAIFeatures && isAIEnabled && selectionInfo && selectionInfo.bounds && (
+        <div 
+          className="absolute z-50 flex space-x-2 bg-background border border-border rounded-lg p-2 shadow-lg"
+          style={{
+            top: `${selectionInfo.bounds.top + selectionInfo.bounds.height + 8}px`,
+            left: `${Math.max(8, selectionInfo.bounds.left)}px`,
+            maxWidth: '300px'
+          }}
+        >
           <Button
             size="sm"
             variant="outline"
             onClick={() => handleAIImprovement('improve')}
-            className="text-micro px-2 py-1"
+            className="text-micro px-2 py-1 whitespace-nowrap"
           >
             <WandSparkles className="h-3 w-3 mr-1" />
             Improve
@@ -216,7 +228,7 @@ const SafeRichTextEditor = forwardRef<SafeRichTextEditorRef, SafeRichTextEditorP
             size="sm"
             variant="outline"
             onClick={() => handleAIImprovement('rewrite')}
-            className="text-micro px-2 py-1"
+            className="text-micro px-2 py-1 whitespace-nowrap"
           >
             <WandSparkles className="h-3 w-3 mr-1" />
             Rewrite
@@ -225,7 +237,7 @@ const SafeRichTextEditor = forwardRef<SafeRichTextEditorRef, SafeRichTextEditorP
             size="sm"
             variant="outline"
             onClick={() => handleAIImprovement('tone')}
-            className="text-micro px-2 py-1"
+            className="text-micro px-2 py-1 whitespace-nowrap"
           >
             <WandSparkles className="h-3 w-3 mr-1" />
             Tone
