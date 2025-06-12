@@ -116,6 +116,9 @@ const AuthenticatedCoverLetter = () => {
   
   // Ref for the editable cover letter to trigger manual saves
   const editableCoverLetterRef = useRef<{ forceSave: () => Promise<void> }>(null);
+  
+  // Save state management to prevent duplicate saves
+  const [isSaving, setIsSaving] = useState(false);
 
   const lengthOptions = [
     { value: 'short', label: 'Short (150-200 words)', description: 'Brief and to the point' },
@@ -360,13 +363,16 @@ const AuthenticatedCoverLetter = () => {
 
   const handleTabChange = async (newTab: string) => {
     // If leaving the "result" tab and there's a selected cover letter, trigger save
-    if (activeTab === 'result' && selectedCoverLetter && newTab !== 'result') {
-      console.log('Leaving result tab - triggering save for cover letter:', selectedCoverLetter.id);
+    if (activeTab === 'result' && selectedCoverLetter && newTab !== 'result' && !isSaving) {
+      console.log('[CoverLetter] Leaving result tab - triggering save for cover letter:', selectedCoverLetter.id);
+      setIsSaving(true);
       try {
         await editableCoverLetterRef.current?.forceSave();
-        console.log('Force save completed successfully');
+        console.log('[CoverLetter] Force save completed successfully');
       } catch (error) {
-        console.error('Error during force save:', error);
+        console.error('[CoverLetter] Error during force save:', error);
+      } finally {
+        setIsSaving(false);
       }
     }
     

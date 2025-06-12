@@ -41,14 +41,25 @@ const EditableCoverLetter = forwardRef<EditableCoverLetterRef, EditableCoverLett
       
       // Convert current HTML to JSON and save immediately
       const jsonData = htmlToJson(htmlContent);
-      const textContent = generateFormattedText(jsonData);
+      console.log('[EditableCoverLetter] Force save - HTML→JSON conversion:', {
+        sectionsCount: jsonData.sections.length,
+        formattedSections: jsonData.sections.filter(s => s.formatting?.bold).length
+      });
       
-      if (textContent !== content && textContent.trim() !== '') {
+      // Compare JSON data instead of text to preserve formatting
+      const currentJsonString = typeof content === 'string' && content.startsWith('{') 
+        ? content 
+        : JSON.stringify(textToJson(content));
+      const newJsonString = JSON.stringify(jsonData);
+      
+      if (newJsonString !== currentJsonString && jsonData.sections.length > 0) {
         console.log('[EditableCoverLetter] Force saving changes...');
-        await onSave(JSON.stringify(jsonData));
+        await onSave(newJsonString);
+      } else {
+        console.log('[EditableCoverLetter] No changes to force save');
       }
     } catch (error) {
-      console.error('Error force saving cover letter:', error);
+      console.error('[EditableCoverLetter] Error force saving cover letter:', error);
     }
   }, [htmlContent, content, onSave]);
 
@@ -61,6 +72,7 @@ const EditableCoverLetter = forwardRef<EditableCoverLetterRef, EditableCoverLett
   const handleContentChange = useCallback(async (html: string) => {
     console.log('[EditableCoverLetter] Content changed:', {
       htmlLength: html.length,
+      hasBoldElements: html.includes('<strong>') || html.includes('<b>'),
       timestamp: new Date().toISOString()
     });
     
@@ -74,18 +86,27 @@ const EditableCoverLetter = forwardRef<EditableCoverLetterRef, EditableCoverLett
     // Immediate save for better reliability
     try {
       const jsonData = htmlToJson(html);
-      const textContent = generateFormattedText(jsonData);
+      console.log('[EditableCoverLetter] HTML→JSON conversion:', {
+        sectionsCount: jsonData.sections.length,
+        formattedSections: jsonData.sections.filter(s => s.formatting?.bold).length
+      });
       
-      if (textContent !== content && textContent.trim() !== '') {
-        console.log('[EditableCoverLetter] Saving changes immediately...', {
+      // Compare JSON data instead of text to preserve formatting
+      const currentJsonString = typeof content === 'string' && content.startsWith('{') 
+        ? content 
+        : JSON.stringify(textToJson(content));
+      const newJsonString = JSON.stringify(jsonData);
+      
+      if (newJsonString !== currentJsonString && jsonData.sections.length > 0) {
+        console.log('[EditableCoverLetter] JSON changes detected, saving...', {
           htmlLength: html.length,
           jsonSections: jsonData.sections.length,
-          textLength: textContent.length
+          formattedSections: jsonData.sections.filter(s => s.formatting?.bold).length
         });
-        await onSave(JSON.stringify(jsonData));
+        await onSave(newJsonString);
         console.log('[EditableCoverLetter] Save completed successfully');
       } else {
-        console.log('[EditableCoverLetter] No changes detected, skipping save');
+        console.log('[EditableCoverLetter] No JSON changes detected, skipping save');
       }
     } catch (error) {
       console.error('[EditableCoverLetter] Error saving changes:', error);

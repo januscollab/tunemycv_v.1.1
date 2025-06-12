@@ -509,8 +509,13 @@ export const parseDocumentJson = (jsonString: string): DocumentJson | null => {
   }
 };
 
-// Enhanced text generation with improved formatting
+// Enhanced text generation with formatting preservation
 export const generateFormattedText = (docJson: DocumentJson): string => {
+  console.log('[documentJsonUtils] generateFormattedText called:', { 
+    sectionsCount: docJson.sections.length,
+    formattedSections: docJson.sections.filter(s => s.formatting?.bold).length
+  });
+  
   const textLines: string[] = [];
   
   for (const section of docJson.sections) {
@@ -521,14 +526,30 @@ export const generateFormattedText = (docJson: DocumentJson): string => {
           textLines.push('');
         }
         const hashes = '#'.repeat(section.level || 1);
-        textLines.push(`${hashes} ${section.content}`);
+        let headingText = `${hashes} ${section.content}`;
+        
+        // Preserve bold formatting for headings
+        if (section.formatting?.bold) {
+          headingText = `**${headingText}**`;
+        }
+        
+        textLines.push(headingText);
         textLines.push(''); // Empty line after heading
         break;
         
       case 'paragraph':
         if (section.content) {
-          // Split long paragraphs into readable chunks
-          const paragraphLines = section.content.split('\n').filter(line => line.trim());
+          // Preserve line breaks within paragraphs
+          let paragraphContent = section.content;
+          
+          // Preserve bold formatting for paragraphs
+          if (section.formatting?.bold) {
+            // Split by line breaks and wrap each line in bold markdown
+            const lines = paragraphContent.split('\n').filter(line => line.trim());
+            paragraphContent = lines.map(line => `**${line}**`).join('\n');
+          }
+          
+          const paragraphLines = paragraphContent.split('\n').filter(line => line.trim());
           textLines.push(...paragraphLines);
           textLines.push(''); // Empty line after paragraph
         }
@@ -537,7 +558,14 @@ export const generateFormattedText = (docJson: DocumentJson): string => {
       case 'list':
         if (section.items) {
           for (const item of section.items) {
-            textLines.push(`- ${item}`); // Use "-" bullets consistently
+            let listItem = `- ${item}`;
+            
+            // Preserve bold formatting for list items
+            if (section.formatting?.bold) {
+              listItem = `- **${item}**`;
+            }
+            
+            textLines.push(listItem);
           }
           textLines.push(''); // Empty line after list
         }
@@ -550,7 +578,14 @@ export const generateFormattedText = (docJson: DocumentJson): string => {
     textLines.pop();
   }
   
-  return textLines.join('\n');
+  const result = textLines.join('\n');
+  console.log('[documentJsonUtils] generateFormattedText result:', { 
+    textLength: result.length,
+    hasBoldMarkdown: result.includes('**'),
+    preview: result.substring(0, 100)
+  });
+  
+  return result;
 };
 
 // Check if text should be preserved as-is (TXT files, simple docs)

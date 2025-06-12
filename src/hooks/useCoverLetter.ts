@@ -246,6 +246,13 @@ export const useCoverLetter = () => {
   };
 
   const updateCoverLetter = async (id: string, content: string) => {
+    console.log('[useCoverLetter] updateCoverLetter called:', {
+      id,
+      contentType: typeof content,
+      isJSON: content.startsWith('{'),
+      contentLength: content.length
+    });
+
     const { error } = await supabase
       .from('cover_letters')
       .update({ 
@@ -255,10 +262,11 @@ export const useCoverLetter = () => {
       .eq('id', id);
 
     if (error) {
-      console.error('Error updating cover letter:', error);
+      console.error('[useCoverLetter] Error updating cover letter:', error);
       throw error;
     }
 
+    console.log('[useCoverLetter] Cover letter updated successfully');
     toast({
       title: 'Cover Letter Updated',
       description: 'Your changes have been saved successfully.',
