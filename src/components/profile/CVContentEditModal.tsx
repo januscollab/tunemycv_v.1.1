@@ -110,37 +110,66 @@ const CVContentEditModal: React.FC<CVContentEditModalProps> = ({
   };
 
   const handleContentChange = async (newJson: DocumentJson, newText: string) => {
-    console.log('[CVContentEditModal] Final save - converting and saving to database:', {
+    console.log('[CVContentEditModal] Content changed in editor:', {
       sectionsCount: newJson.sections.length,
-      textLength: newText.length
+      textLength: newText.length,
+      timestamp: new Date().toISOString()
     });
-
-    // Save to database (only called on explicit save)
-    const { error } = await supabase
-      .from('uploads')
-      .update({
-        extracted_text: newText,
-        document_content_json: newJson as any,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', cv.id);
-
-    if (error) throw error;
-    console.log('[CVContentEditModal] Save successful');
+    // Note: Auto-save disabled - only save on explicit save button click
   };
 
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      // Get current HTML content from editor and trigger save
+      console.log('[CVContentEditModal] Starting explicit save...');
+      
+      // Force save from editor to get latest content
+      let finalJson: DocumentJson;
+      let finalText: string;
+      
       if (editorRef.current) {
-        const currentHtml = editorRef.current.htmlContent;
+        console.log('[CVContentEditModal] Getting content from editor...');
         await editorRef.current.saveChanges();
+        
+        // Get the latest content from the editor's state
+        if (typeof editorContent === 'object' && editorContent.sections) {
+          finalJson = editorContent as DocumentJson;
+          finalText = generateFormattedText(finalJson);
+        } else {
+          throw new Error('Invalid editor content state');
+        }
+      } else {
+        throw new Error('Editor reference not available');
       }
+
+      console.log('[CVContentEditModal] Saving to database...', {
+        sectionsCount: finalJson.sections.length,
+        textLength: finalText.length
+      });
+
+      // Save to database with explicit transaction
+      const { error } = await supabase
+        .from('uploads')
+        .update({
+          extracted_text: finalText,
+          document_content_json: finalJson as any,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', cv.id);
+
+      if (error) {
+        console.error('[CVContentEditModal] Database save error:', error);
+        throw error;
+      }
+      
+      console.log('[CVContentEditModal] Save completed successfully');
+      
+      // Only close after successful save
       onUpdate();
       onClose();
     } catch (error) {
-      console.error('Error saving CV content:', error);
+      console.error('[CVContentEditModal] Save failed:', error);
+      // Keep modal open on error so user can retry
       // Silent error handling - no toast notification
     } finally {
       setIsSaving(false);

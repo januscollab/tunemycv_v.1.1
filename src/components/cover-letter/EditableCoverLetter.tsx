@@ -57,28 +57,33 @@ const EditableCoverLetter = forwardRef<EditableCoverLetterRef, EditableCoverLett
     forceSave
   }), [forceSave]);
 
-  // Handle content changes and convert back to JSON on save
-  const handleContentChange = useCallback((html: string) => {
+  // Handle content changes with immediate save (no debouncing)
+  const handleContentChange = useCallback(async (html: string) => {
+    console.log('[EditableCoverLetter] Content changed:', {
+      htmlLength: html.length,
+      timestamp: new Date().toISOString()
+    });
+    
     setHtmlContent(html);
     
-    // Debounced save - convert HTML back to JSON
+    // Clear any pending debounced save
     if (debounceTimeoutRef.current) {
       clearTimeout(debounceTimeoutRef.current);
     }
     
-    debounceTimeoutRef.current = setTimeout(() => {
-      try {
-        // Convert HTML back to JSON and then to text for saving
-        const jsonData = htmlToJson(html);
-        const textContent = generateFormattedText(jsonData);
-        
-        if (textContent !== content && textContent.trim() !== '') {
-          onSave(JSON.stringify(jsonData));
-        }
-      } catch (error) {
-        console.error('Error converting HTML to JSON:', error);
+    // Immediate save for better reliability
+    try {
+      const jsonData = htmlToJson(html);
+      const textContent = generateFormattedText(jsonData);
+      
+      if (textContent !== content && textContent.trim() !== '') {
+        console.log('[EditableCoverLetter] Saving changes immediately...');
+        await onSave(JSON.stringify(jsonData));
+        console.log('[EditableCoverLetter] Save completed');
       }
-    }, 2000);
+    } catch (error) {
+      console.error('[EditableCoverLetter] Error saving changes:', error);
+    }
   }, [content, onSave]);
 
   // Quill configuration with AI features and download button

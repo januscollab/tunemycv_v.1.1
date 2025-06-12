@@ -52,6 +52,12 @@ export const useJsonFirstEditor = ({
   // Update from HTML (editor changes)
   const updateFromHtml = useCallback((html: string) => {
     try {
+      console.log('[useJsonFirstEditor] updateFromHtml called:', {
+        htmlLength: html.length,
+        enableAutoSave,
+        timestamp: new Date().toISOString()
+      });
+      
       const validHtml = html || '<p><br></p>';
       setHtmlContent(validHtml);
       
@@ -60,12 +66,14 @@ export const useJsonFirstEditor = ({
       setHasUnsavedChanges(true);
       
       if (onContentChange && enableAutoSave) {
+        console.log('[useJsonFirstEditor] Auto-saving changes...');
         const text = generateFormattedText(newJson);
         onContentChange(newJson, text);
         setHasUnsavedChanges(false);
+        console.log('[useJsonFirstEditor] Auto-save completed');
       }
     } catch (error) {
-      console.error('Error updating from HTML:', error);
+      console.error('[useJsonFirstEditor] Error updating from HTML:', error);
     }
   }, [onContentChange, enableAutoSave]);
 
@@ -104,21 +112,37 @@ export const useJsonFirstEditor = ({
 
   // Manual save - Use current JSON state
   const saveChanges = useCallback(async () => {
-    if (!onContentChange) return;
+    if (!onContentChange) {
+      console.warn('[useJsonFirstEditor] saveChanges called but no onContentChange handler');
+      return;
+    }
+    
+    console.log('[useJsonFirstEditor] Manual save started:', {
+      sectionsCount: documentJson.sections.length,
+      hasUnsavedChanges,
+      timestamp: new Date().toISOString()
+    });
     
     setIsConverting(true);
     
     try {
       const textToSave = generateFormattedText(documentJson);
-      setHasUnsavedChanges(false);
+      console.log('[useJsonFirstEditor] Generated text for save:', {
+        textLength: textToSave.length,
+        preview: textToSave.substring(0, 100)
+      });
+      
       await onContentChange(documentJson, textToSave);
+      setHasUnsavedChanges(false);
+      
+      console.log('[useJsonFirstEditor] Manual save completed successfully');
     } catch (error) {
-      console.error('Save failed:', error);
+      console.error('[useJsonFirstEditor] Manual save failed:', error);
       throw error;
     } finally {
       setIsConverting(false);
     }
-  }, [onContentChange, documentJson]);
+  }, [onContentChange, documentJson, hasUnsavedChanges]);
 
   // Get plain text representation
   const getPlainText = useCallback(() => {
