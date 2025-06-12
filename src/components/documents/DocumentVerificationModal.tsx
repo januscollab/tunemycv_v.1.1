@@ -115,13 +115,13 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
   };
 
   // Handle dialog close with auto-save using ref
-  const editorRef = useRef<{ htmlContent: string; saveChanges: (html: string) => Promise<void> }>(null);
+  const editorRef = useRef<{ htmlContent: string; saveChanges: () => Promise<void> }>(null);
   
   const handleDialogClose = useCallback(async (open: boolean) => {
     if (!open && editorRef.current && hasUnsavedChanges) {
       console.log('[DocumentVerificationModal] Auto-saving JSON on dialog close');
       try {
-        await editorRef.current.saveChanges(editorRef.current.htmlContent);
+        await editorRef.current.saveChanges();
         console.log('[DocumentVerificationModal] Auto-save completed');
       } catch (error) {
         console.error('[DocumentVerificationModal] Auto-save failed on close:', error);
@@ -352,7 +352,7 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
                 // Save current content before closing using editor ref
                 if (editorRef.current) {
                   try {
-                    await editorRef.current.saveChanges(editorRef.current.htmlContent);
+                    await editorRef.current.saveChanges();
                     console.log('[DocumentVerificationModal] Save completed before close');
                   } catch (error) {
                     console.error('Save failed on close:', error);

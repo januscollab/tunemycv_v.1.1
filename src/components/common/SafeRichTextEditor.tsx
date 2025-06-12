@@ -29,7 +29,7 @@ interface SafeRichTextEditorProps {
 
 interface SafeRichTextEditorRef {
   htmlContent: string;
-  saveChanges: (html: string) => Promise<void>;
+  saveChanges: () => Promise<void>;
 }
 
 const SafeRichTextEditor = forwardRef<SafeRichTextEditorRef, SafeRichTextEditorProps>(({
@@ -49,7 +49,7 @@ const SafeRichTextEditor = forwardRef<SafeRichTextEditorRef, SafeRichTextEditorP
   const [editorError, setEditorError] = useState<string | null>(null);
   const [isQuillReady, setIsQuillReady] = useState(false);
 
-  // Use the HTML-first editor hook
+  // Use the JSON-first editor hook
   const {
     documentJson,
     htmlContent,
@@ -62,7 +62,6 @@ const SafeRichTextEditor = forwardRef<SafeRichTextEditorRef, SafeRichTextEditorP
   } = useJsonFirstEditor({
     initialContent,
     onContentChange,
-    debounceMs,
     enableAutoSave: false
   });
 

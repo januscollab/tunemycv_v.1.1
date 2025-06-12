@@ -27,7 +27,7 @@ interface ControlledRichTextEditorProps {
 
 interface ControlledRichTextEditorRef {
   htmlContent: string;
-  saveChanges: (html: string) => Promise<void>;
+  saveChanges: () => Promise<void>;
 }
 
 const ControlledRichTextEditor = forwardRef<ControlledRichTextEditorRef, ControlledRichTextEditorProps>(({
@@ -69,8 +69,7 @@ const ControlledRichTextEditor = forwardRef<ControlledRichTextEditorRef, Control
   } = useJsonFirstEditor({
     initialContent,
     onContentChange,
-    debounceMs,
-    enableAutoSave: false // Disable auto-save for HTML-first approach
+    enableAutoSave: false // Disable auto-save for manual control
   });
 
   // Expose methods through ref

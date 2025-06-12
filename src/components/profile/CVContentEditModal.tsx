@@ -35,7 +35,7 @@ const CVContentEditModal: React.FC<CVContentEditModalProps> = ({
   const [editorContent, setEditorContent] = useState<string | DocumentJson>('');
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const editorRef = useRef<{ htmlContent: string; saveChanges: (html: string) => Promise<void> }>(null);
+  const editorRef = useRef<{ htmlContent: string; saveChanges: () => Promise<void> }>(null);
 
   // Load CV content on modal open
   useEffect(() => {
@@ -125,7 +125,7 @@ const CVContentEditModal: React.FC<CVContentEditModalProps> = ({
       // Get current HTML content from editor and trigger save
       if (editorRef.current) {
         const currentHtml = editorRef.current.htmlContent;
-        await editorRef.current.saveChanges(currentHtml);
+        await editorRef.current.saveChanges();
       }
       onUpdate();
       onClose();
