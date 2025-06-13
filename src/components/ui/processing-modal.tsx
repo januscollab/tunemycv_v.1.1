@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
-import { Progress } from './progress';
+import { ProgressIndicator } from './progress-indicator';
 import { Button } from './button';
 
 interface ProcessingModalProps {
@@ -112,7 +112,7 @@ const ProcessingModal: React.FC<ProcessingModalProps> = ({
         </div>
         
         <div className="mb-6">
-          <Progress value={Math.min(progress, 95)} className="w-full mb-2" />
+          <ProgressIndicator value={Math.min(progress, 95)} className="w-full mb-2" showPercentage={false} />
           <div className="text-sm text-muted-foreground">
             {Math.round(Math.min(progress, 95))}% • {formatTime(timeElapsed)}
           </div>

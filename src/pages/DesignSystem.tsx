@@ -82,7 +82,7 @@ const DesignSystem = () => {
   const inputComponents = [
     { 
       name: 'Floating Label Input', 
-      component: <FloatingLabelInput placeholder="Enhanced floating label with improved positioning" label="Job Description" />, 
+      component: <FloatingLabelInput label="Job Description" />, 
       usage: '68 usages',
       description: 'Input with floating labels that prevent text clashing. Label moves to absolute top when focused (text-micro size), positioned lower when inactive.',
       status: 'current',
@@ -90,11 +90,27 @@ const DesignSystem = () => {
     },
     { 
       name: 'Floating Label Textarea', 
-      component: <FloatingLabelTextarea placeholder="Enhanced floating label textarea..." label="Job Description" rows={3} />, 
+      component: <FloatingLabelTextarea label="Job Description" rows={3} />, 
       usage: '34 usages',
       description: 'Textarea with floating labels and improved text positioning. Label moves to absolute top when focused, positioned lower when inactive.',
       status: 'current',
       migration: 'Same improved positioning as input variant. Text size remains text-micro when floated to top.'
+    },
+    { 
+      name: 'Capture Input', 
+      component: <CaptureInput label="Job Title" placeholder="e.g. Senior Software Engineer" description="Enter the exact job title from the posting" />, 
+      usage: '45 usages',
+      description: 'Single-line input for capturing new information with clear title positioning and helpful descriptions.',
+      status: 'current',
+      migration: 'Fixed label position, placeholder guidance, optional description. Used for one-time data entry.'
+    },
+    { 
+      name: 'Capture Textarea', 
+      component: <CaptureTextarea label="Job Description" placeholder="Paste the full job description here..." description="Include requirements, responsibilities, and qualifications" />, 
+      usage: '32 usages',
+      description: 'Multi-line input for longer content with consistent label behavior and auto-resize.',
+      status: 'current',
+      migration: 'Auto-resize, clear placeholder text, helpful descriptions. Used for analysis inputs and uploads.'
     },
   ];
 
@@ -421,10 +437,9 @@ const DesignSystem = () => {
 
         {/* Tabbed Navigation */}
         <Tabs defaultValue="foundations" className="mt-8">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="foundations">Foundations</TabsTrigger>
             <TabsTrigger value="components">Components</TabsTrigger>
-            <TabsTrigger value="forms">Form Fields</TabsTrigger>
             <TabsTrigger value="interactions">Interactions</TabsTrigger>
             <TabsTrigger value="loading">Loading States</TabsTrigger>
           </TabsList>
@@ -627,257 +642,6 @@ const DesignSystem = () => {
             </section>
           </TabsContent>
 
-          {/* Form Fields Tab */}
-          <TabsContent value="forms" className="space-y-8">
-            {/* Form Field Types Overview */}
-            <section>
-              <h2 className="text-title font-bold text-foreground mb-8 flex items-center gap-3">
-                <FileText className="h-6 w-6 text-primary" />
-                Form Field Types
-              </h2>
-              
-              <div className="mb-8 grid gap-6 md:grid-cols-2">
-                <Card className="p-6">
-                  <h3 className="text-heading font-semibold text-foreground mb-3 flex items-center gap-2">
-                    <Upload className="h-5 w-5 text-primary" />
-                    Type 1: Capture Fields
-                  </h3>
-                  <p className="text-caption text-muted-foreground mb-4">
-                    For capturing new information once. Used for analysis inputs, job descriptions, CV uploads, and one-time data entry.
-                  </p>
-                  <div className="bg-muted/30 p-4 rounded-lg">
-                    <Badge variant="outline" className="text-micro mb-2">Usage Example</Badge>
-                    <div className="text-tiny text-muted-foreground">
-                      • Job description input<br/>
-                      • CV analysis forms<br/>
-                      • Upload forms
-                    </div>
-                  </div>
-                </Card>
-                
-                <Card className="p-6">
-                  <h3 className="text-heading font-semibold text-foreground mb-3 flex items-center gap-2">
-                    <Users className="h-5 w-5 text-success" />
-                    Type 2: Saved Data Fields
-                  </h3>
-                  <p className="text-caption text-muted-foreground mb-4">
-                    For displaying and editing saved information. Used for profile data, settings, and persistent user information.
-                  </p>
-                  <div className="bg-muted/30 p-4 rounded-lg">
-                    <Badge variant="outline" className="text-micro mb-2">Usage Example</Badge>
-                    <div className="text-tiny text-muted-foreground">
-                      • Profile information<br/>
-                      • User preferences<br/>
-                      • Account settings
-                    </div>
-                  </div>
-                </Card>
-              </div>
-            </section>
-
-            {/* Capture Fields (Type 1) */}
-            <section>
-              <h2 className="text-heading font-semibold text-foreground mb-6 flex items-center gap-2">
-                <Upload className="h-5 w-5 text-primary" />
-                Capture Fields (Type 1)
-              </h2>
-              
-              <div className="grid gap-6 md:grid-cols-2">
-                <Card className="p-6">
-                  <CardHeader className="pb-3 px-0">
-                    <CardTitle className="text-subheading">Capture Input</CardTitle>
-                    <p className="text-caption text-muted-foreground">
-                      Single-line input for capturing new information with clear title positioning.
-                    </p>
-                  </CardHeader>
-                  <CardContent className="px-0">
-                    <div className="bg-muted/30 p-4 rounded-lg mb-4">
-                      <CaptureInput 
-                        label="Job Title" 
-                        placeholder="e.g. Senior Software Engineer"
-                        description="Enter the exact job title from the posting"
-                      />
-                    </div>
-                    <div className="text-micro text-muted-foreground bg-muted/50 p-2 rounded border-l-2 border-primary/50">
-                      <strong>Key Features:</strong> Fixed label position, placeholder guidance, optional description
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="p-6">
-                  <CardHeader className="pb-3 px-0">
-                    <CardTitle className="text-subheading">Capture Textarea</CardTitle>
-                    <p className="text-caption text-muted-foreground">
-                      Multi-line input for longer content with consistent label behavior.
-                    </p>
-                  </CardHeader>
-                  <CardContent className="px-0">
-                    <div className="bg-muted/30 p-4 rounded-lg mb-4">
-                      <CaptureTextarea 
-                        label="Job Description" 
-                        placeholder="Paste the full job description here..."
-                        description="Include requirements, responsibilities, and qualifications"
-                      />
-                    </div>
-                    <div className="text-micro text-muted-foreground bg-muted/50 p-2 rounded border-l-2 border-primary/50">
-                      <strong>Key Features:</strong> Auto-resize, clear placeholder text, helpful descriptions
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </section>
-
-            {/* Saved Data Fields (Type 2) */}
-            <section>
-              <h2 className="text-heading font-semibold text-foreground mb-6 flex items-center gap-2">
-                <Users className="h-5 w-5 text-success" />
-                Saved Data Fields (Type 2)
-              </h2>
-              
-              <div className="grid gap-6 md:grid-cols-2">
-                <Card className="p-6">
-                  <CardHeader className="pb-3 px-0">
-                    <CardTitle className="text-subheading">Saved Data Input</CardTitle>
-                    <p className="text-caption text-muted-foreground">
-                      For displaying and editing saved user information with external labels only.
-                    </p>
-                  </CardHeader>
-                  <CardContent className="px-0">
-                    <div className="bg-muted/30 p-4 rounded-lg mb-4">
-                      <SavedDataInput 
-                        label="Full Name" 
-                        value="John Doe"
-                        description="This appears on your CV and profile"
-                      />
-                    </div>
-                    <div className="text-micro text-muted-foreground bg-muted/50 p-2 rounded border-l-2 border-success/50">
-                      <strong>Key Features:</strong> No internal labels, shows saved data clearly, clean editing experience
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="p-6">
-                  <CardHeader className="pb-3 px-0">
-                    <CardTitle className="text-subheading">Saved Data Textarea</CardTitle>
-                    <p className="text-caption text-muted-foreground">
-                      Multi-line field for longer saved content like bio or summary.
-                    </p>
-                  </CardHeader>
-                  <CardContent className="px-0">
-                    <div className="bg-muted/30 p-4 rounded-lg mb-4">
-                      <SavedDataTextarea 
-                        label="Professional Summary" 
-                        value="Experienced software engineer with 5+ years in full-stack development..."
-                        description="This summary appears on your CV"
-                      />
-                    </div>
-                    <div className="text-micro text-muted-foreground bg-muted/50 p-2 rounded border-l-2 border-success/50">
-                      <strong>Key Features:</strong> External label only, optimized for displaying existing data
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </section>
-
-            {/* Form Layout Examples */}
-            <section>
-              <h2 className="text-heading font-semibold text-foreground mb-6 flex items-center gap-2">
-                <Grid className="h-5 w-5 text-warning" />
-                Form Layout Patterns
-              </h2>
-              
-              <div className="space-y-8">
-                {/* Two Column Layout Example */}
-                <Card className="p-6">
-                  <CardHeader className="pb-4 px-0">
-                    <CardTitle className="text-subheading">Two-Column Personal Information Form</CardTitle>
-                    <p className="text-caption text-muted-foreground">
-                      Standard layout pattern for personal details with responsive grid system.
-                    </p>
-                  </CardHeader>
-                  <CardContent className="px-0">
-                    <div className="bg-muted/30 p-6 rounded-lg">
-                      <FormSection title="Personal Information" description="Enter your basic details">
-                        <FormTwoColumn>
-                          <SavedDataInput label="First Name" value="John" />
-                          <SavedDataInput label="Last Name" value="Doe" />
-                          <SavedDataInput label="Email Address" value="john.doe@email.com" />
-                          <SavedDataInput label="Phone Number" value="+1 (555) 123-4567" />
-                          <SavedDataInput label="City" value="San Francisco" />
-                          <SavedDataInput label="Country" value="United States" />
-                        </FormTwoColumn>
-                      </FormSection>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Single Column Layout Example */}
-                <Card className="p-6">
-                  <CardHeader className="pb-4 px-0">
-                    <CardTitle className="text-subheading">Single-Column Capture Form</CardTitle>
-                    <p className="text-caption text-muted-foreground">
-                      Best for capturing longer content or when focus is needed on individual fields.
-                    </p>
-                  </CardHeader>
-                  <CardContent className="px-0">
-                    <div className="bg-muted/30 p-6 rounded-lg">
-                      <FormSection title="Job Analysis" description="Provide details for analysis">
-                        <FormSingleColumn>
-                          <CaptureInput 
-                            label="Company Name" 
-                            placeholder="e.g. TechCorp Inc."
-                            description="The company posting this job"
-                          />
-                          <CaptureInput 
-                            label="Job Title" 
-                            placeholder="e.g. Senior Software Engineer"
-                            description="Exact title from the job posting"
-                          />
-                          <CaptureTextarea 
-                            label="Job Description" 
-                            placeholder="Paste the complete job description here..."
-                            description="Include all requirements, responsibilities, and qualifications"
-                          />
-                        </FormSingleColumn>
-                      </FormSection>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </section>
-
-            {/* Implementation Guidelines */}
-            <section>
-              <h2 className="text-heading font-semibold text-foreground mb-6 flex items-center gap-2">
-                <Code className="h-5 w-5 text-info" />
-                Implementation Guidelines
-              </h2>
-              
-              <div className="grid gap-6 md:grid-cols-2">
-                <Card className="p-6 border-l-4 border-primary">
-                  <h3 className="text-subheading font-medium mb-3">When to Use Capture Fields (Type 1)</h3>
-                  <ul className="text-caption text-muted-foreground space-y-2">
-                    <li>• Job description input forms</li>
-                    <li>• CV upload and analysis forms</li>
-                    <li>• One-time data entry scenarios</li>
-                    <li>• Search and filter inputs</li>
-                    <li>• Content creation forms</li>
-                  </ul>
-                </Card>
-                
-                <Card className="p-6 border-l-4 border-success">
-                  <h3 className="text-subheading font-medium mb-3">When to Use Saved Data Fields (Type 2)</h3>
-                  <ul className="text-caption text-muted-foreground space-y-2">
-                    <li>• User profile information</li>
-                    <li>• Account settings and preferences</li>
-                    <li>• Editing existing content</li>
-                    <li>• Form fields with pre-populated data</li>
-                    <li>• Configuration interfaces</li>
-                  </ul>
-                </Card>
-              </div>
-            </section>
-          </TabsContent>
 
           {/* Interactions Tab */}
           <TabsContent value="interactions" className="space-y-8">

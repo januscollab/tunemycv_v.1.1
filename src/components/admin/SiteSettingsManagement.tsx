@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { FloatingLabelInput } from '@/components/common/FloatingLabelInput';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Progress } from '@/components/ui/progress';
+import { ProgressIndicator } from '@/components/ui/progress-indicator';
 
 interface SiteSettings {
   id: string;
@@ -414,9 +414,10 @@ const SiteSettingsManagement: React.FC = () => {
                 <div className={`text-2xl font-bold ${getUsageStatusColor(adobeUsage.usage_percentage)}`}>
                   {adobeUsage.current_usage} / {adobeUsage.monthly_limit}
                 </div>
-                <Progress 
+                <ProgressIndicator 
                   value={Math.min(adobeUsage.usage_percentage, 100)} 
-                  className="h-2"
+                  size="sm"
+                  showPercentage={false}
                 />
                 <p className="text-micro text-blueberry/60 dark:text-apple-core/60">
                   {adobeUsage.usage_percentage.toFixed(1)}% of monthly limit

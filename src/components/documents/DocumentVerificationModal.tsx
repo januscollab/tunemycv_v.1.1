@@ -132,9 +132,26 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
     }
   }, [hasUnsavedChanges, onClose]);
 
+  // Enhanced auto-save on outside click
+  const handleInteractOutside = useCallback(async (event: Event) => {
+    if (editorRef.current && hasUnsavedChanges) {
+      console.log('[DocumentVerificationModal] Auto-saving on outside interaction');
+      try {
+        await editorRef.current.saveChanges();
+        console.log('[DocumentVerificationModal] Outside click auto-save completed');
+      } catch (error) {
+        console.error('[DocumentVerificationModal] Outside click auto-save failed:', error);
+      }
+    }
+  }, [hasUnsavedChanges]);
+
   return (
     <Dialog open={isOpen} onOpenChange={handleDialogClose}>
-      <DialogContent className="max-w-7xl max-h-[95vh] flex flex-col p-0">
+      <DialogContent 
+        className="max-w-7xl max-h-[95vh] flex flex-col p-0"
+        onInteractOutside={handleInteractOutside}
+      >
+      
         {/* Compact Header */}
         <DialogHeader className="px-6 py-3 border-b border-border bg-background">
           <div className="flex items-center justify-between">
@@ -332,13 +349,20 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
               variant="outline" 
               size="sm"
                 onClick={() => {
-                  // Revert to original JSON
-                  console.log('[DocumentVerificationModal] Reverting to original JSON');
+                  // Complete revert to original state with zero session changes
+                  console.log('[DocumentVerificationModal] Complete revert to original JSON - zero session changes');
                   const originalText = generateFormattedText(initialDocumentJson);
                   setDocumentJson(initialDocumentJson);
                   setEditedText(originalText);
                   setHasUnsavedChanges(false);
-                  handleContentChange(initialDocumentJson, originalText);
+                  setLastSaved(null);
+                  setIsAutoSaving(false);
+                  
+                  // Force editor reset if available
+                  if (editorRef.current) {
+                    // Reset editor to original content
+                    handleContentChange(initialDocumentJson, originalText);
+                  }
                 }}
               className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200"
             >
