@@ -118,7 +118,7 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
 
   return (
     <div 
-      className={cn("fixed z-[9999]", positionClasses[position], className)}
+      className={cn("fixed z-notification", positionClasses[position], className)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -138,11 +138,7 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
                     <Button
                       size="icon"
                       onClick={() => handleAction(action)}
-                      className="w-12 h-12 rounded-full shadow-lg hover:scale-110 transition-all duration-200 bg-white border-2 border-zapier-orange text-zapier-orange hover:bg-zapier-orange hover:text-white"
-                      style={{ 
-                        zIndex: 10000 + index,
-                        position: 'relative'
-                      }}
+                      className="w-12 h-12 rounded-full shadow-lg hover:scale-110 transition-all duration-200 bg-white border-2 border-zapier-orange text-zapier-orange hover:bg-zapier-orange hover:text-white relative"
                     >
                       {action.icon}
                     </Button>
@@ -169,7 +165,7 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
                       ? "bg-zapier-orange hover:bg-zapier-orange/90 scale-110" 
                       : "bg-zapier-orange hover:bg-zapier-orange/90 hover:scale-110"
                   )}
-                  style={{ zIndex: 10000 }}
+                  
                 >
                   <Zap className="w-6 h-6" />
                 </Button>
