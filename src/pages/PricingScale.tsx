@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { MockPaymentModal } from '@/components/ui/mock-payment-modal';
 import { ContactSalesModal } from '@/components/ui/contact-sales-modal';
-import QuickActions from '@/components/common/QuickActions';
+
 import Breadcrumbs from '@/components/navigation/Breadcrumbs';
 
 const PricingScale = () => {
@@ -437,9 +437,6 @@ const PricingScale = () => {
           onClose={() => setIsContactModalOpen(false)}
         />
       </div>
-      
-      {/* Quick Actions */}
-      <QuickActions />
     </div>
   );
 };

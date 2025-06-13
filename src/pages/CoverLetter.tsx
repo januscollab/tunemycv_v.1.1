@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FileText, Sparkles, Trash2, RefreshCw, Clock, FileUp, Search, AlertCircle, Eye, Edit, Download, History, RotateCcw, Edit2, Linkedin } from 'lucide-react';
 import Breadcrumbs from '@/components/navigation/Breadcrumbs';
-import QuickActions from '@/components/common/QuickActions';
+
 import { useAuth } from '@/contexts/AuthContext';
 import { useCoverLetter } from '@/hooks/useCoverLetter';
 import { useUserData } from '@/hooks/useUserData';
@@ -1007,9 +1007,6 @@ const AuthenticatedCoverLetter = () => {
           titleType="cover-letter"
         />
       </div>
-      
-      {/* Quick Actions */}
-      <QuickActions showBackForward={true} />
     </div>
   );
 };

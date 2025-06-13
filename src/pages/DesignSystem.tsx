@@ -12,7 +12,7 @@ import { CaptureTextarea } from '@/components/ui/capture-textarea';
 import { SavedDataInput } from '@/components/ui/saved-data-input';
 import { SavedDataTextarea } from '@/components/ui/saved-data-textarea';
 import { FormTwoColumn, FormSingleColumn, FormSection } from '@/components/ui/form-layouts';
-import { QuickActions } from '@/components/common/QuickActions';
+
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel } from '@/components/ui/dropdown-menu';
 import { LoadingStatesShowcase } from '@/components/ui/loading-states-showcase';
@@ -181,10 +181,10 @@ const DesignSystem = () => {
       name: 'Quick Actions Menu',
       component: (
         <div className="relative">
-          <QuickActions position="bottom-right" className="relative" showBackForward={false} />
+          <div className="p-4 text-muted-foreground">Quick Actions removed</div>
         </div>
       ),
-      usage: '1 usage',
+      usage: '0 usage',
       description: 'Floating action menu with multiple quick actions'
     },
     {

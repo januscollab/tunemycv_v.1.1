@@ -31,7 +31,7 @@ import AnalysisHistoryTab from '@/components/profile/AnalysisHistoryTab';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Breadcrumbs from '@/components/navigation/Breadcrumbs';
 import StepIndicator from '@/components/ui/step-indicator';
-import QuickActions from '@/components/common/QuickActions';
+
 
 const InterviewToolkit = () => {
   const { user } = useAuth();
@@ -671,18 +671,6 @@ const InterviewToolkit = () => {
       />
       </div>
 
-      {/* Quick Actions */}
-      <QuickActions 
-        customActions={[
-          {
-            id: 'new-prep',
-            label: 'Start New Prep',
-            icon: <MessageSquare className="w-5 h-5" />,
-            onClick: handleStartNew,
-            variant: 'default'
-          }
-        ]}
-      />
     </>
   );
 };

@@ -188,6 +188,23 @@ export default {
 						height: '0'
 					}
 				},
+				// Custom animations to replace tailwindcss-animate
+				'fade-in-0': {
+					'0%': { opacity: '0' },
+					'100%': { opacity: '1' }
+				},
+				'fade-out-0': {
+					'0%': { opacity: '1' },
+					'100%': { opacity: '0' }
+				},
+				'zoom-in-95': {
+					'0%': { opacity: '0', transform: 'scale(0.95)' },
+					'100%': { opacity: '1', transform: 'scale(1)' }
+				},
+				'zoom-out-95': {
+					'0%': { opacity: '1', transform: 'scale(1)' },
+					'100%': { opacity: '0', transform: 'scale(0.95)' }
+				},
 				// Enhanced theme transition animations
 				'fade-in': {
 					'0%': {
@@ -253,6 +270,11 @@ export default {
 				// Existing animations
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
+				// Custom animations to replace tailwindcss-animate
+				'fade-in-0': 'fade-in-0 0.2s ease-out',
+				'fade-out-0': 'fade-out-0 0.2s ease-out',
+				'zoom-in-95': 'zoom-in-95 0.2s ease-out',
+				'zoom-out-95': 'zoom-out-95 0.2s ease-out',
 				// Enhanced animations
 				'fade-in': 'fade-in 0.3s ease-out',
 				'fade-out': 'fade-out 0.3s ease-out',
@@ -263,5 +285,5 @@ export default {
 			}
 		}
 	},
-	plugins: [require("tailwindcss-animate")],
+	plugins: [],
 } satisfies Config;

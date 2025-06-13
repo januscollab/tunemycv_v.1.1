@@ -31,7 +31,7 @@ import AnalysisHistoryTab from '@/components/profile/AnalysisHistoryTab';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Breadcrumbs from '@/components/navigation/Breadcrumbs';
 import StepIndicator from '@/components/ui/step-indicator';
-import QuickActions from '@/components/common/QuickActions';
+
 
 const AnalyzeCV = () => {
   const { user } = useAuth();
@@ -656,18 +656,6 @@ const AnalyzeCV = () => {
       />
       </div>
 
-      {/* Quick Actions */}
-      <QuickActions 
-        customActions={[
-          {
-            id: 'new-analysis',
-            label: 'Start New Analysis',
-            icon: <FileText className="w-5 h-5" />,
-            onClick: handleStartNew,
-            variant: 'default'
-          }
-        ]}
-      />
     </>
   );
 };
