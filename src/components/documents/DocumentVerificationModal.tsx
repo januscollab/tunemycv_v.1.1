@@ -231,7 +231,7 @@ const DocumentVerificationModal: React.FC<DocumentVerificationModalProps> = ({
                   <div className="space-y-2 text-caption">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Name:</span>
-                      <span className="font-medium text-foreground truncate ml-2">{fileName}</span>
+                      <span className="font-medium text-foreground ml-2 break-all">{fileName}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Size:</span>

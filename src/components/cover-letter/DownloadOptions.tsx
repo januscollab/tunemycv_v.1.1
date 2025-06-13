@@ -123,24 +123,24 @@ const DownloadOptions: React.FC<DownloadOptionsProps> = ({
       <DropdownMenuTrigger asChild>
         {triggerComponent || defaultTrigger}
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700" align="end">
+      <DropdownMenuContent className="w-48" align="end">
         <DropdownMenuItem 
           onClick={downloadAsPDF}
-          className="hover:bg-zapier-orange/10 hover:text-zapier-orange cursor-pointer"
+          className="cursor-pointer"
         >
           <FileText className="h-4 w-4 mr-2" />
           Download as PDF
         </DropdownMenuItem>
         <DropdownMenuItem 
           onClick={downloadAsWord}
-          className="hover:bg-zapier-orange/10 hover:text-zapier-orange cursor-pointer"
+          className="cursor-pointer"
         >
           <FileDown className="h-4 w-4 mr-2" />
           Download as Word
         </DropdownMenuItem>
         <DropdownMenuItem 
           onClick={downloadAsText}
-          className="hover:bg-zapier-orange/10 hover:text-zapier-orange cursor-pointer"
+          className="cursor-pointer"
         >
           <FileText className="h-4 w-4 mr-2" />
           Download as Text
