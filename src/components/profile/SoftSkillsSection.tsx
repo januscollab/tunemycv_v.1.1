@@ -189,6 +189,14 @@ const SoftSkillsSection: React.FC = () => {
                         </p>
                       </TooltipContent>
                     </Tooltip>
+                    {currentSkills[key as keyof SoftSkillsData] > 0 && (
+                      <button
+                        onClick={() => setExpandedSkill(expandedSkill === key ? null : key)}
+                        className="text-sm text-gray-600 dark:text-apple-core/80 hover:text-gray-800 dark:hover:text-apple-core"
+                      >
+                        {expandedSkill === key ? "− Hide" : "+ Add"} context/example
+                      </button>
+                    )}
                   </div>
                   <span className="text-sm text-gray-500 dark:text-apple-core/60 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
                     {currentSkills[key as keyof SoftSkillsData]}/10
@@ -208,26 +216,18 @@ const SoftSkillsSection: React.FC = () => {
                 </div>
                 
                 {/* Qualifying Statement Section */}
-                {currentSkills[key as keyof SoftSkillsData] > 0 && (
+                {expandedSkill === key && currentSkills[key as keyof SoftSkillsData] > 0 && (
                   <div className="space-y-2 pt-2 border-t border-gray-200 dark:border-border">
-                    <button
-                      onClick={() => setExpandedSkill(expandedSkill === key ? null : key)}
-                      className="text-sm text-gray-600 dark:text-apple-core/80 hover:text-gray-800 dark:hover:text-apple-core flex items-center gap-1"
-                    >
-                      {expandedSkill === key ? '− Hide' : '+ Add'} context/example
-                    </button>
-                    {expandedSkill === key && (
-                      <Textarea
-                        value={qualifyingStatements[key as keyof SoftSkillsQualifyingStatements]}
-                        onChange={(e) => setQualifyingStatements(prev => ({
-                          ...prev,
-                          [key]: e.target.value
-                        }))}
-                        placeholder={`Describe specific examples of your ${label.toLowerCase()} skills...`}
-                        className="w-full text-sm"
-                        rows={3}
-                      />
-                    )}
+                    <Textarea
+                      value={qualifyingStatements[key as keyof SoftSkillsQualifyingStatements]}
+                      onChange={(e) => setQualifyingStatements(prev => ({
+                        ...prev,
+                        [key]: e.target.value
+                      }))}
+                      placeholder={`Describe specific examples of your ${label.toLowerCase()} skills...`}
+                      className="w-full text-sm"
+                      rows={3}
+                    />
                   </div>
                 )}
               </div>
