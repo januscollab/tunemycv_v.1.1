@@ -525,6 +525,44 @@ export type Database = {
           },
         ]
       }
+      execution_logs: {
+        Row: {
+          ai_response: string | null
+          execution_date: string
+          id: string
+          model_used: string | null
+          prompt_sent: string
+          sprint_id: string
+          user_id: string
+        }
+        Insert: {
+          ai_response?: string | null
+          execution_date?: string
+          id?: string
+          model_used?: string | null
+          prompt_sent: string
+          sprint_id: string
+          user_id: string
+        }
+        Update: {
+          ai_response?: string | null
+          execution_date?: string
+          id?: string
+          model_used?: string | null
+          prompt_sent?: string
+          sprint_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "execution_logs_sprint_id_fkey"
+            columns: ["sprint_id"]
+            isOneToOne: false
+            referencedRelation: "sprints"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           company_size_preference: string | null
@@ -696,6 +734,89 @@ export type Database = {
         }
         Relationships: []
       }
+      sprints: {
+        Row: {
+          created_at: string
+          id: string
+          is_hidden: boolean
+          name: string
+          order_index: number
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_hidden?: boolean
+          name: string
+          order_index?: number
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_hidden?: boolean
+          name?: string
+          order_index?: number
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      tasks: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          order_index: number
+          priority: string | null
+          sprint_id: string
+          status: string
+          tags: string[] | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          order_index?: number
+          priority?: string | null
+          sprint_id: string
+          status?: string
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          order_index?: number
+          priority?: string | null
+          sprint_id?: string
+          status?: string
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_sprint_id_fkey"
+            columns: ["sprint_id"]
+            isOneToOne: false
+            referencedRelation: "sprints"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       uploads: {
         Row: {
           created_at: string | null
@@ -797,6 +918,39 @@ export type Database = {
           credits?: number
           id?: string
           updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_devsuite_settings: {
+        Row: {
+          created_at: string
+          id: string
+          openai_api_key_encrypted: string | null
+          preferred_model: string | null
+          show_priority_sprint: boolean | null
+          story_generation_enabled: boolean | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          openai_api_key_encrypted?: string | null
+          preferred_model?: string | null
+          show_priority_sprint?: boolean | null
+          story_generation_enabled?: boolean | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          openai_api_key_encrypted?: string | null
+          preferred_model?: string | null
+          show_priority_sprint?: boolean | null
+          story_generation_enabled?: boolean | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: []

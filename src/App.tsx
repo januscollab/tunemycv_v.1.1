@@ -22,6 +22,7 @@ import Template from './pages/Template';
 import PricingScale from './pages/PricingScale';
 import DesignSystem from './pages/DesignSystem';
 import DebugTest from './pages/DebugTest';
+import DevSuite from './pages/DevSuite';
 import Navigation from './components/Navigation';
 import Footer from './components/Footer';
 import EnhancedSecurityHeaders from './components/security/EnhancedSecurityHeaders';
@@ -68,6 +69,7 @@ function AppContent() {
           <Route path="/terms-of-service" element={<TermsOfService />} />
           <Route path="/design-system" element={<DesignSystem />} />
           <Route path="/debug-test" element={<DebugTest />} />
+          <Route path="/devsuite" element={<DevSuite />} />
         </Routes>
       </main>
       <Footer />
