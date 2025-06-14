@@ -24,24 +24,24 @@ const InterviewPrepSection: React.FC<InterviewPrepSectionProps> = ({ interviewPr
   const { likelyQuestions = [], suggestedAnswers = [], situationalQuestions = [] } = interviewPrep;
 
   return (
-    <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
+    <div className="bg-card rounded-lg shadow p-6 border border-border">
       <div className="flex items-center mb-6">
-        <MessageSquare className="h-5 w-5 text-apricot mr-2" />
-        <h2 className="text-heading font-semibold text-blueberry dark:text-citrus">Interview Preparation</h2>
+        <MessageSquare className="h-5 w-5 text-primary mr-2" />
+        <h2 className="text-heading font-semibold text-foreground">Interview Preparation</h2>
       </div>
 
       <div className="space-y-6">
         {/* Likely Questions */}
         {likelyQuestions.length > 0 && (
           <div>
-            <h3 className="font-semibold text-blue-600 mb-4 flex items-center">
+            <h3 className="font-semibold text-info mb-4 flex items-center">
               <HelpCircle className="h-4 w-4 mr-2" />
               Likely Questions ({likelyQuestions.length})
             </h3>
             <div className="space-y-2">
               {likelyQuestions.map((question, index) => (
-                <div key={index} className="border border-blue-200 rounded-lg p-3 bg-blue-50 dark:bg-blue-900/20">
-                  <p className="text-caption text-blueberry dark:text-citrus">{question}</p>
+                <div key={index} className="border border-info rounded-lg p-3 bg-info-50">
+                  <p className="text-caption text-foreground">{question}</p>
                 </div>
               ))}
             </div>
@@ -51,18 +51,18 @@ const InterviewPrepSection: React.FC<InterviewPrepSectionProps> = ({ interviewPr
         {/* Suggested Answers */}
         {suggestedAnswers.length > 0 && (
           <div>
-            <h3 className="font-semibold text-green-600 mb-4 flex items-center">
+            <h3 className="font-semibold text-success mb-4 flex items-center">
               <Lightbulb className="h-4 w-4 mr-2" />
               Answer Frameworks ({suggestedAnswers.length})
             </h3>
             <div className="space-y-4">
               {suggestedAnswers.map((answer, index) => (
-                <div key={index} className="border border-green-200 rounded-lg p-4 bg-green-50 dark:bg-green-900/20">
-                  <h4 className="font-medium text-blueberry dark:text-citrus mb-2">{answer.question}</h4>
-                  <p className="text-caption text-blueberry/80 dark:text-apple-core mb-3">{answer.approach}</p>
+                <div key={index} className="border border-success rounded-lg p-4 bg-success-50">
+                  <h4 className="font-medium text-foreground mb-2">{answer.question}</h4>
+                  <p className="text-caption text-muted-foreground mb-3">{answer.approach}</p>
                   <div>
-                    <h5 className="text-micro font-medium text-green-800 dark:text-green-400 mb-2">Key Points to Cover:</h5>
-                    <ul className="text-micro text-green-700 dark:text-green-500 space-y-1">
+                    <h5 className="text-micro font-medium text-success mb-2">Key Points to Cover:</h5>
+                    <ul className="text-micro text-success space-y-1">
                       {answer.keyPoints.map((point, idx) => (
                         <li key={idx} className="flex items-start">
                           <span className="mr-2">•</span>
@@ -80,23 +80,23 @@ const InterviewPrepSection: React.FC<InterviewPrepSectionProps> = ({ interviewPr
         {/* Situational Questions */}
         {situationalQuestions.length > 0 && (
           <div>
-            <h3 className="font-semibold text-purple-600 mb-4 flex items-center">
+            <h3 className="font-semibold text-warning mb-4 flex items-center">
               <Star className="h-4 w-4 mr-2" />
               Situational Questions ({situationalQuestions.length})
             </h3>
             <div className="space-y-4">
               {situationalQuestions.map((situation, index) => (
-                <div key={index} className="border border-purple-200 rounded-lg p-4 bg-purple-50 dark:bg-purple-900/20">
-                  <h4 className="font-medium text-blueberry dark:text-citrus mb-2">{situation.scenario}</h4>
+                <div key={index} className="border border-warning rounded-lg p-4 bg-warning-50">
+                  <h4 className="font-medium text-foreground mb-2">{situation.scenario}</h4>
                   
                   <div className="mb-3">
-                    <h5 className="text-micro font-medium text-purple-800 dark:text-purple-400 mb-1">Framework:</h5>
-                    <p className="text-micro text-purple-700 dark:text-purple-500">{situation.framework}</p>
+                    <h5 className="text-micro font-medium text-warning mb-1">Framework:</h5>
+                    <p className="text-micro text-warning">{situation.framework}</p>
                   </div>
                   
-                  <div className="bg-white/70 dark:bg-gray-800/50 rounded p-3">
-                    <h5 className="text-micro font-medium text-gray-800 dark:text-gray-400 mb-1">Example Response:</h5>
-                    <p className="text-micro text-gray-700 dark:text-gray-500 italic">"{situation.exampleResponse}"</p>
+                  <div className="bg-background/70 rounded p-3">
+                    <h5 className="text-micro font-medium text-muted-foreground mb-1">Example Response:</h5>
+                    <p className="text-micro text-muted-foreground italic">"{situation.exampleResponse}"</p>
                   </div>
                 </div>
               ))}
@@ -107,8 +107,8 @@ const InterviewPrepSection: React.FC<InterviewPrepSectionProps> = ({ interviewPr
         {/* Empty State */}
         {likelyQuestions.length === 0 && suggestedAnswers.length === 0 && situationalQuestions.length === 0 && (
           <div className="text-center py-8">
-            <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-blueberry/60 dark:text-apple-core/60">
+            <MessageSquare className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <p className="text-muted-foreground">
               Interview preparation content will be available after a comprehensive analysis.
             </p>
           </div>
