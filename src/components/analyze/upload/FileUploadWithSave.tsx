@@ -29,10 +29,8 @@ const FileUploadWithSave: React.FC<FileUploadWithSaveProps> = ({
   selectedCVId,
   fileInputRef
 }) => {
-  const [shouldSave, setShouldSave] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
-  const [isButtonLoading, setIsButtonLoading] = useState(false);
-  const [hasBeenSaved, setHasBeenSaved] = useState(false);
+  const shouldSave = false; // CVs are not automatically saved to user's list
   const { user } = useAuth();
   const orchestrator = useUploadOrchestrator();
 
@@ -47,14 +45,11 @@ const FileUploadWithSave: React.FC<FileUploadWithSaveProps> = ({
     try {
       const result = await orchestrator.processFile(file, { 
         fileType: 'cv',
-        shouldStore: true // Always store JSON to database for editor functionality
+        shouldStore: shouldSave // Only save to user's CV list if shouldSave is true
       });
       
       if (result.success && result.file && result.extractedText) {
         onFileSelect(result.file, result.extractedText, shouldSave);
-        if (shouldSave) {
-          setHasBeenSaved(true);
-        }
         setRetryCount(0);
       } else {
         throw new Error(result.error || 'Processing failed');
@@ -75,16 +70,6 @@ const FileUploadWithSave: React.FC<FileUploadWithSaveProps> = ({
         setRetryCount(0);
       }
     }
-  };
-
-  const handleSaveButtonClick = () => {
-    setIsButtonLoading(true);
-    
-    // Simulate save operation with minimum 1 second
-    setTimeout(() => {
-      setShouldSave(!shouldSave);
-      setIsButtonLoading(false);
-    }, 1000);
   };
 
   const isAtLimit = currentCVCount >= maxCVCount;
