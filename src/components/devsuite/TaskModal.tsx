@@ -130,12 +130,16 @@ const TaskModal: React.FC<TaskModalProps> = ({
 
     setLoading(true);
     try {
+      // Generate auto-tags based on title and description
+      const autoTags = generateAutoTags(title, description);
+      const finalTags = [...new Set([...tags, ...autoTags])]; // Remove duplicates
+
       const taskData = {
         title,
         description: description || null,
         priority,
         status,
-        tags,
+        tags: finalTags,
         sprint_id: sprint.id,
         user_id: user?.id,
       };
@@ -167,6 +171,64 @@ const TaskModal: React.FC<TaskModalProps> = ({
     } finally {
       setLoading(false);
     }
+  };
+
+  // Auto-tagging function
+  const generateAutoTags = (title: string, description: string): string[] => {
+    const content = `${title} ${description}`.toLowerCase();
+    const autoTags: string[] = [];
+
+    // UI/UX related
+    if (content.match(/\b(ui|ux|design|interface|user|component|layout|responsive|mobile|desktop)\b/)) {
+      autoTags.push('ui');
+    }
+
+    // Backend/API related
+    if (content.match(/\b(api|backend|server|database|endpoint|integration|service)\b/)) {
+      autoTags.push('backend');
+    }
+
+    // Frontend related
+    if (content.match(/\b(frontend|react|component|javascript|typescript|css|html)\b/)) {
+      autoTags.push('frontend');
+    }
+
+    // Bug/Fix related
+    if (content.match(/\b(bug|fix|error|issue|problem|debug)\b/)) {
+      autoTags.push('bug');
+    }
+
+    // Feature related
+    if (content.match(/\b(feature|new|add|implement|create|build)\b/)) {
+      autoTags.push('feature');
+    }
+
+    // Documentation related
+    if (content.match(/\b(doc|documentation|readme|guide|manual)\b/)) {
+      autoTags.push('docs');
+    }
+
+    // Testing related
+    if (content.match(/\b(test|testing|unit|integration|e2e|spec)\b/)) {
+      autoTags.push('testing');
+    }
+
+    // Security related
+    if (content.match(/\b(security|auth|authentication|authorization|secure|vulnerability)\b/)) {
+      autoTags.push('security');
+    }
+
+    // Performance related
+    if (content.match(/\b(performance|optimize|speed|slow|cache|memory)\b/)) {
+      autoTags.push('performance');
+    }
+
+    // Refactor related
+    if (content.match(/\b(refactor|cleanup|improve|restructure|organize)\b/)) {
+      autoTags.push('refactor');
+    }
+
+    return autoTags;
   };
 
   return (
@@ -253,17 +315,22 @@ const TaskModal: React.FC<TaskModalProps> = ({
               />
               <Button type="button" onClick={handleAddTag} className="menu-text-animation">Add</Button>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {tags.map((tag, index) => (
-                <Badge key={index} variant="secondary" className="flex items-center gap-1">
-                  {tag}
-                  <X
-                    className="h-3 w-3 cursor-pointer"
-                    onClick={() => handleRemoveTag(tag)}
-                  />
-                </Badge>
-              ))}
-            </div>
+            {tags.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-2">
+                {tags.map((tag, index) => (
+                  <Badge key={index} variant="secondary" className="flex items-center gap-1">
+                    {tag}
+                    <X
+                      className="h-3 w-3 cursor-pointer"
+                      onClick={() => handleRemoveTag(tag)}
+                    />
+                  </Badge>
+                ))}
+              </div>
+            )}
+            <p className="text-xs text-muted-foreground mt-1">
+              Tags are automatically suggested based on task content (ui, backend, frontend, bug, feature, docs, testing, security, performance, refactor)
+            </p>
           </div>
         </div>
 

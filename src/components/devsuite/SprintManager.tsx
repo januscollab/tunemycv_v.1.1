@@ -169,8 +169,25 @@ const SprintManager = () => {
 
     const tasksInSprint = getTasksForSprint(sprint.id);
     if (tasksInSprint.length > 0) {
-      toast.error('Cannot delete sprint with tasks. Move or delete tasks first.');
-      return;
+      if (!window.confirm(`This sprint contains ${tasksInSprint.length} tasks. All tasks will be moved to the Backlog sprint. Continue?`)) {
+        return;
+      }
+      
+      // Find or create Backlog sprint
+      const backlogSprint = sprints.find(s => s.name === 'Backlog');
+      if (backlogSprint) {
+        // Move all tasks to Backlog
+        const { error: moveError } = await supabase
+          .from('tasks')
+          .update({ sprint_id: backlogSprint.id })
+          .eq('sprint_id', sprint.id);
+          
+        if (moveError) throw moveError;
+      }
+    } else {
+      if (!window.confirm('Are you sure you want to delete this sprint?')) {
+        return;
+      }
     }
 
     try {
@@ -227,12 +244,20 @@ const SprintManager = () => {
 
   const handleCloseSprint = async (sprint: Sprint) => {
     try {
-      // Update all tasks in sprint to completed status
+      // Get all tasks in the sprint
+      const sprintTasks = getTasksForSprint(sprint.id);
+      
+      // Update all tasks in sprint to completed status and archive them
       const { error: tasksError } = await supabase
         .from('tasks')
-        .update({ status: 'completed' })
+        .update({ 
+          status: 'completed',
+          archived_at: new Date().toISOString(),
+          archived_by: user?.id,
+          archive_reason: `Sprint "${sprint.name}" closed`
+        })
         .eq('sprint_id', sprint.id)
-        .neq('status', 'completed');
+        .is('archived_at', null);
 
       if (tasksError) throw tasksError;
 
@@ -245,7 +270,7 @@ const SprintManager = () => {
       if (sprintError) throw sprintError;
 
       loadData();
-      toast.success('Sprint closed successfully');
+      toast.success(`Sprint closed successfully. ${sprintTasks.length} tasks archived.`);
     } catch (error) {
       console.error('Error closing sprint:', error);
       toast.error('Failed to close sprint');
@@ -430,7 +455,7 @@ const SprintManager = () => {
                           Archive Completed
                         </Button>
                       )}
-                      {sprint.name !== 'Priority Sprint' && getTasksForSprint(sprint.id).length === 0 && (
+                      {sprint.name !== 'Priority Sprint' && (
                         <Button
                           size="sm"
                           variant="destructive"
