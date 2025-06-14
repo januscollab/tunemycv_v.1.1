@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import { WandSparkles, RotateCcw, Check, X, AlertCircle } from 'lucide-react';
+import { WandSparkles, RotateCcw, Check, X, AlertCircle, Save, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -14,6 +14,8 @@ interface AIContext {
 interface RichTextEditorProps {
   value?: string;
   onChange?: (value: string) => void;
+  onSave?: (value: string) => void;
+  onDownload?: (value: string, filename?: string) => void;
   className?: string;
   placeholder?: string;
   readOnly?: boolean;
@@ -23,12 +25,15 @@ interface RichTextEditorProps {
   state?: 'default' | 'error' | 'success';
   disabled?: boolean;
   minHeight?: string;
+  filename?: string;
   onAIRequest?: (context: AIContext, action: 'improve' | 'rewrite' | 'tone') => void;
 }
 
 const RichTextEditor: React.FC<RichTextEditorProps> = ({
   value = '',
   onChange,
+  onSave,
+  onDownload,
   className,
   placeholder = 'Start writing...',
   readOnly = false,
@@ -38,6 +43,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   state = 'default',
   disabled = false,
   minHeight = '200px',
+  filename = 'document',
   onAIRequest
 }) => {
   const quillRef = useRef<ReactQuill>(null);
@@ -78,12 +84,77 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     }
   }, [showAIFeatures, readOnly, disabled]);
 
-  // AI improvement handlers
-  const handleAIImprovement = useCallback((action: 'improve' | 'rewrite' | 'tone') => {
-    if (selectionInfo && onAIRequest) {
-      onAIRequest(selectionInfo, action);
+  // Save and download handlers
+  const handleSave = useCallback(() => {
+    if (onSave && content) {
+      onSave(content);
     }
-  }, [selectionInfo, onAIRequest]);
+  }, [onSave, content]);
+
+  const handleDownload = useCallback(() => {
+    if (onDownload && content) {
+      onDownload(content, filename);
+    } else if (content) {
+      // Default download functionality - create and download as HTML file
+      const blob = new Blob([content], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${filename}.html`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+  }, [onDownload, content, filename]);
+
+  // Add custom buttons to toolbar after component mounts
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (variant === 'minimal' || readOnly || disabled) return;
+
+      const toolbar = document.querySelector('.rich-text-editor .ql-toolbar');
+      if (!toolbar) return;
+
+      // Remove existing custom buttons
+      const existingCustomButtons = toolbar.querySelectorAll('.ql-custom-button');
+      existingCustomButtons.forEach(button => button.remove());
+
+      // Create save button
+      const saveButton = document.createElement('button');
+      saveButton.className = 'ql-custom-button ql-custom-left';
+      saveButton.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>';
+      saveButton.title = 'Save';
+      saveButton.type = 'button';
+      saveButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        handleSave();
+      });
+
+      // Create download button
+      const downloadButton = document.createElement('button');
+      downloadButton.className = 'ql-custom-button ql-custom-right';
+      downloadButton.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
+      downloadButton.title = 'Download';
+      downloadButton.type = 'button';
+      downloadButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        handleDownload();
+      });
+
+      // Insert save button at the beginning
+      if (toolbar.firstChild) {
+        toolbar.insertBefore(saveButton, toolbar.firstChild);
+      } else {
+        toolbar.appendChild(saveButton);
+      }
+
+      // Insert download button at the end
+      toolbar.appendChild(downloadButton);
+    }, 100); // Small delay to ensure Quill has rendered
+
+    return () => clearTimeout(timer);
+  }, [handleSave, handleDownload, variant, readOnly, disabled, content]);
 
   // Toolbar configurations based on variant
   const getToolbarConfig = () => {
@@ -109,6 +180,13 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         ];
     }
   };
+
+  // AI improvement handlers
+  const handleAIImprovement = useCallback((action: 'improve' | 'rewrite' | 'tone') => {
+    if (selectionInfo && onAIRequest) {
+      onAIRequest(selectionInfo, action);
+    }
+  }, [selectionInfo, onAIRequest]);
 
   // Quill configuration
   const modules = {

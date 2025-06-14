@@ -503,12 +503,21 @@ const DesignSystem = () => {
             setRteContent(value);
             console.log('Content changed:', value);
           }}
+          onSave={(value) => {
+            console.log('Saving content:', value);
+            // In real implementation, this would save to backend
+          }}
+          onDownload={(value, filename) => {
+            console.log('Downloading content:', value, filename);
+            // Download functionality is handled internally
+          }}
+          filename="design-system-sample"
           className="w-full"
           minHeight="200px"
         />
       ),
       usage: '45 usages',
-      description: 'Full-featured rich text editor with all formatting options'
+      description: 'Full-featured rich text editor with save and download functionality'
     },
     {
       name: 'Minimal Editor',
