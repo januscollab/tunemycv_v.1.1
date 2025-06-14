@@ -23,6 +23,7 @@ import PricingScale from './pages/PricingScale';
 import DesignSystem from './pages/DesignSystem';
 import DebugTest from './pages/DebugTest';
 import SprintPlan from './pages/dev/SprintPlan';
+import DevLogin from './pages/dev/DevLogin';
 import DebugLogs from './pages/dev/DebugLogs';
 import CodeAnalysis from './pages/dev/CodeAnalysis';
 import AIAssistant from './pages/dev/AIAssistant';
@@ -72,6 +73,7 @@ function AppContent() {
           <Route path="/terms-of-service" element={<TermsOfService />} />
           <Route path="/design-system" element={<DesignSystem />} />
           <Route path="/debug-test" element={<DebugTest />} />
+          <Route path="/dev" element={<DevLogin />} />
           <Route path="/dev/sprintplan" element={<SprintPlan />} />
           <Route path="/dev/debug" element={<DebugLogs />} />
           <Route path="/dev/analysis" element={<CodeAnalysis />} />
