@@ -769,6 +769,9 @@ export type Database = {
       }
       tasks: {
         Row: {
+          archive_reason: string | null
+          archived_at: string | null
+          archived_by: string | null
           created_at: string
           description: string | null
           id: string
@@ -782,6 +785,9 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          archive_reason?: string | null
+          archived_at?: string | null
+          archived_by?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -795,6 +801,9 @@ export type Database = {
           user_id: string
         }
         Update: {
+          archive_reason?: string | null
+          archived_at?: string | null
+          archived_by?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -1082,6 +1091,10 @@ export type Database = {
       }
     }
     Functions: {
+      archive_completed_tasks: {
+        Args: { sprint_id_param: string }
+        Returns: number
+      }
       check_enhanced_rate_limit: {
         Args: {
           identifier_key: string
