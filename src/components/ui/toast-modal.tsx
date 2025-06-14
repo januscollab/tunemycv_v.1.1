@@ -25,14 +25,14 @@ const ToastModal: React.FC<ToastModalProps> = ({
           <div className="flex-1">
             {title && (
               <DialogTitle className={`text-lg font-semibold mb-2 ${
-                variant === 'destructive' ? 'text-red-600 dark:text-red-400' : 'text-foreground'
+                variant === 'destructive' ? 'text-destructive' : 'text-foreground'
               }`}>
                 {title}
               </DialogTitle>
             )}
             {description && (
               <p className={`text-sm ${
-                variant === 'destructive' ? 'text-red-600/80 dark:text-red-400/80' : 'text-muted-foreground'
+                variant === 'destructive' ? 'text-destructive/80' : 'text-muted-foreground'
               }`}>
                 {description}
               </p>

@@ -144,13 +144,13 @@ const UserManagement = () => {
 
       <div className="flex items-center space-x-4">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-space-0.75 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
             type="text"
             placeholder="Search users..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-space-1 py-space-0.5 border border-input-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-input-focus bg-background text-foreground"
+            className="w-full pl-10 pr-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary bg-background text-foreground"
           />
         </div>
       </div>
@@ -178,34 +178,34 @@ const UserManagement = () => {
                     </div>
                   </div>
                 </TableCell>
-                <TableCell className="text-foreground-secondary">{user.email}</TableCell>
+                <TableCell className="text-muted-foreground">{user.email}</TableCell>
                 <TableCell>
-                  <span className="inline-flex items-center px-space-0.5 py-space-0.25 rounded-full text-micro font-medium bg-primary-100 text-primary-700">
+                  <span className="inline-flex items-center px-2 py-1 rounded-full text-caption font-medium bg-primary-50 text-primary">
                     {user.credits} credits
                   </span>
                 </TableCell>
-                <TableCell className="text-foreground-secondary">{user.total_analyses}</TableCell>
-                <TableCell className="text-foreground-secondary">
+                <TableCell className="text-muted-foreground">{user.total_analyses}</TableCell>
+                <TableCell className="text-muted-foreground">
                   {new Date(user.created_at).toLocaleDateString()}
                 </TableCell>
-                <TableCell className="text-foreground-secondary">
+                <TableCell className="text-muted-foreground">
                   {user.last_analysis 
                     ? new Date(user.last_analysis).toLocaleDateString()
                     : 'Never'
                   }
                 </TableCell>
                 <TableCell>
-                  <div className="flex items-center space-x-space-0.5">
+                  <div className="flex items-center space-x-2">
                     <button
                       onClick={() => setSelectedUser(user)}
-                      className="p-space-0.25 text-muted-foreground hover:text-primary transition-colors"
+                      className="p-1 text-muted-foreground hover:text-primary transition-colors"
                       title="View Details"
                     >
                       <Eye className="h-4 w-4" />
                     </button>
                     <button
                       onClick={() => setUserToDelete(user)}
-                      className="p-space-0.25 text-muted-foreground hover:text-destructive transition-colors"
+                      className="p-1 text-muted-foreground hover:text-destructive transition-colors"
                       title="Delete User"
                     >
                       <Trash2 className="h-4 w-4" />
