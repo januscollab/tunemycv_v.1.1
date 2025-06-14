@@ -4,7 +4,7 @@ import { useToast } from '@/hooks/use-toast';
 import { extractJobTitleFromText } from '@/utils/analysisUtils';
 import AnalysisResults from '@/components/analysis/AnalysisResults';
 import CVSelector from '@/components/analyze/CVSelector';
-import JobDescriptionUpload from '@/components/analyze/JobDescriptionUpload';
+import JobDescriptionSelector from '@/components/analyze/JobDescriptionSelector';
 import CreditsPanel from '@/components/analyze/CreditsPanel';
 import AnalyzeButton from '@/components/analyze/AnalyzeButton';
 import InterviewPrepAnalysisSelector from '@/components/analyze/InterviewPrepAnalysisSelector';
@@ -521,7 +521,7 @@ const AnalyzeCV = () => {
                       Upload a file (PDF, DOCX, TXT) or paste the text directly
                     </p>
                     
-                    <JobDescriptionUpload
+                    <JobDescriptionSelector
                       onJobDescriptionSet={handleJobDescriptionSet}
                       uploadedFile={uploadedFiles.jobDescription}
                       disabled={uploading || analyzing}
