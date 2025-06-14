@@ -535,49 +535,7 @@ const AnalyzeCV = () => {
                     uploading={uploading || analyzing}
                   />
 
-                  {/* Let's Get Personal Section */}
-                  <div className="bg-gradient-to-br from-zapier-orange/5 via-white to-apricot/5 dark:from-zapier-orange/10 dark:via-blueberry/10 dark:to-apricot/10 rounded-lg shadow-sm p-5 border border-zapier-orange/20 dark:border-zapier-orange/30">
-                    <div className="flex items-start space-x-3 mb-4">
-                      <div className="w-8 h-8 bg-zapier-orange/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Users className="h-4 w-4 text-zapier-orange" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-blueberry dark:text-citrus mb-2">
-                          Motivation Matters (Optional)
-                        </h3>
-                        <p className="text-sm text-blueberry/70 dark:text-apple-core/80 mb-4 leading-relaxed">
-                          Each role application is unique for you. Share your motivations for applying, beyond your achievements and work history from your CV, to help us better match through analysis.
-                        </p>
-                        
-                        {surveyResponses ? (
-                          <div className="flex items-center space-x-2 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-                            <CheckCircle className="h-4 w-4 text-green-600" />
-                            <span className="text-sm font-medium text-green-800 dark:text-green-200">
-                              Survey completed! Your responses will enhance the analysis.
-                            </span>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setShowPersonalizationSurvey(true)}
-                              className="text-green-600 hover:text-green-700 ml-auto"
-                            >
-                              Retake Survey
-                            </Button>
-                          </div>
-                        ) : (
-                          <Button
-                            onClick={() => setShowPersonalizationSurvey(true)}
-                            variant="outline"
-                            className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200"
-                            disabled={uploading || analyzing}
-                          >
-                            <MessageSquare className="h-4 w-4 mr-2" />
-                            Take Survey
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+                  {/* Hide Motivation Matters section */}
 
                   {/* Analyze Button */}
                   <AnalyzeButton

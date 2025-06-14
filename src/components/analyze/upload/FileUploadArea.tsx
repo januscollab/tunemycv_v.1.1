@@ -47,15 +47,17 @@ const FileUploadArea: React.FC<FileUploadAreaProps> = ({
 
   return (
     <>
-      <DragDropZone
-        onDrop={handleDrop}
-        accept={accept}
-        maxSize={maxSizeBytes}
-        disabled={uploading || orchestrator.isProcessing}
-        placeholder={orchestrator.isProcessing ? orchestrator.progress : (uploading ? "Uploading..." : label)}
-        description={`${accept} • Max ${maxSize}`}
-        className="border-apple-core/30 dark:border-citrus/30"
-      />
+      <div className="relative">
+        <DragDropZone
+          onDrop={handleDrop}
+          accept={accept}
+          maxSize={maxSizeBytes}
+          disabled={uploading || orchestrator.isProcessing}
+          placeholder={orchestrator.isProcessing ? orchestrator.progress : (uploading ? "Uploading..." : label)}
+          description={`${accept} • Max ${maxSize}`}
+          className="border-2 border-dashed border-primary/20 hover:border-primary/40 transition-colors duration-200 rounded-xl bg-gradient-to-br from-background via-muted/10 to-background shadow-sm hover:shadow-md"
+        />
+      </div>
       
       {orchestrator.isProcessing && (
         <div className="flex items-center justify-center p-4">
