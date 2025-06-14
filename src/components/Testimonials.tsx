@@ -55,7 +55,7 @@ const Testimonials = () => {
   ];
 
   return (
-    <section className="py-20 px-4 bg-gray-50 dark:bg-gray-800">
+    <section className="py-20 px-4 bg-muted dark:bg-card">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-display font-bold text-foreground mb-4">
@@ -83,7 +83,7 @@ const Testimonials = () => {
                 </div>
               </div>
               
-              <p className="text-blueberry/80 dark:text-gray-900 mb-6 leading-relaxed">
+              <p className="text-blueberry/80 dark:text-foreground mb-6 leading-relaxed">
                 "{testimonial.content}"
               </p>
               

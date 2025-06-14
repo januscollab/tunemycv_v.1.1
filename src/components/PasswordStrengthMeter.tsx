@@ -12,13 +12,13 @@ const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({ password 
   const getStrengthColor = () => {
     switch (validation.strength) {
       case 'weak':
-        return 'bg-red-500';
+        return 'bg-destructive';
       case 'medium':
-        return 'bg-yellow-500';
+        return 'bg-warning';
       case 'strong':
-        return 'bg-green-500';
+        return 'bg-success';
       default:
-        return 'bg-gray-300';
+        return 'bg-muted';
     }
   };
 
@@ -54,15 +54,15 @@ const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({ password 
       {password && (
         <>
           <div className="flex items-center space-x-2">
-            <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
               <div 
                 className={`h-full transition-all duration-300 ${getStrengthColor()} ${getStrengthWidth()}`}
               />
             </div>
             <span className={`text-caption font-medium ${
-              validation.strength === 'weak' ? 'text-red-600' :
-              validation.strength === 'medium' ? 'text-yellow-600' :
-              'text-green-600'
+              validation.strength === 'weak' ? 'text-destructive' :
+              validation.strength === 'medium' ? 'text-warning' :
+              'text-success'
             }`}>
               {getStrengthText()}
             </span>
@@ -71,8 +71,8 @@ const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({ password 
           {validation.errors.length > 0 && (
             <div className="space-y-1">
               {validation.errors.map((error, index) => (
-                <p key={index} className="text-micro text-red-600 flex items-center">
-                  <span className="w-1 h-1 bg-red-600 rounded-full mr-2"></span>
+                <p key={index} className="text-micro text-destructive flex items-center">
+                  <span className="w-1 h-1 bg-destructive rounded-full mr-2"></span>
                   {error}
                 </p>
               ))}
@@ -80,8 +80,8 @@ const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({ password 
           )}
           
           {validation.isValid && (
-            <p className="text-micro text-green-600 flex items-center">
-              <span className="w-1 h-1 bg-green-600 rounded-full mr-2"></span>
+            <p className="text-micro text-success flex items-center">
+              <span className="w-1 h-1 bg-success rounded-full mr-2"></span>
               Password meets all requirements
             </p>
           )}
