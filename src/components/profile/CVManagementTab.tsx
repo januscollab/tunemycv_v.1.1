@@ -203,9 +203,9 @@ const CVManagementTab: React.FC<CVManagementTabProps> = ({ credits, memberSince 
 
   if (loading) {
     return (
-      <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6">
+      <div className="bg-card rounded-lg shadow p-6">
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-apricot"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
       </div>
     );
