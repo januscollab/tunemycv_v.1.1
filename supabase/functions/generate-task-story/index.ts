@@ -62,6 +62,15 @@ Please generate a clear, actionable user story or task description following the
 3. Include specific acceptance criteria as bullet points
 4. Keep it concise but comprehensive
 5. Focus on what needs to be delivered
+6. Include progress tracking considerations - mention how completion can be measured
+7. Add any dependencies or blockers that should be considered
+8. Suggest metrics or success criteria where applicable
+
+Format your response to include:
+- Clear task description
+- Acceptance criteria (bulleted)
+- Progress tracking notes
+- Any dependencies or considerations
 
 Generate only the story/description text, no additional formatting or explanations.`;
 
