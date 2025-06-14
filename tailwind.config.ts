@@ -143,6 +143,8 @@ export default {
 					border: 'rgb(var(--sidebar-border) / <alpha-value>)',
 					ring: 'rgb(var(--sidebar-ring) / <alpha-value>)',
 				},
+				// Footer
+				footer: 'rgb(var(--footer) / <alpha-value>)',
 				// Interactive states
 				hover: 'rgb(var(--hover) / <alpha-value>)',
 				active: 'rgb(var(--active) / <alpha-value>)',

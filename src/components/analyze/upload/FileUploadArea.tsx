@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { DragDropZone } from '@/components/ui/drag-drop-zone';
-import ProcessingModal from '@/components/ui/processing-modal';
+import { ProgressIndicator } from '@/components/ui/progress-indicator';
 import { useUploadOrchestrator } from '@/hooks/useUploadOrchestrator';
 
 interface FileUploadAreaProps {
@@ -57,12 +57,17 @@ const FileUploadArea: React.FC<FileUploadAreaProps> = ({
         className="border-apple-core/30 dark:border-citrus/30"
       />
       
-      <ProcessingModal
-        isOpen={orchestrator.isProcessing}
-        title="Processing Document"
-        message={orchestrator.progress}
-        onCancel={orchestrator.cancel}
-      />
+      {orchestrator.isProcessing && (
+        <div className="flex items-center justify-center p-4">
+          <ProgressIndicator 
+            value={50}
+            variant="default"
+            size="md"
+            label="Processing Document"
+            
+          />
+        </div>
+      )}
     </>
   );
 };

@@ -4,7 +4,7 @@ import FileUploadArea from './upload/FileUploadArea';
 import { useToast } from '@/hooks/use-toast';
 import { UploadedFile } from '@/types/fileTypes';
 import { DocumentJson, textToJson, generateFormattedText } from '@/utils/documentJsonUtils';
-import JobDescriptionTextInput from './JobDescriptionTextInput';
+import { CaptureTextarea } from '@/components/ui/capture-textarea';
 import DocumentPreviewCard from '@/components/documents/DocumentPreviewCard';
 import DocumentVerificationModal from '@/components/documents/DocumentVerificationModal';
 import { supabase } from '@/integrations/supabase/client';
@@ -136,7 +136,21 @@ const JobDescriptionUpload: React.FC<JobDescriptionUploadProps> = ({
       
       <div className="text-center text-blueberry/60 dark:text-apple-core/60">or</div>
       
-      <JobDescriptionTextInput onSubmit={handleJobDescriptionText} disabled={disabled} />
+      <CaptureTextarea
+        label="Job Description"
+        value=""
+        onChange={(e) => {
+          const text = e.target.value;
+          if (text.length >= 50) {
+            handleJobDescriptionText(text);
+          }
+        }}
+        placeholder="Paste the job description here... (minimum 50 characters)"
+        className="min-h-[120px]"
+        disabled={disabled}
+        maxLength={10000}
+        description="Enter at least 50 characters to proceed"
+      />
     </div>
   );
 };

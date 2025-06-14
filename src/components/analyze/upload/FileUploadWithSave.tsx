@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { DragDropZone } from '@/components/ui/drag-drop-zone';
-import ProcessingModal from '@/components/ui/processing-modal';
+import { ProgressIndicator } from '@/components/ui/progress-indicator';
 import { BounceLoader } from '@/components/ui/progress-indicator';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUploadOrchestrator } from '@/hooks/useUploadOrchestrator';
@@ -102,12 +102,17 @@ const FileUploadWithSave: React.FC<FileUploadWithSaveProps> = ({
         fileInputRef={fileInputRef}
       />
       
-      <ProcessingModal
-        isOpen={orchestrator.isProcessing}
-        title="Processing CV"
-        message={orchestrator.progress}
-        onCancel={orchestrator.cancel}
-      />
+      {orchestrator.isProcessing && (
+        <div className="flex items-center justify-center p-4">
+          <ProgressIndicator 
+            value={50}
+            variant="default"
+            size="md"
+            label="Processing CV"
+            
+          />
+        </div>
+      )}
 
       {user && !selectedCVId && !hasBeenSaved && (
         <div className="mt-4 space-y-2">

@@ -98,6 +98,9 @@
     --sidebar-border: 226 232 240;
     --sidebar-ring: 255 74 0;
 
+    /* Footer */
+    --footer: 58 58 58;
+
     /* Transitions */
     --transition-fast: 150ms;
     --transition-normal: 200ms;

@@ -37,7 +37,7 @@ import DownloadOptions from '@/components/cover-letter/DownloadOptions';
 import EditableCoverLetter from '@/components/cover-letter/EditableCoverLetter';
 import NoAnalysisModal from '@/components/cover-letter/NoAnalysisModal';
 import CoverLetterLoggedOut from '@/components/cover-letter/CoverLetterLoggedOut';
-import ProcessingModal from '@/components/ui/processing-modal';
+import { ProgressIndicator } from '@/components/ui/progress-indicator';
 
 
 const CoverLetter = () => {
@@ -403,17 +403,29 @@ const AuthenticatedCoverLetter = () => {
           onUseManualInput={() => setGenerationMethod('input')}
         />
 
-        <ProcessingModal
-          isOpen={isRegenerating}
-          title="Regenerating Cover Letter"
-          message="Please wait while we regenerate your cover letter with the new settings..."
-        />
+        {isRegenerating && (
+          <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-modal">
+            <ProgressIndicator 
+              value={50}
+              variant="default"
+              size="lg"
+              label="Regenerating Cover Letter"
+              
+            />
+          </div>
+        )}
 
-        <ProcessingModal
-          isOpen={isGenerating}
-          title="Generating Cover Letter"
-          message="Please wait while we create your personalized cover letter..."
-        />
+        {isGenerating && (
+          <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-modal">
+            <ProgressIndicator 
+              value={50}
+              variant="default"
+              size="lg"
+              label="Generating Cover Letter"
+              
+            />
+          </div>
+        )}
 
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6">

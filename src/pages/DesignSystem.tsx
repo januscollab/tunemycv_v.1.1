@@ -19,10 +19,8 @@ import { LoadingStatesShowcase } from '@/components/ui/loading-states-showcase';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 // Import missing component examples
-import JobDescriptionTextInput from '@/components/analyze/JobDescriptionTextInput';
 import { ContactSalesModal } from '@/components/ui/contact-sales-modal';
 import { WelcomeCreditsModal } from '@/components/ui/welcome-credits-modal';
-import ProcessingModal from '@/components/ui/processing-modal';
 import ToastModal from '@/components/ui/toast-modal';
 import { MockPaymentModal } from '@/components/ui/mock-payment-modal';
 
@@ -137,18 +135,19 @@ const DesignSystem = () => {
   // Missing Components in Documentation
   const missingComponents = [
     { 
-      name: 'JobDescriptionTextInput', 
+      name: 'JobDescriptionTextInput (replaced with CaptureTextarea)', 
       component: (
         <div className="w-full min-h-[120px]">
-          <JobDescriptionTextInput 
-            onSubmit={() => {}} 
-            disabled={false}
+          <CaptureTextarea
+            label="Job Description"
+            placeholder="Paste job description here..."
+            className="min-h-[120px]"
           />
         </div>
       ), 
-      usage: '12 usages',
-      description: 'Specialized input for job descriptions with auto-save functionality and validation',
-      status: 'active',
+      usage: '0 usages (replaced)',
+      description: 'Replaced with CaptureTextarea - specialized input for job descriptions',
+      status: 'replaced',
       trigger: () => {}
     },
     { 
@@ -956,12 +955,6 @@ const DesignSystem = () => {
         onClose={() => setActiveModal(null)} 
       />
       
-      <ProcessingModal 
-        isOpen={activeModal === 'processing'} 
-        title="Processing Document"
-        message="Extracting text from your document..."
-        onCancel={() => setActiveModal(null)}
-      />
       
       <ToastModal 
         isOpen={activeModal === 'toast'} 
