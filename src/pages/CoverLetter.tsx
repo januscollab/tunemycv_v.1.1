@@ -711,19 +711,6 @@ const AuthenticatedCoverLetter = () => {
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-4 pt-0">
-                      <div className="flex items-center justify-end">
-                        <DownloadOptions
-                          content={selectedCoverLetter.content}
-                          fileName={`Cover_Letter_${selectedCoverLetter.company_name}_${selectedCoverLetter.job_title}`}
-                          triggerComponent={
-                            <div className="flex items-center text-sm text-gray-600 hover:text-zapier-orange transition-colors cursor-pointer">
-                              <Download className="h-4 w-4 mr-1" />
-                              Download
-                            </div>
-                          }
-                        />
-                      </div>
-
                       <EditableCoverLetter
                         ref={editableCoverLetterRef}
                         content={selectedCoverLetter.content}
@@ -736,10 +723,10 @@ const AuthenticatedCoverLetter = () => {
                             value={formData.tone}
                             onValueChange={(value) => handleInputChange('tone', value)}
                           >
-                            <SelectTrigger className="w-40 h-10 px-3 py-2">
+                            <SelectTrigger>
                               <SelectValue placeholder="Select tone" />
                             </SelectTrigger>
-                            <SelectContent className="bg-background border border-border shadow-lg z-50">
+                            <SelectContent>
                               <SelectItem value="professional">Professional</SelectItem>
                               <SelectItem value="conversational">Conversational</SelectItem>
                               <SelectItem value="confident">Confident</SelectItem>
@@ -752,10 +739,10 @@ const AuthenticatedCoverLetter = () => {
                             value={formData.length}
                             onValueChange={(value) => handleInputChange('length', value)}
                           >
-                            <SelectTrigger className="w-56 h-10 px-3 py-2">
+                            <SelectTrigger>
                               <SelectValue placeholder="Select length" />
                             </SelectTrigger>
-                            <SelectContent className="bg-background border border-border shadow-lg z-50">
+                            <SelectContent>
                               {lengthOptions.map((option) => (
                                 <SelectItem key={option.value} value={option.value}>
                                   {option.label}

@@ -80,7 +80,29 @@ const EditableCoverLetter = forwardRef<EditableCoverLetterRef, EditableCoverLett
           root.render(
             React.createElement(DownloadOptions, {
               content: generateFormattedText(htmlToJson(htmlContent)),
-              fileName: fileName
+              fileName: fileName,
+              triggerComponent: React.createElement('button', {
+                className: 'text-foreground hover:text-primary transition-colors px-2 py-1 rounded flex items-center gap-1 text-caption font-normal',
+                onClick: () => {},
+                style: { 
+                  background: 'none', 
+                  border: 'none', 
+                  cursor: 'pointer',
+                  height: '28px'
+                }
+              }, 
+              React.createElement('svg', {
+                className: 'h-4 w-4',
+                fill: 'none',
+                stroke: 'currentColor',
+                viewBox: '0 0 24 24'
+              }, React.createElement('path', {
+                strokeLinecap: 'round',
+                strokeLinejoin: 'round',
+                strokeWidth: '2',
+                d: 'M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4'
+              })),
+              'Download')
             })
           );
         });
@@ -203,10 +225,10 @@ const EditableCoverLetter = forwardRef<EditableCoverLetterRef, EditableCoverLett
           value={htmlContent}
           onChange={handleContentChange}
           placeholder="Edit your cover letter content here..."
-          modules={modules}
-          formats={formats}
-          className="min-h-[400px] bg-background text-foreground border border-border rounded-md"
-        />
+      modules={modules}
+      formats={formats}
+      className="min-h-[400px] bg-background text-foreground border border-border rounded-md [&_.ql-editor]:focus-visible:outline-none [&_.ql-toolbar_.ql-stroke]:hover:stroke-primary [&_.ql-toolbar_.ql-fill]:hover:fill-primary [&_.ql-toolbar_button]:hover:text-primary [&_.ql-toolbar_button.ql-active]:text-primary [&_.ql-toolbar_button.ql-active_.ql-stroke]:stroke-primary [&_.ql-toolbar_button.ql-active_.ql-fill]:fill-primary"
+    />
       </div>
     </div>
   );

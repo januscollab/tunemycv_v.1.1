@@ -120,12 +120,12 @@ export const htmlToJson = (html: string): DocumentJson => {
         if (innerHTML.trim()) {
           const hasBold = element.querySelector('strong, b') !== null;
           
-          // Convert <br> tags back to newlines, preserve bold content
+          // Preserve HTML structure better - don't strip <br> tags during conversion
           let contentWithNewlines = innerHTML
-            .replace(/<br\s*\/?>/gi, '\n')
             .replace(/<strong[^>]*>(.*?)<\/strong>/gi, '$1') // Extract bold content
             .replace(/<b[^>]*>(.*?)<\/b>/gi, '$1') // Extract bold content
-            .replace(/<[^>]*>/g, '') // Remove any other HTML tags
+            .replace(/<(?!br\s*\/?>)[^>]*>/g, '') // Remove HTML tags except <br>
+            .replace(/<br\s*\/?>/gi, '\n') // Convert <br> to newlines
             .trim();
           
           if (contentWithNewlines) {
