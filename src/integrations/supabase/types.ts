@@ -585,6 +585,81 @@ export type Database = {
         }
         Relationships: []
       }
+      security_incidents: {
+        Row: {
+          created_at: string | null
+          details: Json | null
+          endpoint: string | null
+          id: string
+          incident_type: string
+          ip_address: unknown | null
+          resolved: boolean | null
+          resolved_at: string | null
+          severity: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          details?: Json | null
+          endpoint?: string | null
+          id?: string
+          incident_type: string
+          ip_address?: unknown | null
+          resolved?: boolean | null
+          resolved_at?: string | null
+          severity?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          details?: Json | null
+          endpoint?: string | null
+          id?: string
+          incident_type?: string
+          ip_address?: unknown | null
+          resolved?: boolean | null
+          resolved_at?: string | null
+          severity?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      security_rate_limits: {
+        Row: {
+          blocked_until: string | null
+          created_at: string | null
+          endpoint: string
+          id: string
+          identifier: string
+          request_count: number | null
+          updated_at: string | null
+          window_start: string | null
+        }
+        Insert: {
+          blocked_until?: string | null
+          created_at?: string | null
+          endpoint: string
+          id?: string
+          identifier: string
+          request_count?: number | null
+          updated_at?: string | null
+          window_start?: string | null
+        }
+        Update: {
+          blocked_until?: string | null
+          created_at?: string | null
+          endpoint?: string
+          id?: string
+          identifier?: string
+          request_count?: number | null
+          updated_at?: string | null
+          window_start?: string | null
+        }
+        Relationships: []
+      }
       site_settings: {
         Row: {
           admin_email: string | null
