@@ -9,9 +9,6 @@ import { FloatingLabelInput } from '@/components/common/FloatingLabelInput';
 import { FloatingLabelTextarea } from '@/components/common/FloatingLabelTextarea';
 import { CaptureInput } from '@/components/ui/capture-input';
 import { CaptureTextarea } from '@/components/ui/capture-textarea';
-import { SavedDataInput } from '@/components/ui/saved-data-input';
-import { SavedDataTextarea } from '@/components/ui/saved-data-textarea';
-import { FormTwoColumn, FormSingleColumn, FormSection } from '@/components/ui/form-layouts';
 
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel } from '@/components/ui/dropdown-menu';
@@ -317,16 +314,6 @@ const DesignSystem = () => {
 
   // Interaction Examples
   const interactionExamples = [
-    {
-      name: 'Quick Actions Menu',
-      component: (
-        <div className="relative">
-          <div className="p-4 text-muted-foreground">Quick Actions removed</div>
-        </div>
-      ),
-      usage: '0 usage',
-      description: 'Floating action menu with multiple quick actions'
-    },
     {
       name: 'Dropdown Menu',
       component: (
