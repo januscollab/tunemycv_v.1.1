@@ -55,14 +55,14 @@ const Testimonials = () => {
   ];
 
   return (
-    <section className="py-20 px-4 bg-muted dark:bg-card">
+    <section className="py-20 px-4 bg-muted">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-display font-bold text-foreground mb-4">
             What Our Users Say
           </h2>
-          <p className="text-heading text-foreground-secondary max-w-3xl mx-auto">
-            Join thousands of professionals who have transformed their careers with <span className="text-zapier-orange">Tune</span>MyCV
+          <p className="text-heading text-muted-foreground max-w-3xl mx-auto">
+            Join thousands of professionals who have transformed their careers with <span className="text-primary">Tune</span>MyCV
           </p>
         </div>
 
@@ -70,20 +70,20 @@ const Testimonials = () => {
           {testimonials.map((testimonial, index) => (
             <div 
               key={index} 
-              className={`bg-surface dark:bg-blueberry/20 rounded-xl shadow-lg p-space-1.5 hover:shadow-xl transition-shadow border border-apple-core/20 dark:border-citrus/20 ${
+              className={`bg-card rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow border border-border ${
                 index >= 3 ? 'hidden md:block' : ''
               } ${index >= 3 ? 'lg:block' : ''}`}
             >
-              <div className="flex items-center mb-space-1">
-                <Quote className="h-8 w-8 text-citrus dark:text-foreground mr-3" />
+              <div className="flex items-center mb-4">
+                <Quote className="h-8 w-8 text-primary mr-3" />
                 <div className="flex space-x-1">
                   {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-citrus text-citrus dark:fill-foreground dark:text-foreground" />
+                    <Star key={i} className="h-4 w-4 fill-primary text-primary" />
                   ))}
                 </div>
               </div>
               
-              <p className="text-blueberry/80 dark:text-foreground mb-space-1.5 leading-relaxed">
+              <p className="text-muted-foreground mb-6 leading-relaxed">
                 "{testimonial.content}"
               </p>
               
@@ -91,12 +91,12 @@ const Testimonials = () => {
                 <img 
                   src={testimonial.avatar}
                   alt={testimonial.name}
-                  className="w-12 h-12 rounded-full mr-4 border-2 border-apple-core/30 dark:border-citrus/30"
+                  className="w-12 h-12 rounded-full mr-4 border-2 border-border"
                 />
                 <div>
-                  <h4 className="font-semibold text-blueberry dark:text-foreground">{testimonial.name}</h4>
-                  <p className="text-caption text-blueberry/70 dark:text-foreground/80">{testimonial.role}</p>
-                  <p className="text-caption text-apricot font-medium">{testimonial.company}</p>
+                  <h4 className="font-semibold text-foreground">{testimonial.name}</h4>
+                  <p className="text-caption text-muted-foreground">{testimonial.role}</p>
+                  <p className="text-caption text-primary font-medium">{testimonial.company}</p>
                 </div>
               </div>
             </div>

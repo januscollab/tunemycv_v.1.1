@@ -226,17 +226,17 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
   };
 
   return (
-    <Card className="bg-white dark:bg-blueberry/20 border border-apple-core/20 dark:border-citrus/20">
+    <Card className="bg-card border border-border">
       <CardHeader>
-        <CardTitle className="text-heading font-semibold text-blueberry dark:text-citrus flex items-center">
-          <FileText className="h-5 w-5 text-apricot mr-2" />
+        <CardTitle className="text-heading font-semibold text-foreground flex items-center">
+          <FileText className="h-5 w-5 text-primary mr-2" />
           Your CV
         </CardTitle>
-        <p className="text-body text-blueberry/70 dark:text-apple-core/80">
+        <p className="text-caption text-muted-foreground">
           Upload a new CV or select from your saved CVs. 
           <Link 
             to="/profile?tab=files" 
-            className="text-apricot hover:text-apricot/80 ml-1 underline"
+            className="text-primary hover:text-primary/80 ml-1 underline"
           >
             Manage your CVs in your Profile
           </Link>
@@ -296,13 +296,13 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
         ) : (
           <div className="space-y-4">
             {/* Tab Navigation */}
-            <div className="grid grid-cols-2 gap-2 bg-apple-core/10 dark:bg-citrus/10 p-1 rounded-lg">
+            <div className="grid grid-cols-2 gap-2 bg-muted p-1 rounded-lg">
               <button
                 onClick={() => setActiveTab('saved')}
                 className={`px-3 py-2 text-caption font-medium rounded-md transition-colors flex items-center justify-center space-x-2 ${
                   activeTab === 'saved'
-                    ? 'text-zapier-orange border-b-2 border-zapier-orange bg-transparent'
-                    : 'text-blueberry/70 dark:text-apple-core/70 hover:bg-apple-core/10 dark:hover:bg-citrus/10'
+                    ? 'text-primary border-b-2 border-primary bg-transparent'
+                    : 'text-muted-foreground hover:bg-accent'
                 }`}
                 disabled={uploading || isLoading}
               >
@@ -324,8 +324,8 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
                 }}
                 className={`px-3 py-2 text-caption font-medium rounded-md transition-colors flex items-center justify-center space-x-2 ${
                   activeTab === 'upload'
-                    ? 'text-zapier-orange border-b-2 border-zapier-orange bg-transparent'
-                    : 'text-blueberry/70 dark:text-apple-core/70 hover:bg-apple-core/10 dark:hover:bg-citrus/10'
+                    ? 'text-primary border-b-2 border-primary bg-transparent'
+                    : 'text-muted-foreground hover:bg-accent'
                 }`}
                 disabled={uploading || isLoading}
               >
