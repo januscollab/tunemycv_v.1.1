@@ -135,22 +135,6 @@ const DesignSystem = () => {
   // Missing Components in Documentation
   const missingComponents = [
     { 
-      name: 'JobDescriptionTextInput (replaced with CaptureTextarea)', 
-      component: (
-        <div className="w-full min-h-[120px]">
-          <CaptureTextarea
-            label="Job Description"
-            placeholder="Paste job description here..."
-            className="min-h-[120px]"
-          />
-        </div>
-      ), 
-      usage: '0 usages (replaced)',
-      description: 'Replaced with CaptureTextarea - specialized input for job descriptions',
-      status: 'replaced',
-      trigger: () => {}
-    },
-    { 
       name: 'ContactSalesModal', 
       component: (
         <Button 
@@ -181,22 +165,6 @@ const DesignSystem = () => {
       description: 'Modal shown to new users explaining credit system',
       status: 'active',
       trigger: () => setActiveModal('welcomeCredits')
-    },
-    { 
-      name: 'ProcessingModal', 
-      component: (
-        <Button 
-          variant="outline" 
-          size="sm"
-          onClick={() => setActiveModal('processing')}
-        >
-          Open Processing Modal
-        </Button>
-      ), 
-      usage: '8 usages',
-      description: 'Modal for showing file upload and processing progress',
-      status: 'active',
-      trigger: () => setActiveModal('processing')
     },
     { 
       name: 'ToastModal', 
