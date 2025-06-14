@@ -18,6 +18,17 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { LoadingStatesShowcase } from '@/components/ui/loading-states-showcase';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
+// Import missing component examples
+import JobDescriptionTextInput from '@/components/analyze/JobDescriptionTextInput';
+import { ContactSalesModal } from '@/components/ui/contact-sales-modal';
+import { WelcomeCreditsModal } from '@/components/ui/welcome-credits-modal';
+import ProcessingModal from '@/components/ui/processing-modal';
+import ToastModal from '@/components/ui/toast-modal';
+import { MockPaymentModal } from '@/components/ui/mock-payment-modal';
+import BounceLoader from '@/components/ui/bounce-loader';
+import { StepIndicator } from '@/components/ui/step-indicator';
+import { ProgressIndicator } from '@/components/ui/progress-indicator';
+
 const DesignSystem = () => {
   const [activeModal, setActiveModal] = useState<string | null>(null);
   const colorTokens = [
@@ -127,66 +138,162 @@ const DesignSystem = () => {
   const missingComponents = [
     { 
       name: 'JobDescriptionTextInput', 
-      component: <div className="text-caption text-muted-foreground">Auto-saving job description input with character count</div>, 
+      component: (
+        <div className="w-full min-h-[120px]">
+          <JobDescriptionTextInput 
+            onSubmit={() => {}} 
+            disabled={false}
+          />
+        </div>
+      ), 
       usage: '12 usages',
       description: 'Specialized input for job descriptions with auto-save functionality and validation',
-      status: 'active'
+      status: 'active',
+      trigger: () => {}
     },
     { 
       name: 'ContactSalesModal', 
-      component: <div className="text-caption text-muted-foreground">Modal for sales contact form</div>, 
+      component: (
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={() => setActiveModal('contactSales')}
+        >
+          Open Contact Sales Modal
+        </Button>
+      ), 
       usage: '3 usages',
       description: 'Modal component for sales inquiries and contact forms',
-      status: 'active'
+      status: 'active',
+      trigger: () => setActiveModal('contactSales')
     },
     { 
       name: 'WelcomeCreditsModal', 
-      component: <div className="text-caption text-muted-foreground">New user welcome credits modal</div>, 
+      component: (
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={() => setActiveModal('welcomeCredits')}
+        >
+          Open Welcome Credits Modal
+        </Button>
+      ), 
       usage: '5 usages',
       description: 'Modal shown to new users explaining credit system',
-      status: 'active'
+      status: 'active',
+      trigger: () => setActiveModal('welcomeCredits')
     },
     { 
       name: 'ProcessingModal', 
-      component: <div className="text-caption text-muted-foreground">File processing status modal</div>, 
+      component: (
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={() => setActiveModal('processing')}
+        >
+          Open Processing Modal
+        </Button>
+      ), 
       usage: '8 usages',
       description: 'Modal for showing file upload and processing progress',
-      status: 'active'
+      status: 'active',
+      trigger: () => setActiveModal('processing')
     },
     { 
       name: 'ToastModal', 
-      component: <div className="text-caption text-muted-foreground">Enhanced toast notification modal</div>, 
+      component: (
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={() => setActiveModal('toast')}
+        >
+          Open Toast Modal
+        </Button>
+      ), 
       usage: '15 usages',
       description: 'Advanced toast notifications for complex feedback',
-      status: 'active'
+      status: 'active',
+      trigger: () => setActiveModal('toast')
     },
     { 
       name: 'MockPaymentModal', 
-      component: <div className="text-caption text-muted-foreground">Demo payment processing modal</div>, 
+      component: (
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={() => setActiveModal('mockPayment')}
+        >
+          Open Payment Modal
+        </Button>
+      ), 
       usage: '2 usages',
       description: 'Modal for simulating payment flows in demo mode',
-      status: 'active'
+      status: 'active',
+      trigger: () => setActiveModal('mockPayment')
     },
     { 
       name: 'BounceLoader', 
-      component: <div className="text-caption text-muted-foreground">Three-dot bounce loading animation</div>, 
+      component: (
+        <div className="flex flex-col items-center gap-4">
+          <div className="flex gap-4">
+            <BounceLoader size="sm" className="text-primary" />
+            <BounceLoader size="md" className="text-primary" />
+            <BounceLoader size="lg" className="text-primary" />
+          </div>
+          <div className="text-micro text-muted-foreground">Small, Medium, Large</div>
+        </div>
+      ), 
       usage: '23 usages',
       description: 'Animated loading indicator with bouncing dots',
-      status: 'active'
+      status: 'active',
+      trigger: () => {}
     },
     { 
       name: 'StepIndicator', 
-      component: <div className="text-caption text-muted-foreground">Multi-step process indicator</div>, 
+      component: (
+        <div className="space-y-4">
+          <StepIndicator
+            steps={[
+              { id: '1', title: 'Upload', description: 'Upload your CV' },
+              { id: '2', title: 'Analyze', description: 'AI processes document' },
+              { id: '3', title: 'Results', description: 'View analysis results' }
+            ]}
+            currentStep="2"
+            completedSteps={['1']}
+            orientation="horizontal"
+          />
+          <StepIndicator
+            steps={[
+              { id: '1', title: 'Upload CV' },
+              { id: '2', title: 'Job Description' },
+              { id: '3', title: 'Analysis' }
+            ]}
+            currentStep="2"
+            completedSteps={['1']}
+            orientation="vertical"
+            className="max-w-xs"
+          />
+        </div>
+      ), 
       usage: '7 usages',
       description: 'Visual indicator for multi-step workflows and forms',
-      status: 'active'
+      status: 'active',
+      trigger: () => {}
     },
     { 
       name: 'ProgressIndicator', 
-      component: <div className="text-caption text-muted-foreground">Advanced progress bar with variants</div>, 
+      component: (
+        <div className="space-y-4 w-full">
+          <ProgressIndicator value={75} label="Processing CV" />
+          <ProgressIndicator value={45} variant="success" size="lg" />
+          <ProgressIndicator value={25} variant="warning" showPercentage={false} />
+          <ProgressIndicator value={85} variant="destructive" size="sm" />
+        </div>
+      ), 
       usage: '34 usages',
       description: 'Progress bars with multiple variants, sizes, and animations',
-      status: 'active'
+      status: 'active',
+      trigger: () => {}
     }
   ];
 
@@ -854,6 +961,42 @@ const DesignSystem = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Modal Examples */}
+      <ContactSalesModal 
+        isOpen={activeModal === 'contactSales'} 
+        onClose={() => setActiveModal(null)} 
+      />
+      
+      <WelcomeCreditsModal 
+        isOpen={activeModal === 'welcomeCredits'} 
+        onClose={() => setActiveModal(null)} 
+      />
+      
+      <ProcessingModal 
+        isOpen={activeModal === 'processing'} 
+        title="Processing Document"
+        message="Extracting text from your document..."
+        onCancel={() => setActiveModal(null)}
+      />
+      
+      <ToastModal 
+        isOpen={activeModal === 'toast'} 
+        onClose={() => setActiveModal(null)}
+        title="Success!"
+        description="Your action was completed successfully."
+        variant="default"
+      />
+      
+      <MockPaymentModal 
+        isOpen={activeModal === 'mockPayment'} 
+        onClose={() => setActiveModal(null)}
+        plan={{
+          name: "Pro Plan",
+          price: 19.99,
+          credits: 100
+        }}
+      />
     </div>
   );
 };
