@@ -23,14 +23,38 @@
 }
 
 .rich-text-editor .ql-editor {
-  color: hsl(var(--foreground)) !important;
+  color: #000000 !important;
   line-height: 1.6;
   padding: 1rem;
   min-height: inherit;
+  font-size: 1.125rem; /* Increased from default */
 }
 
 .rich-text-editor .ql-editor * {
-  color: hsl(var(--foreground)) !important;
+  color: #000000 !important;
+}
+
+/* Ensure all text content is black in both light and dark modes */
+.rich-text-editor .ql-editor h1,
+.rich-text-editor .ql-editor h2,
+.rich-text-editor .ql-editor h3,
+.rich-text-editor .ql-editor p,
+.rich-text-editor .ql-editor li,
+.rich-text-editor .ql-editor span,
+.rich-text-editor .ql-editor div {
+  color: #000000 !important;
+}
+
+.dark .rich-text-editor .ql-editor,
+.dark .rich-text-editor .ql-editor *,
+.dark .rich-text-editor .ql-editor h1,
+.dark .rich-text-editor .ql-editor h2,
+.dark .rich-text-editor .ql-editor h3,
+.dark .rich-text-editor .ql-editor p,
+.dark .rich-text-editor .ql-editor li,
+.dark .rich-text-editor .ql-editor span,
+.dark .rich-text-editor .ql-editor div {
+  color: #000000 !important;
 }
 
 .rich-text-editor .ql-editor.ql-blank::before {
@@ -38,12 +62,13 @@
   font-style: italic;
 }
 
-/* Toolbar button styling - All buttons black by default */
+/* Toolbar button styling - All buttons black by default with increased size */
 .rich-text-editor .ql-toolbar button {
   color: #000000 !important;
   transition: color 0.2s ease;
   border-radius: 4px;
-  padding: 4px 6px;
+  padding: 8px 10px; /* Increased padding */
+  font-size: 0.875rem; /* Slightly larger font size */
 }
 
 .rich-text-editor .ql-toolbar button:hover {
@@ -250,13 +275,16 @@
   background: none;
   border: none;
   cursor: pointer;
-  padding: 6px 8px;
+  padding: 8px 12px; /* Increased padding */
   border-radius: 4px;
   color: #000000 !important;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 6px; /* Space between icon and text */
+  font-size: 0.875rem; /* Consistent font size */
+  font-weight: 500;
 }
 
 .rich-text-editor .ql-toolbar .ql-custom-button:hover {

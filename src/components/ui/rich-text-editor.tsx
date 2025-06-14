@@ -4,6 +4,9 @@ import 'react-quill/dist/quill.snow.css';
 import { WandSparkles, RotateCcw, Check, X, AlertCircle, Save, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
+import jsPDF from 'jspdf';
+import { Document, Packer, Paragraph, TextRun } from 'docx';
 
 interface AIContext {
   selectedText: string;
@@ -50,6 +53,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const [content, setContent] = useState(value);
   const [isAIEnabled, setIsAIEnabled] = useState(false);
   const [selectionInfo, setSelectionInfo] = useState<AIContext | null>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const { toast } = useToast();
 
   // Update content when value prop changes
   useEffect(() => {
@@ -91,22 +96,107 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     }
   }, [onSave, content]);
 
-  const handleDownload = useCallback(() => {
-    if (onDownload && content) {
-      onDownload(content, filename);
-    } else if (content) {
-      // Default download functionality - create and download as HTML file
-      const blob = new Blob([content], { type: 'text/html' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `${filename}.html`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+  const handleDownload = useCallback(async (format?: 'pdf' | 'docx' | 'txt' | 'html') => {
+    if (!content) return;
+    
+    setIsDownloading(true);
+    
+    try {
+      // Strip HTML tags for plain text formats
+      const stripHtml = (html: string) => {
+        const tmp = document.createElement('div');
+        tmp.innerHTML = html;
+        return tmp.textContent || tmp.innerText || '';
+      };
+
+      const plainText = stripHtml(content);
+      const baseFilename = filename || 'document';
+
+      if (onDownload && !format) {
+        // Use custom download handler if provided
+        onDownload(content, baseFilename);
+        return;
+      }
+
+      switch (format) {
+        case 'pdf':
+          const pdf = new jsPDF();
+          const splitText = pdf.splitTextToSize(plainText, 180);
+          pdf.text(splitText, 10, 10);
+          pdf.save(`${baseFilename}.pdf`);
+          toast({
+            title: 'Success',
+            description: 'Document downloaded as PDF',
+          });
+          break;
+
+        case 'docx':
+          const doc = new Document({
+            sections: [{
+              properties: {},
+              children: [
+                new Paragraph({
+                  children: [
+                    new TextRun(plainText)
+                  ],
+                }),
+              ],
+            }],
+          });
+          const blob = await Packer.toBlob(doc);
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `${baseFilename}.docx`;
+          link.click();
+          window.URL.revokeObjectURL(url);
+          toast({
+            title: 'Success',
+            description: 'Document downloaded as Word document',
+          });
+          break;
+
+        case 'txt':
+          const textBlob = new Blob([plainText], { type: 'text/plain' });
+          const textUrl = window.URL.createObjectURL(textBlob);
+          const textLink = document.createElement('a');
+          textLink.href = textUrl;
+          textLink.download = `${baseFilename}.txt`;
+          textLink.click();
+          window.URL.revokeObjectURL(textUrl);
+          toast({
+            title: 'Success',
+            description: 'Document downloaded as text file',
+          });
+          break;
+
+        default:
+        case 'html':
+          const htmlBlob = new Blob([content], { type: 'text/html' });
+          const htmlUrl = URL.createObjectURL(htmlBlob);
+          const htmlLink = document.createElement('a');
+          htmlLink.href = htmlUrl;
+          htmlLink.download = `${baseFilename}.html`;
+          document.body.appendChild(htmlLink);
+          htmlLink.click();
+          document.body.removeChild(htmlLink);
+          URL.revokeObjectURL(htmlUrl);
+          toast({
+            title: 'Success',
+            description: 'Document downloaded as HTML file',
+          });
+          break;
+      }
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to download document',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsDownloading(false);
     }
-  }, [onDownload, content, filename]);
+  }, [content, filename, onDownload, toast]);
 
   // Add custom buttons to toolbar after component mounts
   useEffect(() => {
@@ -120,27 +210,95 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       const existingCustomButtons = toolbar.querySelectorAll('.ql-custom-button');
       existingCustomButtons.forEach(button => button.remove());
 
-      // Create save button
+      // Create save button with text
       const saveButton = document.createElement('button');
       saveButton.className = 'ql-custom-button ql-custom-left';
-      saveButton.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>';
-      saveButton.title = 'Save';
+      saveButton.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg><span>Save</span>';
+      saveButton.title = 'Save document';
       saveButton.type = 'button';
       saveButton.addEventListener('click', (e) => {
         e.preventDefault();
         handleSave();
       });
 
-      // Create download button
+      // Create download button with dropdown functionality
+      const downloadContainer = document.createElement('div');
+      downloadContainer.className = 'ql-custom-download-container';
+      downloadContainer.style.cssText = 'position: relative; display: inline-block;';
+      
       const downloadButton = document.createElement('button');
       downloadButton.className = 'ql-custom-button ql-custom-right';
-      downloadButton.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
-      downloadButton.title = 'Download';
+      downloadButton.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span>Download</span>';
+      downloadButton.title = 'Download document';
       downloadButton.type = 'button';
+      
+      // Create dropdown menu
+      const dropdown = document.createElement('div');
+      dropdown.className = 'ql-download-dropdown';
+      dropdown.style.cssText = `
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        display: none;
+        z-index: 1000;
+        min-width: 140px;
+      `;
+      
+      const downloadOptions = [
+        { label: 'PDF', format: 'pdf' },
+        { label: 'Word Document', format: 'docx' },
+        { label: 'Text File', format: 'txt' },
+        { label: 'HTML File', format: 'html' }
+      ];
+      
+      downloadOptions.forEach(option => {
+        const optionElement = document.createElement('button');
+        optionElement.textContent = option.label;
+        optionElement.style.cssText = `
+          display: block;
+          width: 100%;
+          padding: 8px 12px;
+          border: none;
+          background: none;
+          text-align: left;
+          cursor: pointer;
+          color: #000;
+          font-size: 0.875rem;
+        `;
+        optionElement.addEventListener('mouseenter', () => {
+          optionElement.style.backgroundColor = '#f5f5f5';
+        });
+        optionElement.addEventListener('mouseleave', () => {
+          optionElement.style.backgroundColor = 'transparent';
+        });
+        optionElement.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          handleDownload(option.format as any);
+          dropdown.style.display = 'none';
+        });
+        dropdown.appendChild(optionElement);
+      });
+      
       downloadButton.addEventListener('click', (e) => {
         e.preventDefault();
-        handleDownload();
+        e.stopPropagation();
+        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
       });
+      
+      // Close dropdown when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!downloadContainer.contains(e.target as Node)) {
+          dropdown.style.display = 'none';
+        }
+      });
+      
+      downloadContainer.appendChild(downloadButton);
+      downloadContainer.appendChild(dropdown);
 
       // Insert save button at the beginning
       if (toolbar.firstChild) {
@@ -149,8 +307,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         toolbar.appendChild(saveButton);
       }
 
-      // Insert download button at the end
-      toolbar.appendChild(downloadButton);
+      // Insert download container at the end
+      toolbar.appendChild(downloadContainer);
     }, 100); // Small delay to ensure Quill has rendered
 
     return () => clearTimeout(timer);
