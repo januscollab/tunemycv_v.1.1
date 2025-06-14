@@ -73,7 +73,7 @@ const EnhancedSprintBoard: React.FC<EnhancedSprintBoardProps> = ({
 
   return (
     <DndContext onDragEnd={handleDragEnd}>
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {sprints.map((sprint) => {
           const sprintTasks = getTasksBySprintId(sprint.id);
           
