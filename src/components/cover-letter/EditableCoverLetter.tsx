@@ -82,7 +82,7 @@ const EditableCoverLetter = forwardRef<EditableCoverLetterRef, EditableCoverLett
               content: generateFormattedText(htmlToJson(htmlContent)),
               fileName: fileName,
               triggerComponent: React.createElement('button', {
-                className: 'text-foreground hover:text-primary transition-colors px-2 py-1 rounded flex items-center gap-1 text-caption font-normal',
+                className: 'text-black hover:text-orange-500 transition-colors px-2 py-1 rounded flex items-center gap-1 text-caption font-normal',
                  onClick: () => {},
                 style: { 
                   background: 'none', 
@@ -98,7 +98,8 @@ const EditableCoverLetter = forwardRef<EditableCoverLetterRef, EditableCoverLett
                 className: 'h-4 w-4',
                 fill: 'none',
                 stroke: 'currentColor',
-                viewBox: '0 0 24 24'
+                viewBox: '0 0 24 24',
+                xmlns: 'http://www.w3.org/2000/svg'
               }, React.createElement('path', {
                 strokeLinecap: 'round',
                 strokeLinejoin: 'round',

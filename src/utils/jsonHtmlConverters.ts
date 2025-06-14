@@ -24,15 +24,24 @@ export const jsonToHtml = (json: DocumentJson): string => {
         
       case 'paragraph':
         if (section.content) {
-          // Preserve line breaks within paragraphs by converting newlines to <br> tags
-          const contentWithBreaks = section.content
-            .split('\n')
-            .map(line => line.trim())
-            .filter(line => line.length > 0)
-            .join('<br>');
+          // Preserve line breaks and paragraph indentation
+          const contentLines = section.content.split('\n');
+          let processedContent = '';
+          
+          // Handle indented paragraphs by preserving leading spaces as non-breaking spaces
+          const processedLines = contentLines.map(line => {
+            const leadingSpaces = line.match(/^(\s*)/)?.[1] || '';
+            const trimmedLine = line.trim();
+            if (!trimmedLine) return '';
+            
+            // Convert leading spaces to non-breaking spaces for indentation
+            const indentation = '&nbsp;'.repeat(leadingSpaces.length);
+            return indentation + escapeHtml(trimmedLine);
+          }).filter(line => line.length > 0);
+          
+          processedContent = processedLines.join('<br>');
           
           // Apply bold formatting if specified
-          let processedContent = escapeHtml(contentWithBreaks).replace(/&lt;br&gt;/g, '<br>');
           if (section.formatting?.bold) {
             processedContent = `<strong>${processedContent}</strong>`;
           }
@@ -120,13 +129,15 @@ export const htmlToJson = (html: string): DocumentJson => {
         if (innerHTML.trim()) {
           const hasBold = element.querySelector('strong, b') !== null;
           
-          // Preserve HTML structure better - don't strip <br> tags during conversion
+          // Better preserve HTML structure including indentation and line breaks
           let contentWithNewlines = innerHTML
-            .replace(/<strong[^>]*>(.*?)<\/strong>/gi, '$1') // Extract bold content
-            .replace(/<b[^>]*>(.*?)<\/b>/gi, '$1') // Extract bold content
+            .replace(/<strong[^>]*>(.*?)<\/strong>/gi, '$1') // Extract bold content but preserve structure
+            .replace(/<b[^>]*>(.*?)<\/b>/gi, '$1') // Extract bold content but preserve structure
+            .replace(/&nbsp;/g, ' ') // Convert non-breaking spaces back to regular spaces
             .replace(/<(?!br\s*\/?>)[^>]*>/g, '') // Remove HTML tags except <br>
             .replace(/<br\s*\/?>/gi, '\n') // Convert <br> to newlines
-            .trim();
+            .replace(/^\s+|\s+$/g, '') // Trim start/end but preserve internal structure
+            .replace(/\n\s+/g, '\n'); // Clean up excessive whitespace after newlines
           
           if (contentWithNewlines) {
             const paragraphSection: DocumentSection = {

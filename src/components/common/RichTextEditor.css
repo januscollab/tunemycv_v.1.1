@@ -60,15 +60,15 @@
 }
 
 .rich-text-editor .ql-toolbar button {
-  color: hsl(var(--foreground));
+  color: #000000 !important; /* Default text color black */
 }
 
 .rich-text-editor .ql-toolbar button:hover {
-  color: hsl(var(--primary));
+  color: hsl(var(--zapier-orange)) !important; /* Orange hover */
 }
 
 .rich-text-editor .ql-toolbar button.ql-active {
-  color: hsl(var(--primary));
+  color: hsl(var(--zapier-orange)) !important; /* Orange active */
 }
 
 /* Header styling in editor */
