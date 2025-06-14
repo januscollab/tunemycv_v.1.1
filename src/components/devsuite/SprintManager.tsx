@@ -27,6 +27,7 @@ interface Task {
   status: string;
   sprint_id: string;
   order_index: number;
+  archived_at?: string | null;
 }
 
 const SprintManager = () => {
@@ -305,6 +306,40 @@ const SprintManager = () => {
     }
   };
 
+  const handleClearAllTasks = async () => {
+    const allActiveTasks = tasks.filter(task => !task.archived_at);
+    
+    if (allActiveTasks.length === 0) {
+      toast.error('No active tasks to archive');
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Are you sure you want to archive ALL ${allActiveTasks.length} active tasks from all sprints? This action will move all tasks to the archive.`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      const { error } = await supabase
+        .from('tasks')
+        .update({
+          archived_at: new Date().toISOString(),
+          archived_by: user?.id,
+          archive_reason: 'Bulk archive - Clear all tasks operation'
+        })
+        .in('id', allActiveTasks.map(t => t.id));
+
+      if (error) throw error;
+
+      loadData();
+      toast.success(`Successfully archived ${allActiveTasks.length} tasks from all sprints`);
+    } catch (error) {
+      console.error('Error clearing all tasks:', error);
+      toast.error('Failed to archive all tasks');
+    }
+  };
+
   const onDragEnd = async (result: any) => {
     if (!result.destination) return;
 
@@ -375,6 +410,13 @@ const SprintManager = () => {
           >
             Add Sprint
           </Button>
+          <Button 
+            variant="destructive"
+            onClick={handleClearAllTasks}
+            className="menu-text-animation"
+          >
+            Clear All Tasks
+          </Button>
           <Button onClick={() => loadData()} className="menu-text-animation">Refresh</Button>
         </div>
       </div>
@@ -406,7 +448,7 @@ const SprintManager = () => {
       )}
 
       <DragDropContext onDragEnd={onDragEnd}>
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2">
           {sprints
             .filter(sprint => !sprint.is_hidden)
             .map((sprint) => (

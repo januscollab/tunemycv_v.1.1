@@ -7,7 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
-import { Search, Archive, Undo2 } from 'lucide-react';
+import { Search, Archive, Undo2, Eye } from 'lucide-react';
+import TaskDetailModal from './TaskDetailModal';
 
 interface ArchivedTask {
   id: string;
@@ -31,6 +32,8 @@ const ArchivedStoriesTab = () => {
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
   const [sprintFilter, setSprintFilter] = useState<string>('all');
   const [availableSprints, setAvailableSprints] = useState<{id: string, name: string}[]>([]);
+  const [selectedTask, setSelectedTask] = useState<ArchivedTask | null>(null);
+  const [showTaskDetail, setShowTaskDetail] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -120,6 +123,16 @@ const ArchivedStoriesTab = () => {
       console.error('Error deleting task:', error);
       toast.error('Failed to delete task');
     }
+  };
+
+  const handleViewTask = (task: ArchivedTask) => {
+    setSelectedTask(task);
+    setShowTaskDetail(true);
+  };
+
+  const handleCloseTaskDetail = () => {
+    setSelectedTask(null);
+    setShowTaskDetail(false);
   };
 
   // Filter tasks based on search and filters
@@ -260,6 +273,15 @@ const ArchivedStoriesTab = () => {
                     <Button
                       size="sm"
                       variant="outline"
+                      onClick={() => handleViewTask(task)}
+                      className="menu-text-animation"
+                    >
+                      <Eye className="h-4 w-4 mr-1" />
+                      View
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
                       onClick={() => handleRestoreTask(task)}
                       className="menu-text-animation"
                     >
@@ -281,6 +303,14 @@ const ArchivedStoriesTab = () => {
           ))}
         </div>
       )}
+
+      <TaskDetailModal
+        task={selectedTask}
+        isOpen={showTaskDetail}
+        onClose={handleCloseTaskDetail}
+        onRestore={handleRestoreTask}
+        onDelete={handlePermanentDelete}
+      />
     </div>
   );
 };

@@ -71,6 +71,11 @@
   color: hsl(var(--zapier-orange)) !important; /* Orange active */
 }
 
+/* Dark mode toolbar button styling */
+.dark .rich-text-editor .ql-toolbar button {
+  color: #000000 !important; /* Keep black even in dark mode */
+}
+
 /* Header styling in editor */
 .rich-text-editor .ql-editor h1 {
   font-size: 1.875rem;
