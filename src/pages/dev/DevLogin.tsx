@@ -1,20 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { useAdminAuth } from '@/hooks/useAdminAuth';
+import { useDevAuth } from '@/contexts/DevAuthContext';
+import { useDevAdminAuth } from '@/hooks/useDevAdminAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Shield, Code, AlertTriangle } from 'lucide-react';
-import { useSecureAuth } from '@/hooks/useSecureAuth';
 
 const DevLogin: React.FC = () => {
-  const { user } = useAuth();
-  const { isAdmin, loading } = useAdminAuth();
+  const { user, signIn } = useDevAuth();
+  const { isAdmin, loading } = useDevAdminAuth();
   const navigate = useNavigate();
-  const { secureSignIn } = useSecureAuth();
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -70,13 +68,13 @@ const DevLogin: React.FC = () => {
     setAuthLoading(true);
 
     try {
-      const result = await secureSignIn(email, password);
-      if (!result.success) {
-        setError(result.error || 'Login failed');
+      const result = await signIn(email, password);
+      if (result.error) {
+        setError(result.error.message || 'Login failed');
       }
       // Success will be handled by useEffect above
-    } catch (err) {
-      setError('An unexpected error occurred');
+    } catch (err: any) {
+      setError(err.message || 'An unexpected error occurred');
     } finally {
       setAuthLoading(false);
     }

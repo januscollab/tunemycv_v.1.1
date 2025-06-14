@@ -2,7 +2,7 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { AlertTriangle, Shield } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useAdminAuth } from '@/hooks/useAdminAuth';
+import { useDevAdminAuth } from '@/hooks/useDevAdminAuth';
 
 interface DevEnvironmentGuardProps {
   children: React.ReactNode;
@@ -10,7 +10,7 @@ interface DevEnvironmentGuardProps {
 
 const DevEnvironmentGuard: React.FC<DevEnvironmentGuardProps> = ({ children }) => {
   const isDevelopment = import.meta.env.DEV;
-  const { isAdmin, loading } = useAdminAuth();
+  const { isAdmin, loading } = useDevAdminAuth();
   
   // Show loading state while checking admin status
   if (loading) {
@@ -42,23 +42,14 @@ const DevEnvironmentGuard: React.FC<DevEnvironmentGuardProps> = ({ children }) =
         </button>
       </div>
       
-      <Alert className="m-4 border-amber-200 bg-amber-50 text-amber-800">
-        {isDevelopment ? (
-          <>
-            <AlertTriangle className="h-4 w-4" />
-            <AlertDescription>
-              🚧 Development Environment - This area is only accessible in dev mode and will not be deployed.
-            </AlertDescription>
-          </>
-        ) : (
-          <>
-            <Shield className="h-4 w-4" />
-            <AlertDescription>
-              🔐 Admin Access - You have administrative privileges to access these development tools.
-            </AlertDescription>
-          </>
-        )}
-      </Alert>
+      {!isDevelopment && (
+        <Alert className="m-4 border-amber-200 bg-amber-50 text-amber-800">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>
+            🚧 Development Environment - Admin access granted.
+          </AlertDescription>
+        </Alert>
+      )}
       {children}
     </div>
   );
