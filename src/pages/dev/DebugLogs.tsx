@@ -147,18 +147,18 @@ const DebugLogs: React.FC = () => {
                           key={log.id}
                           className={`p-4 rounded-lg border ${
                             log.type === 'user' 
-                              ? 'bg-blue-50 border-blue-200' 
-                              : 'bg-green-50 border-green-200'
+                              ? 'bg-info-50 border-border' 
+                              : 'bg-success-50 border-border'
                           }`}
                         >
                           <div className="flex items-start space-x-3">
                             <div className={`p-2 rounded-full ${
-                              log.type === 'user' ? 'bg-blue-100' : 'bg-green-100'
+                              log.type === 'user' ? 'bg-info-50' : 'bg-success-50'
                             }`}>
                               {log.type === 'user' ? (
-                                <User className="h-4 w-4 text-blue-600" />
+                                <User className="h-4 w-4 text-info" />
                               ) : (
-                                <Bot className="h-4 w-4 text-green-600" />
+                                <Bot className="h-4 w-4 text-success" />
                               )}
                             </div>
                             

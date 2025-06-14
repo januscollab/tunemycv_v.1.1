@@ -61,7 +61,7 @@ const EnhancedSprintBoard: React.FC<EnhancedSprintBoardProps> = ({
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'high': return 'bg-destructive text-destructive-foreground';
-      case 'medium': return 'bg-yellow-500 text-white';
+      case 'medium': return 'bg-warning text-warning-foreground';
       case 'low': return 'bg-muted text-muted-foreground';
       default: return 'bg-muted text-muted-foreground';
     }

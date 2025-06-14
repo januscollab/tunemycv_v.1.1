@@ -46,22 +46,22 @@ const SprintPlan: React.FC = () => {
     {
       id: 'backlog',
       name: 'Backlog (Long Term)',
-      color: 'bg-slate-100'
+      color: 'bg-muted'
     },
     {
       id: 'priority',
       name: 'Priority Sprint', 
-      color: 'bg-red-100'
+      color: 'bg-destructive-50'
     },
     {
       id: 'sprint2',
       name: 'Sprint 2',
-      color: 'bg-blue-100'
+      color: 'bg-info-50'
     },
     {
       id: 'sprint3',
       name: 'Sprint 3',
-      color: 'bg-green-100'
+      color: 'bg-success-50'
     }
   ];
 

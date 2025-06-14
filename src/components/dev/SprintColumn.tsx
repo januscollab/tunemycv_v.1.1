@@ -50,7 +50,7 @@ const SprintColumn: React.FC<SprintColumnProps> = ({
       ref={setNodeRef}
       className={`h-fit transition-colors ${isOver ? 'ring-2 ring-primary' : ''}`}
     >
-      <CardHeader className={`${sprint.color} rounded-t-lg`}>
+      <CardHeader className="bg-muted rounded-t-lg">
         <CardTitle className="flex items-center justify-between text-sm font-semibold">
           {sprint.name}
           <Badge variant="secondary">{tasks.length}</Badge>
