@@ -835,83 +835,80 @@ const AuthenticatedCoverLetter = () => {
                       </div>
                     ) : (
                       <>
-                        <div className="space-y-4">
+                        <div className="space-y-2">
                           {paginatedCoverLetters.map((coverLetter) => (
                             <div
                               key={coverLetter.id}
-                              className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow hover:border-zapier-orange/50 relative"
+                              className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow hover:border-zapier-orange/50"
                             >
-                              <div className="flex justify-between items-start">
-                                <div className="flex-1 pr-4">
-                                  <div className="flex items-center space-x-3 mb-2">
-                                    <h3 className="text-lg font-medium text-gray-900">
-                                      {coverLetter.job_title} at {coverLetter.company_name}
-                                    </h3>
-                                    <button
-                                      onClick={() => {
-                                        setEditingCoverLetter(coverLetter);
-                                        setIsEditDialogOpen(true);
-                                      }}
-                                      className="text-gray-400 hover:text-zapier-orange transition-colors"
-                                      title="Edit title"
-                                    >
-                                      <Edit2 className="h-3 w-3" />
-                                    </button>
-                                    {coverLetter.regeneration_count > 0 && (
-                                      <Badge variant="outline" className="text-xs">
-                                        v{coverLetter.regeneration_count + 1}
-                                      </Badge>
-                                    )}
-                                   </div>
-                                   
-                                   {/* Date/time stamp moved under title */}
-                                   <div className="flex items-center text-sm text-gray-600 mb-3">
-                                     <Clock className="h-4 w-4 mr-1" />
-                                     <span>Updated {formatDate(coverLetter.updated_at)}</span>
-                                   </div>
-                                 </div>
-                               </div>
-                               
-                               {/* Action buttons row at bottom */}
-                              <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-100">
-                                <div className="flex items-center space-x-3">
+                              {/* Header row with title, edit button, version badge, and delete button */}
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center space-x-2 flex-1 min-w-0">
+                                  <h3 className="text-body font-medium text-gray-900 truncate">
+                                    {coverLetter.job_title} at {coverLetter.company_name}
+                                  </h3>
+                                  <button
+                                    onClick={() => {
+                                      setEditingCoverLetter(coverLetter);
+                                      setIsEditDialogOpen(true);
+                                    }}
+                                    className="text-gray-400 hover:text-zapier-orange transition-colors flex-shrink-0"
+                                    title="Edit title"
+                                  >
+                                    <Edit2 className="h-3 w-3" />
+                                  </button>
+                                  {coverLetter.regeneration_count > 0 && (
+                                    <Badge variant="outline" className="text-tiny flex-shrink-0">
+                                      v{coverLetter.regeneration_count + 1}
+                                    </Badge>
+                                  )}
+                                </div>
+                                <button
+                                  onClick={() => handleDelete(coverLetter.id)}
+                                  className="text-red-600 hover:text-zapier-orange transition-colors flex-shrink-0"
+                                  title="Delete cover letter"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </button>
+                              </div>
+                              
+                              {/* Date and actions row */}
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center text-caption text-gray-600">
+                                  <Clock className="h-3 w-3 mr-1" />
+                                  <span>Updated {formatDate(coverLetter.updated_at)}</span>
+                                </div>
+                                
+                                <div className="flex items-center space-x-2">
                                   <button
                                     onClick={() => handleViewCoverLetter(coverLetter)}
-                                    className="flex items-center px-2 py-1 text-xs text-black hover:text-zapier-orange transition-colors"
+                                    className="flex items-center px-2 py-1 text-tiny text-black hover:text-zapier-orange transition-colors"
                                   >
                                     <Eye className="h-3 w-3 mr-1" />
                                     View
                                   </button>
                                   
-                                  {coverLetter.analysis_result_id && (
-                                    <button
-                                      onClick={() => handleViewCVAnalysis(coverLetter.analysis_result_id)}
-                                      className="flex items-center px-2 py-1 text-xs text-green-600 hover:text-green-700 hover:bg-green-50 rounded-md transition-colors"
-                                    >
-                                      <FileText className="h-3 w-3 mr-1" />
-                                      View CV Analysis
-                                    </button>
-                                  )}
-                                  
                                   <DownloadOptions
                                     content={coverLetter.content}
                                     fileName={`Cover_Letter_${coverLetter.company_name}_${coverLetter.job_title}`}
                                     triggerComponent={
-                                      <button className="flex items-center px-2 py-1 text-xs text-black hover:text-zapier-orange hover:bg-zapier-orange/10 rounded-md transition-colors">
+                                      <button className="flex items-center px-2 py-1 text-tiny text-black hover:text-zapier-orange hover:bg-zapier-orange/10 rounded-md transition-colors">
                                         <FileText className="h-3 w-3 mr-1" />
                                         Download
                                       </button>
                                     }
                                   />
+                                  
+                                  {coverLetter.analysis_result_id && (
+                                    <button
+                                      onClick={() => handleViewCVAnalysis(coverLetter.analysis_result_id)}
+                                      className="flex items-center px-2 py-1 text-tiny text-green-600 hover:text-green-700 hover:bg-green-50 rounded-md transition-colors"
+                                    >
+                                      <FileText className="h-3 w-3 mr-1" />
+                                      CV Analysis
+                                    </button>
+                                  )}
                                 </div>
-                                
-                                {/* Delete button in bottom right */}
-                                <button
-                                  onClick={() => handleDelete(coverLetter.id)}
-                                  className="p-1 text-xs text-red-600 hover:text-zapier-orange transition-colors"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </button>
                               </div>
                             </div>
                           ))}
