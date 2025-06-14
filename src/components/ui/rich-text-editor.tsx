@@ -307,8 +307,13 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         toolbar.appendChild(saveButton);
       }
 
-      // Insert download container at the end
-      toolbar.appendChild(downloadContainer);
+      // Insert download container after the save button but before the existing toolbar items
+      const firstFormat = toolbar.querySelector('.ql-formats');
+      if (firstFormat) {
+        toolbar.insertBefore(downloadContainer, firstFormat);
+      } else {
+        toolbar.appendChild(downloadContainer);
+      }
     }, 100); // Small delay to ensure Quill has rendered
 
     return () => clearTimeout(timer);
@@ -333,7 +338,6 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           [{ 'header': [1, 2, 3, false] }],
           ['bold', 'italic'],
           [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-          ['link'],
           ['clean']
         ];
     }
@@ -363,7 +367,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
   const formats = variant === 'minimal' 
     ? ['bold', 'list', 'bullet']
-    : ['header', 'bold', 'italic', 'list', 'bullet', 'ordered', 'link'];
+    : ['header', 'bold', 'italic', 'list', 'bullet', 'ordered'];
 
   // Size classes
   const sizeClasses = {
