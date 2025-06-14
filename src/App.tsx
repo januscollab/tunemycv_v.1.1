@@ -2,7 +2,6 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
-import { DevAuthProvider } from './contexts/DevAuthContext';
 import { ThemeProvider } from './components/theme-provider';
 import { TooltipProvider } from '@/components/ui/tooltip';
 
@@ -23,15 +22,6 @@ import Template from './pages/Template';
 import PricingScale from './pages/PricingScale';
 import DesignSystem from './pages/DesignSystem';
 import DebugTest from './pages/DebugTest';
-import SprintPlan from './pages/dev/SprintPlan';
-import DevLogin from './pages/dev/DevLogin';
-import DebugLogs from './pages/dev/DebugLogs';
-import CodeAnalysis from './pages/dev/CodeAnalysis';
-import AIAssistant from './pages/dev/AIAssistant';
-import WorkflowHub from './pages/dev/WorkflowHub';
-import SprintAnalytics from './pages/dev/SprintAnalytics';
-import DesignSystemAudit from './pages/dev/DesignSystemAudit';
-import ComplianceMonitor from './pages/dev/ComplianceMonitor';
 import Navigation from './components/Navigation';
 import Footer from './components/Footer';
 import EnhancedSecurityHeaders from './components/security/EnhancedSecurityHeaders';
@@ -54,13 +44,12 @@ function ScrollToTop() {
 
 function AppContent() {
   const location = useLocation();
-  const isDevRoute = location.pathname.startsWith('/dev');
 
   return (
     <div className="flex flex-col min-h-screen w-full transition-colors duration-normal">
       <EnhancedSecurityHeaders />
       <ScrollToTop />
-      {!isDevRoute && <Navigation />}
+      <Navigation />
       <main className="flex-grow">
         <Routes>
           <Route path="/" element={<Index />} />
@@ -79,18 +68,9 @@ function AppContent() {
           <Route path="/terms-of-service" element={<TermsOfService />} />
           <Route path="/design-system" element={<DesignSystem />} />
           <Route path="/debug-test" element={<DebugTest />} />
-          <Route path="/dev" element={<DevLogin />} />
-          <Route path="/dev/sprintplan" element={<SprintPlan />} />
-          <Route path="/dev/debug" element={<DebugLogs />} />
-          <Route path="/dev/analysis" element={<CodeAnalysis />} />
-          <Route path="/dev/ai" element={<AIAssistant />} />
-          <Route path="/dev/workflows" element={<WorkflowHub />} />
-          <Route path="/dev/analytics" element={<SprintAnalytics />} />
-          <Route path="/dev/design-system-audit" element={<DesignSystemAudit />} />
-          <Route path="/dev/compliance-monitor" element={<ComplianceMonitor />} />
         </Routes>
       </main>
-      {!isDevRoute && <Footer />}
+      <Footer />
       <FeedbackIntegration />
       <Toaster />
     </div>
@@ -103,11 +83,9 @@ function App() {
       <TooltipProvider delayDuration={300} skipDelayDuration={100}>
         <QueryClientProvider client={queryClient}>
           <AuthProvider>
-            <DevAuthProvider>
-              <Router>
-                <AppContent />
-              </Router>
-            </DevAuthProvider>
+            <Router>
+              <AppContent />
+            </Router>
           </AuthProvider>
         </QueryClientProvider>
       </TooltipProvider>
