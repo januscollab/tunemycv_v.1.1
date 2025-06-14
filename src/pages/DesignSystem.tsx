@@ -29,6 +29,7 @@ import { ProgressIndicator } from '@/components/ui/progress-indicator';
 
 const DesignSystem = () => {
   const [activeModal, setActiveModal] = useState<string | null>(null);
+  const [rteContent, setRteContent] = useState("<h2>Sample Heading</h2><p>This is a paragraph with <strong>bold text</strong> and <em>italic text</em>.</p><ul><li>First item</li><li>Second item</li></ul>");
   const colorTokens = [
     { 
       name: 'Primary', 
@@ -497,8 +498,11 @@ const DesignSystem = () => {
       component: (
         <RichTextEditor
           placeholder="Enter your content here..."
-          value="<h2>Sample Heading</h2><p>This is a paragraph with <strong>bold text</strong> and <em>italic text</em>.</p><ul><li>First item</li><li>Second item</li></ul>"
-          onChange={(value) => console.log('Content changed:', value)}
+          value={rteContent}
+          onChange={(value) => {
+            setRteContent(value);
+            console.log('Content changed:', value);
+          }}
           className="w-full"
           minHeight="200px"
         />
