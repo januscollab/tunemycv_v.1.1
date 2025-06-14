@@ -26,6 +26,8 @@ import SprintPlan from './pages/dev/SprintPlan';
 import DebugLogs from './pages/dev/DebugLogs';
 import CodeAnalysis from './pages/dev/CodeAnalysis';
 import AIAssistant from './pages/dev/AIAssistant';
+import WorkflowHub from './pages/dev/WorkflowHub';
+import SprintAnalytics from './pages/dev/SprintAnalytics';
 import Navigation from './components/Navigation';
 import Footer from './components/Footer';
 import EnhancedSecurityHeaders from './components/security/EnhancedSecurityHeaders';
@@ -74,6 +76,8 @@ function AppContent() {
           <Route path="/dev/debug" element={<DebugLogs />} />
           <Route path="/dev/analysis" element={<CodeAnalysis />} />
           <Route path="/dev/ai" element={<AIAssistant />} />
+          <Route path="/dev/workflows" element={<WorkflowHub />} />
+          <Route path="/dev/analytics" element={<SprintAnalytics />} />
         </Routes>
       </main>
       <Footer />

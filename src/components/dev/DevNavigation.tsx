@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Code, MessageSquare, Trello, Settings, Bug, Zap } from 'lucide-react';
+import { Code, MessageSquare, Trello, Settings, Bug, Zap, Workflow, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const DevNavigation: React.FC = () => {
@@ -30,6 +30,18 @@ const DevNavigation: React.FC = () => {
       href: '/dev/ai',
       icon: Zap,
       description: 'Development AI tools'
+    },
+    {
+      title: 'Workflow Hub',
+      href: '/dev/workflows',
+      icon: Workflow,
+      description: 'Automation & integrations'
+    },
+    {
+      title: 'Sprint Analytics',
+      href: '/dev/analytics',
+      icon: TrendingUp,
+      description: 'Performance metrics'
     }
   ];
 
