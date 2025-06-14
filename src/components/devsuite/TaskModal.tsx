@@ -52,6 +52,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
   const [priority, setPriority] = useState('medium');
   const [tags, setTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState('');
+  const [status, setStatus] = useState('todo');
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
 
@@ -60,11 +61,13 @@ const TaskModal: React.FC<TaskModalProps> = ({
       setTitle(task.title);
       setDescription(task.description || '');
       setPriority(task.priority);
+      setStatus(task.status);
       setTags(task.tags || []);
     } else {
       setTitle('');
       setDescription('');
       setPriority('medium');
+      setStatus('todo');
       setTags([]);
     }
   }, [task, open]);
@@ -131,6 +134,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
         title,
         description: description || null,
         priority,
+        status,
         tags,
         sprint_id: sprint.id,
         user_id: user?.id,
@@ -207,18 +211,33 @@ const TaskModal: React.FC<TaskModalProps> = ({
             />
           </div>
 
-          <div>
-            <Label htmlFor="priority">Priority</Label>
-            <select
-              id="priority"
-              value={priority}
-              onChange={(e) => setPriority(e.target.value)}
-              className="w-full p-2 border border-input rounded-md bg-background"
-            >
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </select>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="priority">Priority</Label>
+              <select
+                id="priority"
+                value={priority}
+                onChange={(e) => setPriority(e.target.value)}
+                className="w-full p-2 border border-input rounded-md bg-background"
+              >
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+              </select>
+            </div>
+            <div>
+              <Label htmlFor="status">Status</Label>
+              <select
+                id="status"
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
+                className="w-full p-2 border border-input rounded-md bg-background"
+              >
+                <option value="todo">To Do</option>
+                <option value="in-progress">In Progress</option>
+                <option value="completed">Completed</option>
+              </select>
+            </div>
           </div>
 
           <div>

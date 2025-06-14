@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import SprintManager from '@/components/devsuite/SprintManager';
 import DevSuiteSettings from '@/components/devsuite/DevSuiteSettings';
 import ExecutionLogs from '@/components/devsuite/ExecutionLogs';
+import SprintAnalytics from '@/components/devsuite/SprintAnalytics';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -44,14 +45,19 @@ const DevSuite = () => {
         </div>
 
         <Tabs defaultValue="sprints" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="sprints">Sprint Manager</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
             <TabsTrigger value="logs">Execution Logs</TabsTrigger>
           </TabsList>
 
           <TabsContent value="sprints">
             <SprintManager />
+          </TabsContent>
+
+          <TabsContent value="analytics">
+            <SprintAnalytics />
           </TabsContent>
 
           <TabsContent value="settings">

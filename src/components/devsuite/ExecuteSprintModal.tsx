@@ -106,10 +106,38 @@ Format your response to help track progress and completion status.`;
 
       if (error) throw error;
 
-      // TODO: Parse AI response and update task statuses
-      // This would analyze the AI response for completion indicators
+      // Parse AI response for task completion indicators
+      const completionKeywords = ['completed', 'finished', 'done', 'implemented', 'delivered'];
+      const taskCompletions: { [key: string]: boolean } = {};
+
+      // Analyze AI response for each task
+      tasks.forEach((task) => {
+        const taskMentioned = aiResponse.toLowerCase().includes(task.title.toLowerCase());
+        const hasCompletionIndicator = completionKeywords.some(keyword => 
+          aiResponse.toLowerCase().includes(`${task.title.toLowerCase()} ${keyword}`) ||
+          aiResponse.toLowerCase().includes(`${keyword} ${task.title.toLowerCase()}`)
+        );
+        
+        if (taskMentioned && hasCompletionIndicator) {
+          taskCompletions[task.id] = true;
+        }
+      });
+
+      // Update task statuses based on AI analysis
+      if (Object.keys(taskCompletions).length > 0) {
+        const updatePromises = Object.keys(taskCompletions).map(taskId =>
+          supabase
+            .from('tasks')
+            .update({ status: 'completed' })
+            .eq('id', taskId)
+        );
+
+        await Promise.all(updatePromises);
+        toast.success(`AI response processed! Updated ${Object.keys(taskCompletions).length} tasks as completed.`);
+      } else {
+        toast.success('AI response processed and logged');
+      }
       
-      toast.success('AI response processed and logged');
       onOpenChange(false);
     } catch (error) {
       console.error('Error processing AI response:', error);

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -37,6 +38,8 @@ const SprintManager = () => {
   const [executeModalOpen, setExecuteModalOpen] = useState(false);
   const [selectedSprint, setSelectedSprint] = useState<Sprint | null>(null);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [newSprintName, setNewSprintName] = useState('');
+  const [addingNewSprint, setAddingNewSprint] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -90,6 +93,122 @@ const SprintManager = () => {
     setExecuteModalOpen(true);
   };
 
+  const handleAddSprint = async () => {
+    if (!newSprintName.trim()) return;
+
+    try {
+      const maxOrder = Math.max(...sprints.map(s => s.order_index), -1);
+      const { error } = await supabase
+        .from('sprints')
+        .insert({
+          name: newSprintName,
+          order_index: maxOrder + 1,
+          user_id: user?.id,
+        });
+
+      if (error) throw error;
+
+      setNewSprintName('');
+      setAddingNewSprint(false);
+      loadData();
+      toast.success('Sprint created successfully');
+    } catch (error) {
+      console.error('Error creating sprint:', error);
+      toast.error('Failed to create sprint');
+    }
+  };
+
+  const handleDeleteSprint = async (sprint: Sprint) => {
+    if (sprint.name === 'Priority') {
+      toast.error('Cannot delete Priority sprint');
+      return;
+    }
+
+    const tasksInSprint = getTasksForSprint(sprint.id);
+    if (tasksInSprint.length > 0) {
+      toast.error('Cannot delete sprint with tasks. Move or delete tasks first.');
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('sprints')
+        .delete()
+        .eq('id', sprint.id);
+
+      if (error) throw error;
+
+      loadData();
+      toast.success('Sprint deleted successfully');
+    } catch (error) {
+      console.error('Error deleting sprint:', error);
+      toast.error('Failed to delete sprint');
+    }
+  };
+
+  const handleDeleteTask = async (task: Task) => {
+    try {
+      const { error } = await supabase
+        .from('tasks')
+        .delete()
+        .eq('id', task.id);
+
+      if (error) throw error;
+
+      loadData();
+      toast.success('Task deleted successfully');
+    } catch (error) {
+      console.error('Error deleting task:', error);
+      toast.error('Failed to delete task');
+    }
+  };
+
+  const handleToggleTaskStatus = async (task: Task) => {
+    const newStatus = task.status === 'completed' ? 'todo' : 'completed';
+    
+    try {
+      const { error } = await supabase
+        .from('tasks')
+        .update({ status: newStatus })
+        .eq('id', task.id);
+
+      if (error) throw error;
+
+      loadData();
+      toast.success(`Task marked as ${newStatus === 'completed' ? 'completed' : 'todo'}`);
+    } catch (error) {
+      console.error('Error updating task status:', error);
+      toast.error('Failed to update task status');
+    }
+  };
+
+  const handleCloseSprint = async (sprint: Sprint) => {
+    try {
+      // Update all tasks in sprint to completed status
+      const { error: tasksError } = await supabase
+        .from('tasks')
+        .update({ status: 'completed' })
+        .eq('sprint_id', sprint.id)
+        .neq('status', 'completed');
+
+      if (tasksError) throw tasksError;
+
+      // Update sprint status to completed
+      const { error: sprintError } = await supabase
+        .from('sprints')
+        .update({ status: 'completed' })
+        .eq('id', sprint.id);
+
+      if (sprintError) throw sprintError;
+
+      loadData();
+      toast.success('Sprint closed successfully');
+    } catch (error) {
+      console.error('Error closing sprint:', error);
+      toast.error('Failed to close sprint');
+    }
+  };
+
   const onDragEnd = async (result: any) => {
     if (!result.destination) return;
 
@@ -135,6 +254,15 @@ const SprintManager = () => {
     }
   };
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'completed': return 'bg-green-500';
+      case 'in-progress': return 'bg-blue-500';
+      case 'todo': return 'bg-gray-500';
+      default: return 'bg-gray-500';
+    }
+  };
+
   if (loading) {
     return <div className="text-center py-8">Loading sprints...</div>;
   }
@@ -143,8 +271,41 @@ const SprintManager = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold">Sprint Manager</h2>
-        <Button onClick={() => loadData()}>Refresh</Button>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            onClick={() => setAddingNewSprint(true)}
+          >
+            Add Sprint
+          </Button>
+          <Button onClick={() => loadData()}>Refresh</Button>
+        </div>
       </div>
+
+      {addingNewSprint && (
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex gap-2">
+              <Input
+                value={newSprintName}
+                onChange={(e) => setNewSprintName(e.target.value)}
+                placeholder="Enter sprint name"
+                onKeyPress={(e) => e.key === 'Enter' && handleAddSprint()}
+              />
+              <Button onClick={handleAddSprint}>Create</Button>
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setAddingNewSprint(false);
+                  setNewSprintName('');
+                }}
+              >
+                Cancel
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <DragDropContext onDragEnd={onDragEnd}>
         <div className="grid gap-6 md:grid-cols-3">
@@ -154,8 +315,13 @@ const SprintManager = () => {
               <Card key={sprint.id} className="h-fit">
                 <CardHeader>
                   <div className="flex justify-between items-center">
-                    <CardTitle className="text-lg">{sprint.name}</CardTitle>
-                    <div className="flex gap-2">
+                    <div className="flex items-center gap-2">
+                      <CardTitle className="text-lg">{sprint.name}</CardTitle>
+                      <Badge variant={sprint.status === 'completed' ? 'default' : 'secondary'}>
+                        {sprint.status}
+                      </Badge>
+                    </div>
+                    <div className="flex gap-1">
                       <Button
                         size="sm"
                         onClick={() => handleAddTask(sprint)}
@@ -169,6 +335,24 @@ const SprintManager = () => {
                       >
                         Execute
                       </Button>
+                      {sprint.status !== 'completed' && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleCloseSprint(sprint)}
+                        >
+                          Close
+                        </Button>
+                      )}
+                      {sprint.name !== 'Priority' && getTasksForSprint(sprint.id).length === 0 && (
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handleDeleteSprint(sprint)}
+                        >
+                          Delete
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </CardHeader>
@@ -191,11 +375,43 @@ const SprintManager = () => {
                                 ref={provided.innerRef}
                                 {...provided.draggableProps}
                                 {...provided.dragHandleProps}
-                                className="p-3 border rounded-lg bg-card cursor-pointer hover:shadow-md transition-shadow"
-                                onClick={() => handleEditTask(task)}
+                                className={`p-3 border rounded-lg bg-card hover:shadow-md transition-shadow ${
+                                  task.status === 'completed' ? 'opacity-70' : ''
+                                }`}
                               >
-                                <div className="font-medium text-sm mb-2">
-                                  {task.title}
+                                <div className="flex items-start justify-between mb-2">
+                                  <div 
+                                    className={`font-medium text-sm cursor-pointer ${
+                                      task.status === 'completed' ? 'line-through' : ''
+                                    }`}
+                                    onClick={() => handleEditTask(task)}
+                                  >
+                                    {task.title}
+                                  </div>
+                                  <div className="flex gap-1">
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleToggleTaskStatus(task);
+                                      }}
+                                      className={`w-4 h-4 rounded border text-xs ${
+                                        task.status === 'completed' 
+                                          ? 'bg-green-500 text-white' 
+                                          : 'border-gray-300 hover:border-green-500'
+                                      }`}
+                                    >
+                                      {task.status === 'completed' ? '✓' : ''}
+                                    </button>
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDeleteTask(task);
+                                      }}
+                                      className="w-4 h-4 text-red-500 hover:text-red-700 text-xs"
+                                    >
+                                      ×
+                                    </button>
+                                  </div>
                                 </div>
                                 {task.description && (
                                   <div className="text-xs text-muted-foreground mb-2">
@@ -203,6 +419,12 @@ const SprintManager = () => {
                                   </div>
                                 )}
                                 <div className="flex items-center gap-2">
+                                  <Badge 
+                                    variant="secondary" 
+                                    className={`text-xs ${getStatusColor(task.status)}`}
+                                  >
+                                    {task.status}
+                                  </Badge>
                                   <Badge 
                                     variant="secondary" 
                                     className={`text-xs ${getPriorityColor(task.priority)}`}
