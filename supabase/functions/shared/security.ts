@@ -157,6 +157,12 @@ export const logSecurityEvent = async (
         userAgent,
         timestamp: new Date().toISOString()
       });
+      
+      // Real-time threat detection - trigger immediate response
+      if (severity === 'critical') {
+        // Could trigger immediate user session termination or account suspension
+        console.error('CRITICAL SECURITY THREAT DETECTED - IMMEDIATE ACTION REQUIRED');
+      }
     }
   } catch (error) {
     console.error('Failed to log security event:', error);
