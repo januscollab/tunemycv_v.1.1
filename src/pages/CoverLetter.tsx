@@ -13,7 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import EditTitleDialog from '@/components/ui/edit-title-dialog';
 import { Label } from '@/components/ui/label';
 import { FloatingLabelInput } from '@/components/common/FloatingLabelInput';
-import { FloatingLabelTextarea } from '@/components/common/FloatingLabelTextarea';
+import { CaptureTextarea } from '@/components/ui/capture-textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -544,18 +544,15 @@ const AuthenticatedCoverLetter = () => {
                         </div>
 
                         <div>
-                          <FloatingLabelTextarea
-                            label="Job Description *"
-                            id="jobDescription"
+                          <CaptureTextarea
+                            label="Job Description"
                             placeholder="Paste the complete job description here for the most tailored results..."
+                            description="Job description is required for optimal cover letter generation"
                             value={formData.jobDescription}
                             onChange={(e) => handleInputChange('jobDescription', e.target.value)}
                             rows={6}
                             className={validationErrors.includes('Job description is required') ? 'border-red-500' : ''}
                           />
-                          <p className="text-sm font-normal text-blueberry/70 dark:text-apple-core/70 mt-1">
-                            Job description is required for optimal cover letter generation
-                          </p>
                         </div>
                       </CardContent>
                     </Card>
