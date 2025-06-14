@@ -16,10 +16,10 @@ const ATSOptimizationSection: React.FC<ATSOptimizationSectionProps> = ({ priorit
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high': return 'bg-red-100 text-red-800 border-red-200';
-      case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'low': return 'bg-blue-100 text-blue-800 border-blue-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'high': return 'bg-destructive-50 text-destructive border-destructive';
+      case 'medium': return 'bg-warning-50 text-warning border-warning';
+      case 'low': return 'bg-info-50 text-info border-info';
+      default: return 'bg-muted text-muted-foreground border-border';
     }
   };
 
@@ -61,22 +61,22 @@ const ATSOptimizationSection: React.FC<ATSOptimizationSectionProps> = ({ priorit
             <p className="text-caption text-blueberry/80 dark:text-apple-core mb-3">{recommendation.description}</p>
             
             <div className="mb-3">
-              <h4 className="text-micro font-medium text-blue-800 dark:text-blue-400 mb-1">Expected Impact:</h4>
-              <p className="text-micro text-blue-700 dark:text-blue-500">{recommendation.impact}</p>
+              <h4 className="text-micro font-medium text-info mb-1">Expected Impact:</h4>
+              <p className="text-micro text-info">{recommendation.impact}</p>
             </div>
             
-            <div className="bg-white/70 dark:bg-gray-800/50 rounded p-3">
-              <h4 className="text-micro font-medium text-green-800 dark:text-green-400 mb-1">Sample Text:</h4>
-              <p className="text-micro text-green-700 dark:text-green-500 italic">"{recommendation.sampleText}"</p>
+            <div className="bg-surface rounded p-3">
+              <h4 className="text-micro font-medium text-success mb-1">Sample Text:</h4>
+              <p className="text-micro text-success italic">"{recommendation.sampleText}"</p>
             </div>
           </div>
         ))}
       </div>
 
       <div className="mt-6 pt-4 border-t border-apple-core/20 dark:border-citrus/20">
-        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
-          <h3 className="font-medium text-blue-800 dark:text-blue-400 mb-2">ATS Optimization Tips</h3>
-          <ul className="text-micro text-blue-700 dark:text-blue-500 space-y-1">
+        <div className="bg-info-50 rounded-lg p-4">
+          <h3 className="font-medium text-info mb-2">ATS Optimization Tips</h3>
+          <ul className="text-micro text-info space-y-1">
             <li>• Use exact keywords from the job description</li>
             <li>• Include both acronyms and full terms (e.g., "AI" and "Artificial Intelligence")</li>
             <li>• Place important keywords in prominent sections like summary and experience</li>
