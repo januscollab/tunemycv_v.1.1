@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { formatFileSize } from '@/utils/fileUtils';
 import { assessDocumentQuality, getQualityColor, getQualityBadge, QualityAssessment } from '@/utils/documentQuality';
-import BounceLoader from '@/components/ui/bounce-loader';
+import { BounceLoader } from '@/components/ui/progress-indicator';
 
 import { DocumentJson } from '@/utils/documentJsonUtils';
 

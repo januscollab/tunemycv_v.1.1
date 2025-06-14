@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import ControlledRichTextEditor from '@/components/common/ControlledRichTextEditor';
 import EnhancedEditorErrorBoundary from '@/components/common/EnhancedEditorErrorBoundary';
-import BounceLoader from '@/components/ui/bounce-loader';
+import { BounceLoader } from '@/components/ui/progress-indicator';
 import { supabase } from '@/integrations/supabase/client';
 import { 
   DocumentJson, 

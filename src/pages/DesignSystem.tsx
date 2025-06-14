@@ -25,7 +25,7 @@ import { WelcomeCreditsModal } from '@/components/ui/welcome-credits-modal';
 import ProcessingModal from '@/components/ui/processing-modal';
 import ToastModal from '@/components/ui/toast-modal';
 import { MockPaymentModal } from '@/components/ui/mock-payment-modal';
-import BounceLoader from '@/components/ui/bounce-loader';
+
 import { StepIndicator } from '@/components/ui/step-indicator';
 import { ProgressIndicator } from '@/components/ui/progress-indicator';
 
@@ -230,23 +230,6 @@ const DesignSystem = () => {
       description: 'Modal for simulating payment flows in demo mode',
       status: 'active',
       trigger: () => setActiveModal('mockPayment')
-    },
-    { 
-      name: 'BounceLoader', 
-      component: (
-        <div className="flex flex-col items-center gap-4">
-          <div className="flex gap-4">
-            <BounceLoader size="sm" className="text-primary" />
-            <BounceLoader size="md" className="text-primary" />
-            <BounceLoader size="lg" className="text-primary" />
-          </div>
-          <div className="text-micro text-muted-foreground">Small, Medium, Large</div>
-        </div>
-      ), 
-      usage: '23 usages',
-      description: 'Animated loading indicator with bouncing dots',
-      status: 'active',
-      trigger: () => {}
     },
     { 
       name: 'StepIndicator', 
