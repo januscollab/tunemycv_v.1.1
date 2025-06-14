@@ -928,6 +928,15 @@ export type Database = {
       }
     }
     Functions: {
+      check_enhanced_rate_limit: {
+        Args: {
+          identifier_key: string
+          endpoint_name: string
+          max_requests?: number
+          window_minutes?: number
+        }
+        Returns: boolean
+      }
       cleanup_adobe_debug_files: {
         Args: Record<PropertyKey, never>
         Returns: undefined
@@ -979,6 +988,16 @@ export type Database = {
           event_details?: Json
           target_user_id?: string
           severity?: string
+        }
+        Returns: undefined
+      }
+      log_security_incident: {
+        Args: {
+          incident_type: string
+          incident_details?: Json
+          target_user_id?: string
+          severity?: string
+          endpoint_name?: string
         }
         Returns: undefined
       }

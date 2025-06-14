@@ -2,11 +2,12 @@ import React, { useRef, useEffect, useState, useCallback, forwardRef, useImperat
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import './RichTextEditor.css';
-import { WandSparkles, RotateCcw, AlertTriangle } from 'lucide-react';
+import { WandSparkles, RotateCcw, AlertTriangle, ShieldAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useJsonFirstEditor } from '@/hooks/useJsonFirstEditor';
 import { DocumentJson } from '@/utils/documentJsonUtils';
+import { validateSecureContent, sanitizeHtmlContent, logSecurityEvent } from '@/utils/enhancedSecurityValidation';
 
 interface AIContext {
   selectedText: string;
@@ -48,6 +49,7 @@ const SafeRichTextEditor = forwardRef<SafeRichTextEditorRef, SafeRichTextEditorP
   const [selectionInfo, setSelectionInfo] = useState<AIContext | null>(null);
   const [editorError, setEditorError] = useState<string | null>(null);
   const [isQuillReady, setIsQuillReady] = useState(false);
+  const [securityWarnings, setSecurityWarnings] = useState<string[]>([]);
 
   // Use the JSON-first editor hook
   const {

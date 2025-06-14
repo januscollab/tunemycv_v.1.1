@@ -101,25 +101,67 @@ export const authenticateUser = async (req: Request) => {
   return { user, supabaseClient }
 }
 
-// Security: Log security events
+// Security: Enhanced rate limiting using database
+export const checkEnhancedRateLimit = async (
+  supabaseClient: any,
+  identifier: string,
+  endpoint: string,
+  maxRequests: number = 60,
+  windowMinutes: number = 1
+): Promise<boolean> => {
+  try {
+    const { data: allowed, error } = await supabaseClient.rpc('check_enhanced_rate_limit', {
+      identifier_key: identifier,
+      endpoint_name: endpoint,
+      max_requests: maxRequests,
+      window_minutes: windowMinutes
+    });
+    
+    if (error) {
+      console.error('Rate limiting check failed:', error);
+      return false; // Fail closed for security
+    }
+    
+    return allowed;
+  } catch (error) {
+    console.error('Rate limiting error:', error);
+    return false; // Fail closed for security
+  }
+};
+
+// Security: Log security events with enhanced incident tracking
 export const logSecurityEvent = async (
   supabaseClient: any,
   eventType: string,
   details: any,
   userId?: string,
-  severity: string = 'info'
+  severity: string = 'info',
+  endpoint?: string,
+  userAgent?: string
 ) => {
   try {
-    await supabaseClient.rpc('log_security_event', {
-      event_type: eventType,
-      event_details: details,
+    await supabaseClient.rpc('log_security_incident', {
+      incident_type: eventType,
+      incident_details: details,
       target_user_id: userId,
-      severity: severity
-    })
+      severity: severity,
+      endpoint_name: endpoint
+    });
+    
+    // For high severity incidents, also trigger immediate alerts
+    if (severity === 'high' || severity === 'critical') {
+      console.error(`SECURITY ALERT [${severity.toUpperCase()}]: ${eventType}`, {
+        details,
+        userId,
+        endpoint,
+        userAgent,
+        timestamp: new Date().toISOString()
+      });
+    }
   } catch (error) {
-    console.error('Failed to log security event:', error)
+    console.error('Failed to log security event:', error);
   }
-}
+};
 
 // Security: Sanitize error responses
 export const getSecureErrorResponse = (error: any, endpoint: string) => {
