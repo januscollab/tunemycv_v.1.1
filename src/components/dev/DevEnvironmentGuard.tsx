@@ -43,7 +43,7 @@ const DevEnvironmentGuard: React.FC<DevEnvironmentGuardProps> = ({ children }) =
       </div>
       
       {!isDevelopment && (
-        <Alert className="m-4 border-amber-200 bg-amber-50 text-amber-800">
+        <Alert className="m-4 border-warning/20 bg-warning-50 text-warning-foreground">
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>
             🚧 Development Environment - Admin access granted.
