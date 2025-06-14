@@ -24,6 +24,8 @@ import DesignSystem from './pages/DesignSystem';
 import DebugTest from './pages/DebugTest';
 import SprintPlan from './pages/dev/SprintPlan';
 import DebugLogs from './pages/dev/DebugLogs';
+import CodeAnalysis from './pages/dev/CodeAnalysis';
+import AIAssistant from './pages/dev/AIAssistant';
 import Navigation from './components/Navigation';
 import Footer from './components/Footer';
 import EnhancedSecurityHeaders from './components/security/EnhancedSecurityHeaders';
@@ -70,6 +72,8 @@ function AppContent() {
           <Route path="/debug-test" element={<DebugTest />} />
           <Route path="/dev/sprintplan" element={<SprintPlan />} />
           <Route path="/dev/debug" element={<DebugLogs />} />
+          <Route path="/dev/analysis" element={<CodeAnalysis />} />
+          <Route path="/dev/ai" element={<AIAssistant />} />
         </Routes>
       </main>
       <Footer />
