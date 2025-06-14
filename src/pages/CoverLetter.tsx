@@ -836,16 +836,61 @@ const AuthenticatedCoverLetter = () => {
                           {paginatedCoverLetters.map((coverLetter) => (
                             <div
                               key={coverLetter.id}
-                              className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow hover:border-zapier-orange/50"
+                              className="relative bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md hover:bg-gray-50/50 transition-all duration-200 hover:border-zapier-orange/50 cursor-pointer"
+                              onClick={() => handleViewCoverLetter(coverLetter)}
                             >
-                              {/* Header row with title, edit button, version badge, and delete button */}
+                              {/* Action buttons at top */}
+                              <div className="flex items-center justify-between mb-3 pb-3 border-b border-gray-100">
+                                <div className="flex items-center space-x-3">
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleViewCoverLetter(coverLetter);
+                                    }}
+                                    className="flex items-center px-3 py-2 text-caption font-medium text-black hover:text-zapier-orange bg-gray-50 hover:bg-zapier-orange/10 rounded-md transition-colors"
+                                  >
+                                    <Eye className="h-4 w-4 mr-2" />
+                                    View
+                                  </button>
+                                  
+                                  <DownloadOptions
+                                    content={coverLetter.content}
+                                    fileName={`Cover_Letter_${coverLetter.company_name}_${coverLetter.job_title}`}
+                                    triggerComponent={
+                                      <button 
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="flex items-center px-3 py-2 text-caption font-medium text-black hover:text-zapier-orange bg-gray-50 hover:bg-zapier-orange/10 rounded-md transition-colors"
+                                      >
+                                        <FileText className="h-4 w-4 mr-2" />
+                                        Download
+                                      </button>
+                                    }
+                                  />
+                                  
+                                  {coverLetter.analysis_result_id && (
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleViewCVAnalysis(coverLetter.analysis_result_id);
+                                      }}
+                                      className="flex items-center px-3 py-2 text-caption font-medium text-green-600 hover:text-green-700 bg-green-50 hover:bg-green-100 rounded-md transition-colors"
+                                    >
+                                      <FileText className="h-4 w-4 mr-2" />
+                                      CV Analysis
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Title and content */}
                               <div className="flex items-center justify-between mb-2">
                                 <div className="flex items-center space-x-2 flex-1 min-w-0">
                                   <h3 className="text-body font-medium text-gray-900 truncate">
                                     {coverLetter.job_title} at {coverLetter.company_name}
                                   </h3>
                                   <button
-                                    onClick={() => {
+                                    onClick={(e) => {
+                                      e.stopPropagation();
                                       setEditingCoverLetter(coverLetter);
                                       setIsEditDialogOpen(true);
                                     }}
@@ -860,53 +905,25 @@ const AuthenticatedCoverLetter = () => {
                                     </Badge>
                                   )}
                                 </div>
-                                <button
-                                  onClick={() => handleDelete(coverLetter.id)}
-                                  className="text-red-600 hover:text-zapier-orange transition-colors flex-shrink-0"
-                                  title="Delete cover letter"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </button>
                               </div>
                               
-                              {/* Date and actions row */}
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center text-caption text-gray-600">
-                                  <Clock className="h-3 w-3 mr-1" />
-                                  <span>Updated {formatDate(coverLetter.updated_at)}</span>
-                                </div>
-                                
-                                <div className="flex items-center space-x-2">
-                                  <button
-                                    onClick={() => handleViewCoverLetter(coverLetter)}
-                                    className="flex items-center px-2 py-1 text-tiny text-black hover:text-zapier-orange transition-colors"
-                                  >
-                                    <Eye className="h-3 w-3 mr-1" />
-                                    View
-                                  </button>
-                                  
-                                  <DownloadOptions
-                                    content={coverLetter.content}
-                                    fileName={`Cover_Letter_${coverLetter.company_name}_${coverLetter.job_title}`}
-                                    triggerComponent={
-                                      <button className="flex items-center px-2 py-1 text-tiny text-black hover:text-zapier-orange hover:bg-zapier-orange/10 rounded-md transition-colors">
-                                        <FileText className="h-3 w-3 mr-1" />
-                                        Download
-                                      </button>
-                                    }
-                                  />
-                                  
-                                  {coverLetter.analysis_result_id && (
-                                    <button
-                                      onClick={() => handleViewCVAnalysis(coverLetter.analysis_result_id)}
-                                      className="flex items-center px-2 py-1 text-tiny text-green-600 hover:text-green-700 hover:bg-green-50 rounded-md transition-colors"
-                                    >
-                                      <FileText className="h-3 w-3 mr-1" />
-                                      CV Analysis
-                                    </button>
-                                  )}
-                                </div>
+                              {/* Date */}
+                              <div className="flex items-center text-caption text-gray-600">
+                                <Clock className="h-3 w-3 mr-1" />
+                                <span>Updated {formatDate(coverLetter.updated_at)}</span>
                               </div>
+
+                              {/* Delete button - bottom right */}
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDelete(coverLetter.id);
+                                }}
+                                className="absolute bottom-4 right-4 text-red-600 hover:text-red-700 hover:bg-red-50 p-1 rounded transition-colors"
+                                title="Delete cover letter"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
                             </div>
                           ))}
                         </div>
