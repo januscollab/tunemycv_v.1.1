@@ -23,6 +23,7 @@ import { MockPaymentModal } from '@/components/ui/mock-payment-modal';
 
 import { StepIndicator } from '@/components/ui/step-indicator';
 import { ProgressIndicator } from '@/components/ui/progress-indicator';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const DesignSystem = () => {
   const [activeModal, setActiveModal] = useState<string | null>(null);
@@ -117,6 +118,31 @@ const DesignSystem = () => {
       description: 'Multi-line input for longer content with consistent label behavior and auto-resize.',
       status: 'current',
       migration: 'Auto-resize, clear placeholder text, helpful descriptions. Used for analysis inputs and uploads.'
+    },
+    { 
+      name: 'Select Component', 
+      component: (
+        <div className="space-y-4">
+          <div>
+            <label className="text-body font-medium text-foreground mb-2 block">Data Privacy Level</label>
+            <Select>
+              <SelectTrigger className="w-full border-2 border-primary rounded-md">
+                <SelectValue placeholder="Standard - Standard analytics and improvement" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="standard">Standard - Standard analytics and improvement</SelectItem>
+                <SelectItem value="enhanced">Enhanced - Enhanced features and personalization</SelectItem>
+                <SelectItem value="minimal">Minimal - Essential functionality only</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-caption text-muted-foreground mt-1">Controls how your data is used to improve our services</p>
+          </div>
+        </div>
+      ), 
+      usage: '15 usages',
+      description: 'Custom styled dropdown component with highlighted border and descriptive text. Features prominent labeling and help text.',
+      status: 'current',
+      migration: 'Standard Radix UI select with custom border styling. Used for configuration options and data selection.'
     },
   ];
 
