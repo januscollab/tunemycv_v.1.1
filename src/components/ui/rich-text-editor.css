@@ -228,7 +228,7 @@
 .rich-text-editor .ql-toolbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   flex-wrap: wrap;
   gap: 8px;
 }
@@ -238,12 +238,10 @@
 }
 
 .rich-text-editor .ql-toolbar .ql-custom-left {
-  order: -1;
   margin-right: 8px;
 }
 
 .rich-text-editor .ql-toolbar .ql-custom-right {
-  order: 999;
   margin-left: auto;
 }
 

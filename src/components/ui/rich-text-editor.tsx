@@ -300,9 +300,10 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       downloadContainer.appendChild(downloadButton);
       downloadContainer.appendChild(dropdown);
 
-      // Insert save button at the beginning
-      if (toolbar.firstChild) {
-        toolbar.insertBefore(saveButton, toolbar.firstChild);
+      // Insert save button after existing toolbar items (left-aligned flow)
+      const lastFormat = toolbar.querySelector('.ql-formats:last-of-type');
+      if (lastFormat) {
+        toolbar.insertBefore(saveButton, lastFormat.nextSibling);
       } else {
         toolbar.appendChild(saveButton);
       }
