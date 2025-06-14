@@ -35,7 +35,6 @@ import CreditsPanel from '@/components/analyze/CreditsPanel';
 import AnalysisSelector from '@/components/cover-letter/AnalysisSelector';
 import AdvancedGenerationOptions from '@/components/cover-letter/AdvancedGenerationOptions';
 import DownloadOptions from '@/components/cover-letter/DownloadOptions';
-import EditableCoverLetter from '@/components/cover-letter/EditableCoverLetter';
 import NoAnalysisModal from '@/components/cover-letter/NoAnalysisModal';
 import CoverLetterLoggedOut from '@/components/cover-letter/CoverLetterLoggedOut';
 import { ProgressIndicator } from '@/components/ui/progress-indicator';
@@ -115,8 +114,7 @@ const AuthenticatedCoverLetter = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingCoverLetter, setEditingCoverLetter] = useState<any>(null);
   
-  // Ref for the editable cover letter to trigger manual saves
-  const editableCoverLetterRef = useRef<{ forceSave: () => Promise<void> }>(null);
+  // Note: editableCoverLetterRef removed since RTE is no longer used in View Letter tab
   
   // Save state management to prevent duplicate saves
   const [isSaving, setIsSaving] = useState(false);
@@ -286,17 +284,7 @@ const AuthenticatedCoverLetter = () => {
     }
   };
 
-  const handleUpdateCoverLetter = async (newContent: string) => {
-    if (selectedCoverLetter) {
-      try {
-        await updateCoverLetter(selectedCoverLetter.id, newContent);
-        setSelectedCoverLetter(prev => ({ ...prev, content: newContent }));
-        loadCoverLetterHistory();
-      } catch (error) {
-        console.error('Update failed:', error);
-      }
-    }
-  };
+  // Note: handleUpdateCoverLetter removed since View Letter tab is now read-only
 
   const handleRegenerate = async (coverLetterId: string, tone: string, length: string) => {
     try {
@@ -362,66 +350,12 @@ const AuthenticatedCoverLetter = () => {
     setActiveTab('result');
   };
 
-  const handleTabChange = async (newTab: string) => {
-    // If leaving the "result" tab and there's a selected cover letter, trigger save
-    if (activeTab === 'result' && selectedCoverLetter && newTab !== 'result' && !isSaving) {
-      console.log('[CoverLetter] Leaving result tab - triggering save for cover letter:', selectedCoverLetter.id);
-      setIsSaving(true);
-      try {
-        await editableCoverLetterRef.current?.forceSave();
-        console.log('[CoverLetter] Force save completed successfully');
-      } catch (error) {
-        console.error('[CoverLetter] Error during force save:', error);
-        toast({
-          title: 'Save Error',
-          description: 'Failed to save your changes. Please try again.',
-          variant: 'destructive'
-        });
-      } finally {
-        setIsSaving(false);
-      }
-    }
-    
+  const handleTabChange = (newTab: string) => {
+    // Note: Save logic removed since View Letter tab no longer uses RTE
     setActiveTab(newTab);
   };
 
-  // Enhanced window focus and blur handlers for additional save triggers
-  useEffect(() => {
-    const handleWindowBlur = async () => {
-      if (activeTab === 'result' && selectedCoverLetter && !isSaving) {
-        console.log('[CoverLetter] Window blur detected - auto-saving');
-        try {
-          await editableCoverLetterRef.current?.forceSave();
-        } catch (error) {
-          console.error('[CoverLetter] Error during window blur save:', error);
-        }
-      }
-    };
-
-    const handleBeforeUnload = async (e: BeforeUnloadEvent) => {
-      if (activeTab === 'result' && selectedCoverLetter && !isSaving) {
-        // Note: We can't use async operations in beforeunload, but we can trigger sync save
-        console.log('[CoverLetter] Page unload detected - attempting sync save');
-        try {
-          await editableCoverLetterRef.current?.forceSave();
-        } catch (error) {
-          console.error('[CoverLetter] Error during beforeunload save:', error);
-          // Show warning if save failed
-          e.preventDefault();
-          e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
-          return e.returnValue;
-        }
-      }
-    };
-
-    window.addEventListener('blur', handleWindowBlur);
-    window.addEventListener('beforeunload', handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener('blur', handleWindowBlur);
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-  }, [activeTab, selectedCoverLetter, isSaving]);
+  // Note: Window blur/unload handlers removed since View Letter tab no longer uses RTE
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5 py-6">
@@ -752,11 +686,38 @@ const AuthenticatedCoverLetter = () => {
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-4 pt-0">
-                      <EditableCoverLetter
-                        ref={editableCoverLetterRef}
-                        content={selectedCoverLetter.content}
-                        onSave={handleUpdateCoverLetter}
-                      />
+                      {/* Cover Letter Content Display */}
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-lg font-semibold">Cover Letter Content</h3>
+                          <DownloadOptions 
+                            content={selectedCoverLetter.content}
+                            fileName={`${selectedCoverLetter.company_name}_${selectedCoverLetter.job_title}_Cover_Letter`}
+                          />
+                        </div>
+                        <div 
+                          className="bg-background border border-border rounded-lg p-6 prose prose-sm max-w-none dark:prose-invert"
+                          dangerouslySetInnerHTML={{ 
+                            __html: (() => {
+                              try {
+                                // Try to parse as JSON first
+                                const jsonData = JSON.parse(selectedCoverLetter.content);
+                                // Convert JSON to formatted HTML display
+                                return jsonData.sections?.map((section: any) => {
+                                  let html = section.content || '';
+                                  if (section.formatting?.bold) {
+                                    html = `<strong>${html}</strong>`;
+                                  }
+                                  return `<p>${html}</p>`;
+                                }).join('') || selectedCoverLetter.content;
+                              } catch {
+                                // Fallback to plain text with line breaks
+                                return selectedCoverLetter.content.replace(/\n/g, '<br>');
+                              }
+                            })()
+                          }}
+                        />
+                      </div>
                       
                       <div className="flex items-start justify-between pt-4 border-t">
                         <div className="flex items-center space-x-4">
