@@ -70,20 +70,20 @@ const Testimonials = () => {
           {testimonials.map((testimonial, index) => (
             <div 
               key={index} 
-              className={`bg-white dark:bg-blueberry/20 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow border border-apple-core/20 dark:border-citrus/20 ${
+              className={`bg-surface dark:bg-blueberry/20 rounded-xl shadow-lg p-space-1.5 hover:shadow-xl transition-shadow border border-apple-core/20 dark:border-citrus/20 ${
                 index >= 3 ? 'hidden md:block' : ''
               } ${index >= 3 ? 'lg:block' : ''}`}
             >
-              <div className="flex items-center mb-4">
-                <Quote className="h-8 w-8 text-citrus dark:text-black mr-3" />
+              <div className="flex items-center mb-space-1">
+                <Quote className="h-8 w-8 text-citrus dark:text-foreground mr-3" />
                 <div className="flex space-x-1">
                   {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-citrus text-citrus dark:fill-black dark:text-black" />
+                    <Star key={i} className="h-4 w-4 fill-citrus text-citrus dark:fill-foreground dark:text-foreground" />
                   ))}
                 </div>
               </div>
               
-              <p className="text-blueberry/80 dark:text-foreground mb-6 leading-relaxed">
+              <p className="text-blueberry/80 dark:text-foreground mb-space-1.5 leading-relaxed">
                 "{testimonial.content}"
               </p>
               
@@ -94,8 +94,8 @@ const Testimonials = () => {
                   className="w-12 h-12 rounded-full mr-4 border-2 border-apple-core/30 dark:border-citrus/30"
                 />
                 <div>
-                  <h4 className="font-semibold text-blueberry dark:text-black">{testimonial.name}</h4>
-                  <p className="text-caption text-blueberry/70 dark:text-black/80">{testimonial.role}</p>
+                  <h4 className="font-semibold text-blueberry dark:text-foreground">{testimonial.name}</h4>
+                  <p className="text-caption text-blueberry/70 dark:text-foreground/80">{testimonial.role}</p>
                   <p className="text-caption text-apricot font-medium">{testimonial.company}</p>
                 </div>
               </div>

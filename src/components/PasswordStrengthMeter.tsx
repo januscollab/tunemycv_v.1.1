@@ -72,7 +72,7 @@ const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({ password 
             <div className="space-y-1">
               {validation.errors.map((error, index) => (
                 <p key={index} className="text-micro text-destructive flex items-center">
-                  <span className="w-1 h-1 bg-destructive rounded-full mr-2"></span>
+                  <span className="w-1 h-1 bg-destructive rounded-full mr-space-0.5"></span>
                   {error}
                 </p>
               ))}
@@ -81,7 +81,7 @@ const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({ password 
           
           {validation.isValid && (
             <p className="text-micro text-success flex items-center">
-              <span className="w-1 h-1 bg-success rounded-full mr-2"></span>
+              <span className="w-1 h-1 bg-success rounded-full mr-space-0.5"></span>
               Password meets all requirements
             </p>
           )}
