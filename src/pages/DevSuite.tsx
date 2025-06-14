@@ -5,6 +5,7 @@ import SprintManager from '@/components/devsuite/SprintManager';
 import DevSuiteSettings from '@/components/devsuite/DevSuiteSettings';
 import ExecutionLogs from '@/components/devsuite/ExecutionLogs';
 import SprintAnalytics from '@/components/devsuite/SprintAnalytics';
+import ArchivedStoriesTab from '@/components/devsuite/ArchivedStoriesTab';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -45,8 +46,9 @@ const DevSuite = () => {
         </div>
 
         <Tabs defaultValue="sprints" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="sprints">Sprint Manager</TabsTrigger>
+            <TabsTrigger value="archived">Archived Stories</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
             <TabsTrigger value="logs">Execution Logs</TabsTrigger>
@@ -54,6 +56,10 @@ const DevSuite = () => {
 
           <TabsContent value="sprints">
             <SprintManager />
+          </TabsContent>
+
+          <TabsContent value="archived">
+            <ArchivedStoriesTab />
           </TabsContent>
 
           <TabsContent value="analytics">

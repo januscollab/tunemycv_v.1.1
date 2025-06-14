@@ -64,6 +64,7 @@ const SprintManager = () => {
       const { data: tasksData, error: tasksError } = await supabase
         .from('tasks')
         .select('*')
+        .is('archived_at', null)
         .order('order_index');
 
       if (tasksError) throw tasksError;
@@ -251,6 +252,34 @@ const SprintManager = () => {
     }
   };
 
+  const handleArchiveCompletedTasks = async (sprint: Sprint) => {
+    const completedTasks = getTasksForSprint(sprint.id).filter(task => task.status === 'completed');
+    
+    if (completedTasks.length === 0) {
+      toast.error('No completed tasks to archive');
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('tasks')
+        .update({
+          archived_at: new Date().toISOString(),
+          archived_by: user?.id,
+          archive_reason: `Sprint completion archival from ${sprint.name}`
+        })
+        .in('id', completedTasks.map(t => t.id));
+
+      if (error) throw error;
+
+      loadData();
+      toast.success(`Archived ${completedTasks.length} completed tasks`);
+    } catch (error) {
+      console.error('Error archiving tasks:', error);
+      toast.error('Failed to archive completed tasks');
+    }
+  };
+
   const onDragEnd = async (result: any) => {
     if (!result.destination) return;
 
@@ -389,6 +418,16 @@ const SprintManager = () => {
                           className="menu-text-animation"
                         >
                           Close
+                        </Button>
+                      )}
+                      {sprint.name === 'Priority Sprint' && getTasksForSprint(sprint.id).some(task => task.status === 'completed') && (
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => handleArchiveCompletedTasks(sprint)}
+                          className="menu-text-animation"
+                        >
+                          Archive Completed
                         </Button>
                       )}
                       {sprint.name !== 'Priority Sprint' && getTasksForSprint(sprint.id).length === 0 && (
