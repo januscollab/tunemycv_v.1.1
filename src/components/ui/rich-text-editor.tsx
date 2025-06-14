@@ -307,13 +307,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         toolbar.appendChild(saveButton);
       }
 
-      // Insert download container after the save button but before the existing toolbar items
-      const firstFormat = toolbar.querySelector('.ql-formats');
-      if (firstFormat) {
-        toolbar.insertBefore(downloadContainer, firstFormat);
-      } else {
-        toolbar.appendChild(downloadContainer);
-      }
+      // Insert download container at the end (right-aligned)
+      toolbar.appendChild(downloadContainer);
     }, 100); // Small delay to ensure Quill has rendered
 
     return () => clearTimeout(timer);
