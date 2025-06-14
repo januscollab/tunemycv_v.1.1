@@ -23,22 +23,22 @@ const ToastModal: React.FC<ToastModalProps> = ({
   const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
-    if (isOpen && autoCloseDelay > 0) {
+    if (isOpen && autoCloseDelay > 0 && !isHovered) {
       const timer = setTimeout(() => {
         onClose();
       }, autoCloseDelay);
 
       return () => clearTimeout(timer);
     }
-  }, [isOpen, autoCloseDelay, onClose]);
+  }, [isOpen, autoCloseDelay, onClose, isHovered]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
         className={`max-w-md ${
           variant === 'destructive' 
-            ? 'bg-destructive text-destructive-foreground border-destructive' 
-            : ''
+            ? 'bg-red-600 text-white border-red-600' 
+            : 'bg-background text-foreground border-border'
         }`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -47,14 +47,14 @@ const ToastModal: React.FC<ToastModalProps> = ({
           <div className="flex-1">
             {title && (
               <DialogTitle className={`text-lg font-semibold mb-2 ${
-                variant === 'destructive' ? 'text-destructive-foreground' : 'text-foreground'
+                variant === 'destructive' ? 'text-white' : 'text-foreground'
               }`}>
                 {title}
               </DialogTitle>
             )}
             {description && (
               <p className={`text-sm ${
-                variant === 'destructive' ? 'text-destructive-foreground/90' : 'text-muted-foreground'
+                variant === 'destructive' ? 'text-white/90' : 'text-muted-foreground'
               }`}>
                 {description}
               </p>
@@ -68,8 +68,8 @@ const ToastModal: React.FC<ToastModalProps> = ({
               isHovered ? 'opacity-100' : 'opacity-0'
             } ${
               variant === 'destructive' 
-                ? 'hover:bg-destructive-foreground/20 text-destructive-foreground' 
-                : ''
+                ? 'hover:bg-white/20 text-white hover:text-white' 
+                : 'hover:bg-muted text-foreground hover:text-foreground'
             }`}
           >
             <X className="h-4 w-4" />

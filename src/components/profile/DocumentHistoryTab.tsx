@@ -287,7 +287,149 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
         <>
           <div className="space-y-4">
             {paginatedDocuments.map((document) => (
-              <div key={`${document.type}-${document.id}`} className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow hover:border-zapier-orange/50 relative">
+              <div 
+                key={`${document.type}-${document.id}`} 
+                className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-all duration-200 hover:border-zapier-orange/50 hover:bg-gray-50/50 relative cursor-pointer"
+                onClick={() => {
+                  if (document.type === 'cover_letter') {
+                    navigate('/cover-letter', {
+                      state: {
+                        coverLetterId: document.id,
+                        viewMode: false, // Edit mode
+                        activeTab: 'Current Result'
+                      }
+                    });
+                  } else {
+                    handleView(document);
+                  }
+                }}
+              >
+                {/* Action buttons row at top */}
+                <div className="flex items-center justify-between mb-3 pb-2 border-b border-gray-100">
+                  <div className="flex items-center space-x-4">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleView(document);
+                      }}
+                      className="flex items-center px-3 py-2 text-caption font-medium text-black hover:text-zapier-orange transition-colors bg-gray-50 hover:bg-zapier-orange/10 rounded-md"
+                    >
+                      <Eye className="h-4 w-4 mr-2" />
+                      View
+                    </button>
+                    
+                    {/* Show additional action buttons for CV Analysis items */}
+                    {document.type === 'analysis' && (
+                      <>
+                         <button
+                           onClick={(e) => {
+                             e.stopPropagation();
+                             navigate('/cover-letter', {
+                               state: {
+                                 analysisId: document.id,
+                                 activeTab: 'generate'
+                               }
+                             });
+                           }}
+                           className={`flex items-center px-3 py-2 text-caption font-medium rounded-md transition-colors ${
+                             document.has_cover_letter
+                               ? 'text-green-600 hover:text-green-700 hover:bg-green-50'
+                               : 'text-black hover:text-zapier-orange hover:bg-zapier-orange/10 bg-gray-50'
+                           }`}
+                         >
+                           <FileText className="h-4 w-4 mr-2" />
+                           {document.has_cover_letter ? 'View Cover Letter' : 'Generate Cover Letter'}
+                         </button>
+                        
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate('/interview-prep', {
+                              state: {
+                                analysisId: document.id,
+                                jobTitle: document.job_title,
+                                companyName: document.company_name
+                              }
+                            });
+                          }}
+                          className="flex items-center px-3 py-2 text-caption font-medium text-black hover:text-zapier-orange hover:bg-zapier-orange/10 bg-gray-50 rounded-md transition-colors"
+                        >
+                          <MessageSquare className="h-4 w-4 mr-2" />
+                          Create Interview Prep
+                        </button>
+                      </>
+                    )}
+                    
+                    {document.type === 'cover_letter' && document.analysis_result_id && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // Fallback navigation to CV Analysis History tab
+                          navigate('/analyze?tab=history');
+                        }}
+                        className="flex items-center px-3 py-2 text-caption font-medium text-green-600 hover:text-green-700 hover:bg-green-50 bg-gray-50 rounded-md transition-colors"
+                      >
+                        <FileText className="h-4 w-4 mr-2" />
+                        View CV Analysis
+                      </button>
+                    )}
+                    
+                    <DownloadOptions
+                      content={document.type === 'analysis' 
+                        ? `CV ANALYSIS REPORT
+==================
+
+Job Title: ${document.job_title || 'Untitled Position'}
+Company: ${document.company_name || 'Company not specified'}
+Compatibility Score: ${document.compatibility_score}%
+Date: ${new Date(document.created_at).toLocaleDateString()}
+
+EXECUTIVE SUMMARY
+================
+${document.executive_summary || 'No executive summary available'}
+
+STRENGTHS
+=========
+${document.strengths?.map((strength, index) => `${index + 1}. ${strength}`).join('\n') || 'No strengths listed'}
+
+AREAS FOR IMPROVEMENT
+====================
+${document.weaknesses?.map((weakness, index) => `${index + 1}. ${weakness}`).join('\n') || 'No weaknesses listed'}
+
+RECOMMENDATIONS
+===============
+${document.recommendations?.map((rec, index) => `${index + 1}. ${rec}`).join('\n') || 'No recommendations available'}
+
+---
+Generated by TuneMyCV - Your AI-Powered Career Assistant`
+                        : document.content || ''
+                      }
+                      fileName={document.type === 'analysis' 
+                        ? `CV_Analysis_${document.job_title || 'Untitled'}_${document.company_name || 'Company'}`
+                        : `Cover_Letter_${document.job_title || 'Untitled'}_${document.company_name || 'Company'}`
+                      }
+                      triggerComponent={
+                        <button className="flex items-center px-3 py-2 text-caption font-medium text-black hover:text-zapier-orange transition-colors bg-gray-50 hover:bg-zapier-orange/10 rounded-md">
+                          <Download className="h-4 w-4 mr-2" />
+                          Download
+                        </button>
+                      }
+                    />
+                  </div>
+                  
+                  {/* Delete button - bottom right */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(document.id, document.type);
+                    }}
+                    className="absolute bottom-4 right-4 p-2 text-gray-400 hover:text-red-500 transition-colors hover:bg-red-50 rounded-md"
+                    title="Delete document"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+
                 <div className="flex justify-between items-start">
                   <div className="flex-1 pr-4">
                     <div className="flex items-center space-x-3 mb-2">
@@ -347,130 +489,6 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
                       </span>
                     )}
                   </div>
-                </div>
-                
-                {/* Action buttons row at bottom */}
-                <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-100">
-                  <div className="flex items-center space-x-3">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleView(document);
-                      }}
-                      className="flex items-center px-2 py-1 text-micro text-black hover:text-zapier-orange transition-colors"
-                    >
-                      <Eye className="h-3 w-3 mr-1" />
-                      View
-                    </button>
-                    
-                    {/* Show additional action buttons for CV Analysis items */}
-                    {document.type === 'analysis' && (
-                      <>
-                         <button
-                           onClick={(e) => {
-                             e.stopPropagation();
-                             navigate('/cover-letter', {
-                               state: {
-                                 analysisId: document.id,
-                                 activeTab: 'generate'
-                               }
-                             });
-                           }}
-                           className={`flex items-center px-2 py-1 text-micro rounded-md transition-colors ${
-                             document.has_cover_letter
-                               ? 'text-green-600 hover:text-green-700 hover:bg-green-50'
-                               : 'text-black hover:text-zapier-orange hover:bg-zapier-orange/10'
-                           }`}
-                         >
-                           <FileText className="h-3 w-3 mr-1" />
-                           {document.has_cover_letter ? 'View Cover Letter' : 'Generate Cover Letter'}
-                         </button>
-                        
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate('/interview-prep', {
-                              state: {
-                                analysisId: document.id,
-                                jobTitle: document.job_title,
-                                companyName: document.company_name
-                              }
-                            });
-                          }}
-                          className="flex items-center px-2 py-1 text-micro text-black hover:text-zapier-orange hover:bg-zapier-orange/10 rounded-md transition-colors"
-                        >
-                          <MessageSquare className="h-3 w-3 mr-1" />
-                          Create Interview Prep
-                        </button>
-                      </>
-                    )}
-                    
-                    {document.type === 'cover_letter' && document.analysis_result_id && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          // Fallback navigation to CV Analysis History tab
-                          navigate('/analyze?tab=history');
-                        }}
-                        className="flex items-center px-2 py-1 text-micro text-green-600 hover:text-green-700 hover:bg-green-50 rounded-md transition-colors"
-                      >
-                        <FileText className="h-3 w-3 mr-1" />
-                        View CV Analysis
-                      </button>
-                    )}
-                    
-                     <DownloadOptions
-                        content={document.type === 'analysis' 
-                          ? `CV ANALYSIS REPORT
-==================
-
-Job Title: ${document.job_title || 'Untitled Position'}
-Company: ${document.company_name || 'Company not specified'}
-Compatibility Score: ${document.compatibility_score}%
-Date: ${new Date(document.created_at).toLocaleDateString()}
-
-EXECUTIVE SUMMARY
-================
-${document.executive_summary || 'No executive summary available'}
-
-STRENGTHS
-=========
-${document.strengths?.map((strength, index) => `${index + 1}. ${strength}`).join('\n') || 'No strengths listed'}
-
-AREAS FOR IMPROVEMENT
-====================
-${document.weaknesses?.map((weakness, index) => `${index + 1}. ${weakness}`).join('\n') || 'No weaknesses listed'}
-
-RECOMMENDATIONS
-===============
-${document.recommendations?.map((rec, index) => `${index + 1}. ${rec}`).join('\n') || 'No recommendations available'}
-
----
-Generated by TuneMyCV - Your AI-Powered Career Assistant`
-                          : document.content || ''
-                        }
-                        fileName={document.type === 'analysis' 
-                          ? `CV_Analysis_${document.job_title || 'Untitled'}_${document.company_name || 'Company'}`
-                          : `Cover_Letter_${document.job_title || 'Untitled'}_${document.company_name || 'Company'}`
-                        }
-                        triggerComponent={
-                          <button className="flex items-center px-2 py-1 text-micro text-foreground hover:text-primary hover:bg-primary/10 rounded-md transition-colors">
-                            <Download className="h-3 w-3 mr-1" />
-                            Download
-                          </button>
-                        }
-                      />
-                  </div>
-                  
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDelete(document.id, document.type);
-                    }}
-                    className="p-1 text-micro text-red-600 hover:text-zapier-orange transition-colors"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
                 </div>
               </div>
             ))}
