@@ -468,11 +468,43 @@ async function extractTextWithAdobe(
         }
       }
 
-      // Step 3: Apply text formatting (post-processing)
+      // Step 3: Apply comprehensive JSON formatting and create structured document
       let formattingResult;
       try {
         formattingResult = await formatExtractedText(extractedText, fileName);
         console.log(`Text formatting completed - Applied: ${formattingResult.formattingApplied}, Well-structured: ${formattingResult.isWellStructured}`);
+        
+        // Step 4: Save structured JSON to uploads table as master (if user is authenticated)
+        if (userId) {
+          console.log('Saving structured JSON as master to database...');
+          try {
+            const supabase = createClient(
+              Deno.env.get('SUPABASE_URL') ?? '',
+              Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+            );
+            
+            // Update the uploads table with the structured JSON as master
+            const { error: updateError } = await supabase
+              .from('uploads')
+              .update({
+                document_content_json: formattingResult.documentJson,
+                extracted_text: formattingResult.formattedText,
+                processing_status: 'completed'
+              })
+              .eq('user_id', userId)
+              .eq('file_name', fileName)
+              .order('created_at', { ascending: false })
+              .limit(1);
+            
+            if (updateError) {
+              console.error('Failed to update uploads with JSON:', updateError);
+            } else {
+              console.log('Successfully saved structured JSON as master to database');
+            }
+          } catch (dbError) {
+            console.error('Database update error:', dbError);
+          }
+        }
       } catch (error) {
         console.log('Non-critical: Text formatting failed:', error.message);
         // Create fallback result

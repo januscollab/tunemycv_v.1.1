@@ -3,7 +3,7 @@ import { DocumentJson, textToJson, generateFormattedText } from '@/utils/documen
 import { jsonToHtml, htmlToJson } from '@/utils/jsonHtmlConverters';
 
 interface UseJsonFirstEditorOptions {
-  initialContent: string | DocumentJson;
+  initialContent: string | DocumentJson | { document_content_json?: DocumentJson };
   onContentChange?: (json: DocumentJson, text: string) => void;
   enableAutoSave?: boolean;
 }
@@ -26,21 +26,43 @@ export const useJsonFirstEditor = ({
   enableAutoSave = true
 }: UseJsonFirstEditorOptions): UseJsonFirstEditorReturn => {
   
-  // Initialize JSON as source of truth
+  // Initialize JSON as source of truth - prioritize structured JSON over plain text
   const [documentJson, setDocumentJson] = useState<DocumentJson>(() => {
-    if (typeof initialContent === 'object' && initialContent?.sections) {
+    console.log('[useJsonFirstEditor] Initializing with content type:', typeof initialContent);
+    
+    // Priority 1: Use structured DocumentJson if provided
+    if (typeof initialContent === 'object' && 'sections' in initialContent && initialContent.sections) {
+      console.log('[useJsonFirstEditor] Using provided DocumentJson with', initialContent.sections.length, 'sections');
       return initialContent as DocumentJson;
     }
+    
+    // Priority 2: Parse from document_content_json if available (from database)
+    if (typeof initialContent === 'object' && 'document_content_json' in initialContent && initialContent.document_content_json) {
+      console.log('[useJsonFirstEditor] Found document_content_json, using as master');
+      return initialContent.document_content_json as DocumentJson;
+    }
+    
+    // Priority 3: Convert plain text to structured JSON
     const content = (initialContent as string)?.trim() || '';
+    console.log('[useJsonFirstEditor] Converting plain text to JSON, length:', content.length);
     return textToJson(content);
   });
   
-  // Generate HTML from JSON
+  // Generate HTML from JSON (JSON is always master)
   const [htmlContent, setHtmlContent] = useState<string>(() => {
-    const json = typeof initialContent === 'object' && initialContent?.sections 
-      ? initialContent as DocumentJson 
-      : textToJson((initialContent as string)?.trim() || '');
+    let json: DocumentJson;
+    
+    // Same prioritization for HTML generation
+    if (typeof initialContent === 'object' && 'sections' in initialContent && initialContent.sections) {
+      json = initialContent as DocumentJson;
+    } else if (typeof initialContent === 'object' && 'document_content_json' in initialContent && initialContent.document_content_json) {
+      json = initialContent.document_content_json as DocumentJson;
+    } else {
+      json = textToJson((initialContent as string)?.trim() || '');
+    }
+    
     const html = jsonToHtml(json);
+    console.log('[useJsonFirstEditor] Generated HTML from JSON, length:', html?.length || 0);
     return html || '<p><br></p>';
   });
   

@@ -36,6 +36,13 @@ export const useFileStorage = () => {
       const base64Content = btoa(String.fromCharCode(...new Uint8Array(fileContent)));
       
       const { supabase } = await import('@/integrations/supabase/client');
+      console.log('[useFileStorage] Storing file with structured JSON as master:', {
+        fileName: file.name,
+        hasExtractedText: !!options.extractedText,
+        hasDocumentJson: !!options.prettyJsonString,
+        jsonSize: options.prettyJsonString ? (options.prettyJsonString.length / 1024).toFixed(1) + 'KB' : 'N/A'
+      });
+      
       const { data, error } = await supabase.functions.invoke('save-primary-upload', {
         body: {
           fileContent: base64Content,
@@ -44,7 +51,7 @@ export const useFileStorage = () => {
           uploadType: options.uploadType,
           userId: user.id,
           extractedText: options.extractedText,
-          documentJson: options.prettyJsonString
+          documentJson: options.prettyJsonString // This will be parsed and stored as document_content_json (master)
         }
       });
 
