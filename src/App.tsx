@@ -50,11 +50,14 @@ function ScrollToTop() {
 }
 
 function AppContent() {
+  const location = useLocation();
+  const isDevRoute = location.pathname.startsWith('/dev');
+
   return (
     <div className="flex flex-col min-h-screen w-full transition-colors duration-normal">
       <EnhancedSecurityHeaders />
       <ScrollToTop />
-      <Navigation />
+      {!isDevRoute && <Navigation />}
       <main className="flex-grow">
         <Routes>
           <Route path="/" element={<Index />} />
@@ -82,7 +85,7 @@ function AppContent() {
           <Route path="/dev/analytics" element={<SprintAnalytics />} />
         </Routes>
       </main>
-      <Footer />
+      {!isDevRoute && <Footer />}
       <FeedbackIntegration />
       <Toaster />
     </div>

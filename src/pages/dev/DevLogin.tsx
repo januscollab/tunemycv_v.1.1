@@ -83,69 +83,77 @@ const DevLogin: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-            <Shield className="h-6 w-6 text-primary" />
-          </div>
-          <CardTitle className="flex items-center justify-center space-x-2">
-            <Code className="h-5 w-5" />
-            <span>Dev Suite Access</span>
-          </CardTitle>
-          <p className="text-muted-foreground text-sm">
-            Admin credentials required
-          </p>
-        </CardHeader>
-        
-        <CardContent>
-          <form onSubmit={onSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@tunemycv.com"
-                required
-              />
+    <div className="min-h-screen bg-background">
+      {/* Simple header with logo */}
+      <div className="p-4">
+        <Button 
+          variant="ghost" 
+          className="text-lg font-semibold"
+          onClick={() => navigate('/')}
+        >
+          <img src="/favicon.ico" alt="TuneMyCV" className="h-6 w-6 mr-2" />
+          TuneMyCV
+        </Button>
+      </div>
+      
+      <div className="flex items-center justify-center p-4 mt-16">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+              <Shield className="h-6 w-6 text-primary" />
             </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-
-            {error && (
-              <Alert variant="destructive">
-                <AlertTriangle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-            
-            <Button 
-              type="submit" 
-              className="w-full" 
-              disabled={authLoading}
-            >
-              {authLoading ? 'Signing in...' : 'Access Dev Suite'}
-            </Button>
-          </form>
+            <CardTitle className="flex items-center justify-center space-x-2">
+              <Code className="h-5 w-5" />
+              <span>Dev Suite Access</span>
+            </CardTitle>
+            <p className="text-muted-foreground text-sm">
+              Admin credentials required
+            </p>
+          </CardHeader>
           
-          <div className="mt-6 pt-6 border-t text-center">
-            <Button variant="ghost" size="sm" onClick={() => navigate('/')}>
-              ← Back to Main App
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+          <CardContent>
+            <form onSubmit={onSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="admin@tunemycv.com"
+                  required
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+
+              {error && (
+                <Alert variant="destructive">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+              
+              <Button 
+                type="submit" 
+                className="w-full" 
+                disabled={authLoading}
+              >
+                {authLoading ? 'Signing in...' : 'Access Dev Suite'}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

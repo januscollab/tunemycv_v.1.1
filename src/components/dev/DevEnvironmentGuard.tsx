@@ -31,6 +31,17 @@ const DevEnvironmentGuard: React.FC<DevEnvironmentGuardProps> = ({ children }) =
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Simple header with logo */}
+      <div className="p-4 border-b border-border">
+        <button 
+          onClick={() => window.location.href = '/'}
+          className="flex items-center space-x-2 text-lg font-semibold hover:text-primary transition-colors"
+        >
+          <img src="/favicon.ico" alt="TuneMyCV" className="h-6 w-6" />
+          <span>TuneMyCV</span>
+        </button>
+      </div>
+      
       <Alert className="m-4 border-amber-200 bg-amber-50 text-amber-800">
         {isDevelopment ? (
           <>
