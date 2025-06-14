@@ -264,6 +264,7 @@
 
 .rich-text-editor .ql-toolbar .ql-custom-right {
   margin-left: auto;
+  margin-right: 0;
 }
 
 .rich-text-editor .ql-toolbar .ql-custom-button {
