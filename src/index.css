@@ -285,4 +285,22 @@
   .dark ::-webkit-scrollbar-thumb:hover {
     @apply bg-border-secondary;
   }
+
+  /* Menu Text Animation */
+  .menu-text-animation {
+    @apply relative inline-block transition-all duration-300 ease-out;
+  }
+
+  .menu-text-animation::after {
+    content: '';
+    @apply absolute w-full h-0.5 bottom-0 left-0 bg-primary scale-x-0 origin-bottom-right transition-transform duration-300 ease-out;
+  }
+
+  .menu-text-animation:hover::after {
+    @apply scale-x-100 origin-bottom-left;
+  }
+
+  .menu-text-animation:hover {
+    @apply text-primary transform translate-y-[-1px];
+  }
 }

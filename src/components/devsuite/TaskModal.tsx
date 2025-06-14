@@ -7,7 +7,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { CaptureInput } from '@/components/ui/capture-input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
@@ -181,8 +181,8 @@ const TaskModal: React.FC<TaskModalProps> = ({
         <div className="space-y-4">
           <div>
             <Label htmlFor="title">Title *</Label>
-            <Input
-              id="title"
+            <CaptureInput
+              label=""
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Enter task title"
@@ -198,6 +198,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
                 variant="outline"
                 onClick={handleGenerateStory}
                 disabled={generating || !title}
+                className="menu-text-animation"
               >
                 {generating ? 'Generating...' : 'Generate Story'}
               </Button>
@@ -243,13 +244,14 @@ const TaskModal: React.FC<TaskModalProps> = ({
           <div>
             <Label>Tags</Label>
             <div className="flex gap-2 mb-2">
-              <Input
+              <CaptureInput
+                label=""
                 value={newTag}
                 onChange={(e) => setNewTag(e.target.value)}
                 placeholder="Add tag"
                 onKeyPress={(e) => e.key === 'Enter' && handleAddTag()}
               />
-              <Button type="button" onClick={handleAddTag}>Add</Button>
+              <Button type="button" onClick={handleAddTag} className="menu-text-animation">Add</Button>
             </div>
             <div className="flex flex-wrap gap-2">
               {tags.map((tag, index) => (
@@ -266,10 +268,10 @@ const TaskModal: React.FC<TaskModalProps> = ({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" onClick={() => onOpenChange(false)} className="menu-text-animation">
             Cancel
           </Button>
-          <Button onClick={handleSave} disabled={loading || !title}>
+          <Button onClick={handleSave} disabled={loading || !title} className="menu-text-animation">
             {loading ? 'Saving...' : 'Save Task'}
           </Button>
         </DialogFooter>

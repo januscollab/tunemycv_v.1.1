@@ -94,16 +94,16 @@ const DevSuiteSettings = () => {
       const { error } = await supabase
         .from('sprints')
         .update({ is_hidden: !enabled })
-        .eq('name', 'Priority')
+        .eq('name', 'Priority Sprint')
         .eq('user_id', user?.id);
 
       if (error) throw error;
 
       setSettings(prev => ({ ...prev, show_priority_sprint: enabled }));
-      toast.success(enabled ? 'Priority sprint shown' : 'Priority sprint hidden');
+      toast.success(enabled ? 'Priority Sprint shown' : 'Priority Sprint hidden');
     } catch (error) {
       console.error('Error toggling priority sprint:', error);
-      toast.error('Failed to update priority sprint visibility');
+      toast.error('Failed to update Priority Sprint visibility');
     }
   };
 
@@ -186,7 +186,7 @@ const DevSuiteSettings = () => {
       <Button 
         onClick={handleSaveSettings} 
         disabled={saveLoading}
-        className="w-full"
+        className="w-full menu-text-animation"
       >
         {saveLoading ? 'Saving...' : 'Save Settings'}
       </Button>

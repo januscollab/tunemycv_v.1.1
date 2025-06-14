@@ -173,11 +173,11 @@ Format your response to help track progress and completion status.`;
               />
             </div>
             <div className="flex gap-2">
-              <Button onClick={handleCopyPrompt} variant="outline">
+              <Button onClick={handleCopyPrompt} variant="outline" className="menu-text-animation">
                 <Copy className="h-4 w-4 mr-2" />
                 Copy Prompt
               </Button>
-              <Button onClick={handleSendToLovable}>
+              <Button onClick={handleSendToLovable} className="menu-text-animation">
                 <Send className="h-4 w-4 mr-2" />
                 Send to Lovable
               </Button>
@@ -198,6 +198,7 @@ Format your response to help track progress and completion status.`;
             <Button 
               onClick={handleProcessAIResponse} 
               disabled={loading || !aiResponse}
+              className="menu-text-animation"
             >
               {loading ? 'Processing...' : 'Process Response & Update Tasks'}
             </Button>
@@ -205,7 +206,7 @@ Format your response to help track progress and completion status.`;
         </Tabs>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" onClick={() => onOpenChange(false)} className="menu-text-animation">
             Close
           </Button>
         </DialogFooter>

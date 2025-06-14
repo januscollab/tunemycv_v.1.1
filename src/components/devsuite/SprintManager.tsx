@@ -49,6 +49,9 @@ const SprintManager = () => {
 
   const loadData = async () => {
     try {
+      // First ensure default sprints exist
+      await ensureDefaultSprintsExist();
+
       // Load sprints
       const { data: sprintsData, error: sprintsError } = await supabase
         .from('sprints')
@@ -72,6 +75,45 @@ const SprintManager = () => {
       toast.error('Failed to load sprint data');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const ensureDefaultSprintsExist = async () => {
+    if (!user?.id) return;
+
+    try {
+      // Check if user has any sprints
+      const { data: existingSprints, error: checkError } = await supabase
+        .from('sprints')
+        .select('name')
+        .eq('user_id', user.id);
+
+      if (checkError) throw checkError;
+
+      const defaultSprints = ['Priority Sprint', 'Sprint 2', 'Backlog'];
+      const existingSprintNames = existingSprints?.map(s => s.name) || [];
+      
+      // Create missing default sprints
+      const sprintsToCreate = defaultSprints
+        .filter(name => !existingSprintNames.includes(name))
+        .map((name, index) => ({
+          name,
+          order_index: existingSprints ? existingSprints.length + index : index,
+          user_id: user.id,
+          status: 'active',
+          is_hidden: false
+        }));
+
+      if (sprintsToCreate.length > 0) {
+        const { error: insertError } = await supabase
+          .from('sprints')
+          .insert(sprintsToCreate);
+
+        if (insertError) throw insertError;
+      }
+    } catch (error) {
+      console.error('Error ensuring default sprints:', error);
+      // Don't throw here to prevent blocking the main load
     }
   };
 
@@ -119,8 +161,8 @@ const SprintManager = () => {
   };
 
   const handleDeleteSprint = async (sprint: Sprint) => {
-    if (sprint.name === 'Priority') {
-      toast.error('Cannot delete Priority sprint');
+    if (sprint.name === 'Priority Sprint') {
+      toast.error('Cannot delete Priority Sprint');
       return;
     }
 
@@ -275,10 +317,11 @@ const SprintManager = () => {
           <Button 
             variant="outline" 
             onClick={() => setAddingNewSprint(true)}
+            className="menu-text-animation"
           >
             Add Sprint
           </Button>
-          <Button onClick={() => loadData()}>Refresh</Button>
+          <Button onClick={() => loadData()} className="menu-text-animation">Refresh</Button>
         </div>
       </div>
 
@@ -292,13 +335,14 @@ const SprintManager = () => {
                 placeholder="Enter sprint name"
                 onKeyPress={(e) => e.key === 'Enter' && handleAddSprint()}
               />
-              <Button onClick={handleAddSprint}>Create</Button>
+              <Button onClick={handleAddSprint} className="menu-text-animation">Create</Button>
               <Button 
                 variant="outline" 
                 onClick={() => {
                   setAddingNewSprint(false);
                   setNewSprintName('');
                 }}
+                className="menu-text-animation"
               >
                 Cancel
               </Button>
@@ -325,6 +369,7 @@ const SprintManager = () => {
                       <Button
                         size="sm"
                         onClick={() => handleAddTask(sprint)}
+                        className="menu-text-animation"
                       >
                         Add Task
                       </Button>
@@ -332,6 +377,7 @@ const SprintManager = () => {
                         size="sm"
                         variant="outline"
                         onClick={() => handleExecuteSprint(sprint)}
+                        className="menu-text-animation"
                       >
                         Execute
                       </Button>
@@ -340,15 +386,17 @@ const SprintManager = () => {
                           size="sm"
                           variant="outline"
                           onClick={() => handleCloseSprint(sprint)}
+                          className="menu-text-animation"
                         >
                           Close
                         </Button>
                       )}
-                      {sprint.name !== 'Priority' && getTasksForSprint(sprint.id).length === 0 && (
+                      {sprint.name !== 'Priority Sprint' && getTasksForSprint(sprint.id).length === 0 && (
                         <Button
                           size="sm"
                           variant="destructive"
                           onClick={() => handleDeleteSprint(sprint)}
+                          className="menu-text-animation"
                         >
                           Delete
                         </Button>
