@@ -23,7 +23,7 @@ interface RichTextEditorProps {
   placeholder?: string;
   readOnly?: boolean;
   showAIFeatures?: boolean;
-  variant?: 'default' | 'minimal' | 'compact';
+  variant?: 'default';
   size?: 'sm' | 'md' | 'lg';
   state?: 'default' | 'error' | 'success';
   disabled?: boolean;
@@ -201,7 +201,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   // Add custom buttons to toolbar after component mounts
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (variant === 'minimal' || readOnly || disabled) return;
+      if (readOnly || disabled) return;
 
       const toolbar = document.querySelector('.rich-text-editor .ql-toolbar');
       if (!toolbar) return;
@@ -319,28 +319,14 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     return () => clearTimeout(timer);
   }, [handleSave, handleDownload, variant, readOnly, disabled, content]);
 
-  // Toolbar configurations based on variant
+  // Toolbar configuration
   const getToolbarConfig = () => {
-    switch (variant) {
-      case 'minimal':
-        return [
-          ['bold'],
-          [{ 'list': 'bullet' }]
-        ];
-      case 'compact':
-        return [
-          [{ 'header': [2, 3, false] }],
-          ['bold'],
-          [{ 'list': 'bullet' }]
-        ];
-      default:
-        return [
-          [{ 'header': [1, 2, 3, false] }],
-          ['bold', 'italic'],
-          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-          ['clean']
-        ];
-    }
+    return [
+      [{ 'header': [1, 2, 3, false] }],
+      ['bold', 'italic'],
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      ['clean']
+    ];
   };
 
   // AI improvement handlers
@@ -365,9 +351,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     }
   };
 
-  const formats = variant === 'minimal' 
-    ? ['bold', 'list', 'bullet']
-    : ['header', 'bold', 'italic', 'list', 'bullet', 'ordered'];
+  const formats = ['header', 'bold', 'italic', 'list', 'bullet', 'ordered'];
 
   // Size classes
   const sizeClasses = {
@@ -442,11 +426,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           placeholder={placeholder}
           modules={modules}
           formats={formats}
-          className={cn(
-            'rich-text-editor',
-            variant === 'minimal' && 'rich-text-editor-minimal',
-            variant === 'compact' && 'rich-text-editor-compact'
-          )}
+          className="rich-text-editor"
         />
       </div>
 

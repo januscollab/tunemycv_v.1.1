@@ -520,37 +520,6 @@ const DesignSystem = () => {
       description: 'Full-featured rich text editor with save and download functionality'
     },
     {
-      name: 'Minimal Editor',
-      component: (
-        <RichTextEditor
-          variant="minimal"
-          placeholder="Simple text editing..."
-          value="<p>Minimal editor with basic <strong>bold</strong> formatting and bullet lists.</p>"
-          onChange={(value) => console.log('Minimal changed:', value)}
-          className="w-full"
-          minHeight="150px"
-        />
-      ),
-      usage: '23 usages',
-      description: 'Simplified editor with basic formatting options'
-    },
-    {
-      name: 'Compact Editor',
-      component: (
-        <RichTextEditor
-          variant="compact"
-          size="sm"
-          placeholder="Compact editing experience..."
-          value="<h3>Compact Header</h3><p>Smaller editor for inline editing scenarios.</p>"
-          onChange={(value) => console.log('Compact changed:', value)}
-          className="w-full"
-          minHeight="120px"
-        />
-      ),
-      usage: '34 usages',
-      description: 'Space-efficient editor for smaller content areas'
-    },
-    {
       name: 'With AI Features',
       component: (
         <RichTextEditor
@@ -938,10 +907,10 @@ const DesignSystem = () => {
                       <h4 className="text-body font-semibold">Usage Patterns</h4>
                       <ul className="text-caption space-y-1 text-muted-foreground">
                         <li>• Use <code>default</code> variant for main content editing</li>
-                        <li>• Use <code>minimal</code> for simple text inputs</li>
-                        <li>• Use <code>compact</code> for space-constrained areas</li>
                         <li>• Enable AI features for advanced editing workflows</li>
                         <li>• Use read-only mode for content display</li>
+                        <li>• All menu items are left-aligned with adequate spacing</li>
+                        <li>• Save and download functionality included by default</li>
                       </ul>
                     </div>
                     <div className="space-y-3">
