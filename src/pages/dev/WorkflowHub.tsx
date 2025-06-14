@@ -209,20 +209,20 @@ const WorkflowHub: React.FC = () => {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'running': return <Clock className="h-4 w-4 text-blue-500 animate-pulse" />;
-      case 'success': return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case 'error': return <AlertCircle className="h-4 w-4 text-red-500" />;
+      case 'running': return <Clock className="h-4 w-4 text-info animate-pulse" />;
+      case 'success': return <CheckCircle className="h-4 w-4 text-success" />;
+      case 'error': return <AlertCircle className="h-4 w-4 text-destructive" />;
       default: return <Pause className="h-4 w-4 text-muted-foreground" />;
     }
   };
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'code_review': return 'bg-blue-100 text-blue-800';
-      case 'testing': return 'bg-green-100 text-green-800';
-      case 'deployment': return 'bg-purple-100 text-purple-800';
-      case 'monitoring': return 'bg-orange-100 text-orange-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'code_review': return 'bg-info-50 text-info-foreground';
+      case 'testing': return 'bg-success-50 text-success-foreground';
+      case 'deployment': return 'bg-primary-50 text-primary-foreground';
+      case 'monitoring': return 'bg-warning-50 text-warning-foreground';
+      default: return 'bg-muted text-muted-foreground';
     }
   };
 

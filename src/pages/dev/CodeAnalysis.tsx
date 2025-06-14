@@ -149,9 +149,9 @@ const CodeAnalysis: React.FC = () => {
   };
 
   const getQualityColor = (score: number) => {
-    if (score >= 80) return 'text-green-600';
-    if (score >= 60) return 'text-yellow-600';
-    return 'text-red-600';
+    if (score >= 80) return 'text-success';
+    if (score >= 60) return 'text-warning';
+    return 'text-destructive';
   };
 
   const getComplexityBadge = (complexity: number) => {
@@ -230,7 +230,7 @@ const CodeAnalysis: React.FC = () => {
                   <AlertTriangle className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-yellow-600">
+                  <div className="text-2xl font-bold text-warning">
                     {qualityMetrics.codeSmells}
                   </div>
                   <p className="text-xs text-muted-foreground">Issues detected</p>
@@ -243,7 +243,7 @@ const CodeAnalysis: React.FC = () => {
                   <Clock className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-red-600">
+                  <div className="text-2xl font-bold text-destructive">
                     {qualityMetrics.technicalDebt}h
                   </div>
                   <p className="text-xs text-muted-foreground">Estimated hours</p>
@@ -256,7 +256,7 @@ const CodeAnalysis: React.FC = () => {
                   <TrendingUp className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-yellow-600">
+                  <div className="text-2xl font-bold text-warning">
                     {qualityMetrics.duplicatedLines}%
                   </div>
                   <p className="text-xs text-muted-foreground">Of total codebase</p>
@@ -269,7 +269,7 @@ const CodeAnalysis: React.FC = () => {
                   <Code className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-green-600">
+                  <div className="text-2xl font-bold text-success">
                     {qualityMetrics.cycomplexity}
                   </div>
                   <p className="text-xs text-muted-foreground">Cyclomatic complexity</p>
@@ -307,7 +307,7 @@ const CodeAnalysis: React.FC = () => {
                         {file.issues.length > 0 && (
                           <div className="space-y-1">
                             {file.issues.map((issue, i) => (
-                              <div key={i} className="flex items-center space-x-2 text-xs text-yellow-600">
+                              <div key={i} className="flex items-center space-x-2 text-xs text-warning">
                                 <AlertTriangle className="h-3 w-3" />
                                 <span>{issue}</span>
                               </div>
@@ -375,11 +375,11 @@ const CodeAnalysis: React.FC = () => {
                       <div key={index} className="space-y-2">
                         <h4 className="font-medium text-sm">{file.path}</h4>
                         {file.issues.map((issue, i) => (
-                          <div key={i} className="flex items-start space-x-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                            <AlertTriangle className="h-4 w-4 text-yellow-600 mt-0.5" />
+                          <div key={i} className="flex items-start space-x-3 p-3 bg-warning-50 border border-border rounded-lg">
+                            <AlertTriangle className="h-4 w-4 text-warning mt-0.5" />
                             <div className="flex-1">
-                              <p className="text-sm text-yellow-800">{issue}</p>
-                              <p className="text-xs text-yellow-600 mt-1">
+                              <p className="text-sm text-warning-foreground">{issue}</p>
+                              <p className="text-xs text-muted-foreground mt-1">
                                 Consider refactoring to improve maintainability
                               </p>
                             </div>

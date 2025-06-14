@@ -232,11 +232,11 @@ const AIAssistant: React.FC = () => {
 
   const getCategoryColor = (category: string) => {
     switch (category) {
-      case 'improvement': return 'bg-blue-100 text-blue-800';
-      case 'bug_fix': return 'bg-red-100 text-red-800';
-      case 'refactor': return 'bg-yellow-100 text-yellow-800';
-      case 'new_feature': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'improvement': return 'bg-info-50 text-info-foreground';
+      case 'bug_fix': return 'bg-destructive-50 text-destructive-foreground';
+      case 'refactor': return 'bg-warning-50 text-warning-foreground';
+      case 'new_feature': return 'bg-success-50 text-success-foreground';
+      default: return 'bg-muted text-muted-foreground';
     }
   };
 
@@ -269,7 +269,7 @@ const AIAssistant: React.FC = () => {
             <Card className="h-[600px] flex flex-col">
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <Sparkles className="h-5 w-5 mr-2 text-purple-500" />
+                  <Sparkles className="h-5 w-5 mr-2 text-primary" />
                   AI Chat
                 </CardTitle>
               </CardHeader>
@@ -296,18 +296,18 @@ const AIAssistant: React.FC = () => {
                           message.type === 'user' ? 'flex-row-reverse space-x-reverse' : ''
                         }`}>
                           <div className={`p-2 rounded-full ${
-                            message.type === 'user' ? 'bg-blue-100' : 'bg-green-100'
+                            message.type === 'user' ? 'bg-info-50' : 'bg-success-50'
                           }`}>
                             {message.type === 'user' ? (
-                              <User className="h-4 w-4 text-blue-600" />
+                              <User className="h-4 w-4 text-info" />
                             ) : (
-                              <Bot className="h-4 w-4 text-green-600" />
+                              <Bot className="h-4 w-4 text-success" />
                             )}
                           </div>
                           
                           <div className={`p-3 rounded-lg ${
                             message.type === 'user' 
-                              ? 'bg-blue-600 text-white' 
+                              ? 'bg-primary text-primary-foreground' 
                               : 'bg-muted'
                           }`}>
                             <p className="text-sm">{message.content}</p>
@@ -341,8 +341,8 @@ const AIAssistant: React.FC = () => {
                     
                     {isLoading && (
                       <div className="flex space-x-3">
-                        <div className="p-2 rounded-full bg-green-100">
-                          <Bot className="h-4 w-4 text-green-600" />
+                        <div className="p-2 rounded-full bg-success-50">
+                          <Bot className="h-4 w-4 text-success" />
                         </div>
                         <div className="p-3 rounded-lg bg-muted">
                           <div className="flex space-x-1">
@@ -379,7 +379,7 @@ const AIAssistant: React.FC = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <Lightbulb className="h-5 w-5 mr-2 text-yellow-500" />
+                  <Lightbulb className="h-5 w-5 mr-2 text-warning" />
                   Quick Actions
                 </CardTitle>
               </CardHeader>

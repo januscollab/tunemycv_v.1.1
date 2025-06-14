@@ -345,18 +345,18 @@ const SprintAnalytics: React.FC = () => {
                   <CardTitle>Performance Insights</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-                    <h4 className="font-medium text-green-800 mb-2">Strengths</h4>
-                    <ul className="text-sm text-green-700 space-y-1">
+                  <div className="p-4 bg-success-50 border border-border rounded-lg">
+                    <h4 className="font-medium text-success-foreground mb-2">Strengths</h4>
+                    <ul className="text-sm text-success-foreground space-y-1">
                       <li>• High completion rate ({analyticsData.completionRate.toFixed(1)}%)</li>
                       <li>• Consistent velocity across sprints</li>
                       <li>• Good task prioritization</li>
                     </ul>
                   </div>
                   
-                  <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                    <h4 className="font-medium text-yellow-800 mb-2">Areas for Improvement</h4>
-                    <ul className="text-sm text-yellow-700 space-y-1">
+                  <div className="p-4 bg-warning-50 border border-border rounded-lg">
+                    <h4 className="font-medium text-warning-foreground mb-2">Areas for Improvement</h4>
+                    <ul className="text-sm text-warning-foreground space-y-1">
                       <li>• Average task age is {analyticsData.averageTaskAge.toFixed(0)} days</li>
                       <li>• Consider breaking down large tasks</li>
                       <li>• Monitor work-in-progress limits</li>
