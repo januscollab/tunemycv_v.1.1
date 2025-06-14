@@ -34,21 +34,21 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
     <AlertDialog open={isOpen} onOpenChange={onClose}>
       <AlertDialogContent className="max-w-md mx-auto">
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-red-600">{title}</AlertDialogTitle>
-          <AlertDialogDescription className="text-gray-600">
+          <AlertDialogTitle className="text-destructive">{title}</AlertDialogTitle>
+          <AlertDialogDescription className="text-muted-foreground">
             {description}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel 
             onClick={onClose}
-            className="bg-gray-100 hover:bg-gray-200 text-gray-800 border-gray-300"
+            className="bg-muted hover:bg-muted-hover text-foreground border-border"
           >
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleConfirm}
-            className="bg-red-600 hover:bg-red-700 text-white"
+            className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
           >
             Delete
           </AlertDialogAction>

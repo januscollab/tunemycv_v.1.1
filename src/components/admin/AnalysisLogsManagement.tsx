@@ -154,16 +154,16 @@ const AnalysisLogsManagement = () => {
       </div>
 
       {/* Filters Section */}
-      <div className="bg-white p-4 rounded-lg border border-gray-200 space-y-4">
+      <div className="bg-card p-4 rounded-lg border border-border space-y-4">
         <div className="flex items-center space-x-4 flex-wrap gap-4">
           <div className="relative flex-1 min-w-64">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <input
               type="text"
               placeholder="Search by user, job title, or company..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             />
           </div>
           
