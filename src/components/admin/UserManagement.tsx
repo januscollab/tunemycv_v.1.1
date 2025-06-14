@@ -128,7 +128,7 @@ const UserManagement = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -137,25 +137,25 @@ const UserManagement = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-title font-bold text-foreground">User Management</h1>
-        <div className="text-caption text-gray-500">
+        <div className="text-caption text-muted-foreground">
           Total Users: {users.length}
         </div>
       </div>
 
       <div className="flex items-center space-x-4">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-space-0.75 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
             type="text"
             placeholder="Search users..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full pl-10 pr-space-1 py-space-0.5 border border-input-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-input-focus bg-background text-foreground"
           />
         </div>
       </div>
 
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+      <div className="bg-surface rounded-lg border border-border overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow>
@@ -173,39 +173,39 @@ const UserManagement = () => {
               <TableRow key={user.user_id}>
                 <TableCell>
                   <div>
-                    <div className="font-medium text-gray-900">
+                    <div className="font-medium text-foreground">
                       {user.first_name || 'N/A'} {user.last_name || ''}
                     </div>
                   </div>
                 </TableCell>
-                <TableCell className="text-gray-600">{user.email}</TableCell>
+                <TableCell className="text-foreground-secondary">{user.email}</TableCell>
                 <TableCell>
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-micro font-medium bg-blue-100 text-blue-800">
+                  <span className="inline-flex items-center px-space-0.5 py-space-0.25 rounded-full text-micro font-medium bg-primary-100 text-primary-700">
                     {user.credits} credits
                   </span>
                 </TableCell>
-                <TableCell className="text-gray-600">{user.total_analyses}</TableCell>
-                <TableCell className="text-gray-600">
+                <TableCell className="text-foreground-secondary">{user.total_analyses}</TableCell>
+                <TableCell className="text-foreground-secondary">
                   {new Date(user.created_at).toLocaleDateString()}
                 </TableCell>
-                <TableCell className="text-gray-600">
+                <TableCell className="text-foreground-secondary">
                   {user.last_analysis 
                     ? new Date(user.last_analysis).toLocaleDateString()
                     : 'Never'
                   }
                 </TableCell>
                 <TableCell>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-space-0.5">
                     <button
                       onClick={() => setSelectedUser(user)}
-                      className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                      className="p-space-0.25 text-muted-foreground hover:text-primary transition-colors"
                       title="View Details"
                     >
                       <Eye className="h-4 w-4" />
                     </button>
                     <button
                       onClick={() => setUserToDelete(user)}
-                      className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                      className="p-space-0.25 text-muted-foreground hover:text-destructive transition-colors"
                       title="Delete User"
                     >
                       <Trash2 className="h-4 w-4" />

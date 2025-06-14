@@ -61,7 +61,7 @@ const CreditManagement = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -72,51 +72,51 @@ const CreditManagement = () => {
         <h1 className="text-title font-bold text-foreground">Credit Management</h1>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-space-1.5">
+        <div className="bg-surface p-space-1.5 rounded-lg border border-border">
           <div className="flex items-center">
-            <Users className="h-8 w-8 text-blue-500" />
-            <div className="ml-4">
-              <p className="text-caption font-medium text-gray-600">Total Users</p>
+            <Users className="h-8 w-8 text-primary" />
+            <div className="ml-space-1">
+              <p className="text-caption font-medium text-muted-foreground">Total Users</p>
               <p className="text-title font-bold text-foreground">{stats.totalUsers}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
+        <div className="bg-surface p-space-1.5 rounded-lg border border-border">
           <div className="flex items-center">
-            <CreditCard className="h-8 w-8 text-green-500" />
-            <div className="ml-4">
-              <p className="text-caption font-medium text-gray-600">Total Credits</p>
+            <CreditCard className="h-8 w-8 text-success" />
+            <div className="ml-space-1">
+              <p className="text-caption font-medium text-muted-foreground">Total Credits</p>
               <p className="text-title font-bold text-foreground">{stats.totalCredits}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
+        <div className="bg-surface p-space-1.5 rounded-lg border border-border">
           <div className="flex items-center">
-            <TrendingUp className="h-8 w-8 text-purple-500" />
-            <div className="ml-4">
-              <p className="text-caption font-medium text-gray-600">Avg Credits/User</p>
+            <TrendingUp className="h-8 w-8 text-info" />
+            <div className="ml-space-1">
+              <p className="text-caption font-medium text-muted-foreground">Avg Credits/User</p>
               <p className="text-title font-bold text-foreground">{stats.averageCredits}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
+        <div className="bg-surface p-space-1.5 rounded-lg border border-border">
           <div className="flex items-center">
-            <DollarSign className="h-8 w-8 text-orange-500" />
-            <div className="ml-4">
-              <p className="text-caption font-medium text-gray-600">Total Analyses</p>
+            <DollarSign className="h-8 w-8 text-warning" />
+            <div className="ml-space-1">
+              <p className="text-caption font-medium text-muted-foreground">Total Analyses</p>
               <p className="text-title font-bold text-foreground">{stats.totalAnalyses}</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h2 className="text-subheading font-semibold text-foreground mb-4">Credit Management Tools</h2>
-        <p className="text-gray-600">
+      <div className="bg-surface rounded-lg border border-border p-space-1.5">
+        <h2 className="text-subheading font-semibold text-foreground mb-space-1">Credit Management Tools</h2>
+        <p className="text-muted-foreground">
           Use the User Management section to add credits to individual user accounts. 
           Credit statistics are updated in real-time as users consume credits for AI-powered analyses.
         </p>
