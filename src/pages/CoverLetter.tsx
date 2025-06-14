@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import EditTitleDialog from '@/components/ui/edit-title-dialog';
 import { Label } from '@/components/ui/label';
 import { FloatingLabelInput } from '@/components/common/FloatingLabelInput';
+import { CaptureInput } from '@/components/ui/capture-input';
 import { CaptureTextarea } from '@/components/ui/capture-textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -522,23 +523,23 @@ const AuthenticatedCoverLetter = () => {
                       <CardContent className="space-y-4 pt-0">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <FloatingLabelInput
+                            <CaptureInput
                               label="Job Title *"
-                              id="jobTitle"
                               placeholder="e.g., Marketing Manager"
                               value={formData.jobTitle}
                               onChange={(e) => handleInputChange('jobTitle', e.target.value)}
                               className={validationErrors.includes('Job title is required') ? 'border-red-500' : ''}
+                              required
                             />
                           </div>
                           <div>
-                            <FloatingLabelInput
+                            <CaptureInput
                               label="Company Name *"
-                              id="companyName"
                               placeholder="e.g., TechCorp"
                               value={formData.companyName}
                               onChange={(e) => handleInputChange('companyName', e.target.value)}
                               className={validationErrors.includes('Company name is required') ? 'border-red-500' : ''}
+                              required
                             />
                           </div>
                         </div>

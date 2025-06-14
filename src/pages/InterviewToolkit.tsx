@@ -27,6 +27,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { CaptureInput } from '@/components/ui/capture-input';
 import AnalysisHistoryTab from '@/components/profile/AnalysisHistoryTab';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Breadcrumbs from '@/components/navigation/Breadcrumbs';
@@ -524,32 +525,22 @@ const InterviewToolkit = () => {
                         </div>
                         
                         {/* Job Title */}
-                        <div>
-                          <label className="block text-sm font-medium text-blueberry dark:text-citrus mb-1">
-                            Job Title <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            type="text"
-                            value={interviewJobTitle}
-                            onChange={(e) => setInterviewJobTitle(e.target.value)}
-                            placeholder="e.g., Senior Software Engineer (auto-extracted from job description)"
-                            className="w-full px-3 py-2 border border-apple-core/30 dark:border-citrus/30 rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange focus:border-transparent bg-white dark:bg-blueberry/10 text-blueberry dark:text-apple-core"
-                          />
-                        </div>
+                        <CaptureInput
+                          label="Job Title *"
+                          value={interviewJobTitle}
+                          onChange={(e) => setInterviewJobTitle(e.target.value)}
+                          placeholder="e.g., Senior Software Engineer (auto-extracted from job description)"
+                          required
+                        />
                         
                         {/* Company Name */}
-                        <div>
-                          <label className="block text-sm font-medium text-blueberry dark:text-citrus mb-1">
-                            Company Name <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            type="text"
-                            value={interviewCompanyName}
-                            onChange={(e) => setInterviewCompanyName(e.target.value)}
-                            placeholder="e.g., Tech Corp Inc."
-                            className="w-full px-3 py-2 border border-apple-core/30 dark:border-citrus/30 rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange focus:border-transparent bg-white dark:bg-blueberry/10 text-blueberry dark:text-apple-core"
-                          />
-                        </div>
+                        <CaptureInput
+                          label="Company Name *"
+                          value={interviewCompanyName}
+                          onChange={(e) => setInterviewCompanyName(e.target.value)}
+                          placeholder="e.g., Tech Corp Inc."
+                          required
+                        />
                       </CardContent>
                     </Card>
                   )}
