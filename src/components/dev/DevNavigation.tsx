@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Code, MessageSquare, Trello, Settings, Bug, Zap, Workflow, TrendingUp } from 'lucide-react';
+import { Code, MessageSquare, Trello, Settings, Bug, Zap, Workflow, TrendingUp, Monitor } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const DevNavigation: React.FC = () => {
@@ -42,6 +42,18 @@ const DevNavigation: React.FC = () => {
       href: '/dev/analytics',
       icon: TrendingUp,
       description: 'Performance metrics'
+    },
+    {
+      title: 'Design Audit',
+      href: '/dev/design-system-audit',
+      icon: Bug,
+      description: 'Design system compliance'
+    },
+    {
+      title: 'Compliance Monitor',
+      href: '/dev/compliance-monitor',
+      icon: Monitor,
+      description: 'Real-time monitoring'
     }
   ];
 

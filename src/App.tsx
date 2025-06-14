@@ -30,6 +30,8 @@ import CodeAnalysis from './pages/dev/CodeAnalysis';
 import AIAssistant from './pages/dev/AIAssistant';
 import WorkflowHub from './pages/dev/WorkflowHub';
 import SprintAnalytics from './pages/dev/SprintAnalytics';
+import DesignSystemAudit from './pages/dev/DesignSystemAudit';
+import ComplianceMonitor from './pages/dev/ComplianceMonitor';
 import Navigation from './components/Navigation';
 import Footer from './components/Footer';
 import EnhancedSecurityHeaders from './components/security/EnhancedSecurityHeaders';
@@ -84,6 +86,8 @@ function AppContent() {
           <Route path="/dev/ai" element={<AIAssistant />} />
           <Route path="/dev/workflows" element={<WorkflowHub />} />
           <Route path="/dev/analytics" element={<SprintAnalytics />} />
+          <Route path="/dev/design-system-audit" element={<DesignSystemAudit />} />
+          <Route path="/dev/compliance-monitor" element={<ComplianceMonitor />} />
         </Routes>
       </main>
       {!isDevRoute && <Footer />}
