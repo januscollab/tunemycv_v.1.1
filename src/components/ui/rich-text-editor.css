@@ -71,6 +71,21 @@
   font-size: 0.875rem; /* Slightly larger font size */
 }
 
+/* Increase icon sizes within toolbar buttons */
+.rich-text-editor .ql-toolbar button svg,
+.rich-text-editor .ql-toolbar button .ql-stroke,
+.rich-text-editor .ql-toolbar button .ql-fill {
+  width: 18px !important;
+  height: 18px !important;
+  stroke-width: 2.5 !important;
+}
+
+/* Ensure picker icons are also larger */
+.rich-text-editor .ql-toolbar .ql-picker-label svg {
+  width: 18px !important;
+  height: 18px !important;
+}
+
 .rich-text-editor .ql-toolbar button:hover {
   color: hsl(var(--primary)) !important;
   background-color: hsl(var(--primary) / 0.1);
