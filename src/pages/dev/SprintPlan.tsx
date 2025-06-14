@@ -34,7 +34,8 @@ const SprintPlan: React.FC = () => {
     deleteTask, 
     moveTask, 
     clearAllTasks, 
-    exportTasks 
+    exportTasks,
+    loadDesignSystemFixPlan
   } = useSprintTasks();
   
   const [isTaskEditorOpen, setIsTaskEditorOpen] = useState(false);
@@ -129,6 +130,10 @@ const SprintPlan: React.FC = () => {
           </div>
           
           <div className="flex space-x-2">
+            <Button variant="outline" onClick={loadDesignSystemFixPlan}>
+              <Play className="h-4 w-4 mr-2" />
+              Load Fix Plan
+            </Button>
             <Button variant="outline" onClick={handleExportTasks}>
               <Download className="h-4 w-4 mr-2" />
               Export Tasks

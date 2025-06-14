@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { designSystemFixPlan, type FixPlanTask } from '@/utils/designSystemFixPlan';
 
 interface SprintItem {
   id: string;
@@ -9,6 +10,10 @@ interface SprintItem {
   sprintId: string;
   tags: string[];
   createdAt: Date;
+  estimatedHours?: number;
+  violationType?: string;
+  affectedFiles?: string[];
+  expectedOutcome?: string;
 }
 
 const STORAGE_KEY = 'dev-sprint-tasks';
@@ -28,6 +33,13 @@ export const useSprintTasks = () => {
           createdAt: new Date(task.createdAt)
         }));
         setTasks(parsedTasks);
+      } else {
+        // Initialize with design system fix plan if no saved tasks
+        const initialTasks = designSystemFixPlan.map((task: FixPlanTask) => ({
+          ...task,
+          createdAt: new Date()
+        }));
+        setTasks(initialTasks);
       }
     } catch (error) {
       console.error('[useSprintTasks] Failed to load tasks:', error);
@@ -98,6 +110,14 @@ export const useSprintTasks = () => {
     setTasks(validatedTasks);
   }, []);
 
+  const loadDesignSystemFixPlan = useCallback(() => {
+    const fixPlanTasks = designSystemFixPlan.map((task: FixPlanTask) => ({
+      ...task,
+      createdAt: new Date()
+    }));
+    setTasks(fixPlanTasks);
+  }, []);
+
   return {
     tasks,
     addTask,
@@ -107,6 +127,7 @@ export const useSprintTasks = () => {
     getTasksBySprintId,
     clearAllTasks,
     exportTasks,
-    importTasks
+    importTasks,
+    loadDesignSystemFixPlan
   };
 };
