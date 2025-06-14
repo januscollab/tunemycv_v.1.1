@@ -1,5 +1,12 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8'
+import { 
+  authenticateUser, 
+  validateInput, 
+  logSecurityEvent, 
+  getSecureErrorResponse,
+  checkRateLimit 
+} from '../shared/security.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -25,25 +32,35 @@ serve(async (req) => {
     return new Response('ok', { headers: corsHeaders })
   }
 
-  try {
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      {
-        global: {
-          headers: { Authorization: req.headers.get('Authorization')! },
-        },
-      }
-    )
+  let user: any = null
+  let supabaseClient: any = null
 
-    // Authenticate user
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser()
-    if (authError || !user) {
-      throw new Error('Unauthorized')
+  try {
+    // Security: Authenticate user first
+    const authResult = await authenticateUser(req)
+    user = authResult.user
+    supabaseClient = authResult.supabaseClient
+
+    // Security: Rate limiting (5 requests per minute per user)
+    if (!checkRateLimit(user.id, 5, 60000)) {
+      throw new Error('Rate limit exceeded')
     }
 
-    // Parse request data
-    const request: CoverLetterRequest = await req.json()
+    // Security: Parse and validate request data
+    const rawRequest = await req.json()
+    const request: CoverLetterRequest = {
+      jobTitle: validateInput(rawRequest.jobTitle, 'job title', 200),
+      companyName: validateInput(rawRequest.companyName, 'company name', 200),
+      jobDescription: rawRequest.jobDescription ? validateInput(rawRequest.jobDescription, 'job description', 20000) : undefined,
+      cvText: rawRequest.cvText ? validateInput(rawRequest.cvText, 'CV text', 50000) : undefined,
+      tone: validateInput(rawRequest.tone, 'tone', 50),
+      length: validateInput(rawRequest.length, 'length', 50),
+      analysisResultId: rawRequest.analysisResultId,
+      workExperienceHighlights: rawRequest.workExperienceHighlights ? validateInput(rawRequest.workExperienceHighlights, 'work experience highlights', 2000) : undefined,
+      customHookOpener: rawRequest.customHookOpener ? validateInput(rawRequest.customHookOpener, 'custom hook opener', 1000) : undefined,
+      personalValues: rawRequest.personalValues ? validateInput(rawRequest.personalValues, 'personal values', 1000) : undefined,
+      includeLinkedInUrl: Boolean(rawRequest.includeLinkedInUrl)
+    }
 
     // Validate user credits
     const { data: creditsData, error: creditsError } = await supabaseClient
@@ -202,19 +219,27 @@ ${request.cvText ? `My CV/Resume:\n${request.cvText}` : ''}`
     )
 
   } catch (error) {
-    console.error('Cover letter generation error:', error)
+    // Security: Log security events for suspicious activities
+    if (user && supabaseClient) {
+      if (error.message === 'Rate limit exceeded') {
+        await logSecurityEvent(supabaseClient, 'rate_limit_exceeded', {
+          endpoint: 'generate-cover-letter',
+          user_agent: req.headers.get('user-agent')
+        }, user.id, 'warning')
+      } else if (error.message.includes('Invalid') && error.message.includes('content detected')) {
+        await logSecurityEvent(supabaseClient, 'malicious_input_detected', {
+          endpoint: 'generate-cover-letter',
+          error: error.message,
+          user_agent: req.headers.get('user-agent')
+        }, user.id, 'high')
+      }
+    }
     
-    const errorMessage = error.message === 'Unauthorized' ? 'Unauthorized' :
-                        error.message === 'Insufficient credits' ? 'Insufficient credits' :
-                        error.message
-
-    const statusCode = error.message === 'Unauthorized' ? 401 :
-                      error.message === 'Insufficient credits' ? 400 :
-                      500
-
+    const errorResponse = getSecureErrorResponse(error, 'generate-cover-letter')
+    
     return new Response(
-      JSON.stringify({ error: errorMessage }),
-      { status: statusCode, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      JSON.stringify({ error: errorResponse.message }),
+      { status: errorResponse.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
 })

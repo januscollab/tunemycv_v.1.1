@@ -13,30 +13,88 @@ interface AnalysisRequest {
   userId: string;
 }
 
+// Security: Input validation and sanitization
+const validateInput = (input: any, fieldName: string, maxLength: number = 50000): string => {
+  if (!input || typeof input !== 'string') {
+    throw new Error(`Invalid ${fieldName}: must be a non-empty string`)
+  }
+  
+  const trimmed = input.trim()
+  if (trimmed.length === 0) {
+    throw new Error(`${fieldName} cannot be empty`)
+  }
+  
+  if (trimmed.length > maxLength) {
+    throw new Error(`${fieldName} too long: maximum ${maxLength} characters allowed`)
+  }
+  
+  // Check for potential XSS patterns
+  const suspiciousPatterns = [
+    /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+    /javascript:/gi,
+    /on\w+\s*=/gi,
+    /<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi,
+  ];
+  
+  if (suspiciousPatterns.some(pattern => pattern.test(trimmed))) {
+    throw new Error(`Invalid content detected in ${fieldName}`)
+  }
+  
+  return trimmed
+}
+
+// Security: Authenticate user and get Supabase client
+const authenticateUser = async (req: Request) => {
+  const authHeader = req.headers.get('Authorization')
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    throw new Error('Missing or invalid authorization header')
+  }
+
+  const supabaseClient = createClient(
+    Deno.env.get('SUPABASE_URL') ?? '',
+    Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+    {
+      global: {
+        headers: { Authorization: authHeader },
+      },
+    }
+  )
+
+  const { data: { user }, error: authError } = await supabaseClient.auth.getUser()
+  if (authError || !user) {
+    throw new Error('Unauthorized')
+  }
+
+  return { user, supabaseClient }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
-  try {
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      {
-        global: {
-          headers: { Authorization: req.headers.get('Authorization')! },
-        },
-      }
-    )
+  let user: any = null
+  let supabaseClient: any = null
 
-    // Authenticate user
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser()
-    if (authError || !user) {
-      throw new Error('Unauthorized')
+  try {
+    // Security: Authenticate user first
+    const authResult = await authenticateUser(req)
+    user = authResult.user
+    supabaseClient = authResult.supabaseClient
+
+    // Security: Parse and validate request
+    const rawRequest = await req.json()
+    const request: AnalysisRequest = {
+      cvText: validateInput(rawRequest.cvText, 'CV text', 50000),
+      jobDescription: validateInput(rawRequest.jobDescription, 'job description', 20000),
+      jobTitle: validateInput(rawRequest.jobTitle, 'job title', 200),
+      userId: rawRequest.userId
     }
 
-    // Parse request
-    const request: AnalysisRequest = await req.json()
+    // Security: Verify user ID matches authenticated user
+    if (request.userId !== user.id) {
+      throw new Error('User ID mismatch')
+    }
 
     // Check user credits
     const { data: creditsData, error: creditsError } = await supabaseClient
@@ -134,17 +192,50 @@ serve(async (req) => {
   } catch (error) {
     console.error('CV analysis error:', error)
     
-    const errorMessage = error.message === 'Unauthorized' ? 'Unauthorized' :
-                        error.message === 'Insufficient credits' ? 'Insufficient credits' :
-                        error.message
+    // Security: Log security events for unauthorized access attempts
+    if (user && supabaseClient && (error.message === 'Unauthorized' || error.message === 'User ID mismatch')) {
+      try {
+        await supabaseClient.rpc('log_security_event', {
+          event_type: 'unauthorized_access_attempt',
+          event_details: {
+            endpoint: 'analyze-cv-with-ai',
+            error: error.message,
+            user_agent: req.headers.get('user-agent')
+          },
+          target_user_id: user?.id,
+          severity: 'warning'
+        })
+      } catch (logError) {
+        console.error('Failed to log security event:', logError)
+      }
+    }
+    
+    // Security: Sanitize error messages to prevent information disclosure
+    const getErrorResponse = (err: any) => {
+      if (err.message === 'Unauthorized' || err.message === 'Missing or invalid authorization header') {
+        return { message: 'Unauthorized', status: 401 }
+      }
+      if (err.message === 'Insufficient credits') {
+        return { message: 'Insufficient credits', status: 400 }
+      }
+      if (err.message === 'User ID mismatch') {
+        return { message: 'Invalid request', status: 400 }
+      }
+      if (err.message && err.message.includes('Invalid') && err.message.includes('content detected')) {
+        return { message: 'Invalid input detected', status: 400 }
+      }
+      if (err.message && err.message.includes('too long')) {
+        return { message: 'Input exceeds maximum length', status: 400 }
+      }
+      // Generic error for unexpected issues
+      return { message: 'An error occurred processing your request', status: 500 }
+    }
 
-    const statusCode = error.message === 'Unauthorized' ? 401 :
-                      error.message === 'Insufficient credits' ? 400 :
-                      500
-
+    const errorResponse = getErrorResponse(error)
+    
     return new Response(
-      JSON.stringify({ error: errorMessage }),
-      { status: statusCode, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      JSON.stringify({ error: errorResponse.message }),
+      { status: errorResponse.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
 })

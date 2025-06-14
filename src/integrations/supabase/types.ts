@@ -898,6 +898,15 @@ export type Database = {
         }
         Returns: undefined
       }
+      log_security_event: {
+        Args: {
+          event_type: string
+          event_details?: Json
+          target_user_id?: string
+          severity?: string
+        }
+        Returns: undefined
+      }
       migrate_to_sequential_user_ids: {
         Args: Record<PropertyKey, never>
         Returns: undefined
