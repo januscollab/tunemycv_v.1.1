@@ -372,6 +372,11 @@ const AuthenticatedCoverLetter = () => {
         console.log('[CoverLetter] Force save completed successfully');
       } catch (error) {
         console.error('[CoverLetter] Error during force save:', error);
+        toast({
+          title: 'Save Error',
+          description: 'Failed to save your changes. Please try again.',
+          variant: 'destructive'
+        });
       } finally {
         setIsSaving(false);
       }
@@ -379,6 +384,44 @@ const AuthenticatedCoverLetter = () => {
     
     setActiveTab(newTab);
   };
+
+  // Enhanced window focus and blur handlers for additional save triggers
+  useEffect(() => {
+    const handleWindowBlur = async () => {
+      if (activeTab === 'result' && selectedCoverLetter && !isSaving) {
+        console.log('[CoverLetter] Window blur detected - auto-saving');
+        try {
+          await editableCoverLetterRef.current?.forceSave();
+        } catch (error) {
+          console.error('[CoverLetter] Error during window blur save:', error);
+        }
+      }
+    };
+
+    const handleBeforeUnload = async (e: BeforeUnloadEvent) => {
+      if (activeTab === 'result' && selectedCoverLetter && !isSaving) {
+        // Note: We can't use async operations in beforeunload, but we can trigger sync save
+        console.log('[CoverLetter] Page unload detected - attempting sync save');
+        try {
+          await editableCoverLetterRef.current?.forceSave();
+        } catch (error) {
+          console.error('[CoverLetter] Error during beforeunload save:', error);
+          // Show warning if save failed
+          e.preventDefault();
+          e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+          return e.returnValue;
+        }
+      }
+    };
+
+    window.addEventListener('blur', handleWindowBlur);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('blur', handleWindowBlur);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [activeTab, selectedCoverLetter, isSaving]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5 py-6">

@@ -87,24 +87,45 @@ const SprintManager = () => {
       // Check if user has any sprints
       const { data: existingSprints, error: checkError } = await supabase
         .from('sprints')
-        .select('name')
+        .select('name, id')
         .eq('user_id', user.id);
 
       if (checkError) throw checkError;
 
-      const defaultSprints = ['Priority Sprint', 'Sprint 2', 'Backlog'];
       const existingSprintNames = existingSprints?.map(s => s.name) || [];
       
-      // Create missing default sprints
-      const sprintsToCreate = defaultSprints
-        .filter(name => !existingSprintNames.includes(name))
-        .map((name, index) => ({
-          name,
-          order_index: existingSprints ? existingSprints.length + index : index,
-          user_id: user.id,
-          status: 'active',
-          is_hidden: false
-        }));
+      // Enhanced validation: ensure ONLY ONE of each core sprint exists
+      const defaultSprints = ['Priority Sprint', 'Backlog'];
+      const sprintsToCreate = [];
+      
+      for (const sprintName of defaultSprints) {
+        const existingCount = existingSprintNames.filter(name => name === sprintName).length;
+        
+        if (existingCount === 0) {
+          // Sprint doesn't exist, create it
+          sprintsToCreate.push({
+            name: sprintName,
+            order_index: existingSprints ? existingSprints.length + sprintsToCreate.length : sprintsToCreate.length,
+            user_id: user.id,
+            status: 'active',
+            is_hidden: false
+          });
+        } else if (existingCount > 1) {
+          // Multiple sprints with same name exist, remove duplicates
+          console.warn(`Multiple ${sprintName} sprints found. Removing duplicates.`);
+          const duplicates = existingSprints?.filter(s => s.name === sprintName).slice(1) || [];
+          
+          // Delete duplicate sprints
+          if (duplicates.length > 0) {
+            const { error: deleteError } = await supabase
+              .from('sprints')
+              .delete()
+              .in('id', duplicates.map(s => s.id));
+            
+            if (deleteError) console.error('Error removing duplicate sprints:', deleteError);
+          }
+        }
+      }
 
       if (sprintsToCreate.length > 0) {
         const { error: insertError } = await supabase
@@ -112,6 +133,7 @@ const SprintManager = () => {
           .insert(sprintsToCreate);
 
         if (insertError) throw insertError;
+        console.log(`Created ${sprintsToCreate.length} default sprints`);
       }
     } catch (error) {
       console.error('Error ensuring default sprints:', error);
@@ -140,12 +162,22 @@ const SprintManager = () => {
   const handleAddSprint = async () => {
     if (!newSprintName.trim()) return;
 
+    // Enhanced validation: prevent duplicate core sprints
+    const trimmedName = newSprintName.trim();
+    if (trimmedName === 'Priority Sprint' || trimmedName === 'Backlog') {
+      const existingSprint = sprints.find(s => s.name === trimmedName);
+      if (existingSprint) {
+        toast.error(`A ${trimmedName} already exists. Only one ${trimmedName} is allowed per user.`);
+        return;
+      }
+    }
+
     try {
       const maxOrder = Math.max(...sprints.map(s => s.order_index), -1);
       const { error } = await supabase
         .from('sprints')
         .insert({
-          name: newSprintName,
+          name: trimmedName,
           order_index: maxOrder + 1,
           user_id: user?.id,
         });
@@ -163,8 +195,9 @@ const SprintManager = () => {
   };
 
   const handleDeleteSprint = async (sprint: Sprint) => {
-    if (sprint.name === 'Priority Sprint') {
-      toast.error('Cannot delete Priority Sprint');
+    // Enhanced protection logic - prevent deletion of core sprints
+    if (sprint.name === 'Priority Sprint' || sprint.name === 'Backlog') {
+      toast.error(`Cannot delete ${sprint.name} - this is a protected system sprint`);
       return;
     }
 
@@ -174,7 +207,7 @@ const SprintManager = () => {
         return;
       }
       
-      // Find or create Backlog sprint
+      // Find Backlog sprint (guaranteed to exist due to ensureDefaultSprintsExist)
       const backlogSprint = sprints.find(s => s.name === 'Backlog');
       if (backlogSprint) {
         // Move all tasks to Backlog
@@ -497,7 +530,7 @@ const SprintManager = () => {
                           Archive Completed
                         </Button>
                       )}
-                      {sprint.name !== 'Priority Sprint' && (
+                      {sprint.name !== 'Priority Sprint' && sprint.name !== 'Backlog' && (
                         <Button
                           size="sm"
                           variant="destructive"

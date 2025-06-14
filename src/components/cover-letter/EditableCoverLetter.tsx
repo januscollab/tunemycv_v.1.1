@@ -18,21 +18,37 @@ interface EditableCoverLetterRef {
 }
 
 const EditableCoverLetter = forwardRef<EditableCoverLetterRef, EditableCoverLetterProps>(({ content, onSave, fileName = 'cover-letter' }, ref) => {
-  // Initialize HTML from JSON content
+  // Track initialization state to fix first save bug
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [lastSavedContent, setLastSavedContent] = useState('');
+  
+  // Initialize HTML from JSON content with proper error handling
   const [htmlContent, setHtmlContent] = useState(() => {
     try {
       // Try to parse as JSON first
       const jsonData = JSON.parse(content);
-      return jsonToHtml(jsonData);
+      const html = jsonToHtml(jsonData);
+      setLastSavedContent(content); // Track what was loaded
+      return html;
     } catch {
       // Fallback to text if not JSON
       const jsonData = textToJson(content);
-      return jsonToHtml(jsonData);
+      const html = jsonToHtml(jsonData);
+      const jsonString = JSON.stringify(jsonData);
+      setLastSavedContent(jsonString); // Track what was loaded
+      return html;
     }
   });
   
   const debounceTimeoutRef = useRef<NodeJS.Timeout>();
   const quillRef = useRef<ReactQuill>(null);
+  const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+
+  // Mark as initialized after first render
+  useEffect(() => {
+    const timer = setTimeout(() => setIsInitialized(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Add download button to Quill toolbar
   useEffect(() => {
@@ -114,8 +130,11 @@ const EditableCoverLetter = forwardRef<EditableCoverLetterRef, EditableCoverLett
     }
   }, [htmlContent, fileName]);
 
-  // Force save function exposed through ref
+  // Enhanced force save function with better error handling and state tracking
   const forceSave = useCallback(async () => {
+    console.log('[EditableCoverLetter] Force save triggered');
+    setSaveState('saving');
+    
     try {
       // Cancel any pending debounced save
       if (debounceTimeoutRef.current) {
@@ -124,38 +143,45 @@ const EditableCoverLetter = forwardRef<EditableCoverLetterRef, EditableCoverLett
       
       // Convert current HTML to JSON and save immediately
       const jsonData = htmlToJson(htmlContent);
-      console.log('[EditableCoverLetter] Force save - HTML→JSON conversion:', {
-        sectionsCount: jsonData.sections.length,
-        formattedSections: jsonData.sections.filter(s => s.formatting?.bold).length
-      });
-      
-      // Compare JSON data instead of text to preserve formatting
-      const currentJsonString = typeof content === 'string' && content.startsWith('{') 
-        ? content 
-        : JSON.stringify(textToJson(content));
       const newJsonString = JSON.stringify(jsonData);
       
-      if (newJsonString !== currentJsonString && jsonData.sections.length > 0) {
+      console.log('[EditableCoverLetter] Force save - content comparison:', {
+        sectionsCount: jsonData.sections.length,
+        formattedSections: jsonData.sections.filter(s => s.formatting?.bold).length,
+        lastSavedLength: lastSavedContent.length,
+        newContentLength: newJsonString.length,
+        hasChanges: newJsonString !== lastSavedContent
+      });
+      
+      // Only save if there are actual changes and content exists
+      if (newJsonString !== lastSavedContent && jsonData.sections.length > 0) {
         console.log('[EditableCoverLetter] Force saving changes...');
         await onSave(newJsonString);
+        setLastSavedContent(newJsonString); // Update tracking
+        setSaveState('saved');
+        console.log('[EditableCoverLetter] Force save completed successfully');
       } else {
         console.log('[EditableCoverLetter] No changes to force save');
+        setSaveState('idle');
       }
     } catch (error) {
       console.error('[EditableCoverLetter] Error force saving cover letter:', error);
+      setSaveState('error');
+      throw error; // Re-throw so caller can handle
     }
-  }, [htmlContent, content, onSave]);
+  }, [htmlContent, lastSavedContent, onSave]);
 
   // Expose force save through ref
   useImperativeHandle(ref, () => ({
     forceSave
   }), [forceSave]);
 
-  // Handle content changes with immediate save (no debouncing)
+  // Enhanced content change handler with initialization fix and immediate save
   const handleContentChange = useCallback(async (html: string) => {
     console.log('[EditableCoverLetter] Content changed:', {
       htmlLength: html.length,
       hasBoldElements: html.includes('<strong>') || html.includes('<b>'),
+      isInitialized,
       timestamp: new Date().toISOString()
     });
     
@@ -166,35 +192,47 @@ const EditableCoverLetter = forwardRef<EditableCoverLetterRef, EditableCoverLett
       clearTimeout(debounceTimeoutRef.current);
     }
     
-    // Immediate save for better reliability
+    // Skip saving if not initialized (prevents first save bug)
+    if (!isInitialized) {
+      console.log('[EditableCoverLetter] Skipping save - not initialized yet');
+      return;
+    }
+    
+    setSaveState('saving');
+    
+    // Immediate save for better reliability with proper error handling
     try {
       const jsonData = htmlToJson(html);
-      console.log('[EditableCoverLetter] HTML→JSON conversion:', {
-        sectionsCount: jsonData.sections.length,
-        formattedSections: jsonData.sections.filter(s => s.formatting?.bold).length
-      });
-      
-      // Compare JSON data instead of text to preserve formatting
-      const currentJsonString = typeof content === 'string' && content.startsWith('{') 
-        ? content 
-        : JSON.stringify(textToJson(content));
       const newJsonString = JSON.stringify(jsonData);
       
-      if (newJsonString !== currentJsonString && jsonData.sections.length > 0) {
-        console.log('[EditableCoverLetter] JSON changes detected, saving...', {
+      console.log('[EditableCoverLetter] HTML→JSON conversion:', {
+        sectionsCount: jsonData.sections.length,
+        formattedSections: jsonData.sections.filter(s => s.formatting?.bold).length,
+        hasChanges: newJsonString !== lastSavedContent
+      });
+      
+      // Only save if there are actual changes and content exists
+      if (newJsonString !== lastSavedContent && jsonData.sections.length > 0) {
+        console.log('[EditableCoverLetter] Auto-saving changes...', {
           htmlLength: html.length,
           jsonSections: jsonData.sections.length,
           formattedSections: jsonData.sections.filter(s => s.formatting?.bold).length
         });
+        
         await onSave(newJsonString);
-        console.log('[EditableCoverLetter] Save completed successfully');
+        setLastSavedContent(newJsonString); // Update tracking
+        setSaveState('saved');
+        console.log('[EditableCoverLetter] Auto-save completed successfully');
       } else {
-        console.log('[EditableCoverLetter] No JSON changes detected, skipping save');
+        console.log('[EditableCoverLetter] No changes detected, skipping auto-save');
+        setSaveState('idle');
       }
     } catch (error) {
-      console.error('[EditableCoverLetter] Error saving changes:', error);
+      console.error('[EditableCoverLetter] Error auto-saving changes:', error);
+      setSaveState('error');
+      // Don't throw here - let the component continue working
     }
-  }, [content, onSave]);
+  }, [isInitialized, lastSavedContent, onSave]);
 
   // Quill configuration with download button on toolbar
   const modules = {
@@ -218,6 +256,38 @@ const EditableCoverLetter = forwardRef<EditableCoverLetterRef, EditableCoverLett
 
   return (
     <div className="space-y-6">
+      {/* Save state indicator */}
+      {saveState !== 'idle' && (
+        <div className={`flex items-center gap-2 text-sm px-3 py-2 rounded-md ${
+          saveState === 'saving' ? 'bg-blue-50 text-blue-700' :
+          saveState === 'saved' ? 'bg-green-50 text-green-700' :
+          'bg-red-50 text-red-700'
+        }`}>
+          {saveState === 'saving' && (
+            <>
+              <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+              Saving changes...
+            </>
+          )}
+          {saveState === 'saved' && (
+            <>
+              <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                <span className="text-white text-xs">✓</span>
+              </div>
+              Changes saved successfully
+            </>
+          )}
+          {saveState === 'error' && (
+            <>
+              <div className="w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
+                <span className="text-white text-xs">!</span>
+              </div>
+              Error saving changes
+            </>
+          )}
+        </div>
+      )}
+      
       <div className="bg-muted/20 p-4 rounded-lg">
         <ReactQuill
           ref={quillRef}
@@ -225,10 +295,10 @@ const EditableCoverLetter = forwardRef<EditableCoverLetterRef, EditableCoverLett
           value={htmlContent}
           onChange={handleContentChange}
           placeholder="Edit your cover letter content here..."
-      modules={modules}
-      formats={formats}
-      className="min-h-[400px] bg-background text-foreground border border-border rounded-md [&_.ql-editor]:focus-visible:outline-none [&_.ql-toolbar_.ql-stroke]:hover:stroke-orange-500 [&_.ql-toolbar_.ql-fill]:hover:fill-orange-500 [&_.ql-toolbar_button]:text-black [&_.ql-toolbar_button]:hover:text-orange-500 [&_.ql-toolbar_button.ql-active]:text-orange-500 [&_.ql-toolbar_button.ql-active_.ql-stroke]:stroke-orange-500 [&_.ql-toolbar_button.ql-active_.ql-fill]:fill-orange-500"
-    />
+          modules={modules}
+          formats={formats}
+          className="min-h-[400px] bg-background text-foreground border border-border rounded-md [&_.ql-editor]:focus-visible:outline-none [&_.ql-toolbar_.ql-stroke]:hover:stroke-orange-500 [&_.ql-toolbar_.ql-fill]:hover:fill-orange-500 [&_.ql-toolbar_button]:text-black [&_.ql-toolbar_button]:hover:text-orange-500 [&_.ql-toolbar_button.ql-active]:text-orange-500 [&_.ql-toolbar_button.ql-active_.ql-stroke]:stroke-orange-500 [&_.ql-toolbar_button.ql-active_.ql-fill]:fill-orange-500"
+        />
       </div>
     </div>
   );
