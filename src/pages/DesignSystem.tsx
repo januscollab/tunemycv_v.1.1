@@ -9,6 +9,8 @@ import { FloatingLabelInput } from '@/components/common/FloatingLabelInput';
 import { FloatingLabelTextarea } from '@/components/common/FloatingLabelTextarea';
 import { CaptureInput } from '@/components/ui/capture-input';
 import { CaptureTextarea } from '@/components/ui/capture-textarea';
+import { RichTextEditor } from '@/components/ui/rich-text-editor';
+import '@/components/ui/rich-text-editor.css';
 
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel } from '@/components/ui/dropdown-menu';
@@ -488,6 +490,128 @@ const DesignSystem = () => {
     },
   ];
 
+  // Rich Text Editor examples
+  const richTextEditorExamples = [
+    {
+      name: 'Default Editor',
+      component: (
+        <RichTextEditor
+          placeholder="Enter your content here..."
+          value="<h2>Sample Heading</h2><p>This is a paragraph with <strong>bold text</strong> and <em>italic text</em>.</p><ul><li>First item</li><li>Second item</li></ul>"
+          onChange={(value) => console.log('Content changed:', value)}
+          className="w-full"
+          minHeight="200px"
+        />
+      ),
+      usage: '45 usages',
+      description: 'Full-featured rich text editor with all formatting options'
+    },
+    {
+      name: 'Minimal Editor',
+      component: (
+        <RichTextEditor
+          variant="minimal"
+          placeholder="Simple text editing..."
+          value="<p>Minimal editor with basic <strong>bold</strong> formatting and bullet lists.</p>"
+          onChange={(value) => console.log('Minimal changed:', value)}
+          className="w-full"
+          minHeight="150px"
+        />
+      ),
+      usage: '23 usages',
+      description: 'Simplified editor with basic formatting options'
+    },
+    {
+      name: 'Compact Editor',
+      component: (
+        <RichTextEditor
+          variant="compact"
+          size="sm"
+          placeholder="Compact editing experience..."
+          value="<h3>Compact Header</h3><p>Smaller editor for inline editing scenarios.</p>"
+          onChange={(value) => console.log('Compact changed:', value)}
+          className="w-full"
+          minHeight="120px"
+        />
+      ),
+      usage: '34 usages',
+      description: 'Space-efficient editor for smaller content areas'
+    },
+    {
+      name: 'With AI Features',
+      component: (
+        <RichTextEditor
+          showAIFeatures={true}
+          placeholder="Select text to see AI options..."
+          value="<p>Select any text in this editor to see AI enhancement options appear. Try selecting this sentence to see the AI toolbar.</p>"
+          onChange={(value) => console.log('AI editor changed:', value)}
+          onAIRequest={(context, action) => console.log('AI request:', action, context.selectedText)}
+          className="w-full"
+          minHeight="180px"
+        />
+      ),
+      usage: '12 usages',
+      description: 'Editor with AI-powered text improvement features'
+    },
+    {
+      name: 'Read-only Display',
+      component: (
+        <RichTextEditor
+          readOnly={true}
+          value="<h2>Read-only Content</h2><p>This content cannot be edited and is displayed for viewing only.</p><ul><li>Read-only item 1</li><li>Read-only item 2</li></ul>"
+          className="w-full"
+          minHeight="150px"
+        />
+      ),
+      usage: '18 usages',
+      description: 'Display-only mode for showing formatted content'
+    },
+    {
+      name: 'Error State',
+      component: (
+        <RichTextEditor
+          state="error"
+          placeholder="Editor with error state..."
+          value="<p>This editor shows an error state with red border styling.</p>"
+          onChange={(value) => console.log('Error state changed:', value)}
+          className="w-full"
+          minHeight="150px"
+        />
+      ),
+      usage: '8 usages',
+      description: 'Editor showing validation error state'
+    },
+    {
+      name: 'Success State',
+      component: (
+        <RichTextEditor
+          state="success"
+          placeholder="Editor with success state..."
+          value="<p>This editor shows a success state with green border and checkmark.</p>"
+          onChange={(value) => console.log('Success state changed:', value)}
+          className="w-full"
+          minHeight="150px"
+        />
+      ),
+      usage: '5 usages',
+      description: 'Editor showing successful validation state'
+    },
+    {
+      name: 'Disabled Editor',
+      component: (
+        <RichTextEditor
+          disabled={true}
+          placeholder="Disabled editor..."
+          value="<p>This editor is disabled and cannot be interacted with.</p>"
+          className="w-full"
+          minHeight="150px"
+        />
+      ),
+      usage: '7 usages',
+      description: 'Disabled state for form contexts'
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -549,9 +673,10 @@ const DesignSystem = () => {
 
         {/* Tabbed Navigation */}
         <Tabs defaultValue="foundations" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="foundations">Foundations</TabsTrigger>
             <TabsTrigger value="components">Components</TabsTrigger>
+            <TabsTrigger value="rte">Rich Text Editor</TabsTrigger>
             <TabsTrigger value="interactions">Interactions</TabsTrigger>
             <TabsTrigger value="missing">Missing Docs</TabsTrigger>
             <TabsTrigger value="loading">Loading States</TabsTrigger>
@@ -755,6 +880,72 @@ const DesignSystem = () => {
             </section>
           </TabsContent>
 
+          {/* Rich Text Editor Tab */}
+          <TabsContent value="rte" className="mt-6">
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <Type className="h-5 w-5 text-primary mr-2" />
+                    Rich Text Editor Components
+                  </CardTitle>
+                  <p className="text-caption text-muted-foreground">
+                    Modular rich text editor with multiple variants, states, and AI-powered features for content editing throughout the application.
+                  </p>
+                </CardHeader>
+                <CardContent className="space-y-8">
+                  {richTextEditorExamples.map((example, index) => (
+                    <div key={index} className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="text-subheading font-semibold">{example.name}</h3>
+                          <p className="text-caption text-muted-foreground">{example.description}</p>
+                        </div>
+                        <Badge variant="outline" className="text-micro">
+                          {example.usage}
+                        </Badge>
+                      </div>
+                      <div className="border border-border rounded-lg p-4 bg-background">
+                        {example.component}
+                      </div>
+                      {index < richTextEditorExamples.length - 1 && <Separator />}
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+
+              {/* Implementation Guidelines */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Implementation Guidelines</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-3">
+                      <h4 className="text-body font-semibold">Usage Patterns</h4>
+                      <ul className="text-caption space-y-1 text-muted-foreground">
+                        <li>• Use <code>default</code> variant for main content editing</li>
+                        <li>• Use <code>minimal</code> for simple text inputs</li>
+                        <li>• Use <code>compact</code> for space-constrained areas</li>
+                        <li>• Enable AI features for advanced editing workflows</li>
+                        <li>• Use read-only mode for content display</li>
+                      </ul>
+                    </div>
+                    <div className="space-y-3">
+                      <h4 className="text-body font-semibold">Technical Notes</h4>
+                      <ul className="text-caption space-y-1 text-muted-foreground">
+                        <li>• Built on ReactQuill with custom styling</li>
+                        <li>• Supports theming with design tokens</li>
+                        <li>• Includes AI context selection features</li>
+                        <li>• Responsive and accessibility-compliant</li>
+                        <li>• Modular CSS with variant support</li>
+                      </ul>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
 
           {/* Interactions Tab */}
           <TabsContent value="interactions" className="space-y-8">

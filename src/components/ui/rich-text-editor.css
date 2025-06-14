@@ -1,0 +1,216 @@
+/* Rich Text Editor Design System Styles */
+
+/* Base wrapper styling */
+.rich-text-editor-wrapper {
+  @apply rounded-md border;
+}
+
+/* Default Rich Text Editor */
+.rich-text-editor .ql-toolbar {
+  border: 1px solid hsl(var(--border));
+  border-bottom: none;
+  background-color: hsl(var(--muted));
+  border-radius: 0.375rem 0.375rem 0 0;
+  padding: 0.5rem;
+}
+
+.rich-text-editor .ql-container {
+  border: 1px solid hsl(var(--border));
+  border-top: none;
+  background-color: hsl(var(--background));
+  border-radius: 0 0 0.375rem 0.375rem;
+  font-family: inherit;
+}
+
+.rich-text-editor .ql-editor {
+  color: hsl(var(--foreground)) !important;
+  line-height: 1.6;
+  padding: 1rem;
+  min-height: inherit;
+}
+
+.rich-text-editor .ql-editor * {
+  color: hsl(var(--foreground)) !important;
+}
+
+.rich-text-editor .ql-editor.ql-blank::before {
+  color: hsl(var(--muted-foreground));
+  font-style: italic;
+}
+
+/* Toolbar button styling */
+.rich-text-editor .ql-toolbar button {
+  color: hsl(var(--foreground)) !important;
+  transition: color 0.2s ease;
+}
+
+.rich-text-editor .ql-toolbar button:hover {
+  color: hsl(var(--primary)) !important;
+}
+
+.rich-text-editor .ql-toolbar button.ql-active {
+  color: hsl(var(--primary)) !important;
+}
+
+.rich-text-editor .ql-toolbar .ql-picker-label {
+  color: hsl(var(--foreground));
+}
+
+.rich-text-editor .ql-toolbar .ql-picker-options {
+  background-color: hsl(var(--background));
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.375rem;
+}
+
+.rich-text-editor .ql-toolbar .ql-picker-item {
+  color: hsl(var(--foreground));
+}
+
+.rich-text-editor .ql-toolbar .ql-picker-item:hover {
+  background-color: hsl(var(--accent));
+  color: hsl(var(--primary));
+}
+
+/* Focus styling */
+.rich-text-editor:focus-within .ql-container {
+  border-color: hsl(var(--ring));
+  box-shadow: 0 0 0 2px hsl(var(--ring) / 0.2);
+}
+
+/* Content styling */
+.rich-text-editor .ql-editor h1 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  margin: 1rem 0 0.5rem 0;
+  color: hsl(var(--foreground)) !important;
+}
+
+.rich-text-editor .ql-editor h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0.75rem 0 0.5rem 0;
+  color: hsl(var(--foreground)) !important;
+}
+
+.rich-text-editor .ql-editor h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0.5rem 0 0.25rem 0;
+  color: hsl(var(--foreground)) !important;
+}
+
+.rich-text-editor .ql-editor p {
+  margin: 0.5rem 0;
+  color: hsl(var(--foreground)) !important;
+}
+
+.rich-text-editor .ql-editor ul,
+.rich-text-editor .ql-editor ol {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+
+.rich-text-editor .ql-editor li {
+  margin: 0.25rem 0;
+  color: hsl(var(--foreground)) !important;
+}
+
+.rich-text-editor .ql-editor a {
+  color: hsl(var(--primary)) !important;
+  text-decoration: underline;
+}
+
+.rich-text-editor .ql-editor strong {
+  font-weight: 600;
+}
+
+.rich-text-editor .ql-editor em {
+  font-style: italic;
+}
+
+/* Minimal variant */
+.rich-text-editor-minimal .ql-toolbar {
+  padding: 0.25rem 0.5rem;
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid hsl(var(--border));
+  border-radius: 0;
+}
+
+.rich-text-editor-minimal .ql-container {
+  border: none;
+  border-radius: 0;
+}
+
+.rich-text-editor-minimal .ql-editor {
+  padding: 0.75rem;
+}
+
+/* Compact variant */
+.rich-text-editor-compact .ql-toolbar {
+  padding: 0.375rem 0.5rem;
+}
+
+.rich-text-editor-compact .ql-editor {
+  padding: 0.75rem;
+  font-size: 0.875rem;
+}
+
+.rich-text-editor-compact .ql-editor h1 {
+  font-size: 1.5rem;
+}
+
+.rich-text-editor-compact .ql-editor h2 {
+  font-size: 1.25rem;
+}
+
+.rich-text-editor-compact .ql-editor h3 {
+  font-size: 1.125rem;
+}
+
+/* State variants */
+.rich-text-editor-wrapper.border-destructive .ql-container {
+  border-color: hsl(var(--destructive));
+}
+
+.rich-text-editor-wrapper.border-success .ql-container {
+  border-color: hsl(var(--success));
+}
+
+.rich-text-editor-wrapper.border-destructive .ql-toolbar {
+  border-color: hsl(var(--destructive));
+}
+
+.rich-text-editor-wrapper.border-success .ql-toolbar {
+  border-color: hsl(var(--success));
+}
+
+/* Disabled state */
+.rich-text-editor-wrapper.opacity-50 .ql-editor {
+  cursor: not-allowed;
+}
+
+.rich-text-editor-wrapper.opacity-50 .ql-toolbar button {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Read-only state */
+.rich-text-editor .ql-editor[contenteditable="false"] {
+  cursor: default;
+}
+
+.rich-text-editor .ql-toolbar.ql-toolbar-readonly {
+  display: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .rich-text-editor .ql-toolbar {
+    padding: 0.375rem;
+  }
+  
+  .rich-text-editor .ql-editor {
+    padding: 0.75rem;
+  }
+}
