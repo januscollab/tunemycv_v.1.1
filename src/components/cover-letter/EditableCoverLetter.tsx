@@ -40,19 +40,38 @@ const EditableCoverLetter = forwardRef<EditableCoverLetterRef, EditableCoverLett
       const toolbar = quillRef.current.getEditor().getModule('toolbar');
       if (toolbar && toolbar.container) {
         // Remove existing download button if any
-        const existingBtn = toolbar.container.querySelector('.ql-download');
+        const existingBtn = toolbar.container.querySelector('.ql-download-container');
         if (existingBtn) existingBtn.remove();
 
-        // Add download button to the right side of toolbar
-        const downloadBtn = document.createElement('span');
-        downloadBtn.className = 'ql-download';
-        downloadBtn.style.marginLeft = 'auto';
-        downloadBtn.style.display = 'flex';
-        downloadBtn.style.alignItems = 'center';
+        // Make toolbar container flexbox for proper alignment
+        toolbar.container.style.display = 'flex';
+        toolbar.container.style.justifyContent = 'space-between';
+        toolbar.container.style.alignItems = 'center';
         
-        // Create download component container
+        // Wrap existing toolbar groups in a container
+        const existingGroups = Array.from(toolbar.container.children);
+        const leftContainer = document.createElement('div');
+        leftContainer.style.display = 'flex';
+        leftContainer.style.alignItems = 'center';
+        leftContainer.style.gap = '4px';
+        
+        // Move existing groups to left container
+        existingGroups.forEach(group => {
+          if (group instanceof HTMLElement && group.className !== 'ql-download-container') {
+            leftContainer.appendChild(group as Node);
+          }
+        });
+        
+        // Create download component container on the right
         const downloadContainer = document.createElement('div');
-        downloadContainer.style.marginLeft = 'auto';
+        downloadContainer.className = 'ql-download-container';
+        downloadContainer.style.display = 'flex';
+        downloadContainer.style.alignItems = 'center';
+        downloadContainer.style.height = '28px'; // Match toolbar button height
+        
+        // Clear toolbar and add both containers
+        toolbar.container.innerHTML = '';
+        toolbar.container.appendChild(leftContainer);
         toolbar.container.appendChild(downloadContainer);
 
         // Render download options

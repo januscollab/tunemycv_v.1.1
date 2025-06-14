@@ -49,9 +49,9 @@ const Navigation = () => {
     <>
       {/* Sticky placeholder to prevent layout jump */}
       {isSticky && <div className="h-16" />}
-      <nav className={`bg-background/95 border-b border-border backdrop-blur-md transition-all duration-500 ease-out ${
+      <nav className={`bg-background/95 border-b border-border backdrop-blur-md transition-all duration-500 ease-out will-change-transform ${
         isSticky 
-          ? 'fixed top-0 left-0 right-0 z-50 shadow-lg bg-background/98 transform translate-y-0 opacity-100' 
+          ? 'fixed top-0 left-0 right-0 z-50 shadow-lg bg-background/98 transform translate-y-0 opacity-100 animate-fade-in' 
           : 'relative transform translate-y-0 opacity-100'
       }`}>
         <div className="max-w-6xl mx-auto px-4">
