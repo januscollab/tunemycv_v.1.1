@@ -123,6 +123,73 @@ const DesignSystem = () => {
     { name: 'Link', variant: 'link', usage: '45 usages', description: 'Text-style buttons for inline actions' },
   ];
 
+  // Missing Components in Documentation
+  const missingComponents = [
+    { 
+      name: 'JobDescriptionTextInput', 
+      component: <div className="text-caption text-muted-foreground">Auto-saving job description input with character count</div>, 
+      usage: '12 usages',
+      description: 'Specialized input for job descriptions with auto-save functionality and validation',
+      status: 'active'
+    },
+    { 
+      name: 'ContactSalesModal', 
+      component: <div className="text-caption text-muted-foreground">Modal for sales contact form</div>, 
+      usage: '3 usages',
+      description: 'Modal component for sales inquiries and contact forms',
+      status: 'active'
+    },
+    { 
+      name: 'WelcomeCreditsModal', 
+      component: <div className="text-caption text-muted-foreground">New user welcome credits modal</div>, 
+      usage: '5 usages',
+      description: 'Modal shown to new users explaining credit system',
+      status: 'active'
+    },
+    { 
+      name: 'ProcessingModal', 
+      component: <div className="text-caption text-muted-foreground">File processing status modal</div>, 
+      usage: '8 usages',
+      description: 'Modal for showing file upload and processing progress',
+      status: 'active'
+    },
+    { 
+      name: 'ToastModal', 
+      component: <div className="text-caption text-muted-foreground">Enhanced toast notification modal</div>, 
+      usage: '15 usages',
+      description: 'Advanced toast notifications for complex feedback',
+      status: 'active'
+    },
+    { 
+      name: 'MockPaymentModal', 
+      component: <div className="text-caption text-muted-foreground">Demo payment processing modal</div>, 
+      usage: '2 usages',
+      description: 'Modal for simulating payment flows in demo mode',
+      status: 'active'
+    },
+    { 
+      name: 'BounceLoader', 
+      component: <div className="text-caption text-muted-foreground">Three-dot bounce loading animation</div>, 
+      usage: '23 usages',
+      description: 'Animated loading indicator with bouncing dots',
+      status: 'active'
+    },
+    { 
+      name: 'StepIndicator', 
+      component: <div className="text-caption text-muted-foreground">Multi-step process indicator</div>, 
+      usage: '7 usages',
+      description: 'Visual indicator for multi-step workflows and forms',
+      status: 'active'
+    },
+    { 
+      name: 'ProgressIndicator', 
+      component: <div className="text-caption text-muted-foreground">Advanced progress bar with variants</div>, 
+      usage: '34 usages',
+      description: 'Progress bars with multiple variants, sizes, and animations',
+      status: 'active'
+    }
+  ];
+
   const animationTypes = [
     { 
       name: 'Pricing Tile Hover', 
@@ -436,11 +503,12 @@ const DesignSystem = () => {
         </div>
 
         {/* Tabbed Navigation */}
-        <Tabs defaultValue="foundations" className="mt-8">
-          <TabsList className="grid w-full grid-cols-4">
+        <Tabs defaultValue="foundations" className="w-full">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="foundations">Foundations</TabsTrigger>
             <TabsTrigger value="components">Components</TabsTrigger>
             <TabsTrigger value="interactions">Interactions</TabsTrigger>
+            <TabsTrigger value="missing">Missing Docs</TabsTrigger>
             <TabsTrigger value="loading">Loading States</TabsTrigger>
           </TabsList>
 
@@ -733,7 +801,51 @@ const DesignSystem = () => {
             </section>
           </TabsContent>
 
-          {/* Loading States Tab */}
+            {/* Missing Components Tab */}
+          <TabsContent value="missing" className="space-y-8">
+            <section>
+              <h2 className="text-title font-bold text-foreground mb-8 flex items-center gap-3">
+                <AlertTriangle className="h-6 w-6 text-warning" />
+                Missing Components Documentation
+              </h2>
+              <p className="text-body text-muted-foreground mb-6">
+                These components are actively used in the live site but missing from design system documentation.
+              </p>
+              
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {missingComponents.map((component, index) => (
+                  <Card key={index} className="group hover:shadow-lg transition-all duration-300 border-warning/30">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-subheading flex items-center gap-2">
+                          {component.name}
+                          <Badge variant="outline" className="text-tiny bg-warning/10 text-warning border-warning/30">
+                            {component.status}
+                          </Badge>
+                        </CardTitle>
+                        <Badge variant="outline" className="text-micro">
+                          {component.usage}
+                        </Badge>
+                      </div>
+                      <p className="text-caption text-muted-foreground">
+                        {component.description}
+                      </p>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="bg-warning/5 border border-warning/20 p-4 rounded-lg flex items-center justify-center min-h-[80px]">
+                        {component.component}
+                      </div>
+                      <div className="text-micro text-warning bg-warning/10 p-2 rounded border-l-2 border-warning/50 mt-3">
+                        <strong>Action Required:</strong> Add component documentation and examples to design system
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </section>
+          </TabsContent>
+
+            {/* Loading States Tab */}
           <TabsContent value="loading" className="space-y-8">
             <LoadingStatesShowcase 
               activeModal={activeModal} 
