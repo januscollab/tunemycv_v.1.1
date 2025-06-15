@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { DocumentHistory } from '@/components/ui/profile-document-history';
+import { CategoryDocumentHistory } from '@/components/ui/category-document-history';
 import { Eye, FileText, MessageSquare, Trash2 } from 'lucide-react';
 import AnalysisDetailModal from './analysis/AnalysisDetailModal';
 import UpcomingFeatureModal from './analysis/UpcomingFeatureModal';
@@ -156,7 +156,7 @@ const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ credits, member
 
   return (
     <div className="space-y-6">
-      <DocumentHistory
+      <CategoryDocumentHistory
         header={{
           title: "Analysis History",
           totalCount: analyses.length,

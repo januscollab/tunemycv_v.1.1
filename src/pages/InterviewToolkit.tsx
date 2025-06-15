@@ -28,6 +28,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { CaptureInput } from '@/components/ui/capture-input';
+import { CategoryDocumentHistory } from '@/components/ui/category-document-history';
 import AnalysisHistoryTab from '@/components/profile/AnalysisHistoryTab';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Breadcrumbs from '@/components/navigation/Breadcrumbs';
@@ -611,17 +612,24 @@ const InterviewToolkit = () => {
 
               {/* Interview Notes History Tab */}
               <TabsContent value="history" className="mt-0">
-                <Card className="border border-gray-200 dark:border-gray-700">
-                  <CardContent className="text-center py-8">
-                    <MessageSquare className="h-12 w-12 text-zapier-orange mx-auto mb-4" />
-                    <p className="text-gray-600 dark:text-gray-400 mb-2 font-normal">
-                      Interview Notes History
-                    </p>
-                    <p className="text-sm font-normal text-gray-500">
-                      Your generated interview preparation notes will appear here once the feature is available.
-                    </p>
-                  </CardContent>
-                </Card>
+                <CategoryDocumentHistory
+                  header={{
+                    title: "Interview Notes History",
+                    totalCount: 0,
+                    filterType: 'all',
+                    onFilterChange: () => {},
+                    itemsPerPage: 10,
+                    onItemsPerPageChange: () => {},
+                    showPagination: false
+                  }}
+                  documents={[]}
+                  loading={false}
+                  emptyState={{
+                    title: "No interview notes yet",
+                    description: "Your generated interview preparation notes will appear here once you create them.",
+                    icon: <MessageSquare className="h-12 w-12" />
+                  }}
+                />
               </TabsContent>
             </Tabs>
           </div>
