@@ -331,23 +331,18 @@ const ExperimentalAIMenu: React.FC<ExperimentalAIMenuProps> = ({
             ref={menuRef}
             className={cn(
               "absolute z-[9999] animate-scale-in origin-top transition-all duration-300",
-              "bg-gradient-to-br from-background/98 to-background/95 backdrop-blur-xl",
-              "border border-border/30 rounded-2xl shadow-2xl ring-1 ring-primary/5",
-              "min-w-96 max-w-md overflow-hidden",
-              "before:absolute before:inset-0 before:bg-gradient-to-br before:from-primary/3 before:to-transparent before:pointer-events-none"
+              "bg-gradient-to-br from-background/95 to-background/90 backdrop-blur-xl",
+              "border border-border/50 rounded-2xl shadow-2xl",
+              "min-w-80 max-w-96 overflow-hidden"
             )}
             style={{
               left: `${menuPosition.x}px`,
               top: `${menuPosition.y}px`,
             }}
           >
-            {/* Enhanced Header with AI Avatar and Status */}
-            <div className="relative flex items-center gap-4 p-5 border-b border-border/20 bg-gradient-to-r from-primary/5 via-background/50 to-background/80">
-              {/* Animated Background Elements */}
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/[0.02] to-transparent opacity-60"></div>
-              <div className="absolute top-1 right-4 w-16 h-16 bg-primary/5 rounded-full blur-2xl"></div>
-              
-              <div className="relative w-14 h-14 rounded-2xl overflow-hidden ring-2 ring-primary/10 shadow-lg transition-all duration-500 hover:ring-primary/20 hover:scale-105">
+            {/* Header with AI Avatar and Subtle Branding */}
+            <div className="flex items-center gap-3 p-4 border-b border-border/30 bg-gradient-to-r from-orange-50/10 via-primary-50/10 to-background/20">
+              <div className="relative w-12 h-12 rounded-full overflow-hidden ring-2 ring-orange-200/20 transition-all duration-300">
                 {getAvatarUrl() !== '/ai-assistant-avatar.png' ? (
                   <img 
                     src={getAvatarUrl()} 
@@ -355,189 +350,127 @@ const ExperimentalAIMenu: React.FC<ExperimentalAIMenuProps> = ({
                     className="w-full h-full object-cover transition-all duration-500"
                   />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-primary/20 via-primary/30 to-primary/40 flex items-center justify-center text-2xl transition-all duration-500 hover:scale-110">
-                    ✨
+                  <div className="w-full h-full bg-gradient-to-br from-orange-100/30 via-primary-200/40 to-primary-300/50 flex items-center justify-center text-xl transition-all duration-500">
+                    🤖
                   </div>
                 )}
-                {/* Status indicator */}
-                <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full border-2 border-background flex items-center justify-center">
-                  <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-                </div>
               </div>
               
-              <div className="flex-1 relative z-10">
-                <div className="flex items-center gap-3 mb-1">
-                  <h3 className="text-subheading font-semibold text-foreground">AI Assistant</h3>
-                  <div className="px-2 py-0.5 bg-primary/10 text-primary text-tiny font-medium rounded-full">Ready</div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <p className="text-caption text-foreground-secondary">
-                    {isProcessing ? "Processing your request..." : `${currentSelectedText.length} characters selected`}
-                  </p>
-                  {!isProcessing && (
-                    <div className="w-1 h-1 bg-primary/60 rounded-full animate-pulse"></div>
-                  )}
-                </div>
+              <div className="flex-1">
+                <h3 className="text-sm font-medium text-foreground flex items-center gap-2">
+                  AI Assistant
+                  <div className="w-2 h-2 bg-gradient-to-r from-orange-400 to-orange-500 rounded-full animate-pulse"></div>
+                </h3>
+                <p className="text-xs text-foreground-secondary">
+                  {isProcessing ? "Processing..." : `${currentSelectedText.length} characters selected`}
+                </p>
               </div>
             </div>
 
 
-            {/* Enhanced Contextual Actions */}
-            <div className="p-5 space-y-2">
+            {/* Contextual Actions with Nested Menus */}
+            <div className="p-4 space-y-1">
               {!isProcessing ? (
                 <>
-                  {/* Quick Info Bar */}
-                  <div className="flex items-center justify-between px-3 py-2 bg-primary/5 rounded-lg border border-primary/10 mb-4">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-primary rounded-full"></div>
-                      <span className="text-caption font-medium text-primary">Smart Actions Available</span>
-                    </div>
-                    <span className="text-micro text-foreground-secondary">{contextualActions.length} options</span>
-                  </div>
-
                   {contextualActions.map((action, index) => (
-                    <div key={action.id} className="relative group">
+                    <div key={action.id} className="relative">
                       {action.subActions ? (
-                        // Parent action with submenu - Enhanced Design
-                        <div className="space-y-1">
+                        // Parent action with submenu
+                        <div>
                           <button
                             onClick={() => setActiveSubmenu(activeSubmenu === action.id ? null : action.id)}
                             onMouseEnter={() => setHoveredAction(action.id)}
                             onMouseLeave={() => setHoveredAction(null)}
                             className={cn(
-                              "w-full flex items-center justify-between gap-3 px-4 py-3.5 rounded-xl transition-all duration-300",
-                              "text-foreground hover:bg-gradient-to-r hover:from-primary/8 hover:to-primary/4 hover:text-primary group",
-                              "text-body font-medium border border-transparent hover:border-primary/20 hover:shadow-lg",
-                              "backdrop-blur-sm relative overflow-hidden",
-                              activeSubmenu === action.id && "bg-gradient-to-r from-primary/10 to-primary/5 border-primary/25 shadow-md",
-                              hoveredAction === action.id && "transform scale-[1.02] -translate-y-0.5"
+                              "w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg transition-all duration-300",
+                              "text-foreground/90 hover:bg-gradient-to-r hover:from-orange-50/30 hover:to-primary-50/30 hover:text-primary group",
+                              "text-sm font-medium border border-transparent hover:border-orange-200/30",
+                              activeSubmenu === action.id && "bg-gradient-to-r from-orange-50/40 to-primary-50/40 border-orange-200/40",
+                              hoveredAction === action.id && "transform scale-[1.02] shadow-lg"
                             )}
                             style={{
-                              animationDelay: `${index * 75}ms`,
+                              animationDelay: `${index * 50}ms`,
                               transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)'
                             }}
                           >
-                            {/* Hover glow effect */}
-                            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                            
-                            <div className="flex items-center gap-3 relative z-10">
-                              <div className={cn(
-                                "w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center transition-all duration-300",
-                                hoveredAction === action.id && "bg-primary/20 scale-110"
-                              )}>
-                                <action.icon className={cn(
-                                  "w-4 h-4 transition-all duration-300 text-primary/70",
-                                  hoveredAction === action.id && "scale-110 text-primary"
-                                )} />
-                              </div>
-                              <div className="text-left">
-                                <div className="font-medium">{action.label}</div>
-                                <div className="text-micro text-foreground-secondary">
-                                  {action.subActions?.length} variations
-                                </div>
-                              </div>
+                            <div className="flex items-center gap-3">
+                              <action.icon className={cn(
+                                "w-4 h-4 transition-all duration-300",
+                                hoveredAction === action.id && "scale-110 text-orange-500"
+                              )} />
+                              {action.label}
                             </div>
                             <div className={cn(
-                              "w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center transition-all duration-300",
-                              activeSubmenu === action.id ? "rotate-90 bg-primary/20" : "group-hover:bg-primary/15"
-                            )}>
-                              <div className="w-1.5 h-1.5 bg-primary/60 rounded-full"></div>
-                            </div>
+                              "w-2 h-2 bg-orange-400/60 rounded-full transition-all duration-300",
+                              activeSubmenu === action.id ? "rotate-90 scale-110" : "scale-75"
+                            )} />
                           </button>
                           
-                          {/* Enhanced Submenu */}
+                          {/* Submenu with smooth gliding animation */}
                           {activeSubmenu === action.id && (
-                            <div className="ml-6 space-y-1 animate-fade-in bg-gradient-to-r from-background/50 to-background/30 backdrop-blur-sm rounded-lg p-3 border border-border/20">
+                            <div className="mt-1 ml-4 space-y-0.5 animate-slide-in-right overflow-hidden">
                               {action.subActions.map((subAction, subIndex) => (
                                 <button
                                   key={subAction.id}
                                   onClick={() => handleAIAction(action.id, subAction.id)}
                                   className={cn(
-                                    "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-300",
-                                    "text-foreground-secondary hover:bg-primary/8 hover:text-primary",
-                                    "text-body group border border-transparent hover:border-primary/15",
-                                    "hover:transform hover:translate-x-1 hover:scale-[1.01] hover:shadow-sm"
+                                    "w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-300",
+                                    "text-foreground/80 hover:bg-gradient-to-r hover:from-orange-50/40 hover:to-primary-50/40 hover:text-primary",
+                                    "text-sm group border border-transparent hover:border-orange-200/30",
+                                    "hover:transform hover:translate-x-1 hover:scale-[1.02]"
                                   )}
                                   style={{
                                     animationDelay: `${subIndex * 50}ms`,
                                     transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)'
                                   }}
                                 >
-                                  <div className="w-6 h-6 rounded-md bg-primary/8 flex items-center justify-center group-hover:bg-primary/15 transition-all duration-300">
-                                    <subAction.icon className="w-3 h-3 group-hover:scale-110 transition-all duration-300 text-primary/60 group-hover:text-primary" />
-                                  </div>
-                                  <span className="font-medium">{subAction.label}</span>
+                                  <subAction.icon className="w-3.5 h-3.5 group-hover:scale-110 transition-all duration-300 text-orange-400/70 group-hover:text-orange-500" />
+                                  {subAction.label}
                                 </button>
                               ))}
                             </div>
                           )}
                         </div>
                       ) : (
-                        // Single action without submenu - Enhanced Design
+                        // Single action without submenu
                         <button
                           onClick={() => handleAIAction(action.id)}
                           onMouseEnter={() => setHoveredAction(action.id)}
                           onMouseLeave={() => setHoveredAction(null)}
                           className={cn(
-                            "w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300",
-                            "text-foreground hover:bg-gradient-to-r hover:from-primary/8 hover:to-primary/4 hover:text-primary group",
-                            "text-body font-medium border border-transparent hover:border-primary/20 hover:shadow-lg",
-                            "backdrop-blur-sm relative overflow-hidden",
-                            hoveredAction === action.id && "transform scale-[1.02] -translate-y-0.5"
+                            "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-300",
+                            "text-foreground/90 hover:bg-gradient-to-r hover:from-orange-50/30 hover:to-primary-50/30 hover:text-primary group",
+                            "text-sm font-medium border border-transparent hover:border-orange-200/30",
+                            hoveredAction === action.id && "transform scale-[1.02] shadow-lg"
                           )}
                           style={{
-                            animationDelay: `${index * 75}ms`,
+                            animationDelay: `${index * 50}ms`,
                             transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)'
                           }}
                         >
-                          {/* Hover glow effect */}
-                          <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                          
-                          <div className={cn(
-                            "w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center transition-all duration-300 relative z-10",
-                            hoveredAction === action.id && "bg-primary/20 scale-110"
-                          )}>
-                            <action.icon className={cn(
-                              "w-4 h-4 transition-all duration-300 text-primary/70",
-                              hoveredAction === action.id && "scale-110 text-primary"
-                            )} />
-                          </div>
-                          <div className="text-left relative z-10">
-                            <div className="font-medium">{action.label}</div>
-                            <div className="text-micro text-foreground-secondary">Direct action</div>
-                          </div>
+                          <action.icon className={cn(
+                            "w-4 h-4 transition-all duration-300",
+                            hoveredAction === action.id && "scale-110 text-orange-500"
+                          )} />
+                          {action.label}
                         </button>
                       )}
                     </div>
                   ))}
                 </>
               ) : (
-                // Enhanced Loading state
-                <div className="flex flex-col items-center justify-center py-12 space-y-4">
-                  <div className="relative">
-                    <div className="animate-spin rounded-full h-10 w-10 border-2 border-primary/20"></div>
-                    <div className="animate-ping absolute inset-0 rounded-full h-10 w-10 border-2 border-primary opacity-20"></div>
-                    <div className="absolute inset-2 bg-primary/10 rounded-full animate-pulse"></div>
-                  </div>
-                  <div className="text-center space-y-1">
-                    <div className="text-body font-medium text-foreground">Processing with AI</div>
-                    <div className="text-caption text-foreground-secondary">Analyzing your selection...</div>
+                <div className="flex items-center justify-center py-8">
+                  <div className="text-center space-y-3">
+                    <div className="relative">
+                      <div className="w-8 h-8 border-2 border-orange-200/40 border-t-orange-400 rounded-full animate-spin mx-auto" />
+                      <div className="absolute inset-0 w-8 h-8 border border-primary/20 rounded-full animate-ping" />
+                    </div>
+                    <p className="text-sm text-foreground-secondary">
+                      Enhancing your text...
+                    </p>
                   </div>
                 </div>
               )}
-            </div>
-
-            {/* Enhanced Footer */}
-            <div className="px-5 py-3 border-t border-border/20 bg-gradient-to-r from-background/80 to-background/60">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></div>
-                  <span className="text-micro text-foreground-secondary">AI Ready</span>
-                </div>
-                <div className="text-micro text-foreground-tertiary">
-                  Select text to enhance
-                </div>
-              </div>
             </div>
           </div>
         )}
