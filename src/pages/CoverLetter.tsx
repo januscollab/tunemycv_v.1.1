@@ -808,10 +808,6 @@ const AuthenticatedCoverLetter = () => {
                       <div className="space-y-4">
                         <div className="flex items-center justify-between">
                           <h3 className="text-lg font-semibold">Cover Letter Content</h3>
-                          <DownloadOptions 
-                            content={selectedCoverLetter.content}
-                            fileName={`${selectedCoverLetter.company_name}_${selectedCoverLetter.job_title}_Cover_Letter`}
-                          />
                         </div>
                         <RichTextEditor
                           value={(() => {
@@ -1001,30 +997,48 @@ const AuthenticatedCoverLetter = () => {
                       label: 'Download',
                       icon: <Download className="h-4 w-4 mr-2" />,
                       onClick: (doc) => {
-                        // Create a temporary container to render DownloadOptions
+                        // Create a temporary container to render DownloadOptions dropdown
                         const container = document.createElement('div');
+                        container.className = 'download-options-container';
                         container.style.position = 'fixed';
-                        container.style.top = '50%';
-                        container.style.left = '50%';
-                        container.style.transform = 'translate(-50%, -50%)';
                         container.style.zIndex = '9999';
+                        
+                        // Position the container near the clicked button
+                        const clickEvent = event as MouseEvent;
+                        const rect = (clickEvent.target as Element).getBoundingClientRect();
+                        container.style.top = `${rect.bottom + 5}px`;
+                        container.style.left = `${rect.left}px`;
                         
                         // Import React and render DownloadOptions
                         import('react-dom/client').then(({ createRoot }) => {
                           const root = createRoot(container);
                           const fileName = `${doc.company_name}_${doc.job_title}_Cover_Letter`;
                           
-                          // Render DownloadOptions component
-                          root.render(
-                            React.createElement(DownloadOptions, {
+                          // Create a trigger button that auto-clicks to open the dropdown
+                          const TriggerWrapper = () => {
+                            const triggerRef = React.useRef<HTMLButtonElement>(null);
+                            
+                            React.useEffect(() => {
+                              // Auto-click the trigger to open the dropdown
+                              setTimeout(() => {
+                                triggerRef.current?.click();
+                              }, 10);
+                            }, []);
+                            
+                            return React.createElement(DownloadOptions, {
                               content: doc.content,
-                              fileName: fileName
-                            })
-                          );
+                              fileName: fileName,
+                              triggerComponent: React.createElement('button', {
+                                ref: triggerRef,
+                                style: { opacity: 0, position: 'absolute', pointerEvents: 'none' }
+                              }, 'Download')
+                            });
+                          };
                           
+                          root.render(React.createElement(TriggerWrapper));
                           document.body.appendChild(container);
                           
-                          // Clean up when done
+                          // Clean up when user clicks elsewhere
                           const cleanup = () => {
                             if (document.body.contains(container)) {
                               root.unmount();
@@ -1032,8 +1046,9 @@ const AuthenticatedCoverLetter = () => {
                             }
                           };
                           
-                          // Auto cleanup after 30 seconds
+                          // Auto cleanup after 30 seconds or on outside click
                           setTimeout(cleanup, 30000);
+                          document.addEventListener('click', cleanup, { once: true });
                         });
                       }
                     },
