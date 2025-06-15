@@ -10,6 +10,7 @@ import { FloatingLabelTextarea } from '@/components/common/FloatingLabelTextarea
 import { CaptureInput } from '@/components/ui/capture-input';
 import { CaptureTextarea } from '@/components/ui/capture-textarea';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
+import LegacyRichTextEditor from '@/components/ui/legacy-rich-text-editor';
 import '@/components/ui/rich-text-editor.css';
 
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -645,7 +646,7 @@ const DesignSystem = () => {
     {
       name: 'Default Editor',
       component: (
-        <RichTextEditor
+        <LegacyRichTextEditor
           placeholder="Enter your content here..."
           value={rteContent}
           onChange={(value) => {
@@ -657,10 +658,6 @@ const DesignSystem = () => {
             setRteContent(value);
             // In real implementation, this would save to backend
             // For demo purposes, we'll show a save confirmation
-          }}
-          onDownload={(value, filename) => {
-            console.log('Downloading content:', value, filename);
-            // Download functionality is handled internally
           }}
           filename="design-system-sample"
           className="w-full"
@@ -676,13 +673,11 @@ const DesignSystem = () => {
       name: 'With AI Features',
       component: (
         <RichTextEditor
-          showAIFeatures={true}
-          placeholder="Select text to see AI options..."
-          value="<p>Select any text in this editor to see AI enhancement options appear. Try selecting this sentence to see the AI toolbar.</p>"
-          onChange={(value) => console.log('AI editor changed:', value)}
-          onAIRequest={(context, action) => console.log('AI request:', action, context.selectedText)}
+          initialContent="<p>Select any text in this editor to see AI enhancement options appear. Try selecting this sentence to see the AI toolbar.</p>"
+          onContentChange={(json, text) => console.log('AI editor changed:', json, text)}
+          onAIRequest={(action) => console.log('AI request:', action)}
           className="w-full"
-          minHeight="180px"
+          placeholder="Select text to see AI options..."
         />
       ),
       usage: '12 usages',
@@ -693,9 +688,9 @@ const DesignSystem = () => {
       component: (
         <RichTextEditor
           readOnly={true}
-          value="<h2>Read-only Content</h2><p>This content cannot be edited and is displayed for viewing only.</p><ul><li>Read-only item 1</li><li>Read-only item 2</li></ul>"
+          initialContent="<h2>Read-only Content</h2><p>This content cannot be edited and is displayed for viewing only.</p><ul><li>Read-only item 1</li><li>Read-only item 2</li></ul>"
+          onContentChange={() => {}}
           className="w-full"
-          minHeight="150px"
         />
       ),
       usage: '18 usages',
@@ -704,7 +699,7 @@ const DesignSystem = () => {
     {
       name: 'Error State',
       component: (
-        <RichTextEditor
+        <LegacyRichTextEditor
           state="error"
           placeholder="Editor with error state..."
           value="<p>This editor shows an error state with red border styling.</p>"
@@ -719,7 +714,7 @@ const DesignSystem = () => {
     {
       name: 'Success State',
       component: (
-        <RichTextEditor
+        <LegacyRichTextEditor
           state="success"
           placeholder="Editor with success state..."
           value="<p>This editor shows a success state with green border and checkmark.</p>"
@@ -734,7 +729,7 @@ const DesignSystem = () => {
     {
       name: 'Disabled Editor',
       component: (
-        <RichTextEditor
+        <LegacyRichTextEditor
           disabled={true}
           placeholder="Disabled editor..."
           value="<p>This editor is disabled and cannot be interacted with.</p>"
