@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FileText, Sparkles, Trash2, RefreshCw, Clock, FileUp, Search, AlertCircle, Eye, Edit, Download, History, RotateCcw, Edit2, Linkedin } from 'lucide-react';
 import Breadcrumbs from '@/components/navigation/Breadcrumbs';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
-import { DocumentHistory } from '@/components/ui/document-history';
+import { CategoryDocumentHistory } from '@/components/ui/category-document-history';
 
 import { useAuth } from '@/contexts/AuthContext';
 import { useCoverLetter } from '@/hooks/useCoverLetter';
@@ -841,7 +841,7 @@ const AuthenticatedCoverLetter = () => {
               </TabsContent>
 
               <TabsContent value="history" className="mt-6">
-                <DocumentHistory
+                <CategoryDocumentHistory
                   header={{
                     title: "Cover Letter History",
                     totalCount: allCoverLetters.length,

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { DocumentHistory } from '@/components/ui/document-history';
+import { DocumentHistory } from '@/components/ui/profile-document-history';
 import { Eye, FileText, MessageSquare, Trash2 } from 'lucide-react';
 import AnalysisDetailModal from './analysis/AnalysisDetailModal';
 import UpcomingFeatureModal from './analysis/UpcomingFeatureModal';

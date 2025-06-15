@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { FileText, Eye, Download, MessageSquare, Trash2 } from 'lucide-react';
-import { DocumentHistory, DocumentItem as DesignSystemDocumentItem, DocumentAction } from '@/components/ui/document-history';
+import { DocumentHistory, DocumentItem as DesignSystemDocumentItem, DocumentAction } from '@/components/ui/profile-document-history';
 import DownloadOptions from '@/components/cover-letter/DownloadOptions';
 import EditTitleDialog from '@/components/ui/edit-title-dialog';
 import { Button } from '@/components/ui/button';

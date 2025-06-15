@@ -26,7 +26,8 @@ import { MockPaymentModal } from '@/components/ui/mock-payment-modal';
 import { StepIndicator } from '@/components/ui/step-indicator';
 import { ProgressIndicator } from '@/components/ui/progress-indicator';
 import { HistorySection, HistoryHeader, HistoryList, HistoryEmptyState } from '@/components/ui/history-section';
-import { DocumentHistory, DocumentHistoryHeader, DocumentHistoryList, DocumentHistoryItem } from '@/components/ui/document-history';
+import { CategoryDocumentHistory, CategoryDocumentHistoryHeader, CategoryDocumentHistoryList, CategoryDocumentHistoryItem } from '@/components/ui/category-document-history';
+import { DocumentHistory, DocumentHistoryHeader, DocumentHistoryList, DocumentHistoryItem } from '@/components/ui/profile-document-history';
 
 
 const DesignSystem = () => {
@@ -320,10 +321,10 @@ const DesignSystem = () => {
       trigger: () => {}
     },
     { 
-      name: 'DocumentHistory', 
+      name: 'CategoryDocumentHistory', 
       component: (
         <div className="w-full max-w-4xl">
-          <DocumentHistory
+          <CategoryDocumentHistory
             header={{
               title: "Document History",
               totalCount: 3,
@@ -1133,7 +1134,7 @@ const DesignSystem = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="bg-muted/30 p-4 rounded-lg">
-                      <DocumentHistory
+                       <DocumentHistory
                         header={{
                           title: "Document History",
                           totalCount: 3,
