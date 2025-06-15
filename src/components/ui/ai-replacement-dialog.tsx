@@ -140,19 +140,23 @@ const AIReplacementDialog: React.FC<AIReplacementDialogProps> = ({
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={isLoading}
-            className="text-foreground-secondary"
+            className="text-foreground-secondary relative overflow-hidden group"
           >
-            Cancel
+            <span className="relative z-10">Cancel</span>
+            <span className="absolute inset-0 bg-gradient-to-r from-foreground/5 to-foreground/10 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ease-out"></span>
           </Button>
           
           {!isLoading && onRegenerate && (
             <Button
               variant="outline"
               onClick={onRegenerate}
-              className="gap-2 text-foreground-secondary"
+              className="gap-2 text-foreground-secondary relative overflow-hidden group"
             >
-              <RefreshCw className="h-4 w-4" />
-              Regenerate
+              <span className="relative z-10 flex items-center gap-2">
+                <RefreshCw className="h-4 w-4" />
+                Regenerate
+              </span>
+              <span className="absolute inset-0 bg-gradient-to-r from-foreground/5 to-foreground/10 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ease-out"></span>
             </Button>
           )}
           
@@ -162,9 +166,10 @@ const AIReplacementDialog: React.FC<AIReplacementDialogProps> = ({
                 onAccept()
                 onOpenChange(false)
               }}
-              className="bg-primary text-primary-foreground hover:bg-primary/90"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 relative overflow-hidden group"
             >
-              Apply Changes
+              <span className="relative z-10">Apply Changes</span>
+              <span className="absolute inset-0 bg-gradient-to-r from-white/10 to-white/20 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ease-out"></span>
             </Button>
           )}
         </DialogFooter>

@@ -218,7 +218,7 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
           <div
             ref={menuRef}
             className={cn(
-              "absolute z-modal w-52 bg-gradient-to-br from-primary-600 to-primary-700 rounded-lg shadow-lg overflow-hidden",
+              "absolute z-modal w-52 bg-gradient-to-br from-primary-600/80 to-primary-700/80 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden",
               "animate-scale-in origin-top",
               "transform -translate-x-1/2"
             )}
@@ -228,14 +228,13 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
             }}
           >
             {/* Header Section */}
-            <div className="p-3 border-b border-primary-500/30">
+            <div className="p-3 border-b border-primary-500/20">
               <div className="flex items-center gap-2">
-                <div className="w-7 h-7 bg-primary-foreground/15 rounded-lg flex items-center justify-center">
-                  <WandSparkles className="w-4 h-4 text-primary-foreground/80" />
+                <div className="w-7 h-7 bg-primary-foreground/10 rounded-lg flex items-center justify-center">
+                  <WandSparkles className="w-4 h-4 text-primary-foreground/60" />
                 </div>
                 <div>
-                  <h3 className="text-caption font-semibold text-primary-foreground/95">AI-Enhance</h3>
-                  <p className="text-micro text-primary-foreground/70">Menu</p>
+                  <h3 className="text-caption font-semibold text-primary-foreground/90">AI-Enhance</h3>
                 </div>
               </div>
             </div>
@@ -250,12 +249,12 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
                   disabled={isDisabled}
                   className={cn(
                     "w-full flex items-center justify-between gap-2 px-2.5 py-2 rounded-md transition-all",
-                    "text-primary-foreground/90 hover:bg-primary-500/15 hover:text-primary-foreground",
+                    "text-primary-foreground/90 hover:bg-primary-500/10 hover:text-primary-foreground",
                     "disabled:opacity-50 disabled:cursor-not-allowed"
                   )}
                 >
                   <div className="flex items-center gap-2">
-                    <div className="w-5 h-5 bg-white/25 rounded-md flex items-center justify-center">
+                    <div className="w-5 h-5 text-primary-foreground/70 flex items-center justify-center">
                       <WandSparkles className="w-3.5 h-3.5" />
                     </div>
                     <span className="text-micro font-medium">Rephrase</span>
@@ -269,7 +268,7 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
                   disabled={isDisabled}
                   className={cn(
                     "w-full flex items-center justify-between gap-2 px-2.5 py-2 rounded-md transition-all",
-                    "text-primary-foreground/90 hover:bg-primary-500/15 hover:text-primary-foreground",
+                    "text-primary-foreground/90 hover:bg-primary-500/10 hover:text-primary-foreground",
                     "disabled:opacity-50 disabled:cursor-not-allowed"
                   )}
                 >
@@ -288,7 +287,7 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
                   disabled={isDisabled}
                   className={cn(
                     "w-full flex items-center justify-between gap-2 px-2.5 py-2 rounded-md transition-all",
-                    "text-primary-foreground/90 hover:bg-primary-500/15 hover:text-primary-foreground",
+                    "text-primary-foreground/90 hover:bg-primary-500/10 hover:text-primary-foreground",
                     "disabled:opacity-50 disabled:cursor-not-allowed"
                   )}
                 >
@@ -307,7 +306,7 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
                   disabled={isDisabled}
                   className={cn(
                     "w-full flex items-center justify-between gap-2 px-2.5 py-2 rounded-md transition-all",
-                    "text-primary-foreground/90 hover:bg-primary-500/15 hover:text-primary-foreground",
+                    "text-primary-foreground/90 hover:bg-primary-500/10 hover:text-primary-foreground",
                     "disabled:opacity-50 disabled:cursor-not-allowed"
                   )}
                 >
