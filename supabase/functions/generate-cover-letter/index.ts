@@ -112,7 +112,6 @@ serve(async (req) => {
     Company: ${request.companyName}
 
     IMPORTANT FORMATTING:
-    - Start with the date (today's date)
     - Include company name and address if available
     - Add a blank line, then "Dear Hiring Manager," (ensure there's a space after the company section)
     - Write the cover letter body with proper paragraphs
