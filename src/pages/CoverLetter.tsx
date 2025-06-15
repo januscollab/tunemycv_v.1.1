@@ -918,12 +918,12 @@ const AuthenticatedCoverLetter = () => {
                               }
                             }
                           }}
-                          onAIRequest={(action) => {
-                            console.log('AI request in cover letter:', action);
-                            // Future: Implement AI processing for cover letter enhancement
-                          }}
-                          showAIFeatures={true}
+                          showAIFeatures={false}
                           enableAutoSave={true}
+                          className="min-h-[400px]"
+                          placeholder="Start writing your cover letter..."
+                        />
+                      </div>
                           className="min-h-[400px]"
                           placeholder="Start writing your cover letter..."
                         />
