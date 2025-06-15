@@ -17,6 +17,7 @@ import LegacyKeywordSection from './components/LegacyKeywordSection';
 import PriorityRecommendationsSection from './components/PriorityRecommendationsSection';
 import PersonalizedMatchMessage from './components/PersonalizedMatchMessage';
 import NextStepsSection from './components/NextStepsSection';
+import N8nAnalysisResults from './N8nAnalysisResults';
 import PDFGenerator from './utils/PDFGenerator';
 
 interface AnalysisResultsProps {
@@ -80,6 +81,12 @@ const BugReportModal: React.FC<BugReportModalProps> = ({ isOpen, onClose, transa
 const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, readOnly = false }) => {
   const [showBugReport, setShowBugReport] = useState(false);
   const { getUserDisplayName } = useProfileData();
+  
+  // Check if this is an n8n analysis result
+  if (result.analysis_type === 'n8n') {
+    return <N8nAnalysisResults result={result} onStartNew={onStartNew} readOnly={readOnly} />;
+  }
+  
   const getMatchLevel = (score: number) => {
     if (score >= 80) return 'Excellent Match';
     if (score >= 70) return 'Good Match';

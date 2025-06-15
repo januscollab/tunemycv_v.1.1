@@ -3,6 +3,7 @@ import { useToast } from '@/hooks/use-toast';
 import { extractJobTitleFromText, extractCompanyFromText } from '@/utils/analysisUtils';
 import { saveFilesToDatabase, performAIAnalysis, saveAnalysisResults } from '@/services/analysisService';
 import { performComprehensiveAnalysis } from '@/utils/analysisEngine';
+import { useN8nAnalysis } from '@/hooks/useN8nAnalysis';
 import { UploadedFile } from '@/types/fileTypes';
 
 interface AnalysisOptions {
@@ -15,6 +16,7 @@ interface AnalysisOptions {
 export const useAnalysisExecution = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const n8nAnalysis = useN8nAnalysis();
 
   const executeAnalysis = async (
     uploadedFiles: { cv?: UploadedFile; jobDescription?: UploadedFile },
@@ -45,7 +47,64 @@ export const useAnalysisExecution = () => {
     let analysisResult;
     const hasCreditsForAI = userCredits?.credits && userCredits.credits > 0;
 
-    // Always try enhanced AI analysis if user has credits, otherwise use comprehensive local analysis
+    // Priority 1: Try n8n analysis first
+    try {
+      console.log('Attempting n8n analysis with document JSON...');
+      
+      // Use document JSON if available, otherwise convert from extracted text
+      const cvJson = uploadedFiles.cv.documentJson || {
+        content: uploadedFiles.cv.extractedText,
+        metadata: {
+          fileName: uploadedFiles.cv.file.name,
+          fileSize: uploadedFiles.cv.file.size
+        }
+      };
+      
+      const jdJson = uploadedFiles.jobDescription.documentJson || {
+        content: uploadedFiles.jobDescription.extractedText,
+        metadata: {
+          fileName: uploadedFiles.jobDescription.file.name,
+          fileSize: uploadedFiles.jobDescription.file.size
+        }
+      };
+
+      const n8nResult = await n8nAnalysis.submitForAnalysis(cvJson, jdJson);
+
+      if (n8nResult.success && n8nResult.test_files) {
+        console.log('n8n analysis successful');
+        
+        analysisResult = {
+          user_id: user?.id,
+          cv_upload_id: cvUpload?.id || null,
+          job_description_upload_id: jobUpload?.id || null,
+          cv_file_name: uploadedFiles.cv.file.name,
+          cv_file_size: uploadedFiles.cv.file.size,
+          cv_extracted_text: uploadedFiles.cv.extractedText,
+          job_description_file_name: uploadedFiles.jobDescription.file.name,
+          job_description_extracted_text: uploadedFiles.jobDescription.extractedText,
+          job_title: finalJobTitle,
+          company_name: extractedCompany,
+          compatibility_score: 85, // Default score for n8n results
+          executive_summary: 'Analysis completed via n8n processing workflow.',
+          analysis_type: 'n8n',
+          n8n_html_url: n8nResult.test_files.html,
+          n8n_pdf_url: n8nResult.test_files.pdf,
+          keywords_found: [],
+          keywords_missing: [],
+          strengths: [],
+          weaknesses: [],
+          recommendations: []
+        };
+
+        return analysisResult; // Early return for successful n8n analysis
+      } else {
+        throw new Error('n8n analysis failed, falling back to AI analysis');
+      }
+    } catch (n8nError) {
+      console.error('n8n analysis failed, falling back to AI analysis:', n8nError);
+    }
+
+    // Priority 2: Fall back to AI analysis if user has credits
     if (hasCreditsForAI) {
       try {
         const aiResult = await performAIAnalysis(uploadedFiles, finalJobTitle, user?.id!);
