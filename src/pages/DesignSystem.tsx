@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Eye, Code, Palette, Type, Square, Circle, Triangle, Zap, AlertTriangle, Search, Star, Heart, Award, Sparkles, Layers, Grid, Layout, MousePointer, Users, TrendingUp, Menu, ChevronDown, Info, Download, Settings, Bell, MessageSquare, Play, Pause, Volume2, RefreshCw, Camera, Clock, MapPin, Shield, Unlock, Lock, Mail, Upload, FileText, Loader, Activity, History } from 'lucide-react';
+import { ArrowLeft, Eye, Code, Palette, Type, Square, Circle, Triangle, Zap, AlertTriangle, Search, Star, Heart, Award, Sparkles, Layers, Grid, Layout, MousePointer, Users, TrendingUp, Menu, ChevronDown, Info, Download, Settings, Bell, MessageSquare, Play, Pause, Volume2, RefreshCw, Camera, Clock, MapPin, Shield, Unlock, Lock, Mail, Upload, FileText, Loader, Activity, History, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -26,6 +26,7 @@ import { MockPaymentModal } from '@/components/ui/mock-payment-modal';
 import { StepIndicator } from '@/components/ui/step-indicator';
 import { ProgressIndicator } from '@/components/ui/progress-indicator';
 import { HistorySection, HistoryHeader, HistoryList, HistoryEmptyState } from '@/components/ui/history-section';
+import { DocumentHistory, DocumentHistoryHeader, DocumentHistoryList, DocumentHistoryItem } from '@/components/ui/document-history';
 
 
 const DesignSystem = () => {
@@ -298,6 +299,82 @@ const DesignSystem = () => {
       ), 
       usage: '12 usages',
       description: 'Unified history component for analysis, cover letters, and CV management across the app',
+      status: 'active',
+      trigger: () => {}
+    },
+    { 
+      name: 'DocumentHistory', 
+      component: (
+        <div className="w-full max-w-4xl">
+          <DocumentHistory
+            header={{
+              title: "Document History",
+              totalCount: 3,
+              filterType: 'all',
+              onFilterChange: () => {},
+              itemsPerPage: 10,
+              onItemsPerPageChange: () => {},
+              showPagination: true
+            }}
+            documents={[
+              {
+                id: '1',
+                type: 'analysis',
+                title: 'Program Director',
+                job_title: 'Program Director',
+                company_name: 'Oracle',
+                created_at: '2025-06-14T23:57:00Z',
+                compatibility_score: 88,
+                has_cover_letter: true,
+                executive_summary: 'Strong candidate with relevant experience',
+                strengths: ['Leadership', 'Strategic Planning'],
+                weaknesses: ['Communication'],
+                recommendations: ['Improve presentation skills']
+              },
+              {
+                id: '2',
+                type: 'cover_letter',
+                title: 'Software Engineer Cover Letter',
+                job_title: 'Software Engineer',
+                company_name: 'TechCorp',
+                created_at: '2025-06-13T15:30:00Z',
+                content: 'Dear Hiring Manager...',
+                regeneration_count: 2,
+                analysis_result_id: 'analysis-123'
+              }
+            ]}
+            actions={[
+              {
+                label: 'View',
+                icon: <Eye className="h-4 w-4 mr-2" />,
+                onClick: (doc) => console.log('View:', doc.title)
+              },
+              {
+                label: 'Download',
+                icon: <Download className="h-4 w-4 mr-2" />,
+                onClick: (doc) => console.log('Download:', doc.title)
+              },
+              {
+                label: 'Delete',
+                icon: <Trash2 className="h-4 w-4 mr-2" />,
+                onClick: (doc) => console.log('Delete:', doc.title),
+                variant: 'destructive'
+              }
+            ]}
+            emptyState={{
+              title: "No documents found",
+              description: "You haven't created any analyses or cover letters yet."
+            }}
+            pagination={{
+              currentPage: 1,
+              totalPages: 1,
+              onPageChange: () => {}
+            }}
+          />
+        </div>
+      ), 
+      usage: '8 usages',
+      description: 'Specialized document history component for profile page with filtering, pagination, and advanced actions',
       status: 'active',
       trigger: () => {}
     }
