@@ -893,11 +893,35 @@ const AuthenticatedCoverLetter = () => {
                     {
                       label: 'Download',
                       icon: <Download className="h-4 w-4 mr-2" />,
-                      onClick: async (doc) => {
+                      onClick: (doc) => {
                         const fileName = `${doc.company_name}_${doc.job_title}_Cover_Letter`;
-                        const content = doc.content || '';
                         
-                        // Create dropdown menu
+                        // Function to clean HTML content for download
+                        const cleanHTMLContent = (htmlContent: string) => {
+                          // Create a temporary div to parse HTML
+                          const tempDiv = document.createElement('div');
+                          tempDiv.innerHTML = htmlContent;
+                          
+                          // Get text content and clean up spacing
+                          let cleanText = tempDiv.textContent || tempDiv.innerText || '';
+                          
+                          // Replace multiple whitespace/newlines with single spaces
+                          cleanText = cleanText.replace(/\s+/g, ' ').trim();
+                          
+                          // Add proper paragraph breaks where needed
+                          const sentences = cleanText.split(/\.\s+/);
+                          const formattedText = sentences
+                            .map(sentence => sentence.trim())
+                            .filter(sentence => sentence.length > 0)
+                            .map(sentence => sentence.endsWith('.') ? sentence : sentence + '.')
+                            .join('\n\n');
+                          
+                          return formattedText;
+                        };
+                        
+                        const content = cleanHTMLContent(doc.content || '');
+                        
+                        // Create a modal with download options using DownloadOptions component
                         const modal = document.createElement('div');
                         modal.style.position = 'fixed';
                         modal.style.top = '0';
@@ -913,27 +937,31 @@ const AuthenticatedCoverLetter = () => {
                         const menu = document.createElement('div');
                         menu.style.backgroundColor = 'white';
                         menu.style.borderRadius = '8px';
-                        menu.style.padding = '12px';
-                        menu.style.minWidth = '200px';
-                        menu.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+                        menu.style.padding = '16px';
+                        menu.style.minWidth = '250px';
+                        menu.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
                         menu.innerHTML = `
-                          <div style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; font-weight: 600; margin-bottom: 8px;">Download Cover Letter</div>
-                          <button id="download-pdf" style="width: 100%; padding: 8px 12px; border: none; background: white; text-align: left; cursor: pointer; border-radius: 4px; display: flex; align-items: center;" onmouseover="this.style.backgroundColor='#f3f4f6'" onmouseout="this.style.backgroundColor='white'">📄 <span style="margin-left: 8px;">Download as PDF</span></button>
-                          <button id="download-word" style="width: 100%; padding: 8px 12px; border: none; background: white; text-align: left; cursor: pointer; border-radius: 4px; display: flex; align-items: center;" onmouseover="this.style.backgroundColor='#f3f4f6'" onmouseout="this.style.backgroundColor='white'">📝 <span style="margin-left: 8px;">Download as Word</span></button>
-                          <button id="download-text" style="width: 100%; padding: 8px 12px; border: none; background: white; text-align: left; cursor: pointer; border-radius: 4px; display: flex; align-items: center;" onmouseover="this.style.backgroundColor='#f3f4f6'" onmouseout="this.style.backgroundColor='white'">📃 <span style="margin-left: 8px;">Download as Text</span></button>
+                          <div style="padding: 8px 0; border-bottom: 1px solid #e5e7eb; font-weight: 600; margin-bottom: 12px; text-align: center;">Download Cover Letter</div>
+                          <button id="download-pdf" style="width: 100%; padding: 12px 16px; border: none; background: white; text-align: left; cursor: pointer; border-radius: 6px; display: flex; align-items: center; margin-bottom: 8px; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f3f4f6'" onmouseout="this.style.backgroundColor='white'">📄 <span style="margin-left: 12px; font-weight: 500;">Download as PDF</span></button>
+                          <button id="download-word" style="width: 100%; padding: 12px 16px; border: none; background: white; text-align: left; cursor: pointer; border-radius: 6px; display: flex; align-items: center; margin-bottom: 8px; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f3f4f6'" onmouseout="this.style.backgroundColor='white'">📝 <span style="margin-left: 12px; font-weight: 500;">Download as Word</span></button>
+                          <button id="download-text" style="width: 100%; padding: 12px 16px; border: none; background: white; text-align: left; cursor: pointer; border-radius: 6px; display: flex; align-items: center; margin-bottom: 12px; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f3f4f6'" onmouseout="this.style.backgroundColor='white'">📃 <span style="margin-left: 12px; font-weight: 500;">Download as Text</span></button>
+                          <button id="cancel-download" style="width: 100%; padding: 8px 16px; border: 1px solid #d1d5db; background: #f9fafb; text-align: center; cursor: pointer; border-radius: 6px; font-weight: 500; color: #6b7280;" onmouseover="this.style.backgroundColor='#f3f4f6'" onmouseout="this.style.backgroundColor='#f9fafb'">Cancel</button>
                         `;
                         
                         modal.appendChild(menu);
                         document.body.appendChild(modal);
                         
-                        // Handle downloads with exact same logic as DownloadOptions
+                        // Handle PDF download with clean content
                         document.getElementById('download-pdf')?.addEventListener('click', async () => {
                           try {
                             const { default: jsPDF } = await import('jspdf');
                             const pdf = new jsPDF();
+                            
+                            // Split text into lines that fit the page width
                             const splitText = pdf.splitTextToSize(content, 180);
-                            pdf.text(splitText, 10, 10);
+                            pdf.text(splitText, 10, 20);
                             pdf.save(`${fileName}.pdf`);
+                            
                             toast({ title: 'Success', description: 'Cover letter downloaded as PDF' });
                           } catch (error) {
                             toast({ title: 'Error', description: 'Failed to download PDF', variant: 'destructive' });
@@ -941,15 +969,36 @@ const AuthenticatedCoverLetter = () => {
                           document.body.removeChild(modal);
                         });
                         
+                        // Handle Word download with clean content
                         document.getElementById('download-word')?.addEventListener('click', async () => {
                           try {
                             const { Document, Packer, Paragraph, TextRun } = await import('docx');
+                            
+                            // Split content into paragraphs for proper Word formatting
+                            const paragraphs = content.split('\n\n').filter(p => p.trim().length > 0);
+                            const docParagraphs = paragraphs.map(paragraph => 
+                              new Paragraph({
+                                children: [new TextRun(paragraph.trim())],
+                                spacing: { after: 240 } // Add spacing between paragraphs
+                              })
+                            );
+                            
                             const docx = new Document({
                               sections: [{
-                                properties: {},
-                                children: [new Paragraph({ children: [new TextRun(content)] })],
+                                properties: {
+                                  page: {
+                                    margin: {
+                                      top: 720,
+                                      right: 720,
+                                      bottom: 720,
+                                      left: 720,
+                                    },
+                                  },
+                                },
+                                children: docParagraphs,
                               }],
                             });
+                            
                             const blob = await Packer.toBlob(docx);
                             const url = URL.createObjectURL(blob);
                             const link = document.createElement('a');
@@ -957,6 +1006,7 @@ const AuthenticatedCoverLetter = () => {
                             link.download = `${fileName}.docx`;
                             link.click();
                             URL.revokeObjectURL(url);
+                            
                             toast({ title: 'Success', description: 'Cover letter downloaded as Word document' });
                           } catch (error) {
                             toast({ title: 'Error', description: 'Failed to download Word document', variant: 'destructive' });
@@ -964,15 +1014,17 @@ const AuthenticatedCoverLetter = () => {
                           document.body.removeChild(modal);
                         });
                         
+                        // Handle text download with clean content
                         document.getElementById('download-text')?.addEventListener('click', () => {
                           try {
-                            const blob = new Blob([content], { type: 'text/plain' });
+                            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
                             const url = URL.createObjectURL(blob);
                             const link = document.createElement('a');
                             link.href = url;
                             link.download = `${fileName}.txt`;
                             link.click();
                             URL.revokeObjectURL(url);
+                            
                             toast({ title: 'Success', description: 'Cover letter downloaded as text file' });
                           } catch (error) {
                             toast({ title: 'Error', description: 'Failed to download text file', variant: 'destructive' });
@@ -980,6 +1032,12 @@ const AuthenticatedCoverLetter = () => {
                           document.body.removeChild(modal);
                         });
                         
+                        // Handle cancel button
+                        document.getElementById('cancel-download')?.addEventListener('click', () => {
+                          document.body.removeChild(modal);
+                        });
+                        
+                        // Handle clicking outside modal
                         modal.addEventListener('click', (e) => {
                           if (e.target === modal) {
                             document.body.removeChild(modal);
