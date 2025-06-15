@@ -15,8 +15,9 @@ import {
   BookOpen,
   ChevronRight
 } from "lucide-react"
-import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction } from "@/components/ui/alert-dialog"
+import { AIReplacementDialog } from "@/components/ui/ai-replacement-dialog"
 import { cn } from "@/lib/utils"
+import { useToast } from "@/hooks/use-toast"
 
 interface AIAction {
   type: 'rephrase' | 'improve' | 'adjust_length' | 'role_specific'
@@ -28,7 +29,7 @@ interface AIAction {
 interface AIContextMenuProps {
   children: React.ReactNode
   selectedText?: string
-  onAIAction?: (action: AIAction) => void
+  onTextReplace?: (originalText: string, newText: string) => void
   disabled?: boolean
 }
 

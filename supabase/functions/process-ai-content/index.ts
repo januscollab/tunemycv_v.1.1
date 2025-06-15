@@ -8,6 +8,62 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+interface AIContentRequest {
+  selectedText: string;
+  action: {
+    type: 'rephrase' | 'improve' | 'adjust_length' | 'role_specific';
+    subType?: string;
+  };
+  context?: string;
+}
+
+function generatePrompt(selectedText: string, action: AIContentRequest['action']): string {
+  const baseContext = `You are a professional writing assistant. Your task is to modify the given text according to the specific instructions. Return ONLY the modified text without any explanations, quotes, or additional commentary.
+
+Original text: "${selectedText}"
+
+Instructions:`;
+
+  switch (action.type) {
+    case 'rephrase':
+      switch (action.subType) {
+        case 'professional':
+          return `${baseContext} Transform this text to use formal, polished business language. Make it sound more professional and authoritative while maintaining the core meaning.`;
+        case 'conversational':
+          return `${baseContext} Simplify and humanize the tone. Make it sound more casual, approachable, and conversational while keeping the key information.`;
+        case 'creative':
+          return `${baseContext} Add flair, storytelling elements, or creative language. Make it more engaging and unique while preserving the main message.`;
+        case 'structured':
+          return `${baseContext} Improve sentence order, flow, and logical structure. Reorganize for better clarity and coherence.`;
+        default:
+          return `${baseContext} Rephrase this text to improve clarity and readability while maintaining the original meaning.`;
+      }
+    
+    case 'improve':
+      return `${baseContext} Refine grammar, remove ambiguity, and improve overall clarity. Fix any grammatical errors and make the text more precise and well-written.`;
+    
+    case 'adjust_length':
+      switch (action.subType) {
+        case 'longer':
+          return `${baseContext} Expand this content with more detail, examples, or supporting information. Make it significantly longer while staying relevant.`;
+        case 'shorter':
+          return `${baseContext} Trim this content to its core message. Remove unnecessary words and make it more concise while preserving the key points.`;
+        case 'summarize':
+          return `${baseContext} Provide a 1-2 sentence summary that captures the essence of this text.`;
+        case 'expand_example':
+          return `${baseContext} Add a real-world example, case study, or specific result to illustrate the point being made.`;
+        default:
+          return `${baseContext} Adjust the length appropriately to improve readability.`;
+      }
+    
+    case 'role_specific':
+      return `${baseContext} Tailor the tone and keywords to be more specific to a professional job role. Use industry-appropriate language and terminology that would resonate with hiring managers.`;
+    
+    default:
+      return `${baseContext} Improve this text for better clarity and impact.`;
+  }
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -15,32 +71,17 @@ serve(async (req) => {
   }
 
   try {
-    const { action, content, selectedText } = await req.json();
-
-    let systemPrompt = '';
-    let userPrompt = '';
-
-    switch (action.type) {
-      case 'rephrase':
-        systemPrompt = 'You are a professional writing assistant. Rephrase the given text to be clearer and more engaging while maintaining the original meaning.';
-        userPrompt = `Please rephrase this text: "${selectedText}"`;
-        break;
-      case 'improve-clarity':
-        systemPrompt = 'You are a professional writing assistant. Improve the clarity and readability of the given text.';
-        userPrompt = `Please improve the clarity of this text: "${selectedText}"`;
-        break;
-      case 'adjust-length':
-        const lengthInstruction = action.length === 'shorter' ? 'make it more concise' : 'expand and add more detail';
-        systemPrompt = 'You are a professional writing assistant. Adjust the length of the given text as requested.';
-        userPrompt = `Please ${lengthInstruction} for this text: "${selectedText}"`;
-        break;
-      case 'make-role-specific':
-        systemPrompt = 'You are a professional writing assistant. Adapt the given text to be more specific and relevant to the target role.';
-        userPrompt = `Please make this text more specific to a ${action.role} role: "${selectedText}"`;
-        break;
-      default:
-        throw new Error('Unknown action type');
+    if (!openAIApiKey) {
+      throw new Error('OpenAI API key not configured');
     }
+
+    const { selectedText, action, context }: AIContentRequest = await req.json();
+
+    if (!selectedText || selectedText.trim().length < 10) {
+      throw new Error('Selected text must be at least 10 characters long');
+    }
+
+    const prompt = generatePrompt(selectedText, action);
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -51,23 +92,42 @@ serve(async (req) => {
       body: JSON.stringify({
         model: 'gpt-4o-mini',
         messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt }
+          { 
+            role: 'system', 
+            content: 'You are a professional writing assistant. Always return ONLY the modified text without explanations, quotes, or commentary.' 
+          },
+          { role: 'user', content: prompt }
         ],
-        max_tokens: 500,
         temperature: 0.7,
+        max_tokens: Math.max(selectedText.length * 2, 500),
       }),
     });
 
-    const data = await response.json();
-    const processedText = data.choices[0].message.content;
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`OpenAI API error: ${errorData.error?.message || 'Unknown error'}`);
+    }
 
-    return new Response(JSON.stringify({ processedText }), {
+    const data = await response.json();
+    const generatedText = data.choices[0]?.message?.content?.trim();
+
+    if (!generatedText) {
+      throw new Error('No content generated from OpenAI');
+    }
+
+    return new Response(JSON.stringify({ 
+      originalText: selectedText,
+      generatedText,
+      action 
+    }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
+
   } catch (error) {
     console.error('Error in process-ai-content function:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ 
+      error: error.message || 'An error occurred processing your request' 
+    }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
