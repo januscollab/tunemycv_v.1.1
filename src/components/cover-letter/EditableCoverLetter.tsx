@@ -208,7 +208,11 @@ const EditableCoverLetter = forwardRef<EditableCoverLetterRef, EditableCoverLett
       console.log('[EditableCoverLetter] HTML→JSON conversion:', {
         sectionsCount: jsonData.sections.length,
         formattedSections: jsonData.sections.filter(s => s.formatting?.bold).length,
-        hasChanges: newJsonString !== lastSavedContent
+        hasChanges: newJsonString !== lastSavedContent,
+        htmlPreview: html.substring(0, 200),
+        firstSectionContent: jsonData.sections[0]?.content?.substring(0, 200),
+        hasLineBreaks: jsonData.sections.some(s => s.content?.includes('\n')),
+        hasIndentation: jsonData.sections.some(s => s.content?.match(/^\s+/m))
       });
       
       // Only save if there are actual changes and content exists
@@ -216,7 +220,8 @@ const EditableCoverLetter = forwardRef<EditableCoverLetterRef, EditableCoverLett
         console.log('[EditableCoverLetter] Auto-saving changes...', {
           htmlLength: html.length,
           jsonSections: jsonData.sections.length,
-          formattedSections: jsonData.sections.filter(s => s.formatting?.bold).length
+          formattedSections: jsonData.sections.filter(s => s.formatting?.bold).length,
+          rawJsonContent: JSON.stringify(jsonData, null, 2)
         });
         
         await onSave(newJsonString);

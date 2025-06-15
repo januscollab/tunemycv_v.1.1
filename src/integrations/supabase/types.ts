@@ -568,6 +568,7 @@ export type Database = {
           filename: string
           format: string
           id: string
+          mime: string | null
           storage_path: string
           type: string
           uploaded_at: string | null
@@ -576,6 +577,7 @@ export type Database = {
           filename: string
           format: string
           id?: string
+          mime?: string | null
           storage_path: string
           type: string
           uploaded_at?: string | null
@@ -584,6 +586,7 @@ export type Database = {
           filename?: string
           format?: string
           id?: string
+          mime?: string | null
           storage_path?: string
           type?: string
           uploaded_at?: string | null
