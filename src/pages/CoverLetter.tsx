@@ -816,32 +816,47 @@ const AuthenticatedCoverLetter = () => {
                         <RichTextEditor
                           initialContent={(() => {
                             try {
-                              // Create a temporary div to properly decode HTML entities
-                              const tempDiv = document.createElement('div');
-                              tempDiv.innerHTML = selectedCoverLetter.content;
-                              const decodedContent = tempDiv.textContent || tempDiv.innerText || selectedCoverLetter.content;
-                              
+                              // Helper function to properly decode and clean HTML
+                              const cleanContent = (rawContent: string): string => {
+                                // Create a temporary div to decode HTML entities
+                                const tempDiv = document.createElement('div');
+                                tempDiv.innerHTML = rawContent;
+                                
+                                // Get the decoded text
+                                let decodedText = tempDiv.textContent || tempDiv.innerText || rawContent;
+                                
+                                // Remove any remaining HTML tags that might have been in the text
+                                decodedText = decodedText.replace(/<[^>]*>/g, '');
+                                
+                                // Clean up extra whitespace and format as proper HTML
+                                return decodedText
+                                  .split('\n\n')
+                                  .filter(paragraph => paragraph.trim().length > 0)
+                                  .map(paragraph => `<p>${paragraph.trim()}</p>`)
+                                  .join('');
+                              };
+
                               // Try to parse as JSON first
-                              const jsonData = JSON.parse(decodedContent);
-                              return jsonData.sections?.map((section: any) => {
-                                let html = section.content || '';
-                                if (section.formatting?.bold) {
-                                  html = `<strong>${html}</strong>`;
+                              try {
+                                const jsonData = JSON.parse(selectedCoverLetter.content);
+                                if (jsonData.sections && Array.isArray(jsonData.sections)) {
+                                  return jsonData.sections.map((section: any) => {
+                                    let html = section.content || '';
+                                    if (section.formatting?.bold) {
+                                      html = `<strong>${html}</strong>`;
+                                    }
+                                    return `<p>${html}</p>`;
+                                  }).join('');
                                 }
-                                return `<p>${html}</p>`;
-                              }).join('') || decodedContent;
-                            } catch {
-                              // Fallback: use DOM to decode HTML entities and format as HTML
-                              const tempDiv = document.createElement('div');
-                              tempDiv.innerHTML = selectedCoverLetter.content;
-                              const decodedText = tempDiv.textContent || tempDiv.innerText || selectedCoverLetter.content;
+                              } catch {
+                                // Not JSON, continue to HTML cleaning
+                              }
                               
-                              // Convert plain text to HTML paragraphs
-                              return decodedText
-                                .split('\n\n')
-                                .filter(p => p.trim())
-                                .map(p => `<p>${p.trim()}</p>`)
-                                .join('');
+                              // Clean and format the content
+                              return cleanContent(selectedCoverLetter.content);
+                            } catch (error) {
+                              console.error('Error processing cover letter content:', error);
+                              return `<p>${selectedCoverLetter.content}</p>`;
                             }
                           })()}
                           onContentChange={async (json, text) => {

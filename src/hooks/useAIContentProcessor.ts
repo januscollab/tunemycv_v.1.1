@@ -69,40 +69,30 @@ export const useAIContentProcessor = ({
     setError(null);
 
     try {
-      // TODO: Replace this placeholder with actual OpenAI API call
-      // const prompt = generatePrompt(action);
+      // Use the Supabase edge function for AI processing
+      const { supabase } = await import('@/integrations/supabase/client');
       
-      // Placeholder response - simulate AI processing
-      const mockResponse = await new Promise<string>((resolve) => {
-        setTimeout(() => {
-          resolve(`[AI Processed] ${action.selectedText} (${action.type}${action.subType ? `:${action.subType}` : ''})`);
-        }, 1000);
+      const { data, error: functionError } = await supabase.functions.invoke('process-ai-content', {
+        body: {
+          action: action,
+          selectedText: action.selectedText
+        }
       });
 
-      // Future OpenAI implementation:
-      /*
-      const response = await fetch(apiEndpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          prompt: generatePrompt(action),
-          selectedText: action.selectedText,
-          context: action.context,
-          model: 'gpt-4.1-2025-04-14'
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`AI processing failed: ${response.statusText}`);
+      if (functionError) {
+        throw new Error(functionError.message || 'Failed to process content with AI');
       }
 
-      const data = await response.json();
-      const processedText = data.processedText || data.result || '';
-      */
+      const processedText = data?.processedText;
+      if (!processedText) {
+        throw new Error('No processed text received from AI');
+      }
 
-      const processedText = mockResponse;
+      if (onSuccess) {
+        onSuccess(processedText);
+      }
+
+      return processedText;
 
       if (onSuccess) {
         onSuccess(processedText);
