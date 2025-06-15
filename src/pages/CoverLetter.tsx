@@ -4,6 +4,7 @@ import { FileText, Sparkles, Trash2, RefreshCw, Clock, FileUp, Search, AlertCirc
 import Breadcrumbs from '@/components/navigation/Breadcrumbs';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import { CategoryDocumentHistory } from '@/components/ui/category-document-history';
+import { htmlToJson } from '@/utils/jsonHtmlConverters';
 import DownloadOptions from '@/components/cover-letter/DownloadOptions';
 
 import { useAuth } from '@/contexts/AuthContext';
@@ -852,8 +853,14 @@ const AuthenticatedCoverLetter = () => {
                                 return decodedHtml;
                               }
                               
-                              // If it's already clean HTML or plain text, return as-is
-                              console.log('[CoverLetter] Content appears clean, returning as-is');
+                              // If it's HTML content, convert it to DocumentJson
+                              if (selectedCoverLetter.content.includes('<p>') || selectedCoverLetter.content.includes('<h')) {
+                                console.log('[CoverLetter] Content is HTML, converting to DocumentJson');
+                                return htmlToJson(selectedCoverLetter.content);
+                              }
+                              
+                              // If it's plain text, return as-is
+                              console.log('[CoverLetter] Content appears to be plain text, returning as-is');
                               return selectedCoverLetter.content || '<p>Your cover letter content will appear here...</p>';
                               
                             } catch (error) {
