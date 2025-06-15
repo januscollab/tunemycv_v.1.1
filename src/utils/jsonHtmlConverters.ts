@@ -135,15 +135,14 @@ export const htmlToJson = (html: string): DocumentJson => {
         if (innerHTML.trim()) {
           const hasBold = element.querySelector('strong, b') !== null;
           
-          // Clean and preserve paragraph content
+          // Clean and preserve paragraph content - PRESERVE INDENTATION
           let contentWithNewlines = innerHTML
             .replace(/<strong[^>]*>(.*?)<\/strong>/gi, '$1') // Remove bold tags but preserve content
             .replace(/<b[^>]*>(.*?)<\/b>/gi, '$1') // Remove bold tags but preserve content  
-            .replace(/&nbsp;/g, ' ') // Convert non-breaking spaces back to regular spaces
+            .replace(/&nbsp;/g, ' ') // Convert non-breaking spaces back to regular spaces - KEEP THESE AS SPACES
             .replace(/<(?!br\s*\/?>)[^>]*>/g, '') // Remove HTML tags except <br>
             .replace(/<br\s*\/?>/gi, '\n') // Convert <br> to newlines
             .replace(/^\s+|\s+$/g, '') // Trim start/end but preserve internal structure
-            .replace(/\n\s+/g, '\n') // Clean up excessive whitespace after newlines
             .replace(/\*\*/g, ''); // Remove any double asterisks from markdown
           
           if (contentWithNewlines) {
