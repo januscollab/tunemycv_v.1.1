@@ -261,37 +261,42 @@ const EditableCoverLetter = forwardRef<EditableCoverLetterRef, EditableCoverLett
 
   return (
     <div className="space-y-6">
-      {/* Save state indicator */}
-      {saveState !== 'idle' && (
-        <div className={`flex items-center gap-2 text-sm px-3 py-2 rounded-md ${
-          saveState === 'saving' ? 'bg-blue-50 text-blue-700' :
-          saveState === 'saved' ? 'bg-green-50 text-green-700' :
-          'bg-red-50 text-red-700'
-        }`}>
-          {saveState === 'saving' && (
-            <>
-              <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-              Saving changes...
-            </>
-          )}
-          {saveState === 'saved' && (
-            <>
-              <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
-                <span className="text-white text-xs">✓</span>
-              </div>
-              Changes saved successfully
-            </>
-          )}
-          {saveState === 'error' && (
-            <>
-              <div className="w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
-                <span className="text-white text-xs">!</span>
-              </div>
-              Error saving changes
-            </>
-          )}
-        </div>
-      )}
+      {/* Save state indicator - Always visible with current state */}
+      <div className={`flex items-center gap-2 text-sm px-3 py-2 rounded-md transition-all duration-200 ${
+        saveState === 'saving' ? 'bg-blue-50 text-blue-700 border border-blue-200' :
+        saveState === 'saved' ? 'bg-green-50 text-green-700 border border-green-200' :
+        saveState === 'error' ? 'bg-red-50 text-red-700 border border-red-200' :
+        'bg-muted/50 text-muted-foreground border border-border'
+      }`}>
+        {saveState === 'saving' && (
+          <>
+            <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            Saving changes...
+          </>
+        )}
+        {saveState === 'saved' && (
+          <>
+            <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+              <span className="text-white text-xs">✓</span>
+            </div>
+            Changes saved successfully
+          </>
+        )}
+        {saveState === 'error' && (
+          <>
+            <div className="w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
+              <span className="text-white text-xs">!</span>
+            </div>
+            Error saving changes
+          </>
+        )}
+        {saveState === 'idle' && (
+          <>
+            <div className="w-4 h-4 rounded-full bg-muted border"></div>
+            Ready to edit
+          </>
+        )}
+      </div>
       
       <div className="bg-muted/20 p-4 rounded-lg">
         <ReactQuill
