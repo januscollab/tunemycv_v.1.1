@@ -816,19 +816,32 @@ const AuthenticatedCoverLetter = () => {
                         <RichTextEditor
                           initialContent={(() => {
                             try {
+                              // First decode HTML entities
+                              const decodedContent = selectedCoverLetter.content
+                                .replace(/&lt;/g, '<')
+                                .replace(/&gt;/g, '>')
+                                .replace(/&amp;/g, '&')
+                                .replace(/&quot;/g, '"')
+                                .replace(/&#39;/g, "'");
+                              
                               // Try to parse as JSON first
-                              const jsonData = JSON.parse(selectedCoverLetter.content);
-                              // Convert JSON to formatted HTML display
+                              const jsonData = JSON.parse(decodedContent);
                               return jsonData.sections?.map((section: any) => {
                                 let html = section.content || '';
                                 if (section.formatting?.bold) {
                                   html = `<strong>${html}</strong>`;
                                 }
                                 return `<p>${html}</p>`;
-                              }).join('') || selectedCoverLetter.content;
+                              }).join('') || decodedContent;
                             } catch {
-                              // Fallback to plain text with line breaks
-                              return selectedCoverLetter.content.replace(/\n/g, '<br>');
+                              // Fallback: decode HTML entities and convert line breaks
+                              return selectedCoverLetter.content
+                                .replace(/&lt;/g, '<')
+                                .replace(/&gt;/g, '>')
+                                .replace(/&amp;/g, '&')
+                                .replace(/&quot;/g, '"')
+                                .replace(/&#39;/g, "'")
+                                .replace(/\n/g, '<br>');
                             }
                           })()}
                           onContentChange={async (json, text) => {
