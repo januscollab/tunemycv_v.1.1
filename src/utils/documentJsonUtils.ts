@@ -528,10 +528,8 @@ export const generateFormattedText = (docJson: DocumentJson): string => {
         const hashes = '#'.repeat(section.level || 1);
         let headingText = `${hashes} ${section.content}`;
         
-        // Preserve bold formatting for headings
-        if (section.formatting?.bold) {
-          headingText = `**${headingText}**`;
-        }
+        // Bold formatting will be handled by HTML, not markdown
+        // Removed markdown asterisks to prevent double formatting
         
         textLines.push(headingText);
         textLines.push(''); // Empty line after heading
@@ -542,12 +540,8 @@ export const generateFormattedText = (docJson: DocumentJson): string => {
           // Preserve line breaks within paragraphs
           let paragraphContent = section.content;
           
-          // Preserve bold formatting for paragraphs
-          if (section.formatting?.bold) {
-            // Split by line breaks and wrap each line in bold markdown
-            const lines = paragraphContent.split('\n').filter(line => line.trim());
-            paragraphContent = lines.map(line => `**${line}**`).join('\n');
-          }
+          // Bold formatting will be handled by HTML, not markdown
+          // Removed markdown asterisks to prevent double formatting
           
           const paragraphLines = paragraphContent.split('\n').filter(line => line.trim());
           textLines.push(...paragraphLines);
@@ -560,10 +554,8 @@ export const generateFormattedText = (docJson: DocumentJson): string => {
           for (const item of section.items) {
             let listItem = `- ${item}`;
             
-            // Preserve bold formatting for list items
-            if (section.formatting?.bold) {
-              listItem = `- **${item}**`;
-            }
+            // Bold formatting will be handled by HTML, not markdown
+            // Removed markdown asterisks to prevent double formatting
             
             textLines.push(listItem);
           }
