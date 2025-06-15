@@ -351,6 +351,7 @@ export type Database = {
       }
       analysis_results: {
         Row: {
+          analysis_type: string | null
           company_name: string | null
           compatibility_score: number
           created_at: string | null
@@ -367,12 +368,15 @@ export type Database = {
           job_title: string | null
           keywords_found: Json | null
           keywords_missing: Json | null
+          n8n_html_url: string | null
+          n8n_pdf_url: string | null
           recommendations: string[] | null
           strengths: string[] | null
           user_id: string
           weaknesses: string[] | null
         }
         Insert: {
+          analysis_type?: string | null
           company_name?: string | null
           compatibility_score: number
           created_at?: string | null
@@ -389,12 +393,15 @@ export type Database = {
           job_title?: string | null
           keywords_found?: Json | null
           keywords_missing?: Json | null
+          n8n_html_url?: string | null
+          n8n_pdf_url?: string | null
           recommendations?: string[] | null
           strengths?: string[] | null
           user_id: string
           weaknesses?: string[] | null
         }
         Update: {
+          analysis_type?: string | null
           company_name?: string | null
           compatibility_score?: number
           created_at?: string | null
@@ -411,6 +418,8 @@ export type Database = {
           job_title?: string | null
           keywords_found?: Json | null
           keywords_missing?: Json | null
+          n8n_html_url?: string | null
+          n8n_pdf_url?: string | null
           recommendations?: string[] | null
           strengths?: string[] | null
           user_id?: string
