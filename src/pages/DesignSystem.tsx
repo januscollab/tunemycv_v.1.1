@@ -323,7 +323,7 @@ const DesignSystem = () => {
     { 
       name: 'CategoryDocumentHistory', 
       component: (
-        <div className="w-full max-w-2xl mx-auto" style={{ width: '60%', maxWidth: '800px' }}>
+        <div style={{ width: '100%', maxWidth: '600px', margin: '0 auto' }}>
           <CategoryDocumentHistory
             header={{
               title: "Document History",
