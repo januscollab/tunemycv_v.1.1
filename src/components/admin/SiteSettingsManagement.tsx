@@ -3,7 +3,7 @@ import { Save, Mail, Settings, Calendar, TrendingUp, AlertTriangle, Shield, Chec
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { FloatingLabelInput } from '@/components/common/FloatingLabelInput';
+import { CaptureInput } from '@/components/ui/capture-input';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { ProgressIndicator } from '@/components/ui/progress-indicator';
@@ -557,44 +557,28 @@ const SiteSettingsManagement: React.FC = () => {
 
             {formData.adobe_api_enabled && (
               <>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-space-1">
-                  <div>
-                    <Label htmlFor="monthly_adobe_limit" className="text-caption font-medium text-foreground">
-                      Monthly Limit
-                    </Label>
-                    <FloatingLabelInput
-                      id="monthly_adobe_limit"
-                      label="Monthly Limit"
-                      type="number"
-                      value={formData.monthly_adobe_limit.toString()}
-                      onChange={(e) => handleInputChange('monthly_adobe_limit', parseInt(e.target.value))}
-                      placeholder="500"
-                      min="1"
-                      max="10000"
-                    />
-                    <p className="text-micro text-muted-foreground mt-space-0.25">
-                      Maximum API calls per month
-                    </p>
-                  </div>
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-space-1">
+                   <CaptureInput
+                     label="Monthly Limit"
+                     type="number"
+                     value={formData.monthly_adobe_limit.toString()}
+                     onChange={(e) => handleInputChange('monthly_adobe_limit', parseInt(e.target.value))}
+                     placeholder="500"
+                     min="1"
+                     max="10000"
+                     description="Maximum API calls per month"
+                   />
 
-                  <div>
-                    <Label htmlFor="reset_day" className="text-caption font-medium text-foreground">
-                      Reset Day
-                    </Label>
-                    <FloatingLabelInput
-                      id="reset_day"
-                      label="Reset Day"
-                      type="number"
-                      value={formData.reset_day.toString()}
-                      onChange={(e) => handleInputChange('reset_day', parseInt(e.target.value))}
-                      placeholder="1"
-                      min="1"
-                      max="31"
-                    />
-                    <p className="text-micro text-muted-foreground mt-space-0.25">
-                      Day of month to reset usage counter
-                    </p>
-                  </div>
+                   <CaptureInput
+                     label="Reset Day"
+                     type="number"
+                     value={formData.reset_day.toString()}
+                     onChange={(e) => handleInputChange('reset_day', parseInt(e.target.value))}
+                     placeholder="1"
+                     min="1"
+                     max="31"
+                     description="Day of month to reset usage counter"
+                   />
                 </div>
 
                 <div className="space-y-space-1 border-t border-border pt-space-1">
@@ -602,50 +586,30 @@ const SiteSettingsManagement: React.FC = () => {
                     API Credentials
                   </h4>
                   
-                  <div>
-                    <Label htmlFor="client_id" className="text-caption font-medium text-foreground">
-                      Client ID
-                    </Label>
-                    <FloatingLabelInput
-                      id="client_id"
-                      label="Client ID"
-                      type="text"
-                      value={adobeFormData.client_id}
-                      onChange={(e) => handleAdobeInputChange('client_id', e.target.value)}
-                      placeholder="Your Adobe Client ID"
-                    />
-                  </div>
+                   <CaptureInput
+                     label="Client ID"
+                     type="text"
+                     value={adobeFormData.client_id}
+                     onChange={(e) => handleAdobeInputChange('client_id', e.target.value)}
+                     placeholder="Your Adobe Client ID"
+                   />
 
-                  <div>
-                    <Label htmlFor="client_secret" className="text-caption font-medium text-foreground">
-                      Client Secret
-                    </Label>
-                    <FloatingLabelInput
-                      id="client_secret"
-                      label="Client Secret"
-                      type="password"
-                      value={adobeFormData.client_secret}
-                      onChange={(e) => handleAdobeInputChange('client_secret', e.target.value)}
-                      placeholder={adobeCredentials ? "Enter new secret to update" : "Your Adobe Client Secret"}
-                    />
-                    <p className="text-micro text-muted-foreground mt-space-0.25">
-                      {adobeCredentials ? "Leave blank to keep existing secret" : "This will be encrypted and stored securely"}
-                    </p>
-                  </div>
+                   <CaptureInput
+                     label="Client Secret"
+                     type="password"
+                     value={adobeFormData.client_secret}
+                     onChange={(e) => handleAdobeInputChange('client_secret', e.target.value)}
+                     placeholder={adobeCredentials ? "Enter new secret to update" : "Your Adobe Client Secret"}
+                     description={adobeCredentials ? "Leave blank to keep existing secret" : "This will be encrypted and stored securely"}
+                   />
 
-                  <div>
-                    <Label htmlFor="organization_id" className="text-caption font-medium text-foreground">
-                      Organization ID
-                    </Label>
-                    <FloatingLabelInput
-                      id="organization_id"
-                      label="Organization ID"
-                      type="text"
-                      value={adobeFormData.organization_id}
-                      onChange={(e) => handleAdobeInputChange('organization_id', e.target.value)}
-                      placeholder="Your Adobe Organization ID"
-                    />
-                  </div>
+                   <CaptureInput
+                     label="Organization ID"
+                     type="text"
+                     value={adobeFormData.organization_id}
+                     onChange={(e) => handleAdobeInputChange('organization_id', e.target.value)}
+                     placeholder="Your Adobe Organization ID"
+                   />
 
                   <Button
                     onClick={handleSaveAdobeCredentials}
@@ -672,22 +636,14 @@ const SiteSettingsManagement: React.FC = () => {
         </CardHeader>
         <CardContent className="space-y-space-1.5">
           <div className="space-y-space-1">
-            <div>
-              <Label htmlFor="openai_api_key" className="text-caption font-medium text-foreground">
-                OpenAI API Key
-              </Label>
-              <FloatingLabelInput
-                id="openai_api_key"
-                label="OpenAI API Key"
-                type="password"
-                value={openaiApiKey}
-                onChange={(e) => setOpenaiApiKey(e.target.value)}
-                placeholder={settings?.openai_api_key_encrypted ? "Enter new key to update" : "sk-..."}
-              />
-              <p className="text-micro text-muted-foreground mt-space-0.25">
-                {settings?.openai_api_key_encrypted ? "Leave blank to keep existing key" : "Required for cover letter generation and other AI features"}
-              </p>
-            </div>
+            <CaptureInput
+              label="OpenAI API Key"
+              type="password"
+              value={openaiApiKey}
+              onChange={(e) => setOpenaiApiKey(e.target.value)}
+              placeholder={settings?.openai_api_key_encrypted ? "Enter new key to update" : "sk-..."}
+              description={settings?.openai_api_key_encrypted ? "Leave blank to keep existing key" : "Required for cover letter generation and other AI features"}
+            />
           </div>
         </CardContent>
       </Card>
@@ -702,49 +658,25 @@ const SiteSettingsManagement: React.FC = () => {
         </CardHeader>
         <CardContent className="space-y-space-1.5">
           <div className="space-y-space-1">
-            <div>
-              <Label htmlFor="admin_email" className="text-caption font-medium text-foreground">
-                Admin Email
-              </Label>
-              <div className="mt-space-0.25 relative">
-                <Mail className="absolute left-space-0.75 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <FloatingLabelInput
-                  id="admin_email"
-                  label="Admin Email"
-                  type="email"
-                  value={formData.admin_email}
-                  onChange={(e) => handleInputChange('admin_email', e.target.value)}
-                  placeholder="admin@company.com"
-                  className="pl-10"
-                  maxLength={100}
-                />
-              </div>
-              <p className="text-micro text-muted-foreground mt-space-0.25">
-                Email address for administrative notifications and Adobe usage alerts
-              </p>
-            </div>
+            <CaptureInput
+              label="Admin Email"
+              type="email"
+              value={formData.admin_email}
+              onChange={(e) => handleInputChange('admin_email', e.target.value)}
+              placeholder="admin@company.com"
+              maxLength={100}
+              description="Email address for administrative notifications and Adobe usage alerts"
+            />
 
-            <div>
-              <Label htmlFor="support_email" className="text-caption font-medium text-foreground">
-                Support Email
-              </Label>
-              <div className="mt-space-0.25 relative">
-                <Mail className="absolute left-space-0.75 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <FloatingLabelInput
-                  id="support_email"
-                  label="Support Email"
-                  type="email"
-                  value={formData.support_email}
-                  onChange={(e) => handleInputChange('support_email', e.target.value)}
-                  placeholder="support@company.com"
-                  className="pl-10"
-                  maxLength={100}
-                />
-              </div>
-              <p className="text-micro text-muted-foreground mt-space-0.25">
-                Email address for customer support and feedback forms
-              </p>
-            </div>
+            <CaptureInput
+              label="Support Email"
+              type="email"
+              value={formData.support_email}
+              onChange={(e) => handleInputChange('support_email', e.target.value)}
+              placeholder="support@company.com"
+              maxLength={100}
+              description="Email address for customer support and feedback forms"
+            />
           </div>
 
           <div className="flex items-center justify-between pt-space-1 border-t border-border">
