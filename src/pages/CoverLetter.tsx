@@ -37,6 +37,7 @@ import CreditsPanel from '@/components/analyze/CreditsPanel';
 import AnalysisSelector from '@/components/cover-letter/AnalysisSelector';
 import AdvancedGenerationOptions from '@/components/cover-letter/AdvancedGenerationOptions';
 import DownloadOptions from '@/components/cover-letter/DownloadOptions';
+
 import NoAnalysisModal from '@/components/cover-letter/NoAnalysisModal';
 import CoverLetterLoggedOut from '@/components/cover-letter/CoverLetterLoggedOut';
 import { ProgressIndicator } from '@/components/ui/progress-indicator';
@@ -873,9 +874,93 @@ const AuthenticatedCoverLetter = () => {
                     {
                       label: 'Download',
                       icon: <Download className="h-4 w-4 mr-2" />,
-                      onClick: (document) => {
-                        // Handle download - this will need custom implementation
-                        console.log('Download:', document);
+                      onClick: (doc) => {
+                        // Create a modal-like approach for downloads
+                        const modal = window.document.createElement('div');
+                        modal.style.position = 'fixed';
+                        modal.style.top = '0';
+                        modal.style.left = '0';
+                        modal.style.right = '0';
+                        modal.style.bottom = '0';
+                        modal.style.zIndex = '9999';
+                        modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+                        modal.style.display = 'flex';
+                        modal.style.alignItems = 'center';
+                        modal.style.justifyContent = 'center';
+                        
+                        const panel = window.document.createElement('div');
+                        panel.style.backgroundColor = 'white';
+                        panel.style.borderRadius = '8px';
+                        panel.style.padding = '24px';
+                        panel.style.minWidth = '300px';
+                        panel.innerHTML = `
+                          <h3 style="margin: 0 0 16px 0; font-size: 18px; font-weight: 600;">Download Cover Letter</h3>
+                          <p style="margin: 0 0 16px 0; color: #666;">Choose your preferred format:</p>
+                          <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <button id="download-pdf" style="padding: 8px 16px; border: 1px solid #ddd; border-radius: 4px; background: white; cursor: pointer;">📄 Download as PDF</button>
+                            <button id="download-word" style="padding: 8px 16px; border: 1px solid #ddd; border-radius: 4px; background: white; cursor: pointer;">📝 Download as Word</button>
+                            <button id="download-text" style="padding: 8px 16px; border: 1px solid #ddd; border-radius: 4px; background: white; cursor: pointer;">📃 Download as Text</button>
+                            <button id="download-cancel" style="padding: 8px 16px; border: 1px solid #ddd; border-radius: 4px; background: #f5f5f5; cursor: pointer; margin-top: 8px;">Cancel</button>
+                          </div>
+                        `;
+                        
+                        modal.appendChild(panel);
+                        window.document.body.appendChild(modal);
+                        
+                        // Handle downloads
+                        const fileName = `${doc.company_name}_${doc.job_title}_Cover_Letter`;
+                        const content = doc.content || '';
+                        
+                        window.document.getElementById('download-pdf')?.addEventListener('click', async () => {
+                          const { default: jsPDF } = await import('jspdf');
+                          const pdf = new jsPDF();
+                          const splitText = pdf.splitTextToSize(content, 180);
+                          pdf.text(splitText, 10, 10);
+                          pdf.save(`${fileName}.pdf`);
+                          window.document.body.removeChild(modal);
+                          toast({ title: 'Success', description: 'PDF downloaded successfully' });
+                        });
+                        
+                        window.document.getElementById('download-word')?.addEventListener('click', async () => {
+                          const { Document, Packer, Paragraph, TextRun } = await import('docx');
+                          const docx = new Document({
+                            sections: [{
+                              properties: {},
+                              children: [new Paragraph({ children: [new TextRun(content)] })],
+                            }],
+                          });
+                          const blob = await Packer.toBlob(docx);
+                          const url = window.URL.createObjectURL(blob);
+                          const link = window.document.createElement('a');
+                          link.href = url;
+                          link.download = `${fileName}.docx`;
+                          link.click();
+                          window.URL.revokeObjectURL(url);
+                          window.document.body.removeChild(modal);
+                          toast({ title: 'Success', description: 'Word document downloaded successfully' });
+                        });
+                        
+                        window.document.getElementById('download-text')?.addEventListener('click', () => {
+                          const blob = new Blob([content], { type: 'text/plain' });
+                          const url = window.URL.createObjectURL(blob);
+                          const link = window.document.createElement('a');
+                          link.href = url;
+                          link.download = `${fileName}.txt`;
+                          link.click();
+                          window.URL.revokeObjectURL(url);
+                          window.document.body.removeChild(modal);
+                          toast({ title: 'Success', description: 'Text file downloaded successfully' });
+                        });
+                        
+                        window.document.getElementById('download-cancel')?.addEventListener('click', () => {
+                          window.document.body.removeChild(modal);
+                        });
+                        
+                        modal.addEventListener('click', (e) => {
+                          if (e.target === modal) {
+                            window.document.body.removeChild(modal);
+                          }
+                        });
                       }
                     },
                     {
