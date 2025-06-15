@@ -251,8 +251,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       const downloadOptions = [
         { label: 'PDF', format: 'pdf' },
         { label: 'Word Document', format: 'docx' },
-        { label: 'Text File', format: 'txt' },
-        { label: 'HTML File', format: 'html' }
+        { label: 'Text File', format: 'txt' }
       ];
       
       downloadOptions.forEach(option => {
