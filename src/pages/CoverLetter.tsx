@@ -111,6 +111,7 @@ const AuthenticatedCoverLetter = () => {
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [generationMethod, setGenerationMethod] = useState<'input' | 'analysis'>('input');
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [filterType, setFilterType] = useState<'all' | 'analysis' | 'cover_letter'>('all');
   
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -846,8 +847,8 @@ const AuthenticatedCoverLetter = () => {
                   header={{
                     title: "Cover Letter History",
                     totalCount: allCoverLetters.length,
-                    filterType: 'cover_letter',
-                    onFilterChange: () => {},
+                    filterType: filterType,
+                    onFilterChange: setFilterType,
                     itemsPerPage: itemsPerPage,
                     onItemsPerPageChange: setItemsPerPage,
                     showPagination: true
