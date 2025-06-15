@@ -1009,13 +1009,13 @@ const DesignSystem = () => {
                 ))}
               </div>
 
-              {/* RENAME ME Component */}
+              {/* Category Document History Component */}
               <div className="space-y-4">
-                <h3 className="text-heading font-semibold">RENAME ME</h3>
+                <h3 className="text-heading font-semibold">Category Document History</h3>
                 <Card className="group hover:shadow-lg transition-all duration-300">
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-subheading">RENAME ME</CardTitle>
+                      <CardTitle className="text-subheading">Category Document History</CardTitle>
                       <Badge variant="outline" className="text-micro">
                         12 usages
                       </Badge>
