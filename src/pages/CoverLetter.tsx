@@ -816,13 +816,10 @@ const AuthenticatedCoverLetter = () => {
                         <RichTextEditor
                           initialContent={(() => {
                             try {
-                              // First decode HTML entities
-                              const decodedContent = selectedCoverLetter.content
-                                .replace(/&lt;/g, '<')
-                                .replace(/&gt;/g, '>')
-                                .replace(/&amp;/g, '&')
-                                .replace(/&quot;/g, '"')
-                                .replace(/&#39;/g, "'");
+                              // Create a temporary div to properly decode HTML entities
+                              const tempDiv = document.createElement('div');
+                              tempDiv.innerHTML = selectedCoverLetter.content;
+                              const decodedContent = tempDiv.textContent || tempDiv.innerText || selectedCoverLetter.content;
                               
                               // Try to parse as JSON first
                               const jsonData = JSON.parse(decodedContent);
@@ -834,14 +831,17 @@ const AuthenticatedCoverLetter = () => {
                                 return `<p>${html}</p>`;
                               }).join('') || decodedContent;
                             } catch {
-                              // Fallback: decode HTML entities and convert line breaks
-                              return selectedCoverLetter.content
-                                .replace(/&lt;/g, '<')
-                                .replace(/&gt;/g, '>')
-                                .replace(/&amp;/g, '&')
-                                .replace(/&quot;/g, '"')
-                                .replace(/&#39;/g, "'")
-                                .replace(/\n/g, '<br>');
+                              // Fallback: use DOM to decode HTML entities and format as HTML
+                              const tempDiv = document.createElement('div');
+                              tempDiv.innerHTML = selectedCoverLetter.content;
+                              const decodedText = tempDiv.textContent || tempDiv.innerText || selectedCoverLetter.content;
+                              
+                              // Convert plain text to HTML paragraphs
+                              return decodedText
+                                .split('\n\n')
+                                .filter(p => p.trim())
+                                .map(p => `<p>${p.trim()}</p>`)
+                                .join('');
                             }
                           })()}
                           onContentChange={async (json, text) => {
