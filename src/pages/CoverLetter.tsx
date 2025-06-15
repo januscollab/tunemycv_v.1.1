@@ -714,7 +714,7 @@ const AuthenticatedCoverLetter = () => {
                               return selectedCoverLetter.content.replace(/\n/g, '<br>');
                             }
                           })()}
-                          readOnly={true}
+                          readOnly={false}
                           className="min-h-[400px]"
                           placeholder=""
                         />

@@ -27,7 +27,7 @@
   line-height: 1.6;
   padding: 1rem;
   min-height: inherit;
-  font-size: 1.125rem; /* Increased from default */
+  font-size: 1rem; /* Decreased from 1.125rem */
 }
 
 .rich-text-editor .ql-editor * {
