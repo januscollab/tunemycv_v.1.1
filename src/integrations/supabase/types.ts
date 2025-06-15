@@ -736,6 +736,7 @@ export type Database = {
           debug_mode: boolean | null
           id: string
           monthly_adobe_limit: number | null
+          openai_api_key_encrypted: string | null
           reset_day: number | null
           support_email: string | null
           updated_at: string
@@ -747,6 +748,7 @@ export type Database = {
           debug_mode?: boolean | null
           id?: string
           monthly_adobe_limit?: number | null
+          openai_api_key_encrypted?: string | null
           reset_day?: number | null
           support_email?: string | null
           updated_at?: string
@@ -758,6 +760,7 @@ export type Database = {
           debug_mode?: boolean | null
           id?: string
           monthly_adobe_limit?: number | null
+          openai_api_key_encrypted?: string | null
           reset_day?: number | null
           support_email?: string | null
           updated_at?: string

@@ -168,12 +168,23 @@ ${request.jobDescription ? `Job Description:\n${request.jobDescription}\n\n` : '
 
 ${request.cvText ? `My CV/Resume:\n${request.cvText}` : ''}`
 
+    // Get site settings for OpenAI API key
+    const { data: siteSettings, error: settingsError } = await supabaseClient
+      .from('site_settings')
+      .select('openai_api_key_encrypted')
+      .limit(1)
+      .single()
+
+    if (settingsError || !siteSettings?.openai_api_key_encrypted) {
+      throw new Error('OpenAI API key not configured. Please contact administrator.')
+    }
+
     // Generate cover letter with AI
     const startTime = Date.now()
     const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
+        'Authorization': `Bearer ${siteSettings.openai_api_key_encrypted}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({

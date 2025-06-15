@@ -16,6 +16,7 @@ interface SiteSettings {
   reset_day: number;
   adobe_api_enabled: boolean;
   debug_mode: boolean;
+  openai_api_key_encrypted: string;
   updated_at: string;
 }
 
@@ -49,8 +50,10 @@ const SiteSettingsManagement: React.FC = () => {
     monthly_adobe_limit: 500,
     reset_day: 1,
     adobe_api_enabled: false,
-    debug_mode: true
+    debug_mode: true,
+    openai_api_key_encrypted: ''
   });
+  const [openaiApiKey, setOpenaiApiKey] = useState('');
   const [adobeFormData, setAdobeFormData] = useState({
     client_id: '',
     client_secret: '',
@@ -84,8 +87,10 @@ const SiteSettingsManagement: React.FC = () => {
           monthly_adobe_limit: data.monthly_adobe_limit || 500,
           reset_day: data.reset_day || 1,
           adobe_api_enabled: data.adobe_api_enabled || false,
-          debug_mode: data.debug_mode ?? true
+          debug_mode: data.debug_mode ?? true,
+          openai_api_key_encrypted: data.openai_api_key_encrypted || ''
         });
+        setOpenaiApiKey(data.openai_api_key_encrypted ? '••••••••••••' : '');
       }
     } catch (error) {
       console.error('Error loading site settings:', error);
@@ -161,7 +166,8 @@ const SiteSettingsManagement: React.FC = () => {
             monthly_adobe_limit: dataToSave.monthly_adobe_limit,
             reset_day: dataToSave.reset_day,
             adobe_api_enabled: dataToSave.adobe_api_enabled,
-            debug_mode: dataToSave.debug_mode
+            debug_mode: dataToSave.debug_mode,
+            openai_api_key_encrypted: dataToSave.openai_api_key_encrypted
           })
           .eq('id', settings.id);
 
@@ -268,7 +274,8 @@ const SiteSettingsManagement: React.FC = () => {
             monthly_adobe_limit: formData.monthly_adobe_limit,
             reset_day: formData.reset_day,
             adobe_api_enabled: formData.adobe_api_enabled,
-            debug_mode: formData.debug_mode
+            debug_mode: formData.debug_mode,
+            ...(openaiApiKey && !openaiApiKey.includes('•') && { openai_api_key_encrypted: openaiApiKey })
           })
           .eq('id', settings.id);
 
@@ -651,6 +658,36 @@ const SiteSettingsManagement: React.FC = () => {
                 </div>
               </>
             )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* OpenAI Configuration */}
+      <Card className="border border-border">
+        <CardHeader>
+          <CardTitle className="flex items-center text-heading font-semibold text-foreground">
+            <Shield className="h-5 w-5 text-primary mr-space-0.5" />
+            OpenAI Configuration
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-space-1.5">
+          <div className="space-y-space-1">
+            <div>
+              <Label htmlFor="openai_api_key" className="text-caption font-medium text-foreground">
+                OpenAI API Key
+              </Label>
+              <FloatingLabelInput
+                id="openai_api_key"
+                label="OpenAI API Key"
+                type="password"
+                value={openaiApiKey}
+                onChange={(e) => setOpenaiApiKey(e.target.value)}
+                placeholder={settings?.openai_api_key_encrypted ? "Enter new key to update" : "sk-..."}
+              />
+              <p className="text-micro text-muted-foreground mt-space-0.25">
+                {settings?.openai_api_key_encrypted ? "Leave blank to keep existing key" : "Required for cover letter generation and other AI features"}
+              </p>
+            </div>
           </div>
         </CardContent>
       </Card>
