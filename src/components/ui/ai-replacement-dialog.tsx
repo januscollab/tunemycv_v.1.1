@@ -140,6 +140,7 @@ const AIReplacementDialog: React.FC<AIReplacementDialogProps> = ({
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={isLoading}
+            className="text-foreground-secondary"
           >
             Cancel
           </Button>
@@ -148,7 +149,7 @@ const AIReplacementDialog: React.FC<AIReplacementDialogProps> = ({
             <Button
               variant="outline"
               onClick={onRegenerate}
-              className="gap-2"
+              className="gap-2 text-foreground-secondary"
             >
               <RefreshCw className="h-4 w-4" />
               Regenerate

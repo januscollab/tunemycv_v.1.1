@@ -230,12 +230,12 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
             {/* Header Section */}
             <div className="p-4 border-b border-primary-500/30">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-primary-foreground/20 rounded-xl flex items-center justify-center">
-                  <WandSparkles className="w-5 h-5 text-primary-foreground" />
+                <div className="w-10 h-10 bg-primary-foreground/15 rounded-xl flex items-center justify-center">
+                  <WandSparkles className="w-5 h-5 text-primary-foreground/80" />
                 </div>
                 <div>
-                  <h3 className="text-body font-medium text-primary-foreground">AI-Enhance</h3>
-                  <p className="text-tiny text-primary-foreground/80">Menu</p>
+                  <h3 className="text-heading font-semibold text-primary-foreground/95">AI-Enhance</h3>
+                  <p className="text-tiny text-primary-foreground/70">Menu</p>
                 </div>
               </div>
             </div>
@@ -243,20 +243,19 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
             {/* Menu Items */}
             <div className="p-2">
               <div className="space-y-1">
-                {/* Active item - Rephrase with softer orange */}
+                {/* Rephrase */}
                 <button
                   onMouseEnter={(e) => handleSubmenuHover('rephrase', e)}
                   onMouseLeave={handleSubmenuLeave}
                   disabled={isDisabled}
                   className={cn(
                     "w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg transition-all",
-                    "bg-gradient-to-r from-orange-200/60 to-orange-300/60 text-white shadow-sm",
-                    "hover:from-orange-300/70 hover:to-orange-400/70 transform hover:scale-[1.01]",
-                    "disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    "text-primary-foreground/90 hover:bg-primary-500/20 hover:text-primary-foreground",
+                    "disabled:opacity-50 disabled:cursor-not-allowed"
                   )}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-white/30 rounded-lg flex items-center justify-center">
+                    <div className="w-6 h-6 bg-white/40 rounded-lg flex items-center justify-center">
                       <WandSparkles className="w-4 h-4" />
                     </div>
                     <span className="text-caption font-medium">Rephrase</span>
