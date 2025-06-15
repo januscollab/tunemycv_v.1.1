@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileText, Calendar, Building, Eye, Edit2, Trash2, Download, MessageSquare } from 'lucide-react';
+import { FileText, Calendar, Building, Eye, Edit2, Trash2, Download, MessageSquare, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -166,10 +166,52 @@ export const DocumentHistoryItem: React.FC<{
       )}
       onClick={() => onDocumentClick?.(document)}
     >
-      <CardContent className="p-6">
-        {/* Action buttons row at top */}
-        <div className="flex items-center justify-between mb-3 pb-2 border-b border-border">
-          <div className="flex items-center space-x-4">
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between">
+          {/* Left side - Document info */}
+          <div className="flex items-center space-x-3 flex-1 min-w-0">
+            {/* Success checkmark for completed documents */}
+            <div className="text-success flex-shrink-0">
+              ✓
+            </div>
+            
+            {/* Document title and info */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center space-x-2 mb-1">
+                <h3 className="text-subheading font-medium text-foreground truncate">
+                  {document.job_title || document.title || 'Untitled'}
+                </h3>
+                {/* Version badge */}
+                {document.regeneration_count !== undefined && (
+                  <Badge 
+                    variant={document.regeneration_count === 0 ? "default" : "secondary"}
+                    className={cn(
+                      "text-micro px-2 py-0.5",
+                      document.regeneration_count === 0 
+                        ? "bg-success/10 text-success border-success/20" 
+                        : "bg-warning/10 text-warning border-warning/20"
+                    )}
+                  >
+                    v{(document.regeneration_count || 0) + 1}
+                  </Badge>
+                )}
+              </div>
+              
+              {/* Subtitle */}
+              <div className="text-caption text-muted-foreground mb-1">
+                {document.type === 'analysis' ? 'CV Analysis Result' : 'Generated from CV analysis'}
+              </div>
+              
+              {/* Date */}
+              <div className="flex items-center text-micro text-muted-foreground">
+                <Clock className="h-3 w-3 mr-1" />
+                <span>Updated {formatDate(document.created_at)}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right side - Action buttons */}
+          <div className="flex items-center space-x-2 flex-shrink-0 ml-4">
             {actions.map((action, index) => {
               if (action.condition && !action.condition(document)) {
                 return null;
@@ -178,16 +220,17 @@ export const DocumentHistoryItem: React.FC<{
               return (
                 <Button
                   key={index}
-                  variant="outline"
+                  variant="ghost"
                   size="sm"
                   onClick={(e) => {
                     e.stopPropagation();
                     action.onClick(document);
                   }}
                   className={cn(
-                    "text-caption font-medium transition-colors",
-                    action.variant === 'destructive' && "text-destructive hover:text-destructive",
-                    action.variant === 'success' && "text-success hover:text-success"
+                    "text-caption font-medium transition-colors px-3 py-1.5 h-auto",
+                    action.variant === 'destructive' && "text-destructive hover:text-destructive hover:bg-destructive/10",
+                    action.variant === 'success' && "text-success hover:text-success hover:bg-success/10",
+                    action.variant !== 'destructive' && action.variant !== 'success' && "text-muted-foreground hover:text-foreground hover:bg-muted"
                   )}
                 >
                   {action.icon}
@@ -195,49 +238,6 @@ export const DocumentHistoryItem: React.FC<{
                 </Button>
               );
             })}
-          </div>
-        </div>
-
-        <div className="flex justify-between items-start">
-          <div className="flex-1 pr-4">
-            <div className="flex items-center space-x-3 mb-2">
-              <h3 className="text-heading font-medium text-foreground">
-                {document.job_title || document.title || 'Untitled'}
-              </h3>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  // Handle edit title logic here
-                }}
-                className="p-1 h-auto text-muted-foreground hover:text-foreground"
-              >
-                <Edit2 className="h-3 w-3" />
-              </Button>
-            </div>
-            
-            <div className="flex items-center space-x-4 text-caption text-muted-foreground mb-2">
-              {document.company_name && (
-                <div className="flex items-center space-x-1">
-                  <Building className="h-3 w-3" />
-                  <span>{document.company_name}</span>
-                </div>
-              )}
-              <div className="flex items-center space-x-1">
-                <Calendar className="h-3 w-3" />
-                <span>{formatDate(document.created_at)}</span>
-              </div>
-              {document.compatibility_score && (
-                <div className="text-primary font-medium">
-                  Score: {document.compatibility_score}%
-                </div>
-              )}
-            </div>
-          </div>
-          
-          <div className="flex items-center space-x-2 flex-shrink-0">
-            {getDocumentBadge()}
           </div>
         </div>
       </CardContent>
