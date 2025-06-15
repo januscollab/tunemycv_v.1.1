@@ -153,12 +153,26 @@ const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>(({
     </div>
   );
 
+  // Handle AI text replacement
+  const handleTextReplace = (originalText: string, newText: string) => {
+    if (quillRef.current) {
+      const editor = quillRef.current.getEditor();
+      const text = editor.getText();
+      const index = text.indexOf(originalText);
+      
+      if (index !== -1) {
+        editor.deleteText(index, originalText.length);
+        editor.insertText(index, newText);
+      }
+    }
+  };
+
   // Wrap with AI Context Menu if AI features are enabled
   if (showAIFeatures) {
     return (
       <AIContextMenu
         selectedText={selectedText}
-        onAIAction={handleAIAction}
+        onTextReplace={handleTextReplace}
         disabled={readOnly || isConverting}
       >
         {editorContent}
