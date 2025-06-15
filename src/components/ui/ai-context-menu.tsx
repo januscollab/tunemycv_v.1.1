@@ -213,12 +213,12 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
       <div ref={containerRef} className="relative">
         {children}
         
-        {/* Main AI Menu - Redesigned based on image */}
+        {/* Main AI Menu - Compact Design */}
         {menuPosition.visible && (
           <div
             ref={menuRef}
             className={cn(
-              "absolute z-modal w-64 bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl shadow-lg overflow-hidden",
+              "absolute z-modal w-52 bg-gradient-to-br from-primary-600 to-primary-700 rounded-lg shadow-lg overflow-hidden",
               "animate-scale-in origin-top",
               "transform -translate-x-1/2"
             )}
@@ -228,39 +228,39 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
             }}
           >
             {/* Header Section */}
-            <div className="p-4 border-b border-primary-500/30">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-primary-foreground/15 rounded-xl flex items-center justify-center">
-                  <WandSparkles className="w-5 h-5 text-primary-foreground/80" />
+            <div className="p-3 border-b border-primary-500/30">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 bg-primary-foreground/15 rounded-lg flex items-center justify-center">
+                  <WandSparkles className="w-4 h-4 text-primary-foreground/80" />
                 </div>
                 <div>
-                  <h3 className="text-heading font-semibold text-primary-foreground/95">AI-Enhance</h3>
-                  <p className="text-tiny text-primary-foreground/70">Menu</p>
+                  <h3 className="text-caption font-semibold text-primary-foreground/95">AI-Enhance</h3>
+                  <p className="text-micro text-primary-foreground/70">Menu</p>
                 </div>
               </div>
             </div>
 
             {/* Menu Items */}
-            <div className="p-2">
-              <div className="space-y-1">
+            <div className="p-1.5">
+              <div className="space-y-0.5">
                 {/* Rephrase */}
                 <button
                   onMouseEnter={(e) => handleSubmenuHover('rephrase', e)}
                   onMouseLeave={handleSubmenuLeave}
                   disabled={isDisabled}
                   className={cn(
-                    "w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg transition-all",
-                    "text-primary-foreground/90 hover:bg-primary-500/20 hover:text-primary-foreground",
+                    "w-full flex items-center justify-between gap-2 px-2.5 py-2 rounded-md transition-all",
+                    "text-primary-foreground/90 hover:bg-primary-500/15 hover:text-primary-foreground",
                     "disabled:opacity-50 disabled:cursor-not-allowed"
                   )}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-white/40 rounded-lg flex items-center justify-center">
-                      <WandSparkles className="w-4 h-4" />
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 bg-white/25 rounded-md flex items-center justify-center">
+                      <WandSparkles className="w-3.5 h-3.5" />
                     </div>
-                    <span className="text-caption font-medium">Rephrase</span>
+                    <span className="text-micro font-medium">Rephrase</span>
                   </div>
-                  <ChevronRight className="w-4 h-4" />
+                  <ChevronRight className="w-3.5 h-3.5" />
                 </button>
 
                 {/* Improve */}
@@ -268,36 +268,37 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
                   onClick={() => handleAIAction('improve', undefined, 'Improve Clarity')}
                   disabled={isDisabled}
                   className={cn(
-                    "w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg transition-all",
-                    "text-primary-foreground/90 hover:bg-primary-500/30 hover:text-primary-foreground",
+                    "w-full flex items-center justify-between gap-2 px-2.5 py-2 rounded-md transition-all",
+                    "text-primary-foreground/90 hover:bg-primary-500/15 hover:text-primary-foreground",
                     "disabled:opacity-50 disabled:cursor-not-allowed"
                   )}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 text-primary-foreground/70 flex items-center justify-center">
-                      <Edit3 className="w-4 h-4" />
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 text-primary-foreground/70 flex items-center justify-center">
+                      <Edit3 className="w-3.5 h-3.5" />
                     </div>
-                    <span className="text-caption">Improve</span>
+                    <span className="text-micro">Improve</span>
                   </div>
                 </button>
+
                 {/* Adjust Length */}
                 <button
                   onMouseEnter={(e) => handleSubmenuHover('length', e)}
                   onMouseLeave={handleSubmenuLeave}
                   disabled={isDisabled}
                   className={cn(
-                    "w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg transition-all",
-                    "text-primary-foreground/90 hover:bg-primary-500/30 hover:text-primary-foreground",
+                    "w-full flex items-center justify-between gap-2 px-2.5 py-2 rounded-md transition-all",
+                    "text-primary-foreground/90 hover:bg-primary-500/15 hover:text-primary-foreground",
                     "disabled:opacity-50 disabled:cursor-not-allowed"
                   )}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 text-primary-foreground/70 flex items-center justify-center">
-                      <ArrowUpDown className="w-4 h-4" />
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 text-primary-foreground/70 flex items-center justify-center">
+                      <ArrowUpDown className="w-3.5 h-3.5" />
                     </div>
-                    <span className="text-caption">Adjust Length</span>
+                    <span className="text-micro">Adjust Length</span>
                   </div>
-                  <ChevronRight className="w-4 h-4" />
+                  <ChevronRight className="w-3.5 h-3.5" />
                 </button>
 
                 {/* Role Specific */}
@@ -305,22 +306,22 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
                   onClick={() => handleAIAction('role_specific', undefined, 'Role Specific')}
                   disabled={isDisabled}
                   className={cn(
-                    "w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg transition-all",
-                    "text-primary-foreground/90 hover:bg-primary-500/30 hover:text-primary-foreground",
+                    "w-full flex items-center justify-between gap-2 px-2.5 py-2 rounded-md transition-all",
+                    "text-primary-foreground/90 hover:bg-primary-500/15 hover:text-primary-foreground",
                     "disabled:opacity-50 disabled:cursor-not-allowed"
                   )}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 text-primary-foreground/70 flex items-center justify-center">
-                      <Target className="w-4 h-4" />
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 text-primary-foreground/70 flex items-center justify-center">
+                      <Target className="w-3.5 h-3.5" />
                     </div>
-                    <span className="text-caption">Role Specific</span>
+                    <span className="text-micro">Role Specific</span>
                   </div>
                 </button>
               </div>
 
               {isDisabled && (
-                <div className="px-3 py-2 mt-2 text-primary-foreground/60 text-micro border-t border-primary-500/30">
+                <div className="px-2.5 py-2 mt-2 text-primary-foreground/60 text-micro border-t border-primary-500/30">
                   Select 10+ characters to use AI features
                 </div>
               )}
