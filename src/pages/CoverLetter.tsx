@@ -714,6 +714,14 @@ const AuthenticatedCoverLetter = () => {
                               return selectedCoverLetter.content.replace(/\n/g, '<br>');
                             }
                           })()}
+                          onChange={(content) => {
+                            if (selectedCoverLetter) {
+                              setSelectedCoverLetter({
+                                ...selectedCoverLetter,
+                                content: content
+                              });
+                            }
+                          }}
                           readOnly={false}
                           className="min-h-[400px]"
                           placeholder=""

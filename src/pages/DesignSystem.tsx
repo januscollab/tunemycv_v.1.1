@@ -1050,6 +1050,93 @@ const DesignSystem = () => {
                   </CardContent>
                 </Card>
               </div>
+
+              {/* Document History Component */}
+              <div className="space-y-4">
+                <h3 className="text-heading font-semibold">Document History</h3>
+                <Card className="group hover:shadow-lg transition-all duration-300">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-subheading">Document History</CardTitle>
+                      <Badge variant="outline" className="text-micro">
+                        8 usages
+                      </Badge>
+                    </div>
+                    <p className="text-caption text-muted-foreground">
+                      Specialized document history component for profile page with filtering, pagination, and advanced actions
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="bg-muted/30 p-4 rounded-lg">
+                      <DocumentHistory
+                        header={{
+                          title: "Document History",
+                          totalCount: 3,
+                          filterType: 'all',
+                          onFilterChange: () => {},
+                          itemsPerPage: 10,
+                          onItemsPerPageChange: () => {},
+                          showPagination: true
+                        }}
+                        documents={[
+                          {
+                            id: '1',
+                            type: 'analysis',
+                            title: 'Program Director',
+                            job_title: 'Program Director',
+                            company_name: 'Oracle',
+                            created_at: '2025-06-14T23:57:00Z',
+                            compatibility_score: 88,
+                            has_cover_letter: true,
+                            executive_summary: 'Strong candidate with relevant experience',
+                            strengths: ['Leadership', 'Strategic Planning'],
+                            weaknesses: ['Communication'],
+                            recommendations: ['Improve presentation skills']
+                          },
+                          {
+                            id: '2',
+                            type: 'cover_letter',
+                            title: 'Software Engineer Cover Letter',
+                            job_title: 'Software Engineer',
+                            company_name: 'TechCorp',
+                            created_at: '2025-06-13T15:30:00Z',
+                            content: 'Dear Hiring Manager...',
+                            regeneration_count: 2,
+                            analysis_result_id: 'analysis-123'
+                          }
+                        ]}
+                        actions={[
+                          {
+                            label: 'View',
+                            icon: <Eye className="h-4 w-4 mr-2" />,
+                            onClick: (doc) => console.log('View:', doc.title)
+                          },
+                          {
+                            label: 'Download',
+                            icon: <Download className="h-4 w-4 mr-2" />,
+                            onClick: (doc) => console.log('Download:', doc.title)
+                          },
+                          {
+                            label: 'Delete',
+                            icon: <Trash2 className="h-4 w-4 mr-2" />,
+                            onClick: (doc) => console.log('Delete:', doc.title),
+                            variant: 'destructive'
+                          }
+                        ]}
+                        emptyState={{
+                          title: "No documents found",
+                          description: "You haven't created any analyses or cover letters yet."
+                        }}
+                        pagination={{
+                          currentPage: 1,
+                          totalPages: 1,
+                          onPageChange: () => {}
+                        }}
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </section>
           </TabsContent>
 
