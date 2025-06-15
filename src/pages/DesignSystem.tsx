@@ -12,6 +12,7 @@ import { CaptureTextarea } from '@/components/ui/capture-textarea';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import LegacyRichTextEditor from '@/components/ui/legacy-rich-text-editor';
 import { AIContextMenu } from '@/components/ui/ai-context-menu';
+import { ExperimentalAIMenu } from '@/components/ui/experimental-ai-menu';
 import '@/components/ui/rich-text-editor.css';
 
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -837,13 +838,14 @@ const DesignSystem = () => {
 
         {/* Tabbed Navigation */}
         <Tabs defaultValue="foundations" className="w-full">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="foundations">Foundations</TabsTrigger>
             <TabsTrigger value="components">Components</TabsTrigger>
             <TabsTrigger value="rte">Rich Text Editor</TabsTrigger>
             <TabsTrigger value="interactions">Interactions</TabsTrigger>
             <TabsTrigger value="missing">Missing Docs</TabsTrigger>
             <TabsTrigger value="loading">Loading States</TabsTrigger>
+            <TabsTrigger value="experiments">Experiments</TabsTrigger>
           </TabsList>
 
           {/* Foundations Tab */}
@@ -1445,6 +1447,204 @@ const DesignSystem = () => {
               activeModal={activeModal} 
               setActiveModal={setActiveModal}
             />
+          </TabsContent>
+
+          {/* Experiments Tab */}
+          <TabsContent value="experiments" className="space-y-8">
+            <section>
+              <h2 className="text-display font-bold mb-4">🧪 Experimental Components</h2>
+              <p className="text-body text-muted-foreground mb-8">
+                Creative explorations and experimental UI concepts. These are not production components but design experiments.
+              </p>
+
+              {/* Floating AI Assistant Experiment */}
+              <Card className="mb-8">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Sparkles className="h-5 w-5 text-primary" />
+                    Floating AI Assistant
+                  </CardTitle>
+                  <p className="text-caption text-muted-foreground">
+                    A completely reimagined AI context menu with orbital interactions and personality
+                  </p>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Demo Area */}
+                  <div className="border-2 border-dashed border-border rounded-lg p-8 bg-muted/30 relative min-h-[400px]">
+                    <ExperimentalAIMenu selectedText="sample text">
+                      <div className="space-y-4">
+                        <h3 className="text-heading font-semibold">Select any text below to see the AI assistant:</h3>
+                        
+                        <div className="space-y-4 text-body leading-relaxed">
+                          <p className="bg-background p-4 rounded-lg border">
+                            This is a sample paragraph with some text that you can select to trigger the experimental AI menu. 
+                            Try selecting different amounts of text to see how the AI's personality changes based on complexity.
+                          </p>
+                          
+                          <p className="bg-background p-4 rounded-lg border">
+                            Here's another paragraph! Notice how the AI responds differently to exclamation marks and questions? 
+                            The floating assistant adapts its mood and behavior based on what you select.
+                          </p>
+                          
+                          <p className="bg-background p-4 rounded-lg border">
+                            This is a much longer paragraph with complex sentence structures, technical terminology, and detailed explanations that should trigger the AI's "thinking" mode. The assistant recognizes text complexity and adjusts its visual feedback accordingly, showing a more contemplative expression when dealing with sophisticated content that requires deeper analysis and processing.
+                          </p>
+                        </div>
+                        
+                        <div className="bg-accent/50 p-4 rounded-lg border border-accent">
+                          <h4 className="font-semibold mb-2">🎯 Try These Features:</h4>
+                          <ul className="text-caption space-y-1 list-disc list-inside">
+                            <li>Select short text → Happy AI 😊</li>
+                            <li>Select text with ! or ? → Excited AI 🤖</li>
+                            <li>Select long/complex text → Thinking AI 🤔</li>
+                            <li>Hover over the floating circle → Orbital actions appear</li>
+                            <li>Click actions with arrows → Sub-menus slide out</li>
+                            <li>Watch the processing animation with particles</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </ExperimentalAIMenu>
+                  </div>
+
+                  {/* Design Concept */}
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <h4 className="text-heading font-semibold">🎨 Design Concept</h4>
+                      <div className="space-y-3 text-caption">
+                        <div className="flex items-start gap-3">
+                          <div className="w-6 h-6 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 flex-shrink-0 mt-0.5"></div>
+                          <div>
+                            <div className="font-medium">Orbital Interface</div>
+                            <div className="text-muted-foreground">Actions orbit around central AI like planets</div>
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-3">
+                          <div className="w-6 h-6 rounded-full bg-gradient-to-r from-blue-400 to-cyan-400 flex-shrink-0 mt-0.5"></div>
+                          <div>
+                            <div className="font-medium">Adaptive Personality</div>
+                            <div className="text-muted-foreground">AI mood changes based on text complexity</div>
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-3">
+                          <div className="w-6 h-6 rounded-full bg-gradient-to-r from-green-400 to-emerald-400 flex-shrink-0 mt-0.5"></div>
+                          <div>
+                            <div className="font-medium">Magnetic Positioning</div>
+                            <div className="text-muted-foreground">Smart positioning that avoids content overlap</div>
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-3">
+                          <div className="w-6 h-6 rounded-full bg-gradient-to-r from-orange-400 to-red-400 flex-shrink-0 mt-0.5"></div>
+                          <div>
+                            <div className="font-medium">Particle Effects</div>
+                            <div className="text-muted-foreground">Visual feedback during AI processing</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <h4 className="text-heading font-semibold">⚡ Interactive Features</h4>
+                      <div className="space-y-2 text-caption">
+                        <div className="p-3 bg-accent/30 rounded-lg border border-accent">
+                          <div className="font-medium mb-1">Breathing Animation</div>
+                          <div className="text-muted-foreground">Subtle life-like animation when idle</div>
+                        </div>
+                        <div className="p-3 bg-accent/30 rounded-lg border border-accent">
+                          <div className="font-medium mb-1">Progressive Disclosure</div>
+                          <div className="text-muted-foreground">Actions reveal based on interaction depth</div>
+                        </div>
+                        <div className="p-3 bg-accent/30 rounded-lg border border-accent">
+                          <div className="font-medium mb-1">Smooth Transitions</div>
+                          <div className="text-muted-foreground">Fluid animations between states</div>
+                        </div>
+                        <div className="p-3 bg-accent/30 rounded-lg border border-accent">
+                          <div className="font-medium mb-1">Contextual Intelligence</div>
+                          <div className="text-muted-foreground">Responds to text characteristics</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Technical Details */}
+                  <div className="bg-muted/50 p-4 rounded-lg border border-muted">
+                    <h4 className="text-heading font-semibold mb-3">🔧 Technical Implementation</h4>
+                    <div className="grid md:grid-cols-3 gap-4 text-caption">
+                      <div>
+                        <div className="font-medium mb-2">Positioning Logic</div>
+                        <div className="text-muted-foreground space-y-1">
+                          <div>• Magnetic snap to optimal positions</div>
+                          <div>• Boundary detection & adjustment</div>
+                          <div>• Content overlap prevention</div>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="font-medium mb-2">Animation System</div>
+                        <div className="text-muted-foreground space-y-1">
+                          <div>• CSS transforms for orbiting</div>
+                          <div>• Staggered animation delays</div>
+                          <div>• Particle system with random positioning</div>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="font-medium mb-2">State Management</div>
+                        <div className="text-muted-foreground space-y-1">
+                          <div>• AI mood based on text analysis</div>
+                          <div>• Progressive menu states</div>
+                          <div>• Processing feedback loops</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Future Experiments Placeholder */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Zap className="h-5 w-5 text-warning" />
+                    Future Experiments
+                  </CardTitle>
+                  <p className="text-caption text-muted-foreground">
+                    Ideas for future experimental components and interactions
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="p-4 border border-dashed border-border rounded-lg text-center opacity-75">
+                      <div className="text-2xl mb-2">🎭</div>
+                      <div className="font-medium mb-1">Morphing Buttons</div>
+                      <div className="text-caption text-muted-foreground">Buttons that transform based on context</div>
+                    </div>
+                    <div className="p-4 border border-dashed border-border rounded-lg text-center opacity-75">
+                      <div className="text-2xl mb-2">🌊</div>
+                      <div className="font-medium mb-1">Fluid Navigation</div>
+                      <div className="text-caption text-muted-foreground">Liquid-like menu transitions</div>
+                    </div>
+                    <div className="p-4 border border-dashed border-border rounded-lg text-center opacity-75">
+                      <div className="text-2xl mb-2">🎨</div>
+                      <div className="font-medium mb-1">Adaptive Themes</div>
+                      <div className="text-caption text-muted-foreground">Colors that change with content</div>
+                    </div>
+                    <div className="p-4 border border-dashed border-border rounded-lg text-center opacity-75">
+                      <div className="text-2xl mb-2">🔮</div>
+                      <div className="font-medium mb-1">Predictive UI</div>
+                      <div className="text-caption text-muted-foreground">Interface that anticipates actions</div>
+                    </div>
+                    <div className="p-4 border border-dashed border-border rounded-lg text-center opacity-75">
+                      <div className="text-2xl mb-2">⚡</div>
+                      <div className="font-medium mb-1">Gesture Controls</div>
+                      <div className="text-caption text-muted-foreground">Hand gesture-based interactions</div>
+                    </div>
+                    <div className="p-4 border border-dashed border-border rounded-lg text-center opacity-75">
+                      <div className="text-2xl mb-2">🎪</div>
+                      <div className="font-medium mb-1">Physics UI</div>
+                      <div className="text-caption text-muted-foreground">Elements with realistic physics</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </section>
           </TabsContent>
         </Tabs>
       </div>
