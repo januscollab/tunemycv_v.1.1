@@ -1024,14 +1024,37 @@ const AuthenticatedCoverLetter = () => {
                         
                         const fileName = `${doc.company_name}_${doc.job_title}_Cover_Letter`;
                         
-                        // Helper function to clean HTML content
-                        const cleanContent = (htmlContent: string) => {
+                        // Helper function to properly convert HTML content to clean text
+                        const convertHtmlToText = (htmlContent: string) => {
+                          // Create a temporary div to parse HTML
                           const tempDiv = document.createElement('div');
                           tempDiv.innerHTML = htmlContent;
-                          return tempDiv.textContent || tempDiv.innerText || '';
+                          
+                          // Replace <br> tags with newlines before getting text content
+                          const brTags = tempDiv.querySelectorAll('br');
+                          brTags.forEach(br => {
+                            br.replaceWith('\n');
+                          });
+                          
+                          // Replace </p> tags with double newlines for paragraph breaks
+                          const pTags = tempDiv.querySelectorAll('p');
+                          pTags.forEach(p => {
+                            p.after('\n\n');
+                          });
+                          
+                          // Get clean text content
+                          let cleanText = tempDiv.textContent || tempDiv.innerText || '';
+                          
+                          // Clean up excessive whitespace and newlines
+                          cleanText = cleanText
+                            .replace(/\n\s*\n\s*\n/g, '\n\n') // Replace multiple newlines with double newlines
+                            .replace(/^\s+|\s+$/g, '') // Trim start and end
+                            .replace(/[ \t]+/g, ' '); // Replace multiple spaces/tabs with single space
+                          
+                          return cleanText;
                         };
                         
-                        const cleanedContent = cleanContent(doc.content || '');
+                        const cleanedContent = convertHtmlToText(doc.content || '');
                         
                         // Create menu items
                         const menuItems = [
@@ -1077,10 +1100,29 @@ const AuthenticatedCoverLetter = () => {
                                 toast({ title: 'Success', description: 'Cover letter downloaded as PDF' });
                               } else if (item.action === 'word') {
                                 const { Document, Packer, Paragraph, TextRun } = await import('docx');
+                                
+                                // Split content into paragraphs for better Word formatting
+                                const paragraphs = cleanedContent.split('\n\n').filter(p => p.trim().length > 0);
+                                const docParagraphs = paragraphs.map(paragraph => 
+                                  new Paragraph({
+                                    children: [new TextRun(paragraph.trim())],
+                                    spacing: { after: 240 } // Add spacing between paragraphs
+                                  })
+                                );
+                                
                                 const doc = new Document({
                                   sections: [{
-                                    properties: {},
-                                    children: [new Paragraph({ children: [new TextRun(cleanedContent)] })],
+                                    properties: {
+                                      page: {
+                                        margin: {
+                                          top: 720,
+                                          right: 720,
+                                          bottom: 720,
+                                          left: 720,
+                                        },
+                                      },
+                                    },
+                                    children: docParagraphs,
                                   }],
                                 });
                                 const blob = await Packer.toBlob(doc);
