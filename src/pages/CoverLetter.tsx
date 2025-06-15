@@ -688,11 +688,16 @@ const AuthenticatedCoverLetter = () => {
                             <Clock className="h-4 w-4" />
                             Generated {formatDate(selectedCoverLetter.created_at)}
                           </div>
-                          {selectedCoverLetter.regeneration_count > 0 && (
-                            <Badge variant="outline" className="text-xs">
-                              Iteration {selectedCoverLetter.regeneration_count + 1}
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="text-xs font-medium">
+                              Version {selectedCoverLetter.regeneration_count + 1}
                             </Badge>
-                          )}
+                            {selectedCoverLetter.regeneration_count > 0 && (
+                              <span className="text-xs text-gray-500">
+                                (Last updated {formatDate(selectedCoverLetter.updated_at || selectedCoverLetter.created_at)})
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </CardHeader>
