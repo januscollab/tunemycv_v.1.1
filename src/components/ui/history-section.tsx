@@ -147,7 +147,14 @@ export const HistoryListItem: React.FC<{
                 {item.title}
               </h3>
               {item.badge && (
-                <Badge variant={item.badge.variant || 'default'} className="text-micro">
+                <Badge 
+                  variant={item.badge.variant || 'default'} 
+                  className={cn(
+                    "text-micro",
+                    item.badge.variant === 'default' && "bg-green-100 text-green-800 border-green-200",
+                    item.badge.variant === 'secondary' && "bg-orange-100 text-orange-800 border-orange-200"
+                  )}
+                >
                   {item.badge.text}
                 </Badge>
               )}

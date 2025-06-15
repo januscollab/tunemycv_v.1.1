@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -44,7 +44,35 @@ export const useCoverLetter = () => {
   const [coverLetter, setCoverLetter] = useState<any>(null);
   const [hasGenerated, setHasGenerated] = useState(false);
   const [showNoAnalysisModal, setShowNoAnalysisModal] = useState(false);
+  const [generationProgress, setGenerationProgress] = useState(0);
+  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
+
+  const startProgressTracking = useCallback(() => {
+    setGenerationProgress(0);
+    let progress = 0;
+    
+    progressIntervalRef.current = setInterval(() => {
+      progress += Math.random() * 15 + 5; // Random increment between 5-20%
+      if (progress >= 90) {
+        progress = 90; // Cap at 90% until completion
+        if (progressIntervalRef.current) {
+          clearInterval(progressIntervalRef.current);
+        }
+      }
+      setGenerationProgress(progress);
+    }, 500);
+  }, []);
+
+  const completeProgress = useCallback(() => {
+    setGenerationProgress(100);
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+      progressIntervalRef.current = null;
+    }
+    // Reset progress after a short delay
+    setTimeout(() => setGenerationProgress(0), 1000);
+  }, []);
 
   const resetForm = () => {
     setSelectedAnalysisId('');
@@ -58,6 +86,8 @@ export const useCoverLetter = () => {
 
   const generateCoverLetter = async (params: GenerateCoverLetterParams) => {
     setIsGenerating(true);
+    startProgressTracking();
+    
     try {
       const { data, error } = await supabase.functions.invoke('generate-cover-letter', {
         body: params
@@ -67,6 +97,7 @@ export const useCoverLetter = () => {
 
       setCoverLetter(data);
       setHasGenerated(true);
+      completeProgress();
 
       toast({
         title: 'Cover Letter Generated!',
@@ -76,6 +107,7 @@ export const useCoverLetter = () => {
       return data;
     } catch (error: any) {
       console.error('Cover letter generation error:', error);
+      completeProgress();
       toast({
         title: 'Generation Failed',
         description: error.message || 'Failed to generate cover letter. Please try again.',
@@ -89,6 +121,8 @@ export const useCoverLetter = () => {
 
   const generateFromAnalysis = async (params: GenerateFromAnalysisParams) => {
     setIsGenerating(true);
+    startProgressTracking();
+    
     try {
       // Get analysis data
       const { data: analysisData, error: analysisError } = await supabase
@@ -120,6 +154,7 @@ export const useCoverLetter = () => {
 
       setCoverLetter(data);
       setHasGenerated(true);
+      completeProgress();
 
       toast({
         title: 'Cover Letter Generated!',
@@ -129,6 +164,7 @@ export const useCoverLetter = () => {
       return data;
     } catch (error: any) {
       console.error('Cover letter generation from analysis error:', error);
+      completeProgress();
       toast({
         title: 'Generation Failed',
         description: error.message || 'Failed to generate cover letter from analysis. Please try again.',
@@ -142,6 +178,8 @@ export const useCoverLetter = () => {
 
   const regenerateCoverLetter = async (params: RegenerateCoverLetterParams) => {
     setIsRegenerating(true);
+    startProgressTracking();
+    
     try {
       // Get the original cover letter data
       const { data: originalData, error: fetchError } = await supabase
@@ -206,6 +244,7 @@ export const useCoverLetter = () => {
 
       if (updateError) throw updateError;
 
+      completeProgress();
       toast({
         title: 'Cover Letter Regenerated!',
         description: isFreeregeneration 
@@ -220,6 +259,7 @@ export const useCoverLetter = () => {
       };
     } catch (error: any) {
       console.error('Cover letter regeneration error:', error);
+      completeProgress();
       toast({
         title: 'Regeneration Failed',
         description: error.message || 'Failed to regenerate cover letter. Please try again.',
@@ -314,6 +354,7 @@ export const useCoverLetter = () => {
     hasGenerated,
     showNoAnalysisModal,
     setShowNoAnalysisModal,
-    resetForm
+    resetForm,
+    generationProgress
   };
 };

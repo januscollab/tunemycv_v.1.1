@@ -30,6 +30,8 @@ interface RichTextEditorProps {
   minHeight?: string;
   filename?: string;
   onAIRequest?: (context: AIContext, action: 'improve' | 'rewrite' | 'tone') => void;
+  autoSave?: boolean;
+  autoSaveDelay?: number;
 }
 
 const RichTextEditor: React.FC<RichTextEditorProps> = ({
@@ -47,13 +49,17 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   disabled = false,
   minHeight = '200px',
   filename = 'document',
-  onAIRequest
+  onAIRequest,
+  autoSave = false,
+  autoSaveDelay = 2000
 }) => {
   const quillRef = useRef<ReactQuill>(null);
   const [content, setContent] = useState(value);
   const [isAIEnabled, setIsAIEnabled] = useState(false);
   const [selectionInfo, setSelectionInfo] = useState<AIContext | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
 
   // Update content when value prop changes
@@ -63,11 +69,47 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     }
   }, [value, content]);
 
+  // Auto-save functionality
+  const performAutoSave = useCallback(async (contentToSave: string) => {
+    if (onSave && autoSave && !readOnly && !disabled) {
+      setIsSaving(true);
+      try {
+        await onSave(contentToSave);
+      } catch (error) {
+        console.error('Auto-save failed:', error);
+      } finally {
+        setIsSaving(false);
+      }
+    }
+  }, [onSave, autoSave, readOnly, disabled]);
+
   // Content change handler
   const handleContentChange = useCallback((newValue: string) => {
     setContent(newValue);
     onChange?.(newValue);
-  }, [onChange]);
+    
+    // Auto-save logic
+    if (autoSave && onSave && !readOnly && !disabled) {
+      // Clear existing timeout
+      if (autoSaveTimeoutRef.current) {
+        clearTimeout(autoSaveTimeoutRef.current);
+      }
+      
+      // Set new timeout for auto-save
+      autoSaveTimeoutRef.current = setTimeout(() => {
+        performAutoSave(newValue);
+      }, autoSaveDelay);
+    }
+  }, [onChange, autoSave, onSave, readOnly, disabled, autoSaveDelay, performAutoSave]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (autoSaveTimeoutRef.current) {
+        clearTimeout(autoSaveTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Handle text selection for AI features
   const handleSelectionChange = useCallback((range: any, source: any, editor: any) => {
@@ -257,8 +299,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   return (
     <div className={cn('relative', className)}>
       {/* State Indicator */}
-      {state !== 'default' && (
-        <div className="absolute top-2 left-2 z-20">
+      {(state !== 'default' || isSaving) && (
+        <div className="absolute top-2 left-2 z-20 flex items-center space-x-1">
+          {isSaving && <Save className="h-4 w-4 text-muted-foreground animate-pulse" />}
           {stateIcons[state]}
         </div>
       )}

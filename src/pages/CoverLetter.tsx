@@ -83,7 +83,8 @@ const AuthenticatedCoverLetter = () => {
     hasGenerated,
     showNoAnalysisModal,
     setShowNoAnalysisModal,
-    resetForm
+    resetForm,
+    generationProgress
   } = useCoverLetter();
   
   const [formData, setFormData] = useState({
@@ -385,11 +386,11 @@ const AuthenticatedCoverLetter = () => {
         {isRegenerating && (
           <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-modal">
             <ProgressIndicator 
-              value={50}
+              value={generationProgress}
               variant="default"
               size="lg"
               label="Regenerating Cover Letter"
-              
+              showPercentage={true}
             />
           </div>
         )}
@@ -397,11 +398,11 @@ const AuthenticatedCoverLetter = () => {
         {isGenerating && (
           <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-modal">
             <ProgressIndicator 
-              value={50}
+              value={generationProgress}
               variant="default"
               size="lg"
               label="Generating Cover Letter"
-              
+              showPercentage={true}
             />
           </div>
         )}
@@ -722,6 +723,33 @@ const AuthenticatedCoverLetter = () => {
                               });
                             }
                           }}
+                          onSave={async (content) => {
+                            if (selectedCoverLetter && user) {
+                              try {
+                                const { error } = await supabase
+                                  .from('cover_letters')
+                                  .update({ content })
+                                  .eq('id', selectedCoverLetter.id)
+                                  .eq('user_id', user.id);
+                                
+                                if (error) throw error;
+                                
+                                toast({
+                                  title: 'Success',
+                                  description: 'Cover letter saved automatically',
+                                });
+                              } catch (error) {
+                                console.error('Auto-save failed:', error);
+                                toast({
+                                  title: 'Error',
+                                  description: 'Failed to auto-save cover letter',
+                                  variant: 'destructive',
+                                });
+                              }
+                            }
+                          }}
+                          autoSave={true}
+                          autoSaveDelay={3000}
                           readOnly={false}
                           className="min-h-[400px]"
                           placeholder=""
