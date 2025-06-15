@@ -37,6 +37,7 @@ const ExperimentalAIMenu: React.FC<ExperimentalAIMenuProps> = ({
   const [activeOrbit, setActiveOrbit] = useState<string | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
   const [aiMood, setAiMood] = useState<'ready' | 'thinking' | 'excited'>('ready')
+  const [isHovering, setIsHovering] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const menuRef = useRef<HTMLDivElement>(null)
   const selectionTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -70,34 +71,32 @@ const ExperimentalAIMenu: React.FC<ExperimentalAIMenuProps> = ({
       setAiMood('ready')
     }
 
-    // Wait for user to finish selecting
-    selectionTimeoutRef.current = setTimeout(() => {
-      const range = selection.getRangeAt(0)
-      const rect = range.getBoundingClientRect()
-      const containerRect = containerRef.current?.getBoundingClientRect()
+    // Immediate positioning for stability
+    const range = selection.getRangeAt(0)
+    const rect = range.getBoundingClientRect()
+    const containerRect = containerRef.current?.getBoundingClientRect()
+    
+    if (containerRect) {
+      // Magnetic positioning - snap to optimal positions
+      let x = rect.left - containerRect.left + (rect.width / 2)
+      let y = rect.bottom - containerRect.top + 20
       
-      if (containerRect) {
-        // Magnetic positioning - snap to optimal positions
-        let x = rect.left - containerRect.left + (rect.width / 2)
-        let y = rect.bottom - containerRect.top + 20
-        
-        // Keep menu within bounds
-        const menuWidth = 120
-        const menuHeight = 120
-        
-        if (x + menuWidth > containerRect.width) {
-          x = containerRect.width - menuWidth - 10
-        }
-        if (x < 10) {
-          x = 10
-        }
-        if (y + menuHeight > containerRect.height) {
-          y = rect.top - containerRect.top - menuHeight - 10
-        }
-        
-        setMenuPosition({ x, y, visible: true })
+      // Keep menu within bounds
+      const menuWidth = 120
+      const menuHeight = 120
+      
+      if (x + menuWidth > containerRect.width) {
+        x = containerRect.width - menuWidth - 10
       }
-    }, 200)
+      if (x < 10) {
+        x = 10
+      }
+      if (y + menuHeight > containerRect.height) {
+        y = rect.top - containerRect.top - menuHeight - 10
+      }
+      
+      setMenuPosition({ x, y, visible: true })
+    }
   }
 
   const handleAIAction = async (action: string, subAction?: string) => {
@@ -155,7 +154,7 @@ const ExperimentalAIMenu: React.FC<ExperimentalAIMenuProps> = ({
       id: 'rephrase', 
       icon: WandSparkles, 
       label: 'Rephrase', 
-      color: 'from-purple-400 to-pink-400',
+      color: 'from-purple-300/40 via-purple-400/50 to-pink-400/40',
       angle: 0,
       subActions: [
         { id: 'professional', label: 'Professional', icon: Brain },
@@ -168,14 +167,14 @@ const ExperimentalAIMenu: React.FC<ExperimentalAIMenuProps> = ({
       id: 'improve', 
       icon: Edit3, 
       label: 'Improve', 
-      color: 'from-blue-400 to-cyan-400',
+      color: 'from-blue-300/40 via-blue-400/50 to-cyan-400/40',
       angle: 90 
     },
     { 
       id: 'length', 
       icon: ArrowUpDown, 
       label: 'Length', 
-      color: 'from-green-400 to-emerald-400',
+      color: 'from-green-300/40 via-green-400/50 to-emerald-400/40',
       angle: 180,
       subActions: [
         { id: 'longer', label: 'Longer', icon: ArrowUp },
@@ -188,7 +187,7 @@ const ExperimentalAIMenu: React.FC<ExperimentalAIMenuProps> = ({
       id: 'role', 
       icon: Target, 
       label: 'Role Fit', 
-      color: 'from-orange-400 to-red-400',
+      color: 'from-orange-200/30 via-orange-300/40 to-red-300/30',
       angle: 270 
     }
   ]
@@ -214,80 +213,126 @@ const ExperimentalAIMenu: React.FC<ExperimentalAIMenuProps> = ({
             {/* Central AI Circle */}
             <div 
               className={cn(
-                "relative w-20 h-20 rounded-full cursor-pointer transition-all duration-500",
-                "bg-gradient-to-br from-primary-400/90 to-primary-600/90 backdrop-blur-lg",
-                "shadow-lg border border-white/20",
-                isProcessing ? "animate-pulse scale-110" : "hover:scale-105",
-                aiMood === 'thinking' && "animate-bounce",
-                aiMood === 'excited' && "animate-pulse"
+                "relative w-20 h-20 rounded-full cursor-pointer transition-all duration-700 ease-out",
+                "bg-gradient-to-br from-primary-300/30 via-primary-400/40 to-primary-600/50 backdrop-blur-xl",
+                "shadow-2xl border border-white/10",
+                isProcessing ? "scale-110" : "hover:scale-110",
+                "transform-gpu"
               )}
-              onMouseEnter={() => !isProcessing && setActiveOrbit('main')}
-              onMouseLeave={() => !isProcessing && setActiveOrbit(null)}
+              onMouseEnter={() => {
+                if (!isProcessing) {
+                  setActiveOrbit('main')
+                  setIsHovering(true)
+                }
+              }}
+              onMouseLeave={() => {
+                if (!isProcessing) {
+                  setActiveOrbit(null)
+                  setIsHovering(false)
+                }
+              }}
+              style={{
+                transition: 'all 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)'
+              }}
             >
-              {/* AI Avatar */}
-              <div className="absolute inset-0 flex items-center justify-center">
+              {/* AI Avatar with Fluid Motion */}
+              <div className={cn(
+                "absolute inset-0 flex items-center justify-center transition-all duration-500",
+                isHovering && "scale-110"
+              )}>
                 {isProcessing ? (
-                  <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <div className="w-6 h-6 border-2 border-white/60 border-t-transparent rounded-full animate-spin" />
                 ) : (
-                  <div className="text-2xl">{getAiEmoji()}</div>
+                  <div className={cn(
+                    "text-2xl transition-all duration-500 transform",
+                    isHovering && "rotate-12 scale-110"
+                  )}>
+                    {getAiEmoji()}
+                  </div>
                 )}
               </div>
               
-              {/* Ready Indicator */}
+              {/* Fluid Ring Animation */}
               {!isProcessing && (
-                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white animate-pulse" />
+                <div className={cn(
+                  "absolute inset-0 rounded-full transition-all duration-700",
+                  "bg-gradient-to-r from-primary-200/20 via-primary-400/30 to-primary-600/20",
+                  isHovering ? "scale-110 opacity-60" : "scale-100 opacity-30"
+                )} />
               )}
               
-              {/* Breathing Effect */}
-              {!isProcessing && activeOrbit !== 'main' && (
-                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary-300/30 to-primary-500/30 animate-ping" />
+              {/* Pulse Ring */}
+              {isProcessing && (
+                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary-300/40 to-primary-500/40 animate-ping" />
               )}
             </div>
 
             {/* Orbital Actions */}
             {activeOrbit === 'main' && !isProcessing && (
               <>
-                {orbitActions.map((action, index) => {
-                  const angle = (action.angle * Math.PI) / 180
-                  const radius = 50
-                  const x = Math.cos(angle) * radius
-                  const y = Math.sin(angle) * radius
-                  
-                  return (
-                    <div
-                      key={action.id}
-                      className={cn(
-                        "absolute w-12 h-12 rounded-full cursor-pointer transition-all duration-300",
-                        `bg-gradient-to-r ${action.color}`,
-                        "shadow-md border border-white/30 backdrop-blur-sm",
-                        "hover:scale-110 hover:shadow-lg",
-                        "flex items-center justify-center text-white",
-                        "animate-scale-in"
-                      )}
-                      style={{
-                        left: `${x}px`,
-                        top: `${y}px`,
-                        animationDelay: `${index * 100}ms`,
-                        transform: 'translate(-50%, -50%)'
-                      }}
-                      onClick={() => {
-                        if (action.subActions) {
-                          setActiveOrbit(action.id)
-                        } else {
-                          handleAIAction(action.id)
-                        }
-                      }}
-                      onMouseEnter={() => setActiveOrbit(action.id)}
-                    >
-                      <action.icon className="w-5 h-5" />
-                      
-                      {/* Tooltip */}
-                      <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black/80 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
-                        {action.label}
-                      </div>
-                    </div>
-                  )
-                })}
+                 {orbitActions.map((action, index) => {
+                   const angle = (action.angle * Math.PI) / 180
+                   const radius = 50
+                   const x = Math.cos(angle) * radius
+                   const y = Math.sin(angle) * radius
+                   const isActive = activeOrbit === action.id
+                   
+                   return (
+                     <div
+                       key={action.id}
+                       className={cn(
+                         "absolute rounded-full cursor-pointer backdrop-blur-xl border border-white/20",
+                         "flex items-center justify-center text-white/80",
+                         "animate-scale-in group relative overflow-hidden",
+                         "transform-gpu transition-all duration-500 ease-out",
+                         isActive ? "w-16 h-16 shadow-2xl" : "w-12 h-12 shadow-lg hover:w-14 hover:h-14"
+                       )}
+                       style={{
+                         left: `${x}px`,
+                         top: `${y}px`,
+                         animationDelay: `${index * 100}ms`,
+                         transform: 'translate(-50%, -50%)',
+                         background: `linear-gradient(135deg, ${action.color.replace('from-', '').replace(' via-', ', ').replace(' to-', ', ')})`
+                       }}
+                       onClick={() => {
+                         if (action.subActions) {
+                           setActiveOrbit(action.id)
+                         } else {
+                           handleAIAction(action.id)
+                         }
+                       }}
+                       onMouseEnter={() => setActiveOrbit(action.id)}
+                     >
+                       {/* Morphing Background */}
+                       <div className={cn(
+                         "absolute inset-0 rounded-full transition-all duration-500",
+                         "bg-gradient-to-br opacity-0 group-hover:opacity-20",
+                         action.color.includes('purple') && "from-purple-200 to-pink-200",
+                         action.color.includes('blue') && "from-blue-200 to-cyan-200", 
+                         action.color.includes('green') && "from-green-200 to-emerald-200",
+                         action.color.includes('orange') && "from-orange-100 to-red-100"
+                       )} />
+                       
+                       <action.icon className={cn(
+                         "transition-all duration-300 relative z-10",
+                         isActive ? "w-6 h-6" : "w-5 h-5 group-hover:w-5.5 group-hover:h-5.5"
+                       )} />
+                       
+                       {/* Morphing Ripple */}
+                       <div className={cn(
+                         "absolute inset-0 rounded-full transition-all duration-700",
+                         "opacity-0 group-hover:opacity-30",
+                         "bg-gradient-to-r from-white/10 via-white/20 to-white/10",
+                         "animate-pulse"
+                       )} />
+                       
+                       {/* Tooltip */}
+                       <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 px-2 py-1 bg-background/90 backdrop-blur text-foreground text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300 border border-border/50 shadow-lg">
+                         {action.label}
+                       </div>
+                     </div>
+                   )
+                 })}
               </>
             )}
 
