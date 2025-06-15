@@ -42,14 +42,15 @@ interface MenuPosition {
 const AIContextMenu: React.FC<AIContextMenuProps> = ({
   children,
   selectedText = "",
-  onAIAction,
+  onTextReplace,
   disabled = false
 }) => {
-  const [showComingSoon, setShowComingSoon] = useState(false)
-  const [actionDetails, setActionDetails] = useState<{ title: string; description: string }>({
-    title: "",
-    description: ""
-  })
+  const { toast } = useToast()
+  const [showReplacementDialog, setShowReplacementDialog] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [generatedText, setGeneratedText] = useState("")
+  const [originalText, setOriginalText] = useState("")
+  const [actionTitle, setActionTitle] = useState("")
   const [menuPosition, setMenuPosition] = useState<MenuPosition>({ x: 0, y: 0, visible: false })
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null)
   const [submenuPosition, setSubmenuPosition] = useState<MenuPosition>({ x: 0, y: 0, visible: false })
@@ -58,24 +59,63 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
   const submenuRef = useRef<HTMLDivElement>(null)
   const selectionTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  const handleAIAction = (type: AIAction['type'], subType?: string, title?: string, description?: string) => {
-    if (disabled || !selectedText.trim() || selectedText.length < 10) return
+  const handleAIAction = async (type: AIAction['type'], subType?: string, title?: string) => {
+    const selection = window.getSelection()
+    const currentSelectedText = selection?.toString().trim() || selectedText.trim()
     
-    setActionDetails({
-      title: title || "AI Feature",
-      description: description || "This AI-powered feature is coming soon!"
-    })
-    setShowComingSoon(true)
+    if (disabled || !currentSelectedText || currentSelectedText.length < 10) return
+    
+    setIsLoading(true)
+    setOriginalText(currentSelectedText)
+    setActionTitle(title || "AI Processing")
+    setShowReplacementDialog(true)
     setMenuPosition({ x: 0, y: 0, visible: false })
     setActiveSubmenu(null)
 
-    // Placeholder for future AI integration
-    if (onAIAction) {
-      onAIAction({
-        type,
-        subType,
-        selectedText,
-        context: "editor"
+    try {
+      const response = await fetch(`https://aohrfehhyjdebaatzqdl.supabase.co/functions/v1/process-ai-content`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFvaHJmZWhoeWpkZWJhYXR6cWRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg1MzY3MTcsImV4cCI6MjA2NDExMjcxN30.lq2vftfHXRX1Mvlj4X04TdaF7YWU8vRIZU-DN85Dr1o`
+        },
+        body: JSON.stringify({
+          selectedText: currentSelectedText,
+          action: { type, subType },
+          context: "editor"
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const data = await response.json()
+      
+      if (data.error) {
+        throw new Error(data.error)
+      }
+
+      setGeneratedText(data.generatedText)
+    } catch (error) {
+      console.error('AI processing failed:', error)
+      toast({
+        title: "AI Processing Failed",
+        description: error instanceof Error ? error.message : "Unable to process text with AI",
+        variant: "destructive"
+      })
+      setShowReplacementDialog(false)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleAcceptReplacement = () => {
+    if (onTextReplace && originalText && generatedText) {
+      onTextReplace(originalText, generatedText)
+      toast({
+        title: "Text Updated",
+        description: "AI-generated text has been applied successfully."
       })
     }
   }
@@ -208,7 +248,7 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
 
               {/* Improve Clarity */}
               <button
-                onClick={() => handleAIAction('improve', undefined, '🔍 Improve Clarity', 'Refine grammar and remove ambiguity')}
+                onClick={() => handleAIAction('improve', undefined, '🔍 Improve Clarity')}
                 disabled={isDisabled}
                 className={cn(
                   "w-full flex items-center gap-2 px-3 py-2 text-caption rounded-md",
@@ -240,7 +280,7 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
 
               {/* Make Role-Specific */}
               <button
-                onClick={() => handleAIAction('role_specific', undefined, '🎯 Make It Role-Specific', 'Tailor tone and keywords to a job role')}
+                onClick={() => handleAIAction('role_specific', undefined, '🎯 Make It Role-Specific')}
                 disabled={isDisabled}
                 className={cn(
                   "w-full flex items-center gap-2 px-3 py-2 text-caption rounded-md",
@@ -278,28 +318,28 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
               {activeSubmenu === 'rephrase' && (
                 <>
                   <button
-                    onClick={() => handleAIAction('rephrase', 'professional', '🧠 More Professional', 'Transform text to use formal, polished business language')}
+                    onClick={() => handleAIAction('rephrase', 'professional', '🧠 More Professional')}
                     className="w-full flex items-center gap-2 px-3 py-2 text-caption rounded-md hover:bg-accent transition-colors"
                   >
                     <Brain className="h-4 w-4" />
                     🧠 More Professional
                   </button>
                   <button
-                    onClick={() => handleAIAction('rephrase', 'conversational', '💬 More Conversational', 'Simplify and humanize the tone')}
+                    onClick={() => handleAIAction('rephrase', 'conversational', '💬 More Conversational')}
                     className="w-full flex items-center gap-2 px-3 py-2 text-caption rounded-md hover:bg-accent transition-colors"
                   >
                     <MessageCircle className="h-4 w-4" />
                     💬 More Conversational
                   </button>
                   <button
-                    onClick={() => handleAIAction('rephrase', 'creative', '✨ More Creative', 'Add flair, storytelling, or uniqueness')}
+                    onClick={() => handleAIAction('rephrase', 'creative', '✨ More Creative')}
                     className="w-full flex items-center gap-2 px-3 py-2 text-caption rounded-md hover:bg-accent transition-colors"
                   >
                     <Sparkles className="h-4 w-4" />
                     ✨ More Creative
                   </button>
                   <button
-                    onClick={() => handleAIAction('rephrase', 'structured', '🧱 More Structured', 'Improve sentence order, flow, and logic')}
+                    onClick={() => handleAIAction('rephrase', 'structured', '🧱 More Structured')}
                     className="w-full flex items-center gap-2 px-3 py-2 text-caption rounded-md hover:bg-accent transition-colors"
                   >
                     <Square className="h-4 w-4" />
@@ -311,28 +351,28 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
               {activeSubmenu === 'length' && (
                 <>
                   <button
-                    onClick={() => handleAIAction('adjust_length', 'longer', '⬆️ Make Longer', 'Expand content with more detail')}
+                    onClick={() => handleAIAction('adjust_length', 'longer', '⬆️ Make Longer')}
                     className="w-full flex items-center gap-2 px-3 py-2 text-caption rounded-md hover:bg-accent transition-colors"
                   >
                     <ArrowUp className="h-4 w-4" />
                     ⬆️ Make Longer
                   </button>
                   <button
-                    onClick={() => handleAIAction('adjust_length', 'shorter', '⬇️ Make Shorter', 'Trim content to its core message')}
+                    onClick={() => handleAIAction('adjust_length', 'shorter', '⬇️ Make Shorter')}
                     className="w-full flex items-center gap-2 px-3 py-2 text-caption rounded-md hover:bg-accent transition-colors"
                   >
                     <ArrowDown className="h-4 w-4" />
                     ⬇️ Make Shorter
                   </button>
                   <button
-                    onClick={() => handleAIAction('adjust_length', 'summarize', '🧩 Summarize', 'Provide 1-2 sentence summary')}
+                    onClick={() => handleAIAction('adjust_length', 'summarize', '🧩 Summarize')}
                     className="w-full flex items-center gap-2 px-3 py-2 text-caption rounded-md hover:bg-accent transition-colors"
                   >
                     <List className="h-4 w-4" />
                     🧩 Summarize
                   </button>
                   <button
-                    onClick={() => handleAIAction('adjust_length', 'expand_example', '📚 Expand with Example', 'Add a real-world example or result')}
+                    onClick={() => handleAIAction('adjust_length', 'expand_example', '📚 Expand with Example')}
                     className="w-full flex items-center gap-2 px-3 py-2 text-caption rounded-md hover:bg-accent transition-colors"
                   >
                     <BookOpen className="h-4 w-4" />
@@ -345,26 +385,16 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
         )}
       </div>
 
-      <AlertDialog open={showComingSoon} onOpenChange={setShowComingSoon}>
-        <AlertDialogContent className="bg-popover border-popover-border">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-heading text-foreground">
-              {actionDetails.title}
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-body text-foreground-secondary">
-              {actionDetails.description}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction 
-              onClick={() => setShowComingSoon(false)}
-              className="bg-primary text-primary-foreground hover:bg-primary/90"
-            >
-              Got it!
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <AIReplacementDialog
+        open={showReplacementDialog}
+        onOpenChange={setShowReplacementDialog}
+        originalText={originalText}
+        generatedText={generatedText}
+        actionTitle={actionTitle}
+        isLoading={isLoading}
+        onAccept={handleAcceptReplacement}
+        onRegenerate={() => handleAIAction('improve', undefined, actionTitle)}
+      />
     </>
   )
 }
