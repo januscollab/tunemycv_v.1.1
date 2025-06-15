@@ -93,12 +93,6 @@ export const useAIContentProcessor = ({
       }
 
       return processedText;
-
-      if (onSuccess) {
-        onSuccess(processedText);
-      }
-
-      return processedText;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to process content with AI';
       setError(errorMessage);
