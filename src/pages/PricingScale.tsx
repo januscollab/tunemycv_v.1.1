@@ -6,7 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { MockPaymentModal } from '@/components/ui/mock-payment-modal';
 import { ContactSalesModal } from '@/components/ui/contact-sales-modal';
-import QuickActions from '@/components/common/QuickActions';
+
+import Breadcrumbs from '@/components/navigation/Breadcrumbs';
 
 const PricingScale = () => {
   const [selectedTier, setSelectedTier] = useState(0);
@@ -75,6 +76,14 @@ const PricingScale = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5 py-6">
       <div className="max-w-wider mx-auto px-4">
+        <div className="mb-6">
+          <Breadcrumbs 
+            items={[
+              { label: 'Home', href: '/' },
+              { label: 'Pricing' }
+            ]}
+          />
+        </div>
         <div className="mb-6">
           <div className="flex items-start mb-6">
             <CreditCard className="h-8 w-8 text-zapier-orange mr-3 flex-shrink-0" />
@@ -428,9 +437,6 @@ const PricingScale = () => {
           onClose={() => setIsContactModalOpen(false)}
         />
       </div>
-      
-      {/* Quick Actions */}
-      <QuickActions />
     </div>
   );
 };

@@ -525,6 +525,77 @@ export type Database = {
           },
         ]
       }
+      execution_logs: {
+        Row: {
+          ai_response: string | null
+          execution_date: string
+          id: string
+          model_used: string | null
+          prompt_sent: string
+          sprint_id: string
+          user_id: string
+        }
+        Insert: {
+          ai_response?: string | null
+          execution_date?: string
+          id?: string
+          model_used?: string | null
+          prompt_sent: string
+          sprint_id: string
+          user_id: string
+        }
+        Update: {
+          ai_response?: string | null
+          execution_date?: string
+          id?: string
+          model_used?: string | null
+          prompt_sent?: string
+          sprint_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "execution_logs_sprint_id_fkey"
+            columns: ["sprint_id"]
+            isOneToOne: false
+            referencedRelation: "sprints"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      n8n_tmp: {
+        Row: {
+          created_at: string | null
+          filename: string
+          format: string
+          id: string
+          mime: string | null
+          storage_path: string
+          type: string
+          uploaded_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          filename: string
+          format: string
+          id?: string
+          mime?: string | null
+          storage_path: string
+          type: string
+          uploaded_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          filename?: string
+          format?: string
+          id?: string
+          mime?: string | null
+          storage_path?: string
+          type?: string
+          uploaded_at?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           company_size_preference: string | null
@@ -585,6 +656,81 @@ export type Database = {
         }
         Relationships: []
       }
+      security_incidents: {
+        Row: {
+          created_at: string | null
+          details: Json | null
+          endpoint: string | null
+          id: string
+          incident_type: string
+          ip_address: unknown | null
+          resolved: boolean | null
+          resolved_at: string | null
+          severity: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          details?: Json | null
+          endpoint?: string | null
+          id?: string
+          incident_type: string
+          ip_address?: unknown | null
+          resolved?: boolean | null
+          resolved_at?: string | null
+          severity?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          details?: Json | null
+          endpoint?: string | null
+          id?: string
+          incident_type?: string
+          ip_address?: unknown | null
+          resolved?: boolean | null
+          resolved_at?: string | null
+          severity?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      security_rate_limits: {
+        Row: {
+          blocked_until: string | null
+          created_at: string | null
+          endpoint: string
+          id: string
+          identifier: string
+          request_count: number | null
+          updated_at: string | null
+          window_start: string | null
+        }
+        Insert: {
+          blocked_until?: string | null
+          created_at?: string | null
+          endpoint: string
+          id?: string
+          identifier: string
+          request_count?: number | null
+          updated_at?: string | null
+          window_start?: string | null
+        }
+        Update: {
+          blocked_until?: string | null
+          created_at?: string | null
+          endpoint?: string
+          id?: string
+          identifier?: string
+          request_count?: number | null
+          updated_at?: string | null
+          window_start?: string | null
+        }
+        Relationships: []
+      }
       site_settings: {
         Row: {
           admin_email: string | null
@@ -593,6 +739,7 @@ export type Database = {
           debug_mode: boolean | null
           id: string
           monthly_adobe_limit: number | null
+          openai_api_key_encrypted: string | null
           reset_day: number | null
           support_email: string | null
           updated_at: string
@@ -604,6 +751,7 @@ export type Database = {
           debug_mode?: boolean | null
           id?: string
           monthly_adobe_limit?: number | null
+          openai_api_key_encrypted?: string | null
           reset_day?: number | null
           support_email?: string | null
           updated_at?: string
@@ -615,11 +763,104 @@ export type Database = {
           debug_mode?: boolean | null
           id?: string
           monthly_adobe_limit?: number | null
+          openai_api_key_encrypted?: string | null
           reset_day?: number | null
           support_email?: string | null
           updated_at?: string
         }
         Relationships: []
+      }
+      sprints: {
+        Row: {
+          created_at: string
+          id: string
+          is_hidden: boolean
+          name: string
+          order_index: number
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_hidden?: boolean
+          name: string
+          order_index?: number
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_hidden?: boolean
+          name?: string
+          order_index?: number
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      tasks: {
+        Row: {
+          archive_reason: string | null
+          archived_at: string | null
+          archived_by: string | null
+          created_at: string
+          description: string | null
+          id: string
+          order_index: number
+          priority: string | null
+          sprint_id: string
+          status: string
+          tags: string[] | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          archive_reason?: string | null
+          archived_at?: string | null
+          archived_by?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          order_index?: number
+          priority?: string | null
+          sprint_id: string
+          status?: string
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          archive_reason?: string | null
+          archived_at?: string | null
+          archived_by?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          order_index?: number
+          priority?: string | null
+          sprint_id?: string
+          status?: string
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_sprint_id_fkey"
+            columns: ["sprint_id"]
+            isOneToOne: false
+            referencedRelation: "sprints"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       uploads: {
         Row: {
@@ -722,6 +963,39 @@ export type Database = {
           credits?: number
           id?: string
           updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_devsuite_settings: {
+        Row: {
+          created_at: string
+          id: string
+          openai_api_key_encrypted: string | null
+          preferred_model: string | null
+          show_priority_sprint: boolean | null
+          story_generation_enabled: boolean | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          openai_api_key_encrypted?: string | null
+          preferred_model?: string | null
+          show_priority_sprint?: boolean | null
+          story_generation_enabled?: boolean | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          openai_api_key_encrypted?: string | null
+          preferred_model?: string | null
+          show_priority_sprint?: boolean | null
+          story_generation_enabled?: boolean | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -853,6 +1127,19 @@ export type Database = {
       }
     }
     Functions: {
+      archive_completed_tasks: {
+        Args: { sprint_id_param: string }
+        Returns: number
+      }
+      check_enhanced_rate_limit: {
+        Args: {
+          identifier_key: string
+          endpoint_name: string
+          max_requests?: number
+          window_minutes?: number
+        }
+        Returns: boolean
+      }
       cleanup_adobe_debug_files: {
         Args: Record<PropertyKey, never>
         Returns: undefined
@@ -895,6 +1182,25 @@ export type Database = {
           action_type: string
           target_user?: string
           action_details?: Json
+        }
+        Returns: undefined
+      }
+      log_security_event: {
+        Args: {
+          event_type: string
+          event_details?: Json
+          target_user_id?: string
+          severity?: string
+        }
+        Returns: undefined
+      }
+      log_security_incident: {
+        Args: {
+          incident_type: string
+          incident_details?: Json
+          target_user_id?: string
+          severity?: string
+          endpoint_name?: string
         }
         Returns: undefined
       }

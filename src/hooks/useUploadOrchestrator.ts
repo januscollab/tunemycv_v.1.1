@@ -20,6 +20,7 @@ interface UploadResult {
 interface UploadOptions {
   fileType: 'cv' | 'job_description';
   shouldStore?: boolean;
+  preserveOriginalFormat?: boolean;
 }
 
 export const useUploadOrchestrator = () => {
@@ -61,16 +62,15 @@ export const useUploadOrchestrator = () => {
       setProgress('Formatting for storage...');
       const prettyJsonString = prettifyDocumentJson(extractionResult.documentJson);
 
-      // Step 4: Store processed file with both JSON and text (ONLY if explicitly requested)
-      if (options.shouldStore === true) {
-        setProgress('Storing processed file...');
-        await storage.storeFile(validationResult.secureFile, { 
-          uploadType: options.fileType,
-          extractedText: extractionResult.extractedText,
-          prettyJsonString
-        });
-        // Continue even if storage fails - it's for debugging only
-      }
+      // Step 4: ALWAYS store processed file with JSON for editor functionality
+      setProgress('Storing processed file...');
+      await storage.storeFile(validationResult.secureFile, { 
+        uploadType: options.fileType,
+        extractedText: extractionResult.extractedText,
+        prettyJsonString,
+        saveToUserList: options.shouldStore === true // Separate flag for adding to user's CV list
+      });
+      // Continue even if storage fails
 
       setProgress('Complete');
       return {

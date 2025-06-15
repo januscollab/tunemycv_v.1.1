@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, CreditCard, CheckCircle } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { FloatingLabelInput } from '@/components/common/FloatingLabelInput';
+import { CaptureInput } from '@/components/ui/capture-input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfileData } from '@/hooks/useProfileData';
@@ -175,8 +175,7 @@ export const MockPaymentModal: React.FC<MockPaymentModalProps> = ({
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="firstName">First Name</Label>
-                    <FloatingLabelInput
+                    <CaptureInput
                       id="firstName"
                       label="First Name"
                       placeholder="John"
@@ -187,8 +186,7 @@ export const MockPaymentModal: React.FC<MockPaymentModalProps> = ({
                     />
                   </div>
                   <div>
-                    <Label htmlFor="lastName">Last Name</Label>
-                    <FloatingLabelInput
+                    <CaptureInput
                       id="lastName"
                       label="Last Name"
                       placeholder="Doe"
@@ -201,8 +199,7 @@ export const MockPaymentModal: React.FC<MockPaymentModalProps> = ({
                 </div>
 
                 <div>
-                  <Label htmlFor="email">Email</Label>
-                  <FloatingLabelInput
+                  <CaptureInput
                     id="email"
                     label="Email"
                     type="email"
@@ -218,8 +215,7 @@ export const MockPaymentModal: React.FC<MockPaymentModalProps> = ({
               {/* Mock Payment Form */}
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="cardNumber">Card Number</Label>
-                  <FloatingLabelInput
+                  <CaptureInput
                     id="cardNumber"
                     label="Card Number"
                     placeholder="4242 4242 4242 4242"
@@ -231,8 +227,7 @@ export const MockPaymentModal: React.FC<MockPaymentModalProps> = ({
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="expiry">Expiry</Label>
-                    <FloatingLabelInput
+                    <CaptureInput
                       id="expiry"
                       label="Expiry"
                       placeholder="12/28"
@@ -242,8 +237,7 @@ export const MockPaymentModal: React.FC<MockPaymentModalProps> = ({
                     />
                   </div>
                   <div>
-                    <Label htmlFor="cvc">CVC</Label>
-                    <FloatingLabelInput
+                    <CaptureInput
                       id="cvc"
                       label="CVC"
                       placeholder="123"

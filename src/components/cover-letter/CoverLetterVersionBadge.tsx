@@ -14,6 +14,7 @@ const CoverLetterVersionBadge: React.FC<CoverLetterVersionBadgeProps> = ({
 }) => {
   const getVersionDisplay = () => {
     if (totalVersions === 1) return null; // Don't show version for single version
+    // Show v1 for first version when multiple versions exist
     return `v${version}`;
   };
 

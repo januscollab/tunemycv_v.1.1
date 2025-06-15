@@ -45,15 +45,15 @@ const EnhancedKeywordAnalysis: React.FC<EnhancedKeywordAnalysisProps> = ({ keywo
 
   const getImportanceColor = (importance: string) => {
     switch (importance) {
-      case 'high': return 'bg-red-100 text-red-800';
-      case 'medium': return 'bg-yellow-100 text-yellow-800';
-      case 'low': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'high': return 'bg-destructive-50 text-destructive';
+      case 'medium': return 'bg-warning-50 text-warning';
+      case 'low': return 'bg-muted text-muted-foreground';
+      default: return 'bg-muted text-muted-foreground';
     }
   };
 
   const getStatusColor = (found: boolean) => {
-    return found ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+    return found ? 'bg-success-50 text-success' : 'bg-destructive-50 text-destructive';
   };
 
   return (
@@ -65,13 +65,13 @@ const EnhancedKeywordAnalysis: React.FC<EnhancedKeywordAnalysisProps> = ({ keywo
 
       {/* Summary Stats */}
       <div className="grid grid-cols-3 gap-4 mb-6">
-        <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-3 text-center">
+        <div className="bg-success-50 rounded-lg p-3 text-center">
           <div className="text-title font-bold text-success">{matchedKeywords}</div>
-          <div className="text-caption text-green-700 dark:text-green-400">Found</div>
+          <div className="text-caption text-success">Found</div>
         </div>
-        <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-3 text-center">
+        <div className="bg-destructive-50 rounded-lg p-3 text-center">
           <div className="text-title font-bold text-destructive">{missingKeywords}</div>
-          <div className="text-caption text-red-700 dark:text-red-400">Missing</div>
+          <div className="text-caption text-destructive">Missing</div>
         </div>
         <div className="bg-citrus/20 dark:bg-citrus/10 rounded-lg p-3 text-center">
           <div className="text-title font-bold text-primary">{keywordMatchPercentage}%</div>
@@ -99,7 +99,7 @@ const EnhancedKeywordAnalysis: React.FC<EnhancedKeywordAnalysisProps> = ({ keywo
         </div>
         
         {displayKeywords.map((keyword, index) => (
-          <div key={index} className="grid grid-cols-4 gap-2 text-caption items-start py-2 border-b border-gray-100 dark:border-gray-700 last:border-b-0">
+          <div key={index} className="grid grid-cols-4 gap-2 text-caption items-start py-2 border-b border-border last:border-b-0">
             <div>
               <span className="font-medium text-blueberry dark:text-apple-core">{keyword.keyword}</span>
               {keyword.context && (
@@ -108,7 +108,7 @@ const EnhancedKeywordAnalysis: React.FC<EnhancedKeywordAnalysisProps> = ({ keywo
                 </div>
               )}
               {keyword.found && keyword.occurrences > 0 && (
-                <div className="text-micro text-green-600 mt-1">
+                <div className="text-micro text-success mt-1">
                   Found {keyword.occurrences} time{keyword.occurrences !== 1 ? 's' : ''}
                 </div>
               )}
@@ -157,12 +157,12 @@ const EnhancedKeywordAnalysis: React.FC<EnhancedKeywordAnalysisProps> = ({ keywo
 
       {/* Match Rate Alert */}
       {keywordMatchPercentage < 60 && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-4">
+        <div className="bg-warning-50 border border-warning rounded-lg p-4 mt-4">
           <div className="flex items-center mb-2">
-            <AlertCircle className="h-4 w-4 text-yellow-600 mr-2" />
-            <span className="text-caption font-medium text-yellow-800">Low Keyword Match Rate</span>
+            <AlertCircle className="h-4 w-4 text-warning mr-2" />
+            <span className="text-caption font-medium text-warning">Low Keyword Match Rate</span>
           </div>
-          <p className="text-micro text-yellow-700">
+          <p className="text-micro text-warning">
             Your CV matches {keywordMatchPercentage}% of the key terms from the job description. 
             Consider incorporating more of the missing high-importance keywords to improve Applicant Tracking System (ATS) compatibility.
           </p>

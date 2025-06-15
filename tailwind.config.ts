@@ -143,10 +143,18 @@ export default {
 					border: 'rgb(var(--sidebar-border) / <alpha-value>)',
 					ring: 'rgb(var(--sidebar-ring) / <alpha-value>)',
 				},
+				// Footer
+				footer: 'rgb(var(--footer) / <alpha-value>)',
 				// Interactive states
 				hover: 'rgb(var(--hover) / <alpha-value>)',
 				active: 'rgb(var(--active) / <alpha-value>)',
 				focus: 'rgb(var(--focus) / <alpha-value>)',
+			},
+			zIndex: {
+				'tooltip': '100',
+				'dropdown': '200',
+				'modal': '1000',
+				'notification': '9999',
 			},
 			borderRadius: {
 				lg: '8px',
@@ -182,6 +190,7 @@ export default {
 						height: '0'
 					}
 				},
+				// Removed problematic dialog/tooltip animations for instant appearance
 				// Enhanced theme transition animations
 				'fade-in': {
 					'0%': {
@@ -247,6 +256,7 @@ export default {
 				// Existing animations
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
+				// Removed problematic dialog/tooltip animation references
 				// Enhanced animations
 				'fade-in': 'fade-in 0.3s ease-out',
 				'fade-out': 'fade-out 0.3s ease-out',
@@ -257,5 +267,5 @@ export default {
 			}
 		}
 	},
-	plugins: [require("tailwindcss-animate")],
+	plugins: [],
 } satisfies Config;

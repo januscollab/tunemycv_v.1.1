@@ -48,15 +48,15 @@ const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({ userDisplayNa
         <button
           className={`flex items-center px-3 py-2 text-caption font-semibold transition-colors relative ${
             isActive('/profile')
-              ? 'text-zapier-orange'
-              : 'text-earth dark:text-white hover:text-zapier-orange'
+              ? 'text-primary'
+              : 'text-foreground hover:text-primary'
           }`}
         >
           <User className="h-4 w-4 mr-2" />
           Profile
           <ChevronDown className="h-4 w-4 ml-1" />
           {isActive('/profile') && (
-            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-zapier-orange"></div>
+            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"></div>
           )}
         </button>
       </DropdownMenuTrigger>

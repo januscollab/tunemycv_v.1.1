@@ -1,233 +1,262 @@
 import React, { useState } from 'react';
-import { FileText, Upload, Check, X, AlertCircle, Clock } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Separator } from '@/components/ui/separator';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { JsonQualityModal } from './JsonQualityModal';
+import FileUploadArea from '@/components/analyze/upload/FileUploadArea';
+import { DocumentJson } from '@/utils/documentJsonUtils';
+import { QualityAssessment } from '@/utils/documentQuality';
+import { DocumentTypeDetection } from '@/utils/documentValidation';
+import { FileText, TestTube2, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
 
 interface TestResult {
-  step: string;
-  status: 'pending' | 'success' | 'error';
-  message: string;
-  timestamp?: string;
+  id: string;
+  fileName: string;
+  fileSize: number;
+  extractedText: string;
+  documentJson: DocumentJson;
+  typeDetection: DocumentTypeDetection;
+  qualityAssessment: QualityAssessment;
+  timestamp: Date;
 }
 
-const FileUploadTestPanel: React.FC = () => {
-  const { user } = useAuth();
-  const { toast } = useToast();
-  const [isRunning, setIsRunning] = useState(false);
+export const FileUploadTestPanel: React.FC = () => {
   const [testResults, setTestResults] = useState<TestResult[]>([]);
+  const [selectedResult, setSelectedResult] = useState<TestResult | null>(null);
+  const [showJsonModal, setShowJsonModal] = useState(false);
 
-  const addTestResult = (step: string, status: 'pending' | 'success' | 'error', message: string) => {
-    setTestResults(prev => [
-      ...prev.filter(r => r.step !== step),
-      {
-        step,
-        status,
-        message,
-        timestamp: status === 'pending' ? undefined : new Date().toLocaleTimeString()
-      }
-    ]);
-  };
-
-  const runComprehensiveTest = async () => {
-    if (!user) {
-      toast({ title: 'Error', description: 'Please log in to run tests', variant: 'destructive' });
-      return;
-    }
-
-    setIsRunning(true);
-    setTestResults([]);
-
-    try {
-      // Test 1: CV Upload to Debug System
-      addTestResult('cv-upload', 'pending', 'Testing CV upload to debug system...');
-      const testCVContent = 'John Doe\nSoftware Engineer\nExperience: 5 years in React development';
-      const testCVFile = new File([testCVContent], 'test-cv.txt', { type: 'text/plain' });
-      const cvArrayBuffer = await testCVFile.arrayBuffer();
-      const cvBase64 = btoa(String.fromCharCode(...new Uint8Array(cvArrayBuffer)));
-
-      const cvResult = await supabase.functions.invoke('save-user-upload', {
-        body: {
-          fileContent: cvBase64,
-          fileName: 'test-cv-debug.txt',
-          fileType: 'text/plain',
-          uploadType: 'cv',
-          userId: user.id
-        }
-      });
-
-      if (cvResult.error) throw new Error(`CV upload failed: ${cvResult.error.message}`);
-      addTestResult('cv-upload', 'success', 'CV successfully saved to debug system');
-
-      // Test 2: Job Description Upload to Debug System
-      addTestResult('jd-upload', 'pending', 'Testing job description upload to debug system...');
-      const testJDContent = 'Senior Software Engineer\nCompany: Tech Corp\nRequirements: React, TypeScript, 5+ years experience';
-      
-      const jdResult = await supabase.functions.invoke('save-job-description', {
-        body: {
-          content: testJDContent,
-          jobTitle: 'Senior Software Engineer',
-          companyName: 'Tech Corp',
-          userId: user.id
-        }
-      });
-
-      if (jdResult.error) throw new Error(`Job description upload failed: ${jdResult.error.message}`);
-      addTestResult('jd-upload', 'success', 'Job description successfully saved to debug system');
-
-      // Test 3: Verify Debug Files Created
-      addTestResult('debug-verify', 'pending', 'Verifying debug files were created...');
-      
-      const { data: debugFiles, error: debugError } = await supabase
-        .from('adobe_debug_files')
-        .select('*')
-        .eq('user_id', (await supabase.from('profiles').select('user_id').eq('id', user.id).single()).data?.user_id || 'unknown')
-        .gte('created_at', new Date(Date.now() - 60000).toISOString()) // Files created in last minute
-        .order('created_at', { ascending: false });
-
-      if (debugError) throw new Error(`Debug verification failed: ${debugError.message}`);
-      
-      const recentFiles = debugFiles?.filter(f => 
-        f.file_name.includes('test-cv-debug') || f.file_name.includes('Job_Description')
-      ) || [];
-
-      if (recentFiles.length >= 2) {
-        addTestResult('debug-verify', 'success', `Found ${recentFiles.length} debug files with correct naming`);
-      } else {
-        addTestResult('debug-verify', 'error', `Only found ${recentFiles.length} debug files, expected 2`);
-      }
-
-      // Test 4: State Tracking Verification
-      addTestResult('state-verify', 'pending', 'Verifying state tracking...');
-      
-      const uploadedStateFiles = recentFiles.filter(f => f.state === 'uploaded-by-user');
-      if (uploadedStateFiles.length >= 2) {
-        addTestResult('state-verify', 'success', 'All files have correct "uploaded-by-user" state');
-      } else {
-        addTestResult('state-verify', 'error', `Only ${uploadedStateFiles.length} files have correct state`);
-      }
-
-      // Test 5: File Naming Convention Check
-      addTestResult('naming-verify', 'pending', 'Verifying file naming conventions...');
-      
-      const namingPattern = /^\d{6} .+ \d{6}-\d{6} uploaded-by-user\./;
-      const correctlyNamed = recentFiles.filter(f => namingPattern.test(f.file_name));
-      
-      if (correctlyNamed.length === recentFiles.length && recentFiles.length > 0) {
-        addTestResult('naming-verify', 'success', 'All files follow correct naming convention');
-      } else {
-        addTestResult('naming-verify', 'error', `${correctlyNamed.length}/${recentFiles.length} files have correct naming`);
-      }
-
-      toast({ title: 'Test Complete', description: 'File upload pipeline test completed successfully' });
-
-    } catch (error) {
-      console.error('Test failed:', error);
-      addTestResult('error', 'error', error instanceof Error ? error.message : 'Unknown error occurred');
-      toast({ title: 'Test Failed', description: 'File upload pipeline test encountered errors', variant: 'destructive' });
-    } finally {
-      setIsRunning(false);
-    }
+  const handleFileSelect = (
+    file: File, 
+    extractedText: string, 
+    documentJson: any, 
+    typeDetection: any, 
+    qualityAssessment: any
+  ) => {
+    const testResult: TestResult = {
+      id: `test-${Date.now()}`,
+      fileName: file.name,
+      fileSize: file.size,
+      extractedText,
+      documentJson,
+      typeDetection,
+      qualityAssessment,
+      timestamp: new Date()
+    };
+    
+    setTestResults(prev => [testResult, ...prev]);
+    setSelectedResult(testResult);
   };
 
   const clearResults = () => {
     setTestResults([]);
+    setSelectedResult(null);
   };
 
-  const getStatusIcon = (status: 'pending' | 'success' | 'error') => {
-    switch (status) {
-      case 'pending':
-        return <Clock className="h-4 w-4 text-blue-500 animate-spin" />;
-      case 'success':
-        return <Check className="h-4 w-4 text-green-500" />;
-      case 'error':
-        return <X className="h-4 w-4 text-red-500" />;
-    }
+  const getQualityIcon = (quality: number) => {
+    if (quality >= 0.8) return <CheckCircle className="h-4 w-4 text-success" />;
+    if (quality >= 0.6) return <AlertTriangle className="h-4 w-4 text-warning" />;
+    return <XCircle className="h-4 w-4 text-destructive" />;
+  };
+
+  const getProcessingMethodBadge = (method: string) => {
+    return method === 'professional' 
+      ? <Badge variant="default">Professional NLP</Badge>
+      : <Badge variant="secondary">Legacy</Badge>;
   };
 
   return (
-    <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center space-x-2">
-          <FileText className="h-5 w-5 text-apricot" />
-          <h2 className="text-title font-semibold text-slate-900 dark:text-citrus">Debug File Upload Pipeline Test</h2>
-        </div>
-        <div className="flex space-x-2">
-          <button
-            onClick={runComprehensiveTest}
-            disabled={isRunning || !user}
-            className="px-4 py-2 bg-apricot text-white rounded-md hover:bg-apricot/90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
-          >
-            <Upload className="h-4 w-4" />
-            <span>Run Test</span>
-          </button>
-          <button
-            onClick={clearResults}
-            disabled={isRunning}
-            className="px-4 py-2 bg-slate-500 text-white rounded-md hover:bg-slate-600 disabled:opacity-50"
-          >
-            Clear
-          </button>
-        </div>
-      </div>
+    <div className="max-w-6xl mx-auto p-6 space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <TestTube2 className="h-5 w-5" />
+            File Upload Testing Panel
+          </CardTitle>
+          <p className="text-caption text-muted-foreground">
+            Test professional text processing and JSON structure quality
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <h4 className="font-medium mb-2">Test CV Upload</h4>
+              <FileUploadArea
+                onFileSelect={handleFileSelect}
+                uploading={false}
+                accept=".pdf,.docx,.txt"
+                maxSize="5MB"
+                label="Upload test CV"
+                fileType="cv"
+              />
+            </div>
+            <div>
+              <h4 className="font-medium mb-2">Test Job Description Upload</h4>
+              <FileUploadArea
+                onFileSelect={handleFileSelect}
+                uploading={false}
+                accept=".pdf,.docx,.txt"
+                maxSize="10MB"
+                label="Upload test job description"
+                fileType="job_description"
+              />
+            </div>
+          </div>
+          
+          {testResults.length > 0 && (
+            <div className="flex justify-between items-center">
+              <Badge variant="outline">{testResults.length} test(s) completed</Badge>
+              <Button variant="outline" size="sm" onClick={clearResults}>
+                Clear Results
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
-      {!user && (
-        <div className="flex items-center space-x-2 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-md mb-4">
-          <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
-          <span className="text-caption text-yellow-700 dark:text-yellow-300">Please log in to run pipeline tests</span>
+      {testResults.length > 0 && (
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* Test Results List */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Test Results</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ScrollArea className="h-80">
+                <div className="space-y-3">
+                  {testResults.map((result) => (
+                    <div
+                      key={result.id}
+                      className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                        selectedResult?.id === result.id
+                          ? 'border-primary bg-primary/10'
+                          : 'border-border hover:bg-muted/50'
+                      }`}
+                      onClick={() => setSelectedResult(result)}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-2">
+                          <FileText className="h-4 w-4 text-muted-foreground" />
+                          <div>
+                            <div className="font-medium text-caption truncate max-w-32">
+                              {result.fileName}
+                            </div>
+                            <div className="text-micro text-muted-foreground">
+                              {result.timestamp.toLocaleTimeString()}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {getQualityIcon(result.documentJson.metadata?.structureQuality || 0)}
+                          {getProcessingMethodBadge(result.documentJson.metadata?.processingMethod || 'legacy')}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
+            </CardContent>
+          </Card>
+
+          {/* Selected Result Details */}
+          {selectedResult && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span>Analysis Details</span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowJsonModal(true)}
+                  >
+                    Inspect JSON
+                  </Button>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4 text-caption">
+                  <div>
+                    <span className="text-muted-foreground">File Size:</span>
+                    <div className="font-medium">{(selectedResult.fileSize / 1024).toFixed(1)} KB</div>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Word Count:</span>
+                    <div className="font-medium">{selectedResult.extractedText.split(' ').length}</div>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Sections:</span>
+                    <div className="font-medium">{selectedResult.documentJson.sections.length}</div>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Quality Score:</span>
+                    <div className="font-medium flex items-center gap-1">
+                      {getQualityIcon(selectedResult.documentJson.metadata?.structureQuality || 0)}
+                      {Math.round((selectedResult.documentJson.metadata?.structureQuality || 0) * 100)}%
+                    </div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div>
+                  <h4 className="font-medium mb-2">Processing Method</h4>
+                  {getProcessingMethodBadge(selectedResult.documentJson.metadata?.processingMethod || 'legacy')}
+                </div>
+
+                <div>
+                  <h4 className="font-medium mb-2">Document Type Detection</h4>
+                  <Alert>
+                    <AlertDescription className="text-caption">
+                      Detected as: <strong>{selectedResult.typeDetection?.detectedType || 'Unknown'}</strong>
+                      {selectedResult.typeDetection?.confidence && (
+                        <span className="ml-2">
+                          (Confidence: {Math.round(selectedResult.typeDetection.confidence * 100)}%)
+                        </span>
+                      )}
+                    </AlertDescription>
+                  </Alert>
+                </div>
+
+                <div>
+                  <h4 className="font-medium mb-2">Structure Preview</h4>
+                  <ScrollArea className="h-40 border rounded p-2">
+                    <div className="space-y-1 text-micro">
+                      {selectedResult.documentJson.sections.slice(0, 10).map((section, index) => (
+                        <div key={section.id} className="flex items-center gap-2">
+                          <Badge variant="outline" className="text-micro">
+                            {section.type}
+                            {section.level && ` H${section.level}`}
+                          </Badge>
+                          <span className="truncate">
+                            {section.content?.substring(0, 50) || 
+                             (section.items && `${section.items.length} items`) || 
+                             'Empty section'}
+                          </span>
+                        </div>
+                      ))}
+                      {selectedResult.documentJson.sections.length > 10 && (
+                        <div className="text-muted-foreground">
+                          ... and {selectedResult.documentJson.sections.length - 10} more sections
+                        </div>
+                      )}
+                    </div>
+                  </ScrollArea>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       )}
 
-      <div className="space-y-3">
-        {testResults.length === 0 && !isRunning && (
-          <p className="text-slate-600 dark:text-apple-core/80 text-center py-8">
-            Click "Run Test" to validate the file upload pipeline with debug file naming
-          </p>
-        )}
-
-        {testResults.map((result, index) => (
-          <div
-            key={index}
-            className={`flex items-center justify-between p-3 rounded-md border ${
-              result.status === 'success' 
-                ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700'
-                : result.status === 'error'
-                ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700'
-                : 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700'
-            }`}
-          >
-            <div className="flex items-center space-x-3">
-              {getStatusIcon(result.status)}
-              <div>
-                <div className="font-medium text-slate-900 dark:text-citrus capitalize">
-                  {result.step.replace('-', ' ')}
-                </div>
-                <div className="text-caption text-slate-600 dark:text-apple-core/80">
-                  {result.message}
-                </div>
-              </div>
-            </div>
-            {result.timestamp && (
-              <span className="text-micro text-slate-500 dark:text-apple-core/60">
-                {result.timestamp}
-              </span>
-            )}
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-6 p-4 bg-slate-50 dark:bg-blueberry/10 rounded-md">
-        <h3 className="font-medium text-slate-900 dark:text-citrus mb-2">Test Coverage</h3>
-        <ul className="text-caption text-slate-600 dark:text-apple-core/80 space-y-1">
-          <li>• CV upload to debug system with proper naming</li>
-          <li>• Job description upload to debug system</li>
-          <li>• Debug file creation verification</li>
-          <li>• State tracking verification ("uploaded-by-user")</li>
-          <li>• File naming convention compliance</li>
-        </ul>
-      </div>
+      {/* JSON Quality Modal */}
+      <JsonQualityModal
+        open={showJsonModal}
+        onOpenChange={setShowJsonModal}
+        documentJson={selectedResult?.documentJson}
+        extractedText={selectedResult?.extractedText}
+      />
     </div>
   );
 };
-
-export default FileUploadTestPanel;

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Progress } from '@/components/ui/progress';
+import { ProgressIndicator } from '@/components/ui/progress-indicator';
 
 interface LegacyCompatibilitySectionProps {
   result: any;
@@ -29,7 +29,7 @@ const LegacyCompatibilitySection: React.FC<LegacyCompatibilitySectionProps> = ({
               <span className="text-micro text-blueberry/60 dark:text-apple-core/60">Weight: {category.weight}%</span>
             </div>
           </div>
-          <Progress value={category.score * 10} className="mb-2" />
+          <ProgressIndicator value={category.score * 10} className="mb-2" showPercentage={false} />
           <p className="text-micro text-blueberry/70 dark:text-apple-core/80">{category.feedback}</p>
         </div>
       ))}

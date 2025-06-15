@@ -18,19 +18,19 @@ const AnalysisScoreCard: React.FC<AnalysisScoreCardProps> = ({
   const percentageScore = score > 1 ? score : Math.round(score * 100);
   
   const getScoreColor = (score: number) => {
-    if (score >= 70) return 'bg-green-500';
-    if (score >= 50) return 'bg-orange-500';
-    return 'bg-red-400';
+    if (score >= 70) return 'bg-success';
+    if (score >= 50) return 'bg-warning';
+    return 'bg-destructive';
   };
 
   const getTextColor = (score: number) => {
-    if (score >= 70) return 'text-green-600';
-    if (score >= 50) return 'text-orange-600';
-    return 'text-red-600';
+    if (score >= 70) return 'text-success';
+    if (score >= 50) return 'text-warning';
+    return 'text-destructive';
   };
 
   return (
-    <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20 text-center">
+    <div className="bg-card rounded-lg shadow p-6 border border-border text-center">
       {/* Large Score Circle */}
       <div className="flex items-center justify-center mb-4">
         <div className={`relative w-32 h-32 ${getScoreColor(percentageScore)} rounded-full flex items-center justify-center`}>
@@ -41,13 +41,13 @@ const AnalysisScoreCard: React.FC<AnalysisScoreCardProps> = ({
         </div>
       </div>
       
-      <h3 className="text-heading font-semibold text-blueberry dark:text-citrus mb-2">Compatibility Score</h3>
+      <h3 className="text-heading font-semibold text-foreground mb-2">Compatibility Score</h3>
       <p className={`font-medium mb-4 ${getTextColor(percentageScore)}`}>
         {getMatchLevel(percentageScore)}
       </p>
       
       {jobTitle && (
-        <div className="text-caption text-blueberry/60 dark:text-apple-core/60">
+        <div className="text-caption text-muted-foreground">
           <p>for the <span className="font-medium">{jobTitle}</span> position</p>
           {companyName && companyName !== 'the Company' && (
             <p>at <span className="font-medium">{companyName}</span></p>

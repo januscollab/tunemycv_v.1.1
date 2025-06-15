@@ -5,17 +5,17 @@ import { Upload, Search, FileText } from 'lucide-react';
 const HowItWorks = () => {
   const steps = [
     {
-      icon: <Upload className="h-12 w-12 text-zapier-orange" />,
+      icon: <Upload className="h-12 w-12 text-primary" />,
       title: "Upload Your CV",
       description: "Simply upload your CV in PDF, DOC, or DOCX format. Our AI will extract and analyze your professional information instantly."
     },
     {
-      icon: <Search className="h-12 w-12 text-zapier-orange" />,
+      icon: <Search className="h-12 w-12 text-primary" />,
       title: "Analyze & Match", 
       description: "Paste any job description and our AI will analyze the match between your CV and the role, highlighting strengths and improvement areas."
     },
     {
-      icon: <FileText className="h-12 w-12 text-zapier-orange" />,
+      icon: <FileText className="h-12 w-12 text-primary" />,
       title: "Ready. Set. Interview.",
       description: "Our Interview Toolkit will help you with a tailored cover letter and a complete interview prep pack — so you're fully equipped to succeed"
     }
@@ -28,7 +28,7 @@ const HowItWorks = () => {
           <div className="flex justify-center mb-6">
             <div className="relative">
               {step.icon}
-              <div className="absolute -top-2 -right-2 bg-zapier-orange text-white rounded-full w-6 h-6 flex items-center justify-center text-caption font-bold">
+              <div className="absolute -top-2 -right-2 bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-caption font-bold">
                 {index + 1}
               </div>
             </div>

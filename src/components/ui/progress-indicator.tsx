@@ -46,7 +46,8 @@ export const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({
         value={value}
         className={cn(
           sizeClasses[size],
-          variantClasses[variant]
+          variantClasses[variant],
+          "bg-muted"
         )}
       />
     </div>

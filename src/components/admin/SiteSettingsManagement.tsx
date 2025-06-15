@@ -3,10 +3,10 @@ import { Save, Mail, Settings, Calendar, TrendingUp, AlertTriangle, Shield, Chec
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { FloatingLabelInput } from '@/components/common/FloatingLabelInput';
+import { CaptureInput } from '@/components/ui/capture-input';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Progress } from '@/components/ui/progress';
+import { ProgressIndicator } from '@/components/ui/progress-indicator';
 
 interface SiteSettings {
   id: string;
@@ -16,6 +16,7 @@ interface SiteSettings {
   reset_day: number;
   adobe_api_enabled: boolean;
   debug_mode: boolean;
+  openai_api_key_encrypted: string;
   updated_at: string;
 }
 
@@ -49,8 +50,10 @@ const SiteSettingsManagement: React.FC = () => {
     monthly_adobe_limit: 500,
     reset_day: 1,
     adobe_api_enabled: false,
-    debug_mode: true
+    debug_mode: true,
+    openai_api_key_encrypted: ''
   });
+  const [openaiApiKey, setOpenaiApiKey] = useState('');
   const [adobeFormData, setAdobeFormData] = useState({
     client_id: '',
     client_secret: '',
@@ -84,8 +87,10 @@ const SiteSettingsManagement: React.FC = () => {
           monthly_adobe_limit: data.monthly_adobe_limit || 500,
           reset_day: data.reset_day || 1,
           adobe_api_enabled: data.adobe_api_enabled || false,
-          debug_mode: data.debug_mode ?? true
+          debug_mode: data.debug_mode ?? true,
+          openai_api_key_encrypted: data.openai_api_key_encrypted || ''
         });
+        setOpenaiApiKey(data.openai_api_key_encrypted ? '••••••••••••' : '');
       }
     } catch (error) {
       console.error('Error loading site settings:', error);
@@ -161,7 +166,8 @@ const SiteSettingsManagement: React.FC = () => {
             monthly_adobe_limit: dataToSave.monthly_adobe_limit,
             reset_day: dataToSave.reset_day,
             adobe_api_enabled: dataToSave.adobe_api_enabled,
-            debug_mode: dataToSave.debug_mode
+            debug_mode: dataToSave.debug_mode,
+            openai_api_key_encrypted: dataToSave.openai_api_key_encrypted
           })
           .eq('id', settings.id);
 
@@ -268,7 +274,8 @@ const SiteSettingsManagement: React.FC = () => {
             monthly_adobe_limit: formData.monthly_adobe_limit,
             reset_day: formData.reset_day,
             adobe_api_enabled: formData.adobe_api_enabled,
-            debug_mode: formData.debug_mode
+            debug_mode: formData.debug_mode,
+            ...(openaiApiKey && !openaiApiKey.includes('•') && { openai_api_key_encrypted: openaiApiKey })
           })
           .eq('id', settings.id);
 
@@ -371,25 +378,25 @@ const SiteSettingsManagement: React.FC = () => {
   };
 
   const getUsageStatusColor = (percentage: number) => {
-    if (percentage >= 100) return 'text-red-600';
-    if (percentage >= 90) return 'text-red-500';
-    if (percentage >= 80) return 'text-orange-500';
-    if (percentage >= 50) return 'text-yellow-500';
-    return 'text-green-600';
+    if (percentage >= 100) return 'text-destructive';
+    if (percentage >= 90) return 'text-destructive';
+    if (percentage >= 80) return 'text-warning';
+    if (percentage >= 50) return 'text-warning';
+    return 'text-success';
   };
 
   const getProgressColor = (percentage: number) => {
-    if (percentage >= 100) return 'bg-red-500';
-    if (percentage >= 90) return 'bg-red-400';
-    if (percentage >= 80) return 'bg-orange-400';
-    if (percentage >= 50) return 'bg-yellow-400';
-    return 'bg-green-500';
+    if (percentage >= 100) return 'bg-destructive';
+    if (percentage >= 90) return 'bg-destructive';
+    if (percentage >= 80) return 'bg-warning';
+    if (percentage >= 50) return 'bg-warning';
+    return 'bg-success';
   };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-zapier-orange"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -398,52 +405,53 @@ const SiteSettingsManagement: React.FC = () => {
     <div className="space-y-6">
       {/* Adobe Usage Dashboard */}
       {formData.adobe_api_enabled && adobeUsage && (
-        <Card className="border border-apple-core/20 dark:border-citrus/20">
+        <Card className="border border-border">
           <CardHeader>
-            <CardTitle className="flex items-center text-heading font-semibold text-blueberry dark:text-citrus">
-              <TrendingUp className="h-5 w-5 text-apricot mr-2" />
+            <CardTitle className="flex items-center text-heading font-semibold text-foreground">
+              <TrendingUp className="h-5 w-5 text-primary mr-space-0.5" />
               Adobe PDF Services Usage
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label className="text-caption font-medium text-blueberry dark:text-apple-core">
+          <CardContent className="space-y-space-1">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-space-1">
+              <div className="space-y-space-0.5">
+                <Label className="text-caption font-medium text-foreground">
                   Current Usage
                 </Label>
                 <div className={`text-2xl font-bold ${getUsageStatusColor(adobeUsage.usage_percentage)}`}>
                   {adobeUsage.current_usage} / {adobeUsage.monthly_limit}
                 </div>
-                <Progress 
+                <ProgressIndicator 
                   value={Math.min(adobeUsage.usage_percentage, 100)} 
-                  className="h-2"
+                  size="sm"
+                  showPercentage={false}
                 />
-                <p className="text-micro text-blueberry/60 dark:text-apple-core/60">
+                <p className="text-micro text-muted-foreground">
                   {adobeUsage.usage_percentage.toFixed(1)}% of monthly limit
                 </p>
               </div>
               
-              <div className="space-y-2">
-                <Label className="text-caption font-medium text-blueberry dark:text-apple-core">
+              <div className="space-y-space-0.5">
+                <Label className="text-caption font-medium text-foreground">
                   Days Until Reset
                 </Label>
-                <div className="text-2xl font-bold text-blueberry dark:text-apple-core">
+                <div className="text-2xl font-bold text-foreground">
                   {adobeUsage.days_until_reset}
                 </div>
-                <p className="text-micro text-blueberry/60 dark:text-apple-core/60">
+                <p className="text-micro text-muted-foreground">
                   Resets on {new Date(adobeUsage.reset_date).toLocaleDateString()}
                 </p>
               </div>
               
-              <div className="space-y-2">
-                <Label className="text-caption font-medium text-blueberry dark:text-apple-core">
+              <div className="space-y-space-0.5">
+                <Label className="text-caption font-medium text-foreground">
                   Status
                 </Label>
                 <div className={`text-lg font-semibold ${getUsageStatusColor(adobeUsage.usage_percentage)}`}>
                   {adobeUsage.usage_percentage >= 100 ? (
-                    <span className="flex items-center"><AlertTriangle className="h-4 w-4 mr-1" />Limit Reached</span>
+                    <span className="flex items-center"><AlertTriangle className="h-4 w-4 mr-space-0.25" />Limit Reached</span>
                   ) : adobeUsage.usage_percentage >= 90 ? (
-                    <span className="flex items-center"><AlertTriangle className="h-4 w-4 mr-1" />Critical</span>
+                    <span className="flex items-center"><AlertTriangle className="h-4 w-4 mr-space-0.25" />Critical</span>
                   ) : adobeUsage.usage_percentage >= 80 ? (
                     'High Usage'
                   ) : adobeUsage.usage_percentage >= 50 ? (
@@ -459,192 +467,156 @@ const SiteSettingsManagement: React.FC = () => {
       )}
 
       {/* Adobe PDF Services Configuration */}
-      <Card className="border border-apple-core/20 dark:border-citrus/20">
+      <Card className="border border-border">
         <CardHeader>
-          <CardTitle className="flex items-center text-heading font-semibold text-blueberry dark:text-citrus">
-            <Shield className="h-5 w-5 text-apricot mr-2" />
+          <CardTitle className="flex items-center text-heading font-semibold text-foreground">
+            <Shield className="h-5 w-5 text-primary mr-space-0.5" />
             Adobe PDF Services Configuration
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-4">
-            <div className="flex items-center space-x-2">
+        <CardContent className="space-y-space-1.5">
+          <div className="space-y-space-1">
+            <div className="flex items-center space-x-space-0.5">
               <input
                 type="checkbox"
                 id="adobe_api_enabled"
                 checked={formData.adobe_api_enabled}
                 onChange={(e) => handleAdobeToggleChange(e.target.checked)}
                 disabled={autoSaving}
-                className="rounded border-apple-core/30 disabled:opacity-50"
+                className="rounded border-input-border disabled:opacity-50"
               />
-              <Label htmlFor="adobe_api_enabled" className="text-caption font-medium text-blueberry dark:text-apple-core">
+              <Label htmlFor="adobe_api_enabled" className="text-caption font-medium text-foreground">
                 Enable Adobe PDF Services API
               </Label>
               {autoSaveStatus === 'saving' && (
-                <div className="flex items-center ml-2">
-                  <Loader2 className="h-4 w-4 animate-spin text-apricot" />
-                  <span className="text-micro text-blueberry/60 dark:text-apple-core/60 ml-1">
+                <div className="flex items-center ml-space-0.5">
+                  <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                  <span className="text-micro text-muted-foreground ml-space-0.25">
                     Auto-saving...
                   </span>
                 </div>
               )}
               {autoSaveStatus === 'success' && (
-                <div className="flex items-center ml-2">
-                  <Check className="h-4 w-4 text-green-600" />
-                  <span className="text-micro text-green-600 ml-1">
+                <div className="flex items-center ml-space-0.5">
+                  <Check className="h-4 w-4 text-success" />
+                  <span className="text-micro text-success ml-space-0.25">
                     Auto-saved
                   </span>
                 </div>
               )}
               {autoSaveStatus === 'error' && (
-                <div className="flex items-center ml-2">
-                  <AlertTriangle className="h-4 w-4 text-red-500" />
-                  <span className="text-micro text-red-500 ml-1">
+                <div className="flex items-center ml-space-0.5">
+                  <AlertTriangle className="h-4 w-4 text-destructive" />
+                  <span className="text-micro text-destructive ml-space-0.25">
                     Auto-save failed
                   </span>
                 </div>
               )}
             </div>
 
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-space-0.5">
               <input
                 type="checkbox"
                 id="debug_mode"
                 checked={formData.debug_mode}
                 onChange={(e) => handleDebugToggleChange(e.target.checked)}
                 disabled={autoSaving}
-                className="rounded border-apple-core/30 disabled:opacity-50"
+                className="rounded border-input-border disabled:opacity-50"
               />
-              <Label htmlFor="debug_mode" className="text-caption font-medium text-blueberry dark:text-apple-core">
+              <Label htmlFor="debug_mode" className="text-caption font-medium text-foreground">
                 Enable Debug Mode
               </Label>
               {autoSaveStatus === 'saving' && (
-                <div className="flex items-center ml-2">
-                  <Loader2 className="h-4 w-4 animate-spin text-apricot" />
-                  <span className="text-micro text-blueberry/60 dark:text-apple-core/60 ml-1">
+                <div className="flex items-center ml-space-0.5">
+                  <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                  <span className="text-micro text-muted-foreground ml-space-0.25">
                     Auto-saving...
                   </span>
                 </div>
               )}
               {autoSaveStatus === 'success' && (
-                <div className="flex items-center ml-2">
-                  <Check className="h-4 w-4 text-green-600" />
-                  <span className="text-micro text-green-600 ml-1">
+                <div className="flex items-center ml-space-0.5">
+                  <Check className="h-4 w-4 text-success" />
+                  <span className="text-micro text-success ml-space-0.25">
                     Auto-saved
                   </span>
                 </div>
               )}
               {autoSaveStatus === 'error' && (
-                <div className="flex items-center ml-2">
-                  <AlertTriangle className="h-4 w-4 text-red-500" />
-                  <span className="text-micro text-red-500 ml-1">
+                <div className="flex items-center ml-space-0.5">
+                  <AlertTriangle className="h-4 w-4 text-destructive" />
+                  <span className="text-micro text-destructive ml-space-0.25">
                     Auto-save failed
                   </span>
                 </div>
               )}
             </div>
-            <p className="text-micro text-blueberry/60 dark:text-apple-core/60 -mt-1">
+            <p className="text-micro text-muted-foreground -mt-space-0.25">
               When enabled, Adobe PDF extraction saves debug ZIP files to storage for inspection
             </p>
 
             {formData.adobe_api_enabled && (
               <>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="monthly_adobe_limit" className="text-caption font-medium text-blueberry dark:text-apple-core">
-                      Monthly Limit
-                    </Label>
-                    <FloatingLabelInput
-                      id="monthly_adobe_limit"
-                      label="Monthly Limit"
-                      type="number"
-                      value={formData.monthly_adobe_limit.toString()}
-                      onChange={(e) => handleInputChange('monthly_adobe_limit', parseInt(e.target.value))}
-                      placeholder="500"
-                      min="1"
-                      max="10000"
-                    />
-                    <p className="text-micro text-blueberry/60 dark:text-apple-core/60 mt-1">
-                      Maximum API calls per month
-                    </p>
-                  </div>
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-space-1">
+                   <CaptureInput
+                     label="Monthly Limit"
+                     type="number"
+                     value={formData.monthly_adobe_limit.toString()}
+                     onChange={(e) => handleInputChange('monthly_adobe_limit', parseInt(e.target.value))}
+                     placeholder="500"
+                     min="1"
+                     max="10000"
+                     description="Maximum API calls per month"
+                   />
 
-                  <div>
-                    <Label htmlFor="reset_day" className="text-caption font-medium text-blueberry dark:text-apple-core">
-                      Reset Day
-                    </Label>
-                    <FloatingLabelInput
-                      id="reset_day"
-                      label="Reset Day"
-                      type="number"
-                      value={formData.reset_day.toString()}
-                      onChange={(e) => handleInputChange('reset_day', parseInt(e.target.value))}
-                      placeholder="1"
-                      min="1"
-                      max="31"
-                    />
-                    <p className="text-micro text-blueberry/60 dark:text-apple-core/60 mt-1">
-                      Day of month to reset usage counter
-                    </p>
-                  </div>
+                   <CaptureInput
+                     label="Reset Day"
+                     type="number"
+                     value={formData.reset_day.toString()}
+                     onChange={(e) => handleInputChange('reset_day', parseInt(e.target.value))}
+                     placeholder="1"
+                     min="1"
+                     max="31"
+                     description="Day of month to reset usage counter"
+                   />
                 </div>
 
-                <div className="space-y-4 border-t border-apple-core/20 dark:border-citrus/20 pt-4">
-                  <h4 className="text-caption font-semibold text-blueberry dark:text-apple-core">
+                <div className="space-y-space-1 border-t border-border pt-space-1">
+                  <h4 className="text-caption font-semibold text-foreground">
                     API Credentials
                   </h4>
                   
-                  <div>
-                    <Label htmlFor="client_id" className="text-caption font-medium text-blueberry dark:text-apple-core">
-                      Client ID
-                    </Label>
-                    <FloatingLabelInput
-                      id="client_id"
-                      label="Client ID"
-                      type="text"
-                      value={adobeFormData.client_id}
-                      onChange={(e) => handleAdobeInputChange('client_id', e.target.value)}
-                      placeholder="Your Adobe Client ID"
-                    />
-                  </div>
+                   <CaptureInput
+                     label="Client ID"
+                     type="text"
+                     value={adobeFormData.client_id}
+                     onChange={(e) => handleAdobeInputChange('client_id', e.target.value)}
+                     placeholder="Your Adobe Client ID"
+                   />
 
-                  <div>
-                    <Label htmlFor="client_secret" className="text-caption font-medium text-blueberry dark:text-apple-core">
-                      Client Secret
-                    </Label>
-                    <FloatingLabelInput
-                      id="client_secret"
-                      label="Client Secret"
-                      type="password"
-                      value={adobeFormData.client_secret}
-                      onChange={(e) => handleAdobeInputChange('client_secret', e.target.value)}
-                      placeholder={adobeCredentials ? "Enter new secret to update" : "Your Adobe Client Secret"}
-                    />
-                    <p className="text-micro text-blueberry/60 dark:text-apple-core/60 mt-1">
-                      {adobeCredentials ? "Leave blank to keep existing secret" : "This will be encrypted and stored securely"}
-                    </p>
-                  </div>
+                   <CaptureInput
+                     label="Client Secret"
+                     type="password"
+                     value={adobeFormData.client_secret}
+                     onChange={(e) => handleAdobeInputChange('client_secret', e.target.value)}
+                     placeholder={adobeCredentials ? "Enter new secret to update" : "Your Adobe Client Secret"}
+                     description={adobeCredentials ? "Leave blank to keep existing secret" : "This will be encrypted and stored securely"}
+                   />
 
-                  <div>
-                    <Label htmlFor="organization_id" className="text-caption font-medium text-blueberry dark:text-apple-core">
-                      Organization ID
-                    </Label>
-                    <FloatingLabelInput
-                      id="organization_id"
-                      label="Organization ID"
-                      type="text"
-                      value={adobeFormData.organization_id}
-                      onChange={(e) => handleAdobeInputChange('organization_id', e.target.value)}
-                      placeholder="Your Adobe Organization ID"
-                    />
-                  </div>
+                   <CaptureInput
+                     label="Organization ID"
+                     type="text"
+                     value={adobeFormData.organization_id}
+                     onChange={(e) => handleAdobeInputChange('organization_id', e.target.value)}
+                     placeholder="Your Adobe Organization ID"
+                   />
 
                   <Button
                     onClick={handleSaveAdobeCredentials}
                     disabled={saving || !adobeFormData.client_id || !adobeFormData.organization_id || (!adobeCredentials && !adobeFormData.client_secret)}
-                    className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200"
+                    className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-normal"
                   >
-                    <Save className="h-4 w-4 mr-2" />
+                    <Save className="h-4 w-4 mr-space-0.5" />
                     {saving ? 'Saving...' : 'Save Adobe Credentials'}
                   </Button>
                 </div>
@@ -654,63 +626,61 @@ const SiteSettingsManagement: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* General Site Settings */}
-      <Card className="border border-apple-core/20 dark:border-citrus/20">
+      {/* OpenAI Configuration */}
+      <Card className="border border-border">
         <CardHeader>
-          <CardTitle className="flex items-center text-heading font-semibold text-blueberry dark:text-citrus">
-            <Settings className="h-5 w-5 text-apricot mr-2" />
+          <CardTitle className="flex items-center text-heading font-semibold text-foreground">
+            <Shield className="h-5 w-5 text-primary mr-space-0.5" />
+            OpenAI Configuration
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-space-1.5">
+          <div className="space-y-space-1">
+            <CaptureInput
+              label="OpenAI API Key"
+              type="password"
+              value={openaiApiKey}
+              onChange={(e) => setOpenaiApiKey(e.target.value)}
+              placeholder={settings?.openai_api_key_encrypted ? "Enter new key to update" : "sk-..."}
+              description={settings?.openai_api_key_encrypted ? "Leave blank to keep existing key" : "Required for cover letter generation and other AI features"}
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* General Site Settings */}
+      <Card className="border border-border">
+        <CardHeader>
+          <CardTitle className="flex items-center text-heading font-semibold text-foreground">
+            <Settings className="h-5 w-5 text-primary mr-space-0.5" />
             General Site Settings
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="admin_email" className="text-caption font-medium text-blueberry dark:text-apple-core">
-                Admin Email
-              </Label>
-              <div className="mt-1 relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-blueberry/60 dark:text-apple-core/60" />
-                <FloatingLabelInput
-                  id="admin_email"
-                  label="Admin Email"
-                  type="email"
-                  value={formData.admin_email}
-                  onChange={(e) => handleInputChange('admin_email', e.target.value)}
-                  placeholder="admin@company.com"
-                  className="pl-10"
-                  maxLength={100}
-                />
-              </div>
-              <p className="text-micro text-blueberry/60 dark:text-apple-core/60 mt-1">
-                Email address for administrative notifications and Adobe usage alerts
-              </p>
-            </div>
+        <CardContent className="space-y-space-1.5">
+          <div className="space-y-space-1">
+            <CaptureInput
+              label="Admin Email"
+              type="email"
+              value={formData.admin_email}
+              onChange={(e) => handleInputChange('admin_email', e.target.value)}
+              placeholder="admin@company.com"
+              maxLength={100}
+              description="Email address for administrative notifications and Adobe usage alerts"
+            />
 
-            <div>
-              <Label htmlFor="support_email" className="text-caption font-medium text-blueberry dark:text-apple-core">
-                Support Email
-              </Label>
-              <div className="mt-1 relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-blueberry/60 dark:text-apple-core/60" />
-                <FloatingLabelInput
-                  id="support_email"
-                  label="Support Email"
-                  type="email"
-                  value={formData.support_email}
-                  onChange={(e) => handleInputChange('support_email', e.target.value)}
-                  placeholder="support@company.com"
-                  className="pl-10"
-                  maxLength={100}
-                />
-              </div>
-              <p className="text-micro text-blueberry/60 dark:text-apple-core/60 mt-1">
-                Email address for customer support and feedback forms
-              </p>
-            </div>
+            <CaptureInput
+              label="Support Email"
+              type="email"
+              value={formData.support_email}
+              onChange={(e) => handleInputChange('support_email', e.target.value)}
+              placeholder="support@company.com"
+              maxLength={100}
+              description="Email address for customer support and feedback forms"
+            />
           </div>
 
-          <div className="flex items-center justify-between pt-4 border-t border-apple-core/20 dark:border-citrus/20">
-            <div className="text-caption text-blueberry/60 dark:text-apple-core/60">
+          <div className="flex items-center justify-between pt-space-1 border-t border-border">
+            <div className="text-caption text-muted-foreground">
               {settings && (
                 <span>Last updated: {new Date(settings.updated_at).toLocaleDateString()}</span>
               )}
@@ -718,9 +688,9 @@ const SiteSettingsManagement: React.FC = () => {
             <Button
               onClick={handleSave}
               disabled={saving || autoSaving}
-              className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-200"
+              className="font-normal hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 transition-all duration-normal"
             >
-              <Save className="h-4 w-4 mr-2" />
+              <Save className="h-4 w-4 mr-space-0.5" />
               {saving ? 'Saving...' : autoSaving ? 'Auto-saving...' : 'Save Settings'}
             </Button>
           </div>

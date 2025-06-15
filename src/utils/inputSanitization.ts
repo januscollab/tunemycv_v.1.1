@@ -31,13 +31,15 @@ export const sanitizeEmail = (email: string): string => {
   return email.toLowerCase().trim();
 };
 
-// File name sanitization
+// File name sanitization - preserves spaces for readability
 export const sanitizeFileName = (fileName: string): string => {
   if (!fileName || typeof fileName !== 'string') return '';
   
   return fileName
-    .replace(/[^a-zA-Z0-9._-]/g, '') // Allow only alphanumeric, dots, underscores, hyphens
+    .replace(/[^a-zA-Z0-9.\s_-]/g, '') // Allow alphanumeric, dots, spaces, underscores, hyphens
     .replace(/\.{2,}/g, '.') // Replace multiple dots with single dot
+    .replace(/\s{2,}/g, ' ') // Replace multiple spaces with single space
+    .trim() // Remove leading/trailing spaces
     .substring(0, 255); // Limit length
 };
 

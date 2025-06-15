@@ -36,32 +36,32 @@ const BugReportModal: React.FC<BugReportModalProps> = ({ isOpen, onClose, transa
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-surface rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col border border-apple-core/10 dark:border-citrus/20">
-        <div className="p-6 border-b border-apple-core/10 dark:border-citrus/20 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-red-500/10 rounded-lg flex items-center justify-center">
-              <Bug className="h-5 w-5 text-red-500" />
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-modal flex items-center justify-center p-space-1">
+      <div className="bg-surface rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col border border-border">
+        <div className="p-space-1.5 border-b border-border flex items-center justify-between">
+          <div className="flex items-center space-x-space-0.75">
+            <div className="w-10 h-10 bg-destructive/10 rounded-lg flex items-center justify-center">
+              <Bug className="h-5 w-5 text-destructive" />
             </div>
             <div>
-              <h2 className="text-subheading font-semibold text-blueberry dark:text-citrus">
+              <h2 className="text-subheading font-semibold text-foreground">
                 Report Analysis Error
               </h2>
-              <p className="text-caption text-blueberry/60 dark:text-apple-core/60">
+              <p className="text-caption text-muted-foreground">
                 Help us improve by reporting issues
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-apple-core/10 dark:hover:bg-citrus/10 rounded-lg transition-colors"
+            className="p-space-0.5 hover:bg-muted rounded-lg transition-colors"
             aria-label="Close bug report form"
           >
             <ArrowLeft className="h-5 w-5" />
           </button>
         </div>
 
-        <div className="flex-1 p-6 overflow-y-auto">
+        <div className="flex-1 p-space-1.5 overflow-y-auto">
           <FloatingFeedbackForm 
             onClose={onClose} 
             currentPage="analysis"

@@ -136,10 +136,10 @@ export const extractTextFromFile = async (file: File, signal?: AbortSignal): Pro
     try {
       console.log(`Extracting text from DOCX: ${file.name}`);
       
-      // Import mammoth dynamically
-      const mammoth = await import('mammoth');
       const arrayBuffer = await file.arrayBuffer();
       
+      // Dynamic import to avoid build issues
+      const { default: mammoth } = await import('mammoth');
       const result = await mammoth.extractRawText({ arrayBuffer });
       let extractedText = result.value;
       

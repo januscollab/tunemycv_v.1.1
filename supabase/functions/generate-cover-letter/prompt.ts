@@ -71,6 +71,10 @@ IMPORTANT FORMATTING REQUIREMENTS:
 - Do NOT include the candidate's name in the salutation or closing signature
 - ALWAYS end with "Sincerely," followed by a blank line, then the complete contact information footer:
 
+PLACEHOLDER FORMATTING:
+- If you need to use placeholder text (e.g., for company names, job titles, or other specific information), enclose them in square brackets like [Company Name], [Job Title], [Department Name]
+- This helps users easily identify what needs to be customized
+
 ${contactHeader}
 
 ${advancedOptionsText ? `\nAdditional personalization requirements:${advancedOptionsText}` : ''}

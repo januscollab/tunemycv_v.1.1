@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Upload, FileText, CheckCircle, Zap } from 'lucide-react';
-import { Progress } from './progress';
+import { ProgressIndicator } from './progress-indicator';
 import { Button } from './button';
 import { BounceLoader, WaveLoader, PulseRing, MorphingDots } from './progress-indicator';
 
@@ -60,7 +60,7 @@ export const MinimalUploadModal: React.FC<FileUploadModalProps> = ({
           <div className="w-16 h-16 mx-auto mb-4 bg-muted rounded-full flex items-center justify-center">
             <Upload className="h-8 w-8 text-muted-foreground" />
           </div>
-          <Progress value={Math.min(progress, 95)} className="w-full mb-2" />
+          <ProgressIndicator value={Math.min(progress, 95)} className="w-full mb-2" showPercentage={false} />
           <div className="text-caption text-muted-foreground">
             {Math.round(Math.min(progress, 95))}% complete
           </div>
@@ -169,7 +169,7 @@ export const EngagingUploadModal: React.FC<FileUploadModalProps> = ({
             </p>
           </div>
           
-          <Progress value={Math.min(progress, 95)} className="w-full mb-2" />
+          <ProgressIndicator value={Math.min(progress, 95)} className="w-full mb-2" showPercentage={false} />
           <div className="text-caption text-muted-foreground">
             {Math.round(Math.min(progress, 95))}% complete
           </div>
@@ -280,7 +280,7 @@ export const AnimatedUploadModal: React.FC<FileUploadModalProps> = ({
             </div>
             
             <div className="relative">
-              <Progress value={Math.min(progress, 95)} className="w-full mb-2 h-2" />
+              <ProgressIndicator value={Math.min(progress, 95)} className="w-full mb-2" size="sm" showPercentage={false} />
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform translate-x-[-100%] animate-pulse" style={{ animationDuration: '2s' }} />
             </div>
             <div className="text-caption text-muted-foreground">

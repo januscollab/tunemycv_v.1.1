@@ -27,11 +27,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { CaptureInput } from '@/components/ui/capture-input';
+import { CategoryDocumentHistory } from '@/components/ui/category-document-history';
 import AnalysisHistoryTab from '@/components/profile/AnalysisHistoryTab';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Breadcrumbs from '@/components/navigation/Breadcrumbs';
 import StepIndicator from '@/components/ui/step-indicator';
-import QuickActions from '@/components/common/QuickActions';
+
 
 const InterviewToolkit = () => {
   const { user } = useAuth();
@@ -524,32 +526,22 @@ const InterviewToolkit = () => {
                         </div>
                         
                         {/* Job Title */}
-                        <div>
-                          <label className="block text-sm font-medium text-blueberry dark:text-citrus mb-1">
-                            Job Title <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            type="text"
-                            value={interviewJobTitle}
-                            onChange={(e) => setInterviewJobTitle(e.target.value)}
-                            placeholder="e.g., Senior Software Engineer (auto-extracted from job description)"
-                            className="w-full px-3 py-2 border border-apple-core/30 dark:border-citrus/30 rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange focus:border-transparent bg-white dark:bg-blueberry/10 text-blueberry dark:text-apple-core"
-                          />
-                        </div>
+                        <CaptureInput
+                          label="Job Title *"
+                          value={interviewJobTitle}
+                          onChange={(e) => setInterviewJobTitle(e.target.value)}
+                          placeholder="e.g., Senior Software Engineer (auto-extracted from job description)"
+                          required
+                        />
                         
                         {/* Company Name */}
-                        <div>
-                          <label className="block text-sm font-medium text-blueberry dark:text-citrus mb-1">
-                            Company Name <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            type="text"
-                            value={interviewCompanyName}
-                            onChange={(e) => setInterviewCompanyName(e.target.value)}
-                            placeholder="e.g., Tech Corp Inc."
-                            className="w-full px-3 py-2 border border-apple-core/30 dark:border-citrus/30 rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange focus:border-transparent bg-white dark:bg-blueberry/10 text-blueberry dark:text-apple-core"
-                          />
-                        </div>
+                        <CaptureInput
+                          label="Company Name *"
+                          value={interviewCompanyName}
+                          onChange={(e) => setInterviewCompanyName(e.target.value)}
+                          placeholder="e.g., Tech Corp Inc."
+                          required
+                        />
                       </CardContent>
                     </Card>
                   )}
@@ -620,17 +612,23 @@ const InterviewToolkit = () => {
 
               {/* Interview Notes History Tab */}
               <TabsContent value="history" className="mt-0">
-                <Card className="border border-gray-200 dark:border-gray-700">
-                  <CardContent className="text-center py-8">
-                    <MessageSquare className="h-12 w-12 text-zapier-orange mx-auto mb-4" />
-                    <p className="text-gray-600 dark:text-gray-400 mb-2 font-normal">
-                      Interview Notes History
-                    </p>
-                    <p className="text-sm font-normal text-gray-500">
-                      Your generated interview preparation notes will appear here once the feature is available.
-                    </p>
-                  </CardContent>
-                </Card>
+                <CategoryDocumentHistory
+                  header={{
+                    title: "Interview Notes History",
+                    totalCount: 0,
+                    itemsPerPage: 10,
+                    onItemsPerPageChange: () => {},
+                    showPagination: false,
+                    showFilter: false
+                  }}
+                  documents={[]}
+                  loading={false}
+                  emptyState={{
+                    title: "No interview notes yet",
+                    description: "Your generated interview preparation notes will appear here once you create them.",
+                    icon: <MessageSquare className="h-12 w-12" />
+                  }}
+                />
               </TabsContent>
             </Tabs>
           </div>
@@ -671,18 +669,6 @@ const InterviewToolkit = () => {
       />
       </div>
 
-      {/* Quick Actions */}
-      <QuickActions 
-        customActions={[
-          {
-            id: 'new-prep',
-            label: 'Start New Prep',
-            icon: <MessageSquare className="w-5 h-5" />,
-            onClick: handleStartNew,
-            variant: 'default'
-          }
-        ]}
-      />
     </>
   );
 };

@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { AlertTriangle, Send, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { FloatingLabelTextarea } from '@/components/common/FloatingLabelTextarea';
+import { CaptureTextarea } from '@/components/ui/capture-textarea';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -96,14 +95,13 @@ const ErrorReportModal: React.FC<ErrorReportModalProps> = ({
           </div>
           
           <div>
-            <FloatingLabelTextarea
+            <CaptureTextarea
               label="Describe the issue you encountered"
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Please describe what went wrong with the document processing..."
               rows={4}
-              className="mt-1"
               required
             />
           </div>

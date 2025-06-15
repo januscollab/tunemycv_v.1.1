@@ -51,8 +51,8 @@ const AuthForm: React.FC<AuthFormProps> = ({
   };
 
   return (
-    <div className="mt-4">
-      <form className="space-y-3" onSubmit={onSubmit}>
+    <div className="mt-space-1">
+      <form className="space-y-space-0.75" onSubmit={onSubmit}>
         {mode === 'register' && (
           <NameFields
             firstName={formData.firstName}

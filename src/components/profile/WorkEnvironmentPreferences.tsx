@@ -3,7 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Building, MapPin, Info } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { FloatingLabelInput } from '@/components/common/FloatingLabelInput';
 
 const WorkEnvironmentPreferences: React.FC = () => {
@@ -104,18 +104,16 @@ const WorkEnvironmentPreferences: React.FC = () => {
       <div className="flex items-center mb-6">
         <Building className="h-5 w-5 text-gray-500 dark:text-apple-core/60 mr-2" />
         <h3 className="text-lg font-medium text-gray-900 dark:text-citrus">Your Work Environment Preferences</h3>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:text-apple-core/60 dark:hover:text-apple-core/80 cursor-help ml-2" />
-            </TooltipTrigger>
-            <TooltipContent side="bottom" className="max-w-sm">
-              <p className="text-sm">
-                <strong>Get Opportunities That Match Your Lifestyle</strong> - Set preferences to receive more relevant job matches that fit your ideal work situation.
-              </p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:text-apple-core/60 dark:hover:text-apple-core/80 cursor-help ml-2" />
+          </TooltipTrigger>
+          <TooltipContent side="bottom" className="max-w-sm">
+            <p className="text-sm">
+              <strong>Get Opportunities That Match Your Lifestyle</strong> - Set preferences to receive more relevant job matches that fit your ideal work situation.
+            </p>
+          </TooltipContent>
+        </Tooltip>
       </div>
       <p className="text-sm text-gray-500 dark:text-apple-core/60 mb-6">
         Let us know your preferred work environment to better match you with suitable opportunities

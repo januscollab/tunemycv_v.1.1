@@ -98,6 +98,9 @@
     --sidebar-border: 226 232 240;
     --sidebar-ring: 255 74 0;
 
+    /* Footer */
+    --footer: 58 58 58;
+
     /* Transitions */
     --transition-fast: 150ms;
     --transition-normal: 200ms;
@@ -281,5 +284,54 @@
 
   .dark ::-webkit-scrollbar-thumb:hover {
     @apply bg-border-secondary;
+  }
+
+  /* Menu Text Animation */
+  .menu-text-animation {
+    @apply relative inline-block transition-all duration-300 ease-out;
+  }
+
+  .menu-text-animation::after {
+    content: '';
+    @apply absolute w-full h-0.5 bottom-0 left-0 bg-primary scale-x-0 origin-bottom-right transition-transform duration-300 ease-out;
+  }
+
+  .menu-text-animation:hover::after {
+    @apply scale-x-100 origin-bottom-left;
+  }
+
+  .menu-text-animation:hover {
+    @apply text-primary transform translate-y-[-1px];
+  }
+
+  /* AI Context Menu Animations */
+  .animate-fade-in {
+    animation: fadeIn 200ms ease-out forwards;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 150ms ease-out forwards;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
   }
 }

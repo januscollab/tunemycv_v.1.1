@@ -1,8 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FileText, Sparkles, Trash2, RefreshCw, Clock, FileUp, Search, AlertCircle, Eye, Edit, Download, History, RotateCcw, Edit2, Linkedin } from 'lucide-react';
 import Breadcrumbs from '@/components/navigation/Breadcrumbs';
-import QuickActions from '@/components/common/QuickActions';
+import { RichTextEditor } from '@/components/ui/rich-text-editor';
+import { CategoryDocumentHistory } from '@/components/ui/category-document-history';
+import { htmlToJson } from '@/utils/jsonHtmlConverters';
+import DownloadOptions from '@/components/cover-letter/DownloadOptions';
+
 import { useAuth } from '@/contexts/AuthContext';
 import { useCoverLetter } from '@/hooks/useCoverLetter';
 import { useUserData } from '@/hooks/useUserData';
@@ -13,7 +17,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import EditTitleDialog from '@/components/ui/edit-title-dialog';
 import { Label } from '@/components/ui/label';
 import { FloatingLabelInput } from '@/components/common/FloatingLabelInput';
-import { FloatingLabelTextarea } from '@/components/common/FloatingLabelTextarea';
+import { CaptureInput } from '@/components/ui/capture-input';
+import { CaptureTextarea } from '@/components/ui/capture-textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -33,11 +38,10 @@ import ServiceExplanation from '@/components/common/ServiceExplanation';
 import CreditsPanel from '@/components/analyze/CreditsPanel';
 import AnalysisSelector from '@/components/cover-letter/AnalysisSelector';
 import AdvancedGenerationOptions from '@/components/cover-letter/AdvancedGenerationOptions';
-import DownloadOptions from '@/components/cover-letter/DownloadOptions';
-import EditableCoverLetter from '@/components/cover-letter/EditableCoverLetter';
+
 import NoAnalysisModal from '@/components/cover-letter/NoAnalysisModal';
 import CoverLetterLoggedOut from '@/components/cover-letter/CoverLetterLoggedOut';
-import ProcessingModal from '@/components/ui/processing-modal';
+import { ProgressIndicator } from '@/components/ui/progress-indicator';
 
 
 const CoverLetter = () => {
@@ -82,7 +86,8 @@ const AuthenticatedCoverLetter = () => {
     hasGenerated,
     showNoAnalysisModal,
     setShowNoAnalysisModal,
-    resetForm
+    resetForm,
+    generationProgress
   } = useCoverLetter();
   
   const [formData, setFormData] = useState({
@@ -107,12 +112,18 @@ const AuthenticatedCoverLetter = () => {
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [generationMethod, setGenerationMethod] = useState<'input' | 'analysis'>('input');
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [filterType, setFilterType] = useState<'all' | 'analysis' | 'cover_letter'>('all');
   
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingCoverLetter, setEditingCoverLetter] = useState<any>(null);
+  
+  // Note: editableCoverLetterRef removed since RTE is no longer used in View Letter tab
+  
+  // Save state management to prevent duplicate saves
+  const [isSaving, setIsSaving] = useState(false);
 
   const lengthOptions = [
     { value: 'short', label: 'Short (150-200 words)', description: 'Brief and to the point' },
@@ -177,9 +188,15 @@ const AuthenticatedCoverLetter = () => {
   const loadCoverLetterHistory = async () => {
     setLoadingHistory(true);
     try {
-      const data = await getCoverLetters();
-      setAllCoverLetters(data);
-      setCoverLetters(data); // For backward compatibility
+      const { data, error } = await supabase
+        .from('cover_letters')
+        .select('*')
+        .eq('user_id', user?.id)
+        .order('updated_at', { ascending: false }); // Latest first
+      
+      if (error) throw error;
+      setAllCoverLetters(data || []);
+      setCoverLetters(data || []); // For backward compatibility
     } catch (error) {
       console.error('Failed to load cover letter history:', error);
     } finally {
@@ -279,17 +296,7 @@ const AuthenticatedCoverLetter = () => {
     }
   };
 
-  const handleUpdateCoverLetter = async (newContent: string) => {
-    if (selectedCoverLetter) {
-      try {
-        await updateCoverLetter(selectedCoverLetter.id, newContent);
-        setSelectedCoverLetter(prev => ({ ...prev, content: newContent }));
-        loadCoverLetterHistory();
-      } catch (error) {
-        console.error('Update failed:', error);
-      }
-    }
-  };
+  // Note: handleUpdateCoverLetter removed since View Letter tab is now read-only
 
   const handleRegenerate = async (coverLetterId: string, tone: string, length: string) => {
     try {
@@ -355,12 +362,117 @@ const AuthenticatedCoverLetter = () => {
     setActiveTab('result');
   };
 
-  const handleTabChange = (newTab: string) => {
+  const handleTabChange = async (newTab: string) => {
+    // Auto-save when switching away from the result tab if there's content
+    if (activeTab === 'result' && selectedCoverLetter && user) {
+      try {
+        // Get current content from the Rich Text Editor
+        const currentContent = selectedCoverLetter.content;
+        if (currentContent && currentContent.trim()) {
+          const { error } = await supabase
+            .from('cover_letters')
+            .update({ 
+              content: currentContent
+            })
+            .eq('id', selectedCoverLetter.id)
+            .eq('user_id', user.id);
+          
+          if (error) {
+            console.error('Auto-save on tab switch failed:', error);
+          } else {
+            // Update local state
+            setSelectedCoverLetter(prev => ({
+              ...prev,
+              content: currentContent,
+              updated_at: new Date().toISOString()
+            }));
+            // Refresh history to show updated timestamp
+            loadCoverLetterHistory();
+          }
+        }
+      } catch (error) {
+        console.error('Auto-save on tab switch error:', error);
+      }
+    }
+    
     setActiveTab(newTab);
   };
 
+  
+  // Auto-save when user switches browser tabs or navigates away
+  useEffect(() => {
+    const handleBeforeUnload = async () => {
+      if (activeTab === 'result' && selectedCoverLetter && user) {
+        try {
+          const currentContent = selectedCoverLetter.content;
+          if (currentContent && currentContent.trim()) {
+            // Use navigator.sendBeacon for reliable data sending on page unload
+            const data = JSON.stringify({
+              id: selectedCoverLetter.id,
+              content: currentContent,
+              user_id: user.id
+            });
+            
+            // Fallback to fetch if sendBeacon is not available
+            if (navigator.sendBeacon) {
+              navigator.sendBeacon('/api/autosave-cover-letter', data);
+            } else {
+              await fetch('/api/autosave-cover-letter', {
+                method: 'POST',
+                body: data,
+                headers: { 'Content-Type': 'application/json' },
+                keepalive: true
+              });
+            }
+          }
+        } catch (error) {
+          console.error('Auto-save on page unload failed:', error);
+        }
+      }
+    };
+
+    const handleVisibilityChange = async () => {
+      if (document.hidden && activeTab === 'result' && selectedCoverLetter && user) {
+        try {
+          const currentContent = selectedCoverLetter.content;
+          if (currentContent && currentContent.trim()) {
+            const { error } = await supabase
+              .from('cover_letters')
+              .update({ 
+                content: currentContent
+              })
+              .eq('id', selectedCoverLetter.id)
+              .eq('user_id', user.id);
+            
+            if (!error) {
+              setSelectedCoverLetter(prev => ({
+                ...prev,
+                content: currentContent,
+                updated_at: new Date().toISOString()
+              }));
+            }
+          }
+        } catch (error) {
+          console.error('Auto-save on visibility change failed:', error);
+        }
+      }
+    };
+
+    // Add event listeners
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [activeTab, selectedCoverLetter, user]);
+
+  // Note: Window blur/unload handlers removed since View Letter tab no longer uses RTE
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5 py-6">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-primary/3 dark:from-primary/10 dark:via-background dark:to-primary/5 py-6">
       <div className="max-w-wider mx-auto px-4">
         <Breadcrumbs />
         <div className="mb-6">
@@ -383,17 +495,29 @@ const AuthenticatedCoverLetter = () => {
           onUseManualInput={() => setGenerationMethod('input')}
         />
 
-        <ProcessingModal
-          isOpen={isRegenerating}
-          title="Regenerating Cover Letter"
-          message="Please wait while we regenerate your cover letter with the new settings..."
-        />
+        {isRegenerating && (
+          <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-modal">
+            <ProgressIndicator 
+              value={generationProgress}
+              variant="default"
+              size="lg"
+              label="Regenerating Cover Letter"
+              showPercentage={true}
+            />
+          </div>
+        )}
 
-        <ProcessingModal
-          isOpen={isGenerating}
-          title="Generating Cover Letter"
-          message="Please wait while we create your personalized cover letter..."
-        />
+        {isGenerating && (
+          <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-modal">
+            <ProgressIndicator 
+              value={generationProgress}
+              variant="default"
+              size="lg"
+              label="Generating Cover Letter"
+              showPercentage={true}
+            />
+          </div>
+        )}
 
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6">
@@ -432,10 +556,10 @@ const AuthenticatedCoverLetter = () => {
                   )}
 
                   {/* Panel 1: Generation Method Selection */}
-                  <Card className="border border-gray-200 dark:border-gray-700">
+                  <Card>
                     <CardHeader className="pb-3">
                       <CardTitle className="flex items-center text-xl font-semibold">
-                        <Sparkles className="h-5 w-5 text-zapier-orange mr-2" />
+                        <Sparkles className="h-5 w-5 text-primary mr-2" />
                         Generate Cover Letter
                       </CardTitle>
                     </CardHeader>
@@ -447,15 +571,15 @@ const AuthenticatedCoverLetter = () => {
                             onClick={() => setGenerationMethod('input')}
                             className={`p-4 border rounded-md text-left transition-colors ${
                               generationMethod === 'input'
-                                ? 'border-zapier-orange bg-zapier-orange/5'
-                                : 'border-gray-200 hover:border-zapier-orange/50'
+                                ? 'border-primary bg-primary/5'
+                                : 'border hover:border-primary/50'
                             }`}
                           >
                             <div className="flex items-center mb-2">
-                              <FileUp className="h-5 w-5 text-zapier-orange mr-2" />
+                              <FileUp className="h-5 w-5 text-primary mr-2" />
                               <span className="font-medium">Generate from Input</span>
                             </div>
-                            <p className="text-sm font-normal text-gray-600">
+                            <p className="text-caption text-muted-foreground">
                               Enter job details manually to create a cover letter
                             </p>
                           </button>
@@ -464,15 +588,15 @@ const AuthenticatedCoverLetter = () => {
                             onClick={() => setGenerationMethod('analysis')}
                             className={`p-4 border rounded-md text-left transition-colors ${
                               generationMethod === 'analysis'
-                                ? 'border-zapier-orange bg-zapier-orange/5'
-                                : 'border-gray-200 hover:border-zapier-orange/50'
+                                ? 'border-primary bg-primary/5'
+                                : 'border hover:border-primary/50'
                             }`}
                           >
                             <div className="flex items-center mb-2">
-                              <Search className="h-5 w-5 text-zapier-orange mr-2" />
+                              <Search className="h-5 w-5 text-primary mr-2" />
                               <span className="font-medium">Generate from Analysis</span>
                             </div>
-                            <p className="text-sm font-normal text-gray-600">
+                            <p className="text-caption text-muted-foreground">
                               Use your previous CV analysis results
                             </p>
                           </button>
@@ -483,47 +607,44 @@ const AuthenticatedCoverLetter = () => {
 
                   {/* Panel 2: Job Details (only shown for input method) */}
                   {generationMethod === 'input' && (
-                    <Card className="border border-gray-200 dark:border-gray-700">
+                    <Card>
                       <CardHeader className="pb-3">
                         <CardTitle className="text-xl font-semibold text-left">Job Details</CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-4 pt-0">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <FloatingLabelInput
+                            <CaptureInput
                               label="Job Title *"
-                              id="jobTitle"
                               placeholder="e.g., Marketing Manager"
                               value={formData.jobTitle}
                               onChange={(e) => handleInputChange('jobTitle', e.target.value)}
                               className={validationErrors.includes('Job title is required') ? 'border-red-500' : ''}
+                              required
                             />
                           </div>
                           <div>
-                            <FloatingLabelInput
+                            <CaptureInput
                               label="Company Name *"
-                              id="companyName"
                               placeholder="e.g., TechCorp"
                               value={formData.companyName}
                               onChange={(e) => handleInputChange('companyName', e.target.value)}
                               className={validationErrors.includes('Company name is required') ? 'border-red-500' : ''}
+                              required
                             />
                           </div>
                         </div>
 
                         <div>
-                          <FloatingLabelTextarea
-                            label="Job Description *"
-                            id="jobDescription"
+                          <CaptureTextarea
+                            label="Job Description"
                             placeholder="Paste the complete job description here for the most tailored results..."
+                            description="Job description is required for optimal cover letter generation"
                             value={formData.jobDescription}
                             onChange={(e) => handleInputChange('jobDescription', e.target.value)}
                             rows={6}
                             className={validationErrors.includes('Job description is required') ? 'border-red-500' : ''}
                           />
-                          <p className="text-sm font-normal text-blueberry/70 dark:text-apple-core/70 mt-1">
-                            Job description is required for optimal cover letter generation
-                          </p>
                         </div>
                       </CardContent>
                     </Card>
@@ -670,32 +791,145 @@ const AuthenticatedCoverLetter = () => {
                             <Clock className="h-4 w-4" />
                             Generated {formatDate(selectedCoverLetter.created_at)}
                           </div>
-                          {selectedCoverLetter.regeneration_count > 0 && (
-                            <Badge variant="outline" className="text-xs">
-                              Iteration {selectedCoverLetter.regeneration_count + 1}
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="text-xs font-medium">
+                              Version {selectedCoverLetter.regeneration_count + 1}
                             </Badge>
-                          )}
+                            {selectedCoverLetter.regeneration_count > 0 && (
+                              <span className="text-xs text-gray-500">
+                                (Last updated {formatDate(selectedCoverLetter.updated_at || selectedCoverLetter.created_at)})
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-4 pt-0">
-                      <div className="flex items-center justify-end">
-                        <DownloadOptions
-                          content={selectedCoverLetter.content}
-                          fileName={`Cover_Letter_${selectedCoverLetter.company_name}_${selectedCoverLetter.job_title}`}
-                          triggerComponent={
-                            <div className="flex items-center text-sm text-gray-600 hover:text-zapier-orange transition-colors cursor-pointer">
-                              <Download className="h-4 w-4 mr-1" />
-                              Download
-                            </div>
-                          }
+                      {/* Cover Letter Content Display */}
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-lg font-semibold">Cover Letter Content</h3>
+                          <DownloadOptions 
+                            content={selectedCoverLetter.content}
+                            fileName={`${selectedCoverLetter.company_name}_${selectedCoverLetter.job_title}_Cover_Letter`}
+                            triggerComponent={
+                              <Button variant="outline" size="sm" className="gap-2">
+                                <Download className="h-4 w-4" />
+                                Download
+                              </Button>
+                            }
+                          />
+                        </div>
+                        <RichTextEditor
+                          initialContent={(() => {
+                            console.log('[CoverLetter] Processing content for RTE:', {
+                              contentType: typeof selectedCoverLetter.content,
+                              contentLength: selectedCoverLetter.content?.length,
+                              isJSON: selectedCoverLetter.content?.startsWith('{'),
+                              preview: selectedCoverLetter.content?.substring(0, 100)
+                            });
+
+                            try {
+                              // First check if content is already valid JSON
+                              try {
+                                const jsonData = JSON.parse(selectedCoverLetter.content);
+                                if (jsonData.sections && Array.isArray(jsonData.sections)) {
+                                  console.log('[CoverLetter] Content is valid DocumentJson, returning as-is');
+                                  return jsonData;
+                                }
+                              } catch (jsonError) {
+                                console.log('[CoverLetter] Content is not JSON, processing as HTML/text');
+                              }
+                              
+                              // Check if content looks like HTML with entities that need decoding
+                              if (selectedCoverLetter.content.includes('&lt;') || selectedCoverLetter.content.includes('&gt;')) {
+                                console.log('[CoverLetter] Content has HTML entities, decoding...');
+                                
+                                // Decode HTML entities properly
+                                const tempDiv = document.createElement('div');
+                                tempDiv.innerHTML = selectedCoverLetter.content;
+                                const decodedHtml = tempDiv.innerHTML;
+                                
+                                console.log('[CoverLetter] Decoded HTML:', {
+                                  original: selectedCoverLetter.content.substring(0, 100),
+                                  decoded: decodedHtml.substring(0, 100)
+                                });
+                                
+                                // Return the decoded HTML directly - let RichTextEditor handle conversion
+                                return decodedHtml;
+                              }
+                              
+                              // If it's HTML content, clean it but keep as HTML for the editor
+                              if (selectedCoverLetter.content.includes('<p>') || selectedCoverLetter.content.includes('<h')) {
+                                console.log('[CoverLetter] Content is HTML, cleaning formatting');
+                                // Clean any double asterisks from HTML content
+                                let cleanedHtml = selectedCoverLetter.content
+                                  .replace(/\*\*([^*]+)\*\*/g, '$1')  // Remove markdown bold
+                                  .replace(/\*\*/g, '');             // Remove any remaining double asterisks
+                                return cleanedHtml;
+                              }
+                              
+                              // If it's plain text, clean and return as-is
+                              console.log('[CoverLetter] Content appears to be plain text, cleaning formatting');
+                              let cleanedText = selectedCoverLetter.content || '<p>Your cover letter content will appear here...</p>';
+                              cleanedText = cleanedText
+                                .replace(/\*\*([^*]+)\*\*/g, '$1')  // Remove markdown bold
+                                .replace(/\*\*/g, '');             // Remove any remaining double asterisks
+                              return cleanedText;
+                              
+                            } catch (error) {
+                              console.error('[CoverLetter] Error processing content for RTE:', error);
+                              return '<p>Error loading content. Please try refreshing the page.</p>';
+                            }
+                          })()}
+                          onContentChange={async (json, text) => {
+                            if (selectedCoverLetter && user) {
+                              // Convert back to HTML for storage
+                              const htmlContent = json.sections.map(section => {
+                                let html = section.content || '';
+                                if (section.formatting?.bold) {
+                                  html = `<strong>${html}</strong>`;
+                                }
+                                return `<p>${html}</p>`;
+                              }).join('');
+                              
+                              // Update local state
+                              setSelectedCoverLetter({
+                                ...selectedCoverLetter,
+                                content: htmlContent
+                              });
+
+                              // Auto-save to database with debouncing
+                              try {
+                                const { error } = await supabase
+                                  .from('cover_letters')
+                                  .update({ 
+                                    content: htmlContent
+                                  })
+                                  .eq('id', selectedCoverLetter.id)
+                                  .eq('user_id', user.id);
+                                
+                                if (error) {
+                                  console.error('Auto-save failed:', error);
+                                } else {
+                                  // Update timestamp
+                                  setSelectedCoverLetter(prev => ({
+                                    ...prev,
+                                    content: htmlContent,
+                                    updated_at: new Date().toISOString()
+                                  }));
+                                }
+                              } catch (error) {
+                                console.error('Auto-save error:', error);
+                              }
+                            }
+                          }}
+                          showAIFeatures={true}
+                          enableAutoSave={true}
+                          className="min-h-[400px]"
+                          placeholder="Start writing your cover letter..."
                         />
                       </div>
-
-                      <EditableCoverLetter
-                        content={selectedCoverLetter.content}
-                        onSave={handleUpdateCoverLetter}
-                      />
                       
                       <div className="flex items-start justify-between pt-4 border-t">
                         <div className="flex items-center space-x-4">
@@ -703,8 +937,8 @@ const AuthenticatedCoverLetter = () => {
                             value={formData.tone}
                             onValueChange={(value) => handleInputChange('tone', value)}
                           >
-                            <SelectTrigger className="w-32">
-                              <SelectValue />
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select tone" />
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="professional">Professional</SelectItem>
@@ -719,8 +953,8 @@ const AuthenticatedCoverLetter = () => {
                             value={formData.length}
                             onValueChange={(value) => handleInputChange('length', value)}
                           >
-                            <SelectTrigger className="w-48">
-                              <SelectValue />
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select length" />
                             </SelectTrigger>
                             <SelectContent>
                               {lengthOptions.map((option) => (
@@ -781,172 +1015,222 @@ const AuthenticatedCoverLetter = () => {
               </TabsContent>
 
               <TabsContent value="history" className="mt-6">
-                <Card className="border-0 shadow-none bg-transparent">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-xl font-semibold">Saved Cover Letters</CardTitle>
-                      {allCoverLetters.length > 0 && (
-                        <div className="flex items-center space-x-2">
-                          <span className="text-sm text-gray-600">Show:</span>
-                          <Select value={itemsPerPage.toString()} onValueChange={(value) => setItemsPerPage(Number(value))}>
-                            <SelectTrigger className="w-20">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="10">10</SelectItem>
-                              <SelectItem value="20">20</SelectItem>
-                              <SelectItem value="30">30</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <span className="text-sm text-gray-600">per page</span>
-                        </div>
-                      )}
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    {loadingHistory ? (
-                      <div className="text-center py-8 font-normal">Loading...</div>
-                    ) : allCoverLetters.length === 0 ? (
-                      <div className="text-center py-8">
-                        <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                        <p className="text-gray-600 dark:text-gray-400 font-normal">
-                          No cover letters created yet.
-                        </p>
-                      </div>
-                    ) : (
-                      <>
-                        <div className="space-y-4">
-                          {paginatedCoverLetters.map((coverLetter) => (
-                            <div
-                              key={coverLetter.id}
-                              className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow hover:border-zapier-orange/50 relative"
-                            >
-                              <div className="flex justify-between items-start">
-                                <div className="flex-1 pr-4">
-                                  <div className="flex items-center space-x-3 mb-2">
-                                    <h3 className="text-lg font-medium text-gray-900">
-                                      {coverLetter.job_title} at {coverLetter.company_name}
-                                    </h3>
-                                    <button
-                                      onClick={() => {
-                                        setEditingCoverLetter(coverLetter);
-                                        setIsEditDialogOpen(true);
-                                      }}
-                                      className="text-gray-400 hover:text-zapier-orange transition-colors"
-                                      title="Edit title"
-                                    >
-                                      <Edit2 className="h-3 w-3" />
-                                    </button>
-                                    {coverLetter.regeneration_count > 0 && (
-                                      <Badge variant="outline" className="text-xs">
-                                        v{coverLetter.regeneration_count + 1}
-                                      </Badge>
-                                    )}
-                                   </div>
-                                   
-                                   {/* Date/time stamp moved under title */}
-                                   <div className="flex items-center text-sm text-gray-600 mb-3">
-                                     <Clock className="h-4 w-4 mr-1" />
-                                     <span>Updated {formatDate(coverLetter.updated_at)}</span>
-                                   </div>
-                                 </div>
-                               </div>
-                               
-                               {/* Action buttons row at bottom */}
-                              <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-100">
-                                <div className="flex items-center space-x-3">
-                                  <button
-                                    onClick={() => handleViewCoverLetter(coverLetter)}
-                                    className="flex items-center px-2 py-1 text-xs text-black hover:text-zapier-orange transition-colors"
-                                  >
-                                    <Eye className="h-3 w-3 mr-1" />
-                                    View
-                                  </button>
-                                  
-                                  {coverLetter.analysis_result_id && (
-                                    <button
-                                      onClick={() => handleViewCVAnalysis(coverLetter.analysis_result_id)}
-                                      className="flex items-center px-2 py-1 text-xs text-green-600 hover:text-green-700 hover:bg-green-50 rounded-md transition-colors"
-                                    >
-                                      <FileText className="h-3 w-3 mr-1" />
-                                      View CV Analysis
-                                    </button>
-                                  )}
-                                  
-                                  <DownloadOptions
-                                    content={coverLetter.content}
-                                    fileName={`Cover_Letter_${coverLetter.company_name}_${coverLetter.job_title}`}
-                                    triggerComponent={
-                                      <button className="flex items-center px-2 py-1 text-xs text-black hover:text-zapier-orange hover:bg-zapier-orange/10 rounded-md transition-colors">
-                                        <FileText className="h-3 w-3 mr-1" />
-                                        Download
-                                      </button>
-                                    }
-                                  />
-                                </div>
+                <CategoryDocumentHistory
+                  header={{
+                    title: "Cover Letter History",
+                    totalCount: allCoverLetters.length,
+                    itemsPerPage: itemsPerPage,
+                    onItemsPerPageChange: setItemsPerPage,
+                    showPagination: true,
+                    showFilter: false
+                  }}
+                  documents={paginatedCoverLetters.map(coverLetter => ({
+                    id: coverLetter.id,
+                    type: 'cover_letter' as const,
+                    title: `${coverLetter.job_title} at ${coverLetter.company_name}`,
+                    company_name: coverLetter.company_name,
+                    job_title: coverLetter.job_title,
+                    created_at: coverLetter.updated_at,
+                    regeneration_count: coverLetter.regeneration_count,
+                    content: coverLetter.content,
+                    analysis_result_id: coverLetter.analysis_result_id
+                  }))}
+                  loading={loadingHistory}
+                  onDocumentClick={handleViewCoverLetter}
+                  actions={[
+                    {
+                      label: 'View',
+                      icon: <Eye className="h-4 w-4 mr-2" />,
+                      onClick: handleViewCoverLetter
+                    },
+                    {
+                      label: 'Download',
+                      icon: <Download className="h-4 w-4 mr-2" />,
+                      onClick: (doc) => {
+                        // Create a dropdown menu similar to DownloadOptions
+                        const menu = document.createElement('div');
+                        menu.className = 'download-menu';
+                        menu.style.cssText = `
+                          position: fixed;
+                          background: white;
+                          border: 1px solid #e5e7eb;
+                          border-radius: 8px;
+                          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                          z-index: 9999;
+                          min-width: 200px;
+                          padding: 8px;
+                        `;
+                        
+                        // Position near the clicked button
+                        const rect = (event?.target as HTMLElement)?.getBoundingClientRect();
+                        if (rect) {
+                          menu.style.top = `${rect.bottom + 5}px`;
+                          menu.style.left = `${rect.left}px`;
+                        }
+                        
+                        const fileName = `${doc.company_name}_${doc.job_title}_Cover_Letter`;
+                        
+                        // Helper function to properly convert HTML content to clean text
+                        const convertHtmlToText = (htmlContent: string) => {
+                          // Create a temporary div to parse HTML
+                          const tempDiv = document.createElement('div');
+                          tempDiv.innerHTML = htmlContent;
+                          
+                          // Replace <br> tags with newlines before getting text content
+                          const brTags = tempDiv.querySelectorAll('br');
+                          brTags.forEach(br => {
+                            br.replaceWith('\n');
+                          });
+                          
+                          // Replace </p> tags with double newlines for paragraph breaks
+                          const pTags = tempDiv.querySelectorAll('p');
+                          pTags.forEach(p => {
+                            p.after('\n\n');
+                          });
+                          
+                          // Get clean text content
+                          let cleanText = tempDiv.textContent || tempDiv.innerText || '';
+                          
+                          // Clean up excessive whitespace and newlines
+                          cleanText = cleanText
+                            .replace(/\n\s*\n\s*\n/g, '\n\n') // Replace multiple newlines with double newlines
+                            .replace(/^\s+|\s+$/g, '') // Trim start and end
+                            .replace(/[ \t]+/g, ' '); // Replace multiple spaces/tabs with single space
+                          
+                          return cleanText;
+                        };
+                        
+                        const cleanedContent = convertHtmlToText(doc.content || '');
+                        
+                        // Create menu items
+                        const menuItems = [
+                          { label: '📄 Download as PDF', action: 'pdf' },
+                          { label: '📝 Download as Word', action: 'word' },
+                          { label: '📃 Download as Text', action: 'text' }
+                        ];
+                        
+                        menuItems.forEach(item => {
+                          const menuItem = document.createElement('button');
+                          menuItem.textContent = item.label;
+                          menuItem.style.cssText = `
+                            width: 100%;
+                            padding: 8px 12px;
+                            border: none;
+                            background: transparent;
+                            text-align: left;
+                            cursor: pointer;
+                            border-radius: 4px;
+                            font-size: 14px;
+                            display: block;
+                            margin-bottom: 4px;
+                          `;
+                          
+                          menuItem.addEventListener('mouseenter', () => {
+                            menuItem.style.backgroundColor = '#f3f4f6';
+                          });
+                          
+                          menuItem.addEventListener('mouseleave', () => {
+                            menuItem.style.backgroundColor = 'transparent';
+                          });
+                          
+                          menuItem.addEventListener('click', async () => {
+                            document.body.removeChild(menu);
+                            
+                            try {
+                              if (item.action === 'pdf') {
+                                const { default: jsPDF } = await import('jspdf');
+                                const pdf = new jsPDF();
+                                const splitText = pdf.splitTextToSize(cleanedContent, 180);
+                                pdf.text(splitText, 10, 10);
+                                pdf.save(`${fileName}.pdf`);
+                                toast({ title: 'Success', description: 'Cover letter downloaded as PDF' });
+                              } else if (item.action === 'word') {
+                                const { Document, Packer, Paragraph, TextRun } = await import('docx');
                                 
-                                {/* Delete button in bottom right */}
-                                <button
-                                  onClick={() => handleDelete(coverLetter.id)}
-                                  className="p-1 text-xs text-red-600 hover:text-zapier-orange transition-colors"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </button>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-
-                        {/* Pagination */}
-                        {totalPages > 1 && (
-                          <div className="mt-6 flex justify-center">
-                            <Pagination>
-                              <PaginationContent>
-                                <PaginationItem>
-                                  <PaginationPrevious 
-                                    href="#" 
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      if (currentPage > 1) setCurrentPage(currentPage - 1);
-                                    }}
-                                    className={`${currentPage <= 1 ? 'pointer-events-none opacity-50' : ''} text-sm font-normal`}
-                                  />
-                                </PaginationItem>
+                                // Split content into paragraphs for better Word formatting
+                                const paragraphs = cleanedContent.split('\n\n').filter(p => p.trim().length > 0);
+                                const docParagraphs = paragraphs.map(paragraph => 
+                                  new Paragraph({
+                                    children: [new TextRun(paragraph.trim())],
+                                    spacing: { after: 240 } // Add spacing between paragraphs
+                                  })
+                                );
                                 
-                                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                                  <PaginationItem key={page}>
-                                    <PaginationLink
-                                      href="#"
-                                      onClick={(e) => {
-                                        e.preventDefault();
-                                        setCurrentPage(page);
-                                      }}
-                                      isActive={currentPage === page}
-                                      className="text-sm font-normal"
-                                    >
-                                      {page}
-                                    </PaginationLink>
-                                  </PaginationItem>
-                                ))}
-                                
-                                <PaginationItem>
-                                  <PaginationNext 
-                                    href="#" 
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-                                    }}
-                                    className={`${currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''} text-sm font-normal`}
-                                  />
-                                </PaginationItem>
-                              </PaginationContent>
-                            </Pagination>
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </CardContent>
-                </Card>
+                                const doc = new Document({
+                                  sections: [{
+                                    properties: {
+                                      page: {
+                                        margin: {
+                                          top: 720,
+                                          right: 720,
+                                          bottom: 720,
+                                          left: 720,
+                                        },
+                                      },
+                                    },
+                                    children: docParagraphs,
+                                  }],
+                                });
+                                const blob = await Packer.toBlob(doc);
+                                const url = window.URL.createObjectURL(blob);
+                                const link = document.createElement('a');
+                                link.href = url;
+                                link.download = `${fileName}.docx`;
+                                link.click();
+                                window.URL.revokeObjectURL(url);
+                                toast({ title: 'Success', description: 'Cover letter downloaded as Word document' });
+                              } else if (item.action === 'text') {
+                                const blob = new Blob([cleanedContent], { type: 'text/plain' });
+                                const url = window.URL.createObjectURL(blob);
+                                const link = document.createElement('a');
+                                link.href = url;
+                                link.download = `${fileName}.txt`;
+                                link.click();
+                                window.URL.revokeObjectURL(url);
+                                toast({ title: 'Success', description: 'Cover letter downloaded as text file' });
+                              }
+                            } catch (error) {
+                              toast({ title: 'Error', description: 'Failed to download file', variant: 'destructive' });
+                            }
+                          });
+                          
+                          menu.appendChild(menuItem);
+                        });
+                        
+                        // Add to page
+                        document.body.appendChild(menu);
+                        
+                        // Remove on outside click
+                        const removeMenu = (e: Event) => {
+                          if (!menu.contains(e.target as Node)) {
+                            document.body.removeChild(menu);
+                            document.removeEventListener('click', removeMenu);
+                          }
+                        };
+                        
+                        // Delay to prevent immediate removal
+                        setTimeout(() => {
+                          document.addEventListener('click', removeMenu);
+                        }, 100);
+                      }
+                    },
+                    {
+                      label: 'Delete',
+                      icon: <Trash2 className="h-4 w-4 mr-2" />,
+                      onClick: (document) => handleDelete(document.id),
+                      variant: 'destructive'
+                    }
+                  ]}
+                  emptyState={{
+                    title: "No cover letters created yet",
+                    description: "You haven't created any cover letters yet."
+                  }}
+                  pagination={totalPages > 1 ? {
+                    currentPage: currentPage,
+                    totalPages: totalPages,
+                    onPageChange: setCurrentPage
+                  } : undefined}
+                />
               </TabsContent>
             </Tabs>
           </div>
@@ -986,9 +1270,6 @@ const AuthenticatedCoverLetter = () => {
           titleType="cover-letter"
         />
       </div>
-      
-      {/* Quick Actions */}
-      <QuickActions showBackForward={true} />
     </div>
   );
 };

@@ -8,7 +8,7 @@ const Footer = () => {
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
   return (
-    <footer className="bg-earth dark:bg-gray-900 text-white py-12">
+    <footer className="bg-footer text-white py-12">
       <div className="max-w-6xl mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1 md:col-span-2">
@@ -27,7 +27,7 @@ const Footer = () => {
               <Mail className="h-4 w-4 mr-2 text-white/80" />
               <button 
                 onClick={() => setIsContactModalOpen(true)}
-                className="text-white/80 hover:text-zapier-orange transition-colors cursor-pointer underline"
+                className="text-white/80 hover:text-primary transition-colors cursor-pointer underline"
               >
                 hello@tunemycv.com
               </button>
@@ -35,25 +35,25 @@ const Footer = () => {
           </div>
           
           <div>
-            <h3 className="font-semibold mb-4">Quick Links</h3>
+            <h3 className="font-semibold mb-4 text-white">Quick Links</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/analyze" className="text-white/80 hover:text-zapier-orange transition-colors">
+                <Link to="/analyze" className="text-white/80 hover:text-primary transition-colors">
                   Analyze CV
                 </Link>
               </li>
               <li>
-                <Link to="/cover-letter" className="text-white/80 hover:text-zapier-orange transition-colors">
+                <Link to="/cover-letter" className="text-white/80 hover:text-primary transition-colors">
                   Cover Letter
                 </Link>
               </li>
               <li>
-                <Link to="/resources" className="text-white/80 hover:text-zapier-orange transition-colors">
+                <Link to="/resources" className="text-white/80 hover:text-primary transition-colors">
                   Resources
                 </Link>
               </li>
               <li>
-                <Link to="/next-steps" className="text-white/80 hover:text-zapier-orange transition-colors">
+                <Link to="/next-steps" className="text-white/80 hover:text-primary transition-colors">
                   Next Steps
                 </Link>
               </li>
@@ -61,28 +61,28 @@ const Footer = () => {
           </div>
           
           <div>
-            <h3 className="font-semibold mb-4">Support</h3>
+            <h3 className="font-semibold mb-4 text-white">Support</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/help-centre" className="text-white/80 hover:text-zapier-orange transition-colors">
+                <Link to="/help-centre" className="text-white/80 hover:text-primary transition-colors">
                   Help Centre
                 </Link>
               </li>
               <li>
                 <button 
                   onClick={() => setIsContactModalOpen(true)}
-                  className="text-white/80 hover:text-zapier-orange transition-colors cursor-pointer"
+                  className="text-white/80 hover:text-primary transition-colors cursor-pointer"
                 >
                   Contact Us
                 </button>
               </li>
               <li>
-                <Link to="/privacy-policy" className="text-white/80 hover:text-zapier-orange transition-colors">
+                <Link to="/privacy-policy" className="text-white/80 hover:text-primary transition-colors">
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link to="/terms-of-service" className="text-white/80 hover:text-zapier-orange transition-colors">
+                <Link to="/terms-of-service" className="text-white/80 hover:text-primary transition-colors">
                   Terms of Service
                 </Link>
               </li>
@@ -91,8 +91,8 @@ const Footer = () => {
         </div>
         
         <div className="border-t border-white/20 mt-8 pt-8 text-center">
-          <p className="text-white/60">
-            © 2024 <span className="text-zapier-orange">Tune</span>MyCV. All rights reserved.
+          <p className="text-white/80">
+            © 2024 <span className="text-primary">Tune</span>MyCV. All rights reserved.
           </p>
         </div>
       </div>

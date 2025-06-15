@@ -12,6 +12,7 @@ interface DragDropZoneProps {
   children?: React.ReactNode;
   placeholder?: string;
   description?: string;
+  fileInputRef?: React.RefObject<HTMLInputElement>;
 }
 
 export const DragDropZone: React.FC<DragDropZoneProps> = ({
@@ -23,7 +24,8 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
   className,
   children,
   placeholder = "Click to upload or drag and drop files here",
-  description = "Supported file types"
+  description = "Supported file types",
+  fileInputRef
 }) => {
   const [isDragOver, setIsDragOver] = useState(false);
   const [dragError, setDragError] = useState<string | null>(null);
@@ -146,6 +148,7 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
       onDrop={handleDrop}
     >
       <input
+        ref={fileInputRef}
         type="file"
         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
         accept={accept}

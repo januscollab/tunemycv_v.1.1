@@ -1,7 +1,14 @@
-// Version: 2.1 - Force redeployment to activate naming fixes
+// Version: 2.2 - Security enhancements
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.8";
 import { generateUserUploadFileName } from "../shared/fileNaming.ts";
+import { 
+  validateInput, 
+  validateFileName,
+  logSecurityEvent, 
+  getSecureErrorResponse,
+  checkRateLimit 
+} from '../shared/security.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -35,9 +42,26 @@ const handler = async (req: Request): Promise<Response> => {
   );
 
   try {
-    console.log('Step 1: Parsing request body...');
-    const requestBody: SaveUploadRequest = await req.json();
+    console.log('Step 1: Parsing and validating request...');
+    const rawRequest = await req.json();
+    
+    // Security: Validate and sanitize request data
+    const requestBody: SaveUploadRequest = {
+      fileContent: validateInput(rawRequest.fileContent, 'file content', 100 * 1024 * 1024), // 100MB base64 limit
+      fileName: validateFileName(rawRequest.fileName),
+      fileType: validateInput(rawRequest.fileType, 'file type', 100),
+      uploadType: rawRequest.uploadType === 'cv' || rawRequest.uploadType === 'job_description' ? rawRequest.uploadType : (() => {
+        throw new Error('Invalid upload type')
+      })(),
+      userId: validateInput(rawRequest.userId, 'user ID', 100)
+    };
+    
     const { fileContent, fileName, fileType, uploadType, userId } = requestBody;
+    
+    // Security: Rate limiting (10 uploads per minute per user)
+    if (!checkRateLimit(userId, 10, 60000)) {
+      throw new Error('Rate limit exceeded')
+    }
     
     console.log(`Step 2: Processing ${uploadType} upload for user ${userId}, file: ${fileName}, type: ${fileType}`);
 
@@ -141,12 +165,29 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
   } catch (error: any) {
-    console.error('Save upload error:', error);
+    // Security: Log security events for suspicious activities
+    if (error.message === 'Rate limit exceeded') {
+      await logSecurityEvent(supabase, 'rate_limit_exceeded', {
+        endpoint: 'save-user-upload',
+        user_agent: req.headers.get('user-agent'),
+        user_id: rawRequest?.userId
+      }, rawRequest?.userId, 'warning')
+    } else if (error.message.includes('Invalid') && error.message.includes('content detected')) {
+      await logSecurityEvent(supabase, 'malicious_file_upload_detected', {
+        endpoint: 'save-user-upload',
+        error: error.message,
+        user_agent: req.headers.get('user-agent'),
+        user_id: rawRequest?.userId
+      }, rawRequest?.userId, 'high')
+    }
+    
+    const errorResponse = getSecureErrorResponse(error, 'save-user-upload')
+    
     return new Response(JSON.stringify({
       success: false,
-      error: error.message || 'Unknown error occurred'
+      error: errorResponse.message
     }), {
-      status: 500,
+      status: errorResponse.status,
       headers: { 'Content-Type': 'application/json', ...corsHeaders },
     });
   }
