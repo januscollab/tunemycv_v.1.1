@@ -924,10 +924,6 @@ const AuthenticatedCoverLetter = () => {
                           placeholder="Start writing your cover letter..."
                         />
                       </div>
-                          className="min-h-[400px]"
-                          placeholder="Start writing your cover letter..."
-                        />
-                      </div>
                       
                       <div className="flex items-start justify-between pt-4 border-t">
                         <div className="flex items-center space-x-4">
