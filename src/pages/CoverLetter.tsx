@@ -363,7 +363,7 @@ const AuthenticatedCoverLetter = () => {
   // Note: Window blur/unload handlers removed since View Letter tab no longer uses RTE
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5 py-6">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-primary/3 dark:from-primary/10 dark:via-background dark:to-primary/5 py-6">
       <div className="max-w-wider mx-auto px-4">
         <Breadcrumbs />
         <div className="mb-6">
@@ -447,10 +447,10 @@ const AuthenticatedCoverLetter = () => {
                   )}
 
                   {/* Panel 1: Generation Method Selection */}
-                  <Card className="border border-gray-200 dark:border-gray-700">
+                  <Card>
                     <CardHeader className="pb-3">
                       <CardTitle className="flex items-center text-xl font-semibold">
-                        <Sparkles className="h-5 w-5 text-zapier-orange mr-2" />
+                        <Sparkles className="h-5 w-5 text-primary mr-2" />
                         Generate Cover Letter
                       </CardTitle>
                     </CardHeader>
@@ -462,15 +462,15 @@ const AuthenticatedCoverLetter = () => {
                             onClick={() => setGenerationMethod('input')}
                             className={`p-4 border rounded-md text-left transition-colors ${
                               generationMethod === 'input'
-                                ? 'border-zapier-orange bg-zapier-orange/5'
-                                : 'border-gray-200 hover:border-zapier-orange/50'
+                                ? 'border-primary bg-primary/5'
+                                : 'border hover:border-primary/50'
                             }`}
                           >
                             <div className="flex items-center mb-2">
-                              <FileUp className="h-5 w-5 text-zapier-orange mr-2" />
+                              <FileUp className="h-5 w-5 text-primary mr-2" />
                               <span className="font-medium">Generate from Input</span>
                             </div>
-                            <p className="text-sm font-normal text-gray-600">
+                            <p className="text-caption text-muted-foreground">
                               Enter job details manually to create a cover letter
                             </p>
                           </button>
@@ -479,15 +479,15 @@ const AuthenticatedCoverLetter = () => {
                             onClick={() => setGenerationMethod('analysis')}
                             className={`p-4 border rounded-md text-left transition-colors ${
                               generationMethod === 'analysis'
-                                ? 'border-zapier-orange bg-zapier-orange/5'
-                                : 'border-gray-200 hover:border-zapier-orange/50'
+                                ? 'border-primary bg-primary/5'
+                                : 'border hover:border-primary/50'
                             }`}
                           >
                             <div className="flex items-center mb-2">
-                              <Search className="h-5 w-5 text-zapier-orange mr-2" />
+                              <Search className="h-5 w-5 text-primary mr-2" />
                               <span className="font-medium">Generate from Analysis</span>
                             </div>
-                            <p className="text-sm font-normal text-gray-600">
+                            <p className="text-caption text-muted-foreground">
                               Use your previous CV analysis results
                             </p>
                           </button>
@@ -498,7 +498,7 @@ const AuthenticatedCoverLetter = () => {
 
                   {/* Panel 2: Job Details (only shown for input method) */}
                   {generationMethod === 'input' && (
-                    <Card className="border border-gray-200 dark:border-gray-700">
+                    <Card>
                       <CardHeader className="pb-3">
                         <CardTitle className="text-xl font-semibold text-left">Job Details</CardTitle>
                       </CardHeader>
