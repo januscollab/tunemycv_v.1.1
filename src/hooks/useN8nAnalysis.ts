@@ -44,14 +44,29 @@ export const useN8nAnalysis = () => {
       }));
 
       console.log('Sending request to n8n webhook...');
+      console.log('FormData contents:', {
+        file1: cvBlob.size + ' bytes (CV)',
+        file2: jdBlob.size + ' bytes (JD)',
+        file_type_map: JSON.stringify({
+          file1: 'cv',
+          file2: 'jd'
+        })
+      });
       
       const response = await fetch('https://januscollab.app.n8n.cloud/webhook/document-intake', {
         method: 'POST',
         body: formData,
+        headers: {
+          // Don't set Content-Type for FormData, let browser set it
+        }
       });
 
+      console.log('n8n response status:', response.status, response.statusText);
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const responseText = await response.text();
+        console.error('n8n error response:', responseText);
+        throw new Error(`n8n HTTP error! status: ${response.status} - ${response.statusText}. Response: ${responseText}`);
       }
 
       const result = await response.json();

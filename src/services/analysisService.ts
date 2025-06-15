@@ -17,6 +17,8 @@ export const saveFilesToDatabase = async (
   options: SaveFilesOptions
 ) => {
   console.log('Saving files to database with options:', options);
+  console.log('CV will be saved:', options.saveCV);
+  console.log('Job Description will be saved:', options.saveJobDescription);
   
   // Ensure user is authenticated before proceeding
   const { data: { user } } = await supabase.auth.getUser();
@@ -157,7 +159,15 @@ export const saveAnalysisResults = async (analysisData: any) => {
     strengths: analysisData.strengths,
     weaknesses: analysisData.weaknesses,
     recommendations: analysisData.recommendations,
-    executive_summary: analysisData.executive_summary
+    executive_summary: analysisData.executive_summary,
+    // Add n8n-specific fields
+    analysis_type: analysisData.analysis_type || 'standard',
+    n8n_html_url: analysisData.n8n_html_url || null,
+    n8n_pdf_url: analysisData.n8n_pdf_url || null,
+    pdf_file_data: analysisData.pdf_file_data || null,
+    html_file_data: analysisData.html_file_data || null,
+    pdf_file_name: analysisData.pdf_file_name || null,
+    html_file_name: analysisData.html_file_name || null
   };
 
   const { data: analysisResult, error: analysisError } = await supabase
