@@ -991,6 +991,65 @@ const DesignSystem = () => {
                   </Card>
                 ))}
               </div>
+
+              {/* History Section Component */}
+              <div className="space-y-4">
+                <h3 className="text-heading font-semibold">History Section</h3>
+                <Card className="group hover:shadow-lg transition-all duration-300">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-subheading">History Section</CardTitle>
+                      <Badge variant="outline" className="text-micro">
+                        12 usages
+                      </Badge>
+                    </div>
+                    <p className="text-caption text-muted-foreground">
+                      Unified history component for analysis, cover letters, and CV management across the app - identical to existing History UI
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="bg-muted/30 p-4 rounded-lg">
+                      <HistorySection
+                        header={{
+                          title: "Saved Cover Letters",
+                          count: 1,
+                          countLabel: "cover letter",
+                          icon: <History className="h-5 w-5" />,
+                          actions: (
+                            <div className="flex items-center gap-2">
+                              <span className="text-caption text-muted-foreground">Show:</span>
+                              <select className="text-caption border rounded px-2 py-1 bg-background">
+                                <option>10</option>
+                              </select>
+                              <span className="text-caption text-muted-foreground">per page</span>
+                            </div>
+                          )
+                        }}
+                        items={[
+                          {
+                            id: "1",
+                            title: "Program Director at Oracle",
+                            date: "Updated 15/06/2025 at 00:02",
+                            actions: [
+                              {
+                                label: "View",
+                                variant: "outline",
+                                onClick: () => {}
+                              },
+                              {
+                                label: "Download", 
+                                variant: "outline",
+                                onClick: () => {}
+                              }
+                            ]
+                          }
+                        ]}
+                        variant="default"
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </section>
           </TabsContent>
 
