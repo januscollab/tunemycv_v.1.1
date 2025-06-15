@@ -24,7 +24,10 @@ export const useN8nAnalysis = () => {
     setIsProcessing(true);
     
     try {
+      console.log('=== N8N ANALYSIS DEBUG START ===');
       console.log('Submitting CV and JD JSON to n8n webhook...');
+      console.log('CV JSON length:', JSON.stringify(cvJson).length);
+      console.log('JD JSON length:', JSON.stringify(jobDescriptionJson).length);
       
       // Create JSON files as Blob objects
       const cvBlob = new Blob([JSON.stringify(cvJson, null, 2)], { 
@@ -33,6 +36,8 @@ export const useN8nAnalysis = () => {
       const jdBlob = new Blob([JSON.stringify(jobDescriptionJson, null, 2)], { 
         type: 'application/json' 
       });
+
+      console.log('Created blobs - CV:', cvBlob.size, 'bytes, JD:', jdBlob.size, 'bytes');
 
       // Create form data
       const formData = new FormData();
@@ -43,7 +48,7 @@ export const useN8nAnalysis = () => {
         file2: 'jd'
       }));
 
-      console.log('Sending request to n8n webhook...');
+      console.log('FormData created successfully');
       console.log('FormData contents:', {
         file1: cvBlob.size + ' bytes (CV)',
         file2: jdBlob.size + ' bytes (JD)',
@@ -52,21 +57,41 @@ export const useN8nAnalysis = () => {
           file2: 'jd'
         })
       });
+
+      // Test network connectivity first
+      console.log('Testing network connectivity...');
+      try {
+        const testResponse = await fetch('https://httpbin.org/get', { method: 'GET' });
+        console.log('Network test successful:', testResponse.status);
+      } catch (networkError) {
+        console.error('Network connectivity test failed:', networkError);
+        throw new Error('Network connectivity issue detected. Please check your internet connection.');
+      }
+      
+      console.log('Sending request to n8n webhook: https://januscollab.app.n8n.cloud/webhook/document-intake');
+      console.log('Request method: POST');
+      console.log('Request headers: FormData (auto-generated)');
       
       const response = await fetch('https://januscollab.app.n8n.cloud/webhook/document-intake', {
         method: 'POST',
         body: formData,
-        headers: {
-          // Don't set Content-Type for FormData, let browser set it
-        }
+        // No manual headers for FormData - let browser handle it
       });
 
-      console.log('n8n response status:', response.status, response.statusText);
+      console.log('n8n response received!');
+      console.log('Response status:', response.status);
+      console.log('Response statusText:', response.statusText);
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
 
       if (!response.ok) {
-        const responseText = await response.text();
-        console.error('n8n error response:', responseText);
-        throw new Error(`n8n HTTP error! status: ${response.status} - ${response.statusText}. Response: ${responseText}`);
+        let responseText = '';
+        try {
+          responseText = await response.text();
+          console.error('n8n error response body:', responseText);
+        } catch (textError) {
+          console.error('Could not read error response text:', textError);
+        }
+        throw new Error(`n8n HTTP error! Status: ${response.status} ${response.statusText}. Response: ${responseText}`);
       }
 
       const result = await response.json();
@@ -115,18 +140,41 @@ export const useN8nAnalysis = () => {
       }
 
     } catch (error) {
-      console.error('n8n analysis error:', error);
+      console.error('=== N8N ANALYSIS ERROR ===');
+      console.error('Error type:', error instanceof Error ? error.constructor.name : typeof error);
+      console.error('Error message:', error instanceof Error ? error.message : String(error));
+      console.error('Full error object:', error);
+      
+      // Provide more specific error messages based on error type
+      let userFriendlyMessage = "Sorry — something went wrong while processing your documents. Please try again, or contact support if the issue continues.";
+      let errorDetails = "";
+      
+      if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+        userFriendlyMessage = "Network connection failed. This could be due to internet connectivity issues or the n8n service being temporarily unavailable.";
+        errorDetails = "Network error: Failed to reach n8n webhook";
+      } else if (error instanceof Error && error.message.includes('Network connectivity issue')) {
+        userFriendlyMessage = "Internet connectivity issue detected. Please check your network connection and try again.";
+        errorDetails = error.message;
+      } else if (error instanceof Error && error.message.includes('CORS')) {
+        userFriendlyMessage = "Cross-origin request blocked. The n8n service may need to allow requests from this domain.";
+        errorDetails = "CORS policy error";
+      } else if (error instanceof Error) {
+        errorDetails = error.message;
+      }
+      
+      console.error('User-friendly message:', userFriendlyMessage);
+      console.error('Error details:', errorDetails);
       
       toast({
         title: "Processing Failed",
-        description: "Sorry — something went wrong while processing your documents. Please try again, or contact support if the issue continues.",
+        description: userFriendlyMessage,
         variant: "destructive"
       });
 
       return {
         success: false,
         message: 'Processing failed',
-        error: error instanceof Error ? error.message : 'Unknown error occurred'
+        error: errorDetails || (error instanceof Error ? error.message : 'Unknown error occurred')
       };
     } finally {
       setIsProcessing(false);
