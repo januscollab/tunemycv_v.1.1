@@ -43,11 +43,10 @@ export interface DocumentAction {
 interface CategoryDocumentHistoryHeaderProps {
   title: string;
   totalCount: number;
-  filterType: 'all' | 'analysis' | 'cover_letter';
-  onFilterChange: (filter: 'all' | 'analysis' | 'cover_letter') => void;
   itemsPerPage: number;
   onItemsPerPageChange: (count: number) => void;
   showPagination?: boolean;
+  showFilter?: boolean;
 }
 
 interface CategoryDocumentHistoryListProps {
@@ -79,11 +78,10 @@ interface CategoryDocumentHistoryProps extends CategoryDocumentHistoryListProps 
 export const CategoryDocumentHistoryHeader: React.FC<CategoryDocumentHistoryHeaderProps> = ({
   title,
   totalCount,
-  filterType,
-  onFilterChange,
   itemsPerPage,
   onItemsPerPageChange,
-  showPagination = true
+  showPagination = true,
+  showFilter = false
 }) => {
   return (
     <div className="flex items-center justify-between">
@@ -95,19 +93,21 @@ export const CategoryDocumentHistoryHeader: React.FC<CategoryDocumentHistoryHead
       </div>
       
       <div className="flex items-center space-x-4">
-        <div className="flex items-center space-x-2">
-          <span className="text-caption text-muted-foreground">Filter:</span>
-          <Select value={filterType} onValueChange={onFilterChange}>
-            <SelectTrigger className="w-40">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Documents</SelectItem>
-              <SelectItem value="analysis">CV Analysis</SelectItem>
-              <SelectItem value="cover_letter">Cover Letters</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        {showFilter && (
+          <div className="flex items-center space-x-2">
+            <span className="text-caption text-muted-foreground">Filter:</span>
+            <Select value="all" onValueChange={() => {}}>
+              <SelectTrigger className="w-40">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Documents</SelectItem>
+                <SelectItem value="analysis">CV Analysis</SelectItem>
+                <SelectItem value="cover_letter">Cover Letters</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
         
         {showPagination && totalCount > 0 && (
           <div className="flex items-center space-x-2">
@@ -175,7 +175,8 @@ export const CategoryDocumentHistoryItem: React.FC<{
           <div className="flex-1">
             <div className="flex items-center space-x-3 mb-2">
               <h3 className="text-heading font-medium text-foreground">
-                {document.job_title || document.title || 'Untitled'}
+                {document.title}
+                {document.company_name && ` - ${document.company_name}`}
               </h3>
               {getDocumentBadge()}
               <Button
@@ -193,7 +194,9 @@ export const CategoryDocumentHistoryItem: React.FC<{
             
             <div className="flex items-center space-x-4 text-caption text-muted-foreground mb-2">
               {document.type === 'cover_letter' && (
-                <span className="text-muted-foreground">Generated from CV analysis</span>
+                <span className="text-muted-foreground">
+                  {document.analysis_result_id ? 'Generated from CV analysis' : 'Generated from manual input'}
+                </span>
               )}
               <div className="flex items-center space-x-1">
                 <Calendar className="h-3 w-3" />

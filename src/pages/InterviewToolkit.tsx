@@ -616,11 +616,10 @@ const InterviewToolkit = () => {
                   header={{
                     title: "Interview Notes History",
                     totalCount: 0,
-                    filterType: 'all',
-                    onFilterChange: () => {},
                     itemsPerPage: 10,
                     onItemsPerPageChange: () => {},
-                    showPagination: false
+                    showPagination: false,
+                    showFilter: false
                   }}
                   documents={[]}
                   loading={false}

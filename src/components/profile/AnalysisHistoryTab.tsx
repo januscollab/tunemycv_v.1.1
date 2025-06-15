@@ -160,11 +160,10 @@ const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ credits, member
         header={{
           title: "Analysis History",
           totalCount: analyses.length,
-          filterType: 'analysis',
-          onFilterChange: () => {},
           itemsPerPage: itemsPerPage,
           onItemsPerPageChange: setItemsPerPage,
-          showPagination: true
+          showPagination: true,
+          showFilter: true
         }}
         documents={paginatedAnalyses.map(analysis => ({
           id: analysis.id,

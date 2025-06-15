@@ -328,11 +328,10 @@ const DesignSystem = () => {
             header={{
               title: "Document History",
               totalCount: 3,
-              filterType: 'all',
-              onFilterChange: () => {},
               itemsPerPage: 10,
               onItemsPerPageChange: () => {},
-              showPagination: true
+              showPagination: true,
+              showFilter: true
             }}
             documents={[
               {
