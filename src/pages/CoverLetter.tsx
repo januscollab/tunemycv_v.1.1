@@ -808,6 +808,10 @@ const AuthenticatedCoverLetter = () => {
                       <div className="space-y-4">
                         <div className="flex items-center justify-between">
                           <h3 className="text-lg font-semibold">Cover Letter Content</h3>
+                          <DownloadOptions 
+                            content={selectedCoverLetter.content}
+                            fileName={`${selectedCoverLetter.company_name}_${selectedCoverLetter.job_title}_Cover_Letter`}
+                          />
                         </div>
                         <RichTextEditor
                           value={(() => {
@@ -997,59 +1001,129 @@ const AuthenticatedCoverLetter = () => {
                       label: 'Download',
                       icon: <Download className="h-4 w-4 mr-2" />,
                       onClick: (doc) => {
-                        // Create a temporary container to render DownloadOptions dropdown
-                        const container = document.createElement('div');
-                        container.className = 'download-options-container';
-                        container.style.position = 'fixed';
-                        container.style.zIndex = '9999';
+                        // Create a dropdown menu similar to DownloadOptions
+                        const menu = document.createElement('div');
+                        menu.className = 'download-menu';
+                        menu.style.cssText = `
+                          position: fixed;
+                          background: white;
+                          border: 1px solid #e5e7eb;
+                          border-radius: 8px;
+                          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                          z-index: 9999;
+                          min-width: 200px;
+                          padding: 8px;
+                        `;
                         
-                        // Position the container near the clicked button
-                        const clickEvent = event as MouseEvent;
-                        const rect = (clickEvent.target as Element).getBoundingClientRect();
-                        container.style.top = `${rect.bottom + 5}px`;
-                        container.style.left = `${rect.left}px`;
+                        // Position near the clicked button
+                        const rect = (event?.target as HTMLElement)?.getBoundingClientRect();
+                        if (rect) {
+                          menu.style.top = `${rect.bottom + 5}px`;
+                          menu.style.left = `${rect.left}px`;
+                        }
                         
-                        // Import React and render DownloadOptions
-                        import('react-dom/client').then(({ createRoot }) => {
-                          const root = createRoot(container);
-                          const fileName = `${doc.company_name}_${doc.job_title}_Cover_Letter`;
+                        const fileName = `${doc.company_name}_${doc.job_title}_Cover_Letter`;
+                        
+                        // Helper function to clean HTML content
+                        const cleanContent = (htmlContent: string) => {
+                          const tempDiv = document.createElement('div');
+                          tempDiv.innerHTML = htmlContent;
+                          return tempDiv.textContent || tempDiv.innerText || '';
+                        };
+                        
+                        const cleanedContent = cleanContent(doc.content || '');
+                        
+                        // Create menu items
+                        const menuItems = [
+                          { label: '📄 Download as PDF', action: 'pdf' },
+                          { label: '📝 Download as Word', action: 'word' },
+                          { label: '📃 Download as Text', action: 'text' }
+                        ];
+                        
+                        menuItems.forEach(item => {
+                          const menuItem = document.createElement('button');
+                          menuItem.textContent = item.label;
+                          menuItem.style.cssText = `
+                            width: 100%;
+                            padding: 8px 12px;
+                            border: none;
+                            background: transparent;
+                            text-align: left;
+                            cursor: pointer;
+                            border-radius: 4px;
+                            font-size: 14px;
+                            display: block;
+                            margin-bottom: 4px;
+                          `;
                           
-                          // Create a trigger button that auto-clicks to open the dropdown
-                          const TriggerWrapper = () => {
-                            const triggerRef = React.useRef<HTMLButtonElement>(null);
+                          menuItem.addEventListener('mouseenter', () => {
+                            menuItem.style.backgroundColor = '#f3f4f6';
+                          });
+                          
+                          menuItem.addEventListener('mouseleave', () => {
+                            menuItem.style.backgroundColor = 'transparent';
+                          });
+                          
+                          menuItem.addEventListener('click', async () => {
+                            document.body.removeChild(menu);
                             
-                            React.useEffect(() => {
-                              // Auto-click the trigger to open the dropdown
-                              setTimeout(() => {
-                                triggerRef.current?.click();
-                              }, 10);
-                            }, []);
-                            
-                            return React.createElement(DownloadOptions, {
-                              content: doc.content,
-                              fileName: fileName,
-                              triggerComponent: React.createElement('button', {
-                                ref: triggerRef,
-                                style: { opacity: 0, position: 'absolute', pointerEvents: 'none' }
-                              }, 'Download')
-                            });
-                          };
-                          
-                          root.render(React.createElement(TriggerWrapper));
-                          document.body.appendChild(container);
-                          
-                          // Clean up when user clicks elsewhere
-                          const cleanup = () => {
-                            if (document.body.contains(container)) {
-                              root.unmount();
-                              document.body.removeChild(container);
+                            try {
+                              if (item.action === 'pdf') {
+                                const { default: jsPDF } = await import('jspdf');
+                                const pdf = new jsPDF();
+                                const splitText = pdf.splitTextToSize(cleanedContent, 180);
+                                pdf.text(splitText, 10, 10);
+                                pdf.save(`${fileName}.pdf`);
+                                toast({ title: 'Success', description: 'Cover letter downloaded as PDF' });
+                              } else if (item.action === 'word') {
+                                const { Document, Packer, Paragraph, TextRun } = await import('docx');
+                                const doc = new Document({
+                                  sections: [{
+                                    properties: {},
+                                    children: [new Paragraph({ children: [new TextRun(cleanedContent)] })],
+                                  }],
+                                });
+                                const blob = await Packer.toBlob(doc);
+                                const url = window.URL.createObjectURL(blob);
+                                const link = document.createElement('a');
+                                link.href = url;
+                                link.download = `${fileName}.docx`;
+                                link.click();
+                                window.URL.revokeObjectURL(url);
+                                toast({ title: 'Success', description: 'Cover letter downloaded as Word document' });
+                              } else if (item.action === 'text') {
+                                const blob = new Blob([cleanedContent], { type: 'text/plain' });
+                                const url = window.URL.createObjectURL(blob);
+                                const link = document.createElement('a');
+                                link.href = url;
+                                link.download = `${fileName}.txt`;
+                                link.click();
+                                window.URL.revokeObjectURL(url);
+                                toast({ title: 'Success', description: 'Cover letter downloaded as text file' });
+                              }
+                            } catch (error) {
+                              toast({ title: 'Error', description: 'Failed to download file', variant: 'destructive' });
                             }
-                          };
+                          });
                           
-                          // Auto cleanup after 30 seconds or on outside click
-                          setTimeout(cleanup, 30000);
-                          document.addEventListener('click', cleanup, { once: true });
+                          menu.appendChild(menuItem);
                         });
+                        
+                        // Add to page
+                        document.body.appendChild(menu);
+                        
+                        // Remove on outside click
+                        const removeMenu = (e: Event) => {
+                          if (!menu.contains(e.target as Node)) {
+                            document.body.removeChild(menu);
+                            document.removeEventListener('click', removeMenu);
+                          }
+                        };
+                        
+                        // Delay to prevent immediate removal
+                        setTimeout(() => {
+                          document.addEventListener('click', removeMenu);
+                        }, 100);
                       }
                     },
                     {
