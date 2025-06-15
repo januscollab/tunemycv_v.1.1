@@ -187,9 +187,15 @@ const AuthenticatedCoverLetter = () => {
   const loadCoverLetterHistory = async () => {
     setLoadingHistory(true);
     try {
-      const data = await getCoverLetters();
-      setAllCoverLetters(data);
-      setCoverLetters(data); // For backward compatibility
+      const { data, error } = await supabase
+        .from('cover_letters')
+        .select('*')
+        .eq('user_id', user?.id)
+        .order('updated_at', { ascending: false }); // Latest first
+      
+      if (error) throw error;
+      setAllCoverLetters(data || []);
+      setCoverLetters(data || []); // For backward compatibility
     } catch (error) {
       console.error('Failed to load cover letter history:', error);
     } finally {
@@ -874,100 +880,97 @@ const AuthenticatedCoverLetter = () => {
                     {
                       label: 'Download',
                       icon: <Download className="h-4 w-4 mr-2" />,
-                      onClick: (doc) => {
-                        // Use DownloadOptions component functionality inline
+                      onClick: async (doc) => {
                         const fileName = `${doc.company_name}_${doc.job_title}_Cover_Letter`;
-                        
-                        // Create a temporary container for DownloadOptions
-                        const container = document.createElement('div');
-                        container.style.position = 'fixed';
-                        container.style.top = '50%';
-                        container.style.left = '50%';
-                        container.style.transform = 'translate(-50%, -50%)';
-                        container.style.zIndex = '9999';
-                        container.style.backgroundColor = 'white';
-                        container.style.padding = '20px';
-                        container.style.borderRadius = '8px';
-                        container.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
-                        container.style.border = '1px solid #e5e7eb';
-                        
-                        const overlay = document.createElement('div');
-                        overlay.style.position = 'fixed';
-                        overlay.style.top = '0';
-                        overlay.style.left = '0';
-                        overlay.style.right = '0';
-                        overlay.style.bottom = '0';
-                        overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-                        overlay.style.zIndex = '9998';
-                        
-                        container.innerHTML = `
-                          <h3 style="margin: 0 0 16px 0; font-size: 18px; font-weight: 600;">Download Cover Letter</h3>
-                          <p style="margin: 0 0 16px 0; color: #666;">Choose your preferred format:</p>
-                          <div style="display: flex; flex-direction: column; gap: 8px;">
-                            <button id="download-pdf" style="padding: 8px 16px; border: 1px solid #ddd; border-radius: 4px; background: white; cursor: pointer; text-align: left;">📄 Download as PDF</button>
-                            <button id="download-word" style="padding: 8px 16px; border: 1px solid #ddd; border-radius: 4px; background: white; cursor: pointer; text-align: left;">📝 Download as Word</button>
-                            <button id="download-text" style="padding: 8px 16px; border: 1px solid #ddd; border-radius: 4px; background: white; cursor: pointer; text-align: left;">📃 Download as Text</button>
-                            <button id="download-cancel" style="padding: 8px 16px; border: 1px solid #ddd; border-radius: 4px; background: #f5f5f5; cursor: pointer; margin-top: 8px; text-align: center;">Cancel</button>
-                          </div>
-                        `;
-                        
-                        document.body.appendChild(overlay);
-                        document.body.appendChild(container);
-                        
                         const content = doc.content || '';
                         
+                        // Create dropdown menu
+                        const modal = document.createElement('div');
+                        modal.style.position = 'fixed';
+                        modal.style.top = '0';
+                        modal.style.left = '0';
+                        modal.style.right = '0';
+                        modal.style.bottom = '0';
+                        modal.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+                        modal.style.zIndex = '9999';
+                        modal.style.display = 'flex';
+                        modal.style.alignItems = 'center';
+                        modal.style.justifyContent = 'center';
+                        
+                        const menu = document.createElement('div');
+                        menu.style.backgroundColor = 'white';
+                        menu.style.borderRadius = '8px';
+                        menu.style.padding = '12px';
+                        menu.style.minWidth = '200px';
+                        menu.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+                        menu.innerHTML = `
+                          <div style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; font-weight: 600; margin-bottom: 8px;">Download Cover Letter</div>
+                          <button id="download-pdf" style="width: 100%; padding: 8px 12px; border: none; background: white; text-align: left; cursor: pointer; border-radius: 4px; display: flex; align-items: center;" onmouseover="this.style.backgroundColor='#f3f4f6'" onmouseout="this.style.backgroundColor='white'">📄 <span style="margin-left: 8px;">Download as PDF</span></button>
+                          <button id="download-word" style="width: 100%; padding: 8px 12px; border: none; background: white; text-align: left; cursor: pointer; border-radius: 4px; display: flex; align-items: center;" onmouseover="this.style.backgroundColor='#f3f4f6'" onmouseout="this.style.backgroundColor='white'">📝 <span style="margin-left: 8px;">Download as Word</span></button>
+                          <button id="download-text" style="width: 100%; padding: 8px 12px; border: none; background: white; text-align: left; cursor: pointer; border-radius: 4px; display: flex; align-items: center;" onmouseover="this.style.backgroundColor='#f3f4f6'" onmouseout="this.style.backgroundColor='white'">📃 <span style="margin-left: 8px;">Download as Text</span></button>
+                        `;
+                        
+                        modal.appendChild(menu);
+                        document.body.appendChild(modal);
+                        
+                        // Handle downloads with exact same logic as DownloadOptions
                         document.getElementById('download-pdf')?.addEventListener('click', async () => {
-                          const { default: jsPDF } = await import('jspdf');
-                          const pdf = new jsPDF();
-                          const splitText = pdf.splitTextToSize(content, 180);
-                          pdf.text(splitText, 10, 10);
-                          pdf.save(`${fileName}.pdf`);
-                          document.body.removeChild(container);
-                          document.body.removeChild(overlay);
-                          toast({ title: 'Success', description: 'PDF downloaded successfully' });
+                          try {
+                            const { default: jsPDF } = await import('jspdf');
+                            const pdf = new jsPDF();
+                            const splitText = pdf.splitTextToSize(content, 180);
+                            pdf.text(splitText, 10, 10);
+                            pdf.save(`${fileName}.pdf`);
+                            toast({ title: 'Success', description: 'Cover letter downloaded as PDF' });
+                          } catch (error) {
+                            toast({ title: 'Error', description: 'Failed to download PDF', variant: 'destructive' });
+                          }
+                          document.body.removeChild(modal);
                         });
                         
                         document.getElementById('download-word')?.addEventListener('click', async () => {
-                          const { Document, Packer, Paragraph, TextRun } = await import('docx');
-                          const docx = new Document({
-                            sections: [{
-                              properties: {},
-                              children: [new Paragraph({ children: [new TextRun(content)] })],
-                            }],
-                          });
-                          const blob = await Packer.toBlob(docx);
-                          const url = URL.createObjectURL(blob);
-                          const link = document.createElement('a');
-                          link.href = url;
-                          link.download = `${fileName}.docx`;
-                          link.click();
-                          URL.revokeObjectURL(url);
-                          document.body.removeChild(container);
-                          document.body.removeChild(overlay);
-                          toast({ title: 'Success', description: 'Word document downloaded successfully' });
+                          try {
+                            const { Document, Packer, Paragraph, TextRun } = await import('docx');
+                            const docx = new Document({
+                              sections: [{
+                                properties: {},
+                                children: [new Paragraph({ children: [new TextRun(content)] })],
+                              }],
+                            });
+                            const blob = await Packer.toBlob(docx);
+                            const url = URL.createObjectURL(blob);
+                            const link = document.createElement('a');
+                            link.href = url;
+                            link.download = `${fileName}.docx`;
+                            link.click();
+                            URL.revokeObjectURL(url);
+                            toast({ title: 'Success', description: 'Cover letter downloaded as Word document' });
+                          } catch (error) {
+                            toast({ title: 'Error', description: 'Failed to download Word document', variant: 'destructive' });
+                          }
+                          document.body.removeChild(modal);
                         });
                         
                         document.getElementById('download-text')?.addEventListener('click', () => {
-                          const blob = new Blob([content], { type: 'text/plain' });
-                          const url = URL.createObjectURL(blob);
-                          const link = document.createElement('a');
-                          link.href = url;
-                          link.download = `${fileName}.txt`;
-                          link.click();
-                          URL.revokeObjectURL(url);
-                          document.body.removeChild(container);
-                          document.body.removeChild(overlay);
-                          toast({ title: 'Success', description: 'Text file downloaded successfully' });
+                          try {
+                            const blob = new Blob([content], { type: 'text/plain' });
+                            const url = URL.createObjectURL(blob);
+                            const link = document.createElement('a');
+                            link.href = url;
+                            link.download = `${fileName}.txt`;
+                            link.click();
+                            URL.revokeObjectURL(url);
+                            toast({ title: 'Success', description: 'Cover letter downloaded as text file' });
+                          } catch (error) {
+                            toast({ title: 'Error', description: 'Failed to download text file', variant: 'destructive' });
+                          }
+                          document.body.removeChild(modal);
                         });
                         
-                        document.getElementById('download-cancel')?.addEventListener('click', () => {
-                          document.body.removeChild(container);
-                          document.body.removeChild(overlay);
-                        });
-                        
-                        overlay.addEventListener('click', () => {
-                          document.body.removeChild(container);
-                          document.body.removeChild(overlay);
+                        modal.addEventListener('click', (e) => {
+                          if (e.target === modal) {
+                            document.body.removeChild(modal);
+                          }
                         });
                       }
                     },
