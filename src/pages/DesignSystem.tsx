@@ -1129,7 +1129,7 @@ const DesignSystem = () => {
                       </Badge>
                     </div>
                     <p className="text-caption text-muted-foreground">
-                      Specialized document history component for profile page with filtering, pagination, and advanced actions
+                      Specialized document history component for profile page with filtering, pagination, and dynamic per-document actions
                     </p>
                   </CardHeader>
                   <CardContent>
