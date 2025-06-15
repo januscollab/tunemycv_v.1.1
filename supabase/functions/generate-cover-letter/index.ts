@@ -144,10 +144,12 @@ serve(async (req) => {
     IMPORTANT FORMATTING:
     - Include company name and address if available
     - Add a blank line, then "Dear Hiring Manager," (ensure there's a space after the company section)
-    - Write the cover letter body with proper paragraphs
+    - Write the cover letter body with proper paragraphs separated by blank lines
+    - Each paragraph should be on its own line with a blank line between paragraphs
     - End with "Sincerely," followed by a blank line
     - Include the contact information footer with all available details: ${contactHeader || 'Use the contact information provided above'}
     - Do NOT include the candidate's name in the signature area unless it's already in the contact footer
+    - Ensure proper line spacing throughout the document
 
     PLACEHOLDER RULES:
     - Replace [Your Name] with actual name if available: ${contactDetails.name || '[Your Name]'}
