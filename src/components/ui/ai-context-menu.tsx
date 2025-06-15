@@ -80,7 +80,7 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
         <ContextMenuTrigger asChild>
           {children}
         </ContextMenuTrigger>
-        <ContextMenuContent className="w-56 bg-popover border-popover-border shadow-lg">
+        <ContextMenuContent className="w-56 bg-popover border-popover-border shadow-lg animate-fade-in">
           {/* Primary Level Menu - Most Common Actions */}
           <ContextMenuSub>
             <ContextMenuSubTrigger 
@@ -90,7 +90,7 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
               <WandSparkles className="h-4 w-4" />
               ✍️ Rephrase
             </ContextMenuSubTrigger>
-            <ContextMenuSubContent className="w-64 bg-popover border-popover-border shadow-lg">
+            <ContextMenuSubContent className="w-64 bg-popover border-popover-border shadow-lg animate-scale-in">
               <ContextMenuItem 
                 onClick={() => handleAIAction('rephrase', 'professional', '🧠 More Professional', 'Transform text to use formal, polished business language')}
                 className="flex items-center gap-2 text-caption cursor-pointer"
@@ -139,7 +139,7 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
               <ArrowUpDown className="h-4 w-4" />
               📏 Adjust Length
             </ContextMenuSubTrigger>
-            <ContextMenuSubContent className="w-64 bg-popover border-popover-border shadow-lg">
+            <ContextMenuSubContent className="w-64 bg-popover border-popover-border shadow-lg animate-scale-in">
               <ContextMenuItem 
                 onClick={() => handleAIAction('adjust_length', 'longer', '⬆️ Make Longer', 'Expand content with more detail')}
                 className="flex items-center gap-2 text-caption cursor-pointer"
