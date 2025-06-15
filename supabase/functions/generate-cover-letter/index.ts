@@ -80,15 +80,36 @@ serve(async (req) => {
       .eq('user_id', user.id)
       .single()
 
-    // Build contact header
+    // Build contact header with all available information
     let contactHeader = ''
+    let contactDetails = {
+      name: '',
+      phone: '',
+      email: '',
+      linkedin: '',
+      portfolio: ''
+    }
+
     if (profileData) {
+      // Build structured contact info
+      const name = profileData.first_name && profileData.last_name 
+        ? `${profileData.first_name} ${profileData.last_name}` 
+        : profileData.first_name || ''
+      
+      contactDetails.name = name
+      contactDetails.phone = profileData.phone_number || ''
+      contactDetails.email = profileData.email || ''
+      contactDetails.linkedin = (request.includeLinkedInUrl && profileData.linkedin_url) ? profileData.linkedin_url : ''
+      contactDetails.portfolio = profileData.personal_website_url || ''
+
+      // Build contact header for signature
       const parts = []
-      if (profileData.display_name) parts.push(profileData.display_name)
-      if (profileData.email) parts.push(profileData.email)
+      if (name) parts.push(name)
       if (profileData.phone_number) parts.push(profileData.phone_number)
+      if (profileData.email) parts.push(profileData.email)
       if (request.includeLinkedInUrl && profileData.linkedin_url) parts.push(profileData.linkedin_url)
-      if (profileData.location) parts.push(profileData.location)
+      if (profileData.personal_website_url) parts.push(profileData.personal_website_url)
+      
       contactHeader = parts.join(' | ')
     }
 
@@ -102,7 +123,7 @@ serve(async (req) => {
       lengthInstruction = 'Write a comprehensive cover letter (4-5 paragraphs, around 400-500 words).'
     }
 
-    // Build system prompt
+    // Build system prompt with contact information instructions
     const systemPrompt = `Write a professional cover letter that is engaging, specific, and tailored to the job requirements. 
     Use a confident but humble tone, highlight relevant achievements with specific examples, and show genuine interest in the company and role.
     Avoid generic phrases and focus on value proposition.
@@ -111,19 +132,33 @@ serve(async (req) => {
 
     Company: ${request.companyName}
 
+    CONTACT INFORMATION TO USE:
+    ${contactDetails.name ? `- Name: ${contactDetails.name}` : '- Name: [Your Name]'}
+    ${contactDetails.phone ? `- Phone: ${contactDetails.phone}` : '- Phone: [Your Phone Number]'}
+    ${contactDetails.email ? `- Email: ${contactDetails.email}` : '- Email: [Your Email Address]'}
+    ${contactDetails.linkedin ? `- LinkedIn: ${contactDetails.linkedin}` : ''}
+    ${contactDetails.portfolio ? `- Portfolio: ${contactDetails.portfolio}` : ''}
+
     IMPORTANT FORMATTING:
     - Include company name and address if available
     - Add a blank line, then "Dear Hiring Manager," (ensure there's a space after the company section)
     - Write the cover letter body with proper paragraphs
     - End with "Sincerely," followed by a blank line
-    - Include contact information at the bottom: ${contactHeader}
-    - Do NOT include the candidate's name in the signature area
+    - Include the contact information footer with all available details: ${contactHeader || 'Use the contact information provided above'}
+    - Do NOT include the candidate's name in the signature area unless it's already in the contact footer
+
+    PLACEHOLDER RULES:
+    - Replace [Your Name] with actual name if available: ${contactDetails.name || '[Your Name]'}
+    - Replace [Your Phone Number] with actual phone if available: ${contactDetails.phone || '[Your Phone Number]'}
+    - Replace [Your Email Address] with actual email if available: ${contactDetails.email || '[Your Email Address]'}
+    - Include LinkedIn URL in contact footer if provided: ${contactDetails.linkedin || ''}
+    - Include portfolio URL in contact footer if provided: ${contactDetails.portfolio || ''}
 
     ${request.workExperienceHighlights ? `Key experience to highlight: ${request.workExperienceHighlights}` : ''}
     ${request.customHookOpener ? `Use this opening approach: ${request.customHookOpener}` : ''}
     ${request.personalValues ? `Incorporate these personal values: ${request.personalValues}` : ''}
 
-    Important: Return only the cover letter content without any additional commentary or formatting markers.`
+    Important: Return only the cover letter content without any additional commentary or formatting markers. Use actual contact information when available, only use placeholders for missing information.`
 
     // Build user prompt
     const userPrompt = `Job Title: ${request.jobTitle}
