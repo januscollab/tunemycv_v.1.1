@@ -1,10 +1,17 @@
 import { useState, useCallback } from 'react';
-import { AIAction } from '@/components/ui/ai-context-menu';
+// Simplified AI action interface for compatibility
 
 interface AIProcessorOptions {
   apiEndpoint?: string;
   onSuccess?: (processedText: string) => void;
   onError?: (error: string) => void;
+}
+
+interface AIAction {
+  type: string;
+  subType?: string;
+  selectedText: string;
+  context: string;
 }
 
 interface UseAIContentProcessorReturn {

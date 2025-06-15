@@ -4,7 +4,7 @@ import 'react-quill/dist/quill.snow.css';
 import './rich-text-editor.css';
 import { useJsonFirstEditor } from '@/hooks/useJsonFirstEditor';
 import { DocumentJson } from '@/utils/documentJsonUtils';
-import { AIContextMenu, AIAction } from '@/components/ui/ai-context-menu';
+import { ExperimentalAIMenu } from '@/components/ui/experimental-ai-menu';
 import { cn } from '@/lib/utils';
 
 interface RichTextEditorProps {
@@ -14,7 +14,6 @@ interface RichTextEditorProps {
   placeholder?: string;
   readOnly?: boolean;
   showAIFeatures?: boolean;
-  onAIRequest?: (action: AIAction) => void;
   enableAutoSave?: boolean;
   debounceMs?: number;
 }
@@ -32,7 +31,6 @@ const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>(({
   placeholder = 'Start editing...',
   readOnly = false,
   showAIFeatures = true,
-  onAIRequest,
   enableAutoSave = true,
   debounceMs = 300
 }, ref) => {
@@ -88,16 +86,19 @@ const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>(({
     }
   }, [showAIFeatures]);
 
-  // Handle AI actions - placeholder for future implementation
-  const handleAIAction = useCallback((action: AIAction) => {
-    console.log('AI Action requested:', action);
-    
-    // Future implementation: Call OpenAI API to process the selected text
-    // For now, just pass to parent component if handler exists
-    if (onAIRequest) {
-      onAIRequest(action);
+  // Handle AI text replacement - now handled by ExperimentalAIMenu
+  const handleTextReplace = (originalText: string, newText: string) => {
+    if (quillRef.current) {
+      const editor = quillRef.current.getEditor();
+      const text = editor.getText();
+      const index = text.indexOf(originalText);
+      
+      if (index !== -1) {
+        editor.deleteText(index, originalText.length);
+        editor.insertText(index, newText);
+      }
     }
-  }, [onAIRequest]);
+  };
 
   // Quill configuration with enhanced features
   const modules = {
@@ -153,30 +154,15 @@ const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>(({
     </div>
   );
 
-  // Handle AI text replacement
-  const handleTextReplace = (originalText: string, newText: string) => {
-    if (quillRef.current) {
-      const editor = quillRef.current.getEditor();
-      const text = editor.getText();
-      const index = text.indexOf(originalText);
-      
-      if (index !== -1) {
-        editor.deleteText(index, originalText.length);
-        editor.insertText(index, newText);
-      }
-    }
-  };
-
   // Wrap with AI Context Menu if AI features are enabled
   if (showAIFeatures) {
     return (
-      <AIContextMenu
+      <ExperimentalAIMenu
         selectedText={selectedText}
-        onTextReplace={handleTextReplace}
         disabled={readOnly || isConverting}
       >
         {editorContent}
-      </AIContextMenu>
+      </ExperimentalAIMenu>
     );
   }
 

@@ -11,7 +11,7 @@ import { CaptureInput } from '@/components/ui/capture-input';
 import { CaptureTextarea } from '@/components/ui/capture-textarea';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import LegacyRichTextEditor from '@/components/ui/legacy-rich-text-editor';
-import { AIContextMenu } from '@/components/ui/ai-context-menu';
+// Using ExperimentalAIMenu as the new standard
 import { ExperimentalAIMenu } from '@/components/ui/experimental-ai-menu';
 import '@/components/ui/rich-text-editor.css';
 
@@ -677,7 +677,6 @@ const DesignSystem = () => {
         <RichTextEditor
           initialContent="<p>Select any text in this editor to see AI enhancement options appear. Try selecting this sentence to see the AI toolbar.</p>"
           onContentChange={(json, text) => console.log('AI editor changed:', json, text)}
-          onAIRequest={(action) => console.log('AI request:', action)}
           className="w-full"
           placeholder="Select text to see AI options..."
         />
@@ -749,27 +748,24 @@ const DesignSystem = () => {
           <p className="text-caption text-muted-foreground">
             Select any text below to see the new AI context menu design inspired by your brand colors:
           </p>
-          <AIContextMenu
+          <ExperimentalAIMenu
             selectedText="This is sample selected text"
-            onTextReplace={(original, newText) => {
-              console.log('Text replacement:', { original, newText });
-            }}
           >
             <div className="p-4 border border-border rounded-lg bg-background min-h-[120px]">
-              <h3 className="text-heading font-semibold mb-3">Sample Content for AI Enhancement</h3>
+              <h3 className="text-heading font-semibold mb-3">Enhanced AI Assistant</h3>
               <p className="text-body leading-relaxed">
-                Select any portion of this text to trigger the new AI context menu. 
-                The menu features a gradient background using your brand's primary colors, 
-                with an orange accent for the active "Rephrase" option that mimics the 
-                "Cradis" styling from your reference image. Try selecting this sentence 
-                or any other text to see the menu appear with smooth animations.
+                Select any portion of this text to trigger the enhanced AI context menu. 
+                The menu features improved search capabilities, better text alternatives, 
+                and seamless replace functionality with smart contextual filtering and 
+                developer-configurable avatar. Try selecting this sentence to see the 
+                enhanced menu appear with smooth gliding animations.
               </p>
               <p className="text-body mt-4">
-                The design includes proper semantic tokens, hover states, and accessibility 
-                features while maintaining the aesthetic from your uploaded reference.
+                Features include before/after text comparison, contextual action filtering,
+                and subtle orange branding aligned with the design system.
               </p>
             </div>
-          </AIContextMenu>
+          </ExperimentalAIMenu>
         </div>
       ),
       usage: 'New component',

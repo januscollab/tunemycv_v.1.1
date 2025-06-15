@@ -115,17 +115,46 @@ const ExperimentalAIMenu: React.FC<ExperimentalAIMenuProps> = ({
       isLoading: true
     })
     
-    // Simulate AI processing with realistic delay
-    setTimeout(() => {
-      // Generate mock improved text based on action
-      let improvedText = generateMockImprovement(currentText, action, subAction)
+    try {
+      // Use real AI processing via Supabase edge function
+      const response = await fetch(`https://aohrfehhyjdebaatzqdl.supabase.co/functions/v1/process-ai-content`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFvaHJmZWhoeWpkZWJhYXR6cWRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg1MzY3MTcsImV4cCI6MjA2NDExMjcxN30.lq2vftfHXRX1Mvlj4X04TdaF7YWU8vRIZU-DN85Dr1o`
+        },
+        body: JSON.stringify({
+          selectedText: currentText,
+          action: { type: action, subType: subAction },
+          context: "editor"
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const data = await response.json()
       
+      if (data.error) {
+        throw new Error(data.error)
+      }
+
       setDialogState(prev => ({
         ...prev,
-        generatedText: improvedText,
+        generatedText: data.processedText || generateMockImprovement(currentText, action, subAction),
         isLoading: false
       }))
-    }, 2000 + Math.random() * 1000) // 2-3 seconds
+    } catch (error) {
+      console.error('AI processing failed, using fallback:', error)
+      // Fallback to mock improvement if AI fails
+      const fallbackText = generateMockImprovement(currentText, action, subAction)
+      setDialogState(prev => ({
+        ...prev,
+        generatedText: fallbackText,
+        isLoading: false
+      }))
+    }
   }
 
   const generateMockImprovement = (text: string, action: string, subAction?: string): string => {
@@ -163,14 +192,20 @@ const ExperimentalAIMenu: React.FC<ExperimentalAIMenuProps> = ({
   }
 
   const handleAcceptChanges = () => {
-    // In a real implementation, this would replace the selected text
+    // Replace the selected text with the generated text
+    const selection = window.getSelection()
+    if (selection && selection.rangeCount > 0 && dialogState.generatedText) {
+      const range = selection.getRangeAt(0)
+      range.deleteContents()
+      range.insertNode(document.createTextNode(dialogState.generatedText))
+      selection.removeAllRanges()
+    }
+    
     toast({
       title: "Changes Applied",
       description: "Your text has been successfully updated with AI improvements.",
     })
     
-    // Clear selection and close dialog
-    window.getSelection()?.removeAllRanges()
     setDialogState(prev => ({ ...prev, open: false }))
   }
 
@@ -197,19 +232,14 @@ const ExperimentalAIMenu: React.FC<ExperimentalAIMenuProps> = ({
     }, 1500)
   }
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (file && file.type.startsWith('image/')) {
-      const url = URL.createObjectURL(file)
-      // Store in localStorage for persistence
-      localStorage.setItem('ai-avatar-url', url)
-      setShowUpload(false)
-    }
+  // Developer-configurable avatar URL - no user upload needed
+  const getAvatarUrl = () => {
+    // Developer can configure this via environment or config
+    return aiAvatarUrl || '/ai-assistant-avatar.png' // Default developer avatar
   }
 
   const closeMenu = () => {
     setMenuPosition({ x: 0, y: 0, visible: false })
-    setShowUpload(false)
     setActiveSubmenu(null)
     setHoveredAction(null)
   }
@@ -312,25 +342,18 @@ const ExperimentalAIMenu: React.FC<ExperimentalAIMenuProps> = ({
           >
             {/* Header with AI Avatar and Subtle Branding */}
             <div className="flex items-center gap-3 p-4 border-b border-border/30 bg-gradient-to-r from-orange-50/10 via-primary-50/10 to-background/20">
-              <div 
-                className="relative w-12 h-12 rounded-full overflow-hidden cursor-pointer group ring-2 ring-orange-200/20 transition-all duration-300 hover:ring-orange-300/40"
-                onClick={() => setShowUpload(!showUpload)}
-              >
-                {aiAvatarUrl || localStorage.getItem('ai-avatar-url') ? (
+              <div className="relative w-12 h-12 rounded-full overflow-hidden ring-2 ring-orange-200/20 transition-all duration-300">
+                {getAvatarUrl() !== '/ai-assistant-avatar.png' ? (
                   <img 
-                    src={aiAvatarUrl || localStorage.getItem('ai-avatar-url') || ''} 
+                    src={getAvatarUrl()} 
                     alt="AI Assistant" 
-                    className="w-full h-full object-cover transition-all duration-500 group-hover:scale-110"
+                    className="w-full h-full object-cover transition-all duration-500"
                   />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-orange-100/30 via-primary-200/40 to-primary-300/50 flex items-center justify-center text-xl transition-all duration-500 group-hover:scale-110 group-hover:rotate-12">
+                  <div className="w-full h-full bg-gradient-to-br from-orange-100/30 via-primary-200/40 to-primary-300/50 flex items-center justify-center text-xl transition-all duration-500">
                     🤖
                   </div>
                 )}
-                {/* Upload indicator with subtle branding */}
-                <div className="absolute inset-0 bg-gradient-to-br from-orange-500/70 to-primary-500/70 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center backdrop-blur-sm">
-                  <Upload className="w-4 h-4 text-white" />
-                </div>
               </div>
               
               <div className="flex-1">
@@ -344,21 +367,6 @@ const ExperimentalAIMenu: React.FC<ExperimentalAIMenuProps> = ({
               </div>
             </div>
 
-            {/* Upload Panel with smooth sliding */}
-            {showUpload && (
-              <div className="p-4 bg-gradient-to-r from-orange-50/20 to-accent/30 border-b border-border/50 animate-slide-in-right">
-                <p className="text-xs text-foreground-secondary mb-3 font-medium">
-                  Upload your AI avatar image:
-                </p>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="w-full text-xs p-2 bg-background/50 border border-border/50 rounded-lg transition-all duration-200 hover:border-orange-300/50 focus:border-orange-400/50 focus:outline-none"
-                />
-              </div>
-            )}
 
             {/* Contextual Actions with Nested Menus */}
             <div className="p-4 space-y-1">
