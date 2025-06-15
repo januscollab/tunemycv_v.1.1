@@ -225,22 +225,14 @@ const AnalyzeCV = () => {
   };
 
   const handleAnalysis = () => {
-    // Validate that we have at least a job description
-    if (!uploadedFiles.jobDescription) {
+    // Validate that we have both CV and job description for n8n analysis
+    if (!uploadedFiles.cv || !uploadedFiles.jobDescription) {
       toast({ 
-        title: 'Missing Information', 
-        description: 'Please provide a job description to analyze.', 
+        title: 'Missing Files', 
+        description: 'Please upload both CV and job description to perform analysis.', 
         variant: 'destructive' 
       });
       return;
-    }
-
-    // Show warning if no CV is uploaded
-    if (!uploadedFiles.cv) {
-      toast({ 
-        title: 'No CV Uploaded', 
-        description: 'Analysis will be performed on job description only. Upload a CV for comprehensive analysis.', 
-      });
     }
 
     // Create options object with default values for temporary analysis
@@ -336,7 +328,7 @@ const AnalyzeCV = () => {
     setShowInterviewPrepModal(true);
   };
 
-  const canAnalyze = !!uploadedFiles.jobDescription; // Fixed: properly check if job description exists
+  const canAnalyze = !!uploadedFiles.cv && !!uploadedFiles.jobDescription; // Both files required for n8n analysis
   const hasCreditsForAI = userCredits?.credits && userCredits.credits > 0;
 
 
@@ -528,12 +520,22 @@ const AnalyzeCV = () => {
                     />
                   </div>
 
-                  {/* CV Selection - Optional */}
-                  <CVSelector
-                    onCVSelect={handleCVSelect}
-                    selectedCV={uploadedFiles.cv}
-                    uploading={uploading || analyzing}
-                  />
+                  {/* CV Selection - Required */}
+                  <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm border border-apple-core/20 dark:border-citrus/20">
+                    <div className="p-5">
+                      <h3 className="text-heading font-semibold text-blueberry dark:text-citrus mb-3">
+                        Your CV <span className="text-red-500">*</span>
+                      </h3>
+                      <p className="text-micro text-blueberry/60 dark:text-apple-core/70 mb-3">
+                        Upload your CV or select from previously saved CVs
+                      </p>
+                      <CVSelector
+                        onCVSelect={handleCVSelect}
+                        selectedCV={uploadedFiles.cv}
+                        uploading={uploading || analyzing}
+                      />
+                    </div>
+                  </div>
 
                   {/* Hide Motivation Matters section */}
 
