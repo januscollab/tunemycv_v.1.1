@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FileText, Sparkles, Trash2, RefreshCw, Clock, FileUp, Search, AlertCircle, Eye, Edit, Download, History, RotateCcw, Edit2, Linkedin } from 'lucide-react';
 import Breadcrumbs from '@/components/navigation/Breadcrumbs';
+import { RichTextEditor } from '@/components/ui/rich-text-editor';
 
 import { useAuth } from '@/contexts/AuthContext';
 import { useCoverLetter } from '@/hooks/useCoverLetter';
@@ -695,27 +696,27 @@ const AuthenticatedCoverLetter = () => {
                             fileName={`${selectedCoverLetter.company_name}_${selectedCoverLetter.job_title}_Cover_Letter`}
                           />
                         </div>
-                        <div 
-                          className="bg-background border border-border rounded-lg p-6 prose prose-sm max-w-none dark:prose-invert"
-                          dangerouslySetInnerHTML={{ 
-                            __html: (() => {
-                              try {
-                                // Try to parse as JSON first
-                                const jsonData = JSON.parse(selectedCoverLetter.content);
-                                // Convert JSON to formatted HTML display
-                                return jsonData.sections?.map((section: any) => {
-                                  let html = section.content || '';
-                                  if (section.formatting?.bold) {
-                                    html = `<strong>${html}</strong>`;
-                                  }
-                                  return `<p>${html}</p>`;
-                                }).join('') || selectedCoverLetter.content;
-                              } catch {
-                                // Fallback to plain text with line breaks
-                                return selectedCoverLetter.content.replace(/\n/g, '<br>');
-                              }
-                            })()
-                          }}
+                        <RichTextEditor
+                          value={(() => {
+                            try {
+                              // Try to parse as JSON first
+                              const jsonData = JSON.parse(selectedCoverLetter.content);
+                              // Convert JSON to formatted HTML display
+                              return jsonData.sections?.map((section: any) => {
+                                let html = section.content || '';
+                                if (section.formatting?.bold) {
+                                  html = `<strong>${html}</strong>`;
+                                }
+                                return `<p>${html}</p>`;
+                              }).join('') || selectedCoverLetter.content;
+                            } catch {
+                              // Fallback to plain text with line breaks
+                              return selectedCoverLetter.content.replace(/\n/g, '<br>');
+                            }
+                          })()}
+                          readOnly={true}
+                          className="min-h-[400px]"
+                          placeholder=""
                         />
                       </div>
                       
