@@ -109,10 +109,16 @@ serve(async (req) => {
 
     ${lengthInstruction}
 
-    Contact information to include at the top:
-    ${contactHeader}
-
     Company: ${request.companyName}
+
+    IMPORTANT FORMATTING:
+    - Start with the date (today's date)
+    - Include company name and address if available
+    - Add a blank line, then "Dear Hiring Manager," (ensure there's a space after the company section)
+    - Write the cover letter body with proper paragraphs
+    - End with "Sincerely," followed by a blank line
+    - Include contact information at the bottom: ${contactHeader}
+    - Do NOT include the candidate's name in the signature area
 
     ${request.workExperienceHighlights ? `Key experience to highlight: ${request.workExperienceHighlights}` : ''}
     ${request.customHookOpener ? `Use this opening approach: ${request.customHookOpener}` : ''}
@@ -142,8 +148,8 @@ ${request.cvText ? `My CV/Resume:\n${request.cvText}` : ''}`
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
         ],
-        temperature: 0.7,
-        max_tokens: 1000,
+        temperature: 0.6,
+        max_tokens: 2000,
       }),
     })
 
