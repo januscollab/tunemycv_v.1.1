@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FileText, Sparkles, Trash2, RefreshCw, Clock, FileUp, Search, AlertCircle, Eye, Edit, Download, History, RotateCcw, Edit2, Linkedin } from 'lucide-react';
 import Breadcrumbs from '@/components/navigation/Breadcrumbs';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
+import { DocumentHistory } from '@/components/ui/document-history';
 
 import { useAuth } from '@/contexts/AuthContext';
 import { useCoverLetter } from '@/hooks/useCoverLetter';
@@ -840,186 +841,71 @@ const AuthenticatedCoverLetter = () => {
               </TabsContent>
 
               <TabsContent value="history" className="mt-6">
-                <Card className="border-0 shadow-none bg-transparent">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-xl font-semibold">Saved Cover Letters</CardTitle>
-                      {allCoverLetters.length > 0 && (
-                        <div className="flex items-center space-x-2">
-                          <span className="text-sm text-gray-600">Show:</span>
-                          <Select value={itemsPerPage.toString()} onValueChange={(value) => setItemsPerPage(Number(value))}>
-                            <SelectTrigger className="w-20">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="10">10</SelectItem>
-                              <SelectItem value="20">20</SelectItem>
-                              <SelectItem value="30">30</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <span className="text-sm text-gray-600">per page</span>
-                        </div>
-                      )}
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    {loadingHistory ? (
-                      <div className="text-center py-8 font-normal">Loading...</div>
-                    ) : allCoverLetters.length === 0 ? (
-                      <div className="text-center py-8">
-                        <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                        <p className="text-gray-600 dark:text-gray-400 font-normal">
-                          No cover letters created yet.
-                        </p>
-                      </div>
-                    ) : (
-                      <>
-                        <div className="space-y-2">
-                          {paginatedCoverLetters.map((coverLetter) => (
-                            <div
-                              key={coverLetter.id}
-                              className="relative bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md hover:bg-gray-50/50 transition-all duration-200 hover:border-zapier-orange/50 cursor-pointer"
-                              onClick={() => handleViewCoverLetter(coverLetter)}
-                            >
-                              {/* Action buttons at top */}
-                              <div className="flex items-center justify-between mb-3 pb-3 border-b border-gray-100">
-                                <div className="flex items-center space-x-3">
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleViewCoverLetter(coverLetter);
-                                    }}
-                                    className="flex items-center px-3 py-2 text-caption font-medium text-black hover:text-zapier-orange bg-gray-50 hover:bg-zapier-orange/10 rounded-md transition-colors"
-                                  >
-                                    <Eye className="h-4 w-4 mr-2" />
-                                    View
-                                  </button>
-                                  
-                                  <DownloadOptions
-                                    content={coverLetter.content}
-                                    fileName={`Cover_Letter_${coverLetter.company_name}_${coverLetter.job_title}`}
-                                    triggerComponent={
-                                      <button 
-                                        onClick={(e) => e.stopPropagation()}
-                                        className="flex items-center px-3 py-2 text-caption font-medium text-black hover:text-zapier-orange bg-gray-50 hover:bg-zapier-orange/10 rounded-md transition-colors"
-                                      >
-                                        <FileText className="h-4 w-4 mr-2" />
-                                        Download
-                                      </button>
-                                    }
-                                  />
-                                  
-                                  {coverLetter.analysis_result_id && (
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleViewCVAnalysis(coverLetter.analysis_result_id);
-                                      }}
-                                      className="flex items-center px-3 py-2 text-caption font-medium text-green-600 hover:text-green-700 bg-green-50 hover:bg-green-100 rounded-md transition-colors"
-                                    >
-                                      <FileText className="h-4 w-4 mr-2" />
-                                      CV Analysis
-                                    </button>
-                                  )}
-                                </div>
-                              </div>
-
-                              {/* Title and content */}
-                              <div className="flex items-center justify-between mb-2">
-                                <div className="flex items-center space-x-2 flex-1 min-w-0">
-                                  <h3 className="text-body font-medium text-gray-900 truncate">
-                                    {coverLetter.job_title} at {coverLetter.company_name}
-                                  </h3>
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setEditingCoverLetter(coverLetter);
-                                      setIsEditDialogOpen(true);
-                                    }}
-                                    className="text-gray-400 hover:text-zapier-orange transition-colors flex-shrink-0"
-                                    title="Edit title"
-                                  >
-                                    <Edit2 className="h-3 w-3" />
-                                  </button>
-                                  {coverLetter.regeneration_count > 0 && (
-                                    <Badge variant="outline" className="text-tiny flex-shrink-0">
-                                      v{coverLetter.regeneration_count + 1}
-                                    </Badge>
-                                  )}
-                                </div>
-                              </div>
-                              
-                              {/* Date */}
-                              <div className="flex items-center text-caption text-gray-600">
-                                <Clock className="h-3 w-3 mr-1" />
-                                <span>Updated {formatDate(coverLetter.updated_at)}</span>
-                              </div>
-
-                              {/* Delete button - bottom right */}
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDelete(coverLetter.id);
-                                }}
-                                className="absolute bottom-4 right-4 text-red-600 hover:text-red-700 hover:bg-red-50 p-1 rounded transition-colors"
-                                title="Delete cover letter"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-
-                        {/* Pagination */}
-                        {totalPages > 1 && (
-                          <div className="mt-6 flex justify-center">
-                            <Pagination>
-                              <PaginationContent>
-                                <PaginationItem>
-                                  <PaginationPrevious 
-                                    href="#" 
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      if (currentPage > 1) setCurrentPage(currentPage - 1);
-                                    }}
-                                    className={`${currentPage <= 1 ? 'pointer-events-none opacity-50' : ''} text-sm font-normal`}
-                                  />
-                                </PaginationItem>
-                                
-                                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                                  <PaginationItem key={page}>
-                                    <PaginationLink
-                                      href="#"
-                                      onClick={(e) => {
-                                        e.preventDefault();
-                                        setCurrentPage(page);
-                                      }}
-                                      isActive={currentPage === page}
-                                      className="text-sm font-normal"
-                                    >
-                                      {page}
-                                    </PaginationLink>
-                                  </PaginationItem>
-                                ))}
-                                
-                                <PaginationItem>
-                                  <PaginationNext 
-                                    href="#" 
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-                                    }}
-                                    className={`${currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''} text-sm font-normal`}
-                                  />
-                                </PaginationItem>
-                              </PaginationContent>
-                            </Pagination>
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </CardContent>
-                </Card>
+                <DocumentHistory
+                  header={{
+                    title: "Cover Letter History",
+                    totalCount: allCoverLetters.length,
+                    filterType: 'cover_letter',
+                    onFilterChange: () => {},
+                    itemsPerPage: itemsPerPage,
+                    onItemsPerPageChange: setItemsPerPage,
+                    showPagination: true
+                  }}
+                  documents={paginatedCoverLetters.map(coverLetter => ({
+                    id: coverLetter.id,
+                    type: 'cover_letter' as const,
+                    title: `${coverLetter.job_title} at ${coverLetter.company_name}`,
+                    company_name: coverLetter.company_name,
+                    job_title: coverLetter.job_title,
+                    created_at: coverLetter.updated_at,
+                    regeneration_count: coverLetter.regeneration_count,
+                    content: coverLetter.content,
+                    analysis_result_id: coverLetter.analysis_result_id
+                  }))}
+                  loading={loadingHistory}
+                  onDocumentClick={handleViewCoverLetter}
+                  actions={[
+                    {
+                      label: 'View',
+                      icon: <Eye className="h-4 w-4 mr-2" />,
+                      onClick: handleViewCoverLetter
+                    },
+                    {
+                      label: 'Download',
+                      icon: <Download className="h-4 w-4 mr-2" />,
+                      onClick: (document) => {
+                        // Handle download - this will need custom implementation
+                        console.log('Download:', document);
+                      }
+                    },
+                    {
+                      label: 'CV Analysis',
+                      icon: <FileText className="h-4 w-4 mr-2" />,
+                      onClick: (document) => {
+                        if (document.analysis_result_id) {
+                          handleViewCVAnalysis(document.analysis_result_id);
+                        }
+                      },
+                      condition: (document) => !!document.analysis_result_id,
+                      variant: 'success'
+                    },
+                    {
+                      label: 'Delete',
+                      icon: <Trash2 className="h-4 w-4 mr-2" />,
+                      onClick: (document) => handleDelete(document.id),
+                      variant: 'destructive'
+                    }
+                  ]}
+                  emptyState={{
+                    title: "No cover letters created yet",
+                    description: "You haven't created any cover letters yet."
+                  }}
+                  pagination={totalPages > 1 ? {
+                    currentPage: currentPage,
+                    totalPages: totalPages,
+                    onPageChange: setCurrentPage
+                  } : undefined}
+                />
               </TabsContent>
             </Tabs>
           </div>

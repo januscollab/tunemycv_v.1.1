@@ -1,23 +1,12 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import AnalysisHistoryHeader from './analysis/AnalysisHistoryHeader';
-import EmptyAnalysisState from './analysis/EmptyAnalysisState';
-import AnalysisListItem from './analysis/AnalysisListItem';
+import { DocumentHistory } from '@/components/ui/document-history';
+import { Eye, FileText, MessageSquare, Trash2 } from 'lucide-react';
 import AnalysisDetailModal from './analysis/AnalysisDetailModal';
 import UpcomingFeatureModal from './analysis/UpcomingFeatureModal';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@/components/ui/pagination';
 
 interface AnalysisResult {
   id: string;
@@ -48,12 +37,9 @@ const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ credits, member
   const [loading, setLoading] = useState(true);
   const [selectedAnalysis, setSelectedAnalysis] = useState<AnalysisResult | null>(null);
   const [upcomingFeatureModal, setUpcomingFeatureModal] = useState<{
-    isOpen: boolean;
-    featureType: 'cover-letter' | 'interview-prep' | null;
-  }>({
-    isOpen: false,
-    featureType: null
-  });
+    open: boolean;
+    feature: string;
+  }>({ open: false, feature: '' });
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -61,139 +47,100 @@ const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ credits, member
 
   useEffect(() => {
     if (user) {
-      loadAnalysisHistory();
+      loadAnalyses();
     }
   }, [user]);
 
-  const loadAnalysisHistory = async () => {
+  const loadAnalyses = async () => {
     try {
       const { data, error } = await supabase
         .from('analysis_results')
         .select(`
-          *,
-          analysis_logs(cost_estimate),
-          cover_letters(id)
+          id,
+          job_title,
+          company_name,
+          compatibility_score,
+          created_at,
+          executive_summary,
+          strengths,
+          weaknesses,
+          recommendations,
+          cv_file_name,
+          cv_file_size
         `)
         .eq('user_id', user?.id)
+        .is('deleted_at', null)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      
-      const transformedData = (data || []).map(analysis => ({
+
+      // Check for cover letters
+      const analysisIds = data?.map(a => a.id) || [];
+      const { data: coverLetterData } = await supabase
+        .from('cover_letters')
+        .select('analysis_result_id')
+        .in('analysis_result_id', analysisIds);
+
+      const coverLetterAnalysisIds = new Set(coverLetterData?.map(cl => cl.analysis_result_id) || []);
+
+      const analysesWithCoverLetters = data?.map(analysis => ({
         ...analysis,
-        credit_cost: analysis.analysis_logs?.[0]?.cost_estimate ? Math.ceil(analysis.analysis_logs[0].cost_estimate) : 1,
-        has_cover_letter: analysis.cover_letters && analysis.cover_letters.length > 0
-      }));
-      
-      setAnalyses(transformedData);
+        has_cover_letter: coverLetterAnalysisIds.has(analysis.id)
+      })) || [];
+
+      setAnalyses(analysesWithCoverLetters);
     } catch (error) {
-      toast({ title: 'Error', description: 'Failed to load analysis history', variant: 'destructive' });
+      console.error('Failed to load analyses:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to load your analysis history',
+        variant: 'destructive',
+      });
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleViewDetails = (analysis: AnalysisResult) => {
-    navigate('/analyze-cv', { 
-      state: { analysis, source: 'history', targetTab: 'view-analysis' }
-    });
   };
 
   const handleDeleteAnalysis = async (analysisId: string) => {
     try {
       const { error } = await supabase
         .from('analysis_results')
-        .delete()
+        .update({ deleted_at: new Date().toISOString() })
         .eq('id', analysisId)
         .eq('user_id', user?.id);
 
       if (error) throw error;
 
       setAnalyses(prev => prev.filter(analysis => analysis.id !== analysisId));
-      toast({ title: 'Success', description: 'Analysis deleted successfully' });
+      toast({
+        title: 'Success',
+        description: 'Analysis deleted successfully',
+      });
     } catch (error) {
-      toast({ title: 'Error', description: 'Failed to delete analysis', variant: 'destructive' });
-    }
-  };
-
-  const handleEditAnalysisTitle = async (analysisId: string, newTitle: string) => {
-    try {
-      const { error } = await supabase
-        .from('analysis_results')
-        .update({ job_title: newTitle })
-        .eq('id', analysisId)
-        .eq('user_id', user?.id);
-
-      if (error) throw error;
-
-      setAnalyses(prev => prev.map(analysis => 
-        analysis.id === analysisId 
-          ? { ...analysis, job_title: newTitle }
-          : analysis
-      ));
-
-      toast({ title: 'Success', description: 'Analysis title updated successfully' });
-    } catch (error) {
-      toast({ title: 'Error', description: 'Failed to update analysis title', variant: 'destructive' });
-    }
-  };
-
-  const handleCreateCoverLetter = async (analysis: AnalysisResult) => {
-    if (analysis.has_cover_letter) {
-      // If cover letter exists, fetch it and navigate to view it
-      try {
-        const { data: coverLetter, error } = await supabase
-          .from('cover_letters')
-          .select('*')
-          .eq('analysis_result_id', analysis.id)
-          .eq('user_id', user?.id)
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .single();
-
-        if (error) throw error;
-
-        console.log('Navigating to Cover Letter to view existing letter:', coverLetter);
-        // Navigate to Cover Letter page with the existing cover letter data
-        navigate('/cover-letter', {
-          state: {
-            coverLetter: coverLetter,
-            viewMode: true,
-            activeTab: 'result'
-          }
-        });
-      } catch (error) {
-        console.error('Failed to fetch cover letter:', error);
-        toast({ title: 'Error', description: 'Failed to load cover letter', variant: 'destructive' });
-      }
-    } else {
-      // If no cover letter exists, navigate to create one
-      console.log('Navigating to Cover Letter to create new letter:', analysis);
-      navigate('/cover-letter', {
-        state: {
-          analysis: analysis,
-          generationMethod: 'analysis'
-        }
+      console.error('Failed to delete analysis:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to delete analysis',
+        variant: 'destructive',
       });
     }
   };
 
-  const handleInterviewPrep = (analysis: AnalysisResult) => {
-    console.log('Navigating to Interview Prep with analysis:', analysis);
-    // Navigate to Analyze CV page with Interview Prep tab and analysis data
-    navigate('/analyze?tab=interview-prep', {
+  const handleViewAnalysis = (analysis: AnalysisResult) => {
+    setSelectedAnalysis(analysis);
+  };
+
+  const handleCreateCoverLetter = (analysis: AnalysisResult) => {
+    navigate('/cover-letter', {
       state: {
         analysis: analysis,
-        source: 'history'
+        activeTab: 'create'
       }
     });
   };
 
-  const closeUpcomingFeatureModal = () => {
-    setUpcomingFeatureModal({
-      isOpen: false,
-      featureType: null
-    });
+  const handleInterviewPrep = () => {
+    setUpcomingFeatureModal({ open: true, feature: 'Interview Preparation' });
   };
 
   // Calculate pagination
@@ -207,118 +154,86 @@ const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ credits, member
     setCurrentPage(1);
   }, [itemsPerPage]);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-zapier-orange"></div>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-      <div className="mb-6">
-        <h2 className="text-heading font-semibold text-gray-900">Analysis History</h2>
-        <div className="text-caption text-gray-500 mt-1">
-          {analyses.length} {analyses.length === 1 ? 'analysis' : 'analyses'}
-        </div>
-      </div>
-        {analyses.length > 0 && (
-          <div className="flex items-center space-x-2">
-            <span className="text-caption text-gray-600">Show:</span>
-            <Select value={itemsPerPage.toString()} onValueChange={(value) => setItemsPerPage(Number(value))}>
-              <SelectTrigger className="w-20">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="10">10</SelectItem>
-                <SelectItem value="20">20</SelectItem>
-                <SelectItem value="30">30</SelectItem>
-              </SelectContent>
-            </Select>
-            <span className="text-caption text-gray-600">per page</span>
-          </div>
-        )}
-      </div>
+      <DocumentHistory
+        header={{
+          title: "Analysis History",
+          totalCount: analyses.length,
+          filterType: 'analysis',
+          onFilterChange: () => {},
+          itemsPerPage: itemsPerPage,
+          onItemsPerPageChange: setItemsPerPage,
+          showPagination: true
+        }}
+        documents={paginatedAnalyses.map(analysis => ({
+          id: analysis.id,
+          type: 'analysis' as const,
+          title: analysis.job_title,
+          company_name: analysis.company_name,
+          created_at: analysis.created_at,
+          compatibility_score: analysis.compatibility_score,
+          has_cover_letter: analysis.has_cover_letter,
+          executive_summary: analysis.executive_summary,
+          strengths: analysis.strengths,
+          weaknesses: analysis.weaknesses,
+          recommendations: analysis.recommendations
+        }))}
+        loading={loading}
+        onDocumentClick={(document) => {
+          // Find the full analysis object
+          const fullAnalysis = analyses.find(a => a.id === document.id);
+          if (fullAnalysis) handleViewAnalysis(fullAnalysis);
+        }}
+        actions={[
+          {
+            label: 'View',
+            icon: <Eye className="h-4 w-4 mr-2" />,
+            onClick: (document) => {
+              const fullAnalysis = analyses.find(a => a.id === document.id);
+              if (fullAnalysis) handleViewAnalysis(fullAnalysis);
+            }
+          },
+          {
+            label: 'Cover Letter',
+            icon: <FileText className="h-4 w-4 mr-2" />,
+            onClick: (document) => {
+              const fullAnalysis = analyses.find(a => a.id === document.id);
+              if (fullAnalysis) handleCreateCoverLetter(fullAnalysis);
+            },
+            variant: 'success'
+          },
+          {
+            label: 'Interview Prep',
+            icon: <MessageSquare className="h-4 w-4 mr-2" />,
+            onClick: handleInterviewPrep
+          },
+          {
+            label: 'Delete',
+            icon: <Trash2 className="h-4 w-4 mr-2" />,
+            onClick: (document) => handleDeleteAnalysis(document.id),
+            variant: 'destructive'
+          }
+        ]}
+        emptyState={{
+          title: "No analyses yet",
+          description: "You haven't created any CV analyses yet. Start by analyzing your CV against a job description."
+        }}
+        pagination={totalPages > 1 ? {
+          currentPage: currentPage,
+          totalPages: totalPages,
+          onPageChange: setCurrentPage
+        } : undefined}
+      />
 
-      {analyses.length === 0 ? (
-        <EmptyAnalysisState />
-      ) : (
-        <>
-          <div className="space-y-4">
-            {paginatedAnalyses.map((analysis) => (
-              <AnalysisListItem
-                key={analysis.id}
-                analysis={analysis}
-                onViewDetails={handleViewDetails}
-                onDelete={handleDeleteAnalysis}
-                onCreateCoverLetter={handleCreateCoverLetter}
-                onInterviewPrep={handleInterviewPrep}
-                onEditTitle={handleEditAnalysisTitle}
-              />
-            ))}
-          </div>
-
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="mt-6 flex justify-center">
-              <Pagination>
-                <PaginationContent>
-                  <PaginationItem>
-                      <PaginationPrevious 
-                      href="#" 
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (currentPage > 1) setCurrentPage(currentPage - 1);
-                      }}
-                      className={`${currentPage <= 1 ? 'pointer-events-none opacity-50' : ''} text-body font-normal`}
-                    />
-                  </PaginationItem>
-                  
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <PaginationItem key={page}>
-                      <PaginationLink
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setCurrentPage(page);
-                        }}
-                        isActive={currentPage === page}
-                        className="text-body font-normal"
-                      >
-                        {page}
-                      </PaginationLink>
-                    </PaginationItem>
-                  ))}
-                  
-                  <PaginationItem>
-                      <PaginationNext 
-                      href="#" 
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-                      }}
-                      className={`${currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''} text-body font-normal`}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            </div>
-          )}
-        </>
+      {/* Modals */}
+      {selectedAnalysis && (
+        <AnalysisDetailModal
+          analysis={selectedAnalysis}
+          onClose={() => setSelectedAnalysis(null)}
+        />
       )}
 
-      <AnalysisDetailModal
-        analysis={selectedAnalysis}
-        onClose={() => setSelectedAnalysis(null)}
-      />
-
-      <UpcomingFeatureModal
-        isOpen={upcomingFeatureModal.isOpen}
-        onClose={closeUpcomingFeatureModal}
-        featureType={upcomingFeatureModal.featureType}
-      />
     </div>
   );
 };
