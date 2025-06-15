@@ -737,11 +737,24 @@ const AuthenticatedCoverLetter = () => {
                               try {
                                 const { error } = await supabase
                                   .from('cover_letters')
-                                  .update({ content })
+                                  .update({ 
+                                    content,
+                                    updated_at: new Date().toISOString()
+                                  })
                                   .eq('id', selectedCoverLetter.id)
                                   .eq('user_id', user.id);
                                 
                                 if (error) throw error;
+                                
+                                // Update local state to reflect changes
+                                setSelectedCoverLetter(prev => ({
+                                  ...prev,
+                                  content,
+                                  updated_at: new Date().toISOString()
+                                }));
+                                
+                                // Refresh history to show updated timestamp
+                                loadCoverLetterHistory();
                                 
                                 toast({
                                   title: 'Success',

@@ -653,8 +653,10 @@ const DesignSystem = () => {
             console.log('Content changed:', value);
           }}
           onSave={(value) => {
-            console.log('Saving content:', value);
+            console.log('Auto-saving content:', value);
+            setRteContent(value);
             // In real implementation, this would save to backend
+            // For demo purposes, we'll show a save confirmation
           }}
           onDownload={(value, filename) => {
             console.log('Downloading content:', value, filename);
@@ -663,10 +665,12 @@ const DesignSystem = () => {
           filename="design-system-sample"
           className="w-full"
           minHeight="200px"
+          autoSave={true}
+          autoSaveDelay={2000}
         />
       ),
       usage: '45 usages',
-      description: 'Full-featured rich text editor with save and download functionality'
+      description: 'Full-featured rich text editor with auto-save and download functionality'
     },
     {
       name: 'With AI Features',
