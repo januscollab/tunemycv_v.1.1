@@ -32,17 +32,17 @@ const applyFormattingRules = (text: string, preserveFormatting = true): string =
   let processed = text;
   
   if (preserveFormatting) {
-    // Preserve intentional line breaks and bold formatting
+    // PRESERVE INDENTATION AND LINE BREAKS - minimal processing for cover letters
     processed = processed
       // Normalize bullets to "-" only
       .replace(/[•·‐−–—]/g, '-')
       // Remove font styling but keep semantic formatting
       .replace(/font-family:[^;]+;?/gi, '')
       .replace(/font-size:[^;]+;?/gi, '')
-      // Clean up excessive whitespace but preserve single line breaks
-      .replace(/[ \t]+/g, ' ')
-      .replace(/\n\s*\n\s*\n/g, '\n\n') // Max 2 consecutive newlines
-      .trim();
+      // PRESERVE LEADING SPACES FOR INDENTATION - only collapse multiple spaces within lines
+      .replace(/[ \t]{2,}/g, ' ') // Only collapse 2+ consecutive spaces/tabs to single space
+      .replace(/\n\s*\n\s*\n/g, '\n\n'); // Max 2 consecutive newlines
+      // DON'T TRIM - preserve leading/trailing whitespace for indentation
   } else {
     // Legacy mode - strip all formatting
     processed = processed
@@ -537,13 +537,14 @@ export const generateFormattedText = (docJson: DocumentJson): string => {
         
       case 'paragraph':
         if (section.content) {
-          // Preserve line breaks within paragraphs
+          // PRESERVE LINE BREAKS AND INDENTATION within paragraphs
           let paragraphContent = section.content;
           
           // Bold formatting will be handled by HTML, not markdown
           // Removed markdown asterisks to prevent double formatting
           
-          const paragraphLines = paragraphContent.split('\n').filter(line => line.trim());
+          // DON'T filter out empty lines - preserve the exact structure
+          const paragraphLines = paragraphContent.split('\n');
           textLines.push(...paragraphLines);
           textLines.push(''); // Empty line after paragraph
         }
@@ -607,11 +608,12 @@ const preserveOriginalTextStructure = (text: string): DocumentJson => {
   
   const flushParagraph = () => {
     if (currentParagraph.length > 0) {
-      const content = currentParagraph.join('\n').trim();
-      if (content) {
+      // PRESERVE INDENTATION: Don't trim the joined content, only check if it has substance
+      const content = currentParagraph.join('\n');
+      if (content.trim()) { // Only check if there's actual content, but preserve formatting
         sections.push({
           type: 'paragraph',
-          content,
+          content, // Keep original formatting including indentation
           id: generateId()
         });
       }
