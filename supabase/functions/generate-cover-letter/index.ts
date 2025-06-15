@@ -259,6 +259,15 @@ ${request.cvText ? `My CV/Resume:\n${request.cvText}` : ''}`
     )
 
   } catch (error) {
+    // Enhanced error logging for debugging
+    console.error('[generate-cover-letter] Error occurred:', {
+      message: error.message,
+      stack: error.stack,
+      timestamp: new Date().toISOString(),
+      userId: user?.id,
+      hasSupabaseClient: !!supabaseClient
+    })
+    
     // Security: Log security events for suspicious activities
     if (user && supabaseClient) {
       if (error.message === 'Rate limit exceeded') {
@@ -273,12 +282,27 @@ ${request.cvText ? `My CV/Resume:\n${request.cvText}` : ''}`
           user_agent: req.headers.get('user-agent')
         }, user.id, 'high')
       }
+      
+      // Log all errors for debugging
+      try {
+        await logSecurityEvent(supabaseClient, 'function_error', {
+          endpoint: 'generate-cover-letter',
+          error: error.message,
+          stack: error.stack,
+          user_agent: req.headers.get('user-agent')
+        }, user.id, 'info')
+      } catch (logError) {
+        console.error('[generate-cover-letter] Failed to log error:', logError)
+      }
     }
     
     const errorResponse = getSecureErrorResponse(error, 'generate-cover-letter')
     
     return new Response(
-      JSON.stringify({ error: errorResponse.message }),
+      JSON.stringify({ 
+        error: errorResponse.message,
+        debug: process.env.NODE_ENV === 'development' ? error.message : undefined
+      }),
       { status: errorResponse.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
