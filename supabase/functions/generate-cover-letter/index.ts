@@ -127,6 +127,8 @@ serve(async (req) => {
     const systemPrompt = `Write a professional cover letter that is engaging, specific, and tailored to the job requirements. 
     Use a confident but humble tone, highlight relevant achievements with specific examples, and show genuine interest in the company and role.
     Avoid generic phrases and focus on value proposition.
+    Write in first person using "I" statements throughout.
+    Do not use quotation marks anywhere in the response.
 
     ${lengthInstruction}
 
