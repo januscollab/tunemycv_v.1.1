@@ -55,6 +55,7 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
   const containerRef = useRef<HTMLDivElement>(null)
   const menuRef = useRef<HTMLDivElement>(null)
   const submenuRef = useRef<HTMLDivElement>(null)
+  const selectionTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   const handleAIAction = (type: AIAction['type'], subType?: string, title?: string, description?: string) => {
     if (disabled || !selectedText.trim() || selectedText.length < 10) return
@@ -79,6 +80,11 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
   }
 
   const handleTextSelection = () => {
+    // Clear any existing timeout
+    if (selectionTimeoutRef.current) {
+      clearTimeout(selectionTimeoutRef.current)
+    }
+
     const selection = window.getSelection()
     if (!selection || selection.rangeCount === 0) {
       setMenuPosition({ x: 0, y: 0, visible: false })
@@ -93,28 +99,23 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
       return
     }
 
-    const range = selection.getRangeAt(0)
-    const rect = range.getBoundingClientRect()
-    const containerRect = containerRef.current?.getBoundingClientRect()
-    
-    if (containerRect) {
-      const x = rect.left - containerRect.left + (rect.width / 2)
-      const y = rect.top - containerRect.top - 8
+    // Wait for user to finish selecting (delay for triple-click and normal selection)
+    selectionTimeoutRef.current = setTimeout(() => {
+      const range = selection.getRangeAt(0)
+      const rect = range.getBoundingClientRect()
+      const containerRect = containerRef.current?.getBoundingClientRect()
       
-      setMenuPosition({ x, y, visible: true })
-    }
+      if (containerRect) {
+        // Position menu below the selection with some padding
+        const x = rect.left - containerRect.left + (rect.width / 2)
+        const y = rect.bottom - containerRect.top + 8
+        
+        setMenuPosition({ x, y, visible: true })
+      }
+    }, 300) // Wait 300ms for user to finish selecting
   }
 
-  const handleSubmenuToggle = (submenuType: string, event: React.MouseEvent) => {
-    event.preventDefault()
-    event.stopPropagation()
-    
-    if (activeSubmenu === submenuType) {
-      setActiveSubmenu(null)
-      setSubmenuPosition({ x: 0, y: 0, visible: false })
-      return
-    }
-
+  const handleSubmenuHover = (submenuType: string, event: React.MouseEvent) => {
     const buttonRect = (event.currentTarget as HTMLElement).getBoundingClientRect()
     const containerRect = containerRef.current?.getBoundingClientRect()
     
@@ -125,6 +126,16 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
       setActiveSubmenu(submenuType)
       setSubmenuPosition({ x, y, visible: true })
     }
+  }
+
+  const handleSubmenuLeave = () => {
+    // Small delay to allow moving to submenu
+    setTimeout(() => {
+      if (!submenuRef.current?.matches(':hover')) {
+        setActiveSubmenu(null)
+        setSubmenuPosition({ x: 0, y: 0, visible: false })
+      }
+    }, 100)
   }
 
   const closeMenus = () => {
@@ -178,7 +189,8 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
             <div className="p-1 space-y-1">
               {/* Rephrase Submenu */}
               <button
-                onClick={(e) => handleSubmenuToggle('rephrase', e)}
+                onMouseEnter={(e) => handleSubmenuHover('rephrase', e)}
+                onMouseLeave={handleSubmenuLeave}
                 disabled={isDisabled}
                 className={cn(
                   "w-full flex items-center justify-between gap-2 px-3 py-2 text-caption rounded-md",
@@ -209,7 +221,8 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
 
               {/* Adjust Length Submenu */}
               <button
-                onClick={(e) => handleSubmenuToggle('length', e)}
+                onMouseEnter={(e) => handleSubmenuHover('length', e)}
+                onMouseLeave={handleSubmenuLeave}
                 disabled={isDisabled}
                 className={cn(
                   "w-full flex items-center justify-between gap-2 px-3 py-2 text-caption rounded-md",
