@@ -109,15 +109,21 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    const generatedText = data.choices[0]?.message?.content?.trim();
+    let generatedText = data.choices[0]?.message?.content?.trim();
 
     if (!generatedText) {
       throw new Error('No content generated from OpenAI');
     }
 
+    // Remove surrounding quotes if present
+    if ((generatedText.startsWith('"') && generatedText.endsWith('"')) ||
+        (generatedText.startsWith("'") && generatedText.endsWith("'"))) {
+      generatedText = generatedText.slice(1, -1);
+    }
+
     return new Response(JSON.stringify({ 
       originalText: selectedText,
-      generatedText,
+      processedText: generatedText,
       action 
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
