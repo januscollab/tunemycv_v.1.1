@@ -200,8 +200,12 @@ export const htmlToJson = (html: string): DocumentJson => {
   return result;
 };
 
-// Utility functions
+// Utility functions - FIXED: Don't double-escape HTML content
 const escapeHtml = (text: string): string => {
+  // Don't escape if text already contains HTML entities or tags
+  if (text.includes('&') || text.includes('<') || text.includes('>')) {
+    return text;
+  }
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;

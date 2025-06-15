@@ -62,7 +62,11 @@ export const useJsonFirstEditor = ({
     }
     
     const html = jsonToHtml(json);
-    console.log('[useJsonFirstEditor] Generated HTML from JSON, length:', html?.length || 0);
+    console.log('[useJsonFirstEditor] Generated HTML from JSON:', { 
+      htmlLength: html?.length || 0, 
+      preview: html?.substring(0, 100),
+      hasRawTags: html?.includes('<') && !html?.includes('&lt;')
+    });
     return html || '<p><br></p>';
   });
   
