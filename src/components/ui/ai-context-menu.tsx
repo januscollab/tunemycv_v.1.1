@@ -213,12 +213,12 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
       <div ref={containerRef} className="relative">
         {children}
         
-        {/* Main AI Menu */}
+        {/* Main AI Menu - Redesigned based on image */}
         {menuPosition.visible && (
           <div
             ref={menuRef}
             className={cn(
-              "absolute z-50 w-56 bg-popover border border-border rounded-lg shadow-lg",
+              "absolute z-modal w-64 bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl shadow-lg overflow-hidden",
               "animate-scale-in origin-top",
               "transform -translate-x-1/2"
             )}
@@ -227,73 +227,125 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
               top: `${menuPosition.y}px`,
             }}
           >
-            <div className="p-1 space-y-1">
-              {/* Rephrase Submenu */}
-              <button
-                onMouseEnter={(e) => handleSubmenuHover('rephrase', e)}
-                onMouseLeave={handleSubmenuLeave}
-                disabled={isDisabled}
-                className={cn(
-                  "w-full flex items-center justify-between gap-2 px-3 py-2 text-caption rounded-md",
-                  "hover:bg-accent transition-colors",
-                  "disabled:opacity-50 disabled:cursor-not-allowed"
-                )}
-              >
-                <div className="flex items-center gap-2">
-                  <WandSparkles className="h-4 w-4" />
-                  ✍️ Rephrase
+            {/* Header Section */}
+            <div className="p-4 border-b border-primary-500/30">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-primary-foreground/20 rounded-xl flex items-center justify-center">
+                  <WandSparkles className="w-5 h-5 text-primary-foreground" />
                 </div>
-                <ChevronRight className="h-3 w-3" />
-              </button>
-
-              {/* Improve Clarity */}
-              <button
-                onClick={() => handleAIAction('improve', undefined, '🔍 Improve Clarity')}
-                disabled={isDisabled}
-                className={cn(
-                  "w-full flex items-center gap-2 px-3 py-2 text-caption rounded-md",
-                  "hover:bg-accent transition-colors",
-                  "disabled:opacity-50 disabled:cursor-not-allowed"
-                )}
-              >
-                <Edit3 className="h-4 w-4" />
-                🔍 Improve Clarity
-              </button>
-
-              {/* Adjust Length Submenu */}
-              <button
-                onMouseEnter={(e) => handleSubmenuHover('length', e)}
-                onMouseLeave={handleSubmenuLeave}
-                disabled={isDisabled}
-                className={cn(
-                  "w-full flex items-center justify-between gap-2 px-3 py-2 text-caption rounded-md",
-                  "hover:bg-accent transition-colors",
-                  "disabled:opacity-50 disabled:cursor-not-allowed"
-                )}
-              >
-                <div className="flex items-center gap-2">
-                  <ArrowUpDown className="h-4 w-4" />
-                  📏 Adjust Length
+                <div>
+                  <h3 className="text-body font-medium text-primary-foreground">AI-Enhance</h3>
+                  <p className="text-tiny text-primary-foreground/80">Menu</p>
                 </div>
-                <ChevronRight className="h-3 w-3" />
-              </button>
+              </div>
+            </div>
 
-              {/* Make Role-Specific */}
-              <button
-                onClick={() => handleAIAction('role_specific', undefined, '🎯 Make It Role-Specific')}
-                disabled={isDisabled}
-                className={cn(
-                  "w-full flex items-center gap-2 px-3 py-2 text-caption rounded-md",
-                  "hover:bg-accent transition-colors",
-                  "disabled:opacity-50 disabled:cursor-not-allowed"
-                )}
-              >
-                <Target className="h-4 w-4" />
-                🎯 Make It Role-Specific
-              </button>
+            {/* Menu Items */}
+            <div className="p-2">
+              <div className="space-y-1">
+                {/* Drodt placeholder item */}
+                <div className="px-3 py-2.5 flex items-center gap-3 text-primary-foreground/60">
+                  <Edit3 className="w-4 h-4" />
+                  <span className="text-caption">Drodt</span>
+                </div>
+
+                {/* Active item - Cradis style */}
+                <button
+                  onMouseEnter={(e) => handleSubmenuHover('rephrase', e)}
+                  onMouseLeave={handleSubmenuLeave}
+                  disabled={isDisabled}
+                  className={cn(
+                    "w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg transition-all",
+                    "bg-gradient-to-r from-orange-400 to-orange-500 text-white shadow-md",
+                    "hover:from-orange-500 hover:to-orange-600 transform hover:scale-[1.02]",
+                    "disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  )}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 bg-white/20 rounded-lg flex items-center justify-center">
+                      <WandSparkles className="w-4 h-4" />
+                    </div>
+                    <span className="text-caption font-medium">Rephrase</span>
+                  </div>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+
+                {/* Other menu items */}
+                <button
+                  onMouseEnter={(e) => handleSubmenuHover('length', e)}
+                  onMouseLeave={handleSubmenuLeave}
+                  disabled={isDisabled}
+                  className={cn(
+                    "w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg transition-all",
+                    "text-primary-foreground/90 hover:bg-primary-500/30 hover:text-primary-foreground",
+                    "disabled:opacity-50 disabled:cursor-not-allowed"
+                  )}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 text-primary-foreground/70 flex items-center justify-center">
+                      <ArrowUpDown className="w-4 h-4" />
+                    </div>
+                    <span className="text-caption">Adjust Length</span>
+                  </div>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+
+                <button
+                  onClick={() => handleAIAction('improve', undefined, 'Improve')}
+                  disabled={isDisabled}
+                  className={cn(
+                    "w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg transition-all",
+                    "text-primary-foreground/90 hover:bg-primary-500/30 hover:text-primary-foreground",
+                    "disabled:opacity-50 disabled:cursor-not-allowed"
+                  )}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 text-primary-foreground/70 flex items-center justify-center">
+                      <Brain className="w-4 h-4" />
+                    </div>
+                    <span className="text-caption">Cloud</span>
+                  </div>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+
+                <button
+                  onClick={() => handleAIAction('role_specific', undefined, 'Role Specific')}
+                  disabled={isDisabled}
+                  className={cn(
+                    "w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg transition-all",
+                    "text-primary-foreground/90 hover:bg-primary-500/30 hover:text-primary-foreground",
+                    "disabled:opacity-50 disabled:cursor-not-allowed"
+                  )}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 text-primary-foreground/70 flex items-center justify-center">
+                      <Target className="w-4 h-4" />
+                    </div>
+                    <span className="text-caption">Clade</span>
+                  </div>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+
+                <button
+                  disabled={isDisabled}
+                  className={cn(
+                    "w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg transition-all",
+                    "text-primary-foreground/90 hover:bg-primary-500/30 hover:text-primary-foreground",
+                    "disabled:opacity-50 disabled:cursor-not-allowed"
+                  )}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 text-primary-foreground/70 flex items-center justify-center">
+                      <MessageCircle className="w-4 h-4" />
+                    </div>
+                    <span className="text-caption">Clesss</span>
+                  </div>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
 
               {isDisabled && (
-                <div className="px-3 py-2 text-muted-foreground text-micro border-t border-border">
+                <div className="px-3 py-2 mt-2 text-primary-foreground/60 text-micro border-t border-primary-500/30">
                   Select 10+ characters to use AI features
                 </div>
               )}

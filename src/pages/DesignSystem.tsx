@@ -11,6 +11,7 @@ import { CaptureInput } from '@/components/ui/capture-input';
 import { CaptureTextarea } from '@/components/ui/capture-textarea';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import LegacyRichTextEditor from '@/components/ui/legacy-rich-text-editor';
+import { AIContextMenu } from '@/components/ui/ai-context-menu';
 import '@/components/ui/rich-text-editor.css';
 
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -739,6 +740,39 @@ const DesignSystem = () => {
       ),
       usage: '7 usages',
       description: 'Disabled state for form contexts'
+    },
+    {
+      name: 'AI Context Menu (New Design)',
+      component: (
+        <div className="space-y-4">
+          <p className="text-caption text-muted-foreground">
+            Select any text below to see the new AI context menu design inspired by your brand colors:
+          </p>
+          <AIContextMenu
+            selectedText="This is sample selected text"
+            onTextReplace={(original, newText) => {
+              console.log('Text replacement:', { original, newText });
+            }}
+          >
+            <div className="p-4 border border-border rounded-lg bg-background min-h-[120px]">
+              <h3 className="text-heading font-semibold mb-3">Sample Content for AI Enhancement</h3>
+              <p className="text-body leading-relaxed">
+                Select any portion of this text to trigger the new AI context menu. 
+                The menu features a gradient background using your brand's primary colors, 
+                with an orange accent for the active "Rephrase" option that mimics the 
+                "Cradis" styling from your reference image. Try selecting this sentence 
+                or any other text to see the menu appear with smooth animations.
+              </p>
+              <p className="text-body mt-4">
+                The design includes proper semantic tokens, hover states, and accessibility 
+                features while maintaining the aesthetic from your uploaded reference.
+              </p>
+            </div>
+          </AIContextMenu>
+        </div>
+      ),
+      usage: 'New component',
+      description: 'AI-powered context menu with brand-aligned design for text enhancement'
     }
   ];
 
