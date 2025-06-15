@@ -139,9 +139,9 @@ export const htmlToJson = (html: string): DocumentJson => {
           let contentWithNewlines = innerHTML
             .replace(/<strong[^>]*>(.*?)<\/strong>/gi, '$1') // Remove bold tags but preserve content
             .replace(/<b[^>]*>(.*?)<\/b>/gi, '$1') // Remove bold tags but preserve content  
-            .replace(/&nbsp;/g, ' ') // Convert non-breaking spaces back to regular spaces - KEEP THESE AS SPACES
             .replace(/<(?!br\s*\/?>)[^>]*>/g, '') // Remove HTML tags except <br>
             .replace(/<br\s*\/?>/gi, '\n') // Convert <br> to newlines
+            .replace(/&nbsp;/g, ' ') // Convert non-breaking spaces back to regular spaces AFTER line processing
             .replace(/\s+$/g, '') // Only trim trailing whitespace, preserve leading spaces for indentation
             .replace(/\*\*/g, ''); // Remove any double asterisks from markdown
           
