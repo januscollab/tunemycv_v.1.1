@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Eye, Code, Palette, Type, Square, Circle, Triangle, Zap, AlertTriangle, Search, Star, Heart, Award, Sparkles, Layers, Grid, Layout, MousePointer, Users, TrendingUp, Menu, ChevronDown, Info, Download, Settings, Bell, MessageSquare, Play, Pause, Volume2, RefreshCw, Camera, Clock, MapPin, Shield, Unlock, Lock, Mail, Upload, FileText, Loader, Activity } from 'lucide-react';
+import { ArrowLeft, Eye, Code, Palette, Type, Square, Circle, Triangle, Zap, AlertTriangle, Search, Star, Heart, Award, Sparkles, Layers, Grid, Layout, MousePointer, Users, TrendingUp, Menu, ChevronDown, Info, Download, Settings, Bell, MessageSquare, Play, Pause, Volume2, RefreshCw, Camera, Clock, MapPin, Shield, Unlock, Lock, Mail, Upload, FileText, Loader, Activity, History } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -25,6 +25,7 @@ import { MockPaymentModal } from '@/components/ui/mock-payment-modal';
 
 import { StepIndicator } from '@/components/ui/step-indicator';
 import { ProgressIndicator } from '@/components/ui/progress-indicator';
+import { HistorySection, HistoryHeader, HistoryList, HistoryEmptyState } from '@/components/ui/history-section';
 
 
 const DesignSystem = () => {
@@ -243,6 +244,60 @@ const DesignSystem = () => {
       ), 
       usage: '34 usages',
       description: 'Progress bars with multiple variants, sizes, and animations',
+      status: 'active',
+      trigger: () => {}
+    },
+    { 
+      name: 'HistorySection', 
+      component: (
+        <div className="w-full max-w-lg">
+          <HistorySection
+            header={{
+              title: "Analysis History",
+              count: 3,
+              countLabel: "analysis",
+              icon: <History className="h-5 w-5" />,
+              actions: <Button variant="outline" size="sm">View All</Button>
+            }}
+            items={[
+              {
+                id: '1',
+                title: 'Senior Software Engineer',
+                subtitle: 'TechCorp Inc.',
+                date: '2 hours ago',
+                status: 'completed',
+                badge: { text: '95%', variant: 'default' },
+                metadata: [
+                  { label: 'Score', value: '95%' },
+                  { label: 'Credits', value: '1' }
+                ],
+                actions: [
+                  { label: 'View', variant: 'outline', onClick: () => {} },
+                  { label: 'Download', variant: 'ghost', onClick: () => {} }
+                ]
+              },
+              {
+                id: '2',
+                title: 'Product Manager',
+                subtitle: 'StartupXYZ',
+                date: '1 day ago',
+                status: 'completed',
+                badge: { text: '88%', variant: 'secondary' },
+                metadata: [
+                  { label: 'Score', value: '88%' }
+                ],
+                actions: [
+                  { label: 'View', variant: 'outline', onClick: () => {} }
+                ]
+              }
+            ]}
+            variant="default"
+            onItemClick={(item) => console.log('Clicked:', item.title)}
+          />
+        </div>
+      ), 
+      usage: '12 usages',
+      description: 'Unified history component for analysis, cover letters, and CV management across the app',
       status: 'active',
       trigger: () => {}
     }
