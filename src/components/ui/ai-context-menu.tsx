@@ -96,7 +96,7 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
         throw new Error(data.error)
       }
 
-      setGeneratedText(data.generatedText)
+      setGeneratedText(data.processedText)
     } catch (error) {
       console.error('AI processing failed:', error)
       toast({

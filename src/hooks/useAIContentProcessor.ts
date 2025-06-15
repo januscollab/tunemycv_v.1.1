@@ -74,8 +74,12 @@ export const useAIContentProcessor = ({
       
       const { data, error: functionError } = await supabase.functions.invoke('process-ai-content', {
         body: {
-          action: action,
-          selectedText: action.selectedText
+          selectedText: action.selectedText,
+          action: {
+            type: action.type,
+            subType: action.subType
+          },
+          context: "editor"
         }
       });
 
