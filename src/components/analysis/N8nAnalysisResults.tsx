@@ -1,8 +1,9 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, Download, Eye, FileText, Globe } from 'lucide-react';
+import { ExternalLink, Eye, FileText, Globe, Download } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { DownloadMenu } from '@/components/ui/download-menu';
 
 interface N8nAnalysisResultsProps {
   result: {
@@ -179,14 +180,21 @@ const N8nAnalysisResults: React.FC<N8nAnalysisResultsProps> = ({
                   <Eye className="h-4 w-4 mr-2" />
                   Preview PDF Report
                 </Button>
-                <Button
-                  onClick={() => handleDownload(result.n8n_pdf_url!, 'pdf')}
+                <DownloadMenu
+                  buttonText="Download"
                   variant="outline"
                   className="w-full"
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  Download PDF
-                </Button>
+                  onDownloadPDF={() => handleDownload(result.n8n_pdf_url!, 'pdf')}
+                  onDownloadHTML={() => handleDownload(result.n8n_html_url!, 'html')}
+                  onDownloadText={() => {
+                    // Convert PDF to text functionality could be added here
+                    console.log('Text download not implemented for n8n reports');
+                  }}
+                  onDownloadWord={() => {
+                    // Convert PDF to Word functionality could be added here  
+                    console.log('Word download not implemented for n8n reports');
+                  }}
+                />
                 <Button
                   onClick={() => handleExternalLink(result.n8n_pdf_url!)}
                   variant="outline"
