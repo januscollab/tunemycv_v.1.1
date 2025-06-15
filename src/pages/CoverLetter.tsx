@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FileText, Sparkles, Trash2, RefreshCw, Clock, FileUp, Search, AlertCircle, Eye, Edit, Download, History, RotateCcw, Edit2, Linkedin } from 'lucide-react';
 import Breadcrumbs from '@/components/navigation/Breadcrumbs';
-import LegacyRichTextEditor from '@/components/ui/legacy-rich-text-editor';
+import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import { CategoryDocumentHistory } from '@/components/ui/category-document-history';
 import DownloadOptions from '@/components/cover-letter/DownloadOptions';
 
@@ -813,8 +813,8 @@ const AuthenticatedCoverLetter = () => {
                             fileName={`${selectedCoverLetter.company_name}_${selectedCoverLetter.job_title}_Cover_Letter`}
                           />
                         </div>
-                        <LegacyRichTextEditor
-                          value={(() => {
+                        <RichTextEditor
+                          initialContent={(() => {
                             try {
                               // Try to parse as JSON first
                               const jsonData = JSON.parse(selectedCoverLetter.content);
@@ -831,57 +831,56 @@ const AuthenticatedCoverLetter = () => {
                               return selectedCoverLetter.content.replace(/\n/g, '<br>');
                             }
                           })()}
-                          onChange={(content) => {
-                            if (selectedCoverLetter) {
+                          onContentChange={async (json, text) => {
+                            if (selectedCoverLetter && user) {
+                              // Convert back to HTML for storage
+                              const htmlContent = json.sections.map(section => {
+                                let html = section.content || '';
+                                if (section.formatting?.bold) {
+                                  html = `<strong>${html}</strong>`;
+                                }
+                                return `<p>${html}</p>`;
+                              }).join('');
+                              
+                              // Update local state
                               setSelectedCoverLetter({
                                 ...selectedCoverLetter,
-                                content: content
+                                content: htmlContent
                               });
-                            }
-                          }}
-                          onSave={async (content) => {
-                            if (selectedCoverLetter && user) {
+
+                              // Auto-save to database with debouncing
                               try {
                                 const { error } = await supabase
                                   .from('cover_letters')
                                   .update({ 
-                                    content
-                                    // Remove manual updated_at - let database trigger handle it
+                                    content: htmlContent
                                   })
                                   .eq('id', selectedCoverLetter.id)
                                   .eq('user_id', user.id);
                                 
-                                if (error) throw error;
-                                
-                                // Update local state to reflect changes
-                                setSelectedCoverLetter(prev => ({
-                                  ...prev,
-                                  content,
-                                  updated_at: new Date().toISOString()
-                                }));
-                                
-                                // Refresh history to show updated timestamp
-                                loadCoverLetterHistory();
-                                
-                                toast({
-                                  title: 'Success',
-                                  description: 'Cover letter saved automatically',
-                                });
+                                if (error) {
+                                  console.error('Auto-save failed:', error);
+                                } else {
+                                  // Update timestamp
+                                  setSelectedCoverLetter(prev => ({
+                                    ...prev,
+                                    content: htmlContent,
+                                    updated_at: new Date().toISOString()
+                                  }));
+                                }
                               } catch (error) {
-                                console.error('Auto-save failed:', error);
-                                toast({
-                                  title: 'Error',
-                                  description: 'Failed to auto-save cover letter',
-                                  variant: 'destructive',
-                                });
+                                console.error('Auto-save error:', error);
                               }
                             }
                           }}
-                          autoSave={true}
-                          autoSaveDelay={3000}
-                          readOnly={false}
+                          onAIRequest={(action) => {
+                            console.log('AI request in cover letter:', action);
+                            // Future: Implement AI processing for cover letter enhancement
+                          }}
+                          showAIFeatures={true}
+                          enableAutoSave={true}
                           className="min-h-[400px]"
-                          placeholder=""
+                          placeholder="Start writing your cover letter..."
                         />
                       </div>
                       
