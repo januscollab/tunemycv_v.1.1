@@ -4,6 +4,7 @@ import { extractJobTitleFromText, extractCompanyFromText } from '@/utils/analysi
 import { saveFilesToDatabase, saveAnalysisResults } from '@/services/analysisService';
 import { useN8nAnalysis } from '@/hooks/useN8nAnalysis';
 import { UploadedFile } from '@/types/fileTypes';
+import { supabase } from '@/integrations/supabase/client';
 
 interface AnalysisOptions {
   saveCV: boolean;
@@ -130,9 +131,35 @@ export const useAnalysisExecution = () => {
 
         console.log('n8n CV analysis completed successfully:', { ...savedResult, ...analysisResult });
         
+        // Deduct credits for successful n8n analysis with returned documents
+        try {
+          const { data: currentCredits, error: creditsError } = await supabase
+            .from('user_credits')
+            .select('credits')
+            .eq('user_id', user?.id)
+            .single();
+
+          if (creditsError) {
+            console.warn('Could not fetch current credits for deduction:', creditsError);
+          } else if (currentCredits && currentCredits.credits > 0) {
+            const { error: updateError } = await supabase
+              .from('user_credits')
+              .update({ credits: Math.max(0, currentCredits.credits - 1) })
+              .eq('user_id', user?.id);
+
+            if (updateError) {
+              console.warn('Could not deduct credit:', updateError);
+            } else {
+              console.log('Credit deducted for successful n8n analysis');
+            }
+          }
+        } catch (creditError) {
+          console.warn('Credit deduction failed:', creditError);
+        }
+        
         toast({ 
           title: 'Analysis Complete!', 
-          description: 'Your CV analysis has been completed successfully via n8n.'
+          description: 'Your CV analysis has been completed successfully via n8n. 1 credit has been deducted.'
         });
         
         return { ...savedResult, ...analysisResult };
