@@ -964,17 +964,6 @@ const AuthenticatedCoverLetter = () => {
                       }
                     },
                     {
-                      label: 'CV Analysis',
-                      icon: <FileText className="h-4 w-4 mr-2" />,
-                      onClick: (document) => {
-                        if (document.analysis_result_id) {
-                          handleViewCVAnalysis(document.analysis_result_id);
-                        }
-                      },
-                      condition: (document) => !!document.analysis_result_id,
-                      variant: 'success'
-                    },
-                    {
                       label: 'Delete',
                       icon: <Trash2 className="h-4 w-4 mr-2" />,
                       onClick: (document) => handleDelete(document.id),
