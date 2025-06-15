@@ -55,7 +55,7 @@ interface CategoryDocumentHistoryListProps {
   loading?: boolean;
   onDocumentClick?: (document: DocumentItem) => void;
   onEditTitle?: (documentId: string, newTitle: string, type: 'analysis' | 'cover_letter') => void;
-  actions?: DocumentAction[];
+  actions?: DocumentAction[] | ((document: DocumentItem) => DocumentAction[]);
   emptyState?: {
     title: string;
     description: string;
@@ -353,15 +353,18 @@ export const CategoryDocumentHistoryList: React.FC<CategoryDocumentHistoryListPr
 
   return (
     <div className="space-y-4">
-      {documents.map((document) => (
-        <CategoryDocumentHistoryItem
-          key={`${document.type}-${document.id}`}
-          document={document}
-          onDocumentClick={onDocumentClick}
-          onEditTitle={onEditTitle}
-          actions={actions}
-        />
-      ))}
+      {documents.map((document) => {
+        const documentActions = typeof actions === 'function' ? actions(document) : actions || [];
+        return (
+          <CategoryDocumentHistoryItem
+            key={`${document.type}-${document.id}`}
+            document={document}
+            onDocumentClick={onDocumentClick}
+            onEditTitle={onEditTitle}
+            actions={documentActions}
+          />
+        );
+      })}
     </div>
   );
 };
