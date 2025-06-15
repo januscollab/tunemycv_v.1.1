@@ -16,6 +16,8 @@ import {
   Upload
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { AIReplacementDialog } from "./ai-replacement-dialog"
+import { useToast } from "@/hooks/use-toast"
 
 interface ExperimentalAIMenuProps {
   children: React.ReactNode
@@ -41,6 +43,20 @@ const ExperimentalAIMenu: React.FC<ExperimentalAIMenuProps> = ({
   const [showUpload, setShowUpload] = useState(false)
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null)
   const [hoveredAction, setHoveredAction] = useState<string | null>(null)
+  const [dialogState, setDialogState] = useState<{
+    open: boolean
+    originalText: string
+    generatedText: string
+    actionTitle: string
+    isLoading: boolean
+  }>({
+    open: false,
+    originalText: "",
+    generatedText: "",
+    actionTitle: "",
+    isLoading: false
+  })
+  const { toast } = useToast()
   const containerRef = useRef<HTMLDivElement>(null)
   const menuRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -86,14 +102,99 @@ const ExperimentalAIMenu: React.FC<ExperimentalAIMenuProps> = ({
   }
 
   const handleAIAction = async (action: string, subAction?: string) => {
-    setIsProcessing(true)
+    const currentText = window.getSelection()?.toString().trim() || ""
+    const actionTitle = `${action}${subAction ? ` - ${subAction}` : ''}`
     
-    // Simulate AI processing
+    // Close menu and open dialog with loading state
+    setMenuPosition({ x: 0, y: 0, visible: false })
+    setDialogState({
+      open: true,
+      originalText: currentText,
+      generatedText: "",
+      actionTitle: actionTitle,
+      isLoading: true
+    })
+    
+    // Simulate AI processing with realistic delay
     setTimeout(() => {
-      setIsProcessing(false)
-      setMenuPosition({ x: 0, y: 0, visible: false })
-      console.log(`AI Action: ${action}${subAction ? ` - ${subAction}` : ''}`)
-    }, 2000)
+      // Generate mock improved text based on action
+      let improvedText = generateMockImprovement(currentText, action, subAction)
+      
+      setDialogState(prev => ({
+        ...prev,
+        generatedText: improvedText,
+        isLoading: false
+      }))
+    }, 2000 + Math.random() * 1000) // 2-3 seconds
+  }
+
+  const generateMockImprovement = (text: string, action: string, subAction?: string): string => {
+    // Mock AI improvements based on action type
+    switch (action) {
+      case 'rephrase':
+        if (subAction === 'professional') {
+          return text.replace(/I think/g, 'I believe').replace(/good/g, 'excellent').replace(/bad/g, 'suboptimal')
+        } else if (subAction === 'conversational') {
+          return `Hey there! ${text.replace(/Therefore/g, 'So').replace(/However/g, 'But')}`
+        } else if (subAction === 'creative') {
+          return `✨ ${text} ✨ This sparks new possibilities and opens doors to innovation.`
+        }
+        return `${text} (rephrased for clarity and impact)`
+      
+      case 'improve':
+        return `${text}\n\nThis enhanced version provides greater clarity, improved structure, and more engaging language that resonates with your audience.`
+      
+      case 'length':
+        if (subAction === 'shorter') {
+          return text.split('. ').slice(0, Math.ceil(text.split('. ').length / 2)).join('. ')
+        } else if (subAction === 'longer') {
+          return `${text}\n\nTo elaborate further, this approach offers several advantages and creates opportunities for deeper engagement. The strategic implementation of these concepts can lead to significant improvements in overall effectiveness.`
+        } else if (subAction === 'summarize') {
+          return `Summary: ${text.substring(0, Math.min(100, text.length))}...`
+        }
+        return `${text} (length adjusted)`
+      
+      case 'role':
+        return `${text}\n\n[Optimized for professional context with industry-specific terminology and strategic focus that aligns with organizational objectives.]`
+      
+      default:
+        return `${text} (enhanced by AI)`
+    }
+  }
+
+  const handleAcceptChanges = () => {
+    // In a real implementation, this would replace the selected text
+    toast({
+      title: "Changes Applied",
+      description: "Your text has been successfully updated with AI improvements.",
+    })
+    
+    // Clear selection and close dialog
+    window.getSelection()?.removeAllRanges()
+    setDialogState(prev => ({ ...prev, open: false }))
+  }
+
+  const handleRegenerateText = () => {
+    setDialogState(prev => ({
+      ...prev,
+      isLoading: true,
+      generatedText: ""
+    }))
+    
+    // Regenerate with slight variation
+    setTimeout(() => {
+      const newText = generateMockImprovement(
+        dialogState.originalText, 
+        dialogState.actionTitle.split(' - ')[0],
+        dialogState.actionTitle.split(' - ')[1]
+      ) + " (regenerated)"
+      
+      setDialogState(prev => ({
+        ...prev,
+        generatedText: newText,
+        isLoading: false
+      }))
+    }, 1500)
   }
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -365,6 +466,18 @@ const ExperimentalAIMenu: React.FC<ExperimentalAIMenuProps> = ({
             </div>
           </div>
         )}
+
+        {/* AI Replacement Dialog */}
+        <AIReplacementDialog
+          open={dialogState.open}
+          onOpenChange={(open) => setDialogState(prev => ({ ...prev, open }))}
+          originalText={dialogState.originalText}
+          generatedText={dialogState.generatedText}
+          actionTitle={dialogState.actionTitle}
+          isLoading={dialogState.isLoading}
+          onAccept={handleAcceptChanges}
+          onRegenerate={handleRegenerateText}
+        />
       </div>
     </>
   )

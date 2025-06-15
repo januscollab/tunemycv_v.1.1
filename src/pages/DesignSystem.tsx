@@ -1454,16 +1454,83 @@ const DesignSystem = () => {
             <section>
               <h2 className="text-display font-bold mb-4">🧪 Experimental Components</h2>
               <p className="text-body text-muted-foreground mb-8">
-                Creative explorations and experimental UI concepts. These are not production components but design experiments.
+                Creative explorations and experimental UI concepts. These are production-ready components with advanced features.
               </p>
 
-              {/* Floating AI Assistant Experiment */}
+              {/* Enhanced AI Assistant */}
               <Card className="mb-8">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Sparkles className="h-5 w-5 text-primary" />
-                    Floating AI Assistant
+                    Enhanced AI Text Assistant
                   </CardTitle>
+                  <p className="text-caption text-muted-foreground">
+                    Contextual AI menu with nested actions, custom avatars, and before/after comparison dialog
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    {/* Interactive Demo */}
+                    <div>
+                      <h4 className="font-medium mb-3">Interactive Demo</h4>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Select any text below to see the enhanced AI assistant with smart contextual filtering and approval workflow.
+                      </p>
+                      <ExperimentalAIMenu>
+                        <div className="p-6 border rounded-lg bg-card">
+                          <h4 className="font-medium mb-3">Sample Content for AI Enhancement</h4>
+                          <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+                            This is a comprehensive text editing experience powered by artificial intelligence. The system provides contextual assistance based on your selected content, offering smart suggestions for rephrasing, improving clarity, adjusting length, and optimizing for specific roles or audiences.
+                          </p>
+                          
+                          <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+                            Select any portion of this text to see the AI assistant appear with relevant actions. The interface includes nested menus for precise control, custom avatar upload capabilities, and a detailed preview system that shows before and after comparisons before you commit to changes.
+                          </p>
+                          
+                          <p className="text-sm text-muted-foreground leading-relaxed">
+                            Try selecting different amounts of text to see how the available actions change contextually - shorter selections won't show summarization options, while longer text unlocks advanced editing features like role optimization and detailed expansion.
+                          </p>
+                          
+                          <div className="mt-4 p-4 bg-orange-50/30 rounded border-l-4 border-orange-400/50">
+                            <p className="text-sm">
+                              <strong>💡 Pro Tip:</strong> You can upload your own AI avatar image by clicking on the assistant's profile picture in the menu. The system remembers your preference and uses subtle orange branding throughout the interface.
+                            </p>
+                          </div>
+                        </div>
+                      </ExperimentalAIMenu>
+                    </div>
+
+                    {/* Feature Grid */}
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div className="p-4 border rounded-lg">
+                        <h4 className="font-medium mb-3 flex items-center gap-2">
+                          <Brain className="w-5 h-5 text-orange-500" />
+                          Smart Context Detection
+                        </h4>
+                        <ul className="text-sm text-muted-foreground space-y-1">
+                          <li>• Actions adapt based on selected text length</li>
+                          <li>• Word count-based feature filtering</li>
+                          <li>• Nested menu organization</li>
+                          <li>• Smooth gliding animations</li>
+                        </ul>
+                      </div>
+
+                      <div className="p-4 border rounded-lg">
+                        <h4 className="font-medium mb-3 flex items-center gap-2">
+                          <Upload className="w-5 h-5 text-orange-500" />
+                          Personalization Features
+                        </h4>
+                        <ul className="text-sm text-muted-foreground space-y-1">
+                          <li>• Custom AI avatar upload</li>
+                          <li>• Persistent user preferences</li>
+                          <li>• Subtle brand integration</li>
+                          <li>• Before/after preview dialog</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
                   <p className="text-caption text-muted-foreground">
                     A completely reimagined AI context menu with orbital interactions and personality
                   </p>
