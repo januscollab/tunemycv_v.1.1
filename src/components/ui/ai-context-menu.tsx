@@ -250,13 +250,13 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
                   disabled={isDisabled}
                   className={cn(
                     "w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg transition-all",
-                    "bg-gradient-to-r from-orange-300/80 to-orange-400/80 text-white shadow-sm",
-                    "hover:from-orange-400/90 hover:to-orange-500/90 transform hover:scale-[1.01]",
+                    "bg-gradient-to-r from-orange-200/60 to-orange-300/60 text-white shadow-sm",
+                    "hover:from-orange-300/70 hover:to-orange-400/70 transform hover:scale-[1.01]",
                     "disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                   )}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-white/25 rounded-lg flex items-center justify-center">
+                    <div className="w-6 h-6 bg-white/30 rounded-lg flex items-center justify-center">
                       <WandSparkles className="w-4 h-4" />
                     </div>
                     <span className="text-caption font-medium">Rephrase</span>
