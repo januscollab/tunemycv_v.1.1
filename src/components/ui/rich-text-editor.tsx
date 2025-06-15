@@ -1,369 +1,175 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useEffect, useState, useCallback, forwardRef, useImperativeHandle } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import { WandSparkles, RotateCcw, Check, X, AlertCircle, Save, Download } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import './rich-text-editor.css';
+import { useJsonFirstEditor } from '@/hooks/useJsonFirstEditor';
+import { DocumentJson } from '@/utils/documentJsonUtils';
+import { AIContextMenu, AIAction } from '@/components/ui/ai-context-menu';
 import { cn } from '@/lib/utils';
-import { useToast } from '@/hooks/use-toast';
-import jsPDF from 'jspdf';
-import { Document, Packer, Paragraph, TextRun } from 'docx';
-
-interface AIContext {
-  selectedText: string;
-  selectionRange: { index: number; length: number };
-  fullText: string;
-}
 
 interface RichTextEditorProps {
-  value?: string;
-  onChange?: (value: string) => void;
-  onSave?: (value: string) => void;
-  onDownload?: (value: string, filename?: string) => void;
+  initialContent: string | DocumentJson;
+  onContentChange: (json: DocumentJson, text: string) => void;
   className?: string;
   placeholder?: string;
   readOnly?: boolean;
   showAIFeatures?: boolean;
-  variant?: 'default';
-  size?: 'sm' | 'md' | 'lg';
-  state?: 'default' | 'error' | 'success';
-  disabled?: boolean;
-  minHeight?: string;
-  filename?: string;
-  onAIRequest?: (context: AIContext, action: 'improve' | 'rewrite' | 'tone') => void;
-  autoSave?: boolean;
-  autoSaveDelay?: number;
+  onAIRequest?: (action: AIAction) => void;
+  enableAutoSave?: boolean;
+  debounceMs?: number;
 }
 
-const RichTextEditor: React.FC<RichTextEditorProps> = ({
-  value = '',
-  onChange,
-  onSave,
-  onDownload,
-  className,
-  placeholder = 'Start writing...',
+interface RichTextEditorRef {
+  htmlContent: string;
+  saveChanges: () => Promise<void>;
+  getPlainText: () => string;
+}
+
+const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>(({
+  initialContent,
+  onContentChange,
+  className = '',
+  placeholder = 'Start editing...',
   readOnly = false,
-  showAIFeatures = false,
-  variant = 'default',
-  size = 'md',
-  state = 'default',
-  disabled = false,
-  minHeight = '200px',
-  filename = 'document',
+  showAIFeatures = true,
   onAIRequest,
-  autoSave = false,
-  autoSaveDelay = 2000
-}) => {
+  enableAutoSave = true,
+  debounceMs = 300
+}, ref) => {
   const quillRef = useRef<ReactQuill>(null);
-  const [content, setContent] = useState(value);
-  const [isAIEnabled, setIsAIEnabled] = useState(false);
-  const [selectionInfo, setSelectionInfo] = useState<AIContext | null>(null);
-  const [isDownloading, setIsDownloading] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const { toast } = useToast();
+  const [selectedText, setSelectedText] = useState('');
 
-  // Update content when value prop changes
-  useEffect(() => {
-    if (value !== content) {
-      setContent(value);
-    }
-  }, [value, content]);
+  // Use the JSON-first editor hook
+  const {
+    documentJson,
+    htmlContent,
+    isConverting,
+    hasUnsavedChanges,
+    updateFromHtml,
+    resetToOriginal,
+    saveChanges,
+    getPlainText
+  } = useJsonFirstEditor({
+    initialContent,
+    onContentChange,
+    enableAutoSave
+  });
 
-  // Auto-save functionality
-  const performAutoSave = useCallback(async (contentToSave: string) => {
-    if (onSave && autoSave && !readOnly && !disabled) {
-      setIsSaving(true);
-      try {
-        await onSave(contentToSave);
-      } catch (error) {
-        console.error('Auto-save failed:', error);
-      } finally {
-        setIsSaving(false);
+  // Expose methods through ref
+  useImperativeHandle(ref, () => ({
+    htmlContent,
+    saveChanges,
+    getPlainText
+  }), [htmlContent, saveChanges, getPlainText]);
+
+  // Handle content changes from Quill
+  const handleContentChange = useCallback((value: string) => {
+    try {
+      if (typeof value === 'string') {
+        updateFromHtml(value);
       }
+    } catch (error) {
+      console.error('[RichTextEditor] Error handling content change:', error);
     }
-  }, [onSave, autoSave, readOnly, disabled]);
-
-  // Content change handler
-  const handleContentChange = useCallback((newValue: string) => {
-    setContent(newValue);
-    onChange?.(newValue);
-    
-    // Auto-save logic
-    if (autoSave && onSave && !readOnly && !disabled) {
-      // Clear existing timeout
-      if (autoSaveTimeoutRef.current) {
-        clearTimeout(autoSaveTimeoutRef.current);
-      }
-      
-      // Set new timeout for auto-save
-      autoSaveTimeoutRef.current = setTimeout(() => {
-        performAutoSave(newValue);
-      }, autoSaveDelay);
-    }
-  }, [onChange, autoSave, onSave, readOnly, disabled, autoSaveDelay, performAutoSave]);
-
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (autoSaveTimeoutRef.current) {
-        clearTimeout(autoSaveTimeoutRef.current);
-      }
-    };
-  }, []);
+  }, [updateFromHtml]);
 
   // Handle text selection for AI features
   const handleSelectionChange = useCallback((range: any, source: any, editor: any) => {
-    if (!showAIFeatures || source !== 'user' || readOnly || disabled) return;
+    if (!showAIFeatures || source !== 'user' || !range) {
+      setSelectedText('');
+      return;
+    }
     
-    if (range && range.length > 0) {
-      const selectedText = editor.getText(range.index, range.length);
-      const fullText = editor.getText();
-      
-      setSelectionInfo({
-        selectedText: selectedText.trim(),
-        selectionRange: range,
-        fullText: fullText
-      });
-      setIsAIEnabled(selectedText.trim().length > 10);
+    if (range.length > 0) {
+      const selected = editor.getText(range.index, range.length);
+      setSelectedText(selected.trim());
     } else {
-      setSelectionInfo(null);
-      setIsAIEnabled(false);
+      setSelectedText('');
     }
-  }, [showAIFeatures, readOnly, disabled]);
+  }, [showAIFeatures]);
 
-  // Save and download handlers
-  const handleSave = useCallback(() => {
-    if (onSave && content) {
-      onSave(content);
-    }
-  }, [onSave, content]);
-
-  const handleDownload = useCallback(async (format?: 'pdf' | 'docx' | 'txt' | 'html') => {
-    if (!content) return;
+  // Handle AI actions - placeholder for future implementation
+  const handleAIAction = useCallback((action: AIAction) => {
+    console.log('AI Action requested:', action);
     
-    setIsDownloading(true);
-    
-    try {
-      // Strip HTML tags for plain text formats
-      const stripHtml = (html: string) => {
-        const tmp = document.createElement('div');
-        tmp.innerHTML = html;
-        return tmp.textContent || tmp.innerText || '';
-      };
-
-      const plainText = stripHtml(content);
-      const baseFilename = filename || 'document';
-
-      if (onDownload && !format) {
-        // Use custom download handler if provided
-        onDownload(content, baseFilename);
-        return;
-      }
-
-      switch (format) {
-        case 'pdf':
-          const pdf = new jsPDF();
-          const splitText = pdf.splitTextToSize(plainText, 180);
-          pdf.text(splitText, 10, 10);
-          pdf.save(`${baseFilename}.pdf`);
-          toast({
-            title: 'Success',
-            description: 'Document downloaded as PDF',
-          });
-          break;
-
-        case 'docx':
-          const doc = new Document({
-            sections: [{
-              properties: {},
-              children: [
-                new Paragraph({
-                  children: [
-                    new TextRun(plainText)
-                  ],
-                }),
-              ],
-            }],
-          });
-          const blob = await Packer.toBlob(doc);
-          const url = window.URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.href = url;
-          link.download = `${baseFilename}.docx`;
-          link.click();
-          window.URL.revokeObjectURL(url);
-          toast({
-            title: 'Success',
-            description: 'Document downloaded as Word document',
-          });
-          break;
-
-        case 'txt':
-          const textBlob = new Blob([plainText], { type: 'text/plain' });
-          const textUrl = window.URL.createObjectURL(textBlob);
-          const textLink = document.createElement('a');
-          textLink.href = textUrl;
-          textLink.download = `${baseFilename}.txt`;
-          textLink.click();
-          window.URL.revokeObjectURL(textUrl);
-          toast({
-            title: 'Success',
-            description: 'Document downloaded as text file',
-          });
-          break;
-
-        default:
-        case 'html':
-          const htmlBlob = new Blob([content], { type: 'text/html' });
-          const htmlUrl = URL.createObjectURL(htmlBlob);
-          const htmlLink = document.createElement('a');
-          htmlLink.href = htmlUrl;
-          htmlLink.download = `${baseFilename}.html`;
-          document.body.appendChild(htmlLink);
-          htmlLink.click();
-          document.body.removeChild(htmlLink);
-          URL.revokeObjectURL(htmlUrl);
-          toast({
-            title: 'Success',
-            description: 'Document downloaded as HTML file',
-          });
-          break;
-      }
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to download document',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsDownloading(false);
+    // Future implementation: Call OpenAI API to process the selected text
+    // For now, just pass to parent component if handler exists
+    if (onAIRequest) {
+      onAIRequest(action);
     }
-  }, [content, filename, onDownload, toast]);
+  }, [onAIRequest]);
 
-  // Removed custom save and download buttons from toolbar
-
-  // Toolbar configuration
-  const getToolbarConfig = () => {
-    return [
-      [{ 'header': [1, 2, 3, false] }],
-      ['bold', 'italic'],
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-      ['clean']
-    ];
-  };
-
-  // AI improvement handlers
-  const handleAIImprovement = useCallback((action: 'improve' | 'rewrite' | 'tone') => {
-    if (selectionInfo && onAIRequest) {
-      onAIRequest(selectionInfo, action);
-    }
-  }, [selectionInfo, onAIRequest]);
-
-  // Quill configuration
+  // Quill configuration with enhanced features
   const modules = {
-    toolbar: {
-      container: getToolbarConfig()
-    },
+    toolbar: [
+      [{ 'header': [1, 2, 3, false] }],
+      ['bold'],
+      [{ 'list': 'bullet' }],
+      ['clean']
+    ],
     clipboard: {
       matchVisual: false
     },
     history: {
       delay: 1000,
       maxStack: 100,
-      userOnly: false
+      userOnly: true
     }
   };
 
-  const formats = ['header', 'bold', 'italic', 'list', 'bullet', 'ordered'];
+  const formats = [
+    'header', 'bold', 'list', 'bullet'
+  ];
 
-  // Size classes
-  const sizeClasses = {
-    sm: 'text-sm',
-    md: 'text-body',
-    lg: 'text-subheading'
-  };
-
-  // State classes
-  const stateClasses = {
-    default: 'border-border',
-    error: 'border-destructive',
-    success: 'border-success'
-  };
-
-  const stateIcons = {
-    error: <AlertCircle className="h-4 w-4 text-destructive" />,
-    success: <Check className="h-4 w-4 text-success" />,
-    default: null
-  };
-
-  return (
-    <div className={cn('relative', className)}>
-      {/* State Indicator */}
-      {(state !== 'default' || isSaving) && (
-        <div className="absolute top-2 left-2 z-20 flex items-center space-x-1">
-          {isSaving && <Save className="h-4 w-4 text-muted-foreground animate-pulse" />}
-          {stateIcons[state]}
-        </div>
-      )}
-
-      {/* AI Enhancement Toolbar */}
-      {showAIFeatures && isAIEnabled && selectionInfo && !readOnly && !disabled && (
-        <div className="absolute top-2 right-2 z-20 flex space-x-1 bg-background border border-border rounded-lg p-1 shadow-lg">
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => handleAIImprovement('improve')}
-            className="text-micro px-2 py-1 h-6"
-          >
-            <WandSparkles className="h-3 w-3 mr-1" />
-            Improve
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => handleAIImprovement('rewrite')}
-            className="text-micro px-2 py-1 h-6"
-          >
-            <RotateCcw className="h-3 w-3 mr-1" />
-            Rewrite
-          </Button>
+  const editorContent = (
+    <div className={cn('rich-text-editor-wrapper relative', className)}>
+      {/* Loading indicator */}
+      {isConverting && (
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 bg-background/80 rounded-lg p-2">
+          <div className="animate-spin rounded-full h-4 w-4 border border-current border-t-transparent" />
         </div>
       )}
 
       {/* Quill Editor */}
-      <div 
-        className={cn(
-          'rich-text-editor-wrapper',
-          sizeClasses[size],
-          stateClasses[state],
-          disabled && 'opacity-50 cursor-not-allowed'
-        )}
-        style={{ minHeight }}
-      >
-        <ReactQuill
-          ref={quillRef}
-          theme="snow"
-          value={content}
-          onChange={handleContentChange}
-          onChangeSelection={handleSelectionChange}
-          readOnly={readOnly || disabled}
-          placeholder={placeholder}
-          modules={modules}
-          formats={formats}
-          className="rich-text-editor"
-        />
-      </div>
+      <ReactQuill
+        ref={quillRef}
+        theme="snow"
+        value={htmlContent}
+        onChange={handleContentChange}
+        onChangeSelection={handleSelectionChange}
+        readOnly={readOnly || isConverting}
+        placeholder={placeholder}
+        modules={modules}
+        formats={formats}
+        className="rich-text-editor bg-background text-foreground border border-border rounded-md"
+      />
 
-      {/* Selected Text Info for AI features */}
-      {showAIFeatures && selectionInfo && !readOnly && !disabled && (
+      {/* Debug Info (development only) */}
+      {process.env.NODE_ENV === 'development' && hasUnsavedChanges && (
         <div className="mt-2 text-micro text-muted-foreground">
-          Selected: {selectionInfo.selectedText.length > 50 
-            ? `${selectionInfo.selectedText.substring(0, 50)}...` 
-            : selectionInfo.selectedText}
+          Unsaved changes • {documentJson.sections.length} sections
         </div>
       )}
     </div>
   );
-};
 
-export { RichTextEditor, type RichTextEditorProps, type AIContext };
+  // Wrap with AI Context Menu if AI features are enabled
+  if (showAIFeatures) {
+    return (
+      <AIContextMenu
+        selectedText={selectedText}
+        onAIAction={handleAIAction}
+        disabled={readOnly || isConverting}
+      >
+        {editorContent}
+      </AIContextMenu>
+    );
+  }
+
+  return editorContent;
+});
+
+RichTextEditor.displayName = 'RichTextEditor';
+
+export default RichTextEditor;
+export { RichTextEditor, type RichTextEditorRef, type RichTextEditorProps };
