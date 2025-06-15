@@ -251,44 +251,61 @@ const DesignSystem = () => {
     { 
       name: 'HistorySection', 
       component: (
-        <div className="w-full max-w-lg">
+        <div className="w-full max-w-4xl">
           <HistorySection
             header={{
-              title: "Analysis History",
+              title: "Saved Cover Letters",
               count: 3,
-              countLabel: "analysis",
+              countLabel: "cover letter",
               icon: <History className="h-5 w-5" />,
-              actions: <Button variant="outline" size="sm">View All</Button>
+              actions: (
+                <div className="flex items-center gap-2">
+                  <span className="text-caption text-muted-foreground">Show:</span>
+                  <select className="text-caption border rounded px-2 py-1 bg-background">
+                    <option>10</option>
+                    <option>20</option>
+                    <option>30</option>
+                  </select>
+                  <span className="text-caption text-muted-foreground">per page</span>
+                </div>
+              )
             }}
             items={[
               {
                 id: '1',
-                title: 'Senior Software Engineer',
-                subtitle: 'TechCorp Inc.',
-                date: '2 hours ago',
+                title: 'Senior Frontend Developer at Google',
+                subtitle: 'Generated from CV analysis',
+                date: 'Updated 15/06/2025 at 14:30',
                 status: 'completed',
-                badge: { text: '95%', variant: 'default' },
-                metadata: [
-                  { label: 'Score', value: '95%' },
-                  { label: 'Credits', value: '1' }
-                ],
+                badge: { text: 'v3', variant: 'default' },
                 actions: [
                   { label: 'View', variant: 'outline', onClick: () => {} },
-                  { label: 'Download', variant: 'ghost', onClick: () => {} }
+                  { label: 'Download', variant: 'outline', onClick: () => {} },
+                  { label: 'CV Analysis', variant: 'outline', onClick: () => {} }
                 ]
               },
               {
                 id: '2',
-                title: 'Product Manager',
-                subtitle: 'StartupXYZ',
-                date: '1 day ago',
+                title: 'Backend Engineer at Microsoft',
+                subtitle: 'Generated from manual input',
+                date: 'Updated 14/06/2025 at 10:15',
                 status: 'completed',
-                badge: { text: '88%', variant: 'secondary' },
-                metadata: [
-                  { label: 'Score', value: '88%' }
-                ],
+                badge: { text: 'v2', variant: 'secondary' },
                 actions: [
-                  { label: 'View', variant: 'outline', onClick: () => {} }
+                  { label: 'View', variant: 'outline', onClick: () => {} },
+                  { label: 'Download', variant: 'outline', onClick: () => {} }
+                ]
+              },
+              {
+                id: '3',
+                title: 'Data Scientist at Meta',
+                subtitle: 'Original version',
+                date: 'Updated 13/06/2025 at 16:45',
+                status: 'completed',
+                badge: { text: 'v1', variant: 'secondary' },
+                actions: [
+                  { label: 'View', variant: 'outline', onClick: () => {} },
+                  { label: 'Download', variant: 'outline', onClick: () => {} }
                 ]
               }
             ]}
@@ -297,8 +314,8 @@ const DesignSystem = () => {
           />
         </div>
       ), 
-      usage: '12 usages',
-      description: 'Unified history component for analysis, cover letters, and CV management across the app',
+      usage: '34 usages',
+      description: 'Unified history component for cover letters with versioning - shows latest version with green badge, past versions with orange badge',
       status: 'active',
       trigger: () => {}
     },
@@ -1028,17 +1045,65 @@ const DesignSystem = () => {
                         items={[
                           {
                             id: "1",
-                            title: "Program Director at Oracle",
-                            date: "Updated 15/06/2025 at 00:02",
+                            title: "Senior Frontend Developer at Google",
+                            subtitle: "Generated from CV analysis",
+                            date: "Updated 15/06/2025 at 14:30",
+                            status: 'completed' as const,
+                            badge: { text: 'v3', variant: 'default' as const },
                             actions: [
                               {
                                 label: "View",
-                                variant: "outline",
+                                variant: "outline" as const,
                                 onClick: () => {}
                               },
                               {
                                 label: "Download", 
-                                variant: "outline",
+                                variant: "outline" as const,
+                                onClick: () => {}
+                              },
+                              {
+                                label: "CV Analysis",
+                                variant: "outline" as const,
+                                onClick: () => {}
+                              }
+                            ]
+                          },
+                          {
+                            id: "2",
+                            title: "Backend Engineer at Microsoft",
+                            subtitle: "Generated from manual input",
+                            date: "Updated 14/06/2025 at 10:15",
+                            status: 'completed' as const,
+                            badge: { text: 'v2', variant: 'secondary' as const },
+                            actions: [
+                              {
+                                label: "View",
+                                variant: "outline" as const,
+                                onClick: () => {}
+                              },
+                              {
+                                label: "Download", 
+                                variant: "outline" as const,
+                                onClick: () => {}
+                              }
+                            ]
+                          },
+                          {
+                            id: "3",
+                            title: "Data Scientist at Meta",
+                            subtitle: "Original version", 
+                            date: "Updated 13/06/2025 at 16:45",
+                            status: 'completed' as const,
+                            badge: { text: 'v1', variant: 'secondary' as const },
+                            actions: [
+                              {
+                                label: "View",
+                                variant: "outline" as const,
+                                onClick: () => {}
+                              },
+                              {
+                                label: "Download", 
+                                variant: "outline" as const,
                                 onClick: () => {}
                               }
                             ]
