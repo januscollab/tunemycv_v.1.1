@@ -65,12 +65,19 @@ export const useAIContentProcessor = ({
   }, []);
 
   const processContent = useCallback(async (action: AIAction): Promise<string | null> => {
+    console.log('[useAIContentProcessor] Starting AI processing:', action);
     setIsProcessing(true);
     setError(null);
 
     try {
       // Use the Supabase edge function for AI processing
+      console.log('[useAIContentProcessor] Importing Supabase client...');
       const { supabase } = await import('@/integrations/supabase/client');
+      
+      console.log('[useAIContentProcessor] Calling process-ai-content function with:', {
+        action: action,
+        selectedText: action.selectedText
+      });
       
       const { data, error: functionError } = await supabase.functions.invoke('process-ai-content', {
         body: {
@@ -79,15 +86,22 @@ export const useAIContentProcessor = ({
         }
       });
 
+      console.log('[useAIContentProcessor] Function response:', { data, functionError });
+
       if (functionError) {
+        console.error('[useAIContentProcessor] Function error:', functionError);
         throw new Error(functionError.message || 'Failed to process content with AI');
       }
 
       const processedText = data?.processedText;
+      console.log('[useAIContentProcessor] Extracted processedText:', processedText);
+      
       if (!processedText) {
+        console.error('[useAIContentProcessor] No processed text in response:', data);
         throw new Error('No processed text received from AI');
       }
 
+      console.log('[useAIContentProcessor] AI processing successful, calling onSuccess...');
       if (onSuccess) {
         onSuccess(processedText);
       }
