@@ -108,7 +108,13 @@ export const htmlToJson = (html: string): DocumentJson => {
       case 'h3':
         const level = parseInt(element.tagName.charAt(1)) as 1 | 2 | 3;
         const headingHasBold = element.querySelector('strong, b') !== null;
-        const headingContent = unescapeHtml(element.textContent || '').trim();
+        // Extract clean heading content without any formatting markup
+        let headingContent = element.innerHTML
+          .replace(/<strong[^>]*>(.*?)<\/strong>/gi, '$1')
+          .replace(/<b[^>]*>(.*?)<\/b>/gi, '$1')
+          .replace(/<[^>]*>/g, '');
+        headingContent = unescapeHtml(headingContent).trim();
+        
         if (headingContent) {
           const headingSection: DocumentSection = {
             type: 'heading',
@@ -129,15 +135,16 @@ export const htmlToJson = (html: string): DocumentJson => {
         if (innerHTML.trim()) {
           const hasBold = element.querySelector('strong, b') !== null;
           
-          // Better preserve HTML structure including indentation and line breaks
+          // Clean and preserve paragraph content
           let contentWithNewlines = innerHTML
-            .replace(/<strong[^>]*>(.*?)<\/strong>/gi, '$1') // Extract bold content but preserve structure
-            .replace(/<b[^>]*>(.*?)<\/b>/gi, '$1') // Extract bold content but preserve structure
+            .replace(/<strong[^>]*>(.*?)<\/strong>/gi, '$1') // Remove bold tags but preserve content
+            .replace(/<b[^>]*>(.*?)<\/b>/gi, '$1') // Remove bold tags but preserve content  
             .replace(/&nbsp;/g, ' ') // Convert non-breaking spaces back to regular spaces
             .replace(/<(?!br\s*\/?>)[^>]*>/g, '') // Remove HTML tags except <br>
             .replace(/<br\s*\/?>/gi, '\n') // Convert <br> to newlines
             .replace(/^\s+|\s+$/g, '') // Trim start/end but preserve internal structure
-            .replace(/\n\s+/g, '\n'); // Clean up excessive whitespace after newlines
+            .replace(/\n\s+/g, '\n') // Clean up excessive whitespace after newlines
+            .replace(/\*\*/g, ''); // Remove any double asterisks from markdown
           
           if (contentWithNewlines) {
             const paragraphSection: DocumentSection = {
@@ -157,11 +164,12 @@ export const htmlToJson = (html: string): DocumentJson => {
         const listHasBold = element.querySelector('strong, b') !== null;
         const listItems = Array.from(element.querySelectorAll('li'))
           .map(li => {
-            // Extract text content while preserving bold information
+            // Extract clean text content 
             const liContent = li.innerHTML
               .replace(/<strong[^>]*>(.*?)<\/strong>/gi, '$1')
               .replace(/<b[^>]*>(.*?)<\/b>/gi, '$1')
-              .replace(/<[^>]*>/g, '');
+              .replace(/<[^>]*>/g, '')
+              .replace(/\*\*/g, ''); // Remove any double asterisks
             return unescapeHtml(liContent).trim();
           })
           .filter(item => item.length > 0);
