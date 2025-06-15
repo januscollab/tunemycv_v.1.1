@@ -172,14 +172,9 @@ ${request.jobDescription ? `Job Description:\n${request.jobDescription}\n\n` : '
 
 ${request.cvText ? `My CV/Resume:\n${request.cvText}` : ''}`
 
-    // Get site settings for OpenAI API key
-    const { data: siteSettings, error: settingsError } = await supabaseClient
-      .from('site_settings')
-      .select('openai_api_key_encrypted')
-      .limit(1)
-      .single()
-
-    if (settingsError || !siteSettings?.openai_api_key_encrypted) {
+    // Get OpenAI API key from environment
+    const openaiApiKey = Deno.env.get('OPENAI_API_KEY')
+    if (!openaiApiKey) {
       throw new Error('OpenAI API key not configured. Please contact administrator.')
     }
 
@@ -191,7 +186,7 @@ ${request.cvText ? `My CV/Resume:\n${request.cvText}` : ''}`
     const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${siteSettings.openai_api_key_encrypted}`,
+        'Authorization': `Bearer ${openaiApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
