@@ -565,6 +565,7 @@ export type Database = {
       }
       n8n_tmp: {
         Row: {
+          created_at: string | null
           filename: string
           format: string
           id: string
@@ -574,6 +575,7 @@ export type Database = {
           uploaded_at: string | null
         }
         Insert: {
+          created_at?: string | null
           filename: string
           format: string
           id?: string
@@ -583,6 +585,7 @@ export type Database = {
           uploaded_at?: string | null
         }
         Update: {
+          created_at?: string | null
           filename?: string
           format?: string
           id?: string
