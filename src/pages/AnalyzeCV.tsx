@@ -3,6 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { extractJobTitleFromText } from '@/utils/analysisUtils';
 import AnalysisResults from '@/components/analysis/AnalysisResults';
+import { N8nAnalysisResults } from '@/components/analysis/N8nAnalysisResults';
 import CVSelector from '@/components/analyze/CVSelector';
 import JobDescriptionSelector from '@/components/analyze/JobDescriptionSelector';
 import CreditsPanel from '@/components/analyze/CreditsPanel';
@@ -555,6 +556,22 @@ const AnalyzeCV = () => {
                     onStartNew={handleStartNew}
                     readOnly={true}
                   />
+                ) : analysisResult ? (
+                  analysisResult.type === 'n8n' ? (
+                    <N8nAnalysisResults
+                      htmlUrl={analysisResult.htmlUrl}
+                      pdfUrl={analysisResult.pdfUrl}
+                      message={analysisResult.message}
+                      cvFileName={analysisResult.cv_file_name}
+                      jobDescriptionFileName={analysisResult.job_description_file_name}
+                    />
+                  ) : (
+                    <AnalysisResults 
+                      result={analysisResult} 
+                      onStartNew={handleStartNew}
+                      readOnly={false}
+                    />
+                  )
                 ) : (
                   <Card className="border border-gray-200 dark:border-gray-700">
                     <CardContent className="text-center py-8">

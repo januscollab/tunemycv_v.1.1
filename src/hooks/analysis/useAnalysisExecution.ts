@@ -3,6 +3,7 @@ import { useToast } from '@/hooks/use-toast';
 import { extractJobTitleFromText, extractCompanyFromText } from '@/utils/analysisUtils';
 import { saveFilesToDatabase, performAIAnalysis, saveAnalysisResults } from '@/services/analysisService';
 import { performComprehensiveAnalysis } from '@/utils/analysisEngine';
+import { useN8nAnalysis } from '@/hooks/useN8nAnalysis';
 import { UploadedFile } from '@/types/fileTypes';
 
 interface AnalysisOptions {
@@ -15,6 +16,7 @@ interface AnalysisOptions {
 export const useAnalysisExecution = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const n8nAnalysis = useN8nAnalysis();
 
   const executeAnalysis = async (
     uploadedFiles: { cv?: UploadedFile; jobDescription?: UploadedFile },
@@ -40,12 +42,36 @@ export const useAnalysisExecution = () => {
       options
     );
 
-    console.log('Files handled successfully, starting enhanced comprehensive analysis...');
+    console.log('Files handled successfully, starting n8n analysis workflow...');
 
+    // Try n8n analysis first
+    const n8nResult = await n8nAnalysis.submitForAnalysis(
+      uploadedFiles.cv.file,
+      uploadedFiles.jobDescription.file
+    );
+
+    if (n8nResult.success) {
+      // n8n analysis succeeded - return the URLs for display
+      return {
+        success: true,
+        type: 'n8n',
+        htmlUrl: n8nResult.htmlUrl,
+        pdfUrl: n8nResult.pdfUrl,
+        message: n8nResult.data.message,
+        cv_file_name: uploadedFiles.cv.file.name,
+        job_description_file_name: uploadedFiles.jobDescription.file.name,
+        job_title: finalJobTitle,
+        company_name: extractedCompany
+      };
+    }
+
+    // If n8n fails, fall back to existing AI/algorithmic analysis
+    console.log('n8n analysis failed, falling back to existing analysis methods');
+    
     let analysisResult;
     const hasCreditsForAI = userCredits?.credits && userCredits.credits > 0;
 
-    // Always try enhanced AI analysis if user has credits, otherwise use comprehensive local analysis
+    // Try AI analysis if user has credits, otherwise use comprehensive local analysis
     if (hasCreditsForAI) {
       try {
         const aiResult = await performAIAnalysis(uploadedFiles, finalJobTitle, user?.id!);
@@ -59,21 +85,17 @@ export const useAnalysisExecution = () => {
         analysisResult = {
           ...enhancedAnalysis,
           user_id: user?.id,
-          cv_upload_id: cvUpload?.id || null, // Can be null for temporary analyses
-          job_description_upload_id: jobUpload?.id || null, // Can be null for temporary analyses
-          // Store CV metadata directly in analysis for decoupling
+          cv_upload_id: cvUpload?.id || null,
+          job_description_upload_id: jobUpload?.id || null,
           cv_file_name: uploadedFiles.cv.file.name,
           cv_file_size: uploadedFiles.cv.file.size,
           cv_extracted_text: uploadedFiles.cv.extractedText,
-          // Store job description metadata directly for temporary analyses
           job_description_file_name: uploadedFiles.jobDescription.file.name,
           job_description_extracted_text: uploadedFiles.jobDescription.extractedText,
-          // Keep legacy fields for backward compatibility
           job_title: enhancedAnalysis.position || finalJobTitle,
           company_name: enhancedAnalysis.companyName || extractedCompany,
           compatibility_score: enhancedAnalysis.compatibilityScore,
           executive_summary: enhancedAnalysis.executiveSummary?.overview || 'Enhanced AI analysis completed successfully.',
-          // Extract simple arrays for legacy database fields
           keywords_found: enhancedAnalysis.keywordAnalysis?.keywords?.filter((k: any) => k.found).map((k: any) => k.keyword) || [],
           keywords_missing: enhancedAnalysis.keywordAnalysis?.keywords?.filter((k: any) => !k.found).map((k: any) => k.keyword) || [],
           strengths: enhancedAnalysis.executiveSummary?.strengths?.map((s: any) => s.title || s) || [],
