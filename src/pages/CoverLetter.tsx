@@ -361,10 +361,112 @@ const AuthenticatedCoverLetter = () => {
     setActiveTab('result');
   };
 
-  const handleTabChange = (newTab: string) => {
-    // Note: Save logic removed since View Letter tab no longer uses RTE
+  const handleTabChange = async (newTab: string) => {
+    // Auto-save when switching away from the result tab if there's content
+    if (activeTab === 'result' && selectedCoverLetter && user) {
+      try {
+        // Get current content from the Rich Text Editor
+        const currentContent = selectedCoverLetter.content;
+        if (currentContent && currentContent.trim()) {
+          const { error } = await supabase
+            .from('cover_letters')
+            .update({ 
+              content: currentContent
+            })
+            .eq('id', selectedCoverLetter.id)
+            .eq('user_id', user.id);
+          
+          if (error) {
+            console.error('Auto-save on tab switch failed:', error);
+          } else {
+            // Update local state
+            setSelectedCoverLetter(prev => ({
+              ...prev,
+              content: currentContent,
+              updated_at: new Date().toISOString()
+            }));
+            // Refresh history to show updated timestamp
+            loadCoverLetterHistory();
+          }
+        }
+      } catch (error) {
+        console.error('Auto-save on tab switch error:', error);
+      }
+    }
+    
     setActiveTab(newTab);
   };
+
+  
+  // Auto-save when user switches browser tabs or navigates away
+  useEffect(() => {
+    const handleBeforeUnload = async () => {
+      if (activeTab === 'result' && selectedCoverLetter && user) {
+        try {
+          const currentContent = selectedCoverLetter.content;
+          if (currentContent && currentContent.trim()) {
+            // Use navigator.sendBeacon for reliable data sending on page unload
+            const data = JSON.stringify({
+              id: selectedCoverLetter.id,
+              content: currentContent,
+              user_id: user.id
+            });
+            
+            // Fallback to fetch if sendBeacon is not available
+            if (navigator.sendBeacon) {
+              navigator.sendBeacon('/api/autosave-cover-letter', data);
+            } else {
+              await fetch('/api/autosave-cover-letter', {
+                method: 'POST',
+                body: data,
+                headers: { 'Content-Type': 'application/json' },
+                keepalive: true
+              });
+            }
+          }
+        } catch (error) {
+          console.error('Auto-save on page unload failed:', error);
+        }
+      }
+    };
+
+    const handleVisibilityChange = async () => {
+      if (document.hidden && activeTab === 'result' && selectedCoverLetter && user) {
+        try {
+          const currentContent = selectedCoverLetter.content;
+          if (currentContent && currentContent.trim()) {
+            const { error } = await supabase
+              .from('cover_letters')
+              .update({ 
+                content: currentContent
+              })
+              .eq('id', selectedCoverLetter.id)
+              .eq('user_id', user.id);
+            
+            if (!error) {
+              setSelectedCoverLetter(prev => ({
+                ...prev,
+                content: currentContent,
+                updated_at: new Date().toISOString()
+              }));
+            }
+          }
+        } catch (error) {
+          console.error('Auto-save on visibility change failed:', error);
+        }
+      }
+    };
+
+    // Add event listeners
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [activeTab, selectedCoverLetter, user]);
 
   // Note: Window blur/unload handlers removed since View Letter tab no longer uses RTE
 
