@@ -8,6 +8,8 @@ interface N8nAnalysisResponse {
     html: string;
     pdf: string;
   };
+  pdfData?: string | null;
+  htmlData?: string | null;
   error?: string;
 }
 
@@ -56,6 +58,31 @@ export const useN8nAnalysis = () => {
       console.log('n8n response received:', result);
 
       if (result.test_files?.html && result.test_files?.pdf) {
+        console.log('n8n response received, downloading files...');
+
+        // Download PDF file
+        let pdfData: string | null = null;
+        let htmlData: string | null = null;
+
+        try {
+          const pdfResponse = await fetch(result.test_files.pdf);
+          const pdfBlob = await pdfResponse.blob();
+          const pdfArrayBuffer = await pdfBlob.arrayBuffer();
+          pdfData = btoa(String.fromCharCode(...new Uint8Array(pdfArrayBuffer)));
+          console.log('PDF downloaded and converted to base64');
+        } catch (error) {
+          console.error('Failed to download PDF:', error);
+        }
+
+        // Download HTML file
+        try {
+          const htmlResponse = await fetch(result.test_files.html);
+          htmlData = await htmlResponse.text();
+          console.log('HTML downloaded');
+        } catch (error) {
+          console.error('Failed to download HTML:', error);
+        }
+
         toast({
           title: "Analysis Complete",
           description: "Your documents have been successfully processed by n8n.",
@@ -64,7 +91,9 @@ export const useN8nAnalysis = () => {
         return {
           success: true,
           message: result.message,
-          test_files: result.test_files
+          test_files: result.test_files,
+          pdfData,
+          htmlData
         };
       } else {
         throw new Error('Invalid response format from n8n');

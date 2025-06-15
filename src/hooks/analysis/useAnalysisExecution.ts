@@ -89,6 +89,10 @@ export const useAnalysisExecution = () => {
           analysis_type: 'n8n',
           n8n_html_url: n8nResult.test_files.html,
           n8n_pdf_url: n8nResult.test_files.pdf,
+          pdf_file_data: n8nResult.pdfData,
+          html_file_data: n8nResult.htmlData,
+          pdf_file_name: `analysis_${finalJobTitle}_${extractedCompany}.pdf`,
+          html_file_name: `analysis_${finalJobTitle}_${extractedCompany}.html`,
           keywords_found: [],
           keywords_missing: [],
           strengths: [],
@@ -96,7 +100,36 @@ export const useAnalysisExecution = () => {
           recommendations: []
         };
 
-        return analysisResult; // Early return for successful n8n analysis
+        // Save analysis results to database immediately for n8n
+        const savedResult = await saveAnalysisResults({
+          user_id: analysisResult.user_id,
+          cv_upload_id: analysisResult.cv_upload_id,
+          job_description_upload_id: analysisResult.job_description_upload_id,
+          cv_file_name: analysisResult.cv_file_name,
+          cv_file_size: analysisResult.cv_file_size,
+          cv_extracted_text: analysisResult.cv_extracted_text,
+          job_description_file_name: analysisResult.job_description_file_name,
+          job_description_extracted_text: analysisResult.job_description_extracted_text,
+          job_title: analysisResult.job_title,
+          company_name: analysisResult.company_name,
+          compatibility_score: analysisResult.compatibility_score,
+          keywords_found: analysisResult.keywords_found,
+          keywords_missing: analysisResult.keywords_missing,
+          strengths: analysisResult.strengths,
+          weaknesses: analysisResult.weaknesses,
+          recommendations: analysisResult.recommendations,
+          executive_summary: analysisResult.executive_summary,
+          analysis_type: analysisResult.analysis_type,
+          n8n_html_url: analysisResult.n8n_html_url,
+          n8n_pdf_url: analysisResult.n8n_pdf_url,
+          pdf_file_data: analysisResult.pdf_file_data,
+          html_file_data: analysisResult.html_file_data,
+          pdf_file_name: analysisResult.pdf_file_name,
+          html_file_name: analysisResult.html_file_name
+        });
+
+        console.log('n8n comprehensive analysis completed successfully:', { ...savedResult, ...analysisResult });
+        return { ...savedResult, ...analysisResult }; // Early return for successful n8n analysis
       } else {
         throw new Error('n8n analysis failed, falling back to AI analysis');
       }

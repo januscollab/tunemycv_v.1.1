@@ -361,6 +361,8 @@ export type Database = {
           cv_upload_id: string | null
           deleted_at: string | null
           executive_summary: string | null
+          html_file_data: string | null
+          html_file_name: string | null
           id: string
           job_description_extracted_text: string | null
           job_description_file_name: string | null
@@ -370,6 +372,8 @@ export type Database = {
           keywords_missing: Json | null
           n8n_html_url: string | null
           n8n_pdf_url: string | null
+          pdf_file_data: string | null
+          pdf_file_name: string | null
           recommendations: string[] | null
           strengths: string[] | null
           user_id: string
@@ -386,6 +390,8 @@ export type Database = {
           cv_upload_id?: string | null
           deleted_at?: string | null
           executive_summary?: string | null
+          html_file_data?: string | null
+          html_file_name?: string | null
           id?: string
           job_description_extracted_text?: string | null
           job_description_file_name?: string | null
@@ -395,6 +401,8 @@ export type Database = {
           keywords_missing?: Json | null
           n8n_html_url?: string | null
           n8n_pdf_url?: string | null
+          pdf_file_data?: string | null
+          pdf_file_name?: string | null
           recommendations?: string[] | null
           strengths?: string[] | null
           user_id: string
@@ -411,6 +419,8 @@ export type Database = {
           cv_upload_id?: string | null
           deleted_at?: string | null
           executive_summary?: string | null
+          html_file_data?: string | null
+          html_file_name?: string | null
           id?: string
           job_description_extracted_text?: string | null
           job_description_file_name?: string | null
@@ -420,6 +430,8 @@ export type Database = {
           keywords_missing?: Json | null
           n8n_html_url?: string | null
           n8n_pdf_url?: string | null
+          pdf_file_data?: string | null
+          pdf_file_name?: string | null
           recommendations?: string[] | null
           strengths?: string[] | null
           user_id?: string

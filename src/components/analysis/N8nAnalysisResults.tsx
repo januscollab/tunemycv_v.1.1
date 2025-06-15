@@ -4,12 +4,17 @@ import { Button } from '@/components/ui/button';
 import { ExternalLink, Eye, FileText, Globe, Download } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { DownloadMenu } from '@/components/ui/download-menu';
+import PDFViewer from '@/components/ui/pdf-viewer';
 
 interface N8nAnalysisResultsProps {
   result: {
     analysis_type?: string;
     n8n_html_url?: string;
     n8n_pdf_url?: string;
+    pdf_file_data?: string;
+    html_file_data?: string;
+    pdf_file_name?: string;
+    html_file_name?: string;
     job_title?: string;
     company_name?: string;
     compatibility_score?: number;
@@ -208,6 +213,15 @@ const N8nAnalysisResults: React.FC<N8nAnalysisResultsProps> = ({
           </Card>
         )}
       </div>
+
+      {/* PDF Viewer Section - Show stored PDF if available */}
+      {result.pdf_file_data && (
+        <PDFViewer
+          pdfData={result.pdf_file_data}
+          fileName={result.pdf_file_name || 'n8n-analysis-report.pdf'}
+          title="n8n Analysis Report"
+        />
+      )}
 
       {/* Additional Information */}
       <Card className="border border-apple-core/20 dark:border-citrus/20 bg-apple-core/5 dark:bg-citrus/5">
