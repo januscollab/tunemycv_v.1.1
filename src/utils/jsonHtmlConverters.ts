@@ -142,7 +142,7 @@ export const htmlToJson = (html: string): DocumentJson => {
             .replace(/&nbsp;/g, ' ') // Convert non-breaking spaces back to regular spaces - KEEP THESE AS SPACES
             .replace(/<(?!br\s*\/?>)[^>]*>/g, '') // Remove HTML tags except <br>
             .replace(/<br\s*\/?>/gi, '\n') // Convert <br> to newlines
-            .replace(/^\s+|\s+$/g, '') // Trim start/end but preserve internal structure
+            .replace(/\s+$/g, '') // Only trim trailing whitespace, preserve leading spaces for indentation
             .replace(/\*\*/g, ''); // Remove any double asterisks from markdown
           
           if (contentWithNewlines) {
