@@ -184,6 +184,9 @@ ${request.cvText ? `My CV/Resume:\n${request.cvText}` : ''}`
     }
 
     // Generate cover letter with AI
+    console.log('[generate-cover-letter] System prompt:', systemPrompt)
+    console.log('[generate-cover-letter] User prompt:', userPrompt)
+    
     const startTime = Date.now()
     const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -212,6 +215,9 @@ ${request.cvText ? `My CV/Resume:\n${request.cvText}` : ''}`
     if (!content) {
       throw new Error('No content generated from OpenAI')
     }
+
+    console.log('[generate-cover-letter] Generated content:', content)
+    console.log('[generate-cover-letter] Content length:', content.length)
 
     const processingTime = Date.now() - startTime
     const tokensUsed = openaiData.usage?.total_tokens || 0
