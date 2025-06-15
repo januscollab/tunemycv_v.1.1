@@ -150,8 +150,11 @@ export const CategoryDocumentHistoryItem: React.FC<{
   const getDocumentBadge = () => {
     if (document.type === 'cover_letter') {
       return (
-        <Badge variant="default" className="text-micro">
-          COVER LETTER
+        <Badge 
+          variant="outline" 
+          className="text-micro bg-green-100 text-green-700 border-green-300 dark:bg-green-900/20 dark:text-green-400 dark:border-green-600"
+        >
+          v3
         </Badge>
       );
     }
@@ -167,43 +170,13 @@ export const CategoryDocumentHistoryItem: React.FC<{
       onClick={() => onDocumentClick?.(document)}
     >
       <CardContent className="p-6">
-        {/* Action buttons row at top */}
-        <div className="flex items-center justify-between mb-3 pb-2 border-b border-border">
-          <div className="flex items-center space-x-4">
-            {actions.map((action, index) => {
-              if (action.condition && !action.condition(document)) {
-                return null;
-              }
-              
-              return (
-                <Button
-                  key={index}
-                  variant="outline"
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    action.onClick(document);
-                  }}
-                  className={cn(
-                    "text-caption font-medium transition-colors",
-                    action.variant === 'destructive' && "text-destructive hover:text-destructive",
-                    action.variant === 'success' && "text-success hover:text-success"
-                  )}
-                >
-                  {action.icon}
-                  {action.label}
-                </Button>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="flex justify-between items-start">
-          <div className="flex-1 pr-4">
+        <div className="flex justify-between items-start mb-4">
+          <div className="flex-1">
             <div className="flex items-center space-x-3 mb-2">
               <h3 className="text-heading font-medium text-foreground">
                 {document.job_title || document.title || 'Untitled'}
               </h3>
+              {getDocumentBadge()}
               <Button
                 variant="ghost"
                 size="sm"
@@ -218,15 +191,12 @@ export const CategoryDocumentHistoryItem: React.FC<{
             </div>
             
             <div className="flex items-center space-x-4 text-caption text-muted-foreground mb-2">
-              {document.company_name && (
-                <div className="flex items-center space-x-1">
-                  <Building className="h-3 w-3" />
-                  <span>{document.company_name}</span>
-                </div>
+              {document.type === 'cover_letter' && (
+                <span className="text-muted-foreground">Generated from CV analysis</span>
               )}
               <div className="flex items-center space-x-1">
                 <Calendar className="h-3 w-3" />
-                <span>{formatDate(document.created_at)}</span>
+                <span>Updated {formatDate(document.created_at)}</span>
               </div>
               {document.compatibility_score && (
                 <div className="text-primary font-medium">
@@ -235,10 +205,35 @@ export const CategoryDocumentHistoryItem: React.FC<{
               )}
             </div>
           </div>
-          
-          <div className="flex items-center space-x-2 flex-shrink-0">
-            {getDocumentBadge()}
-          </div>
+        </div>
+
+        {/* Action buttons row at bottom */}
+        <div className="flex items-center justify-end space-x-2 pt-3 border-t border-border">
+          {actions.map((action, index) => {
+            if (action.condition && !action.condition(document)) {
+              return null;
+            }
+            
+            return (
+              <Button
+                key={index}
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  action.onClick(document);
+                }}
+                className={cn(
+                  "text-caption font-medium transition-colors h-8 px-3",
+                  action.variant === 'destructive' && "text-destructive hover:text-destructive hover:bg-destructive/10",
+                  action.variant === 'success' && "text-success hover:text-success hover:bg-success/10"
+                )}
+              >
+                {action.icon}
+                {action.label}
+              </Button>
+            );
+          })}
         </div>
       </CardContent>
     </Card>
