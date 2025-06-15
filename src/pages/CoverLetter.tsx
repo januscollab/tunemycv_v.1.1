@@ -738,8 +738,8 @@ const AuthenticatedCoverLetter = () => {
                                 const { error } = await supabase
                                   .from('cover_letters')
                                   .update({ 
-                                    content,
-                                    updated_at: new Date().toISOString()
+                                    content
+                                    // Remove manual updated_at - let database trigger handle it
                                   })
                                   .eq('id', selectedCoverLetter.id)
                                   .eq('user_id', user.id);
