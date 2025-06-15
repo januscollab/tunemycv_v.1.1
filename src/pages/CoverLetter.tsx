@@ -815,63 +815,109 @@ const AuthenticatedCoverLetter = () => {
                         </div>
                         <RichTextEditor
                           initialContent={(() => {
+                            console.log('[CoverLetter] Processing content for RTE:', {
+                              contentType: typeof selectedCoverLetter.content,
+                              contentLength: selectedCoverLetter.content?.length,
+                              isJSON: selectedCoverLetter.content?.startsWith('{'),
+                              preview: selectedCoverLetter.content?.substring(0, 100)
+                            });
+
                             try {
-                              // Helper function to completely strip HTML and decode entities
-                              const stripAndDecodeHTML = (rawContent: string): string => {
-                                // First pass: decode HTML entities using DOM
+                              // Enhanced HTML decoding and cleaning
+                              const deepCleanContent = (rawContent: string): string => {
+                                // Create a temporary DOM element for robust HTML entity decoding
                                 const tempDiv = document.createElement('div');
+                                
+                                // First: decode all HTML entities by setting innerHTML
                                 tempDiv.innerHTML = rawContent;
-                                let decodedText = tempDiv.textContent || tempDiv.innerText || rawContent;
                                 
-                                // Second pass: remove any remaining HTML tags
-                                decodedText = decodedText.replace(/<[^>]*>/g, '');
+                                // Extract plain text content (this automatically decodes entities)
+                                let cleanText = tempDiv.textContent || tempDiv.innerText || '';
                                 
-                                // Third pass: clean up common HTML entities that might still be there
-                                decodedText = decodedText
+                                // Second: remove any remaining HTML tags that might have been missed
+                                cleanText = cleanText.replace(/<[^>]*>/g, '');
+                                
+                                // Third: handle any stubborn entities manually
+                                cleanText = cleanText
                                   .replace(/&lt;/g, '<')
                                   .replace(/&gt;/g, '>')
                                   .replace(/&amp;/g, '&')
                                   .replace(/&quot;/g, '"')
                                   .replace(/&#39;/g, "'")
-                                  .replace(/&nbsp;/g, ' ');
+                                  .replace(/&nbsp;/g, ' ')
+                                  .replace(/&hellip;/g, '...')
+                                  .replace(/&mdash;/g, '—')
+                                  .replace(/&ndash;/g, '–');
                                 
-                                return decodedText.trim();
+                                // Fourth: normalize whitespace
+                                cleanText = cleanText.replace(/\s+/g, ' ').trim();
+                                
+                                console.log('[CoverLetter] Deep cleaned content:', {
+                                  original: rawContent.substring(0, 50),
+                                  cleaned: cleanText.substring(0, 50),
+                                  hadEntities: rawContent.includes('&'),
+                                  hadTags: rawContent.includes('<')
+                                });
+                                
+                                return cleanText;
                               };
 
-                              // Try to parse as JSON first
+                              // Try to parse as JSON first (structured content)
                               try {
                                 const jsonData = JSON.parse(selectedCoverLetter.content);
                                 if (jsonData.sections && Array.isArray(jsonData.sections)) {
-                                  const plainText = jsonData.sections
-                                    .map((section: any) => stripAndDecodeHTML(section.content || ''))
-                                    .filter(text => text.length > 0)
-                                    .join('\n\n');
+                                  console.log('[CoverLetter] Processing JSON content with', jsonData.sections.length, 'sections');
                                   
-                                  // Convert to proper HTML paragraphs
-                                  return plainText
-                                    .split('\n\n')
-                                    .filter(p => p.trim())
-                                    .map(p => `<p>${p.trim()}</p>`)
+                                  // Extract and clean each section
+                                  const cleanedSections = jsonData.sections
+                                    .map((section: any) => {
+                                      const cleanContent = deepCleanContent(section.content || '');
+                                      return cleanContent;
+                                    })
+                                    .filter(text => text.length > 0);
+                                  
+                                  // Join sections into paragraphs
+                                  const paragraphs = cleanedSections
+                                    .map(content => `<p>${content}</p>`)
                                     .join('');
+                                  
+                                  console.log('[CoverLetter] JSON to HTML result:', {
+                                    sectionsProcessed: cleanedSections.length,
+                                    htmlLength: paragraphs.length
+                                  });
+                                  
+                                  return paragraphs || '<p>Your cover letter content will appear here...</p>';
                                 }
-                              } catch {
-                                // Not JSON, continue to direct processing
+                              } catch (jsonError) {
+                                console.log('[CoverLetter] Content is not JSON, processing as plain text');
                               }
                               
-                              // Process the raw content
-                              const cleanText = stripAndDecodeHTML(selectedCoverLetter.content);
+                              // Process as plain text content
+                              const cleanText = deepCleanContent(selectedCoverLetter.content);
                               
-                              // Convert to HTML paragraphs (split on double line breaks for paragraphs)
-                              return cleanText
+                              if (!cleanText || cleanText.trim().length === 0) {
+                                return '<p>Your cover letter content will appear here...</p>';
+                              }
+                              
+                              // Split into paragraphs on double line breaks
+                              const paragraphs = cleanText
                                 .split(/\n\s*\n/)
-                                .filter(paragraph => paragraph.trim().length > 0)
-                                .map(paragraph => `<p>${paragraph.trim().replace(/\n/g, ' ')}</p>`)
+                                .filter(p => p.trim().length > 0)
+                                .map(p => `<p>${p.trim().replace(/\n/g, ' ')}</p>`)
                                 .join('');
+                              
+                              console.log('[CoverLetter] Plain text to HTML result:', {
+                                originalLength: selectedCoverLetter.content.length,
+                                cleanedLength: cleanText.length,
+                                paragraphCount: paragraphs.split('<p>').length - 1
+                              });
+                              
+                              return paragraphs || '<p>Your cover letter content will appear here...</p>';
+                              
                             } catch (error) {
-                              console.error('Error processing cover letter content:', error);
-                              // Fallback: just strip HTML and wrap in paragraph
-                              const cleanText = selectedCoverLetter.content.replace(/<[^>]*>/g, '').trim();
-                              return `<p>${cleanText}</p>`;
+                              console.error('[CoverLetter] Error processing content for RTE:', error);
+                              // Emergency fallback
+                              return '<p>Error loading content. Please try refreshing the page.</p>';
                             }
                           })()}
                           onContentChange={async (json, text) => {
