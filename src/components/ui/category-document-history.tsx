@@ -149,12 +149,13 @@ export const CategoryDocumentHistoryItem: React.FC<{
 
   const getDocumentBadge = () => {
     if (document.type === 'cover_letter') {
+      const version = (document.regeneration_count || 0) + 1;
       return (
         <Badge 
           variant="outline" 
           className="text-micro bg-green-100 text-green-700 border-green-300 dark:bg-green-900/20 dark:text-green-400 dark:border-green-600"
         >
-          v3
+          v{version}
         </Badge>
       );
     }
