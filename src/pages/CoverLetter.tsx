@@ -918,7 +918,7 @@ const AuthenticatedCoverLetter = () => {
                               }
                             }
                           }}
-                          showAIFeatures={false}
+                          showAIFeatures={true}
                           enableAutoSave={true}
                           className="min-h-[400px]"
                           placeholder="Start writing your cover letter..."

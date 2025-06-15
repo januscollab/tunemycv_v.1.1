@@ -243,26 +243,20 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
             {/* Menu Items */}
             <div className="p-2">
               <div className="space-y-1">
-                {/* Drodt placeholder item */}
-                <div className="px-3 py-2.5 flex items-center gap-3 text-primary-foreground/60">
-                  <Edit3 className="w-4 h-4" />
-                  <span className="text-caption">Drodt</span>
-                </div>
-
-                {/* Active item - Cradis style */}
+                {/* Active item - Rephrase with softer orange */}
                 <button
                   onMouseEnter={(e) => handleSubmenuHover('rephrase', e)}
                   onMouseLeave={handleSubmenuLeave}
                   disabled={isDisabled}
                   className={cn(
                     "w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg transition-all",
-                    "bg-gradient-to-r from-orange-400 to-orange-500 text-white shadow-md",
-                    "hover:from-orange-500 hover:to-orange-600 transform hover:scale-[1.02]",
+                    "bg-gradient-to-r from-orange-300/80 to-orange-400/80 text-white shadow-sm",
+                    "hover:from-orange-400/90 hover:to-orange-500/90 transform hover:scale-[1.01]",
                     "disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                   )}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-white/20 rounded-lg flex items-center justify-center">
+                    <div className="w-6 h-6 bg-white/25 rounded-lg flex items-center justify-center">
                       <WandSparkles className="w-4 h-4" />
                     </div>
                     <span className="text-caption font-medium">Rephrase</span>
@@ -270,7 +264,24 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
                   <ChevronRight className="w-4 h-4" />
                 </button>
 
-                {/* Other menu items */}
+                {/* Improve */}
+                <button
+                  onClick={() => handleAIAction('improve', undefined, 'Improve Clarity')}
+                  disabled={isDisabled}
+                  className={cn(
+                    "w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg transition-all",
+                    "text-primary-foreground/90 hover:bg-primary-500/30 hover:text-primary-foreground",
+                    "disabled:opacity-50 disabled:cursor-not-allowed"
+                  )}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 text-primary-foreground/70 flex items-center justify-center">
+                      <Edit3 className="w-4 h-4" />
+                    </div>
+                    <span className="text-caption">Improve</span>
+                  </div>
+                </button>
+                {/* Adjust Length */}
                 <button
                   onMouseEnter={(e) => handleSubmenuHover('length', e)}
                   onMouseLeave={handleSubmenuLeave}
@@ -290,24 +301,7 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
                   <ChevronRight className="w-4 h-4" />
                 </button>
 
-                <button
-                  onClick={() => handleAIAction('improve', undefined, 'Improve')}
-                  disabled={isDisabled}
-                  className={cn(
-                    "w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg transition-all",
-                    "text-primary-foreground/90 hover:bg-primary-500/30 hover:text-primary-foreground",
-                    "disabled:opacity-50 disabled:cursor-not-allowed"
-                  )}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 text-primary-foreground/70 flex items-center justify-center">
-                      <Brain className="w-4 h-4" />
-                    </div>
-                    <span className="text-caption">Cloud</span>
-                  </div>
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-
+                {/* Role Specific */}
                 <button
                   onClick={() => handleAIAction('role_specific', undefined, 'Role Specific')}
                   disabled={isDisabled}
@@ -321,26 +315,8 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
                     <div className="w-6 h-6 text-primary-foreground/70 flex items-center justify-center">
                       <Target className="w-4 h-4" />
                     </div>
-                    <span className="text-caption">Clade</span>
+                    <span className="text-caption">Role Specific</span>
                   </div>
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-
-                <button
-                  disabled={isDisabled}
-                  className={cn(
-                    "w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg transition-all",
-                    "text-primary-foreground/90 hover:bg-primary-500/30 hover:text-primary-foreground",
-                    "disabled:opacity-50 disabled:cursor-not-allowed"
-                  )}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 text-primary-foreground/70 flex items-center justify-center">
-                      <MessageCircle className="w-4 h-4" />
-                    </div>
-                    <span className="text-caption">Clesss</span>
-                  </div>
-                  <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
 
@@ -358,7 +334,7 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
           <div
             ref={submenuRef}
             className={cn(
-              "absolute z-50 w-64 bg-popover border border-border rounded-lg shadow-lg",
+              "absolute z-50 w-64 bg-gradient-to-br from-primary-500/95 to-primary-600/95 backdrop-blur-sm border border-primary-400/50 rounded-lg shadow-lg",
               "animate-scale-in origin-top-left"
             )}
             style={{
@@ -370,32 +346,32 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
               {activeSubmenu === 'rephrase' && (
                 <>
                   <button
-                    onClick={() => handleAIAction('rephrase', 'professional', '🧠 More Professional')}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-caption rounded-md hover:bg-accent transition-colors"
+                    onClick={() => handleAIAction('rephrase', 'professional', 'More Professional')}
+                    className="w-full flex items-center gap-3 px-3 py-2 text-caption rounded-md hover:bg-primary-400/30 transition-colors text-primary-foreground/90 hover:text-primary-foreground"
                   >
                     <Brain className="h-4 w-4" />
-                    🧠 More Professional
+                    More Professional
                   </button>
                   <button
-                    onClick={() => handleAIAction('rephrase', 'conversational', '💬 More Conversational')}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-caption rounded-md hover:bg-accent transition-colors"
+                    onClick={() => handleAIAction('rephrase', 'conversational', 'More Conversational')}
+                    className="w-full flex items-center gap-3 px-3 py-2 text-caption rounded-md hover:bg-primary-400/30 transition-colors text-primary-foreground/90 hover:text-primary-foreground"
                   >
                     <MessageCircle className="h-4 w-4" />
-                    💬 More Conversational
+                    More Conversational
                   </button>
                   <button
-                    onClick={() => handleAIAction('rephrase', 'creative', '✨ More Creative')}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-caption rounded-md hover:bg-accent transition-colors"
+                    onClick={() => handleAIAction('rephrase', 'creative', 'More Creative')}
+                    className="w-full flex items-center gap-3 px-3 py-2 text-caption rounded-md hover:bg-primary-400/30 transition-colors text-primary-foreground/90 hover:text-primary-foreground"
                   >
                     <Sparkles className="h-4 w-4" />
-                    ✨ More Creative
+                    More Creative
                   </button>
                   <button
-                    onClick={() => handleAIAction('rephrase', 'structured', '🧱 More Structured')}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-caption rounded-md hover:bg-accent transition-colors"
+                    onClick={() => handleAIAction('rephrase', 'structured', 'More Structured')}
+                    className="w-full flex items-center gap-3 px-3 py-2 text-caption rounded-md hover:bg-primary-400/30 transition-colors text-primary-foreground/90 hover:text-primary-foreground"
                   >
                     <Square className="h-4 w-4" />
-                    🧱 More Structured
+                    More Structured
                   </button>
                 </>
               )}
@@ -403,32 +379,32 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
               {activeSubmenu === 'length' && (
                 <>
                   <button
-                    onClick={() => handleAIAction('adjust_length', 'longer', '⬆️ Make Longer')}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-caption rounded-md hover:bg-accent transition-colors"
+                    onClick={() => handleAIAction('adjust_length', 'longer', 'Make Longer')}
+                    className="w-full flex items-center gap-3 px-3 py-2 text-caption rounded-md hover:bg-primary-400/30 transition-colors text-primary-foreground/90 hover:text-primary-foreground"
                   >
                     <ArrowUp className="h-4 w-4" />
-                    ⬆️ Make Longer
+                    Make Longer
                   </button>
                   <button
-                    onClick={() => handleAIAction('adjust_length', 'shorter', '⬇️ Make Shorter')}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-caption rounded-md hover:bg-accent transition-colors"
+                    onClick={() => handleAIAction('adjust_length', 'shorter', 'Make Shorter')}
+                    className="w-full flex items-center gap-3 px-3 py-2 text-caption rounded-md hover:bg-primary-400/30 transition-colors text-primary-foreground/90 hover:text-primary-foreground"
                   >
                     <ArrowDown className="h-4 w-4" />
-                    ⬇️ Make Shorter
+                    Make Shorter
                   </button>
                   <button
-                    onClick={() => handleAIAction('adjust_length', 'summarize', '🧩 Summarize')}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-caption rounded-md hover:bg-accent transition-colors"
+                    onClick={() => handleAIAction('adjust_length', 'summarize', 'Summarize')}
+                    className="w-full flex items-center gap-3 px-3 py-2 text-caption rounded-md hover:bg-primary-400/30 transition-colors text-primary-foreground/90 hover:text-primary-foreground"
                   >
                     <List className="h-4 w-4" />
-                    🧩 Summarize
+                    Summarize
                   </button>
                   <button
-                    onClick={() => handleAIAction('adjust_length', 'expand_example', '📚 Expand with Example')}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-caption rounded-md hover:bg-accent transition-colors"
+                    onClick={() => handleAIAction('adjust_length', 'expand_example', 'Expand with Example')}
+                    className="w-full flex items-center gap-3 px-3 py-2 text-caption rounded-md hover:bg-primary-400/30 transition-colors text-primary-foreground/90 hover:text-primary-foreground"
                   >
                     <BookOpen className="h-4 w-4" />
-                    📚 Expand with Example
+                    Expand with Example
                   </button>
                 </>
               )}
