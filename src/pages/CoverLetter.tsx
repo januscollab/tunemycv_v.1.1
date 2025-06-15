@@ -853,15 +853,23 @@ const AuthenticatedCoverLetter = () => {
                                 return decodedHtml;
                               }
                               
-                              // If it's HTML content, convert it to DocumentJson
+                              // If it's HTML content, clean it but keep as HTML for the editor
                               if (selectedCoverLetter.content.includes('<p>') || selectedCoverLetter.content.includes('<h')) {
-                                console.log('[CoverLetter] Content is HTML, converting to DocumentJson');
-                                return htmlToJson(selectedCoverLetter.content);
+                                console.log('[CoverLetter] Content is HTML, cleaning formatting');
+                                // Clean any double asterisks from HTML content
+                                let cleanedHtml = selectedCoverLetter.content
+                                  .replace(/\*\*([^*]+)\*\*/g, '$1')  // Remove markdown bold
+                                  .replace(/\*\*/g, '');             // Remove any remaining double asterisks
+                                return cleanedHtml;
                               }
                               
-                              // If it's plain text, return as-is
-                              console.log('[CoverLetter] Content appears to be plain text, returning as-is');
-                              return selectedCoverLetter.content || '<p>Your cover letter content will appear here...</p>';
+                              // If it's plain text, clean and return as-is
+                              console.log('[CoverLetter] Content appears to be plain text, cleaning formatting');
+                              let cleanedText = selectedCoverLetter.content || '<p>Your cover letter content will appear here...</p>';
+                              cleanedText = cleanedText
+                                .replace(/\*\*([^*]+)\*\*/g, '$1')  // Remove markdown bold
+                                .replace(/\*\*/g, '');             // Remove any remaining double asterisks
+                              return cleanedText;
                               
                             } catch (error) {
                               console.error('[CoverLetter] Error processing content for RTE:', error);
