@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
+import { ModernInput } from './ui/ModernInput';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -466,20 +466,20 @@ const SprintManager = () => {
         <Card>
           <CardContent className="pt-6">
             <div className="flex gap-2">
-              <Input
+              <ModernInput
                 value={newSprintName}
                 onChange={(e) => setNewSprintName(e.target.value)}
                 placeholder="Enter sprint name"
                 onKeyPress={(e) => e.key === 'Enter' && handleAddSprint()}
               />
-              <Button onClick={handleAddSprint} className="menu-text-animation">Create</Button>
+              <Button onClick={handleAddSprint} className="transition-all duration-200 hover:scale-105">Create</Button>
               <Button 
                 variant="outline" 
                 onClick={() => {
                   setAddingNewSprint(false);
                   setNewSprintName('');
                 }}
-                className="menu-text-animation"
+                className="transition-all duration-200 hover:scale-105"
               >
                 Cancel
               </Button>
@@ -506,7 +506,7 @@ const SprintManager = () => {
                       <Button
                         size="sm"
                         onClick={() => handleAddTask(sprint)}
-                        className="menu-text-animation"
+                        className="transition-all duration-200 hover:scale-105"
                       >
                         Add Task
                       </Button>
@@ -514,7 +514,7 @@ const SprintManager = () => {
                         size="sm"
                         variant="outline"
                         onClick={() => handleExecuteSprint(sprint)}
-                        className="menu-text-animation"
+                        className="transition-all duration-200 hover:scale-105"
                       >
                         Execute
                       </Button>

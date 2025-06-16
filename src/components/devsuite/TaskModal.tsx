@@ -7,8 +7,8 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { CaptureInput } from '@/components/ui/capture-input';
-import { Textarea } from '@/components/ui/textarea';
+import { ModernInput } from './ui/ModernInput';
+import { ModernTextarea } from './ui/ModernTextarea';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -234,7 +234,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl z-50">
         <DialogHeader>
           <DialogTitle>
             {task ? 'Edit Task' : 'Add Task'} {sprint && `- ${sprint.name}`}
@@ -243,59 +243,59 @@ const TaskModal: React.FC<TaskModalProps> = ({
 
         <div className="space-y-4">
           <div>
-            <Label htmlFor="title">Title *</Label>
-            <CaptureInput
-              label=""
+            <ModernInput
+              label="Title"
+              required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Enter task title"
+              description="Use format: As a [user], I want [goal], so that [benefit]"
             />
           </div>
 
           <div>
             <div className="flex items-center justify-between mb-2">
-              <Label htmlFor="description">Description</Label>
+              <span className="text-sm font-medium text-foreground">Description</span>
               <Button
                 type="button"
                 size="sm"
                 variant="outline"
                 onClick={handleGenerateStory}
                 disabled={generating || !title}
-                className="menu-text-animation"
+                className="transition-all duration-200 hover:scale-105"
               >
-                {generating ? 'Generating...' : 'Generate Story'}
+                {generating ? 'Generating...' : 'Enhance Story'}
               </Button>
             </div>
-            <Textarea
-              id="description"
+            <ModernTextarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Enter task description or user story"
+              placeholder="Enter task description or user story details"
               rows={4}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="priority">Priority</Label>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-foreground">Priority</label>
               <Select value={priority} onValueChange={setPriority}>
-                <SelectTrigger>
+                <SelectTrigger className="transition-all duration-200 hover:border-ring/50 focus:border-ring focus:ring-2 focus:ring-ring focus:ring-offset-2">
                   <SelectValue placeholder="Select priority" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="z-[100]">
                   <SelectItem value="low">Low</SelectItem>
                   <SelectItem value="medium">Medium</SelectItem>
                   <SelectItem value="high">High</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            <div>
-              <Label htmlFor="status">Status</Label>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-foreground">Status</label>
               <Select value={status} onValueChange={setStatus}>
-                <SelectTrigger>
+                <SelectTrigger className="transition-all duration-200 hover:border-ring/50 focus:border-ring focus:ring-2 focus:ring-ring focus:ring-offset-2">
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="z-[100]">
                   <SelectItem value="todo">To Do</SelectItem>
                   <SelectItem value="in-progress">In Progress</SelectItem>
                   <SelectItem value="completed">Completed</SelectItem>
@@ -305,16 +305,15 @@ const TaskModal: React.FC<TaskModalProps> = ({
           </div>
 
           <div>
-            <Label>Tags</Label>
+            <label className="block text-sm font-medium text-foreground">Tags</label>
             <div className="flex gap-2 mb-2">
-              <CaptureInput
-                label=""
+              <ModernInput
                 value={newTag}
                 onChange={(e) => setNewTag(e.target.value)}
                 placeholder="Add tag"
                 onKeyPress={(e) => e.key === 'Enter' && handleAddTag()}
               />
-              <Button type="button" onClick={handleAddTag} className="menu-text-animation">Add</Button>
+              <Button type="button" onClick={handleAddTag} className="transition-all duration-200 hover:scale-105">Add</Button>
             </div>
             {tags.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-2">
@@ -336,10 +335,10 @@ const TaskModal: React.FC<TaskModalProps> = ({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} className="menu-text-animation">
+          <Button variant="outline" onClick={() => onOpenChange(false)} className="transition-all duration-200 hover:scale-105">
             Cancel
           </Button>
-          <Button onClick={handleSave} disabled={loading || !title} className="menu-text-animation">
+          <Button onClick={handleSave} disabled={loading || !title} className="transition-all duration-200 hover:scale-105">
             {loading ? 'Saving...' : 'Save Task'}
           </Button>
         </DialogFooter>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { ModernInput } from './ui/ModernInput';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/integrations/supabase/client';
@@ -119,31 +119,29 @@ const DevSuiteSettings = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label htmlFor="apiKey">OpenAI API Key</Label>
-            <Input
-              id="apiKey"
+            <ModernInput
+              label="OpenAI API Key"
               type="password"
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
               placeholder="sk-..."
+              description="Required for AI story generation and sprint execution features"
             />
-            <p className="text-sm text-muted-foreground mt-1">
-              Required for AI story generation and sprint execution features
-            </p>
           </div>
 
           <div>
-            <Label htmlFor="model">Preferred Model</Label>
-            <select
-              id="model"
-              value={settings.preferred_model}
-              onChange={(e) => setSettings(prev => ({ ...prev, preferred_model: e.target.value }))}
-              className="w-full p-2 border border-input rounded-md bg-background"
-            >
-              <option value="gpt-4">GPT-4</option>
-              <option value="gpt-4-turbo">GPT-4 Turbo</option>
-              <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-            </select>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-foreground">Preferred Model</label>
+              <select
+                value={settings.preferred_model}
+                onChange={(e) => setSettings(prev => ({ ...prev, preferred_model: e.target.value }))}
+                className="flex h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 hover:border-ring/50 transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <option value="gpt-4">GPT-4</option>
+                <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+              </select>
+            </div>
           </div>
 
           <div className="flex items-center justify-between">
@@ -167,7 +165,7 @@ const DevSuiteSettings = () => {
       <Button 
         onClick={handleSaveSettings} 
         disabled={saveLoading}
-        className="w-full menu-text-animation"
+        className="w-full transition-all duration-200 hover:scale-105"
       >
         {saveLoading ? 'Saving...' : 'Save Settings'}
       </Button>

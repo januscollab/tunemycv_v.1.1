@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
+import { ModernInput } from './ui/ModernInput';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -176,7 +176,7 @@ const ArchivedStoriesTab = () => {
           <h2 className="text-2xl font-semibold">Archived Stories</h2>
           <Badge variant="secondary">{filteredTasks.length}</Badge>
         </div>
-        <Button onClick={loadArchivedTasks} className="menu-text-animation">
+        <Button onClick={loadArchivedTasks} className="transition-all duration-200 hover:scale-105">
           Refresh
         </Button>
       </div>
@@ -186,8 +186,8 @@ const ArchivedStoriesTab = () => {
         <CardContent className="pt-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
+              <ModernInput
                 placeholder="Search tasks, descriptions, or tags..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -296,7 +296,7 @@ const ArchivedStoriesTab = () => {
                       size="sm"
                       variant="outline"
                       onClick={() => handleViewTask(task)}
-                      className="menu-text-animation"
+                      className="transition-all duration-200 hover:scale-105"
                     >
                       <Eye className="h-4 w-4 mr-1" />
                       View
@@ -305,7 +305,7 @@ const ArchivedStoriesTab = () => {
                       size="sm"
                       variant="outline"
                       onClick={() => handleRestoreTask(task)}
-                      className="menu-text-animation"
+                      className="transition-all duration-200 hover:scale-105"
                     >
                       <Undo2 className="h-4 w-4 mr-1" />
                       Restore
@@ -314,7 +314,7 @@ const ArchivedStoriesTab = () => {
                       size="sm"
                       variant="destructive"
                       onClick={() => handlePermanentDelete(task)}
-                      className="menu-text-animation"
+                      className="transition-all duration-200 hover:scale-105"
                     >
                       Delete
                     </Button>

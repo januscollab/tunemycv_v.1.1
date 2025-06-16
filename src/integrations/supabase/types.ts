@@ -584,39 +584,6 @@ export type Database = {
           },
         ]
       }
-      n8n_tmp: {
-        Row: {
-          created_at: string | null
-          filename: string
-          format: string
-          id: string
-          mime: string | null
-          storage_path: string
-          type: string
-          uploaded_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          filename: string
-          format: string
-          id?: string
-          mime?: string | null
-          storage_path: string
-          type?: string
-          uploaded_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          filename?: string
-          format?: string
-          id?: string
-          mime?: string | null
-          storage_path?: string
-          type?: string
-          uploaded_at?: string | null
-        }
-        Relationships: []
-      }
       profiles: {
         Row: {
           company_size_preference: string | null
