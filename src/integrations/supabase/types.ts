@@ -602,7 +602,7 @@ export type Database = {
           id?: string
           mime?: string | null
           storage_path: string
-          type: string
+          type?: string
           uploaded_at?: string | null
         }
         Update: {

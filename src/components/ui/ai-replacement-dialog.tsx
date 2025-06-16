@@ -57,12 +57,12 @@ const AIReplacementDialog: React.FC<AIReplacementDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-gradient-to-br from-primary-600/10 to-primary-700/10 backdrop-blur-sm border border-primary/20 max-w-4xl max-h-[80vh] overflow-y-auto animate-scale-in">
-        {/* Enhanced Header with AI Branding */}
-        <div className="p-4 border-b border-primary/20 bg-gradient-to-r from-primary-600/20 to-primary-700/20 rounded-t-lg -m-6 mb-4">
+      <DialogContent className="bg-background/95 backdrop-blur-sm border border-border max-w-4xl max-h-[80vh] overflow-y-auto animate-scale-in shadow-2xl">
+        {/* Clean Header with Subtle AI Branding */}
+        <div className="p-4 border-b border-border bg-muted/30 rounded-t-lg -m-6 mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center shadow-lg">
-              <WandSparkles className="w-5 h-5 text-primary-foreground" />
+            <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center shadow-sm border border-border/50">
+              <WandSparkles className="w-5 h-5 text-muted-foreground" />
             </div>
             <div>
               <DialogTitle className="text-heading text-foreground flex items-center gap-2">
@@ -70,20 +70,20 @@ const AIReplacementDialog: React.FC<AIReplacementDialogProps> = ({
                   <>
                     <div className="flex items-center gap-2">
                       <div className="relative">
-                        <Brain className="h-5 w-5 text-primary animate-pulse" />
-                        <Sparkles className="h-3 w-3 text-primary/60 absolute -top-1 -right-1 animate-bounce" />
+                        <Brain className="h-5 w-5 text-muted-foreground animate-pulse" />
+                        <div className="w-2 h-2 bg-primary rounded-full absolute -top-0.5 -right-0.5"></div>
                       </div>
                       AI Processing...
                     </div>
                   </>
                 ) : (
                   <>
-                    <WandSparkles className="h-5 w-5 text-primary" />
+                    <WandSparkles className="h-5 w-5 text-muted-foreground" />
                     {actionTitle}
                   </>
                 )}
               </DialogTitle>
-              <DialogDescription className="text-body text-foreground-secondary">
+              <DialogDescription className="text-body text-muted-foreground">
                 {isLoading 
                   ? "Analyzing your text with advanced AI algorithms..."
                   : "Review the AI-enhanced content and apply changes if satisfied."
@@ -100,15 +100,15 @@ const AIReplacementDialog: React.FC<AIReplacementDialogProps> = ({
               {/* Original Text */}
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-accent rounded-full"></div>
+                  <div className="w-2 h-2 bg-muted-foreground/50 rounded-full"></div>
                   <h4 className="text-caption font-semibold text-foreground">Original Text</h4>
                 </div>
-                <div className="p-4 bg-gradient-to-br from-accent/30 to-accent/10 rounded-lg border border-accent/30 backdrop-blur-sm">
-                  <p className="text-body text-foreground-secondary whitespace-pre-wrap leading-relaxed">
+                <div className="p-4 bg-muted/50 rounded-lg border border-border/50">
+                  <p className="text-body text-muted-foreground whitespace-pre-wrap leading-relaxed">
                     {originalText}
                   </p>
                 </div>
-                <div className="text-micro text-foreground-secondary flex items-center gap-1">
+                <div className="text-micro text-muted-foreground flex items-center gap-1">
                   <span>{originalText.length} characters</span>
                 </div>
               </div>
@@ -117,7 +117,7 @@ const AIReplacementDialog: React.FC<AIReplacementDialogProps> = ({
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+                    <div className="w-2 h-2 bg-primary rounded-full"></div>
                     <h4 className="text-caption font-semibold text-foreground">AI Enhanced</h4>
                   </div>
                   <Button
@@ -126,7 +126,7 @@ const AIReplacementDialog: React.FC<AIReplacementDialogProps> = ({
                     onClick={handleCopy}
                     className={cn(
                       "text-micro relative overflow-hidden group hover:scale-105 transition-all duration-200",
-                      copied && "bg-primary/10 border-primary/30"
+                      copied && "bg-muted border-muted-foreground/30"
                     )}
                   >
                     <span className="relative z-10 flex items-center gap-1">
@@ -142,23 +142,23 @@ const AIReplacementDialog: React.FC<AIReplacementDialogProps> = ({
                         </>
                       )}
                     </span>
-                    <span className="absolute inset-0 bg-gradient-to-r from-primary/10 to-primary/20 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ease-out"></span>
+                    <span className="absolute inset-0 bg-muted/50 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ease-out"></span>
                   </Button>
                 </div>
-                <div className="p-4 bg-gradient-to-br from-primary/15 to-primary/5 rounded-lg border border-primary/30 backdrop-blur-sm shadow-lg">
+                <div className="p-4 bg-background border border-border shadow-sm rounded-lg">
                   <p className="text-body text-foreground whitespace-pre-wrap leading-relaxed">
                     {generatedText}
                   </p>
                 </div>
-                <div className="text-micro text-foreground-secondary flex items-center gap-1">
+                <div className="text-micro text-muted-foreground flex items-center gap-1">
                   <span>{generatedText.length} characters</span>
                   <span className={cn(
-                    "ml-2 px-2 py-0.5 rounded-full text-micro font-medium",
+                    "ml-2 px-2 py-0.5 rounded-full text-micro font-medium border",
                     generatedText.length > originalText.length 
-                      ? "bg-blue-500/10 text-blue-600 border border-blue-500/20" 
+                      ? "bg-muted/50 text-muted-foreground border-border" 
                       : generatedText.length < originalText.length
-                      ? "bg-green-500/10 text-green-600 border border-green-500/20"
-                      : "bg-amber-500/10 text-amber-600 border border-amber-500/20"
+                      ? "bg-muted/50 text-muted-foreground border-border"
+                      : "bg-muted/50 text-muted-foreground border-border"
                   )}>
                     {generatedText.length > originalText.length 
                       ? `+${generatedText.length - originalText.length}` 
@@ -176,38 +176,36 @@ const AIReplacementDialog: React.FC<AIReplacementDialogProps> = ({
         {isLoading && (
           <div className="flex items-center justify-center py-12 animate-fade-in">
             <div className="text-center space-y-6">
-              {/* Sophisticated Loading Animation */}
-              <div className="relative mx-auto w-20 h-20">
+              {/* Clean Loading Animation */}
+              <div className="relative mx-auto w-16 h-16">
                 {/* Outer rotating ring */}
-                <div className="absolute inset-0 rounded-full border-4 border-primary/20"></div>
-                <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-primary animate-spin"></div>
+                <div className="absolute inset-0 rounded-full border-4 border-border"></div>
+                <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-muted-foreground animate-spin"></div>
                 
-                {/* Inner pulsing circle */}
-                <div className="absolute inset-2 rounded-full bg-gradient-to-br from-primary/30 to-primary/10 animate-pulse flex items-center justify-center">
-                  <Brain className="h-6 w-6 text-primary animate-pulse" />
+                {/* Inner circle */}
+                <div className="absolute inset-2 rounded-full bg-muted/50 flex items-center justify-center">
+                  <Brain className="h-5 w-5 text-muted-foreground animate-pulse" />
                 </div>
                 
-                {/* Floating sparkles */}
-                <Sparkles className="absolute -top-1 -right-1 h-4 w-4 text-primary/60 animate-bounce" style={{ animationDelay: '0s' }} />
-                <Sparkles className="absolute -bottom-1 -left-1 h-3 w-3 text-primary/40 animate-bounce" style={{ animationDelay: '0.5s' }} />
-                <WandSparkles className="absolute top-1/2 -left-2 h-3 w-3 text-primary/50 animate-bounce" style={{ animationDelay: '1s' }} />
+                {/* Subtle indicator dot */}
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full animate-pulse"></div>
               </div>
 
-              {/* Dynamic status messages */}
+              {/* Clean status messages */}
               <div className="space-y-2">
                 <p className="text-heading font-semibold text-foreground">
                   AI Processing in Progress
                 </p>
-                <p className="text-body text-foreground-secondary max-w-md mx-auto leading-relaxed">
+                <p className="text-body text-muted-foreground max-w-md mx-auto leading-relaxed">
                   Our advanced language model is analyzing your text, identifying improvements, and crafting enhanced content...
                 </p>
                 
-                {/* Processing steps indicator */}
-                <div className="flex justify-center items-center gap-2 mt-4">
-                  <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-                  <div className="w-2 h-2 bg-primary/60 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                  <div className="w-2 h-2 bg-primary/40 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
-                  <div className="w-2 h-2 bg-primary/20 rounded-full animate-pulse" style={{ animationDelay: '0.6s' }}></div>
+                {/* Simple progress indicator */}
+                <div className="flex justify-center items-center gap-1 mt-4">
+                  <div className="w-1.5 h-1.5 bg-muted-foreground/50 rounded-full animate-pulse"></div>
+                  <div className="w-1.5 h-1.5 bg-muted-foreground/50 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                  <div className="w-1.5 h-1.5 bg-muted-foreground/50 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                  <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" style={{ animationDelay: '0.6s' }}></div>
                 </div>
               </div>
             </div>
