@@ -218,7 +218,7 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
         label: 'Download',
         icon: <Download className="h-4 w-4 mr-2" />,
         onClick: (doc) => {
-          // Handle download logic here
+          // Create download content
           const content = doc.type === 'analysis' 
             ? `CV ANALYSIS REPORT
 ==================

@@ -41,6 +41,7 @@ const SprintManager = () => {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [newSprintName, setNewSprintName] = useState('');
   const [addingNewSprint, setAddingNewSprint] = useState(false);
+  const [sprintLayout, setSprintLayout] = useState<'one' | 'two'>('two');
 
   useEffect(() => {
     if (user) {
@@ -438,6 +439,13 @@ const SprintManager = () => {
         <div className="flex gap-2">
           <Button 
             variant="outline" 
+            onClick={() => setSprintLayout(sprintLayout === 'one' ? 'two' : 'one')}
+            className="menu-text-animation"
+          >
+            {sprintLayout === 'one' ? '2 Per Row' : '1 Per Row'}
+          </Button>
+          <Button 
+            variant="outline" 
             onClick={() => setAddingNewSprint(true)}
             className="menu-text-animation"
           >
@@ -481,7 +489,7 @@ const SprintManager = () => {
       )}
 
       <DragDropContext onDragEnd={onDragEnd}>
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className={`grid gap-6 ${sprintLayout === 'two' ? 'md:grid-cols-2' : 'grid-cols-1'}`}>
           {sprints
             .filter(sprint => !sprint.is_hidden)
             .map((sprint) => (

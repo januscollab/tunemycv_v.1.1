@@ -163,25 +163,6 @@ const DevSuiteSettings = () => {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Sprint Configuration</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <Label>Show Priority Sprint</Label>
-              <p className="text-sm text-muted-foreground">
-                Display the Priority sprint in sprint manager
-              </p>
-            </div>
-            <Switch
-              checked={settings.show_priority_sprint}
-              onCheckedChange={handleTogglePrioritySprint}
-            />
-          </div>
-        </CardContent>
-      </Card>
 
       <Button 
         onClick={handleSaveSettings} 

@@ -31,7 +31,9 @@ const ArchivedStoriesTab = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
   const [sprintFilter, setSprintFilter] = useState<string>('all');
+  const [tagsFilter, setTagsFilter] = useState<string>('all');
   const [availableSprints, setAvailableSprints] = useState<{id: string, name: string}[]>([]);
+  const [availableTags, setAvaileTags] = useState<string[]>([]);
   const [selectedTask, setSelectedTask] = useState<ArchivedTask | null>(null);
   const [showTaskDetail, setShowTaskDetail] = useState(false);
 
@@ -61,6 +63,11 @@ const ArchivedStoriesTab = () => {
       })) || [];
 
       setArchivedTasks(tasksWithSprintName);
+      
+      // Extract unique tags
+      const allTags = tasksWithSprintName.flatMap(task => task.tags || []);
+      const uniqueTags = [...new Set(allTags)].sort();
+      setAvaileTags(uniqueTags);
     } catch (error) {
       console.error('Error loading archived tasks:', error);
       toast.error('Failed to load archived tasks');
@@ -143,8 +150,9 @@ const ArchivedStoriesTab = () => {
     
     const matchesPriority = priorityFilter === 'all' || task.priority === priorityFilter;
     const matchesSprint = sprintFilter === 'all' || task.sprint_id === sprintFilter;
+    const matchesTags = tagsFilter === 'all' || task.tags.includes(tagsFilter);
 
-    return matchesSearch && matchesPriority && matchesSprint;
+    return matchesSearch && matchesPriority && matchesSprint && matchesTags;
   });
 
   const getPriorityColor = (priority: string) => {
@@ -176,7 +184,7 @@ const ArchivedStoriesTab = () => {
       {/* Search and Filters */}
       <Card>
         <CardContent className="pt-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -208,6 +216,20 @@ const ArchivedStoriesTab = () => {
                 {availableSprints.map(sprint => (
                   <SelectItem key={sprint.id} value={sprint.id}>
                     {sprint.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={tagsFilter} onValueChange={setTagsFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="Filter by tags" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Tags</SelectItem>
+                {availableTags.map(tag => (
+                  <SelectItem key={tag} value={tag}>
+                    {tag}
                   </SelectItem>
                 ))}
               </SelectContent>
