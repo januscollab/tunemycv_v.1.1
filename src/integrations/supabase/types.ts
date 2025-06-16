@@ -1182,6 +1182,14 @@ export type Database = {
         Args: { _user_id: string }
         Returns: boolean
       }
+      enhance_task_story: {
+        Args: {
+          task_title: string
+          existing_description?: string
+          context_info?: string
+        }
+        Returns: string
+      }
       generate_user_id: {
         Args: Record<PropertyKey, never>
         Returns: string

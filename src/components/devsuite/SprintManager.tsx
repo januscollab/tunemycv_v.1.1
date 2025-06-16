@@ -550,8 +550,8 @@ const SprintManager = () => {
                       )}
                     </div>
                   </div>
-                </CardHeader>
-                <CardContent>
+                </ModernCardHeader>
+                <ModernCardContent>
                   <Droppable droppableId={sprint.id}>
                     {(provided) => (
                       <div
@@ -640,8 +640,8 @@ const SprintManager = () => {
                       </div>
                     )}
                   </Droppable>
-                </CardContent>
-              </Card>
+                </ModernCardContent>
+              </ModernCard>
             ))}
         </div>
       </DragDropContext>
