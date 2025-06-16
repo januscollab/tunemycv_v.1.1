@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ModernCard, ModernCardContent, ModernCardHeader, ModernCardTitle } from './ui/ModernCard';
+import { ModernButton } from './ui/ModernButton';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -91,7 +91,7 @@ const ExecutionLogs = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold">Execution Logs</h2>
-        <Button onClick={loadLogs}>Refresh</Button>
+        <ModernButton modernVariant="ghost" onClick={loadLogs}>Refresh</ModernButton>
       </div>
 
       {logs.length === 0 ? (
@@ -122,22 +122,20 @@ const ExecutionLogs = () => {
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge variant="outline">{log.model_used}</Badge>
-                    <Button
+                    <ModernButton
                       size="sm"
-                      variant="outline"
+                      modernVariant="secondary"
                       onClick={() => handleViewDetails(log)}
-                      className="hover-scale"
                     >
                       👁 View Details
-                    </Button>
-                    <Button
+                    </ModernButton>
+                    <ModernButton
                       size="sm"
-                      variant="destructive"
+                      modernVariant="destructive"
                       onClick={() => handleDeleteLog(log.id)}
-                      className="hover-scale"
                     >
                       🗑 Delete
-                    </Button>
+                    </ModernButton>
                   </div>
                 </div>
               </ModernCardHeader>

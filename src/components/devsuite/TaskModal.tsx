@@ -6,9 +6,9 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 import { ModernInput } from './ui/ModernInput';
 import { ModernTextarea } from './ui/ModernTextarea';
+import { ModernButton } from './ui/ModernButton';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -256,16 +256,15 @@ const TaskModal: React.FC<TaskModalProps> = ({
           <div>
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-foreground">Description</span>
-              <Button
-                type="button"
+              <ModernButton
                 size="sm"
-                variant="outline"
+                modernVariant="secondary"
                 onClick={handleGenerateStory}
                 disabled={generating || !title}
-                className="transition-all duration-200 hover:scale-105"
+                isLoading={generating}
               >
                 {generating ? 'Generating...' : 'Enhance Story'}
-              </Button>
+              </ModernButton>
             </div>
             <ModernTextarea
               value={description}
@@ -313,7 +312,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
                 placeholder="Add tag"
                 onKeyPress={(e) => e.key === 'Enter' && handleAddTag()}
               />
-              <Button type="button" onClick={handleAddTag} className="transition-all duration-200 hover:scale-105">Add</Button>
+              <ModernButton modernVariant="secondary" onClick={handleAddTag}>Add</ModernButton>
             </div>
             {tags.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-2">
@@ -335,12 +334,12 @@ const TaskModal: React.FC<TaskModalProps> = ({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} className="transition-all duration-200 hover:scale-105">
+          <ModernButton modernVariant="ghost" onClick={() => onOpenChange(false)}>
             Cancel
-          </Button>
-          <Button onClick={handleSave} disabled={loading || !title} className="transition-all duration-200 hover:scale-105">
+          </ModernButton>
+          <ModernButton modernVariant="primary" onClick={handleSave} disabled={loading || !title} isLoading={loading}>
             {loading ? 'Saving...' : 'Save Task'}
-          </Button>
+          </ModernButton>
         </DialogFooter>
       </DialogContent>
     </Dialog>

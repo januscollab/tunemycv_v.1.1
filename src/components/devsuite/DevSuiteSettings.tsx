@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
 import { ModernInput } from './ui/ModernInput';
 import { ModernCard, ModernCardContent, ModernCardHeader, ModernCardTitle } from './ui/ModernCard';
+import { ModernButton } from './ui/ModernButton';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/integrations/supabase/client';
@@ -162,13 +162,15 @@ const DevSuiteSettings = () => {
       </ModernCard>
 
 
-      <Button 
+      <ModernButton 
+        modernVariant="primary"
         onClick={handleSaveSettings} 
         disabled={saveLoading}
-        className="w-full hover-scale"
+        isLoading={saveLoading}
+        className="w-full"
       >
-        {saveLoading ? '💾 Saving...' : '💾 Save Settings'}
-      </Button>
+        {saveLoading ? 'Saving...' : 'Save Settings'}
+      </ModernButton>
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
 import { ModernCard, ModernCardContent, ModernCardHeader, ModernCardTitle } from './ui/ModernCard';
+import { ModernButton } from './ui/ModernButton';
 import { ModernTextarea } from './ui/ModernTextarea';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -357,36 +357,35 @@ The DevSuite is completely self-contained and can be integrated into any React p
         </ModernCardHeader>
         <ModernCardContent className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Button 
+            <ModernButton 
               onClick={handleExportSQL}
-              className="hover-scale"
-              variant="outline"
+              modernVariant="outline"
             >
               📄 Export SQL Schema
-            </Button>
-            <Button 
+            </ModernButton>
+            <ModernButton 
               onClick={handleExportComponents}
-              className="hover-scale"
-              variant="outline"
+              modernVariant="outline"
             >
               ⚛️ Export Components
-            </Button>
-            <Button 
+            </ModernButton>
+            <ModernButton 
               onClick={handleExportUserData}
               disabled={exporting}
-              className="hover-scale"
-              variant="outline"
+              modernVariant="outline"
+              isLoading={exporting}
             >
               {exporting ? '⏳ Exporting...' : '💾 Export User Data'}
-            </Button>
+            </ModernButton>
           </div>
 
-          <Button 
+          <ModernButton 
             onClick={generateCompletePackage}
-            className="w-full hover-scale"
+            modernVariant="primary"
+            className="w-full"
           >
             📋 Generate Complete Setup Instructions
-          </Button>
+          </ModernButton>
 
           {exportData && (
             <div className="space-y-4">
@@ -397,15 +396,15 @@ The DevSuite is completely self-contained and can be integrated into any React p
                 rows={20}
                 className="font-mono text-sm"
               />
-              <Button 
+              <ModernButton 
                 onClick={() => {
                   navigator.clipboard.writeText(exportData);
                   toast.success('Setup instructions copied to clipboard');
                 }}
-                className="hover-scale"
+                modernVariant="secondary"
               >
                 📋 Copy to Clipboard
-              </Button>
+              </ModernButton>
             </div>
           )}
 

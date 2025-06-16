@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ModernInput } from './ui/ModernInput';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -9,6 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { Search, Archive, Undo2, Eye } from 'lucide-react';
 import TaskDetailModal from './TaskDetailModal';
+import { ModernButton } from './ui/ModernButton';
 
 interface ArchivedTask {
   id: string;
@@ -176,9 +176,9 @@ const ArchivedStoriesTab = () => {
           <h2 className="text-2xl font-semibold">Archived Stories</h2>
           <Badge variant="secondary">{filteredTasks.length}</Badge>
         </div>
-        <Button onClick={loadArchivedTasks} className="transition-all duration-200 hover:scale-105">
+        <ModernButton modernVariant="ghost" onClick={loadArchivedTasks}>
           Refresh
-        </Button>
+        </ModernButton>
       </div>
 
       {/* Search and Filters */}
@@ -292,32 +292,29 @@ const ArchivedStoriesTab = () => {
                   </div>
                   
                   <div className="flex gap-2 ml-4">
-                    <Button
+                    <ModernButton
                       size="sm"
-                      variant="outline"
+                      modernVariant="secondary"
                       onClick={() => handleViewTask(task)}
-                      className="transition-all duration-200 hover:scale-105"
+                      icon={Eye}
                     >
-                      <Eye className="h-4 w-4 mr-1" />
                       View
-                    </Button>
-                    <Button
+                    </ModernButton>
+                    <ModernButton
                       size="sm"
-                      variant="outline"
+                      modernVariant="success"
                       onClick={() => handleRestoreTask(task)}
-                      className="transition-all duration-200 hover:scale-105"
+                      icon={Undo2}
                     >
-                      <Undo2 className="h-4 w-4 mr-1" />
                       Restore
-                    </Button>
-                    <Button
+                    </ModernButton>
+                    <ModernButton
                       size="sm"
-                      variant="destructive"
+                      modernVariant="destructive"
                       onClick={() => handlePermanentDelete(task)}
-                      className="transition-all duration-200 hover:scale-105"
                     >
                       Delete
-                    </Button>
+                    </ModernButton>
                   </div>
                 </div>
               </CardContent>

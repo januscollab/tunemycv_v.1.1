@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ModernInput } from './ui/ModernInput';
 import { ModernCard, ModernCardContent, ModernCardHeader, ModernCardTitle } from './ui/ModernCard';
+import { ModernButton } from './ui/ModernButton';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -412,19 +412,19 @@ const SprintManager = () => {
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high': return 'bg-destructive';
-      case 'medium': return 'bg-zapier-orange';
-      case 'low': return 'bg-secondary';
+      case 'high': return 'bg-red-500 text-white';
+      case 'medium': return 'bg-slate-500 text-white';
+      case 'low': return 'bg-slate-300 text-slate-700';
       default: return 'bg-muted';
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed': return 'bg-green-500';
-      case 'in-progress': return 'bg-blue-500';
-      case 'todo': return 'bg-gray-500';
-      default: return 'bg-gray-500';
+      case 'completed': return 'bg-emerald-500 text-white';
+      case 'in-progress': return 'bg-slate-600 text-white';
+      case 'todo': return 'bg-slate-400 text-white';
+      default: return 'bg-slate-400 text-white';
     }
   };
 
@@ -437,28 +437,25 @@ const SprintManager = () => {
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold">Sprint Manager</h2>
         <div className="flex gap-2">
-          <Button 
-            variant="outline" 
+          <ModernButton 
+            modernVariant="outline" 
             onClick={() => setSprintLayout(sprintLayout === 'one' ? 'two' : 'one')}
-            className="menu-text-animation"
           >
             {sprintLayout === 'one' ? '2 Per Row' : '1 Per Row'}
-          </Button>
-          <Button 
-            variant="outline" 
+          </ModernButton>
+          <ModernButton 
+            modernVariant="secondary" 
             onClick={() => setAddingNewSprint(true)}
-            className="menu-text-animation"
           >
             Add Sprint
-          </Button>
-          <Button 
-            variant="destructive"
+          </ModernButton>
+          <ModernButton 
+            modernVariant="destructive"
             onClick={handleClearAllTasks}
-            className="menu-text-animation"
           >
             Clear All Tasks
-          </Button>
-          <Button onClick={() => loadData()} className="menu-text-animation">Refresh</Button>
+          </ModernButton>
+          <ModernButton modernVariant="ghost" onClick={() => loadData()}>Refresh</ModernButton>
         </div>
       </div>
 
@@ -472,17 +469,16 @@ const SprintManager = () => {
                 placeholder="Enter sprint name"
                 onKeyPress={(e) => e.key === 'Enter' && handleAddSprint()}
               />
-              <Button onClick={handleAddSprint} className="hover-scale">Create</Button>
-              <Button 
-                variant="outline" 
+              <ModernButton onClick={handleAddSprint} modernVariant="primary">Create</ModernButton>
+              <ModernButton 
+                modernVariant="ghost" 
                 onClick={() => {
                   setAddingNewSprint(false);
                   setNewSprintName('');
                 }}
-                className="hover-scale"
               >
                 Cancel
-              </Button>
+              </ModernButton>
             </div>
           </ModernCardContent>
         </ModernCard>
@@ -498,55 +494,48 @@ const SprintManager = () => {
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-2">
                       <ModernCardTitle className="text-lg">{sprint.name}</ModernCardTitle>
-                      <Badge variant={sprint.status === 'completed' ? 'default' : 'secondary'}>
-                        {sprint.status}
-                      </Badge>
                     </div>
                     <div className="flex gap-1">
-                      <Button
+                      <ModernButton
                         size="sm"
+                        modernVariant="primary"
                         onClick={() => handleAddTask(sprint)}
-                        className="transition-all duration-200 hover:scale-105"
                       >
                         Add Task
-                      </Button>
-                      <Button
+                      </ModernButton>
+                      <ModernButton
                         size="sm"
-                        variant="outline"
+                        modernVariant="secondary"
                         onClick={() => handleExecuteSprint(sprint)}
-                        className="transition-all duration-200 hover:scale-105"
                       >
                         Execute
-                      </Button>
+                      </ModernButton>
                       {sprint.status !== 'completed' && (
-                        <Button
+                        <ModernButton
                           size="sm"
-                          variant="outline"
+                          modernVariant="outline"
                           onClick={() => handleCloseSprint(sprint)}
-                          className="menu-text-animation"
                         >
                           Close
-                        </Button>
+                        </ModernButton>
                       )}
                       {sprint.name === 'Priority Sprint' && getTasksForSprint(sprint.id).some(task => task.status === 'completed') && (
-                        <Button
+                        <ModernButton
                           size="sm"
-                          variant="secondary"
+                          modernVariant="ghost"
                           onClick={() => handleArchiveCompletedTasks(sprint)}
-                          className="menu-text-animation"
                         >
                           Archive Completed
-                        </Button>
+                        </ModernButton>
                       )}
                       {sprint.name !== 'Priority Sprint' && sprint.name !== 'Backlog' && (
-                        <Button
+                        <ModernButton
                           size="sm"
-                          variant="destructive"
+                          modernVariant="destructive"
                           onClick={() => handleDeleteSprint(sprint)}
-                          className="menu-text-animation"
                         >
                           Delete
-                        </Button>
+                        </ModernButton>
                       )}
                     </div>
                   </div>

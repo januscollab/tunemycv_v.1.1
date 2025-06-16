@@ -161,13 +161,13 @@ const SprintAnalytics = () => {
                 </div>
 
                 <div className="flex gap-2 text-xs">
-                  <Badge variant="secondary" className="bg-green-100 text-green-800">
+                  <Badge variant="secondary" className="bg-emerald-500 text-white">
                     ✓ {stat.completedTasks}
                   </Badge>
-                  <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                  <Badge variant="secondary" className="bg-slate-600 text-white">
                     ⟳ {stat.inProgressTasks}
                   </Badge>
-                  <Badge variant="secondary" className="bg-gray-100 text-gray-800">
+                  <Badge variant="secondary" className="bg-slate-400 text-white">
                     ○ {stat.todoTasks}
                   </Badge>
                 </div>
