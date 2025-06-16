@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { ModernCard, ModernCardContent, ModernCardHeader, ModernCardTitle } from './ui/ModernCard';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -97,11 +97,11 @@ const SprintAnalytics = () => {
       </div>
 
       {/* Overall Stats */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Overall Progress</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <ModernCard className="animate-fade-in">
+        <ModernCardHeader>
+          <ModernCardTitle>📊 Overall Progress</ModernCardTitle>
+        </ModernCardHeader>
+        <ModernCardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
             <div className="text-center">
               <div className="text-2xl font-bold text-primary">{totalTasks}</div>
@@ -129,25 +129,25 @@ const SprintAnalytics = () => {
               <span>Overall Completion</span>
               <span>{overallCompletion}%</span>
             </div>
-            <Progress value={overallCompletion} className="h-2" />
+            <Progress value={overallCompletion} className="h-3" />
           </div>
-        </CardContent>
-      </Card>
+        </ModernCardContent>
+      </ModernCard>
 
       {/* Sprint-specific Stats */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {sprintStats.map((stat) => (
-          <Card key={stat.sprintId}>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg">{stat.sprintName}</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <ModernCard key={stat.sprintId} className="animate-fade-in hover-scale">
+            <ModernCardHeader className="pb-3">
+              <ModernCardTitle className="text-lg">🎯 {stat.sprintName}</ModernCardTitle>
+            </ModernCardHeader>
+            <ModernCardContent>
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-muted-foreground">Progress</span>
                   <Badge variant="outline">{stat.completionPercentage}%</Badge>
                 </div>
-                <Progress value={stat.completionPercentage} className="h-2" />
+                <Progress value={stat.completionPercentage} className="h-3" />
                 
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div className="flex justify-between">
@@ -172,8 +172,8 @@ const SprintAnalytics = () => {
                   </Badge>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </ModernCardContent>
+          </ModernCard>
         ))}
       </div>
     </div>

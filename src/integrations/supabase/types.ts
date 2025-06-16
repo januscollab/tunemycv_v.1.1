@@ -584,6 +584,48 @@ export type Database = {
           },
         ]
       }
+      n8n_tmp: {
+        Row: {
+          activity_id: string
+          content_type: string | null
+          created_at: string | null
+          document_type: string | null
+          file_extension: string | null
+          file_name: string
+          file_size: number | null
+          file_type: string
+          id: string
+          original_name: string | null
+          storage_path: string | null
+        }
+        Insert: {
+          activity_id: string
+          content_type?: string | null
+          created_at?: string | null
+          document_type?: string | null
+          file_extension?: string | null
+          file_name: string
+          file_size?: number | null
+          file_type: string
+          id?: string
+          original_name?: string | null
+          storage_path?: string | null
+        }
+        Update: {
+          activity_id?: string
+          content_type?: string | null
+          created_at?: string | null
+          document_type?: string | null
+          file_extension?: string | null
+          file_name?: string
+          file_size?: number | null
+          file_type?: string
+          id?: string
+          original_name?: string | null
+          storage_path?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           company_size_preference: string | null

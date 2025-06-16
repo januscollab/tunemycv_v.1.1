@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ModernInput } from './ui/ModernInput';
+import { ModernCard, ModernCardContent, ModernCardHeader, ModernCardTitle } from './ui/ModernCard';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -463,8 +463,8 @@ const SprintManager = () => {
       </div>
 
       {addingNewSprint && (
-        <Card>
-          <CardContent className="pt-6">
+        <ModernCard className="animate-fade-in">
+          <ModernCardContent className="pt-6">
             <div className="flex gap-2">
               <ModernInput
                 value={newSprintName}
@@ -472,20 +472,20 @@ const SprintManager = () => {
                 placeholder="Enter sprint name"
                 onKeyPress={(e) => e.key === 'Enter' && handleAddSprint()}
               />
-              <Button onClick={handleAddSprint} className="transition-all duration-200 hover:scale-105">Create</Button>
+              <Button onClick={handleAddSprint} className="hover-scale">Create</Button>
               <Button 
                 variant="outline" 
                 onClick={() => {
                   setAddingNewSprint(false);
                   setNewSprintName('');
                 }}
-                className="transition-all duration-200 hover:scale-105"
+                className="hover-scale"
               >
                 Cancel
               </Button>
             </div>
-          </CardContent>
-        </Card>
+          </ModernCardContent>
+        </ModernCard>
       )}
 
       <DragDropContext onDragEnd={onDragEnd}>
@@ -493,11 +493,11 @@ const SprintManager = () => {
           {sprints
             .filter(sprint => !sprint.is_hidden)
             .map((sprint) => (
-              <Card key={sprint.id} className="h-fit">
-                <CardHeader>
+              <ModernCard key={sprint.id} className="h-fit animate-fade-in">
+                <ModernCardHeader className="pb-4">
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-2">
-                      <CardTitle className="text-lg">{sprint.name}</CardTitle>
+                      <ModernCardTitle className="text-lg">{sprint.name}</ModernCardTitle>
                       <Badge variant={sprint.status === 'completed' ? 'default' : 'secondary'}>
                         {sprint.status}
                       </Badge>

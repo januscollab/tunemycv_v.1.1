@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ModernInput } from './ui/ModernInput';
+import { ModernCard, ModernCardContent, ModernCardHeader, ModernCardTitle } from './ui/ModernCard';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/integrations/supabase/client';
@@ -112,12 +112,12 @@ const DevSuiteSettings = () => {
   }
 
   return (
-    <div className="space-y-6 max-w-2xl">
-      <Card>
-        <CardHeader>
-          <CardTitle>OpenAI Integration</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+    <div className="space-y-8 max-w-2xl">
+      <ModernCard className="animate-fade-in">
+        <ModernCardHeader>
+          <ModernCardTitle>🤖 OpenAI Integration</ModernCardTitle>
+        </ModernCardHeader>
+        <ModernCardContent className="space-y-6">
           <div>
             <ModernInput
               label="OpenAI API Key"
@@ -158,16 +158,16 @@ const DevSuiteSettings = () => {
               }
             />
           </div>
-        </CardContent>
-      </Card>
+        </ModernCardContent>
+      </ModernCard>
 
 
       <Button 
         onClick={handleSaveSettings} 
         disabled={saveLoading}
-        className="w-full transition-all duration-200 hover:scale-105"
+        className="w-full hover-scale"
       >
-        {saveLoading ? 'Saving...' : 'Save Settings'}
+        {saveLoading ? '💾 Saving...' : '💾 Save Settings'}
       </Button>
     </div>
   );
