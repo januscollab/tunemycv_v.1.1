@@ -257,7 +257,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl z-[9999] relative bg-white border border-gray-200 shadow-xl">
+      <DialogContent className="max-w-2xl">
         {/* Loading Overlay */}
         {isBlocked && (
           <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center rounded-lg">
