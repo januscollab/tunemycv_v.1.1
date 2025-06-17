@@ -884,6 +884,7 @@ export type Database = {
           priority: string | null
           sprint_id: string
           status: string
+          story_info: string | null
           tags: string[] | null
           title: string
           updated_at: string
@@ -901,6 +902,7 @@ export type Database = {
           priority?: string | null
           sprint_id: string
           status?: string
+          story_info?: string | null
           tags?: string[] | null
           title: string
           updated_at?: string
@@ -918,6 +920,7 @@ export type Database = {
           priority?: string | null
           sprint_id?: string
           status?: string
+          story_info?: string | null
           tags?: string[] | null
           title?: string
           updated_at?: string

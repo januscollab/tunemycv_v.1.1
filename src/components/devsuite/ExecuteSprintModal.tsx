@@ -24,6 +24,7 @@ interface Task {
   id: string;
   title: string;
   description: string;
+  story_info?: string;
   priority: string;
   tags: string[];
 }

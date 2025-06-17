@@ -8,11 +8,12 @@ import {
 } from '@/components/ui/dialog';
 import { CaptureInput } from '@/components/ui/capture-input';
 import { CaptureTextarea } from '@/components/ui/capture-textarea';
+import { CaptureTextareaWithPaste } from '@/components/ui/capture-textarea-with-paste';
 import { VybeButton } from '@/components/design-system/VybeButton';
 import { VybeSelect } from '@/components/design-system/VybeSelect';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { AlertTriangle, CheckCircle, Clock, Flag } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Clock, Flag, Sparkles } from 'lucide-react';
 import { X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -28,6 +29,7 @@ interface Task {
   id: string;
   title: string;
   description: string;
+  story_info?: string;
   priority: string;
   tags: string[];
   status: string;
@@ -50,8 +52,9 @@ const TaskModal: React.FC<TaskModalProps> = ({
   onSave,
 }) => {
   const { user } = useAuth();
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+  const [title, setTitle] = useState(''); // AI-generated story title
+  const [storyInfo, setStoryInfo] = useState(''); // User's raw input
+  const [description, setDescription] = useState(''); // AI-generated detailed description
   const [priority, setPriority] = useState('medium');
   const [tags, setTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState('');
@@ -64,6 +67,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
   useEffect(() => {
     if (task) {
       setTitle(task.title);
+      setStoryInfo(task.story_info || '');
       setDescription(task.description || '');
       setPriority(task.priority);
       setStatus(task.status);
@@ -71,6 +75,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
       loadTaskImages(task.id);
     } else {
       setTitle('');
+      setStoryInfo('');
       setDescription('');
       setPriority('medium');
       setStatus('todo');
@@ -106,8 +111,8 @@ const TaskModal: React.FC<TaskModalProps> = ({
   };
 
   const handleGenerateStory = async () => {
-    if (!title) {
-      toast.error('Please enter a task title first');
+    if (!storyInfo.trim()) {
+      toast.error('Please enter story information first');
       return;
     }
 
@@ -128,7 +133,8 @@ const TaskModal: React.FC<TaskModalProps> = ({
       // Call edge function to generate story
       const { data, error } = await supabase.functions.invoke('generate-task-story', {
         body: { 
-          title, 
+          storyInfo,
+          existingTitle: title,
           existingDescription: description,
           context: sprint?.name || 'General'
         }
@@ -136,13 +142,20 @@ const TaskModal: React.FC<TaskModalProps> = ({
 
       if (error) throw error;
 
-      if (data?.story) {
-        setDescription(data.story);
-        toast.success('Story generated successfully');
+      if (data?.title && data?.description) {
+        setTitle(data.title);
+        setDescription(data.description);
+        
+        // Auto-generate tags from the new content
+        const autoTags = generateAutoTags(data.title, data.description);
+        const finalTags = [...new Set([...tags, ...autoTags])];
+        setTags(finalTags);
+        
+        toast.success('Story enhanced successfully');
       }
     } catch (error) {
       console.error('Error generating story:', error);
-      toast.error('Failed to generate story');
+      toast.error('Failed to enhance story');
     } finally {
       setGenerating(false);
       setIsBlocked(false);
@@ -150,16 +163,20 @@ const TaskModal: React.FC<TaskModalProps> = ({
   };
 
   const handleSave = async () => {
-    if (!title || !sprint) return;
+    if ((!title && !storyInfo) || !sprint) {
+      toast.error('Please provide either a story title or story information');
+      return;
+    }
 
     setLoading(true);
     try {
-      // Generate auto-tags based on title and description
-      const autoTags = generateAutoTags(title, description);
+      // Generate auto-tags based on title, description, and story info
+      const autoTags = generateAutoTags(title, description, storyInfo);
       const finalTags = [...new Set([...tags, ...autoTags])]; // Remove duplicates
 
       const taskData = {
-        title,
+        title: title || storyInfo, // Use title if available, otherwise use story info
+        story_info: storyInfo || null,
         description: description || null,
         priority,
         status,
@@ -198,8 +215,8 @@ const TaskModal: React.FC<TaskModalProps> = ({
   };
 
   // Auto-tagging function
-  const generateAutoTags = (title: string, description: string): string[] => {
-    const content = `${title} ${description}`.toLowerCase();
+  const generateAutoTags = (title: string, description: string, storyInfo?: string): string[] => {
+    const content = `${title} ${description} ${storyInfo || ''}`.toLowerCase();
     const autoTags: string[] = [];
 
     // UI/UX related
@@ -255,34 +272,60 @@ const TaskModal: React.FC<TaskModalProps> = ({
     return autoTags;
   };
 
+  const handleImagePaste = async (files: File[]) => {
+    if (!files.length) return;
+    
+    // Convert files to a format TaskImageUpload can handle
+    const fileList = new DataTransfer();
+    files.forEach(file => fileList.items.add(file));
+    
+    // Trigger the same upload logic as TaskImageUpload
+    // We'll need to integrate this properly with TaskImageUpload component
+    toast.success(`Ready to upload ${files.length} pasted image(s)`);
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
         {/* Loading Overlay */}
         {isBlocked && (
           <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center rounded-lg">
             <div className="text-center">
               <div className="animate-spin h-8 w-8 border-4 border-zapier-orange border-t-transparent rounded-full mx-auto mb-4"></div>
               <p className="text-blueberry dark:text-citrus font-medium">Enhancing story...</p>
-              <p className="text-blueberry/60 dark:text-apple-core/60 text-sm">Please wait while AI improves your task</p>
+              <p className="text-blueberry/60 dark:text-apple-core/60 text-sm">AI is generating your story title and description</p>
             </div>
           </div>
         )}
         <DialogHeader>
           <DialogTitle>
-            {task ? 'Edit Task' : 'Add Task'} {sprint && `- ${sprint.name}`}
+            {task ? 'Edit Story' : 'Add Story'} {sprint && `- ${sprint.name}`}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
           <div>
             <CaptureInput
-              label="Title"
-              required
+              label="Story Title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Enter task title"
-              description="Use format: As a [user], I want [goal], so that [benefit]"
+              placeholder="AI-generated agile story title will appear here"
+              description="Generated in proper agile format: As a [user], I want [goal], so that [benefit]"
+              disabled={generating}
+            />
+          </div>
+
+          <div>
+            <CaptureTextareaWithPaste
+              label="Story Info"
+              required
+              value={storyInfo}
+              onChange={(e) => setStoryInfo(e.target.value)}
+              placeholder="Describe what you want to build in your own words..."
+              rows={3}
+              onImagePaste={handleImagePaste}
+              disabled={generating}
+              description="Enter your raw requirements here, then click 'Enhance Story'"
             />
           </div>
 
@@ -291,20 +334,23 @@ const TaskModal: React.FC<TaskModalProps> = ({
               <span className="text-sm font-medium text-foreground">Description</span>
               <VybeButton
                 vybeSize="sm"
-                vybeVariant="secondary"
+                vybeVariant="primary"
                 onClick={handleGenerateStory}
-                disabled={generating || !title}
+                disabled={generating || !storyInfo.trim()}
                 isLoading={generating}
+                icon={Sparkles}
               >
-                {generating ? 'Generating...' : 'Enhance Story'}
+                {generating ? 'Enhancing...' : 'Enhance Story'}
               </VybeButton>
             </div>
-            <CaptureTextarea
+            <CaptureTextareaWithPaste
               label=""
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Enter task description or user story details"
+              placeholder="AI-generated detailed story description will appear here..."
               rows={4}
+              onImagePaste={handleImagePaste}
+              disabled={generating}
             />
           </div>
 
@@ -373,12 +419,17 @@ const TaskModal: React.FC<TaskModalProps> = ({
           />
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="flex gap-2 pt-4 border-t">
           <VybeButton vybeVariant="ghost" onClick={() => onOpenChange(false)}>
             Cancel
           </VybeButton>
-          <VybeButton vybeVariant="primary" onClick={handleSave} disabled={loading || !title} isLoading={loading}>
-            {loading ? 'Saving...' : 'Save Task'}
+          <VybeButton 
+            vybeVariant="primary" 
+            onClick={handleSave} 
+            disabled={loading || (!title && !storyInfo) || generating} 
+            isLoading={loading}
+          >
+            {loading ? 'Saving...' : 'Save Story'}
           </VybeButton>
         </DialogFooter>
       </DialogContent>
