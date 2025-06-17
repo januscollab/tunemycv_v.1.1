@@ -93,11 +93,11 @@ export const useN8nAnalysis = () => {
             console.error('Could not read error response text:', textError);
           }
           webhookError = `HTTP ${response.status}: ${responseText}`;
-          throw new Error(`n8n HTTP error! Status: ${response.status} ${response.statusText}. Response: ${responseText}`);
+          console.error(`n8n HTTP error! Status: ${response.status} ${response.statusText}. Response: ${responseText}`);
+        } else {
+          webhookResponse = await response.json();
+          console.log('n8n response received:', webhookResponse);
         }
-
-        webhookResponse = await response.json();
-        console.log('n8n response received:', webhookResponse);
       } catch (error) {
         webhookError = error instanceof Error ? error.message : 'Unknown webhook error';
         console.error('Webhook call failed:', error);
