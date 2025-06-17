@@ -16,6 +16,7 @@ import { X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import TaskImageUpload from './TaskImageUpload';
 
 interface Sprint {
   id: string;
@@ -57,6 +58,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [isBlocked, setIsBlocked] = useState(false);
+  const [images, setImages] = useState<any[]>([]);
 
   useEffect(() => {
     if (task) {
@@ -65,14 +67,31 @@ const TaskModal: React.FC<TaskModalProps> = ({
       setPriority(task.priority);
       setStatus(task.status);
       setTags(task.tags || []);
+      loadTaskImages(task.id);
     } else {
       setTitle('');
       setDescription('');
       setPriority('medium');
       setStatus('todo');
       setTags([]);
+      setImages([]);
     }
   }, [task, open]);
+
+  const loadTaskImages = async (taskId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('task_images')
+        .select('*')
+        .eq('task_id', taskId)
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+      setImages(data || []);
+    } catch (error) {
+      console.error('Error loading task images:', error);
+    }
+  };
 
   const handleAddTag = () => {
     if (newTag && !tags.includes(newTag)) {
@@ -346,6 +365,13 @@ const TaskModal: React.FC<TaskModalProps> = ({
               Tags are automatically suggested based on task content (ui, backend, frontend, bug, feature, docs, testing, security, performance, refactor)
             </p>
           </div>
+
+          <TaskImageUpload
+            taskId={task?.id}
+            images={images}
+            onImagesChange={setImages}
+            disabled={isBlocked}
+          />
         </div>
 
         <DialogFooter>

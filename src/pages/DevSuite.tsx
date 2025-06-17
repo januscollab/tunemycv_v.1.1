@@ -7,6 +7,7 @@ import ExecutionLogs from '@/components/devsuite/ExecutionLogs';
 import SprintAnalytics from '@/components/devsuite/SprintAnalytics';
 import ArchivedStoriesTab from '@/components/devsuite/ArchivedStoriesTab';
 import ModularExportSystem from '@/components/devsuite/ModularExportSystem';
+import DevSuiteSetupWizard from '@/components/devsuite/DevSuiteSetupWizard';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -49,13 +50,14 @@ const DevSuite = () => {
         </div>
 
         <Tabs defaultValue="sprints" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="sprints">🏃‍♂️ Sprints</TabsTrigger>
             <TabsTrigger value="archived">📦 Archive</TabsTrigger>
             <TabsTrigger value="analytics">📊 Analytics</TabsTrigger>
             <TabsTrigger value="settings">⚙️ Settings</TabsTrigger>
             <TabsTrigger value="logs">📝 Logs</TabsTrigger>
             <TabsTrigger value="export">📤 Export</TabsTrigger>
+            <TabsTrigger value="setup">🧙‍♂️ Setup</TabsTrigger>
           </TabsList>
 
           <TabsContent value="sprints">
@@ -80,6 +82,10 @@ const DevSuite = () => {
 
           <TabsContent value="export">
             <ModularExportSystem />
+          </TabsContent>
+
+          <TabsContent value="setup">
+            <DevSuiteSetupWizard />
           </TabsContent>
         </Tabs>
       </div>

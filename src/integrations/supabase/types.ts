@@ -833,6 +833,44 @@ export type Database = {
         }
         Relationships: []
       }
+      task_images: {
+        Row: {
+          created_at: string
+          file_name: string
+          file_size: number
+          id: string
+          image_url: string
+          task_id: string
+          uploaded_by: string
+        }
+        Insert: {
+          created_at?: string
+          file_name: string
+          file_size: number
+          id?: string
+          image_url: string
+          task_id: string
+          uploaded_by: string
+        }
+        Update: {
+          created_at?: string
+          file_name?: string
+          file_size?: number
+          id?: string
+          image_url?: string
+          task_id?: string
+          uploaded_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_images_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tasks: {
         Row: {
           archive_reason: string | null
@@ -841,6 +879,7 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          images: string[] | null
           order_index: number
           priority: string | null
           sprint_id: string
@@ -857,6 +896,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          images?: string[] | null
           order_index?: number
           priority?: string | null
           sprint_id: string
@@ -873,6 +913,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          images?: string[] | null
           order_index?: number
           priority?: string | null
           sprint_id?: string
