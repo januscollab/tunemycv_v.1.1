@@ -16,6 +16,7 @@ import SoftSkillsSurveyPanel from '@/components/analyze/SoftSkillsSurveyPanel';
 import SoftSkillsSurveyModal from '@/components/analyze/SoftSkillsSurveyModal';
 import { useSoftSkills } from '@/hooks/useSoftSkills';
 import { useAnalysis } from '@/hooks/useAnalysis';
+import { useN8nAnalysis } from '@/hooks/useN8nAnalysis';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { FileText, History, MessageSquare, Target, Calendar, Building, CheckCircle, FileUp, Search, Clock, Eye, Users, Upload, BarChart3, Zap } from 'lucide-react';
@@ -31,6 +32,7 @@ import AnalysisHistoryTab from '@/components/profile/AnalysisHistoryTab';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Breadcrumbs from '@/components/navigation/Breadcrumbs';
 import StepIndicator from '@/components/ui/step-indicator';
+import N8nDebugModal from '@/components/debug/N8nDebugModal';
 
 
 const AnalyzeCV = () => {
@@ -67,6 +69,11 @@ const AnalyzeCV = () => {
   // Soft skills survey states
   const [showSurveyModal, setShowSurveyModal] = useState(false);
   const { saveSoftSkills, dismissSurvey, shouldShowSurvey } = useSoftSkills();
+  
+  // N8N Debug states
+  const [showN8nDebugModal, setShowN8nDebugModal] = useState(false);
+  const [n8nDebugData, setN8nDebugData] = useState<any>(null);
+  const { submitForAnalysis, isProcessing } = useN8nAnalysis();
   
   // Get initial tab from URL parameter or location state
   const urlParams = new URLSearchParams(location.search);
@@ -224,7 +231,7 @@ const AnalyzeCV = () => {
     }
   };
 
-  const handleAnalysis = () => {
+  const handleAnalysis = async () => {
     // Validate that we have both CV and job description for n8n analysis
     if (!uploadedFiles.cv || !uploadedFiles.jobDescription) {
       toast({ 
@@ -235,15 +242,35 @@ const AnalyzeCV = () => {
       return;
     }
 
-    // Create options object with default values for temporary analysis
-    const options = {
-      saveCV: false,
-      saveJobDescription: false,
-      cvSource: 'new' as const,
-      existingCVId: undefined
-    };
+    // Extract the JSON data from the uploaded files
+    const cvJson = (uploadedFiles.cv as any).documentContentJson || {};
+    const jobDescriptionJson = (uploadedFiles.jobDescription as any).documentContentJson || {};
 
-    performAnalysis(uploadedFiles, jobTitle, true, userCredits, options);
+    console.log('Starting N8N Analysis with:', {
+      cvFile: (uploadedFiles.cv as any).fileName || 'CV',
+      jdFile: (uploadedFiles.jobDescription as any).fileName || 'Job Description',
+      cvJsonLength: JSON.stringify(cvJson).length,
+      jdJsonLength: JSON.stringify(jobDescriptionJson).length
+    });
+
+    try {
+      const result = await submitForAnalysis(cvJson, jobDescriptionJson);
+      
+      // Store debug data for the modal
+      setN8nDebugData(result);
+      
+      // Show the debug modal
+      setShowN8nDebugModal(true);
+      
+      console.log('N8N Analysis completed:', result);
+    } catch (error) {
+      console.error('N8N Analysis failed:', error);
+      toast({
+        title: "Analysis Failed",
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleStartNew = () => {
@@ -613,6 +640,16 @@ const AnalyzeCV = () => {
       <InterviewPrepModal
         isOpen={showInterviewPrepModal}
         onClose={() => setShowInterviewPrepModal(false)}
+      />
+
+      {/* N8N Debug Modal */}
+      <N8nDebugModal
+        open={showN8nDebugModal}
+        onOpenChange={setShowN8nDebugModal}
+        debugInfo={n8nDebugData?.debugInfo}
+        testFiles={n8nDebugData?.test_files}
+        pdfData={n8nDebugData?.pdfData}
+        htmlData={n8nDebugData?.htmlData}
       />
       </div>
 

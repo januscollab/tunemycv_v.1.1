@@ -11,6 +11,12 @@ interface N8nAnalysisResponse {
   pdfData?: string | null;
   htmlData?: string | null;
   error?: string;
+  debugInfo?: {
+    networkTest: string;
+    webhookStatus: string;
+    webhookResponse: any;
+    webhookError: string | null;
+  };
 }
 
 export const useN8nAnalysis = () => {
@@ -39,105 +45,117 @@ export const useN8nAnalysis = () => {
 
       console.log('Created blobs - CV:', cvBlob.size, 'bytes, JD:', jdBlob.size, 'bytes');
 
-      // Create form data
+      // Create form data with correct field names
       const formData = new FormData();
-      formData.append('file1', cvBlob, 'cv.json');
-      formData.append('file2', jdBlob, 'job_description.json');
-      formData.append('file_type_map', JSON.stringify({
-        file1: 'cv',
-        file2: 'jd'
-      }));
+      formData.append('cv', cvBlob, 'cv.json');
+      formData.append('jd', jdBlob, 'job_description.json');
 
-      console.log('FormData created successfully');
-      console.log('FormData contents:', {
-        file1: cvBlob.size + ' bytes (CV)',
-        file2: jdBlob.size + ' bytes (JD)',
-        file_type_map: JSON.stringify({
-          file1: 'cv',
-          file2: 'jd'
-        })
-      });
+      console.log('FormData created with cv and jd fields');
 
       // Test network connectivity first
       console.log('Testing network connectivity...');
+      let networkTestResult = 'unknown';
       try {
         const testResponse = await fetch('https://httpbin.org/get', { method: 'GET' });
+        networkTestResult = `success: ${testResponse.status}`;
         console.log('Network test successful:', testResponse.status);
       } catch (networkError) {
+        networkTestResult = `failed: ${networkError.message}`;
         console.error('Network connectivity test failed:', networkError);
-        throw new Error('Network connectivity issue detected. Please check your internet connection.');
       }
       
-      console.log('Sending request to n8n webhook: https://januscollab.app.n8n.cloud/webhook/document-intake');
+      console.log('Sending request to n8n webhook: https://januscollab.app.n8n.cloud/webhook/cv-analysis');
       console.log('Request method: POST');
       console.log('Request headers: FormData (auto-generated)');
       
-      const response = await fetch('https://januscollab.app.n8n.cloud/webhook/document-intake', {
-        method: 'POST',
-        body: formData,
-        // No manual headers for FormData - let browser handle it
-      });
+      let webhookResponse = null;
+      let webhookError = null;
+      let webhookStatus = 'unknown';
+      
+      try {
+        const response = await fetch('https://januscollab.app.n8n.cloud/webhook/cv-analysis', {
+          method: 'POST',
+          body: formData,
+        });
 
-      console.log('n8n response received!');
-      console.log('Response status:', response.status);
-      console.log('Response statusText:', response.statusText);
-      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+        webhookStatus = `${response.status} ${response.statusText}`;
+        console.log('n8n response received!');
+        console.log('Response status:', response.status);
+        console.log('Response statusText:', response.statusText);
+        console.log('Response headers:', Object.fromEntries(response.headers.entries()));
 
-      if (!response.ok) {
-        let responseText = '';
-        try {
-          responseText = await response.text();
-          console.error('n8n error response body:', responseText);
-        } catch (textError) {
-          console.error('Could not read error response text:', textError);
+        if (!response.ok) {
+          let responseText = '';
+          try {
+            responseText = await response.text();
+            console.error('n8n error response body:', responseText);
+          } catch (textError) {
+            console.error('Could not read error response text:', textError);
+          }
+          webhookError = `HTTP ${response.status}: ${responseText}`;
+          throw new Error(`n8n HTTP error! Status: ${response.status} ${response.statusText}. Response: ${responseText}`);
         }
-        throw new Error(`n8n HTTP error! Status: ${response.status} ${response.statusText}. Response: ${responseText}`);
+
+        webhookResponse = await response.json();
+        console.log('n8n response received:', webhookResponse);
+      } catch (error) {
+        webhookError = error instanceof Error ? error.message : 'Unknown webhook error';
+        console.error('Webhook call failed:', error);
       }
 
-      const result = await response.json();
-      console.log('n8n response received:', result);
+      // Always fetch test files regardless of webhook success/failure
+      console.log('Fetching test files from public bucket...');
+      let pdfData: string | null = null;
+      let htmlData: string | null = null;
 
-      if (result.test_files?.html && result.test_files?.pdf) {
-        console.log('n8n response received, downloading files...');
+      try {
+        const htmlResponse = await fetch('https://aohrfehhyjdebaatzqdl.supabase.co/storage/v1/object/public/n8n-bucket/response/test-output.html');
+        if (htmlResponse.ok) {
+          htmlData = await htmlResponse.text();
+          console.log('Test HTML file downloaded successfully');
+        } else {
+          console.error('Failed to fetch test HTML:', htmlResponse.status);
+        }
+      } catch (error) {
+        console.error('Error fetching test HTML:', error);
+      }
 
-        // Download PDF file
-        let pdfData: string | null = null;
-        let htmlData: string | null = null;
-
-        try {
-          const pdfResponse = await fetch(result.test_files.pdf);
+      try {
+        const pdfResponse = await fetch('https://aohrfehhyjdebaatzqdl.supabase.co/storage/v1/object/public/n8n-bucket/response/test-output.pdf');
+        if (pdfResponse.ok) {
           const pdfBlob = await pdfResponse.blob();
           const pdfArrayBuffer = await pdfBlob.arrayBuffer();
           pdfData = btoa(String.fromCharCode(...new Uint8Array(pdfArrayBuffer)));
-          console.log('PDF downloaded and converted to base64');
-        } catch (error) {
-          console.error('Failed to download PDF:', error);
+          console.log('Test PDF file downloaded and converted to base64');
+        } else {
+          console.error('Failed to fetch test PDF:', pdfResponse.status);
         }
-
-        // Download HTML file
-        try {
-          const htmlResponse = await fetch(result.test_files.html);
-          htmlData = await htmlResponse.text();
-          console.log('HTML downloaded');
-        } catch (error) {
-          console.error('Failed to download HTML:', error);
-        }
-
-        toast({
-          title: "Analysis Complete",
-          description: "Your documents have been successfully processed by n8n.",
-        });
-
-        return {
-          success: true,
-          message: result.message,
-          test_files: result.test_files,
-          pdfData,
-          htmlData
-        };
-      } else {
-        throw new Error('Invalid response format from n8n');
+      } catch (error) {
+        console.error('Error fetching test PDF:', error);
       }
+
+      // Show debug info
+      toast({
+        title: "Debug Information",
+        description: `Network: ${networkTestResult}, Webhook: ${webhookStatus}, Files: ${htmlData ? 'HTML ✓' : 'HTML ✗'} ${pdfData ? 'PDF ✓' : 'PDF ✗'}`,
+      });
+
+      return {
+        success: true,
+        message: 'Debug analysis complete with test files',
+        test_files: {
+          html: 'https://aohrfehhyjdebaatzqdl.supabase.co/storage/v1/object/public/n8n-bucket/response/test-output.html',
+          pdf: 'https://aohrfehhyjdebaatzqdl.supabase.co/storage/v1/object/public/n8n-bucket/response/test-output.pdf'
+        },
+        pdfData,
+        htmlData,
+        debugInfo: {
+          networkTest: networkTestResult,
+          webhookStatus,
+          webhookResponse,
+          webhookError
+        }
+      };
 
     } catch (error) {
       console.error('=== N8N ANALYSIS ERROR ===');
