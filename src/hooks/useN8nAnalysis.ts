@@ -216,7 +216,18 @@ export const useN8nAnalysis = () => {
         if (pdfResponse) {
           const pdfBlob = await pdfResponse.blob();
           const pdfArrayBuffer = await pdfBlob.arrayBuffer();
-          pdfData = btoa(String.fromCharCode(...new Uint8Array(pdfArrayBuffer)));
+          
+          // Convert to base64 using chunked approach to avoid call stack overflow
+          const uint8Array = new Uint8Array(pdfArrayBuffer);
+          const chunkSize = 8192;
+          let base64String = '';
+          
+          for (let i = 0; i < uint8Array.length; i += chunkSize) {
+            const chunk = uint8Array.slice(i, i + chunkSize);
+            base64String += btoa(String.fromCharCode.apply(null, Array.from(chunk)));
+          }
+          
+          pdfData = base64String;
           console.log('Test PDF file downloaded and converted to base64');
         } else {
           console.error('Failed to fetch test PDF after all retries');
