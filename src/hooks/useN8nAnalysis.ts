@@ -108,27 +108,58 @@ export const useN8nAnalysis = () => {
       let pdfData: string | null = null;
       let htmlData: string | null = null;
 
+      // Helper function for retrying file downloads
+      const downloadWithRetry = async (url: string, maxRetries = 3): Promise<Response | null> => {
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+          try {
+            console.log(`Attempting to fetch ${url} (attempt ${attempt}/${maxRetries})`);
+            const response = await fetch(url);
+            if (response.ok) {
+              console.log(`Successfully fetched ${url} on attempt ${attempt}`);
+              return response;
+            } else {
+              console.warn(`Failed to fetch ${url} on attempt ${attempt}: ${response.status}`);
+            }
+          } catch (error) {
+            console.warn(`Error fetching ${url} on attempt ${attempt}:`, error);
+          }
+          
+          // Wait 1 second before retry (except on last attempt)
+          if (attempt < maxRetries) {
+            console.log('Waiting 1 second before retry...');
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          }
+        }
+        return null;
+      };
+
+      // Download HTML file first
       try {
-        const htmlResponse = await fetch('https://aohrfehhyjdebaatzqdl.supabase.co/storage/v1/object/public/n8n-bucket/response/test-output.html');
-        if (htmlResponse.ok) {
+        const htmlResponse = await downloadWithRetry('https://aohrfehhyjdebaatzqdl.supabase.co/storage/v1/object/public/n8n-bucket/response/test-output.html');
+        if (htmlResponse) {
           htmlData = await htmlResponse.text();
           console.log('Test HTML file downloaded successfully');
         } else {
-          console.error('Failed to fetch test HTML:', htmlResponse.status);
+          console.error('Failed to fetch test HTML after all retries');
         }
       } catch (error) {
         console.error('Error fetching test HTML:', error);
       }
 
+      // Wait 1 second before downloading PDF
+      console.log('Waiting 1 second before downloading PDF...');
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Download PDF file second
       try {
-        const pdfResponse = await fetch('https://aohrfehhyjdebaatzqdl.supabase.co/storage/v1/object/public/n8n-bucket/response/test-output.pdf');
-        if (pdfResponse.ok) {
+        const pdfResponse = await downloadWithRetry('https://aohrfehhyjdebaatzqdl.supabase.co/storage/v1/object/public/n8n-bucket/response/test-output.pdf');
+        if (pdfResponse) {
           const pdfBlob = await pdfResponse.blob();
           const pdfArrayBuffer = await pdfBlob.arrayBuffer();
           pdfData = btoa(String.fromCharCode(...new Uint8Array(pdfArrayBuffer)));
           console.log('Test PDF file downloaded and converted to base64');
         } else {
-          console.error('Failed to fetch test PDF:', pdfResponse.status);
+          console.error('Failed to fetch test PDF after all retries');
         }
       } catch (error) {
         console.error('Error fetching test PDF:', error);
