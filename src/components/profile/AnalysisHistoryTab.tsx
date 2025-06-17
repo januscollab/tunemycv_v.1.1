@@ -132,10 +132,14 @@ const AnalysisHistoryTab: React.FC<AnalysisHistoryTabProps> = ({ credits, member
   };
 
   const handleView = (document: DocumentItem) => {
+    // For n8n analysis with PDF data, navigate to view-analysis tab
+    // For other analyses, also go to view-analysis tab
     navigate('/analyze', { 
       state: { 
         analysis: document,
-        targetTab: 'view-analysis'
+        targetTab: 'view-analysis',
+        // Pass PDF preference for n8n analyses
+        preferPdfView: document.analysis_type === 'n8n' && document.pdf_file_data
       } 
     });
   };

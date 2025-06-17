@@ -156,6 +156,10 @@ const AnalyzeCV = () => {
       setActiveTab(navigationState.targetTab);
       if (navigationState.analysis) {
         setViewedAnalysis(navigationState.analysis);
+        
+        // If this is an n8n analysis with PDF data and user prefers PDF view,
+        // we'll let the N8nAnalysisResults component handle the tab switching
+        // The PDF viewer is already integrated into N8nAnalysisResults
       }
     }
   }, [navigationState]);
