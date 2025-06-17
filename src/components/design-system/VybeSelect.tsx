@@ -40,51 +40,51 @@ const VybeSelect = forwardRef<HTMLButtonElement, VybeSelectProps>(
   }, ref) => {
     
     const sizeStyles = {
-      sm: "h-9 px-3 text-body",
-      default: "h-11 px-4 text-body",
-      lg: "h-12 px-6 text-subheading"
+      sm: "h-9 px-3 text-sm",
+      default: "h-11 px-4 text-sm",
+      lg: "h-12 px-6 text-base"
     };
 
     return (
       <div className="space-y-2">
         {label && (
-          <label className="block text-body font-medium text-foreground">
+          <label className="block text-sm font-medium text-foreground">
             {label}
-            {required && <span className="text-destructive ml-1">*</span>}
+            {required && <span className="text-red-500 ml-1">*</span>}
           </label>
         )}
         <Select value={value} onValueChange={onValueChange} disabled={disabled}>
           <SelectTrigger 
             ref={ref}
             className={cn(
-              "bg-background border-input-border hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-normal shadow-sm hover:shadow-md",
+              "bg-white border border-gray-200 hover:border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all duration-200 shadow-sm hover:shadow-md rounded-lg",
               sizeStyles[size],
-              disabled && "opacity-50 cursor-not-allowed",
+              disabled && "opacity-50 cursor-not-allowed bg-gray-50",
               className
             )}
           >
             <div className="flex items-center gap-3 w-full">
-              {TriggerIcon && <TriggerIcon className="h-4 w-4 text-muted-foreground shrink-0" />}
-              <SelectValue placeholder={placeholder} className="text-foreground" />
+              {TriggerIcon && <TriggerIcon className="h-4 w-4 text-gray-500 shrink-0" />}
+              <SelectValue placeholder={placeholder} className="text-gray-900" />
             </div>
           </SelectTrigger>
-          <SelectContent className="z-[200] bg-popover border-popover-border shadow-lg">
+          <SelectContent className="z-[9999] bg-white border border-gray-200 shadow-xl rounded-lg overflow-hidden">
             {options.map((option) => (
               <SelectItem 
                 key={option.value} 
                 value={option.value}
-                className="flex items-center gap-3 py-3 px-4 hover:bg-accent/50 focus:bg-accent cursor-pointer"
+                className="flex items-center gap-3 py-3 px-4 hover:bg-orange-50 focus:bg-orange-100 cursor-pointer transition-colors border-l-4 border-transparent hover:border-l-orange-400 focus:border-l-orange-500"
               >
                 <div className="flex items-center gap-3 w-full">
                   {option.icon && (
-                    <option.icon className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <option.icon className="h-4 w-4 text-gray-600 shrink-0" />
                   )}
                   <div className="flex flex-col gap-1">
-                    <span className="text-body font-medium text-foreground">
+                    <span className="text-sm font-medium text-gray-900">
                       {option.label}
                     </span>
                     {option.description && (
-                      <span className="text-caption text-muted-foreground">
+                      <span className="text-xs text-gray-500">
                         {option.description}
                       </span>
                     )}
@@ -95,7 +95,7 @@ const VybeSelect = forwardRef<HTMLButtonElement, VybeSelectProps>(
           </SelectContent>
         </Select>
         {description && (
-          <p className="text-caption text-muted-foreground">
+          <p className="text-xs text-gray-500">
             {description}
           </p>
         )}

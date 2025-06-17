@@ -1,5 +1,6 @@
 import * as React from "react"
 import { useState } from "react"
+import { AIContextMenu } from "@/components/ui/ai-context-menu"
 import { 
   Dialog,
   DialogContent,
@@ -146,9 +147,11 @@ const AIReplacementDialog: React.FC<AIReplacementDialogProps> = ({
                   </Button>
                 </div>
                 <div className="p-4 bg-background border border-border shadow-sm rounded-lg">
-                  <p className="text-body text-foreground whitespace-pre-wrap leading-relaxed">
-                    {generatedText}
-                  </p>
+                  <AIContextMenu disabled={true}>
+                    <p className="text-body text-foreground whitespace-pre-wrap leading-relaxed">
+                      {generatedText}
+                    </p>
+                  </AIContextMenu>
                 </div>
                 <div className="text-micro text-muted-foreground flex items-center gap-1">
                   <span>{generatedText.length} characters</span>

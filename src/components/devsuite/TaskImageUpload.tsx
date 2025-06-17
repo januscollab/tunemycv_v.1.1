@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { VybeButton } from '@/components/design-system/VybeButton';
+import { EngagingUploadModal } from '@/components/ui/file-upload-modals';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -27,12 +28,14 @@ const TaskImageUpload: React.FC<TaskImageUploadProps> = ({
 }) => {
   const { user } = useAuth();
   const [uploading, setUploading] = useState(false);
+  const [showUploadModal, setShowUploadModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileUpload = async (files: FileList | null) => {
     if (!files || files.length === 0 || !user) return;
 
     setUploading(true);
+    setShowUploadModal(true);
     const newImages: TaskImage[] = [];
 
     try {
@@ -98,6 +101,7 @@ const TaskImageUpload: React.FC<TaskImageUploadProps> = ({
       toast.error('Failed to upload images');
     } finally {
       setUploading(false);
+      setShowUploadModal(false);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -158,6 +162,17 @@ const TaskImageUpload: React.FC<TaskImageUploadProps> = ({
   };
 
   return (
+    <>
+      <EngagingUploadModal
+        isOpen={showUploadModal}
+        title="Uploading Images"
+        message="Processing your images..."
+        onCancel={() => {
+          setShowUploadModal(false);
+          setUploading(false);
+        }}
+      />
+      
     <div className="space-y-4">
       <div className="flex items-center gap-2 mb-2">
         <ImageIcon className="h-4 w-4" />
@@ -226,6 +241,7 @@ const TaskImageUpload: React.FC<TaskImageUploadProps> = ({
         </div>
       )}
     </div>
+    </>
   );
 };
 

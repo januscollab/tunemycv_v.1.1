@@ -1,13 +1,13 @@
 import React from 'react';
-import { Button, ButtonProps, buttonVariants } from '@/components/ui/button';
+import { Button, ButtonProps } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Loader2, LucideIcon } from 'lucide-react';
 
-interface VybeButtonProps extends ButtonProps {
+interface VybeButtonProps extends Omit<ButtonProps, 'variant' | 'size'> {
   isLoading?: boolean;
   icon?: LucideIcon;
   iconPosition?: 'left' | 'right';
-  vybeVariant?: 'primary' | 'secondary' | 'destructive' | 'success' | 'ghost' | 'outline';
+  vybeVariant?: 'primary' | 'secondary' | 'destructive' | 'success' | 'ghost' | 'outline' | 'white' | 'dark';
   vybeSize?: 'sm' | 'default' | 'lg' | 'icon';
   fullWidth?: boolean;
 }
@@ -27,21 +27,23 @@ const VybeButton = React.forwardRef<HTMLButtonElement, VybeButtonProps>(
   }, ref) => {
     
     const getVybeStyles = () => {
-      const baseStyles = "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg font-semibold transition-all duration-normal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:scale-[1.02] active:scale-[0.98] shadow-sm hover:shadow-md";
+      const baseStyles = "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border";
       
       const variantStyles = {
-        primary: "bg-primary text-primary-foreground hover:bg-primary/90",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary-hover border border-border",
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        success: "bg-success text-success-foreground hover:bg-success/90",
-        ghost: "text-foreground hover:bg-accent hover:text-accent-foreground shadow-none hover:shadow-sm",
-        outline: "bg-transparent border-2 border-border text-foreground hover:bg-accent hover:border-primary/50"
+        primary: "bg-[#FF6B35] text-white border-[#FF6B35] hover:bg-[#E55A2B] hover:shadow-lg focus-visible:ring-[#FF6B35]/50",
+        secondary: "bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200 hover:shadow-md focus-visible:ring-gray-500/50",
+        destructive: "bg-red-500 text-white border-red-500 hover:bg-red-600 hover:shadow-lg focus-visible:ring-red-500/50",
+        success: "bg-green-500 text-white border-green-500 hover:bg-green-600 hover:shadow-lg focus-visible:ring-green-500/50",
+        ghost: "bg-transparent text-gray-600 border-transparent hover:bg-gray-100 hover:text-gray-900 shadow-none hover:shadow-sm",
+        outline: "bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400 hover:shadow-md focus-visible:ring-gray-500/50",
+        white: "bg-white text-gray-900 border-gray-200 hover:bg-gray-50 hover:shadow-lg focus-visible:ring-gray-500/50",
+        dark: "bg-gray-900 text-white border-gray-900 hover:bg-gray-800 hover:shadow-lg focus-visible:ring-gray-900/50"
       };
 
       const sizeStyles = {
-        sm: "h-9 px-3 text-body",
-        default: "h-11 px-6 text-body",
-        lg: "h-12 px-8 text-subheading",
+        sm: "h-9 px-3 text-sm",
+        default: "h-11 px-6 text-sm",
+        lg: "h-12 px-8 text-base",
         icon: "h-11 w-11 p-0"
       };
 

@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { CaptureInput } from '@/components/ui/capture-input';
 import { ModernCard, ModernCardContent, ModernCardHeader, ModernCardTitle } from './ui/ModernCard';
 import { VybeButton } from '@/components/design-system/VybeButton';
+import { VybeSelect } from '@/components/design-system/VybeSelect';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { Save } from 'lucide-react';
 
 interface Settings {
   openai_api_key_encrypted: string;
@@ -129,20 +131,17 @@ const DevSuiteSettings = () => {
             />
           </div>
 
-          <div>
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-foreground">Preferred Model</label>
-              <select
-                value={settings.preferred_model}
-                onChange={(e) => setSettings(prev => ({ ...prev, preferred_model: e.target.value }))}
-                className="flex h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 hover:border-ring/50 transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <option value="gpt-4">GPT-4</option>
-                <option value="gpt-4-turbo">GPT-4 Turbo</option>
-                <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-              </select>
-            </div>
-          </div>
+          <VybeSelect
+            label="Preferred Model"
+            value={settings.preferred_model}
+            onValueChange={(value) => setSettings(prev => ({ ...prev, preferred_model: value }))}
+            placeholder="Select AI model"
+            options={[
+              { value: 'gpt-4', label: 'GPT-4', description: 'Most capable model for complex tasks' },
+              { value: 'gpt-4-turbo', label: 'GPT-4 Turbo', description: 'Faster and more efficient version' },
+              { value: 'gpt-3.5-turbo', label: 'GPT-3.5 Turbo', description: 'Fast and cost-effective option' }
+            ]}
+          />
 
           <div className="flex items-center justify-between">
             <div>
@@ -168,6 +167,7 @@ const DevSuiteSettings = () => {
         disabled={saveLoading}
         isLoading={saveLoading}
         fullWidth
+        icon={saveLoading ? undefined : Save}
       >
         {saveLoading ? 'Saving...' : 'Save Settings'}
       </VybeButton>
