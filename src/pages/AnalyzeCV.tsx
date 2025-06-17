@@ -28,6 +28,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { CaptureInput } from '@/components/ui/capture-input';
 import AnalysisHistoryTab from '@/components/profile/AnalysisHistoryTab';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Breadcrumbs from '@/components/navigation/Breadcrumbs';
@@ -458,7 +459,7 @@ const AnalyzeCV = () => {
 
   return (
     <>
-      <div className={`min-h-screen bg-gradient-to-br from-apple-core/15 via-white to-citrus/5 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5 ${analyzing ? 'pointer-events-none' : ''}`}>
+      <div className={`min-h-screen bg-gradient-to-br from-primary/5 via-background to-primary/3 dark:from-primary/10 dark:via-background dark:to-primary/5 ${analyzing ? 'pointer-events-none' : ''}`}>
       {/* Loading overlay */}
       {analyzing && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
@@ -518,14 +519,13 @@ const AnalyzeCV = () => {
                   {/* Job Title */}
                   <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-5 border border-apple-core/20 dark:border-citrus/20">
                     <h3 className="text-heading font-semibold text-blueberry dark:text-citrus mb-3">Job Title</h3>
-                    <input
-                      type="text"
-                      value={jobTitle}
-                      onChange={(e) => setJobTitle(e.target.value)}
-                      placeholder="e.g., Senior Software Engineer (auto-extracted from job description)"
-                      className="w-full px-3 py-2 border border-apple-core/30 dark:border-citrus/30 rounded-md focus:outline-none focus:ring-2 focus:ring-zapier-orange focus:border-transparent bg-white dark:bg-blueberry/10 text-blueberry dark:text-apple-core text-caption hover:border-zapier-orange/50 transition-colors"
-                      disabled={analyzing}
-                    />
+                     <CaptureInput
+                       label=""
+                       value={jobTitle}
+                       onChange={(e) => setJobTitle(e.target.value)}
+                       placeholder="e.g., Senior Software Engineer (auto-extracted from job description)"
+                       disabled={analyzing}
+                     />
                     <p className="text-micro text-blueberry/60 dark:text-apple-core/70 mt-2">
                       Job title will be automatically extracted from the job description if not provided.
                     </p>

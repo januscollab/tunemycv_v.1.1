@@ -324,6 +324,36 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
                   Select 10+ characters to use AI features
                 </div>
               )}
+
+              {/* AI Creativity Slider */}
+              <div className="px-2.5 py-2 mt-2 border-t border-primary-500/30">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-micro font-medium text-primary-foreground/90">AI Creativity</span>
+                  <Brain className="w-3.5 h-3.5 text-primary-foreground/70" />
+                </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-tiny text-primary-foreground/60">
+                    <span>Conservative</span>
+                    <span>Creative</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="2"
+                    step="1"
+                    defaultValue="1"
+                    className="w-full h-1.5 bg-primary-500/20 rounded-lg appearance-none cursor-pointer"
+                    style={{
+                      background: 'linear-gradient(to right, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)'
+                    }}
+                  />
+                  <div className="flex justify-between text-tiny text-primary-foreground/70 font-medium">
+                    <span>Precise</span>
+                    <span>Balanced</span>
+                    <span>Creative</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}

@@ -296,6 +296,26 @@ const SprintManager = () => {
     }
   };
 
+  const handleArchiveTask = async (task: Task) => {
+    try {
+      const { error } = await supabase
+        .from('tasks')
+        .update({ 
+          status: 'archived',
+          archived_at: new Date().toISOString()
+        })
+        .eq('id', task.id);
+
+      if (error) throw error;
+      
+      loadData();
+      toast.success('Task archived successfully');
+    } catch (error) {
+      console.error('Error archiving task:', error);
+      toast.error('Failed to archive task');
+    }
+  };
+
   const handleCloseSprint = async (sprint: Sprint) => {
     try {
       // Get all tasks in the sprint
@@ -547,19 +567,31 @@ const SprintManager = () => {
                                     {task.title}
                                   </div>
                                   <div className="flex gap-1">
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleToggleTaskStatus(task);
-                                      }}
-                                      className={`w-4 h-4 rounded border text-xs ${
-                                        task.status === 'completed' 
-                                          ? 'bg-green-500 text-white' 
-                                          : 'border-gray-300 hover:border-green-500'
-                                      }`}
-                                    >
-                                      {task.status === 'completed' ? '✓' : ''}
-                                    </button>
+                                     <button
+                                       onClick={(e) => {
+                                         e.stopPropagation();
+                                         handleToggleTaskStatus(task);
+                                       }}
+                                       className={`w-4 h-4 rounded border text-xs ${
+                                         task.status === 'completed' 
+                                           ? 'bg-green-500 text-white' 
+                                           : 'border-gray-300 hover:border-green-500'
+                                       }`}
+                                     >
+                                       {task.status === 'completed' ? '✓' : ''}
+                                     </button>
+                                     {task.status === 'completed' && (
+                                       <button
+                                         onClick={(e) => {
+                                           e.stopPropagation();
+                                           handleArchiveTask(task);
+                                         }}
+                                         className="w-4 h-4 text-blue-500 hover:text-blue-700 text-xs border border-blue-300 rounded bg-blue-50 hover:bg-blue-100 transition-colors"
+                                         title="Archive this story"
+                                       >
+                                         📁
+                                       </button>
+                                     )}
                                     <button
                                       onClick={(e) => {
                                         e.stopPropagation();
