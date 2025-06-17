@@ -12,6 +12,16 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CheckCircle, XCircle, AlertTriangle, Network, FileText, Bug } from 'lucide-react';
 
+interface RetryLog {
+  url: string;
+  attempt: number;
+  timestamp: number;
+  status: 'success' | 'failed' | 'error';
+  statusCode?: number;
+  error?: string;
+  delay?: number;
+}
+
 interface N8nDebugModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -27,6 +37,7 @@ interface N8nDebugModalProps {
   };
   pdfData?: string | null;
   htmlData?: string | null;
+  retryLogs?: RetryLog[];
 }
 
 const N8nDebugModal: React.FC<N8nDebugModalProps> = ({
@@ -36,6 +47,7 @@ const N8nDebugModal: React.FC<N8nDebugModalProps> = ({
   testFiles,
   pdfData,
   htmlData,
+  retryLogs,
 }) => {
   const getStatusIcon = (status: string) => {
     if (status.includes('success') || status.includes('200')) {
@@ -68,10 +80,11 @@ const N8nDebugModal: React.FC<N8nDebugModalProps> = ({
         </DialogHeader>
 
         <Tabs defaultValue="overview" className="flex-1">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="webhook">Webhook</TabsTrigger>
             <TabsTrigger value="files">Test Files</TabsTrigger>
+            <TabsTrigger value="retry">Retry Details</TabsTrigger>
             <TabsTrigger value="raw">Raw Data</TabsTrigger>
           </TabsList>
 
@@ -205,6 +218,59 @@ const N8nDebugModal: React.FC<N8nDebugModalProps> = ({
                   <p className="text-sm text-red-600">✗ Failed to download</p>
                 )}
               </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="retry" className="space-y-4">
+            <div>
+              <h4 className="font-medium mb-4">File Download Retry Log</h4>
+              {retryLogs && retryLogs.length > 0 ? (
+                <ScrollArea className="h-80 w-full border rounded p-4">
+                  <div className="space-y-3">
+                    {retryLogs.map((log, index) => (
+                      <div key={index} className="bg-muted/50 rounded p-3 border-l-4 border-l-gray-300">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center space-x-2">
+                            <span className="text-sm font-medium">{log.url}</span>
+                            {log.attempt > 0 && <Badge variant="outline">Attempt {log.attempt}</Badge>}
+                            {log.statusCode && <Badge variant="outline">HTTP {log.statusCode}</Badge>}
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            {log.status === 'success' && <CheckCircle className="h-4 w-4 text-green-500" />}
+                            {log.status === 'failed' && <XCircle className="h-4 w-4 text-red-500" />}
+                            {log.status === 'error' && <AlertTriangle className="h-4 w-4 text-yellow-500" />}
+                            {log.status === 'success' ? (
+                              <Badge className="bg-green-100 text-green-800">Success</Badge>
+                            ) : log.status === 'failed' ? (
+                              <Badge variant="destructive">Failed</Badge>
+                            ) : (
+                              <Badge variant="secondary">Error</Badge>
+                            )}
+                          </div>
+                        </div>
+                        
+                        <div className="text-xs text-muted-foreground space-y-1">
+                          <p>
+                            <strong>Time:</strong> {new Date(log.timestamp).toLocaleTimeString()}.{log.timestamp % 1000}ms
+                          </p>
+                          {log.delay && (
+                            <p>
+                              <strong>Delay:</strong> {log.delay}ms
+                            </p>
+                          )}
+                          {log.error && (
+                            <p>
+                              <strong>Details:</strong> {log.error}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+              ) : (
+                <p className="text-sm text-muted-foreground">No retry logs available</p>
+              )}
             </div>
           </TabsContent>
 

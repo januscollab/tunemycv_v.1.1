@@ -1,6 +1,16 @@
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
+interface RetryLog {
+  url: string;
+  attempt: number;
+  timestamp: number;
+  status: 'success' | 'failed' | 'error';
+  statusCode?: number;
+  error?: string;
+  delay?: number;
+}
+
 interface N8nAnalysisResponse {
   success: boolean;
   message: string;
@@ -17,6 +27,7 @@ interface N8nAnalysisResponse {
     webhookResponse: any;
     webhookError: string | null;
   };
+  retryLogs?: RetryLog[];
 }
 
 export const useN8nAnalysis = () => {
@@ -107,26 +118,60 @@ export const useN8nAnalysis = () => {
       console.log('Fetching test files from public bucket...');
       let pdfData: string | null = null;
       let htmlData: string | null = null;
+      const retryLogs: RetryLog[] = [];
 
-      // Helper function for retrying file downloads
+      // Helper function for retrying file downloads with detailed logging
       const downloadWithRetry = async (url: string, maxRetries = 3): Promise<Response | null> => {
         for (let attempt = 1; attempt <= maxRetries; attempt++) {
+          const startTime = Date.now();
+          
           try {
             console.log(`Attempting to fetch ${url} (attempt ${attempt}/${maxRetries})`);
             const response = await fetch(url);
+            
             if (response.ok) {
               console.log(`Successfully fetched ${url} on attempt ${attempt}`);
+              retryLogs.push({
+                url,
+                attempt,
+                timestamp: startTime,
+                status: 'success',
+                statusCode: response.status
+              });
               return response;
             } else {
               console.warn(`Failed to fetch ${url} on attempt ${attempt}: ${response.status}`);
+              retryLogs.push({
+                url,
+                attempt,
+                timestamp: startTime,
+                status: 'failed',
+                statusCode: response.status,
+                error: `HTTP ${response.status}: ${response.statusText}`
+              });
             }
           } catch (error) {
             console.warn(`Error fetching ${url} on attempt ${attempt}:`, error);
+            retryLogs.push({
+              url,
+              attempt,
+              timestamp: startTime,
+              status: 'error',
+              error: error instanceof Error ? error.message : 'Unknown error'
+            });
           }
           
           // Wait 1 second before retry (except on last attempt)
           if (attempt < maxRetries) {
             console.log('Waiting 1 second before retry...');
+            retryLogs.push({
+              url,
+              attempt,
+              timestamp: Date.now(),
+              status: 'failed',
+              delay: 1000,
+              error: 'Waiting 1 second before retry'
+            });
             await new Promise(resolve => setTimeout(resolve, 1000));
           }
         }
@@ -144,10 +189,25 @@ export const useN8nAnalysis = () => {
         }
       } catch (error) {
         console.error('Error fetching test HTML:', error);
+        retryLogs.push({
+          url: 'test-output.html',
+          attempt: 0,
+          timestamp: Date.now(),
+          status: 'error',
+          error: `Outer catch: ${error instanceof Error ? error.message : 'Unknown error'}`
+        });
       }
 
       // Wait 1 second before downloading PDF
       console.log('Waiting 1 second before downloading PDF...');
+      retryLogs.push({
+        url: 'inter-file-delay',
+        attempt: 0,
+        timestamp: Date.now(),
+        status: 'success',
+        delay: 1000,
+        error: 'Waiting 1 second between file downloads'
+      });
       await new Promise(resolve => setTimeout(resolve, 1000));
 
       // Download PDF file second
@@ -163,6 +223,13 @@ export const useN8nAnalysis = () => {
         }
       } catch (error) {
         console.error('Error fetching test PDF:', error);
+        retryLogs.push({
+          url: 'test-output.pdf',
+          attempt: 0,
+          timestamp: Date.now(),
+          status: 'error',
+          error: `Outer catch: ${error instanceof Error ? error.message : 'Unknown error'}`
+        });
       }
 
       // Show debug info
@@ -185,7 +252,8 @@ export const useN8nAnalysis = () => {
           webhookStatus,
           webhookResponse,
           webhookError
-        }
+        },
+        retryLogs
       };
 
     } catch (error) {

@@ -650,6 +650,7 @@ const AnalyzeCV = () => {
         testFiles={n8nDebugData?.test_files}
         pdfData={n8nDebugData?.pdfData}
         htmlData={n8nDebugData?.htmlData}
+        retryLogs={n8nDebugData?.retryLogs}
       />
       </div>
 
