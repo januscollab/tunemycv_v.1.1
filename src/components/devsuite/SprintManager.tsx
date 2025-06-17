@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { CaptureInput } from '@/components/ui/capture-input';
 import { ModernCard, ModernCardContent, ModernCardHeader, ModernCardTitle } from './ui/ModernCard';
-import { ModernButton } from './ui/ModernButton';
+import { VybeButton } from '@/components/design-system/VybeButton';
+import { VybeIconButton } from '@/components/design-system/VybeIconButton';
+import { Grid2X2, Plus, RefreshCw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -453,26 +455,25 @@ const SprintManager = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold">Sprint Manager</h2>
-        <div className="flex gap-2">
-          <ModernButton 
-            modernVariant="outline" 
+        <div className="flex gap-2 items-center">
+          <VybeIconButton
+            icon={sprintLayout === 'one' ? Grid2X2 : Grid2X2}
+            tooltip={sprintLayout === 'one' ? '2 Per Row' : '1 Per Row'}
+            variant="outline"
             onClick={() => setSprintLayout(sprintLayout === 'one' ? 'two' : 'one')}
-          >
-            {sprintLayout === 'one' ? '2 Per Row' : '1 Per Row'}
-          </ModernButton>
-          <ModernButton 
-            modernVariant="secondary" 
+          />
+          <VybeIconButton
+            icon={Plus}
+            tooltip="Add Sprint"
+            variant="secondary"
             onClick={() => setAddingNewSprint(true)}
-          >
-            Add Sprint
-          </ModernButton>
-          <ModernButton 
-            modernVariant="destructive"
-            onClick={handleClearAllTasks}
-          >
-            Clear All Tasks
-          </ModernButton>
-          <ModernButton modernVariant="ghost" onClick={() => loadData()}>Refresh</ModernButton>
+          />
+          <VybeIconButton
+            icon={RefreshCw}
+            tooltip="Refresh"
+            variant="ghost"
+            onClick={() => loadData()}
+          />
         </div>
       </div>
 
@@ -487,16 +488,16 @@ const SprintManager = () => {
                 placeholder="Enter sprint name"
                 onKeyPress={(e) => e.key === 'Enter' && handleAddSprint()}
               />
-              <ModernButton onClick={handleAddSprint} modernVariant="primary">Create</ModernButton>
-              <ModernButton 
-                modernVariant="ghost" 
+              <VybeButton onClick={handleAddSprint} vybeVariant="primary">Create</VybeButton>
+              <VybeButton 
+                vybeVariant="ghost" 
                 onClick={() => {
                   setAddingNewSprint(false);
                   setNewSprintName('');
                 }}
               >
                 Cancel
-              </ModernButton>
+              </VybeButton>
             </div>
           </ModernCardContent>
         </ModernCard>
@@ -603,48 +604,48 @@ const SprintManager = () => {
                     )}
                   </Droppable>
                   
-                  {/* Sprint Action Buttons - Moved to Bottom */}
+                   {/* Sprint Action Buttons - Moved to Bottom */}
                   <div className="flex gap-2 pt-4 border-t border-border/50">
-                    <ModernButton
-                      size="sm"
-                      modernVariant="primary"
+                    <VybeButton
+                      vybeSize="sm"
+                      vybeVariant="primary"
                       onClick={() => handleAddTask(sprint)}
                     >
                       Add Task
-                    </ModernButton>
-                    <ModernButton
-                      size="sm"
-                      modernVariant="secondary"
+                    </VybeButton>
+                    <VybeButton
+                      vybeSize="sm"
+                      vybeVariant="secondary"
                       onClick={() => handleExecuteSprint(sprint)}
                     >
                       Execute
-                    </ModernButton>
+                    </VybeButton>
                     {sprint.status !== 'completed' && (
-                      <ModernButton
-                        size="sm"
-                        modernVariant="outline"
+                      <VybeButton
+                        vybeSize="sm"
+                        vybeVariant="outline"
                         onClick={() => handleCloseSprint(sprint)}
                       >
                         Close
-                      </ModernButton>
+                      </VybeButton>
                     )}
                     {sprint.name === 'Priority Sprint' && getTasksForSprint(sprint.id).some(task => task.status === 'completed') && (
-                      <ModernButton
-                        size="sm"
-                        modernVariant="ghost"
+                      <VybeButton
+                        vybeSize="sm"
+                        vybeVariant="ghost"
                         onClick={() => handleArchiveCompletedTasks(sprint)}
                       >
                         Archive Completed
-                      </ModernButton>
+                      </VybeButton>
                     )}
                     {sprint.name !== 'Priority Sprint' && sprint.name !== 'Backlog' && (
-                      <ModernButton
-                        size="sm"
-                        modernVariant="destructive"
+                      <VybeButton
+                        vybeSize="sm"
+                        vybeVariant="destructive"
                         onClick={() => handleDeleteSprint(sprint)}
                       >
                         Delete
-                      </ModernButton>
+                      </VybeButton>
                     )}
                   </div>
                 </ModernCardContent>

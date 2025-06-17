@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { ModernButton } from './ui/ModernButton';
+import { VybeButton } from '@/components/design-system/VybeButton';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';

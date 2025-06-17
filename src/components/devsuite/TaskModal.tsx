@@ -8,10 +8,11 @@ import {
 } from '@/components/ui/dialog';
 import { CaptureInput } from '@/components/ui/capture-input';
 import { CaptureTextarea } from '@/components/ui/capture-textarea';
-import { ModernButton } from './ui/ModernButton';
+import { VybeButton } from '@/components/design-system/VybeButton';
+import { VybeSelect } from '@/components/design-system/VybeSelect';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { AlertTriangle, CheckCircle, Clock, Flag } from 'lucide-react';
 import { X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -256,7 +257,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl z-50 relative">
+      <DialogContent className="max-w-2xl z-[1000] relative bg-popover border-popover-border shadow-lg">
         {/* Loading Overlay */}
         {isBlocked && (
           <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center rounded-lg">
@@ -288,15 +289,15 @@ const TaskModal: React.FC<TaskModalProps> = ({
           <div>
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-foreground">Description</span>
-              <ModernButton
-                size="sm"
-                modernVariant="secondary"
+              <VybeButton
+                vybeSize="sm"
+                vybeVariant="secondary"
                 onClick={handleGenerateStory}
                 disabled={generating || !title}
                 isLoading={generating}
               >
                 {generating ? 'Generating...' : 'Enhance Story'}
-              </ModernButton>
+              </VybeButton>
             </div>
             <CaptureTextarea
               label=""
@@ -308,32 +309,30 @@ const TaskModal: React.FC<TaskModalProps> = ({
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-foreground">Priority</label>
-              <Select value={priority} onValueChange={setPriority}>
-                <SelectTrigger className="transition-all duration-200 hover:border-ring/50 focus:border-ring focus:ring-2 focus:ring-ring focus:ring-offset-2">
-                  <SelectValue placeholder="Select priority" />
-                </SelectTrigger>
-                <SelectContent className="z-[100]">
-                  <SelectItem value="low">Low</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-foreground">Status</label>
-              <Select value={status} onValueChange={setStatus}>
-                <SelectTrigger className="transition-all duration-200 hover:border-ring/50 focus:border-ring focus:ring-2 focus:ring-ring focus:ring-offset-2">
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent className="z-[100]">
-                  <SelectItem value="todo">To Do</SelectItem>
-                  <SelectItem value="in-progress">In Progress</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <VybeSelect
+              label="Priority"
+              value={priority}
+              onValueChange={setPriority}
+              placeholder="Select priority"
+              icon={Flag}
+              options={[
+                { value: 'low', label: 'Low', icon: Flag },
+                { value: 'medium', label: 'Medium', icon: AlertTriangle },
+                { value: 'high', label: 'High', icon: AlertTriangle }
+              ]}
+            />
+            <VybeSelect
+              label="Status"
+              value={status}
+              onValueChange={setStatus}
+              placeholder="Select status"
+              icon={Clock}
+              options={[
+                { value: 'todo', label: 'To Do', icon: Clock },
+                { value: 'in-progress', label: 'In Progress', icon: AlertTriangle },
+                { value: 'completed', label: 'Completed', icon: CheckCircle }
+              ]}
+            />
           </div>
 
           <div>
@@ -346,7 +345,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
                 placeholder="Add tag"
                 onKeyPress={(e) => e.key === 'Enter' && handleAddTag()}
               />
-              <ModernButton modernVariant="secondary" onClick={handleAddTag}>Add</ModernButton>
+              <VybeButton vybeVariant="secondary" onClick={handleAddTag}>Add</VybeButton>
             </div>
             {tags.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-2">
@@ -375,12 +374,12 @@ const TaskModal: React.FC<TaskModalProps> = ({
         </div>
 
         <DialogFooter>
-          <ModernButton modernVariant="ghost" onClick={() => onOpenChange(false)}>
+          <VybeButton vybeVariant="ghost" onClick={() => onOpenChange(false)}>
             Cancel
-          </ModernButton>
-          <ModernButton modernVariant="primary" onClick={handleSave} disabled={loading || !title} isLoading={loading}>
+          </VybeButton>
+          <VybeButton vybeVariant="primary" onClick={handleSave} disabled={loading || !title} isLoading={loading}>
             {loading ? 'Saving...' : 'Save Task'}
-          </ModernButton>
+          </VybeButton>
         </DialogFooter>
       </DialogContent>
     </Dialog>

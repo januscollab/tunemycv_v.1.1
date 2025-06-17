@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { CaptureInput } from '@/components/ui/capture-input';
 import { ModernCard, ModernCardContent, ModernCardHeader, ModernCardTitle } from './ui/ModernCard';
-import { ModernButton } from './ui/ModernButton';
+import { VybeButton } from '@/components/design-system/VybeButton';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/integrations/supabase/client';
@@ -162,15 +162,15 @@ const DevSuiteSettings = () => {
       </ModernCard>
 
 
-      <ModernButton 
-        modernVariant="primary"
+      <VybeButton 
+        vybeVariant="primary"
         onClick={handleSaveSettings} 
         disabled={saveLoading}
         isLoading={saveLoading}
-        className="w-full"
+        fullWidth
       >
         {saveLoading ? 'Saving...' : 'Save Settings'}
-      </ModernButton>
+      </VybeButton>
     </div>
   );
 };
