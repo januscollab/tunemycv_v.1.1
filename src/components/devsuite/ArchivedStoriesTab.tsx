@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ModernInput } from './ui/ModernInput';
+import { CaptureInput } from '@/components/ui/capture-input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -187,7 +187,8 @@ const ArchivedStoriesTab = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
-              <ModernInput
+              <CaptureInput
+                label=""
                 placeholder="Search tasks, descriptions, or tags..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}

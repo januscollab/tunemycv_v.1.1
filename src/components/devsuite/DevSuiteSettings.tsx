@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ModernInput } from './ui/ModernInput';
+import { CaptureInput } from '@/components/ui/capture-input';
 import { ModernCard, ModernCardContent, ModernCardHeader, ModernCardTitle } from './ui/ModernCard';
 import { ModernButton } from './ui/ModernButton';
 import { Label } from '@/components/ui/label';
@@ -119,7 +119,7 @@ const DevSuiteSettings = () => {
         </ModernCardHeader>
         <ModernCardContent className="space-y-6">
           <div>
-            <ModernInput
+            <CaptureInput
               label="OpenAI API Key"
               type="password"
               value={apiKey}

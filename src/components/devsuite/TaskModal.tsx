@@ -6,8 +6,8 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { ModernInput } from './ui/ModernInput';
-import { ModernTextarea } from './ui/ModernTextarea';
+import { CaptureInput } from '@/components/ui/capture-input';
+import { CaptureTextarea } from '@/components/ui/capture-textarea';
 import { ModernButton } from './ui/ModernButton';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
@@ -56,6 +56,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
   const [status, setStatus] = useState('todo');
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [isBlocked, setIsBlocked] = useState(false);
 
   useEffect(() => {
     if (task) {
@@ -91,6 +92,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
     }
 
     setGenerating(true);
+    setIsBlocked(true);
     try {
       // Get user settings for OpenAI integration
       const { data: settings } = await supabase
@@ -123,6 +125,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
       toast.error('Failed to generate story');
     } finally {
       setGenerating(false);
+      setIsBlocked(false);
     }
   };
 
@@ -234,7 +237,17 @@ const TaskModal: React.FC<TaskModalProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl z-50">
+      <DialogContent className="max-w-2xl z-50 relative">
+        {/* Loading Overlay */}
+        {isBlocked && (
+          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center rounded-lg">
+            <div className="text-center">
+              <div className="animate-spin h-8 w-8 border-4 border-zapier-orange border-t-transparent rounded-full mx-auto mb-4"></div>
+              <p className="text-blueberry dark:text-citrus font-medium">Enhancing story...</p>
+              <p className="text-blueberry/60 dark:text-apple-core/60 text-sm">Please wait while AI improves your task</p>
+            </div>
+          </div>
+        )}
         <DialogHeader>
           <DialogTitle>
             {task ? 'Edit Task' : 'Add Task'} {sprint && `- ${sprint.name}`}
@@ -243,7 +256,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
 
         <div className="space-y-4">
           <div>
-            <ModernInput
+            <CaptureInput
               label="Title"
               required
               value={title}
@@ -266,7 +279,8 @@ const TaskModal: React.FC<TaskModalProps> = ({
                 {generating ? 'Generating...' : 'Enhance Story'}
               </ModernButton>
             </div>
-            <ModernTextarea
+            <CaptureTextarea
+              label=""
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Enter task description or user story details"
@@ -306,7 +320,8 @@ const TaskModal: React.FC<TaskModalProps> = ({
           <div>
             <label className="block text-sm font-medium text-foreground">Tags</label>
             <div className="flex gap-2 mb-2">
-              <ModernInput
+              <CaptureInput
+                label=""
                 value={newTag}
                 onChange={(e) => setNewTag(e.target.value)}
                 placeholder="Add tag"

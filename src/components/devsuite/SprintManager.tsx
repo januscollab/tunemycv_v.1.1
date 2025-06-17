@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
-import { ModernInput } from './ui/ModernInput';
+import { CaptureInput } from '@/components/ui/capture-input';
 import { ModernCard, ModernCardContent, ModernCardHeader, ModernCardTitle } from './ui/ModernCard';
 import { ModernButton } from './ui/ModernButton';
 import { supabase } from '@/integrations/supabase/client';
@@ -54,13 +54,22 @@ const SprintManager = () => {
       // First ensure default sprints exist
       await ensureDefaultSprintsExist();
 
-      // Load sprints
+      // Load sprints with proper ordering (Priority first, Backlog last)
       const { data: sprintsData, error: sprintsError } = await supabase
         .from('sprints')
         .select('*')
         .order('order_index');
 
       if (sprintsError) throw sprintsError;
+
+      // Sort sprints: Priority Sprint first, Backlog last, others in between by order_index
+      const sortedSprints = (sprintsData || []).sort((a, b) => {
+        if (a.name === 'Priority Sprint') return -1;
+        if (b.name === 'Priority Sprint') return 1;
+        if (a.name === 'Backlog') return 1;
+        if (b.name === 'Backlog') return -1;
+        return a.order_index - b.order_index;
+      });
 
       // Load tasks
       const { data: tasksData, error: tasksError } = await supabase
@@ -71,7 +80,7 @@ const SprintManager = () => {
 
       if (tasksError) throw tasksError;
 
-      setSprints(sprintsData || []);
+      setSprints(sortedSprints);
       setTasks(tasksData || []);
     } catch (error) {
       console.error('Error loading data:', error);
@@ -174,12 +183,20 @@ const SprintManager = () => {
     }
 
     try {
-      const maxOrder = Math.max(...sprints.map(s => s.order_index), -1);
+      // Calculate proper order_index (between Priority Sprint and Backlog)
+      const prioritySprint = sprints.find(s => s.name === 'Priority Sprint');
+      const backlogSprint = sprints.find(s => s.name === 'Backlog');
+      const userSprints = sprints.filter(s => s.name !== 'Priority Sprint' && s.name !== 'Backlog');
+      
+      // New user sprints should be placed between Priority Sprint and Backlog
+      const maxUserOrder = userSprints.length > 0 ? Math.max(...userSprints.map(s => s.order_index)) : (prioritySprint?.order_index || 0);
+      const newOrderIndex = maxUserOrder + 1;
+
       const { error } = await supabase
         .from('sprints')
         .insert({
           name: trimmedName,
-          order_index: maxOrder + 1,
+          order_index: newOrderIndex,
           user_id: user?.id,
         });
 
@@ -463,7 +480,8 @@ const SprintManager = () => {
         <ModernCard className="animate-fade-in">
           <ModernCardContent className="pt-6">
             <div className="flex gap-2">
-              <ModernInput
+              <CaptureInput
+                label="Sprint Name"
                 value={newSprintName}
                 onChange={(e) => setNewSprintName(e.target.value)}
                 placeholder="Enter sprint name"
@@ -491,53 +509,8 @@ const SprintManager = () => {
             .map((sprint) => (
               <ModernCard key={sprint.id} className="h-fit animate-fade-in">
                 <ModernCardHeader className="pb-4">
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <ModernCardTitle className="text-lg">{sprint.name}</ModernCardTitle>
-                    </div>
-                    <div className="flex gap-1">
-                      <ModernButton
-                        size="sm"
-                        modernVariant="primary"
-                        onClick={() => handleAddTask(sprint)}
-                      >
-                        Add Task
-                      </ModernButton>
-                      <ModernButton
-                        size="sm"
-                        modernVariant="secondary"
-                        onClick={() => handleExecuteSprint(sprint)}
-                      >
-                        Execute
-                      </ModernButton>
-                      {sprint.status !== 'completed' && (
-                        <ModernButton
-                          size="sm"
-                          modernVariant="outline"
-                          onClick={() => handleCloseSprint(sprint)}
-                        >
-                          Close
-                        </ModernButton>
-                      )}
-                      {sprint.name === 'Priority Sprint' && getTasksForSprint(sprint.id).some(task => task.status === 'completed') && (
-                        <ModernButton
-                          size="sm"
-                          modernVariant="ghost"
-                          onClick={() => handleArchiveCompletedTasks(sprint)}
-                        >
-                          Archive Completed
-                        </ModernButton>
-                      )}
-                      {sprint.name !== 'Priority Sprint' && sprint.name !== 'Backlog' && (
-                        <ModernButton
-                          size="sm"
-                          modernVariant="destructive"
-                          onClick={() => handleDeleteSprint(sprint)}
-                        >
-                          Delete
-                        </ModernButton>
-                      )}
-                    </div>
+                  <div className="flex items-center gap-2">
+                    <ModernCardTitle className="text-lg">{sprint.name}</ModernCardTitle>
                   </div>
                 </ModernCardHeader>
                 <ModernCardContent>
@@ -546,7 +519,7 @@ const SprintManager = () => {
                       <div
                         {...provided.droppableProps}
                         ref={provided.innerRef}
-                        className="space-y-3 min-h-[100px]"
+                        className="space-y-3 min-h-[100px] mb-4"
                       >
                         {getTasksForSprint(sprint.id).map((task, index) => (
                           <Draggable
@@ -629,6 +602,51 @@ const SprintManager = () => {
                       </div>
                     )}
                   </Droppable>
+                  
+                  {/* Sprint Action Buttons - Moved to Bottom */}
+                  <div className="flex gap-2 pt-4 border-t border-border/50">
+                    <ModernButton
+                      size="sm"
+                      modernVariant="primary"
+                      onClick={() => handleAddTask(sprint)}
+                    >
+                      Add Task
+                    </ModernButton>
+                    <ModernButton
+                      size="sm"
+                      modernVariant="secondary"
+                      onClick={() => handleExecuteSprint(sprint)}
+                    >
+                      Execute
+                    </ModernButton>
+                    {sprint.status !== 'completed' && (
+                      <ModernButton
+                        size="sm"
+                        modernVariant="outline"
+                        onClick={() => handleCloseSprint(sprint)}
+                      >
+                        Close
+                      </ModernButton>
+                    )}
+                    {sprint.name === 'Priority Sprint' && getTasksForSprint(sprint.id).some(task => task.status === 'completed') && (
+                      <ModernButton
+                        size="sm"
+                        modernVariant="ghost"
+                        onClick={() => handleArchiveCompletedTasks(sprint)}
+                      >
+                        Archive Completed
+                      </ModernButton>
+                    )}
+                    {sprint.name !== 'Priority Sprint' && sprint.name !== 'Backlog' && (
+                      <ModernButton
+                        size="sm"
+                        modernVariant="destructive"
+                        onClick={() => handleDeleteSprint(sprint)}
+                      >
+                        Delete
+                      </ModernButton>
+                    )}
+                  </div>
                 </ModernCardContent>
               </ModernCard>
             ))}
