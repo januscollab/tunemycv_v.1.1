@@ -1227,7 +1227,7 @@ const DesignSystem = () => {
                 History Components
               </h2>
               
-              <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
+              <div className="w-[80%] mx-auto grid gap-6 grid-cols-1">
                 {/* AnalysisHistory */}
                 <Card className="group hover:shadow-lg transition-all duration-300">
                   <CardHeader className="pb-3">
