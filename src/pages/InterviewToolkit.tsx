@@ -588,47 +588,81 @@ const InterviewToolkit = () => {
               </TabsContent>
 
               {/* View Analysis Tab */}
-              <TabsContent value="view-analysis" className="mt-0">
-                {viewedAnalysis ? (
-                  <AnalysisResults 
-                    result={viewedAnalysis} 
-                    onStartNew={handleStartNew}
-                    readOnly={true}
-                  />
-                ) : (
-                  <Card className="border border-gray-200 dark:border-gray-700">
+              <TabsContent value="view-analysis" className="mt-0 relative">
+                <div className="filter blur-md pointer-events-none">
+                  {viewedAnalysis ? (
+                    <AnalysisResults 
+                      result={viewedAnalysis} 
+                      onStartNew={handleStartNew}
+                      readOnly={true}
+                    />
+                  ) : (
+                    <Card className="border border-gray-200 dark:border-gray-700">
+                      <CardContent className="text-center py-8">
+                        <MessageSquare className="h-12 w-12 text-zapier-orange mx-auto mb-4" />
+                        <p className="text-gray-600 dark:text-gray-400 mb-2 font-normal">
+                          No interview notes generated yet.
+                        </p>
+                        <p className="text-sm font-normal text-gray-500">
+                          Generate personalized interview preparation notes in the Interview Prep tab or view previous notes in History.
+                        </p>
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
+                
+                {/* Coming Soon Overlay */}
+                <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm z-10">
+                  <Card className="max-w-md mx-4 border-2 border-orange-200 bg-orange-50 dark:bg-orange-950 dark:border-orange-800">
                     <CardContent className="text-center py-8">
-                      <MessageSquare className="h-12 w-12 text-zapier-orange mx-auto mb-4" />
-                      <p className="text-gray-600 dark:text-gray-400 mb-2 font-normal">
-                        No interview notes generated yet.
-                      </p>
-                      <p className="text-sm font-normal text-gray-500">
-                        Generate personalized interview preparation notes in the <Button variant="link" onClick={() => setActiveTab('interview-prep')} className="text-zapier-orange hover:text-zapier-orange/80 p-0 h-auto font-normal text-sm">Interview Prep</Button> tab or view previous notes in <Button variant="link" onClick={() => setActiveTab('history')} className="text-zapier-orange hover:text-zapier-orange/80 p-0 h-auto font-normal text-sm">History</Button>.
+                      <Clock className="h-12 w-12 text-orange-600 mx-auto mb-4" />
+                      <h3 className="text-heading font-semibold text-orange-800 dark:text-orange-200 mb-2">
+                        Coming Soon!
+                      </h3>
+                      <p className="text-orange-700 dark:text-orange-300 text-caption">
+                        We're working hard to bring you comprehensive interview notes viewing. This feature will be available soon!
                       </p>
                     </CardContent>
                   </Card>
-                )}
+                </div>
               </TabsContent>
 
               {/* Interview Notes History Tab */}
-              <TabsContent value="history" className="mt-0">
-                <CategoryDocumentHistory
-                  header={{
-                    title: "Interview Notes History",
-                    totalCount: 0,
-                    itemsPerPage: 10,
-                    onItemsPerPageChange: () => {},
-                    showPagination: false,
-                    showFilter: false
-                  }}
-                  documents={[]}
-                  loading={false}
-                  emptyState={{
-                    title: "No interview notes yet",
-                    description: "Your generated interview preparation notes will appear here once you create them.",
-                    icon: <MessageSquare className="h-12 w-12" />
-                  }}
-                />
+              <TabsContent value="history" className="mt-0 relative">
+                <div className="filter blur-md pointer-events-none">
+                  <CategoryDocumentHistory
+                    header={{
+                      title: "Interview Notes History",
+                      totalCount: 0,
+                      itemsPerPage: 10,
+                      onItemsPerPageChange: () => {},
+                      showPagination: false,
+                      showFilter: false
+                    }}
+                    documents={[]}
+                    loading={false}
+                    emptyState={{
+                      title: "No interview notes yet",
+                      description: "Your generated interview preparation notes will appear here once you create them.",
+                      icon: <MessageSquare className="h-12 w-12" />
+                    }}
+                  />
+                </div>
+                
+                {/* Coming Soon Overlay */}
+                <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm z-10">
+                  <Card className="max-w-md mx-4 border-2 border-orange-200 bg-orange-50 dark:bg-orange-950 dark:border-orange-800">
+                    <CardContent className="text-center py-8">
+                      <History className="h-12 w-12 text-orange-600 mx-auto mb-4" />
+                      <h3 className="text-heading font-semibold text-orange-800 dark:text-orange-200 mb-2">
+                        Coming Soon!
+                      </h3>
+                      <p className="text-orange-700 dark:text-orange-300 text-caption">
+                        Interview notes history will be available soon. All your generated interview preparation materials will be stored here for easy access.
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
               </TabsContent>
             </Tabs>
           </div>

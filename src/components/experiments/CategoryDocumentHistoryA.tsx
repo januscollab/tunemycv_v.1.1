@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FileText, Calendar, Building, Eye, Edit2, Trash2, Download, MessageSquare, Filter } from 'lucide-react';
+import { FileText, Calendar, Building, Eye, Edit2, Trash2, Download, MessageSquare, Filter, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -39,6 +39,7 @@ interface CategoryDocumentHistoryAProps {
 const CategoryDocumentHistoryA: React.FC<CategoryDocumentHistoryAProps> = ({ className }) => {
   const [filterType, setFilterType] = useState<'all' | 'analysis' | 'cover_letter'>('all');
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Mock data for demo
   const documents: DocumentItem[] = [
@@ -62,9 +63,14 @@ const CategoryDocumentHistoryA: React.FC<CategoryDocumentHistoryAProps> = ({ cla
     }
   ];
 
-  const filteredDocuments = documents.filter(doc => 
-    filterType === 'all' || doc.type === filterType
-  );
+  const filteredDocuments = documents.filter(doc => {
+    const matchesType = filterType === 'all' || doc.type === filterType;
+    const matchesSearch = searchQuery === '' || 
+      doc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      doc.company_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      doc.job_title?.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesType && matchesSearch;
+  });
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -119,6 +125,18 @@ const CategoryDocumentHistoryA: React.FC<CategoryDocumentHistoryAProps> = ({ cla
             </div>
             
             <div className="flex items-center gap-3">
+              {/* Search */}
+              <div className="flex items-center gap-2">
+                <Search className="h-4 w-4 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder="Search documents..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-48 px-3 py-1.5 text-caption border border-border rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                />
+              </div>
+              
               {/* Filter */}
               <div className="flex items-center gap-2">
                 <Filter className="h-4 w-4 text-muted-foreground" />
