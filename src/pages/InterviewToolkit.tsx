@@ -442,149 +442,17 @@ const InterviewToolkit = () => {
               {/* Interview Prep Tab */}
               <TabsContent value="interview-prep" className="mt-0 relative">
                 <div className="filter blur-md pointer-events-none">
-                  <div className="space-y-6">
-                    {/* Coming Soon Banner */}
-                    <Alert className="border-orange-200 bg-orange-50 dark:bg-orange-950 dark:border-orange-800">
-                      <Clock className="h-4 w-4 text-orange-600" />
-                      <AlertDescription className="text-orange-800 dark:text-orange-200">
-                        This feature is coming soon! We're working hard to bring you comprehensive interview preparation tools.
-                      </AlertDescription>
-                    </Alert>
-
-                    {/* Generation Method Selection */}
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-xl font-bold text-blueberry dark:text-citrus">
-                          Generate Interview Prep Notes
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <button
-                            onClick={() => setInterviewPrepMethod('input')}
-                            className={`p-4 border-2 rounded-lg transition-all ${
-                              interviewPrepMethod === 'input'
-                                ? 'border-zapier-orange bg-zapier-orange/10'
-                                : 'border-gray-200 hover:border-zapier-orange/50'
-                            }`}
-                          >
-                            <div className="flex items-center space-x-3">
-                              <FileUp className={`h-5 w-5 ${
-                                interviewPrepMethod === 'input' ? 'text-zapier-orange' : 'text-gray-500'
-                              }`} />
-                              <div className="text-left">
-                                <h3 className="font-semibold text-blueberry dark:text-citrus">Generate From Input</h3>
-                                <p className="text-sm text-blueberry/70 dark:text-apple-core/80">Enter job details manually</p>
-                              </div>
-                            </div>
-                          </button>
-
-                          <button
-                            onClick={() => setInterviewPrepMethod('analysis')}
-                            className={`p-4 border-2 rounded-lg transition-all ${
-                              interviewPrepMethod === 'analysis'
-                                ? 'border-zapier-orange bg-zapier-orange/10'
-                                : 'border-gray-200 hover:border-zapier-orange/50'
-                            }`}
-                          >
-                            <div className="flex items-center space-x-3">
-                              <Search className={`h-5 w-5 ${
-                                interviewPrepMethod === 'analysis' ? 'text-zapier-orange' : 'text-gray-500'
-                              }`} />
-                              <div className="text-left">
-                                <h3 className="font-semibold text-blueberry dark:text-citrus">Generate from Existing Analysis</h3>
-                                <p className="text-sm text-blueberry/70 dark:text-apple-core/80">Use a previous CV analysis</p>
-                              </div>
-                            </div>
-                          </button>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    {/* Job Details Section */}
-                    {interviewPrepMethod === 'input' && (
-                      <Card>
-                        <CardHeader>
-                          <CardTitle className="text-lg font-semibold text-blueberry dark:text-citrus flex items-center">
-                            <Building className="h-5 w-5 text-zapier-orange mr-2" />
-                            Job Details
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                          {/* Job Description Input */}
-                          <div>
-                            <label className="block text-sm font-medium text-blueberry dark:text-citrus mb-1">
-                              Job Description <span className="text-red-500">*</span>
-                            </label>
-                            <p className="text-xs text-blueberry/60 dark:text-apple-core/70 mb-3">
-                              Upload a file (PDF, DOCX, TXT) or paste the text directly
-                            </p>
-                            <JobDescriptionUpload
-                              onJobDescriptionSet={handleInterviewJobDescriptionSet}
-                              uploadedFile={interviewJobDescription}
-                              disabled={false}
-                            />
-                          </div>
-                          
-                          {/* Job Title */}
-                          <CaptureInput
-                            label="Job Title *"
-                            value={interviewJobTitle}
-                            onChange={(e) => setInterviewJobTitle(e.target.value)}
-                            placeholder="e.g., Senior Software Engineer (auto-extracted from job description)"
-                            required
-                          />
-                          
-                          {/* Company Name */}
-                          <CaptureInput
-                            label="Company Name *"
-                            value={interviewCompanyName}
-                            onChange={(e) => setInterviewCompanyName(e.target.value)}
-                            placeholder="e.g., Tech Corp Inc."
-                            required
-                          />
-                        </CardContent>
-                      </Card>
-                    )}
-
-                    {/* Select Analysis Section */}
-                    {interviewPrepMethod === 'analysis' && (
-                      <Card>
-                        <CardHeader>
-                          <CardTitle className="text-lg font-semibold text-blueberry dark:text-citrus flex items-center">
-                            <Target className="h-5 w-5 text-zapier-orange mr-2" />
-                            Select Analysis
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <AnalysisSelector
-                            onAnalysisSelect={setSelectedAnalysisId}
-                            selectedAnalysisId={selectedAnalysisId}
-                          />
-                        </CardContent>
-                      </Card>
-                    )}
-
-                    {/* Generate Button */}
-                    <div className="bg-card rounded-lg shadow-sm p-5 border border-card-border transition-all duration-normal hover:shadow-md">
-                      <div className="text-center">
-                        <button
-                          onClick={handleGenerateInterviewPrep}
-                          disabled={true}
-                          className="w-full py-4 px-6 rounded-lg text-lg font-semibold transition-all duration-normal bg-muted text-muted-foreground cursor-not-allowed"
-                        >
-                          <div className="flex items-center justify-center space-x-2">
-                            <MessageSquare className="h-5 w-5" />
-                            <span>Generate Interview Prep Notes</span>
-                          </div>
-                        </button>
-                        
-                        <p className="text-sm text-muted-foreground mt-3 transition-colors duration-normal">
-                          Coming soon - Comprehensive interview preparation materials
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+                  <Card className="border border-gray-200 dark:border-gray-700">
+                    <CardContent className="text-center py-8">
+                      <MessageSquare className="h-12 w-12 text-zapier-orange mx-auto mb-4" />
+                      <p className="text-gray-600 dark:text-gray-400 mb-2 font-normal">
+                        No interview prep notes generated yet.
+                      </p>
+                      <p className="text-sm font-normal text-gray-500">
+                        Generate personalized interview preparation notes with company insights and strategic questions.
+                      </p>
+                    </CardContent>
+                  </Card>
                 </div>
                 
                 {/* Coming Soon Overlay */}
@@ -646,23 +514,17 @@ const InterviewToolkit = () => {
               {/* Interview Notes History Tab */}
               <TabsContent value="history" className="mt-0 relative">
                 <div className="filter blur-md pointer-events-none">
-                  <CategoryDocumentHistory
-                    header={{
-                      title: "Interview Notes History",
-                      totalCount: 0,
-                      itemsPerPage: 10,
-                      onItemsPerPageChange: () => {},
-                      showPagination: false,
-                      showFilter: false
-                    }}
-                    documents={[]}
-                    loading={false}
-                    emptyState={{
-                      title: "No interview notes yet",
-                      description: "Your generated interview preparation notes will appear here once you create them.",
-                      icon: <MessageSquare className="h-12 w-12" />
-                    }}
-                  />
+                  <Card className="border border-gray-200 dark:border-gray-700">
+                    <CardContent className="text-center py-8">
+                      <MessageSquare className="h-12 w-12 text-zapier-orange mx-auto mb-4" />
+                      <p className="text-gray-600 dark:text-gray-400 mb-2 font-normal">
+                        No interview notes yet.
+                      </p>
+                      <p className="text-sm font-normal text-gray-500">
+                        Your generated interview preparation notes will appear here once you create them.
+                      </p>
+                    </CardContent>
+                  </Card>
                 </div>
                 
                 {/* Coming Soon Overlay */}
