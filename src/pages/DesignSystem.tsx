@@ -256,7 +256,7 @@ const DesignSystem = () => {
     { 
       name: 'CategoryDocumentHistory', 
       component: (
-        <div style={{ width: '100%', maxWidth: '600px', margin: '0 auto' }}>
+        <div style={{ width: '100%' }}>
           <CategoryDocumentHistory
             header={{
               title: "Document History",
@@ -323,7 +323,7 @@ const DesignSystem = () => {
           />
         </div>
       ), 
-      usage: '8 usages',
+      usage: '8 usages - Used in Cover Letter page and Interview Toolkit page for history tabs',
       description: 'Specialized document history component for profile page with filtering, pagination, and advanced actions',
       status: 'active',
       trigger: () => {}
@@ -1088,7 +1088,7 @@ const DesignSystem = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="bg-muted/30 p-4 rounded-lg">
-                      <EnhancedAnalysisHistory className="max-w-2xl" />
+                      <EnhancedAnalysisHistory className="w-full" />
                     </div>
                   </CardContent>
                 </Card>
@@ -1109,7 +1109,7 @@ const DesignSystem = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="bg-muted/30 p-4 rounded-lg">
-                      <CoverLetterHistory className="max-w-2xl" />
+                      <CoverLetterHistory className="w-full" />
                     </div>
                   </CardContent>
                 </Card>
