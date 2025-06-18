@@ -4,7 +4,7 @@ import { useToast } from '@/hooks/use-toast';
 import { extractJobTitleFromText } from '@/utils/analysisUtils';
 import AnalysisResults from '@/components/analysis/AnalysisResults';
 import N8nAnalysisResults from '@/components/analysis/N8nAnalysisResults';
-
+import AnalysisHistory from '@/components/analysis/AnalysisHistory';
 import CVSelector from '@/components/analyze/CVSelector';
 import JobDescriptionSelector from '@/components/analyze/JobDescriptionSelector';
 import CreditsPanel from '@/components/analyze/CreditsPanel';

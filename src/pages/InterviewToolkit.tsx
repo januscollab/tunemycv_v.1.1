@@ -28,7 +28,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { CaptureInput } from '@/components/ui/capture-input';
-import CoverLetterHistory from '@/components/cover-letter/CoverLetterHistory';
+import { CategoryDocumentHistory } from '@/components/ui/category-document-history';
 import AnalysisHistoryTab from '@/components/profile/AnalysisHistoryTab';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Breadcrumbs from '@/components/navigation/Breadcrumbs';
@@ -612,11 +612,23 @@ const InterviewToolkit = () => {
 
               {/* Interview Notes History Tab */}
               <TabsContent value="history" className="mt-0">
-                <div className="text-center py-12">
-                  <MessageSquare className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-heading font-medium text-foreground mb-2">No interview notes yet</h3>
-                  <p className="text-muted-foreground">Your generated interview preparation notes will appear here once you create them.</p>
-                </div>
+                <CategoryDocumentHistory
+                  header={{
+                    title: "Interview Notes History",
+                    totalCount: 0,
+                    itemsPerPage: 10,
+                    onItemsPerPageChange: () => {},
+                    showPagination: false,
+                    showFilter: false
+                  }}
+                  documents={[]}
+                  loading={false}
+                  emptyState={{
+                    title: "No interview notes yet",
+                    description: "Your generated interview preparation notes will appear here once you create them.",
+                    icon: <MessageSquare className="h-12 w-12" />
+                  }}
+                />
               </TabsContent>
             </Tabs>
           </div>

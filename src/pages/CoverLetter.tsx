@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FileText, Sparkles, Trash2, RefreshCw, Clock, FileUp, Search, AlertCircle, Eye, Edit, Download, History, RotateCcw, Edit2, Linkedin } from 'lucide-react';
 import Breadcrumbs from '@/components/navigation/Breadcrumbs';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
-import CoverLetterHistory from '@/components/cover-letter/CoverLetterHistory';
+import { CategoryDocumentHistory } from '@/components/ui/category-document-history';
 import { htmlToJson } from '@/utils/jsonHtmlConverters';
 import DownloadOptions from '@/components/cover-letter/DownloadOptions';
 
@@ -1015,17 +1015,39 @@ const AuthenticatedCoverLetter = () => {
               </TabsContent>
 
               <TabsContent value="history" className="mt-6">
-                <CoverLetterHistory
-                  onSelectCoverLetter={(coverLetter) => {
-                    setSelectedCoverLetter(coverLetter);
-                    setSelectedContent(coverLetter.content);
-                    setSelectedJobTitle(coverLetter.job_title);
-                    setSelectedCompanyName(coverLetter.company_name);
-                    setActiveTab('view');
+                <CategoryDocumentHistory
+                  header={{
+                    title: "Cover Letter History",
+                    totalCount: allCoverLetters.length,
+                    itemsPerPage: itemsPerPage,
+                    onItemsPerPageChange: setItemsPerPage,
+                    showPagination: true,
+                    showFilter: false
                   }}
-                  className="w-full"
-                />
-              </TabsContent>
+                  documents={paginatedCoverLetters.map(coverLetter => ({
+                    id: coverLetter.id,
+                    type: 'cover_letter' as const,
+                    title: `${coverLetter.job_title} at ${coverLetter.company_name}`,
+                    company_name: coverLetter.company_name,
+                    job_title: coverLetter.job_title,
+                    created_at: coverLetter.updated_at,
+                    regeneration_count: coverLetter.regeneration_count,
+                    content: coverLetter.content,
+                    analysis_result_id: coverLetter.analysis_result_id
+                  }))}
+                  loading={loadingHistory}
+                  onDocumentClick={handleViewCoverLetter}
+                  actions={[
+                    {
+                      label: 'View',
+                      icon: <Eye className="h-4 w-4 mr-2" />,
+                      onClick: handleViewCoverLetter
+                    },
+                    {
+                      label: 'Download',
+                      icon: <Download className="h-4 w-4 mr-2" />,
+                      onClick: (doc) => {
+                        // Create a dropdown menu similar to DownloadOptions
                         const menu = document.createElement('div');
                         menu.className = 'download-menu';
                         menu.style.cssText = `

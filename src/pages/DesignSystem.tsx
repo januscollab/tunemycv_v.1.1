@@ -29,8 +29,9 @@ import { MockPaymentModal } from '@/components/ui/mock-payment-modal';
 import { StepIndicator } from '@/components/ui/step-indicator';
 import { ProgressIndicator } from '@/components/ui/progress-indicator';
 import { HistorySection, HistoryHeader, HistoryList, HistoryEmptyState } from '@/components/ui/history-section';
-
+import { CategoryDocumentHistory, CategoryDocumentHistoryHeader, CategoryDocumentHistoryList, CategoryDocumentHistoryItem } from '@/components/ui/category-document-history';
 import { DocumentHistory, DocumentHistoryHeader, DocumentHistoryList, DocumentHistoryItem } from '@/components/ui/profile-document-history';
+import AnalysisHistory from '@/components/analysis/AnalysisHistory';
 import EnhancedAnalysisHistory from '@/components/analysis/EnhancedAnalysisHistory';
 import CoverLetterHistory from '@/components/cover-letter/CoverLetterHistory';
 
@@ -325,6 +326,81 @@ const DesignSystem = () => {
       status: 'active',
       trigger: () => {}
     },
+    { 
+      name: 'CategoryDocumentHistory', 
+      component: (
+        <div style={{ width: '100%', maxWidth: '600px', margin: '0 auto' }}>
+          <CategoryDocumentHistory
+            header={{
+              title: "Document History",
+              totalCount: 3,
+              itemsPerPage: 10,
+              onItemsPerPageChange: () => {},
+              showPagination: true,
+              showFilter: true
+            }}
+            documents={[
+              {
+                id: '1',
+                type: 'analysis',
+                title: 'Program Director',
+                job_title: 'Program Director',
+                company_name: 'Oracle',
+                created_at: '2025-06-14T23:57:00Z',
+                compatibility_score: 88,
+                has_cover_letter: true,
+                executive_summary: 'Strong candidate with relevant experience',
+                strengths: ['Leadership', 'Strategic Planning'],
+                weaknesses: ['Communication'],
+                recommendations: ['Improve presentation skills']
+              },
+              {
+                id: '2',
+                type: 'cover_letter',
+                title: 'Software Engineer Cover Letter',
+                job_title: 'Software Engineer',
+                company_name: 'TechCorp',
+                created_at: '2025-06-13T15:30:00Z',
+                content: 'Dear Hiring Manager...',
+                regeneration_count: 2,
+                analysis_result_id: 'analysis-123'
+              }
+            ]}
+            actions={[
+              {
+                label: 'View',
+                icon: <Eye className="h-4 w-4 mr-2" />,
+                onClick: (doc) => console.log('View:', doc.title)
+              },
+              {
+                label: 'Download',
+                icon: <Download className="h-4 w-4 mr-2" />,
+                onClick: (doc) => console.log('Download:', doc.title)
+              },
+              {
+                label: 'Delete',
+                icon: <Trash2 className="h-4 w-4 mr-2" />,
+                onClick: (doc) => console.log('Delete:', doc.title),
+                variant: 'destructive'
+              }
+            ]}
+            emptyState={{
+              title: "No documents found",
+              description: "You haven't created any analyses or cover letters yet."
+            }}
+            pagination={{
+              currentPage: 1,
+              totalPages: 1,
+              onPageChange: () => {}
+            }}
+          />
+        </div>
+      ), 
+      usage: '8 usages',
+      description: 'Specialized document history component for profile page with filtering, pagination, and advanced actions',
+      status: 'active',
+      trigger: () => {}
+    }
   ];
 
   const animationTypes = [
@@ -1152,6 +1228,27 @@ const DesignSystem = () => {
               </h2>
               
               <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
+                {/* AnalysisHistory */}
+                <Card className="group hover:shadow-lg transition-all duration-300">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-subheading">AnalysisHistory</CardTitle>
+                      <Badge variant="outline" className="text-micro">Basic version</Badge>
+                    </div>
+                    <p className="text-caption text-muted-foreground">
+                      Basic analysis history component with simple list view and view action.
+                    </p>
+                    <div className="text-micro text-muted-foreground mt-2">
+                      <strong>Used in:</strong> src/pages/AnalyzeCV.tsx (legacy reference)
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="bg-muted/30 p-4 rounded-lg">
+                      <AnalysisHistory className="max-w-2xl" />
+                    </div>
+                  </CardContent>
+                </Card>
+
                 {/* EnhancedAnalysisHistory */}
                 <Card className="group hover:shadow-lg transition-all duration-300">
                   <CardHeader className="pb-3">
@@ -1168,7 +1265,7 @@ const DesignSystem = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="bg-muted/30 p-4 rounded-lg">
-                      <EnhancedAnalysisHistory className="w-4/5" />
+                      <EnhancedAnalysisHistory className="max-w-2xl" />
                     </div>
                   </CardContent>
                 </Card>
@@ -1189,11 +1286,26 @@ const DesignSystem = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="bg-muted/30 p-4 rounded-lg">
-                      <CoverLetterHistory className="w-4/5" />
+                      <CoverLetterHistory className="max-w-2xl" />
                     </div>
                   </CardContent>
                 </Card>
 
+                {/* CategoryDocumentHistory */}
+                <Card className="group hover:shadow-lg transition-all duration-300">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-subheading">CategoryDocumentHistory</CardTitle>
+                      <Badge variant="secondary" className="text-micro">Active</Badge>
+                    </div>
+                    <p className="text-caption text-muted-foreground">
+                      Specialized document history with filtering, pagination, and advanced actions for mixed document types.
+                    </p>
+                    <div className="text-micro text-muted-foreground mt-2">
+                      <strong>Used in:</strong> src/pages/CoverLetter.tsx, src/pages/InterviewToolkit.tsx
+                    </div>
+                  </CardHeader>
+                </Card>
 
                 {/* HistorySection (Generic) */}
                 <Card className="group hover:shadow-lg transition-all duration-300">
