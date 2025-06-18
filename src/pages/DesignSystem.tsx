@@ -812,35 +812,17 @@ const DesignSystem = () => {
               All components use semantic tokens that automatically adapt to light and dark themes.
             </p>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <Card className="text-center p-6">
-                <Palette className="h-8 w-8 mx-auto mb-3 text-primary" />
-                <h3 className="text-heading font-semibold mb-2">Color System</h3>
-                <p className="text-caption text-muted-foreground">Semantic color tokens with automatic theme switching</p>
-              </Card>
-              <Card className="text-center p-6">
-                <Type className="h-8 w-8 mx-auto mb-3 text-primary" />
-                <h3 className="text-heading font-semibold mb-2">Typography</h3>
-                <p className="text-caption text-muted-foreground">Hierarchical text system with responsive scaling</p>
-              </Card>
-              <Card className="text-center p-6">
-                <Grid className="h-8 w-8 mx-auto mb-3 text-primary" />
-                <h3 className="text-heading font-semibold mb-2">Components</h3>
-                <p className="text-caption text-muted-foreground">Reusable components following design principles</p>
-              </Card>
-            </div>
           </div>
         </div>
 
         {/* Tabbed Navigation */}
         <Tabs defaultValue="foundations" className="w-full">
-          <TabsList className="grid w-full grid-cols-7">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="foundations">Foundations</TabsTrigger>
             <TabsTrigger value="components">Components</TabsTrigger>
             <TabsTrigger value="rte">Rich Text Editor</TabsTrigger>
-            <TabsTrigger value="interactions">Interactions</TabsTrigger>
+            <TabsTrigger value="interactions">Interactions & Loading</TabsTrigger>
             <TabsTrigger value="missing">Missing Docs</TabsTrigger>
-            <TabsTrigger value="loading">Loading States</TabsTrigger>
             <TabsTrigger value="experiments">Experiments</TabsTrigger>
           </TabsList>
 
@@ -1234,6 +1216,112 @@ const DesignSystem = () => {
                 </Card>
               </div>
             </section>
+
+            {/* History Components Section */}
+            <section>
+              <h2 className="text-title font-bold text-foreground mb-8 flex items-center gap-3">
+                <History className="h-6 w-6 text-primary" />
+                History Components
+              </h2>
+              
+              <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
+                {/* AnalysisHistory */}
+                <Card className="group hover:shadow-lg transition-all duration-300">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-subheading">AnalysisHistory</CardTitle>
+                      <Badge variant="outline" className="text-micro">Basic version</Badge>
+                    </div>
+                    <p className="text-caption text-muted-foreground">
+                      Basic analysis history component with simple list view and view action.
+                    </p>
+                    <div className="text-micro text-muted-foreground mt-2">
+                      <strong>Used in:</strong> src/pages/AnalyzeCV.tsx (legacy reference)
+                    </div>
+                  </CardHeader>
+                </Card>
+
+                {/* EnhancedAnalysisHistory */}
+                <Card className="group hover:shadow-lg transition-all duration-300">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-subheading">EnhancedAnalysisHistory</CardTitle>
+                      <Badge variant="default" className="text-micro">Current</Badge>
+                    </div>
+                    <p className="text-caption text-muted-foreground">
+                      Advanced analysis history with view, download, delete actions and CTA buttons for generating cover letters and interview prep.
+                    </p>
+                    <div className="text-micro text-muted-foreground mt-2">
+                      <strong>Used in:</strong> src/pages/AnalyzeCV.tsx
+                    </div>
+                  </CardHeader>
+                </Card>
+
+                {/* CoverLetterHistory */}
+                <Card className="group hover:shadow-lg transition-all duration-300">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-subheading">CoverLetterHistory</CardTitle>
+                      <Badge variant="default" className="text-micro">Current</Badge>
+                    </div>
+                    <p className="text-caption text-muted-foreground">
+                      Cover letter history component with view, download, delete actions and template version badges.
+                    </p>
+                    <div className="text-micro text-muted-foreground mt-2">
+                      <strong>Used in:</strong> Currently not used on any pages (ready for integration)
+                    </div>
+                  </CardHeader>
+                </Card>
+
+                {/* CategoryDocumentHistory */}
+                <Card className="group hover:shadow-lg transition-all duration-300">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-subheading">CategoryDocumentHistory</CardTitle>
+                      <Badge variant="secondary" className="text-micro">Active</Badge>
+                    </div>
+                    <p className="text-caption text-muted-foreground">
+                      Specialized document history with filtering, pagination, and advanced actions for mixed document types.
+                    </p>
+                    <div className="text-micro text-muted-foreground mt-2">
+                      <strong>Used in:</strong> src/pages/CoverLetter.tsx, src/pages/InterviewToolkit.tsx
+                    </div>
+                  </CardHeader>
+                </Card>
+
+                {/* HistorySection (Generic) */}
+                <Card className="group hover:shadow-lg transition-all duration-300">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-subheading">HistorySection</CardTitle>
+                      <Badge variant="outline" className="text-micro">Generic UI</Badge>
+                    </div>
+                    <p className="text-caption text-muted-foreground">
+                      Modular history component with header, list, empty state, and pagination support.
+                    </p>
+                    <div className="text-micro text-muted-foreground mt-2">
+                      <strong>Used in:</strong> Design system examples and reusable UI components
+                    </div>
+                  </CardHeader>
+                </Card>
+
+                {/* DocumentHistory (Profile) */}
+                <Card className="group hover:shadow-lg transition-all duration-300">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-subheading">DocumentHistory</CardTitle>
+                      <Badge variant="secondary" className="text-micro">Profile specific</Badge>
+                    </div>
+                    <p className="text-caption text-muted-foreground">
+                      Profile-specific document history with filtering and title editing capabilities.
+                    </p>
+                    <div className="text-micro text-muted-foreground mt-2">
+                      <strong>Used in:</strong> src/components/profile/AnalysisHistoryTab.tsx, src/components/profile/DocumentHistoryTab.tsx
+                    </div>
+                  </CardHeader>
+                </Card>
+              </div>
+            </section>
           </TabsContent>
 
           {/* Rich Text Editor Tab */}
@@ -1391,6 +1479,19 @@ const DesignSystem = () => {
                 ))}
               </div>
             </section>
+
+            {/* Loading States Section */}
+            <section>
+              <h2 className="text-title font-bold text-foreground mb-8 flex items-center gap-3">
+                <Loader className="h-6 w-6 text-primary" />
+                Loading States
+              </h2>
+              
+              <LoadingStatesShowcase 
+                activeModal={activeModal} 
+                setActiveModal={setActiveModal}
+              />
+            </section>
           </TabsContent>
 
             {/* Missing Components Tab */}
@@ -1435,14 +1536,6 @@ const DesignSystem = () => {
                 ))}
               </div>
             </section>
-          </TabsContent>
-
-            {/* Loading States Tab */}
-          <TabsContent value="loading" className="space-y-8">
-            <LoadingStatesShowcase 
-              activeModal={activeModal} 
-              setActiveModal={setActiveModal}
-            />
           </TabsContent>
 
           {/* Experiments Tab */}
