@@ -261,7 +261,7 @@ export const useN8nAnalysis = () => {
               job_title: jobDescriptionJson.jobTitle || 'Unknown Position',
               company_name: jobDescriptionJson.companyName || 'Unknown Company',
               compatibility_score: 85, // Default score for test data
-              pdf_file_data: pdfData ? Buffer.from(pdfData, 'base64') : null,
+              pdf_file_data: pdfData,
               html_file_data: htmlData,
               pdf_file_name: 'analysis-report.pdf',
               html_file_name: 'analysis-report.html',
