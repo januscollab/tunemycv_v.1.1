@@ -35,7 +35,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Breadcrumbs from '@/components/navigation/Breadcrumbs';
 import StepIndicator from '@/components/ui/step-indicator';
 import N8nDebugModal from '@/components/debug/N8nDebugModal';
-
+import EnhancedAnalysisHistory from '@/components/analysis/EnhancedAnalysisHistory';
 
 const AnalyzeCV = () => {
   const { user } = useAuth();
@@ -244,16 +244,21 @@ const AnalyzeCV = () => {
     toast({ title: 'Success', description: 'CV selected successfully!' });
   };
 
-  const handleJobDescriptionSet = (uploadedFile: UploadedFile) => {
+  const handleJobDescriptionSet = (uploadedFile: UploadedFile | undefined) => {
     setUploadedFiles(prev => ({
       ...prev,
       jobDescription: uploadedFile
     }));
 
-    // Auto-extract job title from job description
-    if (!jobTitle) {
-      const extractedJobTitle = extractJobTitleFromText(uploadedFile.extractedText);
-      setJobTitle(extractedJobTitle);
+    if (uploadedFile) {
+      // Auto-extract job title from job description
+      if (!jobTitle) {
+        const extractedJobTitle = extractJobTitleFromText(uploadedFile.extractedText);
+        setJobTitle(extractedJobTitle);
+      }
+    } else {
+      // Clear job title when job description is removed
+      setJobTitle('');
     }
   };
 
@@ -658,7 +663,7 @@ const AnalyzeCV = () => {
 
               {/* Analysis History Tab */}
               <TabsContent value="history" className="mt-0">
-                <AnalysisHistory 
+                <EnhancedAnalysisHistory 
                   onSelectAnalysis={handleHistorySelect}
                 />
               </TabsContent>
