@@ -1,5 +1,7 @@
+
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface RetryLog {
   url: string;
@@ -28,6 +30,7 @@ interface N8nAnalysisResponse {
     webhookError: string | null;
   };
   retryLogs?: RetryLog[];
+  analysisResultId?: string;
 }
 
 export const useN8nAnalysis = () => {
@@ -243,15 +246,52 @@ export const useN8nAnalysis = () => {
         });
       }
 
+      // Store the analysis result in the database
+      let analysisResultId: string | undefined;
+      
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user) {
+          const { data: analysisResult, error: dbError } = await supabase
+            .from('analysis_results')
+            .insert({
+              user_id: user.id,
+              analysis_type: 'n8n',
+              job_title: jobDescriptionJson.jobTitle || 'Unknown Position',
+              company_name: jobDescriptionJson.companyName || 'Unknown Company',
+              compatibility_score: 85, // Default score for test data
+              pdf_file_data: pdfData ? Buffer.from(pdfData, 'base64') : null,
+              html_file_data: htmlData,
+              pdf_file_name: 'analysis-report.pdf',
+              html_file_name: 'analysis-report.html',
+              n8n_pdf_url: 'https://aohrfehhyjdebaatzqdl.supabase.co/storage/v1/object/public/n8n-bucket/response/test-output.pdf',
+              n8n_html_url: 'https://aohrfehhyjdebaatzqdl.supabase.co/storage/v1/object/public/n8n-bucket/response/test-output.html',
+              executive_summary: 'This is a test analysis result generated for development purposes.'
+            })
+            .select('id')
+            .single();
+
+          if (dbError) {
+            console.error('Error storing analysis result:', dbError);
+          } else if (analysisResult) {
+            analysisResultId = analysisResult.id;
+            console.log('Analysis result stored with ID:', analysisResultId);
+          }
+        }
+      } catch (dbError) {
+        console.error('Database operation failed:', dbError);
+      }
+
       // Show debug info
       toast({
-        title: "Debug Information",
-        description: `Network: ${networkTestResult}, Webhook: ${webhookStatus}, Files: ${htmlData ? 'HTML ✓' : 'HTML ✗'} ${pdfData ? 'PDF ✓' : 'PDF ✗'}`,
+        title: "Analysis Complete",
+        description: `Files processed: ${htmlData ? 'HTML ✓' : 'HTML ✗'} ${pdfData ? 'PDF ✓' : 'PDF ✗'}`,
       });
 
       return {
         success: true,
-        message: 'Debug analysis complete with test files',
+        message: 'Analysis complete with test files',
         test_files: {
           html: 'https://aohrfehhyjdebaatzqdl.supabase.co/storage/v1/object/public/n8n-bucket/response/test-output.html',
           pdf: 'https://aohrfehhyjdebaatzqdl.supabase.co/storage/v1/object/public/n8n-bucket/response/test-output.pdf'
@@ -264,7 +304,8 @@ export const useN8nAnalysis = () => {
           webhookResponse,
           webhookError
         },
-        retryLogs
+        retryLogs,
+        analysisResultId
       };
 
     } catch (error) {

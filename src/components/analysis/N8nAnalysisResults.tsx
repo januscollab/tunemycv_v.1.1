@@ -1,7 +1,8 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, Eye, FileText, Globe, Download } from 'lucide-react';
+import { ExternalLink, Eye, FileText, Globe, Download, History } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { DownloadMenu } from '@/components/ui/download-menu';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -30,7 +31,8 @@ const N8nAnalysisResults: React.FC<N8nAnalysisResultsProps> = ({
   onStartNew,
   readOnly = false
 }) => {
-  const [activeTab, setActiveTab] = useState('summary');
+  const [activeTab, setActiveTab] = useState('view-analysis');
+  
   const handlePreview = (url: string, type: string) => {
     // Open in new tab for preview
     window.open(url, '_blank', 'noopener,noreferrer');
@@ -62,9 +64,9 @@ const N8nAnalysisResults: React.FC<N8nAnalysisResultsProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-display font-bold text-foreground">n8n Analysis Results</h2>
+          <h2 className="text-display font-bold text-foreground">CV Analysis Results</h2>
           <p className="text-subheading text-earth/70 dark:text-white/70 mt-1">
-            Your documents have been processed through our advanced n8n workflow
+            Your documents have been processed through our advanced analysis workflow
           </p>
         </div>
         {!readOnly && onStartNew && (
@@ -74,25 +76,21 @@ const N8nAnalysisResults: React.FC<N8nAnalysisResultsProps> = ({
         )}
       </div>
 
-      {/* Tabs for Summary and PDF Viewer */}
+      {/* Tabs for View Analysis and History */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 mb-6">
-          <TabsTrigger value="summary" className="flex items-center space-x-2">
-            <FileText className="h-4 w-4" />
-            <span>Analysis Summary</span>
-          </TabsTrigger>
-          <TabsTrigger 
-            value="pdf-viewer" 
-            className="flex items-center space-x-2"
-            disabled={!result.pdf_file_data}
-          >
+          <TabsTrigger value="view-analysis" className="flex items-center space-x-2">
             <Eye className="h-4 w-4" />
-            <span>View PDF Report</span>
+            <span>View Analysis</span>
+          </TabsTrigger>
+          <TabsTrigger value="history" className="flex items-center space-x-2">
+            <History className="h-4 w-4" />
+            <span>History</span>
           </TabsTrigger>
         </TabsList>
 
-        {/* Summary Tab */}
-        <TabsContent value="summary" className="mt-0">
+        {/* View Analysis Tab */}
+        <TabsContent value="view-analysis" className="mt-0">
           <div className="space-y-6">
             {/* Analysis Summary */}
             <Card className="border border-apple-core/20 dark:border-citrus/20">
@@ -148,7 +146,25 @@ const N8nAnalysisResults: React.FC<N8nAnalysisResultsProps> = ({
               </CardContent>
             </Card>
 
-            {/* Analysis Reports */}
+            {/* PDF Viewer */}
+            {result.pdf_file_data ? (
+              <PDFViewer
+                pdfData={result.pdf_file_data}
+                fileName={result.pdf_file_name || 'analysis-report.pdf'}
+                title="Analysis Report"
+              />
+            ) : (
+              <Card className="border border-apple-core/20 dark:border-citrus/20">
+                <CardContent className="text-center py-8">
+                  <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-600 dark:text-gray-400">
+                    PDF report not available for this analysis
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Download Options */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* HTML Report */}
               {result.n8n_html_url && (
@@ -235,50 +251,53 @@ const N8nAnalysisResults: React.FC<N8nAnalysisResultsProps> = ({
                 </Card>
               )}
             </div>
-
-            {/* Additional Information */}
-            <Card className="border border-apple-core/20 dark:border-citrus/20 bg-apple-core/5 dark:bg-citrus/5">
-              <CardContent className="pt-6">
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-8 h-8 bg-zapier-orange/10 rounded-full flex items-center justify-center">
-                    <FileText className="h-4 w-4 text-zapier-orange" />
-                  </div>
-                  <div>
-                    <h4 className="text-heading font-semibold text-blueberry dark:text-citrus mb-2">
-                      About Your n8n Analysis
-                    </h4>
-                    <p className="text-caption text-blueberry/70 dark:text-apple-core/80">
-                      Your documents were processed using our advanced n8n workflow, which provides comprehensive analysis 
-                      and generates both interactive HTML and downloadable PDF reports. These reports contain detailed 
-                      insights about CV-job compatibility, keyword analysis, and actionable recommendations.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
           </div>
         </TabsContent>
 
-        {/* PDF Viewer Tab */}
-        <TabsContent value="pdf-viewer" className="mt-0">
-          {result.pdf_file_data ? (
-            <PDFViewer
-              pdfData={result.pdf_file_data}
-              fileName={result.pdf_file_name || 'n8n-analysis-report.pdf'}
-              title="n8n Analysis Report"
-            />
-          ) : (
-            <Card className="border border-apple-core/20 dark:border-citrus/20">
-              <CardContent className="text-center py-8">
-                <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+        {/* History Tab */}
+        <TabsContent value="history" className="mt-0">
+          <Card className="border border-apple-core/20 dark:border-citrus/20">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <History className="h-5 w-5 text-zapier-orange" />
+                Analysis History
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8">
+                <History className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                  History Coming Soon
+                </h3>
                 <p className="text-gray-600 dark:text-gray-400">
-                  PDF report not available for this analysis
+                  Your analysis history will be displayed here. This feature is being developed.
                 </p>
-              </CardContent>
-            </Card>
-          )}
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Additional Information */}
+      <Card className="border border-apple-core/20 dark:border-citrus/20 bg-apple-core/5 dark:bg-citrus/5">
+        <CardContent className="pt-6">
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0 w-8 h-8 bg-zapier-orange/10 rounded-full flex items-center justify-center">
+              <FileText className="h-4 w-4 text-zapier-orange" />
+            </div>
+            <div>
+              <h4 className="text-heading font-semibold text-blueberry dark:text-citrus mb-2">
+                About Your Analysis
+              </h4>
+              <p className="text-caption text-blueberry/70 dark:text-apple-core/80">
+                Your documents were processed using our advanced analysis workflow, which provides comprehensive analysis 
+                and generates both interactive HTML and downloadable PDF reports. These reports contain detailed 
+                insights about CV-job compatibility, keyword analysis, and actionable recommendations.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

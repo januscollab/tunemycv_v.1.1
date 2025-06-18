@@ -1,115 +1,131 @@
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, Download, ExternalLink } from 'lucide-react';
+
+import React, { useEffect, useRef, useState } from 'react';
+import { Loader2, FileText, Download, ZoomIn, ZoomOut, RotateCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface PDFViewerProps {
-  pdfData?: string; // Base64 encoded PDF data
-  pdfUrl?: string; // Direct URL to PDF
+  pdfData: string; // base64 encoded PDF data
   fileName?: string;
   title?: string;
-  onDownload?: () => void;
+  className?: string;
 }
 
 const PDFViewer: React.FC<PDFViewerProps> = ({
   pdfData,
-  pdfUrl,
-  fileName = 'analysis-report.pdf',
-  title = 'Analysis Report',
-  onDownload
+  fileName = 'document.pdf',
+  title = 'PDF Document',
+  className = ''
 }) => {
-  const getPdfSource = () => {
-    if (pdfData) {
-      return `data:application/pdf;base64,${pdfData}`;
-    }
-    return pdfUrl;
-  };
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  const handleDownload = () => {
-    if (onDownload) {
-      onDownload();
+  useEffect(() => {
+    if (!pdfData) {
+      setError('No PDF data provided');
+      setIsLoading(false);
       return;
     }
 
-    const source = getPdfSource();
-    if (source) {
-      const link = document.createElement('a');
-      link.href = source;
-      link.download = fileName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+    try {
+      // Convert base64 to blob
+      const binaryString = atob(pdfData);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      
+      const blob = new Blob([bytes], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      setPdfUrl(url);
+      setIsLoading(false);
+    } catch (err) {
+      console.error('Error creating PDF blob:', err);
+      setError('Failed to load PDF document');
+      setIsLoading(false);
     }
+
+    return () => {
+      if (pdfUrl) {
+        URL.revokeObjectURL(pdfUrl);
+      }
+    };
+  }, [pdfData]);
+
+  const handleDownload = () => {
+    if (!pdfUrl) return;
+    
+    const link = document.createElement('a');
+    link.href = pdfUrl;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
-  const handleOpenExternal = () => {
-    const source = getPdfSource();
-    if (source) {
-      window.open(source, '_blank', 'noopener,noreferrer');
-    }
-  };
-
-  const source = getPdfSource();
-
-  if (!source) {
+  if (isLoading) {
     return (
-      <Card className="border border-apple-core/20 dark:border-citrus/20">
-        <CardContent className="text-center py-8">
-          <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-600 dark:text-gray-400">
-            PDF not available
-          </p>
+      <Card className={className}>
+        <CardContent className="flex items-center justify-center py-12">
+          <div className="text-center space-y-4">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
+            <p className="text-muted-foreground">Loading PDF document...</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error || !pdfUrl) {
+    return (
+      <Card className={className}>
+        <CardContent className="flex items-center justify-center py-12">
+          <div className="text-center space-y-4">
+            <FileText className="h-12 w-12 mx-auto text-muted-foreground" />
+            <div>
+              <h3 className="font-semibold text-foreground mb-2">Unable to Load PDF</h3>
+              <p className="text-muted-foreground">{error || 'PDF document could not be displayed'}</p>
+            </div>
+          </div>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <div className="space-y-4">
-      {/* Header with actions */}
-      <Card className="border border-apple-core/20 dark:border-citrus/20">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-zapier-orange" />
-              {title}
-            </CardTitle>
-            <div className="flex gap-2">
-              <Button
-                onClick={handleDownload}
-                variant="outline"
-                size="sm"
-              >
-                <Download className="h-4 w-4 mr-2" />
-                Download
-              </Button>
-              <Button
-                onClick={handleOpenExternal}
-                variant="outline"
-                size="sm"
-              >
-                <ExternalLink className="h-4 w-4 mr-2" />
-                Open in New Tab
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-      </Card>
-
-      {/* PDF Viewer */}
-      <Card className="border border-apple-core/20 dark:border-citrus/20">
-        <CardContent className="p-0">
-          <div className="relative w-full h-[800px] bg-gray-50 dark:bg-gray-900">
-            <iframe
-              src={source}
-              className="w-full h-full border-0"
-              title={title}
-              style={{ minHeight: '600px' }}
-            />
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+    <Card className={className}>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            <FileText className="h-5 w-5" />
+            {title}
+          </CardTitle>
+          <Button
+            onClick={handleDownload}
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2"
+          >
+            <Download className="h-4 w-4" />
+            Download
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent className="p-0">
+        <div className="w-full h-[600px] border rounded-b-lg overflow-hidden">
+          <iframe
+            ref={iframeRef}
+            src={pdfUrl}
+            className="w-full h-full border-0"
+            title={title}
+            onLoad={() => setIsLoading(false)}
+            onError={() => setError('Failed to display PDF')}
+          />
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

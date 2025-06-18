@@ -80,31 +80,11 @@ export const AIReplacementDialog: React.FC<AIReplacementDialogProps> = ({
                   step="1"
                   value={creativityLevel}
                   onChange={(e) => updateCreativityLevel(parseInt(e.target.value))}
-                  className="w-full h-2 bg-primary/20 rounded-lg appearance-none cursor-pointer slider"
+                  className="w-full h-2 bg-primary/20 rounded-lg appearance-none cursor-pointer"
+                  style={{
+                    background: `linear-gradient(to right, #3b82f6 0%, #6366f1 33%, #8b5cf6 66%, #ec4899 100%)`
+                  }}
                 />
-                
-                <style jsx>{`
-                  .slider::-webkit-slider-thumb {
-                    appearance: none;
-                    width: 16px;
-                    height: 16px;
-                    border-radius: 50%;
-                    background: hsl(var(--primary));
-                    border: 2px solid white;
-                    cursor: pointer;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-                  }
-                  
-                  .slider::-moz-range-thumb {
-                    width: 16px;
-                    height: 16px;
-                    border-radius: 50%;
-                    background: hsl(var(--primary));
-                    border: 2px solid white;
-                    cursor: pointer;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-                  }
-                `}</style>
               </div>
 
               {/* Level Labels */}
