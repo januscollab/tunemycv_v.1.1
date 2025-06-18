@@ -591,7 +591,7 @@ const InterviewToolkit = () => {
                 <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm z-10">
                   <Card className="max-w-md mx-4 border-2 border-orange-200 bg-orange-50 dark:bg-orange-950 dark:border-orange-800">
                     <CardContent className="text-center py-8">
-                      <MessageSquare className="h-12 w-12 text-orange-600 mx-auto mb-4" />
+                      <Clock className="h-12 w-12 text-orange-600 mx-auto mb-4" />
                       <h3 className="text-heading font-semibold text-orange-800 dark:text-orange-200 mb-2">
                         Coming Soon!
                       </h3>
@@ -669,7 +669,7 @@ const InterviewToolkit = () => {
                 <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm z-10">
                   <Card className="max-w-md mx-4 border-2 border-orange-200 bg-orange-50 dark:bg-orange-950 dark:border-orange-800">
                     <CardContent className="text-center py-8">
-                      <History className="h-12 w-12 text-orange-600 mx-auto mb-4" />
+                      <Clock className="h-12 w-12 text-orange-600 mx-auto mb-4" />
                       <h3 className="text-heading font-semibold text-orange-800 dark:text-orange-200 mb-2">
                         Coming Soon!
                       </h3>
