@@ -1,3 +1,4 @@
+
 import * as React from "react"
 import { useState, useRef, useEffect } from "react"
 import { 
@@ -18,12 +19,14 @@ import {
 import { AIReplacementDialog } from "@/components/ui/ai-replacement-dialog"
 import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
+import { useCreativitySlider } from "@/hooks/useCreativitySlider"
 
 interface AIAction {
   type: 'rephrase' | 'improve' | 'adjust_length' | 'role_specific'
   subType?: string
   selectedText: string
   context: string
+  temperature: number
 }
 
 interface AIContextMenuProps {
@@ -46,6 +49,7 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
   disabled = false
 }) => {
   const { toast } = useToast()
+  const { creativityLevel, updateCreativityLevel, getCurrentLevel, getTemperature, levels } = useCreativitySlider()
   const [showReplacementDialog, setShowReplacementDialog] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [generatedText, setGeneratedText] = useState("")
@@ -82,7 +86,8 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
         body: JSON.stringify({
           selectedText: currentSelectedText,
           action: { type, subType },
-          context: "editor"
+          context: "editor",
+          temperature: getTemperature()
         })
       })
 
@@ -326,31 +331,73 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
               )}
 
               {/* AI Creativity Slider */}
-              <div className="px-2.5 py-2 mt-2 border-t border-primary-500/30">
-                <div className="flex items-center justify-between mb-2">
+              <div className="px-2.5 py-3 mt-2 border-t border-primary-500/30">
+                <div className="flex items-center justify-between mb-3">
                   <span className="text-micro font-medium text-primary-foreground/90">AI Creativity</span>
                   <Brain className="w-3.5 h-3.5 text-primary-foreground/70" />
                 </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-tiny text-primary-foreground/60">
-                    <span>Conservative</span>
-                    <span>Creative</span>
+                
+                <div className="space-y-3">
+                  {/* Current Level Display */}
+                  <div className="text-center">
+                    <div className="text-tiny font-semibold text-primary-foreground/90">
+                      {getCurrentLevel().label}
+                    </div>
+                    <div className="text-tiny text-primary-foreground/70">
+                      {getCurrentLevel().description}
+                    </div>
                   </div>
-                  <input
-                    type="range"
-                    min="0"
-                    max="2"
-                    step="1"
-                    defaultValue="1"
-                    className="w-full h-1.5 bg-primary-500/20 rounded-lg appearance-none cursor-pointer"
-                    style={{
-                      background: 'linear-gradient(to right, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)'
-                    }}
-                  />
-                  <div className="flex justify-between text-tiny text-primary-foreground/70 font-medium">
-                    <span>Precise</span>
-                    <span>Balanced</span>
-                    <span>Creative</span>
+
+                  {/* Slider */}
+                  <div className="relative">
+                    <input
+                      type="range"
+                      min="0"
+                      max="3"
+                      step="1"
+                      value={creativityLevel}
+                      onChange={(e) => updateCreativityLevel(parseInt(e.target.value))}
+                      className="w-full h-2 bg-primary-500/30 rounded-lg appearance-none cursor-pointer slider"
+                      style={{
+                        background: `linear-gradient(to right, 
+                          #3b82f6 0%, 
+                          #6366f1 33%, 
+                          #8b5cf6 66%, 
+                          #ec4899 100%)`
+                      }}
+                    />
+                    
+                    {/* Slider Track Styling */}
+                    <style jsx>{`
+                      .slider::-webkit-slider-thumb {
+                        appearance: none;
+                        width: 16px;
+                        height: 16px;
+                        border-radius: 50%;
+                        background: #ffffff;
+                        border: 2px solid #6366f1;
+                        cursor: pointer;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                      }
+                      
+                      .slider::-moz-range-thumb {
+                        width: 16px;
+                        height: 16px;
+                        border-radius: 50%;
+                        background: #ffffff;
+                        border: 2px solid #6366f1;
+                        cursor: pointer;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                      }
+                    `}</style>
+                  </div>
+
+                  {/* Level Labels */}
+                  <div className="flex justify-between text-tiny text-primary-foreground/60">
+                    <span>Safe</span>
+                    <span>Measured</span>
+                    <span>Bold</span>
+                    <span>Visionary</span>
                   </div>
                 </div>
               </div>

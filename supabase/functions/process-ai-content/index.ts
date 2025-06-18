@@ -1,3 +1,4 @@
+
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
@@ -15,6 +16,7 @@ interface AIContentRequest {
     subType?: string;
   };
   context?: string;
+  temperature?: number;
 }
 
 function generatePrompt(selectedText: string, action: AIContentRequest['action']): string {
@@ -75,11 +77,16 @@ serve(async (req) => {
       throw new Error('OpenAI API key not configured');
     }
 
-    const { selectedText, action, context }: AIContentRequest = await req.json();
+    const { selectedText, action, context, temperature = 0.7 }: AIContentRequest = await req.json();
 
     if (!selectedText || selectedText.trim().length < 10) {
       throw new Error('Selected text must be at least 10 characters long');
     }
+
+    // Ensure temperature is within valid range (0.0 to 2.0)
+    const validTemperature = Math.max(0.0, Math.min(2.0, temperature));
+
+    console.log(`Processing AI content with temperature: ${validTemperature}`);
 
     const prompt = generatePrompt(selectedText, action);
 
@@ -98,7 +105,7 @@ serve(async (req) => {
           },
           { role: 'user', content: prompt }
         ],
-        temperature: 0.7,
+        temperature: validTemperature,
         max_tokens: Math.max(selectedText.length * 2, 500),
       }),
     });
@@ -124,7 +131,8 @@ serve(async (req) => {
     return new Response(JSON.stringify({ 
       originalText: selectedText,
       processedText: generatedText,
-      action 
+      action,
+      temperature: validTemperature
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
