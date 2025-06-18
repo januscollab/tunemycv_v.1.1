@@ -1114,7 +1114,90 @@ const DesignSystem = () => {
                   </CardContent>
                 </Card>
 
-
+                {/* CategoryDocumentHistory */}
+                <Card className="group hover:shadow-lg transition-all duration-300">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-subheading">CategoryDocumentHistory</CardTitle>
+                      <Badge variant="default" className="text-micro">Current</Badge>
+                    </div>
+                    <p className="text-caption text-muted-foreground">
+                      Advanced document history component with filtering, pagination, and customizable actions for both analyses and cover letters.
+                    </p>
+                    <div className="text-micro text-muted-foreground mt-2">
+                      <strong>Used in:</strong> Cover Letter page and Interview Toolkit page for history tabs (8 usages)
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="bg-muted/30 p-4 rounded-lg">
+                      <CategoryDocumentHistory
+                        className="w-full"
+                        header={{
+                          title: "Document History",
+                          totalCount: 3,
+                          itemsPerPage: 10,
+                          onItemsPerPageChange: () => {},
+                          showPagination: true,
+                          showFilter: true
+                        }}
+                        documents={[
+                          {
+                            id: '1',
+                            type: 'analysis',
+                            title: 'Program Director',
+                            job_title: 'Program Director',
+                            company_name: 'Oracle',
+                            created_at: '2025-06-14T23:57:00Z',
+                            compatibility_score: 88,
+                            has_cover_letter: true,
+                            executive_summary: 'Strong candidate with relevant experience',
+                            strengths: ['Leadership', 'Strategic Planning'],
+                            weaknesses: ['Communication'],
+                            recommendations: ['Improve presentation skills']
+                          },
+                          {
+                            id: '2',
+                            type: 'cover_letter',
+                            title: 'Software Engineer Cover Letter',
+                            job_title: 'Software Engineer',
+                            company_name: 'TechCorp',
+                            created_at: '2025-06-13T15:30:00Z',
+                            content: 'Dear Hiring Manager...',
+                            regeneration_count: 2,
+                            analysis_result_id: 'analysis-123'
+                          }
+                        ]}
+                        actions={[
+                          {
+                            label: 'View',
+                            icon: <Eye className="h-4 w-4 mr-2" />,
+                            onClick: (doc) => console.log('View:', doc.title)
+                          },
+                          {
+                            label: 'Download',
+                            icon: <Download className="h-4 w-4 mr-2" />,
+                            onClick: (doc) => console.log('Download:', doc.title)
+                          },
+                          {
+                            label: 'Delete',
+                            icon: <Trash2 className="h-4 w-4 mr-2" />,
+                            onClick: (doc) => console.log('Delete:', doc.title),
+                            variant: 'destructive'
+                          }
+                        ]}
+                        emptyState={{
+                          title: "No documents found",
+                          description: "You haven't created any analyses or cover letters yet."
+                        }}
+                        pagination={{
+                          currentPage: 1,
+                          totalPages: 1,
+                          onPageChange: () => {}
+                        }}
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
 
                 {/* DocumentHistory (Profile) */}
                 <Card className="group hover:shadow-lg transition-all duration-300">
