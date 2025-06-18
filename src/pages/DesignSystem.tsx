@@ -29,6 +29,8 @@ import { MockPaymentModal } from '@/components/ui/mock-payment-modal';
 import { StepIndicator } from '@/components/ui/step-indicator';
 import { ProgressIndicator } from '@/components/ui/progress-indicator';
 import EnhancedAnalysisHistory from '@/components/analysis/EnhancedAnalysisHistory';
+import { CategoryDocumentHistory } from '@/components/ui/category-document-history';
+import { DocumentHistory as ProfileDocumentHistory } from '@/components/ui/profile-document-history';
 
 
 const DesignSystem = () => {
@@ -949,31 +951,28 @@ const DesignSystem = () => {
                         header={{
                           title: "Sample Document History",
                           totalCount: 5,
-                          showCount: true
+                          itemsPerPage: 10,
+                          onItemsPerPageChange: () => {}
                         }}
                         documents={[
                           {
                             id: "1",
                             type: "cover_letter",
                             title: "Software Engineer Cover Letter",
-                            description: "Technical position at startup",
-                            date: new Date().toISOString(),
-                            size: "2.3 KB",
-                            status: "completed"
+                            created_at: new Date().toISOString(),
+                            job_title: "Software Engineer"
                           },
                           {
                             id: "2", 
                             type: "analysis",
                             title: "CV Analysis Report",
-                            description: "Compatibility analysis for Data Scientist role",
-                            date: new Date().toISOString(),
-                            size: "15.7 KB",
-                            status: "completed"
+                            created_at: new Date().toISOString(),
+                            compatibility_score: 85
                           }
                         ]}
                         actions={[
-                          { label: "View", action: () => {}, icon: "Eye" },
-                          { label: "Download", action: () => {}, icon: "Download" }
+                          { label: "View", onClick: () => {}, icon: <Eye className="h-4 w-4 mr-2" /> },
+                          { label: "Download", onClick: () => {}, icon: <Download className="h-4 w-4 mr-2" /> }
                         ]}
                         className="w-full"
                       />
@@ -998,33 +997,35 @@ const DesignSystem = () => {
                   <CardContent>
                     <div className="bg-muted/30 p-4 rounded-lg">
                       <ProfileDocumentHistory
+                        header={{
+                          title: "User Documents",
+                          totalCount: 2,
+                          filterType: "all",
+                          onFilterChange: () => {},
+                          itemsPerPage: 10,
+                          onItemsPerPageChange: () => {}
+                        }}
                         documents={[
                           {
                             id: "1",
-                            type: "cv",
+                            type: "analysis",
                             title: "Senior Developer CV",
-                            description: "Updated resume for senior positions",
-                            date: new Date().toISOString(),
-                            size: "3.2 KB",
-                            status: "active"
+                            created_at: new Date().toISOString(),
+                            compatibility_score: 92
                           },
                           {
                             id: "2",
                             type: "cover_letter", 
                             title: "Marketing Manager Application",
-                            description: "Cover letter for marketing role",
-                            date: new Date().toISOString(),
-                            size: "1.8 KB",
-                            status: "active"
+                            created_at: new Date().toISOString(),
+                            job_title: "Marketing Manager"
                           }
                         ]}
                         actions={[
-                          { label: "Edit", action: () => {}, icon: "Edit" },
-                          { label: "View", action: () => {}, icon: "Eye" },
-                          { label: "Download", action: () => {}, icon: "Download" }
+                          { label: "Edit", onClick: () => {}, icon: <Eye className="h-4 w-4 mr-2" /> },
+                          { label: "View", onClick: () => {}, icon: <Eye className="h-4 w-4 mr-2" /> },
+                          { label: "Download", onClick: () => {}, icon: <Download className="h-4 w-4 mr-2" /> }
                         ]}
-                        showPagination={true}
-                        itemsPerPage={10}
                         className="w-full"
                       />
                     </div>
