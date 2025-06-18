@@ -173,6 +173,26 @@ const N8nAnalysisResults: React.FC<N8nAnalysisResultsProps> = ({
               </p>
             </div>
           )}
+          
+          {/* Action Buttons */}
+          <div className="flex justify-end gap-2 mt-4">
+            <Button
+              onClick={handleHtmlPreview}
+              variant="outline"
+              size="sm"
+            >
+              <ExternalLink className="h-4 w-4 mr-2" />
+              Review in Browser
+            </Button>
+            <DownloadMenu
+              buttonText="Download"
+              variant="default"
+              size="sm"
+              onDownloadPDF={result.n8n_pdf_url ? () => handleDownload(result.n8n_pdf_url!, 'pdf') : undefined}
+              onDownloadWord={() => console.log('Word download not implemented for n8n reports')}
+              onDownloadText={() => console.log('Text download not implemented for n8n reports')}
+            />
+          </div>
         </CardContent>
       </Card>
 
@@ -194,93 +214,6 @@ const N8nAnalysisResults: React.FC<N8nAnalysisResultsProps> = ({
         </Card>
       )}
 
-      {/* Download Options */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* HTML Report */}
-        {(result.html_file_data || result.n8n_html_url) && (
-          <Card className="border border-apple-core/20 dark:border-citrus/20">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Globe className="h-5 w-5 text-zapier-orange" />
-                Interactive HTML Report
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-caption text-blueberry/70 dark:text-apple-core/80">
-                View your analysis results in an interactive web format with detailed breakdowns and insights.
-              </p>
-              <div className="flex flex-col gap-2">
-                <Button
-                  onClick={handleHtmlPreview}
-                  variant="default"
-                  className="w-full"
-                >
-                  <Eye className="h-4 w-4 mr-2" />
-                  Preview HTML Report
-                </Button>
-                {result.n8n_html_url && (
-                  <Button
-                    onClick={() => handleExternalLink(result.n8n_html_url!)}
-                    variant="outline"
-                    className="w-full"
-                  >
-                    <ExternalLink className="h-4 w-4 mr-2" />
-                    Open in New Tab
-                  </Button>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* PDF Report */}
-        {result.n8n_pdf_url && (
-          <Card className="border border-apple-core/20 dark:border-citrus/20">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-zapier-orange" />
-                PDF Report
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-caption text-blueberry/70 dark:text-apple-core/80">
-                Download your analysis as a professional PDF document for printing or sharing.
-              </p>
-              <div className="flex flex-col gap-2">
-                <Button
-                  onClick={() => handlePreview(result.n8n_pdf_url!, 'pdf')}
-                  variant="default"
-                  className="w-full"
-                >
-                  <Eye className="h-4 w-4 mr-2" />
-                  Preview PDF Report
-                </Button>
-                <DownloadMenu
-                  buttonText="Download"
-                  variant="outline"
-                  className="w-full"
-                  onDownloadPDF={() => handleDownload(result.n8n_pdf_url!, 'pdf')}
-                  onDownloadHTML={() => handleDownload(result.n8n_html_url!, 'html')}
-                  onDownloadText={() => {
-                    console.log('Text download not implemented for n8n reports');
-                  }}
-                  onDownloadWord={() => {
-                    console.log('Word download not implemented for n8n reports');
-                  }}
-                />
-                <Button
-                  onClick={() => handleExternalLink(result.n8n_pdf_url!)}
-                  variant="outline"
-                  className="w-full"
-                >
-                  <ExternalLink className="h-4 w-4 mr-2" />
-                  Open in New Tab
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-      </div>
 
       {/* Additional Information */}
       <Card className="border border-apple-core/20 dark:border-citrus/20 bg-apple-core/5 dark:bg-citrus/5">
