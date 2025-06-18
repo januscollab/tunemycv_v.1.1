@@ -32,6 +32,12 @@ import EnhancedAnalysisHistory from '@/components/analysis/EnhancedAnalysisHisto
 import { CategoryDocumentHistory } from '@/components/ui/category-document-history';
 import { DocumentHistory as ProfileDocumentHistory } from '@/components/ui/profile-document-history';
 
+// Experimental component redesigns
+import EnhancedAnalysisHistoryA from '@/components/experiments/EnhancedAnalysisHistoryA';
+import EnhancedAnalysisHistoryB from '@/components/experiments/EnhancedAnalysisHistoryB';
+import CategoryDocumentHistoryA from '@/components/experiments/CategoryDocumentHistoryA';
+import CategoryDocumentHistoryB from '@/components/experiments/CategoryDocumentHistoryB';
+
 
 const DesignSystem = () => {
   const [activeModal, setActiveModal] = useState<string | null>(null);
@@ -1395,6 +1401,54 @@ const DesignSystem = () => {
                         </div>
                       </div>
                     </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Component Redesigns */}
+              <Card className="mb-8">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Layout className="h-5 w-5 text-primary" />
+                    Component Redesign Experiments
+                  </CardTitle>
+                  <p className="text-caption text-muted-foreground">
+                    Alternative designs for existing components - exploring different layouts and interaction patterns
+                  </p>
+                </CardHeader>
+                <CardContent className="space-y-8">
+                  {/* Enhanced Analysis History Options */}
+                  <div>
+                    <h4 className="text-heading font-semibold mb-4">Enhanced Analysis History</h4>
+                    <Tabs defaultValue="optionA" className="w-full">
+                      <TabsList className="grid w-full grid-cols-2">
+                        <TabsTrigger value="optionA">Option A - Organized Cards</TabsTrigger>
+                        <TabsTrigger value="optionB">Option B - Compact List</TabsTrigger>
+                      </TabsList>
+                      <TabsContent value="optionA" className="mt-6">
+                        <EnhancedAnalysisHistoryA />
+                      </TabsContent>
+                      <TabsContent value="optionB" className="mt-6">
+                        <EnhancedAnalysisHistoryB />
+                      </TabsContent>
+                    </Tabs>
+                  </div>
+                  
+                  {/* Category Document History Options */}
+                  <div>
+                    <h4 className="text-heading font-semibold mb-4">Category Document History</h4>
+                    <Tabs defaultValue="optionA" className="w-full">
+                      <TabsList className="grid w-full grid-cols-2">
+                        <TabsTrigger value="optionA">Option A - Enhanced Layout</TabsTrigger>
+                        <TabsTrigger value="optionB">Option B - Grid/List Toggle</TabsTrigger>
+                      </TabsList>
+                      <TabsContent value="optionA" className="mt-6">
+                        <CategoryDocumentHistoryA />
+                      </TabsContent>
+                      <TabsContent value="optionB" className="mt-6">
+                        <CategoryDocumentHistoryB />
+                      </TabsContent>
+                    </Tabs>
                   </div>
                 </CardContent>
               </Card>
