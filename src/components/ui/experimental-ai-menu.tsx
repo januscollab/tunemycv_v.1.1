@@ -64,10 +64,10 @@ const ExperimentalAIMenu: React.FC<ExperimentalAIMenuProps> = ({
 
   // Creativity levels configuration
   const CREATIVITY_LEVELS = [
-    { level: 0, temperature: 0.2, label: 'Safe & Professional', description: 'Conservative, formal language' },
-    { level: 1, temperature: 0.6, label: 'Confident but Measured', description: 'Balanced professional tone' },
-    { level: 2, temperature: 1.2, label: 'Bold & Memorable', description: 'Creative with impact' },
-    { level: 3, temperature: 1.6, label: 'Expressive and Visionary', description: 'Highly creative and unique' }
+    { level: 0, temperature: 0.2, label: 'Safe', description: 'Conservative, formal language' },
+    { level: 1, temperature: 0.6, label: 'Balanced', description: 'Balanced professional tone' },
+    { level: 2, temperature: 1.2, label: 'Bold', description: 'Creative with impact' },
+    { level: 3, temperature: 1.6, label: 'Visionary', description: 'Highly creative and unique' }
   ]
 
   const getCurrentLevel = () => CREATIVITY_LEVELS[creativityLevel]
@@ -469,25 +469,15 @@ const ExperimentalAIMenu: React.FC<ExperimentalAIMenuProps> = ({
                     </div>
                   ))}
 
-                  {/* AI Creativity Slider - Fixed Implementation */}
-                  <div className="mt-4 pt-4 border-t border-border/30">
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-sm font-medium text-foreground">AI Creativity Level</span>
-                      <Brain className="w-4 h-4 text-primary/70" />
+                  {/* Discreet AI Creativity Slider */}
+                  <div className="mt-3 pt-3 border-t border-border/20">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs text-muted-foreground">Creativity: {getCurrentLevel().label}</span>
+                      <Brain className="w-3 h-3 text-muted-foreground/60" />
                     </div>
                     
-                    <div className="space-y-3">
-                      {/* Current Level Display */}
-                      <div className="text-center">
-                        <div className="text-sm font-semibold text-primary">
-                          {getCurrentLevel().label}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {getCurrentLevel().description}
-                        </div>
-                      </div>
-
-                      {/* Slider */}
+                    <div className="space-y-1">
+                      {/* Compact Slider */}
                       <div className="relative">
                         <input
                           type="range"
@@ -496,16 +486,14 @@ const ExperimentalAIMenu: React.FC<ExperimentalAIMenuProps> = ({
                           step="1"
                           value={creativityLevel}
                           onChange={(e) => setCreativityLevel(parseInt(e.target.value))}
-                          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                          className="w-full h-1 bg-muted rounded-full appearance-none cursor-pointer compact-slider"
                         />
                       </div>
 
-                      {/* Level Labels */}
-                      <div className="flex justify-between text-xs text-muted-foreground">
+                      {/* Minimal Level Indicators */}
+                      <div className="flex justify-between text-[10px] text-muted-foreground/70">
                         <span>Safe</span>
-                        <span>Measured</span>
                         <span>Bold</span>
-                        <span>Visionary</span>
                       </div>
                     </div>
                   </div>
@@ -540,38 +528,43 @@ const ExperimentalAIMenu: React.FC<ExperimentalAIMenuProps> = ({
         />
       </div>
 
-      {/* Custom Slider Styles */}
+      {/* Compact Slider Styles */}
       <style dangerouslySetInnerHTML={{
         __html: `
-          .slider::-webkit-slider-track {
-            height: 8px;
-            background: linear-gradient(to right, #3b82f6 0%, #6366f1 33%, #8b5cf6 66%, #ec4899 100%);
-            border-radius: 4px;
+          .compact-slider::-webkit-slider-track {
+            height: 4px;
+            background: linear-gradient(to right, #10b981 0%, #3b82f6 33%, #8b5cf6 66%, #ec4899 100%);
+            border-radius: 2px;
           }
-          .slider::-webkit-slider-thumb {
+          .compact-slider::-webkit-slider-thumb {
             appearance: none;
-            height: 16px;
-            width: 16px;
+            height: 12px;
+            width: 12px;
             border-radius: 50%;
             background: white;
-            border: 2px solid #3b82f6;
+            border: 2px solid #6b7280;
             cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
           }
-          .slider::-moz-range-track {
-            height: 8px;
-            background: linear-gradient(to right, #3b82f6 0%, #6366f1 33%, #8b5cf6 66%, #ec4899 100%);
-            border-radius: 4px;
+          .compact-slider::-webkit-slider-thumb:hover {
+            border-color: #3b82f6;
+            transform: scale(1.1);
+          }
+          .compact-slider::-moz-range-track {
+            height: 4px;
+            background: linear-gradient(to right, #10b981 0%, #3b82f6 33%, #8b5cf6 66%, #ec4899 100%);
+            border-radius: 2px;
             border: none;
           }
-          .slider::-moz-range-thumb {
-            height: 16px;
-            width: 16px;
+          .compact-slider::-moz-range-thumb {
+            height: 12px;
+            width: 12px;
             border-radius: 50%;
             background: white;
-            border: 2px solid #3b82f6;
+            border: 2px solid #6b7280;
             cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
           }
         `
       }} />
