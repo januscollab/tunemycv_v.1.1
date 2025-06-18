@@ -527,110 +527,121 @@ const SprintManager = () => {
         <div className={`grid gap-6 ${sprintLayout === 'two' ? 'md:grid-cols-2' : 'grid-cols-1'}`}>
           {sprints
             .filter(sprint => !sprint.is_hidden)
-            .map((sprint) => (
-              <ModernCard key={sprint.id} className="h-fit animate-fade-in">
-                <ModernCardHeader className="pb-4">
-                  <div className="flex items-center gap-2">
-                    <ModernCardTitle className="text-lg">{sprint.name}</ModernCardTitle>
-                  </div>
-                </ModernCardHeader>
-                <ModernCardContent>
-                  <Droppable droppableId={sprint.id}>
-                    {(provided) => (
-                      <div
-                        {...provided.droppableProps}
-                        ref={provided.innerRef}
-                        className="space-y-3 min-h-[100px] mb-4"
-                      >
-                        {getTasksForSprint(sprint.id).map((task, index) => (
-                          <Draggable
-                            key={task.id}
-                            draggableId={task.id}
-                            index={index}
-                          >
-                            {(provided) => (
-                              <div
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                                className={`p-3 border rounded-lg bg-card hover:shadow-md transition-shadow ${
-                                  task.status === 'completed' ? 'opacity-70' : ''
-                                }`}
-                              >
-                                <div className="flex items-start justify-between mb-2">
-                                  <div 
-                                    className={`font-medium text-sm cursor-pointer ${
-                                      task.status === 'completed' ? 'line-through' : ''
-                                    }`}
-                                    onClick={() => handleEditTask(task)}
-                                  >
-                                    {task.title}
-                                  </div>
-                                  <div className="flex gap-1">
-                                     <button
-                                       onClick={(e) => {
-                                         e.stopPropagation();
-                                         handleToggleTaskStatus(task);
-                                       }}
-                                       className={`w-4 h-4 rounded border text-xs ${
-                                         task.status === 'completed' 
-                                           ? 'bg-green-500 text-white' 
-                                           : 'border-gray-300 hover:border-green-500'
-                                       }`}
-                                     >
-                                       {task.status === 'completed' ? '✓' : ''}
-                                     </button>
-                                     {task.status === 'completed' && (
+            .map((sprint) => {
+              const isBacklogSprint = sprint.name === 'Backlog - Future Enhancements';
+              const sprintTasks = getTasksForSprint(sprint.id);
+              
+              return (
+                <ModernCard 
+                  key={sprint.id} 
+                  className={`h-fit animate-fade-in ${isBacklogSprint ? 'md:col-span-2' : ''}`}
+                >
+                  <ModernCardHeader className="pb-4">
+                    <div className="flex items-center gap-2">
+                      <ModernCardTitle className="text-lg">{sprint.name}</ModernCardTitle>
+                    </div>
+                  </ModernCardHeader>
+                  <ModernCardContent>
+                    <Droppable droppableId={sprint.id}>
+                      {(provided) => (
+                        <div
+                          {...provided.droppableProps}
+                          ref={provided.innerRef}
+                          className={`min-h-[100px] mb-4 ${
+                            isBacklogSprint 
+                              ? 'grid md:grid-cols-2 gap-3' 
+                              : 'space-y-3'
+                          }`}
+                        >
+                          {sprintTasks.map((task, index) => (
+                            <Draggable
+                              key={task.id}
+                              draggableId={task.id}
+                              index={index}
+                            >
+                              {(provided) => (
+                                <div
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
+                                  className={`p-3 border rounded-lg bg-card hover:shadow-md transition-shadow ${
+                                    task.status === 'completed' ? 'opacity-70' : ''
+                                  }`}
+                                >
+                                  <div className="flex items-start justify-between mb-2">
+                                    <div 
+                                      className={`font-medium text-sm cursor-pointer ${
+                                        task.status === 'completed' ? 'line-through' : ''
+                                      }`}
+                                      onClick={() => handleEditTask(task)}
+                                    >
+                                      {task.title}
+                                    </div>
+                                    <div className="flex gap-1">
                                        <button
                                          onClick={(e) => {
                                            e.stopPropagation();
-                                           handleArchiveTask(task);
+                                           handleToggleTaskStatus(task);
                                          }}
-                                         className="w-4 h-4 text-blue-500 hover:text-blue-700 text-xs border border-blue-300 rounded bg-blue-50 hover:bg-blue-100 transition-colors"
-                                         title="Archive this story"
+                                         className={`w-4 h-4 rounded border text-xs ${
+                                           task.status === 'completed' 
+                                             ? 'bg-green-500 text-white' 
+                                             : 'border-gray-300 hover:border-green-500'
+                                         }`}
                                        >
-                                         📁
+                                         {task.status === 'completed' ? '✓' : ''}
                                        </button>
-                                     )}
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleDeleteTask(task);
-                                      }}
-                                      className="w-4 h-4 text-red-500 hover:text-red-700 text-xs"
+                                       {task.status === 'completed' && (
+                                         <button
+                                           onClick={(e) => {
+                                             e.stopPropagation();
+                                             handleArchiveTask(task);
+                                           }}
+                                           className="w-4 h-4 text-blue-500 hover:text-blue-700 text-xs border border-blue-300 rounded bg-blue-50 hover:bg-blue-100 transition-colors"
+                                           title="Archive this story"
+                                         >
+                                           📁
+                                         </button>
+                                       )}
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleDeleteTask(task);
+                                        }}
+                                        className="w-4 h-4 text-red-500 hover:text-red-700 text-xs"
+                                      >
+                                        ×
+                                      </button>
+                                    </div>
+                                  </div>
+                                  {task.description && (
+                                    <div className="text-xs text-muted-foreground mb-2">
+                                      {task.description.slice(0, 100)}...
+                                    </div>
+                                  )}
+                                  <div className="flex items-center gap-2">
+                                    <Badge 
+                                      variant="secondary" 
+                                      className={`text-xs ${getStatusColor(task.status)}`}
                                     >
-                                      ×
-                                    </button>
-                                  </div>
-                                </div>
-                                {task.description && (
-                                  <div className="text-xs text-muted-foreground mb-2">
-                                    {task.description.slice(0, 100)}...
-                                  </div>
-                                )}
-                                <div className="flex items-center gap-2">
-                                  <Badge 
-                                    variant="secondary" 
-                                    className={`text-xs ${getStatusColor(task.status)}`}
-                                  >
-                                    {task.status}
-                                  </Badge>
-                                  <Badge 
-                                    variant="secondary" 
-                                    className={`text-xs ${getPriorityColor(task.priority)}`}
-                                  >
-                                    {task.priority}
-                                  </Badge>
-                                  {task.tags.map((tag, idx) => (
-                                    <Badge key={idx} variant="outline" className="text-xs">
-                                      {tag}
+                                      {task.status}
                                     </Badge>
-                                  ))}
+                                    <Badge 
+                                      variant="secondary" 
+                                      className={`text-xs ${getPriorityColor(task.priority)}`}
+                                    >
+                                      {task.priority}
+                                    </Badge>
+                                    {task.tags.map((tag, idx) => (
+                                      <Badge key={idx} variant="outline" className="text-xs">
+                                        {tag}
+                                      </Badge>
+                                    ))}
+                                  </div>
                                 </div>
-                              </div>
-                            )}
-                          </Draggable>
-                        ))}
+                              )}
+                            </Draggable>
+                          ))}
                         {provided.placeholder}
                       </div>
                     )}
@@ -682,7 +693,8 @@ const SprintManager = () => {
                   </div>
                 </ModernCardContent>
               </ModernCard>
-            ))}
+              );
+            })}
         </div>
       </DragDropContext>
 

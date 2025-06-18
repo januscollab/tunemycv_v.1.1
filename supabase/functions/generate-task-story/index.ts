@@ -104,23 +104,63 @@ Important: Respond ONLY with valid JSON, no additional text or formatting.`;
       throw new Error('No content generated from OpenAI');
     }
 
-    // Try to parse JSON response
+    // Enhanced JSON parsing with content sanitization
     let result;
     try {
-      result = JSON.parse(content);
+      // Clean up potential JSON artifacts from content
+      const cleanContent = content.trim().replace(/^```json\s*/, '').replace(/\s*```$/, '');
+      
+      result = JSON.parse(cleanContent);
       if (!result.title || !result.description) {
         throw new Error('Invalid response format');
       }
-    } catch (parseError) {
-      // Fallback: create structured response from raw content
-      const lines = content.split('\n').filter(line => line.trim());
-      const titleLine = lines.find(line => line.toLowerCase().includes('as a')) || 
-                       `As a user, I want ${storyInfo}, so that I can achieve my goals`;
+
+      // Sanitize title and description to remove JSON artifacts
+      result.title = sanitizeText(result.title);
+      result.description = sanitizeText(result.description);
       
+    } catch (parseError) {
+      console.log('JSON parse failed, using fallback extraction');
+      
+      // Enhanced fallback: extract title and description from raw content
+      const cleanedContent = sanitizeText(content);
+      const lines = cleanedContent.split('\n').filter(line => line.trim());
+      
+      // Look for title pattern
+      let titleLine = lines.find(line => 
+        line.toLowerCase().includes('as a') && 
+        line.toLowerCase().includes('i want') &&
+        line.toLowerCase().includes('so that')
+      );
+      
+      if (!titleLine) {
+        titleLine = `As a user, I want ${storyInfo}, so that I can achieve my goals`;
+      }
+      
+      // Use cleaned content for description
       result = {
         title: titleLine,
-        description: content
+        description: cleanedContent
       };
+    }
+
+    // Helper function to sanitize text content
+    function sanitizeText(text: string): string {
+      if (!text) return '';
+      
+      return text
+        // Remove JSON structure artifacts
+        .replace(/^["'\s]*{[\s\S]*?["'\s]*title["'\s]*:\s*["']/, '')
+        .replace(/["'\s]*,?\s*["'\s]*description["'\s]*:\s*["'][\s\S]*$/, '')
+        // Remove JSON key prefixes
+        .replace(/^["'\s]*title["'\s]*:\s*["']?/, '')
+        .replace(/^["'\s]*description["'\s]*:\s*["']?/, '')
+        // Remove trailing JSON artifacts
+        .replace(/["'\s]*}?\s*$/, '')
+        .replace(/["'\s]*,?\s*$/, '')
+        // Clean up quotes and whitespace
+        .replace(/^["'\s]+|["'\s]+$/g, '')
+        .trim();
     }
 
     return new Response(JSON.stringify(result), {
