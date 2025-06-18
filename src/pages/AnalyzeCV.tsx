@@ -198,6 +198,36 @@ const AnalyzeCV = () => {
     }
   };
 
+  // Handle history selection - fixed missing function
+  const handleHistorySelect = (analysis: any) => {
+    console.log('History selection:', analysis);
+    
+    // Handle PDF data conversion if it exists
+    let processedAnalysis = { ...analysis };
+    if (analysis.pdf_file_data) {
+      // If PDF data is a string, keep it as is. If it's binary, convert it
+      if (typeof analysis.pdf_file_data === 'string') {
+        processedAnalysis.pdf_file_data = analysis.pdf_file_data;
+      } else {
+        // Handle binary data conversion if needed
+        try {
+          const uint8Array = new Uint8Array(analysis.pdf_file_data);
+          let binaryString = '';
+          for (let i = 0; i < uint8Array.length; i++) {
+            binaryString += String.fromCharCode(uint8Array[i]);
+          }
+          processedAnalysis.pdf_file_data = btoa(binaryString);
+        } catch (error) {
+          console.error('Error converting PDF data:', error);
+          processedAnalysis.pdf_file_data = null;
+        }
+      }
+    }
+    
+    setViewedAnalysis(processedAnalysis);
+    setActiveTab('view-analysis');
+  };
+
   // Clear URL state after it's been processed
   React.useEffect(() => {
     if (navigationState) {
@@ -275,21 +305,7 @@ const AnalyzeCV = () => {
           .single();
         
         if (analysisData) {
-          // Convert PDF data back to base64 string for display
-          let pdfDataForDisplay = null;
-          if (analysisData.pdf_file_data) {
-            const uint8Array = new Uint8Array(analysisData.pdf_file_data);
-            let binaryString = '';
-            for (let i = 0; i < uint8Array.length; i++) {
-              binaryString += String.fromCharCode(uint8Array[i]);
-            }
-            pdfDataForDisplay = btoa(binaryString);
-          }
-          
-          setViewedAnalysis({
-            ...analysisData,
-            pdf_file_data: pdfDataForDisplay
-          });
+          setViewedAnalysis(analysisData);
           setActiveTab('view-analysis');
         }
       }

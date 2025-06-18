@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -299,7 +298,7 @@ export const useN8nAnalysis = () => {
               job_title: jobInfo.job_title || 'Unknown Position',
               company_name: jobInfo.company_name || 'Unknown Company',
               compatibility_score: 85, // Default score for test data
-              pdf_file_data: pdfData ? Buffer.from(pdfData, 'base64') : null,
+              pdf_file_data: pdfData, // Store as base64 string
               html_file_data: htmlData,
               pdf_file_name: 'analysis-report.pdf',
               html_file_name: 'analysis-report.html',
