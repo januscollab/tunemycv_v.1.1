@@ -212,9 +212,14 @@ const CoverLetterHistory: React.FC<CoverLetterHistoryProps> = ({
         {coverLetters.map((coverLetter) => (
           <Card
             key={coverLetter.id}
-            className="hover:shadow-md transition-all duration-200 hover:border-primary/50 hover:bg-muted/50 cursor-pointer border border-border"
+            className="hover:shadow-md transition-all duration-200 hover:border-primary/50 hover:bg-muted/50 cursor-pointer border border-border relative"
             onClick={() => handleView(coverLetter)}
           >
+            {/* Document Type Badge */}
+            <Badge variant="subtle" className="absolute top-2 right-2 text-micro">
+              cover letter
+            </Badge>
+            
             <CardContent className="p-6">
               <div className="flex justify-between items-start mb-4">
                 <div className="flex-1">

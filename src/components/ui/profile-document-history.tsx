@@ -149,12 +149,13 @@ export const DocumentHistoryItem: React.FC<{
 
   const getDocumentBadge = () => {
     if (document.type === 'cover_letter') {
+      const version = (document.regeneration_count || 0) + 1;
       return (
         <Badge 
-          variant="outline" 
-          className="text-micro bg-green-100 text-green-700 border-green-300 dark:bg-green-900/20 dark:text-green-400 dark:border-green-600"
+          variant="compact" 
+          className="bg-green-100 text-green-700 border-green-300 dark:bg-green-900/20 dark:text-green-400 dark:border-green-600"
         >
-          v3
+          v{version}
         </Badge>
       );
     }
@@ -165,10 +166,15 @@ export const DocumentHistoryItem: React.FC<{
     <Card 
       className={cn(
         "hover:shadow-md transition-all duration-200 hover:border-primary/50 hover:bg-muted/50 cursor-pointer",
-        "border border-border"
+        "border border-border relative"
       )}
       onClick={() => onDocumentClick?.(document)}
     >
+      {/* Document Type Badge */}
+      <Badge variant="subtle" className="absolute top-2 right-2 text-micro">
+        {document.type === 'analysis' ? 'cv analysis' : 'cover letter'}
+      </Badge>
+      
       <CardContent className="p-6">
         <div className="flex justify-between items-start mb-4">
           <div className="flex-1">

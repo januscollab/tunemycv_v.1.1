@@ -25,18 +25,21 @@ const AIReviewModal: React.FC<AIReviewModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
-        {/* Gradient header similar to AI context menu */}
-        <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-br from-primary-600/80 to-primary-700/80 rounded-t-lg"></div>
+      <DialogContent className="max-w-md overflow-hidden">
+        {/* Gradient header matching experimental AI menu */}
+        <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-r from-orange-50/10 via-primary-50/10 to-background/20 rounded-t-lg"></div>
         
         <DialogHeader className="relative z-10 pt-4">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-primary-foreground/10 rounded-lg flex items-center justify-center">
-              <Brain className="h-5 w-5 text-primary-foreground/90" />
+            <div className="w-10 h-10 bg-gradient-to-br from-orange-100/30 via-primary-200/40 to-primary-300/50 rounded-lg flex items-center justify-center ring-2 ring-orange-200/20">
+              <Brain className="h-5 w-5 text-foreground" />
             </div>
             <div>
-              <DialogTitle className="text-lg font-semibold text-primary-foreground/90">AI {documentLabel} Review</DialogTitle>
-              <DialogDescription className="text-sm text-primary-foreground/70">
+              <DialogTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
+                AI {documentLabel} Review
+                <div className="w-2 h-2 bg-gradient-to-r from-orange-400 to-orange-500 rounded-full animate-pulse"></div>
+              </DialogTitle>
+              <DialogDescription className="text-sm text-muted-foreground">
                 Get professional insights powered by AI
               </DialogDescription>
             </div>
@@ -70,19 +73,19 @@ const AIReviewModal: React.FC<AIReviewModalProps> = ({
             </ul>
           </div>
 
-          {/* AI Creativity Slider - Compact design */}
-          <div className="p-3 bg-muted/30 rounded-lg border border-border/50">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-sm font-medium text-foreground">AI Creativity</span>
-              <Brain className="h-4 w-4 text-muted-foreground" />
+          {/* AI Creativity Slider - Minimal and discreet */}
+          <div className="p-3 bg-gradient-to-r from-orange-50/20 via-primary-50/20 to-background/10 rounded-lg border border-orange-200/20">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-medium text-foreground opacity-80">AI Creativity</span>
+              <Brain className="h-3 w-3 text-orange-400/70" />
             </div>
             
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <div className="text-center">
-                <div className="text-sm font-semibold text-foreground">
+                <div className="text-xs font-medium text-foreground">
                   {getCurrentLevel().label}
                 </div>
-                <div className="text-xs text-muted-foreground">
+                <div className="text-tiny text-muted-foreground">
                   {getCurrentLevel().description}
                 </div>
               </div>
@@ -95,14 +98,14 @@ const AIReviewModal: React.FC<AIReviewModalProps> = ({
                   step="1"
                   value={creativityLevel}
                   onChange={(e) => updateCreativityLevel(parseInt(e.target.value))}
-                  className="w-full h-2 bg-muted/50 rounded-lg appearance-none cursor-pointer"
+                  className="w-full h-1.5 bg-gradient-to-r from-orange-100/40 to-primary-100/40 rounded-full appearance-none cursor-pointer"
                   style={{
-                    background: `linear-gradient(to right, #3b82f6 0%, #6366f1 33%, #8b5cf6 66%, #ec4899 100%)`
+                    background: `linear-gradient(to right, #fb923c 0%, #f59e0b 33%, #a855f7 66%, #ec4899 100%)`
                   }}
                 />
               </div>
 
-              <div className="flex justify-between text-xs text-muted-foreground">
+              <div className="flex justify-between text-tiny text-muted-foreground opacity-70">
                 <span>Safe</span>
                 <span>Balanced</span>
                 <span>Bold</span>
