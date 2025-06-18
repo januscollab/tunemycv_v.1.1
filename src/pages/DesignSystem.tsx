@@ -28,10 +28,8 @@ import { MockPaymentModal } from '@/components/ui/mock-payment-modal';
 
 import { StepIndicator } from '@/components/ui/step-indicator';
 import { ProgressIndicator } from '@/components/ui/progress-indicator';
-import { HistorySection, HistoryHeader, HistoryList, HistoryEmptyState } from '@/components/ui/history-section';
 import { CategoryDocumentHistory, CategoryDocumentHistoryHeader, CategoryDocumentHistoryList, CategoryDocumentHistoryItem } from '@/components/ui/category-document-history';
 import { DocumentHistory, DocumentHistoryHeader, DocumentHistoryList, DocumentHistoryItem } from '@/components/ui/profile-document-history';
-import AnalysisHistory from '@/components/analysis/AnalysisHistory';
 import EnhancedAnalysisHistory from '@/components/analysis/EnhancedAnalysisHistory';
 import CoverLetterHistory from '@/components/cover-letter/CoverLetterHistory';
 
@@ -252,77 +250,6 @@ const DesignSystem = () => {
       ), 
       usage: '34 usages',
       description: 'Progress bars with multiple variants, sizes, and animations',
-      status: 'active',
-      trigger: () => {}
-    },
-    { 
-      name: 'HistorySection', 
-      component: (
-        <div className="w-full max-w-4xl">
-          <HistorySection
-            header={{
-              title: "Saved Cover Letters",
-              count: 3,
-              countLabel: "cover letter",
-              icon: <History className="h-5 w-5" />,
-              actions: (
-                <div className="flex items-center gap-2">
-                  <span className="text-caption text-muted-foreground">Show:</span>
-                  <select className="text-caption border rounded px-2 py-1 bg-background">
-                    <option>10</option>
-                    <option>20</option>
-                    <option>30</option>
-                  </select>
-                  <span className="text-caption text-muted-foreground">per page</span>
-                </div>
-              )
-            }}
-            items={[
-              {
-                id: '1',
-                title: 'Senior Frontend Developer at Google',
-                subtitle: 'Generated from CV analysis',
-                date: 'Updated 15/06/2025 at 14:30',
-                status: 'completed',
-                badge: { text: 'v3', variant: 'default' },
-                actions: [
-                  { label: 'View', variant: 'outline', onClick: () => {} },
-                  { label: 'Download', variant: 'outline', onClick: () => {} },
-                  { label: 'CV Analysis', variant: 'outline', onClick: () => {} }
-                ]
-              },
-              {
-                id: '2',
-                title: 'Backend Engineer at Microsoft',
-                subtitle: 'Generated from manual input',
-                date: 'Updated 14/06/2025 at 10:15',
-                status: 'completed',
-                badge: { text: 'v2', variant: 'secondary' },
-                actions: [
-                  { label: 'View', variant: 'outline', onClick: () => {} },
-                  { label: 'Download', variant: 'outline', onClick: () => {} }
-                ]
-              },
-              {
-                id: '3',
-                title: 'Data Scientist at Meta',
-                subtitle: 'Original version',
-                date: 'Updated 13/06/2025 at 16:45',
-                status: 'completed',
-                badge: { text: 'v1', variant: 'secondary' },
-                actions: [
-                  { label: 'View', variant: 'outline', onClick: () => {} },
-                  { label: 'Download', variant: 'outline', onClick: () => {} }
-                ]
-              }
-            ]}
-            variant="default"
-            onItemClick={(item) => console.log('Clicked:', item.title)}
-          />
-        </div>
-      ), 
-      usage: '34 usages',
-      description: 'Unified history component for cover letters with versioning - shows latest version with green badge, past versions with orange badge',
       status: 'active',
       trigger: () => {}
     },
@@ -1042,91 +969,7 @@ const DesignSystem = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="bg-muted/30 p-4 rounded-lg">
-                      <HistorySection
-                        header={{
-                          title: "Saved Cover Letters",
-                          count: 1,
-                          countLabel: "cover letter",
-                          icon: <History className="h-5 w-5" />,
-                          actions: (
-                            <div className="flex items-center gap-2">
-                              <span className="text-caption text-muted-foreground">Show:</span>
-                              <select className="text-caption border rounded px-2 py-1 bg-background">
-                                <option>10</option>
-                              </select>
-                              <span className="text-caption text-muted-foreground">per page</span>
-                            </div>
-                          )
-                        }}
-                        items={[
-                          {
-                            id: "1",
-                            title: "Senior Frontend Developer at Google",
-                            subtitle: "Generated from CV analysis",
-                            date: "Updated 15/06/2025 at 14:30",
-                            status: 'completed' as const,
-                            badge: { text: 'v3', variant: 'default' as const },
-                            actions: [
-                              {
-                                label: "View",
-                                variant: "outline" as const,
-                                onClick: () => {}
-                              },
-                              {
-                                label: "Download", 
-                                variant: "outline" as const,
-                                onClick: () => {}
-                              },
-                              {
-                                label: "CV Analysis",
-                                variant: "outline" as const,
-                                onClick: () => {}
-                              }
-                            ]
-                          },
-                          {
-                            id: "2",
-                            title: "Backend Engineer at Microsoft",
-                            subtitle: "Generated from manual input",
-                            date: "Updated 14/06/2025 at 10:15",
-                            status: 'completed' as const,
-                            badge: { text: 'v2', variant: 'secondary' as const },
-                            actions: [
-                              {
-                                label: "View",
-                                variant: "outline" as const,
-                                onClick: () => {}
-                              },
-                              {
-                                label: "Download", 
-                                variant: "outline" as const,
-                                onClick: () => {}
-                              }
-                            ]
-                          },
-                          {
-                            id: "3",
-                            title: "Data Scientist at Meta",
-                            subtitle: "Original version", 
-                            date: "Updated 13/06/2025 at 16:45",
-                            status: 'completed' as const,
-                            badge: { text: 'v1', variant: 'secondary' as const },
-                            actions: [
-                              {
-                                label: "View",
-                                variant: "outline" as const,
-                                onClick: () => {}
-                              },
-                              {
-                                label: "Download", 
-                                variant: "outline" as const,
-                                onClick: () => {}
-                              }
-                            ]
-                          }
-                        ]}
-                        variant="default"
-                      />
+                      <p className="text-sm text-muted-foreground">Category Document History component demo removed</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -1228,26 +1071,6 @@ const DesignSystem = () => {
               </h2>
               
               <div className="w-[80%] mx-auto grid gap-6 grid-cols-1">
-                {/* AnalysisHistory */}
-                <Card className="group hover:shadow-lg transition-all duration-300">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-subheading">AnalysisHistory</CardTitle>
-                      <Badge variant="outline" className="text-micro">Basic version</Badge>
-                    </div>
-                    <p className="text-caption text-muted-foreground">
-                      Basic analysis history component with simple list view and view action.
-                    </p>
-                    <div className="text-micro text-muted-foreground mt-2">
-                      <strong>Used in:</strong> src/pages/AnalyzeCV.tsx (legacy reference)
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="bg-muted/30 p-4 rounded-lg">
-                      <AnalysisHistory className="max-w-2xl" />
-                    </div>
-                  </CardContent>
-                </Card>
 
                 {/* EnhancedAnalysisHistory */}
                 <Card className="group hover:shadow-lg transition-all duration-300">
@@ -1291,37 +1114,7 @@ const DesignSystem = () => {
                   </CardContent>
                 </Card>
 
-                {/* CategoryDocumentHistory */}
-                <Card className="group hover:shadow-lg transition-all duration-300">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-subheading">CategoryDocumentHistory</CardTitle>
-                      <Badge variant="secondary" className="text-micro">Active</Badge>
-                    </div>
-                    <p className="text-caption text-muted-foreground">
-                      Specialized document history with filtering, pagination, and advanced actions for mixed document types.
-                    </p>
-                    <div className="text-micro text-muted-foreground mt-2">
-                      <strong>Used in:</strong> src/pages/CoverLetter.tsx, src/pages/InterviewToolkit.tsx
-                    </div>
-                  </CardHeader>
-                </Card>
 
-                {/* HistorySection (Generic) */}
-                <Card className="group hover:shadow-lg transition-all duration-300">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-subheading">HistorySection</CardTitle>
-                      <Badge variant="outline" className="text-micro">Generic UI</Badge>
-                    </div>
-                    <p className="text-caption text-muted-foreground">
-                      Modular history component with header, list, empty state, and pagination support.
-                    </p>
-                    <div className="text-micro text-muted-foreground mt-2">
-                      <strong>Used in:</strong> Design system examples and reusable UI components
-                    </div>
-                  </CardHeader>
-                </Card>
 
                 {/* DocumentHistory (Profile) */}
                 <Card className="group hover:shadow-lg transition-all duration-300">
