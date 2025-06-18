@@ -31,6 +31,9 @@ import { ProgressIndicator } from '@/components/ui/progress-indicator';
 import { HistorySection, HistoryHeader, HistoryList, HistoryEmptyState } from '@/components/ui/history-section';
 import { CategoryDocumentHistory, CategoryDocumentHistoryHeader, CategoryDocumentHistoryList, CategoryDocumentHistoryItem } from '@/components/ui/category-document-history';
 import { DocumentHistory, DocumentHistoryHeader, DocumentHistoryList, DocumentHistoryItem } from '@/components/ui/profile-document-history';
+import AnalysisHistory from '@/components/analysis/AnalysisHistory';
+import EnhancedAnalysisHistory from '@/components/analysis/EnhancedAnalysisHistory';
+import CoverLetterHistory from '@/components/cover-letter/CoverLetterHistory';
 
 
 const DesignSystem = () => {
@@ -1239,6 +1242,11 @@ const DesignSystem = () => {
                       <strong>Used in:</strong> src/pages/AnalyzeCV.tsx (legacy reference)
                     </div>
                   </CardHeader>
+                  <CardContent>
+                    <div className="bg-muted/30 p-4 rounded-lg">
+                      <AnalysisHistory className="max-w-2xl" />
+                    </div>
+                  </CardContent>
                 </Card>
 
                 {/* EnhancedAnalysisHistory */}
@@ -1255,6 +1263,11 @@ const DesignSystem = () => {
                       <strong>Used in:</strong> src/pages/AnalyzeCV.tsx
                     </div>
                   </CardHeader>
+                  <CardContent>
+                    <div className="bg-muted/30 p-4 rounded-lg">
+                      <EnhancedAnalysisHistory className="max-w-2xl" />
+                    </div>
+                  </CardContent>
                 </Card>
 
                 {/* CoverLetterHistory */}
@@ -1271,6 +1284,11 @@ const DesignSystem = () => {
                       <strong>Used in:</strong> Currently not used on any pages (ready for integration)
                     </div>
                   </CardHeader>
+                  <CardContent>
+                    <div className="bg-muted/30 p-4 rounded-lg">
+                      <CoverLetterHistory className="max-w-2xl" />
+                    </div>
+                  </CardContent>
                 </Card>
 
                 {/* CategoryDocumentHistory */}
