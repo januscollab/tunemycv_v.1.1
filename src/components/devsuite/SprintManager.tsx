@@ -68,8 +68,8 @@ const SprintManager = () => {
       const sortedSprints = (sprintsData || []).sort((a, b) => {
         if (a.name === 'Priority Sprint') return -1;
         if (b.name === 'Priority Sprint') return 1;
-        if (a.name === 'Backlog') return 1;
-        if (b.name === 'Backlog') return -1;
+        if (a.name === 'Backlog - Future Enhancements') return 1;
+        if (b.name === 'Backlog - Future Enhancements') return -1;
         return a.order_index - b.order_index;
       });
 
@@ -107,7 +107,7 @@ const SprintManager = () => {
       const existingSprintNames = existingSprints?.map(s => s.name) || [];
       
       // Enhanced validation: ensure ONLY ONE of each core sprint exists
-      const defaultSprints = ['Priority Sprint', 'Backlog'];
+      const defaultSprints = ['Priority Sprint', 'Backlog - Future Enhancements'];
       const sprintsToCreate = [];
       
       for (const sprintName of defaultSprints) {
@@ -176,7 +176,7 @@ const SprintManager = () => {
 
     // Enhanced validation: prevent duplicate core sprints
     const trimmedName = newSprintName.trim();
-    if (trimmedName === 'Priority Sprint' || trimmedName === 'Backlog') {
+    if (trimmedName === 'Priority Sprint' || trimmedName === 'Backlog - Future Enhancements') {
       const existingSprint = sprints.find(s => s.name === trimmedName);
       if (existingSprint) {
         toast.error(`A ${trimmedName} already exists. Only one ${trimmedName} is allowed per user.`);
@@ -188,7 +188,7 @@ const SprintManager = () => {
       // Calculate proper order_index (between Priority Sprint and Backlog)
       const prioritySprint = sprints.find(s => s.name === 'Priority Sprint');
       const backlogSprint = sprints.find(s => s.name === 'Backlog');
-      const userSprints = sprints.filter(s => s.name !== 'Priority Sprint' && s.name !== 'Backlog');
+      const userSprints = sprints.filter(s => s.name !== 'Priority Sprint' && s.name !== 'Backlog - Future Enhancements');
       
       // New user sprints should be placed between Priority Sprint and Backlog
       const maxUserOrder = userSprints.length > 0 ? Math.max(...userSprints.map(s => s.order_index)) : (prioritySprint?.order_index || 0);
@@ -216,7 +216,7 @@ const SprintManager = () => {
 
   const handleDeleteSprint = async (sprint: Sprint) => {
     // Enhanced protection logic - prevent deletion of core sprints
-    if (sprint.name === 'Priority Sprint' || sprint.name === 'Backlog') {
+    if (sprint.name === 'Priority Sprint' || sprint.name === 'Backlog - Future Enhancements') {
       toast.error(`Cannot delete ${sprint.name} - this is a protected system sprint`);
       return;
     }
@@ -228,7 +228,7 @@ const SprintManager = () => {
       }
       
       // Find Backlog sprint (guaranteed to exist due to ensureDefaultSprintsExist)
-      const backlogSprint = sprints.find(s => s.name === 'Backlog');
+      const backlogSprint = sprints.find(s => s.name === 'Backlog - Future Enhancements');
       if (backlogSprint) {
         // Move all tasks to Backlog
         const { error: moveError } = await supabase

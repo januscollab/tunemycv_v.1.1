@@ -311,7 +311,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
               onChange={(e) => setTitle(e.target.value)}
               placeholder="AI-generated agile story title will appear here"
               description="Generated in proper agile format: As a [user], I want [goal], so that [benefit]"
-              disabled={generating}
+              disabled={generating || isBlocked}
             />
           </div>
 
@@ -324,7 +324,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
               placeholder="Describe what you want to build in your own words..."
               rows={3}
               onImagePaste={handleImagePaste}
-              disabled={generating}
+              disabled={generating || isBlocked}
               description="Enter your raw requirements here, then click 'Enhance Story'"
             />
           </div>
@@ -350,7 +350,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
               placeholder="AI-generated detailed story description will appear here..."
               rows={4}
               onImagePaste={handleImagePaste}
-              disabled={generating}
+              disabled={generating || isBlocked}
             />
           </div>
 
@@ -390,6 +390,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
                 onChange={(e) => setNewTag(e.target.value)}
                 placeholder="Add tag"
                 onKeyPress={(e) => e.key === 'Enter' && handleAddTag()}
+                disabled={generating || isBlocked}
               />
               <VybeButton vybeVariant="secondary" onClick={handleAddTag}>Add</VybeButton>
             </div>

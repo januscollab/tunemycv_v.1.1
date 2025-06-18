@@ -222,7 +222,7 @@ const CoverLetterHistory: React.FC<CoverLetterHistoryProps> = ({
                     <h3 className="text-heading font-medium text-foreground">
                       {coverLetter.job_title}
                     </h3>
-                    <Badge variant="outline" className="text-micro bg-blue-100 text-blue-700 border-blue-300 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-600">
+                    <Badge variant="compact" className="text-tiny">
                       {getTemplateName(coverLetter.template_id)}
                     </Badge>
                   </div>

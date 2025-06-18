@@ -929,6 +929,108 @@ const DesignSystem = () => {
                   </CardContent>
                 </Card>
 
+                {/* CategoryDocumentHistory */}
+                <Card className="group hover:shadow-lg transition-all duration-300">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-subheading">CategoryDocumentHistory</CardTitle>
+                      <Badge variant="secondary" className="text-micro">Restored</Badge>
+                    </div>
+                    <p className="text-caption text-muted-foreground">
+                      Categorized document history with comprehensive filtering, sorting, and management capabilities.
+                    </p>
+                    <div className="text-micro text-muted-foreground mt-2">
+                      <strong>Used in:</strong> src/pages/CoverLetter.tsx, src/pages/InterviewToolkit.tsx
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="bg-muted/30 p-4 rounded-lg">
+                      <CategoryDocumentHistory
+                        header={{
+                          title: "Sample Document History",
+                          totalCount: 5,
+                          showCount: true
+                        }}
+                        documents={[
+                          {
+                            id: "1",
+                            type: "cover_letter",
+                            title: "Software Engineer Cover Letter",
+                            description: "Technical position at startup",
+                            date: new Date().toISOString(),
+                            size: "2.3 KB",
+                            status: "completed"
+                          },
+                          {
+                            id: "2", 
+                            type: "analysis",
+                            title: "CV Analysis Report",
+                            description: "Compatibility analysis for Data Scientist role",
+                            date: new Date().toISOString(),
+                            size: "15.7 KB",
+                            status: "completed"
+                          }
+                        ]}
+                        actions={[
+                          { label: "View", action: () => {}, icon: "Eye" },
+                          { label: "Download", action: () => {}, icon: "Download" }
+                        ]}
+                        className="w-full"
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* ProfileDocumentHistory */}
+                <Card className="group hover:shadow-lg transition-all duration-300">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-subheading">ProfileDocumentHistory</CardTitle>
+                      <Badge variant="secondary" className="text-micro">Restored</Badge>
+                    </div>
+                    <p className="text-caption text-muted-foreground">
+                      Profile-specific document history component for user profile management interfaces.
+                    </p>
+                    <div className="text-micro text-muted-foreground mt-2">
+                      <strong>Used in:</strong> src/components/profile/AnalysisHistoryTab.tsx, src/components/profile/DocumentHistoryTab.tsx
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="bg-muted/30 p-4 rounded-lg">
+                      <ProfileDocumentHistory
+                        documents={[
+                          {
+                            id: "1",
+                            type: "cv",
+                            title: "Senior Developer CV",
+                            description: "Updated resume for senior positions",
+                            date: new Date().toISOString(),
+                            size: "3.2 KB",
+                            status: "active"
+                          },
+                          {
+                            id: "2",
+                            type: "cover_letter", 
+                            title: "Marketing Manager Application",
+                            description: "Cover letter for marketing role",
+                            date: new Date().toISOString(),
+                            size: "1.8 KB",
+                            status: "active"
+                          }
+                        ]}
+                        actions={[
+                          { label: "Edit", action: () => {}, icon: "Edit" },
+                          { label: "View", action: () => {}, icon: "Eye" },
+                          { label: "Download", action: () => {}, icon: "Download" }
+                        ]}
+                        showPagination={true}
+                        itemsPerPage={10}
+                        className="w-full"
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+
               </div>
             </section>
           </TabsContent>
