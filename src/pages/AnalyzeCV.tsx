@@ -3,6 +3,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { extractJobTitleFromText } from '@/utils/analysisUtils';
 import AnalysisResults from '@/components/analysis/AnalysisResults';
+import N8nAnalysisResults from '@/components/analysis/N8nAnalysisResults';
+import AnalysisHistory from '@/components/analysis/AnalysisHistory';
 import CVSelector from '@/components/analyze/CVSelector';
 import JobDescriptionSelector from '@/components/analyze/JobDescriptionSelector';
 import CreditsPanel from '@/components/analyze/CreditsPanel';
@@ -29,7 +31,6 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { CaptureInput } from '@/components/ui/capture-input';
-import AnalysisHistoryTab from '@/components/profile/AnalysisHistoryTab';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Breadcrumbs from '@/components/navigation/Breadcrumbs';
 import StepIndicator from '@/components/ui/step-indicator';
@@ -264,6 +265,35 @@ const AnalyzeCV = () => {
       // Store debug data for the modal
       setN8nDebugData(result);
       
+      // Create analysis result for display
+      if (result.success && result.analysisResultId) {
+        // Load the stored analysis result
+        const { data: analysisData } = await supabase
+          .from('analysis_results')
+          .select('*')
+          .eq('id', result.analysisResultId)
+          .single();
+        
+        if (analysisData) {
+          // Convert PDF data back to base64 string for display
+          let pdfDataForDisplay = null;
+          if (analysisData.pdf_file_data) {
+            const uint8Array = new Uint8Array(analysisData.pdf_file_data);
+            let binaryString = '';
+            for (let i = 0; i < uint8Array.length; i++) {
+              binaryString += String.fromCharCode(uint8Array[i]);
+            }
+            pdfDataForDisplay = btoa(binaryString);
+          }
+          
+          setViewedAnalysis({
+            ...analysisData,
+            pdf_file_data: pdfDataForDisplay
+          });
+          setActiveTab('view-analysis');
+        }
+      }
+      
       // Show the debug modal
       setShowN8nDebugModal(true);
       
@@ -362,7 +392,6 @@ const AnalyzeCV = () => {
 
   const canAnalyze = !!uploadedFiles.cv && !!uploadedFiles.jobDescription; // Both files required for n8n analysis
   const hasCreditsForAI = userCredits?.credits && userCredits.credits > 0;
-
 
   // Logged-out user experience
   if (!user) {
@@ -583,11 +612,19 @@ const AnalyzeCV = () => {
               {/* View Analysis Tab */}
               <TabsContent value="view-analysis" className="mt-0">
                 {viewedAnalysis ? (
-                  <AnalysisResults 
-                    result={viewedAnalysis} 
-                    onStartNew={handleStartNew}
-                    readOnly={true}
-                  />
+                  viewedAnalysis.analysis_type === 'n8n' ? (
+                    <N8nAnalysisResults 
+                      result={viewedAnalysis} 
+                      onStartNew={handleStartNew}
+                      readOnly={true}
+                    />
+                  ) : (
+                    <AnalysisResults 
+                      result={viewedAnalysis} 
+                      onStartNew={handleStartNew}
+                      readOnly={true}
+                    />
+                  )
                 ) : (
                   <Card className="border border-gray-200 dark:border-gray-700">
                     <CardContent className="text-center py-8">
@@ -603,10 +640,11 @@ const AnalyzeCV = () => {
                 )}
               </TabsContent>
 
-
               {/* Analysis History Tab */}
               <TabsContent value="history" className="mt-0">
-                <AnalysisHistoryTab credits={userCredits?.credits || 0} memberSince="" />
+                <AnalysisHistory 
+                  onSelectAnalysis={handleHistorySelect}
+                />
               </TabsContent>
             </Tabs>
           </div>

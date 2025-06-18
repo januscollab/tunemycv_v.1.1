@@ -213,25 +213,33 @@ export const useN8nAnalysis = () => {
       });
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Download PDF file second
+      // Download PDF file second - IMPROVED PDF HANDLING
       try {
         const pdfResponse = await downloadWithRetry('https://aohrfehhyjdebaatzqdl.supabase.co/storage/v1/object/public/n8n-bucket/response/test-output.pdf');
         if (pdfResponse) {
-          const pdfBlob = await pdfResponse.blob();
-          const pdfArrayBuffer = await pdfBlob.arrayBuffer();
+          const pdfArrayBuffer = await pdfResponse.arrayBuffer();
+          console.log('PDF downloaded, size:', pdfArrayBuffer.byteLength, 'bytes');
           
-          // Convert to base64 using chunked approach to avoid call stack overflow
+          // Convert ArrayBuffer to base64 using a more robust method
           const uint8Array = new Uint8Array(pdfArrayBuffer);
-          const chunkSize = 8192;
-          let base64String = '';
+          let binaryString = '';
           
+          // Convert in chunks to avoid stack overflow
+          const chunkSize = 8192;
           for (let i = 0; i < uint8Array.length; i += chunkSize) {
             const chunk = uint8Array.slice(i, i + chunkSize);
-            base64String += btoa(String.fromCharCode.apply(null, Array.from(chunk)));
+            binaryString += String.fromCharCode.apply(null, Array.from(chunk));
           }
           
-          pdfData = base64String;
-          console.log('Test PDF file downloaded and converted to base64');
+          pdfData = btoa(binaryString);
+          console.log('PDF converted to base64, length:', pdfData.length);
+          
+          // Validate base64 format
+          if (pdfData && pdfData.length > 0) {
+            console.log('Base64 PDF data validation: Valid format, starts with:', pdfData.substring(0, 20));
+          } else {
+            console.error('Base64 PDF data validation: Invalid or empty');
+          }
         } else {
           console.error('Failed to fetch test PDF after all retries');
         }
@@ -242,9 +250,39 @@ export const useN8nAnalysis = () => {
           attempt: 0,
           timestamp: Date.now(),
           status: 'error',
-          error: `Outer catch: ${error instanceof Error ? error.message : 'Unknown error'}`
+          error: `PDF processing error: ${error instanceof Error ? error.message : 'Unknown error'}`
         });
       }
+
+      // Extract job information from job description JSON
+      const extractJobInfo = (jdJson: any) => {
+        const jobInfo = {
+          job_title: '',
+          company_name: ''
+        };
+
+        // Try to extract job title
+        if (jdJson.job_title) {
+          jobInfo.job_title = jdJson.job_title;
+        } else if (jdJson.title) {
+          jobInfo.job_title = jdJson.title;
+        } else if (jdJson.position) {
+          jobInfo.job_title = jdJson.position;
+        }
+
+        // Try to extract company name
+        if (jdJson.company_name) {
+          jobInfo.company_name = jdJson.company_name;
+        } else if (jdJson.company) {
+          jobInfo.company_name = jdJson.company;
+        } else if (jdJson.organization) {
+          jobInfo.company_name = jdJson.organization;
+        }
+
+        return jobInfo;
+      };
+
+      const jobInfo = extractJobInfo(jobDescriptionJson);
 
       // Store the analysis result in the database
       let analysisResultId: string | undefined;
@@ -258,16 +296,17 @@ export const useN8nAnalysis = () => {
             .insert({
               user_id: user.id,
               analysis_type: 'n8n',
-              job_title: jobDescriptionJson.jobTitle || 'Unknown Position',
-              company_name: jobDescriptionJson.companyName || 'Unknown Company',
+              job_title: jobInfo.job_title || 'Unknown Position',
+              company_name: jobInfo.company_name || 'Unknown Company',
               compatibility_score: 85, // Default score for test data
-              pdf_file_data: pdfData,
+              pdf_file_data: pdfData ? Buffer.from(pdfData, 'base64') : null,
               html_file_data: htmlData,
               pdf_file_name: 'analysis-report.pdf',
               html_file_name: 'analysis-report.html',
               n8n_pdf_url: 'https://aohrfehhyjdebaatzqdl.supabase.co/storage/v1/object/public/n8n-bucket/response/test-output.pdf',
               n8n_html_url: 'https://aohrfehhyjdebaatzqdl.supabase.co/storage/v1/object/public/n8n-bucket/response/test-output.html',
-              executive_summary: 'This is a test analysis result generated for development purposes.'
+              executive_summary: 'This is a test analysis result generated for development purposes.',
+              job_description_extracted_text: JSON.stringify(jobDescriptionJson)
             })
             .select('id')
             .single();
@@ -283,7 +322,7 @@ export const useN8nAnalysis = () => {
         console.error('Database operation failed:', dbError);
       }
 
-      // Show debug info
+      // Show success toast
       toast({
         title: "Analysis Complete",
         description: `Files processed: ${htmlData ? 'HTML ✓' : 'HTML ✗'} ${pdfData ? 'PDF ✓' : 'PDF ✗'}`,
