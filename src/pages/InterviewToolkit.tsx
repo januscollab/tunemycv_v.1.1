@@ -16,6 +16,7 @@ import SoftSkillsSurveyPanel from '@/components/analyze/SoftSkillsSurveyPanel';
 import SoftSkillsSurveyModal from '@/components/analyze/SoftSkillsSurveyModal';
 import { useSoftSkills } from '@/hooks/useSoftSkills';
 import { useAnalysis } from '@/hooks/useAnalysis';
+import { useInterviewPrep } from '@/hooks/useInterviewPrep';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { FileText, History, MessageSquare, Target, Calendar, Building, CheckCircle, FileUp, Search, Clock, Eye, Users, Upload, BarChart3, Zap } from 'lucide-react';
@@ -88,6 +89,7 @@ const InterviewToolkit = () => {
   const [viewedAnalysis, setViewedAnalysis] = useState(navigationState?.analysis || null);
 
   const { analyzing, analysisResult, setAnalysisResult, performAnalysis } = useAnalysis();
+  const { generateInterviewPrep, isGenerating: isGeneratingInterviewPrep } = useInterviewPrep();
 
   // Humorous loading messages
   const loadingMessages = [
@@ -306,7 +308,7 @@ const InterviewToolkit = () => {
     }));
   };
 
-  const handleGenerateInterviewPrep = () => {
+  const handleGenerateInterviewPrep = async () => {
     // Validation logic
     const hasSelectedInclusions = Object.values(interviewPrepIncludes).some(Boolean);
     
@@ -357,8 +359,29 @@ const InterviewToolkit = () => {
       return;
     }
 
-    // Show the work-in-progress modal
-    setShowInterviewPrepModal(true);
+    try {
+      const request = {
+        analysisResultId: interviewPrepMethod === 'analysis' ? selectedAnalysisId : undefined,
+        jobTitle: interviewJobTitle,
+        companyName: interviewCompanyName,
+        jobDescription: interviewJobDescription?.extractedText,
+        includes: interviewPrepIncludes
+      };
+
+      const result = await generateInterviewPrep(request);
+      
+      if (result.success) {
+        // Navigate to view the generated interview prep
+        navigate('/interview-toolkit', {
+          state: {
+            generatedInterviewPrep: result.interviewPrep,
+            targetTab: 'view-interview-prep'
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Interview prep generation failed:', error);
+    }
   };
 
   const canAnalyze = !!uploadedFiles.jobDescription;
