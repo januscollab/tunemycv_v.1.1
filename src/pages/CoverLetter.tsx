@@ -142,7 +142,14 @@ const AuthenticatedCoverLetter = () => {
 
   // Handle navigation state from analysis history
   useEffect(() => {
-    const state = location.state as { analysis?: any; coverLetter?: any; viewMode?: boolean; activeTab?: string } | null;
+    const state = location.state as { 
+      analysis?: any; 
+      coverLetter?: any; 
+      viewMode?: boolean; 
+      activeTab?: string;
+      fromAnalysis?: boolean;
+      analysisData?: any;
+    } | null;
     if (state?.coverLetter && state?.viewMode) {
       console.log('Navigation state detected for viewing cover letter:', state.coverLetter);
       setSelectedCoverLetter(state.coverLetter);
@@ -161,6 +168,20 @@ const AuthenticatedCoverLetter = () => {
         ...prev,
         jobTitle: state.analysis.job_title || '',
         companyName: state.analysis.company_name || ''
+      }));
+      
+      // Clear the navigation state to prevent re-triggering
+      window.history.replaceState({}, document.title, location.pathname);
+    } else if (state?.fromAnalysis && state?.analysisData) {
+      console.log('Navigation state detected for creating cover letter from analysis:', state.analysisData);
+      setGenerationMethod('analysis');
+      setSelectedAnalysisId(state.analysisData.id);
+      
+      // Pre-populate form data from the analysis
+      setFormData(prev => ({
+        ...prev,
+        jobTitle: state.analysisData.job_title || '',
+        companyName: state.analysisData.company_name || ''
       }));
       
       // Clear the navigation state to prevent re-triggering

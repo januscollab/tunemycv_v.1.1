@@ -77,7 +77,13 @@ const InterviewToolkit = () => {
   const [activeTab, setActiveTab] = useState(initialTab);
 
   // Handle pre-loaded analysis from navigation state
-  const navigationState = location.state as { analysis?: any; source?: string; targetTab?: string } | null;
+  const navigationState = location.state as { 
+    analysis?: any; 
+    source?: string; 
+    targetTab?: string;
+    fromAnalysis?: boolean;
+    analysisData?: any;
+  } | null;
   const [preloadedAnalysis, setPreloadedAnalysis] = useState(navigationState?.analysis || null);
   const [viewedAnalysis, setViewedAnalysis] = useState(navigationState?.analysis || null);
 
@@ -150,6 +156,23 @@ const InterviewToolkit = () => {
       setActiveTab(navigationState.targetTab);
       if (navigationState.analysis) {
         setViewedAnalysis(navigationState.analysis);
+      }
+    }
+    // Handle direct navigation from analysis for interview prep generation
+    if (navigationState?.fromAnalysis && navigationState?.analysisData) {
+      setActiveTab('interview-prep');
+      setInterviewPrepMethod('analysis');
+      setSelectedAnalysisId(navigationState.analysisData.id);
+      setInterviewJobTitle(navigationState.analysisData.job_title || '');
+      setInterviewCompanyName(navigationState.analysisData.company_name || '');
+      if (navigationState.analysisData.job_description_upload_id) {
+        setInterviewJobDescription({
+          id: navigationState.analysisData.job_description_upload_id,
+          fileName: navigationState.analysisData.job_description_file_name,
+          extractedText: navigationState.analysisData.job_description_extracted_text,
+          fileType: 'job_description',
+          uploadType: 'job_description'
+        });
       }
     }
   }, [navigationState]);

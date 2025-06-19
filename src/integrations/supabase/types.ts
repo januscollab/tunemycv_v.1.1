@@ -370,6 +370,8 @@ export type Database = {
           job_title: string | null
           keywords_found: Json | null
           keywords_missing: Json | null
+          linked_cover_letter_id: string | null
+          linked_interview_prep_id: string | null
           n8n_html_url: string | null
           n8n_pdf_url: string | null
           pdf_file_data: string | null
@@ -399,6 +401,8 @@ export type Database = {
           job_title?: string | null
           keywords_found?: Json | null
           keywords_missing?: Json | null
+          linked_cover_letter_id?: string | null
+          linked_interview_prep_id?: string | null
           n8n_html_url?: string | null
           n8n_pdf_url?: string | null
           pdf_file_data?: string | null
@@ -428,6 +432,8 @@ export type Database = {
           job_title?: string | null
           keywords_found?: Json | null
           keywords_missing?: Json | null
+          linked_cover_letter_id?: string | null
+          linked_interview_prep_id?: string | null
           n8n_html_url?: string | null
           n8n_pdf_url?: string | null
           pdf_file_data?: string | null
@@ -450,6 +456,20 @@ export type Database = {
             columns: ["job_description_upload_id"]
             isOneToOne: false
             referencedRelation: "uploads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analysis_results_linked_cover_letter_id_fkey"
+            columns: ["linked_cover_letter_id"]
+            isOneToOne: false
+            referencedRelation: "cover_letters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analysis_results_linked_interview_prep_id_fkey"
+            columns: ["linked_interview_prep_id"]
+            isOneToOne: false
+            referencedRelation: "interview_prep"
             referencedColumns: ["id"]
           },
         ]
@@ -493,6 +513,7 @@ export type Database = {
           id: string
           include_linkedin_url: boolean | null
           job_title: string
+          linked_interview_prep_id: string | null
           personal_values: string | null
           regeneration_count: number | null
           template_id: string | null
@@ -511,6 +532,7 @@ export type Database = {
           id?: string
           include_linkedin_url?: boolean | null
           job_title: string
+          linked_interview_prep_id?: string | null
           personal_values?: string | null
           regeneration_count?: number | null
           template_id?: string | null
@@ -529,6 +551,7 @@ export type Database = {
           id?: string
           include_linkedin_url?: boolean | null
           job_title?: string
+          linked_interview_prep_id?: string | null
           personal_values?: string | null
           regeneration_count?: number | null
           template_id?: string | null
@@ -542,6 +565,13 @@ export type Database = {
             columns: ["analysis_result_id"]
             isOneToOne: false
             referencedRelation: "analysis_results"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cover_letters_linked_interview_prep_id_fkey"
+            columns: ["linked_interview_prep_id"]
+            isOneToOne: false
+            referencedRelation: "interview_prep"
             referencedColumns: ["id"]
           },
         ]
@@ -580,6 +610,66 @@ export type Database = {
             columns: ["sprint_id"]
             isOneToOne: false
             referencedRelation: "sprints"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      interview_prep: {
+        Row: {
+          analysis_result_id: string | null
+          company_name: string
+          content: string
+          created_at: string | null
+          credits_used: number | null
+          generation_parameters: Json | null
+          id: string
+          job_title: string
+          linked_cover_letter_id: string | null
+          regeneration_count: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          analysis_result_id?: string | null
+          company_name: string
+          content: string
+          created_at?: string | null
+          credits_used?: number | null
+          generation_parameters?: Json | null
+          id?: string
+          job_title: string
+          linked_cover_letter_id?: string | null
+          regeneration_count?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          analysis_result_id?: string | null
+          company_name?: string
+          content?: string
+          created_at?: string | null
+          credits_used?: number | null
+          generation_parameters?: Json | null
+          id?: string
+          job_title?: string
+          linked_cover_letter_id?: string | null
+          regeneration_count?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "interview_prep_analysis_result_id_fkey"
+            columns: ["analysis_result_id"]
+            isOneToOne: false
+            referencedRelation: "analysis_results"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "interview_prep_linked_cover_letter_id_fkey"
+            columns: ["linked_cover_letter_id"]
+            isOneToOne: false
+            referencedRelation: "cover_letters"
             referencedColumns: ["id"]
           },
         ]
