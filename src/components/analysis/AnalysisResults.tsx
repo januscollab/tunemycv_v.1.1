@@ -146,7 +146,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
           </div>
           <button 
             onClick={downloadPDF}
-            className="flex items-center space-x-2 text-apricot hover:text-apricot/80 transition-colors"
+            className="flex items-center space-x-2 text-apricot hover:text-apricot/80 transition-colors font-normal"
           >
             <Download className="h-4 w-4" />
           </button>

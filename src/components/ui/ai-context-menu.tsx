@@ -330,8 +330,11 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
                 </div>
               )}
 
+              {/* Orange Separator Line */}
+              <div className="h-px bg-gradient-to-r from-transparent via-orange-400 to-transparent mx-2.5 my-2"></div>
+
               {/* AI Creativity Slider */}
-              <div className="px-2.5 py-3 mt-2 border-t border-primary-500/30">
+              <div className="px-2.5 py-3">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-micro font-medium text-primary-foreground/90">AI Creativity</span>
                   <Brain className="w-3.5 h-3.5 text-primary-foreground/70" />

@@ -77,24 +77,19 @@ export const AIReplacementDialog: React.FC<AIReplacementDialogProps> = ({
         </DialogHeader>
 
         <div className="space-y-6 overflow-y-auto max-h-[calc(90vh-120px)]">
-          {/* Creativity Slider - Discreet Design */}
-          <div className="bg-muted/30 rounded-lg p-4">
-            <div className="mb-4">
-              <h3 className="text-sm font-medium text-foreground mb-1">AI Creativity Level</h3>
-              <div className="text-center">
-                <div className={`text-sm font-semibold bg-gradient-to-r ${getCreativityGradient()} bg-clip-text text-transparent`}>
-                  {getCreativityLabel()}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {getCreativityDescription()}
-                </div>
+          {/* Creativity Slider - Compact Discreet Design */}
+          <div className="bg-muted/20 rounded-md p-3 border border-muted">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-xs font-medium text-muted-foreground">AI Creativity</h3>
+              <div className="text-xs text-primary font-medium">
+                {getCreativityLabel()}
               </div>
             </div>
             
-            <div className="space-y-3">
-              {/* Gradient Slider */}
+            <div className="space-y-2">
+              {/* Compact Slider */}
               <div className="relative">
-                <div className="w-full h-2 bg-gradient-to-r from-blue-500 via-indigo-500 via-purple-500 to-pink-500 rounded-full"></div>
+                <div className="w-full h-1.5 bg-gradient-to-r from-blue-400 via-indigo-400 via-purple-400 to-pink-400 rounded-full opacity-60"></div>
                 <input
                   type="range"
                   min="0"
@@ -102,12 +97,15 @@ export const AIReplacementDialog: React.FC<AIReplacementDialogProps> = ({
                   step="1"
                   value={creativityLevel}
                   onChange={(e) => updateCreativityLevel(parseInt(e.target.value))}
-                  className="absolute top-0 w-full h-2 appearance-none bg-transparent cursor-pointer slider-thumb"
+                  className="absolute top-0 w-full h-1.5 appearance-none bg-transparent cursor-pointer"
+                  style={{
+                    background: 'transparent'
+                  }}
                 />
               </div>
 
-              {/* Level Labels */}
-              <div className="flex justify-between text-xs text-muted-foreground">
+              {/* Compact Level Labels */}
+              <div className="flex justify-between text-tiny text-muted-foreground px-0.5">
                 <span>Safe</span>
                 <span>Measured</span>
                 <span>Bold</span>

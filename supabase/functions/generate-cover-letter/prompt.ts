@@ -63,12 +63,14 @@ export function buildSystemPrompt(
 IMPORTANT FORMATTING REQUIREMENTS:
 - Start with the date and company information
 - Write a compelling cover letter body with proper salutation (Dear Hiring Manager, etc.)
+- CRITICAL: Ensure there is a blank line above "Dear Hiring Manager," 
 - Highlight relevant experience and skills
 - Show genuine enthusiasm for the role
 - Include a professional opening and closing
 - Be well-structured with clear paragraphs
 - Match the requested length and tone precisely
 - Do NOT include the candidate's name in the salutation or closing signature
+- CRITICAL: Ensure there is a blank line above "Sincerely," before the closing
 - ALWAYS end with "Sincerely," followed by a blank line, then the complete contact information footer:
 
 PLACEHOLDER FORMATTING:

@@ -36,7 +36,11 @@ import Breadcrumbs from '@/components/navigation/Breadcrumbs';
 import StepIndicator from '@/components/ui/step-indicator';
 
 
-const InterviewToolkit = () => {
+interface InterviewToolkitProps {
+  viewMode?: boolean;
+}
+
+const InterviewToolkit: React.FC<InterviewToolkitProps> = ({ viewMode = false }) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const location = useLocation();

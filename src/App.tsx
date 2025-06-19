@@ -57,10 +57,10 @@ function AppContent() {
           <Route path="/auth" element={<Auth />} />
           <Route path="/analyze" element={<AnalyzeCV />} />
           <Route path="/cover-letter" element={<CoverLetter />} />
-          <Route path="/cover-letter/view/:id" element={<CoverLetter />} />
+          <Route path="/cover-letter/view/:id" element={<CoverLetter viewMode={true} />} />
           <Route path="/interview-prep" element={<InterviewPrep />} />
           <Route path="/interview-toolkit" element={<InterviewToolkit />} />
-          <Route path="/interview-toolkit/view/:id" element={<InterviewToolkit />} />
+          <Route path="/interview-toolkit/view/:id" element={<InterviewToolkit viewMode={true} />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
           <Route path="/template" element={<Template />} />

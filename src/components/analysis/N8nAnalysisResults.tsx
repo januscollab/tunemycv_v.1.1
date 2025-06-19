@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { ExternalLink, Eye, FileText, Globe, Download } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { DownloadMenu } from '@/components/ui/download-menu';
-import PDFViewer from '@/components/ui/pdf-viewer';
+import PDFDownloadCard from '@/components/ui/pdf-download-card';
 
 interface N8nAnalysisResultsProps {
   result: {
@@ -196,9 +196,9 @@ const N8nAnalysisResults: React.FC<N8nAnalysisResultsProps> = ({
         </CardContent>
       </Card>
 
-      {/* PDF Viewer */}
+      {/* PDF Download */}
       {result.pdf_file_data ? (
-        <PDFViewer
+        <PDFDownloadCard
           pdfData={result.pdf_file_data}
           fileName={result.pdf_file_name || 'analysis-report.pdf'}
           title="Analysis Report"

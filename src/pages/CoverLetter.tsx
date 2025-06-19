@@ -44,7 +44,11 @@ import CoverLetterLoggedOut from '@/components/cover-letter/CoverLetterLoggedOut
 import { ProgressIndicator } from '@/components/ui/progress-indicator';
 
 
-const CoverLetter = () => {
+interface CoverLetterProps {
+  viewMode?: boolean;
+}
+
+const CoverLetter: React.FC<CoverLetterProps> = ({ viewMode = false }) => {
   const { user } = useAuth();
 
   // If user is not authenticated, show the logged-out landing page
