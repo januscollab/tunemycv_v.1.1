@@ -3,7 +3,7 @@ import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Loader2, RefreshCw, Check, X, Brain } from 'lucide-react';
+import { Loader2, RefreshCw, Check, X } from 'lucide-react';
 import { useCreativitySlider } from '@/hooks/useCreativitySlider';
 
 interface AIReplacementDialogProps {
@@ -42,37 +42,59 @@ export const AIReplacementDialog: React.FC<AIReplacementDialogProps> = ({
     onRegenerate();
   };
 
+  const getCreativityGradient = () => {
+    const gradients = [
+      'from-blue-500 to-blue-600',     // Safe
+      'from-blue-500 to-indigo-500',   // Measured  
+      'from-indigo-500 to-purple-500', // Bold
+      'from-purple-500 to-pink-500'    // Visionary
+    ];
+    return gradients[creativityLevel] || gradients[1];
+  };
+
+  const getCreativityLabel = () => {
+    const labels = ['Safe', 'Measured', 'Bold', 'Visionary'];
+    return labels[creativityLevel] || 'Measured';
+  };
+
+  const getCreativityDescription = () => {
+    const descriptions = [
+      'Conservative and professional',
+      'Balanced professional tone', 
+      'Creative and confident',
+      'Innovative and bold'
+    ];
+    return descriptions[creativityLevel] || 'Balanced professional tone';
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Brain className="h-5 w-5 text-primary" />
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
+        <DialogHeader className="pb-4">
+          <DialogTitle className="text-lg font-medium text-foreground">
             {actionTitle}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6">
-          {/* Creativity Slider */}
-          <div className="border rounded-lg p-4 bg-primary/5">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-sm font-medium">AI Creativity Level</span>
-              <Brain className="w-4 h-4 text-primary/70" />
+        <div className="space-y-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+          {/* Creativity Slider - Discreet Design */}
+          <div className="bg-muted/30 rounded-lg p-4">
+            <div className="mb-4">
+              <h3 className="text-sm font-medium text-foreground mb-1">AI Creativity Level</h3>
+              <div className="text-center">
+                <div className={`text-sm font-semibold bg-gradient-to-r ${getCreativityGradient()} bg-clip-text text-transparent`}>
+                  {getCreativityLabel()}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {getCreativityDescription()}
+                </div>
+              </div>
             </div>
             
             <div className="space-y-3">
-              {/* Current Level Display */}
-              <div className="text-center">
-                <div className="text-sm font-semibold text-primary">
-                  {getCurrentLevel().label}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {getCurrentLevel().description}
-                </div>
-              </div>
-
-              {/* Slider */}
+              {/* Gradient Slider */}
               <div className="relative">
+                <div className="w-full h-2 bg-gradient-to-r from-blue-500 via-indigo-500 via-purple-500 to-pink-500 rounded-full"></div>
                 <input
                   type="range"
                   min="0"
@@ -80,10 +102,7 @@ export const AIReplacementDialog: React.FC<AIReplacementDialogProps> = ({
                   step="1"
                   value={creativityLevel}
                   onChange={(e) => updateCreativityLevel(parseInt(e.target.value))}
-                  className="w-full h-2 bg-primary/20 rounded-lg appearance-none cursor-pointer"
-                  style={{
-                    background: `linear-gradient(to right, #3b82f6 0%, #6366f1 33%, #8b5cf6 66%, #ec4899 100%)`
-                  }}
+                  className="absolute top-0 w-full h-2 appearance-none bg-transparent cursor-pointer slider-thumb"
                 />
               </div>
 
@@ -100,64 +119,64 @@ export const AIReplacementDialog: React.FC<AIReplacementDialogProps> = ({
           {/* Text Comparison */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Original Text */}
-            <Card>
+            <Card className="border-muted">
               <CardContent className="p-4">
-                <h3 className="text-sm font-semibold mb-2 text-muted-foreground">Original Text</h3>
-                <div className="text-sm bg-muted/50 p-3 rounded-md max-h-32 overflow-y-auto">
+                <h4 className="text-sm font-medium mb-3 text-muted-foreground">Original Text</h4>
+                <div className="text-sm bg-muted/50 p-3 rounded-md max-h-40 overflow-y-auto border text-foreground">
                   {originalText}
                 </div>
               </CardContent>
             </Card>
 
             {/* Generated Text */}
-            <Card>
+            <Card className="border-primary/20">
               <CardContent className="p-4">
-                <h3 className="text-sm font-semibold mb-2 text-primary">AI Generated Text</h3>
-                <div className="text-sm bg-primary/5 p-3 rounded-md max-h-32 overflow-y-auto">
+                <h4 className="text-sm font-medium mb-3 text-primary">AI Generated Text</h4>
+                <div className="text-sm bg-primary/5 p-3 rounded-md max-h-40 overflow-y-auto border border-primary/20">
                   {isLoading ? (
-                    <div className="flex items-center justify-center py-4">
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      Processing...
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="h-4 w-4 animate-spin mr-2 text-primary" />
+                      <span className="text-primary">Processing...</span>
                     </div>
                   ) : (
-                    generatedText || "No content generated"
+                    <span className="text-foreground">{generatedText || "No content generated"}</span>
                   )}
                 </div>
               </CardContent>
             </Card>
           </div>
+        </div>
 
-          {/* Action Buttons */}
-          <div className="flex justify-between items-center pt-4 border-t">
+        {/* Action Buttons */}
+        <div className="flex justify-between items-center pt-4 border-t bg-background">
+          <Button
+            variant="ghost"
+            onClick={handleRegenerate}
+            disabled={isLoading}
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+          >
+            <RefreshCw className="h-4 w-4" />
+            Regenerate
+          </Button>
+
+          <div className="flex gap-3">
             <Button
               variant="outline"
-              onClick={handleRegenerate}
+              onClick={handleReject}
               disabled={isLoading}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 border-muted hover:bg-muted"
             >
-              <RefreshCw className="h-4 w-4" />
-              Regenerate
+              <X className="h-4 w-4" />
+              Cancel
             </Button>
-
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                onClick={handleReject}
-                disabled={isLoading}
-                className="flex items-center gap-2"
-              >
-                <X className="h-4 w-4" />
-                Cancel
-              </Button>
-              <Button
-                onClick={handleAccept}
-                disabled={isLoading || !generatedText}
-                className="flex items-center gap-2"
-              >
-                <Check className="h-4 w-4" />
-                Apply Changes
-              </Button>
-            </div>
+            <Button
+              onClick={handleAccept}
+              disabled={isLoading || !generatedText}
+              className="flex items-center gap-2 bg-primary hover:bg-primary/90"
+            >
+              <Check className="h-4 w-4" />
+              Apply Changes
+            </Button>
           </div>
         </div>
       </DialogContent>

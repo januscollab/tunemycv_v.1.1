@@ -176,18 +176,18 @@ const N8nAnalysisResults: React.FC<N8nAnalysisResultsProps> = ({
           
           {/* Action Buttons */}
           <div className="flex justify-end gap-2 mt-4">
-            <Button
+            <button
               onClick={handleHtmlPreview}
-              variant="outline"
-              size="sm"
+              className="story-link inline-flex items-center gap-2 px-3 py-1.5 text-sm text-blueberry dark:text-apple-core hover:text-zapier-orange dark:hover:text-citrus transition-colors"
             >
-              <ExternalLink className="h-4 w-4 mr-2" />
+              <ExternalLink className="h-4 w-4" />
               Review in Browser
-            </Button>
+            </button>
             <DownloadMenu
               buttonText="Download"
-              variant="default"
+              variant="ghost"
               size="sm"
+              className="story-link text-blueberry dark:text-apple-core hover:text-zapier-orange dark:hover:text-citrus"
               onDownloadPDF={result.n8n_pdf_url ? () => handleDownload(result.n8n_pdf_url!, 'pdf') : undefined}
               onDownloadWord={() => console.log('Word download not implemented for n8n reports')}
               onDownloadText={() => console.log('Text download not implemented for n8n reports')}
