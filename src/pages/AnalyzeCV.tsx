@@ -673,11 +673,15 @@ const AnalyzeCV = () => {
           />
 
           {/* Credits Panel - Fixed Width */}
-          <div className="space-y-4">
+          <div>
             <CreditsPanel
               credits={userCredits?.credits || 0}
               hasCreditsForAI={hasCreditsForAI}
             />
+          </div>
+          
+          {/* Soft Skills Survey Panel */}
+          <div className="mt-4">
             <SoftSkillsSurveyPanel
               onTakeSurvey={() => setShowSurveyModal(true)}
               onDismiss={dismissSurvey}
