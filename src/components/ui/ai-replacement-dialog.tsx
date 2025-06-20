@@ -70,7 +70,7 @@ export const AIReplacementDialog: React.FC<AIReplacementDialogProps> = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
-        <DialogHeader className="pb-4">
+        <DialogHeader className="pb-2">
           <DialogTitle className="text-lg font-medium text-foreground">
             {actionTitle}
           </DialogTitle>
@@ -83,7 +83,7 @@ export const AIReplacementDialog: React.FC<AIReplacementDialogProps> = ({
             <Card className="border-muted/60">
               <CardContent className="p-4">
                 <h4 className="text-sm font-semibold mb-3 text-muted-foreground">Original Text</h4>
-                <div className="text-sm bg-muted/30 p-3 rounded-md max-h-40 overflow-y-auto border border-muted/30 text-foreground">
+                <div className="text-sm bg-muted/30 p-3 rounded-md max-h-64 overflow-y-auto border border-muted/30 text-foreground">
                   {originalText}
                 </div>
               </CardContent>
@@ -93,7 +93,7 @@ export const AIReplacementDialog: React.FC<AIReplacementDialogProps> = ({
             <Card className="border-primary/30 bg-primary/5">
               <CardContent className="p-4">
                 <h4 className="text-sm font-semibold mb-3 text-primary">✨ AI Enhanced Text</h4>
-                <div className="text-sm bg-primary/10 p-3 rounded-md max-h-40 overflow-y-auto border border-primary/30">
+                <div className="text-sm bg-primary/10 p-3 rounded-md max-h-64 overflow-y-auto border border-primary/30">
                   {isLoading ? (
                     <div className="flex items-center justify-center py-8">
                       <Loader2 className="h-4 w-4 animate-spin mr-2 text-primary" />
@@ -108,9 +108,10 @@ export const AIReplacementDialog: React.FC<AIReplacementDialogProps> = ({
           </div>
         </div>
 
-        {/* Action Buttons with Discreet Creativity Slider */}
-        <div className="flex justify-between items-center pt-4 border-t bg-background">
-          <div className="flex items-center gap-4">
+        {/* Action Buttons with Creativity Slider Below */}
+        <div className="pt-2 border-t bg-background space-y-3">
+          {/* First row: Regenerate and main action buttons */}
+          <div className="flex justify-between items-center">
             <Button
               variant="ghost"
               onClick={handleRegenerate}
@@ -120,51 +121,51 @@ export const AIReplacementDialog: React.FC<AIReplacementDialogProps> = ({
               <RefreshCw className="h-4 w-4" />
               Regenerate
             </Button>
-            
-            {/* Discreet Creativity Slider */}
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] text-muted-foreground/60">Style:</span>
-              <div className="flex items-center gap-1">
-                <span className="text-[9px] text-muted-foreground/50">Safe</span>
-                <div className="relative w-16">
-                  <div className="w-full h-0.5 bg-gradient-to-r from-blue-300/30 via-indigo-300/30 via-purple-300/30 to-pink-300/30 rounded-full"></div>
-                  <input
-                    type="range"
-                    min="0"
-                    max="3"
-                    step="1"
-                    value={creativityLevel}
-                    onChange={(e) => updateCreativityLevel(parseInt(e.target.value))}
-                    className="absolute top-0 w-full h-0.5 appearance-none bg-transparent cursor-pointer opacity-0"
-                  />
-                  <div 
-                    className="absolute top-[-1.5px] w-1 h-1 bg-primary rounded-full transition-all duration-200"
-                    style={{ left: `${(creativityLevel / 3) * 100}%`, transform: 'translateX(-50%)' }}
-                  />
-                </div>
-                <span className="text-[9px] text-muted-foreground/50">Bold</span>
-              </div>
+
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={handleReject}
+                disabled={isLoading}
+                className="flex items-center gap-2 border-muted hover:bg-muted"
+              >
+                <X className="h-4 w-4" />
+                Cancel
+              </Button>
+              <Button
+                onClick={handleAccept}
+                disabled={isLoading || !generatedText}
+                className="flex items-center gap-2 bg-primary hover:bg-primary/90"
+              >
+                <Check className="h-4 w-4" />
+                Apply Changes
+              </Button>
             </div>
           </div>
-
-          <div className="flex gap-3">
-            <Button
-              variant="outline"
-              onClick={handleReject}
-              disabled={isLoading}
-              className="flex items-center gap-2 border-muted hover:bg-muted"
-            >
-              <X className="h-4 w-4" />
-              Cancel
-            </Button>
-            <Button
-              onClick={handleAccept}
-              disabled={isLoading || !generatedText}
-              className="flex items-center gap-2 bg-primary hover:bg-primary/90"
-            >
-              <Check className="h-4 w-4" />
-              Apply Changes
-            </Button>
+          
+          {/* Second row: Creativity Slider */}
+          <div className="flex items-center justify-center gap-3 py-2">
+            <span className="text-[10px] text-muted-foreground/60">Style:</span>
+            <div className="flex items-center gap-2">
+              <span className="text-[9px] text-muted-foreground/50">Safe</span>
+              <div className="relative w-32">
+                <div className="w-full h-0.5 bg-gradient-to-r from-blue-300/30 via-indigo-300/30 via-purple-300/30 to-pink-300/30 rounded-full"></div>
+                <input
+                  type="range"
+                  min="0"
+                  max="3"
+                  step="1"
+                  value={creativityLevel}
+                  onChange={(e) => updateCreativityLevel(parseInt(e.target.value))}
+                  className="absolute top-0 w-full h-0.5 appearance-none bg-transparent cursor-pointer opacity-0"
+                />
+                <div 
+                  className="absolute top-[-1.5px] w-1 h-1 bg-primary rounded-full transition-all duration-200"
+                  style={{ left: `${(creativityLevel / 3) * 100}%`, transform: 'translateX(-50%)' }}
+                />
+              </div>
+              <span className="text-[9px] text-muted-foreground/50">Bold</span>
+            </div>
           </div>
         </div>
       </DialogContent>

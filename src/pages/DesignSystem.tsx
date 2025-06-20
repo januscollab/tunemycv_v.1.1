@@ -35,8 +35,10 @@ import { DocumentHistory as ProfileDocumentHistory } from '@/components/ui/profi
 // Experimental component redesigns
 import EnhancedAnalysisHistoryA from '@/components/experiments/EnhancedAnalysisHistoryA';
 import EnhancedAnalysisHistoryB from '@/components/experiments/EnhancedAnalysisHistoryB';
+import EnhancedAnalysisHistoryC from '@/components/experiments/EnhancedAnalysisHistoryC';
 import CategoryDocumentHistoryA from '@/components/experiments/CategoryDocumentHistoryA';
 import CategoryDocumentHistoryB from '@/components/experiments/CategoryDocumentHistoryB';
+import CategoryDocumentHistoryC from '@/components/experiments/CategoryDocumentHistoryC';
 
 
 const DesignSystem = () => {
@@ -1495,6 +1497,50 @@ const DesignSystem = () => {
                       <div className="text-2xl mb-2">🎪</div>
                       <div className="font-medium mb-1">Physics UI</div>
                       <div className="text-caption text-muted-foreground">Elements with realistic physics</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </section>
+          </TabsContent>
+
+          {/* Experiments Tab */}
+          <TabsContent value="experiments" className="space-y-8">
+            <section>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Sparkles className="h-5 w-5 text-primary" />
+                    Component Experiments
+                  </CardTitle>
+                  <p className="text-muted-foreground">
+                    Alternative designs and layouts for testing and comparison
+                  </p>
+                </CardHeader>
+                <CardContent className="space-y-8">
+                  {/* CV Analysis History Variants */}
+                  <div>
+                    <h3 className="text-heading font-semibold mb-4">CV Analysis History</h3>
+                    <div className="space-y-6">
+                      <EnhancedAnalysisHistoryA />
+                      <Separator />
+                      <EnhancedAnalysisHistoryB />
+                      <Separator />
+                      <EnhancedAnalysisHistoryC />
+                    </div>
+                  </div>
+                  
+                  <Separator className="my-8" />
+                  
+                  {/* Cover Letter History Variants */}
+                  <div>
+                    <h3 className="text-heading font-semibold mb-4">Cover Letter History</h3>
+                    <div className="space-y-6">
+                      <CategoryDocumentHistoryA />
+                      <Separator />
+                      <CategoryDocumentHistoryB />
+                      <Separator />
+                      <CategoryDocumentHistoryC />
                     </div>
                   </div>
                 </CardContent>
