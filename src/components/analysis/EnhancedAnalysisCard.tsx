@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import { Calendar, Eye, Download, Trash2, FileText, Pen } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { VybeIconButton } from '@/components/design-system/VybeIconButton';
-import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { CaptureInput } from '@/components/ui/capture-input';
 import { cn } from '@/lib/utils';
 import LinkageIndicators from '@/components/analysis/LinkageIndicators';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { DocumentTypeBadge } from '@/components/ui/document-type-badge';
 
 interface AnalysisHistoryItem {
   id: string;
@@ -64,10 +62,10 @@ const EnhancedAnalysisCard: React.FC<EnhancedAnalysisCardProps> = ({
   className,
   onAnalysisUpdate
 }) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [editJobTitle, setEditJobTitle] = useState(analysis.job_title || 'Untitled Position');
-  const [editCompanyName, setEditCompanyName] = useState(analysis.company_name || 'Company not specified');
+  const [editJobTitle, setEditJobTitle] = useState(analysis.job_title || 'Unknown Position');
+  const [editCompanyName, setEditCompanyName] = useState(analysis.company_name || 'Unknown Company');
   const [isSaving, setIsSaving] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const { toast } = useToast();
 
   const formatDate = (dateString: string) => {
@@ -106,7 +104,7 @@ const EnhancedAnalysisCard: React.FC<EnhancedAnalysisCardProps> = ({
         onAnalysisUpdate(updatedAnalysis);
       }
 
-      setIsEditing(false);
+      setEditDialogOpen(false);
       toast({
         title: "Updated Successfully",
         description: "Position and company name have been updated.",
@@ -123,149 +121,112 @@ const EnhancedAnalysisCard: React.FC<EnhancedAnalysisCardProps> = ({
     }
   };
 
-  const handleCancelEdit = () => {
-    setEditJobTitle(analysis.job_title || 'Untitled Position');
-    setEditCompanyName(analysis.company_name || 'Company not specified');
-    setIsEditing(false);
-  };
-
-  const handleCardClick = () => {
-    if (!isEditing) {
-      onView(analysis);
-    }
-  };
-
-  const handleButtonClick = (e: React.MouseEvent, action: () => void) => {
-    e.stopPropagation();
-    action();
-  };
-
   const handleEditClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsEditing(true);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSaveEdit();
-    } else if (e.key === 'Escape') {
-      handleCancelEdit();
-    }
+    setEditJobTitle(analysis.job_title || 'Unknown Position');
+    setEditCompanyName(analysis.company_name || 'Unknown Company');
+    setEditDialogOpen(true);
   };
 
   return (
-    <Card
+    <div
       className={cn(
-        "hover:shadow-md transition-all duration-200 hover:border-primary/50 hover:bg-muted/50 border border-border relative border-t-4 border-t-[#FF6B35]",
-        !isEditing && "cursor-pointer",
+        "bg-card border border-border rounded-lg p-4 hover:shadow-md transition-all duration-200 hover:border-primary/50 hover:bg-muted/50 cursor-pointer relative border-t-4 border-t-[#FF6B35]",
         className
       )}
-      onClick={handleCardClick}
+      onClick={() => onView(analysis)}
     >
-      {/* Document Type Badge */}
-      <DocumentTypeBadge 
-        type="analysis" 
-        variant="secondary" 
-        size="sm" 
-        className="absolute top-2 right-2"
-      />
-      
-      <CardContent className="p-6">
-        <div className="flex justify-between items-start mb-4">
-          <div className="flex-1">
-            <div className="flex items-start space-x-3 mb-2">
-              {/* Document icon */}
-              <div className="flex-shrink-0 w-10 h-10 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
-                <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-              </div>
-              
-              <div className="flex-1 min-w-0">
-                {/* Title and company with edit functionality */}
-                <div className="group/edit relative">
-                  {isEditing ? (
-                    <div className="flex gap-2 mb-1">
-                      <Input
-                        value={editJobTitle}
-                        onChange={(e) => setEditJobTitle(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        className="text-heading font-semibold h-auto p-1 border-blue-300 focus:border-blue-500"
-                        placeholder="Position title"
-                        autoFocus
-                      />
-                      <span className="text-heading font-semibold text-foreground self-center">-</span>
-                      <Input
-                        value={editCompanyName}
-                        onChange={(e) => setEditCompanyName(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        className="text-heading font-semibold h-auto p-1 border-blue-300 focus:border-blue-500"
-                        placeholder="Company name"
-                      />
-                      <div className="flex gap-1 self-center">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleSaveEdit();
-                          }}
-                          disabled={isSaving}
-                          className="text-green-600 hover:text-green-700 text-sm px-2 py-1 rounded bg-green-50 hover:bg-green-100"
-                        >
-                          Save
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleCancelEdit();
-                          }}
-                          className="text-gray-600 hover:text-gray-700 text-sm px-2 py-1 rounded bg-gray-50 hover:bg-gray-100"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="text-heading font-medium text-foreground">
-                        {analysis.job_title || 'Untitled Position'} - {analysis.company_name || 'Company not specified'}
-                      </h3>
-                      <button
-                        onClick={handleEditClick}
-                        className="opacity-0 group-hover/edit:opacity-100 transition-opacity duration-200 p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded"
-                        title="Edit position and company"
-                      >
-                        <Pen className="h-3 w-3 text-muted-foreground hover:text-foreground" />
-                      </button>
-                    </div>
-                  )}
-                </div>
-                
-                {/* Date and badge row */}
-                <div className="flex items-center space-x-4 text-caption text-muted-foreground mb-2">
-                  <div className="flex items-center space-x-1">
-                    <Calendar className="h-3 w-3" />
-                    <span>Updated {formatDate(analysis.created_at)}</span>
-                  </div>
-                  <Badge className="text-micro bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800">
-                    CV Analysis
-                  </Badge>
-                </div>
-                
-                {/* Linkage Indicators */}
-                <div className="mt-2">
-                  <LinkageIndicators
-                    hasLinkedCoverLetter={linkage.hasLinkedCoverLetter}
-                    hasLinkedInterviewPrep={linkage.hasLinkedInterviewPrep}
-                    onViewCoverLetter={() => linkage.linkedCoverLetterId && onViewCoverLetter(linkage.linkedCoverLetterId)}
-                    onViewInterviewPrep={() => linkage.linkedInterviewPrepId && onViewInterviewPrep(linkage.linkedInterviewPrepId)}
-                    compact={true}
-                  />
-                </div>
-              </div>
-            </div>
+      {/* Main content layout */}
+      <div className="flex items-start justify-between">
+        {/* Left side - Icon and content */}
+        <div className="flex items-start space-x-3 flex-1">
+          {/* Document icon */}
+          <div className="flex-shrink-0 w-10 h-10 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
+            <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
           </div>
           
-          {/* Compatibility score on the right */}
+          {/* Content */}
+          <div className="flex-1 min-w-0">
+            {/* Title and company with edit */}
+            <div className="group/edit relative flex items-center gap-2 mb-1">
+              <h3 className="text-heading font-medium text-foreground truncate">
+                {analysis.job_title || 'Unknown Position'} - {analysis.company_name || 'Unknown Company'}
+              </h3>
+              <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+                <DialogTrigger asChild>
+                  <button
+                    onClick={handleEditClick}
+                    className="opacity-0 group-hover/edit:opacity-100 transition-opacity duration-200 p-1 hover:bg-muted rounded"
+                    title="Edit position and company"
+                  >
+                    <Pen className="h-3 w-3 text-muted-foreground hover:text-foreground" />
+                  </button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Edit Analysis Details</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <CaptureInput
+                      label="Position Title"
+                      value={editJobTitle}
+                      onChange={(e) => setEditJobTitle(e.target.value)}
+                      placeholder="Enter position title"
+                      required
+                    />
+                    <CaptureInput
+                      label="Company Name"
+                      value={editCompanyName}
+                      onChange={(e) => setEditCompanyName(e.target.value)}
+                      placeholder="Enter company name"
+                      required
+                    />
+                    <div className="flex justify-end space-x-2 pt-4">
+                      <Button
+                        variant="outline"
+                        onClick={() => setEditDialogOpen(false)}
+                        disabled={isSaving}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        onClick={handleSaveEdit}
+                        disabled={isSaving}
+                      >
+                        {isSaving ? 'Saving...' : 'Save Changes'}
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+            
+            {/* Date */}
+            <div className="flex items-center text-caption text-muted-foreground mb-2">
+              <Calendar className="h-3 w-3 mr-1" />
+              <span>Updated {formatDate(analysis.created_at)}</span>
+            </div>
+            
+            {/* Linkage Indicators */}
+            <div className="mt-2">
+              <LinkageIndicators
+                hasLinkedCoverLetter={linkage.hasLinkedCoverLetter}
+                hasLinkedInterviewPrep={linkage.hasLinkedInterviewPrep}
+                onViewCoverLetter={() => linkage.linkedCoverLetterId && onViewCoverLetter(linkage.linkedCoverLetterId)}
+                onViewInterviewPrep={() => linkage.linkedInterviewPrepId && onViewInterviewPrep(linkage.linkedInterviewPrepId)}
+                compact={true}
+              />
+            </div>
+          </div>
+        </div>
+        
+        {/* Right side - Badge and score */}
+        <div className="flex flex-col items-end space-y-2">
+          <Badge className="text-micro bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800">
+            CV Analysis
+          </Badge>
           {analysis.compatibility_score && (
-            <div className="text-right ml-4">
+            <div className="text-right">
               <div className="text-2xl font-bold text-[#FF6B35] leading-none">
                 {analysis.compatibility_score}%
               </div>
@@ -275,113 +236,113 @@ const EnhancedAnalysisCard: React.FC<EnhancedAnalysisCardProps> = ({
             </div>
           )}
         </div>
+      </div>
 
-        {/* Action buttons row at bottom */}
-        <div className="flex items-center justify-between pt-1.5 border-t border-border">
-          {/* Dynamic CTAs on the left */}
-          <div className="flex items-center space-x-2">
-            {/* Cover Letter CTA */}
-            {linkage.hasLinkedCoverLetter ? (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  linkage.linkedCoverLetterId && onViewCoverLetter(linkage.linkedCoverLetterId);
-                }}
-                className="text-caption font-medium transition-colors h-8 px-3 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
-              >
-                <FileText className="h-4 w-4 mr-2" />
-                View Cover Letter
-              </Button>
-            ) : (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onGenerateCoverLetter(analysis);
-                }}
-                className="text-caption font-medium transition-colors h-8 px-3 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
-              >
-                <FileText className="h-4 w-4 mr-2" />
-                Create Cover Letter
-              </Button>
-            )}
-
-            {/* Interview Prep CTA */}
-            {linkage.hasLinkedInterviewPrep ? (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  linkage.linkedInterviewPrepId && onViewInterviewPrep(linkage.linkedInterviewPrepId);
-                }}
-                className="text-caption font-medium transition-colors h-8 px-3 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
-              >
-                <FileText className="h-4 w-4 mr-2" />
-                View Interview Prep
-              </Button>
-            ) : (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onCreateInterviewPrep(analysis);
-                }}
-                className="text-caption font-medium transition-colors h-8 px-3 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
-              >
-                <FileText className="h-4 w-4 mr-2" />
-                Create Interview Prep
-              </Button>
-            )}
-          </div>
-
-          {/* Action icons on the right */}
-          <div className="flex items-center space-x-6">
+      {/* Action buttons row at bottom */}
+      <div className="flex items-center justify-between pt-3 mt-3 border-t border-border">
+        {/* Dynamic CTAs on the left */}
+        <div className="flex items-center space-x-2">
+          {/* Cover Letter CTA */}
+          {linkage.hasLinkedCoverLetter ? (
             <Button
               variant="ghost"
               size="sm"
               onClick={(e) => {
                 e.stopPropagation();
-                onView(analysis);
+                linkage.linkedCoverLetterId && onViewCoverLetter(linkage.linkedCoverLetterId);
               }}
-              className="text-caption font-medium transition-colors h-8 px-3 flex items-center space-x-2 text-black hover:text-black"
+              className="text-caption font-medium transition-colors h-8 px-3 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
             >
-              <Eye className="h-4 w-4 text-black" />
-              <span>View</span>
+              <FileText className="h-4 w-4 mr-2" />
+              View Cover Letter
             </Button>
+          ) : (
             <Button
               variant="ghost"
               size="sm"
               onClick={(e) => {
                 e.stopPropagation();
-                onDownload(analysis);
+                onGenerateCoverLetter(analysis);
               }}
-              className="text-caption font-medium transition-colors h-8 px-3 flex items-center space-x-2 text-black hover:text-black"
+              className="text-caption font-medium transition-colors h-8 px-3 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
             >
-              <Download className="h-4 w-4 text-black" />
-              <span>Download</span>
+              <FileText className="h-4 w-4 mr-2" />
+              Create Cover Letter
             </Button>
+          )}
+
+          {/* Interview Prep CTA */}
+          {linkage.hasLinkedInterviewPrep ? (
             <Button
               variant="ghost"
               size="sm"
               onClick={(e) => {
                 e.stopPropagation();
-                onDelete(analysis);
+                linkage.linkedInterviewPrepId && onViewInterviewPrep(linkage.linkedInterviewPrepId);
               }}
-              disabled={deletingId === analysis.id}
-              className="text-caption font-medium transition-colors h-8 px-3 flex items-center space-x-2 text-destructive hover:text-destructive hover:bg-destructive/10"
+              className="text-caption font-medium transition-colors h-8 px-3 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
             >
-              <Trash2 className="h-4 w-4" />
-              <span>Delete</span>
+              <FileText className="h-4 w-4 mr-2" />
+              View Interview Prep
             </Button>
-          </div>
+          ) : (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                onCreateInterviewPrep(analysis);
+              }}
+              className="text-caption font-medium transition-colors h-8 px-3 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              Create Interview Prep
+            </Button>
+          )}
         </div>
-      </CardContent>
-    </Card>
+
+        {/* Action icons on the right */}
+        <div className="flex items-center space-x-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              onView(analysis);
+            }}
+            className="text-caption font-medium transition-colors h-8 px-3 flex items-center space-x-2 text-foreground hover:text-foreground"
+          >
+            <Eye className="h-4 w-4" />
+            <span>View</span>
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDownload(analysis);
+            }}
+            className="text-caption font-medium transition-colors h-8 px-3 flex items-center space-x-2 text-foreground hover:text-foreground"
+          >
+            <Download className="h-4 w-4" />
+            <span>Download</span>
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(analysis);
+            }}
+            disabled={deletingId === analysis.id}
+            className="text-caption font-medium transition-colors h-8 px-3 flex items-center space-x-2 text-destructive hover:text-destructive hover:bg-destructive/10"
+          >
+            <Trash2 className="h-4 w-4" />
+            <span>Delete</span>
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 };
 
