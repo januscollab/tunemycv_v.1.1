@@ -47,7 +47,7 @@ const FileUploadArea: React.FC<FileUploadAreaProps> = ({
 
   return (
     <>
-      <div className="relative">
+      <div className="relative cursor-pointer">
         <DragDropZone
           onDrop={handleDrop}
           accept={accept}
@@ -55,8 +55,10 @@ const FileUploadArea: React.FC<FileUploadAreaProps> = ({
           disabled={uploading || orchestrator.isProcessing}
           placeholder={orchestrator.isProcessing ? orchestrator.progress : (uploading ? "Uploading..." : label)}
           description={`${accept} • Max ${maxSize}`}
-          className="border-2 border-dashed border-primary/20 hover:border-primary/40 transition-colors duration-200 rounded-xl bg-gradient-to-br from-background via-muted/10 to-background shadow-sm hover:shadow-md"
+          className="border-2 border-dashed border-primary/20 hover:border-primary/40 transition-all duration-200 rounded-xl bg-gradient-to-br from-background via-muted/10 to-background shadow-sm hover:shadow-md hover:scale-[1.01] cursor-pointer min-h-[120px] flex items-center"
         />
+        {/* Enhanced mobile touch target */}
+        <div className="absolute inset-0 bg-transparent hover:bg-primary/5 transition-colors duration-200 rounded-xl pointer-events-none md:pointer-events-auto" />
       </div>
       
       {orchestrator.isProcessing && (
@@ -66,7 +68,6 @@ const FileUploadArea: React.FC<FileUploadAreaProps> = ({
             variant="default"
             size="md"
             label="Processing Document"
-            
           />
         </div>
       )}

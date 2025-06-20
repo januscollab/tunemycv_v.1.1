@@ -150,11 +150,12 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
       <input
         ref={fileInputRef}
         type="file"
-        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed z-10"
         accept={accept}
         multiple={multiple}
         disabled={disabled}
         onChange={handleFileInput}
+        aria-label={placeholder}
       />
       
       {children || (

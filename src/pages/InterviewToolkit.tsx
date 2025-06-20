@@ -30,6 +30,7 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { CaptureInput } from '@/components/ui/capture-input';
 import { CategoryDocumentHistory } from '@/components/ui/category-document-history';
+import InterviewPrepHistory from '@/components/interview-prep/InterviewPrepHistory';
 
 import { useLocation, useNavigate } from 'react-router-dom';
 import Breadcrumbs from '@/components/navigation/Breadcrumbs';

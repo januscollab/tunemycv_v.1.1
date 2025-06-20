@@ -170,15 +170,19 @@ const JobDescriptionUpload: React.FC<JobDescriptionUploadProps> = ({
       )}
       
       <div className="space-y-4">
-        {/* File Upload Option */}
-        <FileUploadArea
-          onFileSelect={handleFileSelect}
-          uploading={false}
-          accept=".pdf,.docx,.txt"
-          maxSize="5MB"
-          label="Upload Job Description"
-          fileType="job_description"
-        />
+        {/* Enhanced File Upload Option - Full Area Clickable */}
+        <div className="group relative">
+          <FileUploadArea
+            onFileSelect={handleFileSelect}
+            uploading={false}
+            accept=".pdf,.docx,.txt"
+            maxSize="5MB"
+            label="Upload Job Description"
+            fileType="job_description"
+          />
+          {/* Enhanced interaction feedback */}
+          <div className="absolute inset-0 bg-transparent hover:bg-primary/5 transition-colors duration-200 rounded-xl pointer-events-none group-hover:pointer-events-auto" />
+        </div>
         
         <div className="text-center text-blueberry/60 dark:text-apple-core/60">or</div>
         
