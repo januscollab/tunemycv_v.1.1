@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { ExternalLink, Eye, FileText, Globe, Download } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { DownloadMenu } from '@/components/ui/download-menu';
-import PDFViewerEnhanced from '@/components/ui/pdf-viewer-enhanced';
+import MultiTierPDFViewer from '@/components/ui/multi-tier-pdf-viewer';
 
 interface N8nAnalysisResultsProps {
   result: {
@@ -198,7 +198,7 @@ const N8nAnalysisResults: React.FC<N8nAnalysisResultsProps> = ({
 
       {/* PDF Viewer */}
       {result.pdf_file_data ? (
-        <PDFViewerEnhanced
+        <MultiTierPDFViewer
           pdfData={result.pdf_file_data}
           fileName={result.pdf_file_name || 'analysis-report.pdf'}
           title="Analysis Report"
