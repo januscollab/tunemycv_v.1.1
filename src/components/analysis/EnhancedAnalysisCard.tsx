@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, Eye, Download, Trash2, FileText, Pen } from 'lucide-react';
+import { Calendar, Eye, Download, Trash2, FileText, Pen, MessageSquare } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -219,23 +219,25 @@ const EnhancedAnalysisCard: React.FC<EnhancedAnalysisCardProps> = ({
         
         {/* Right side - Badge */}
         <div className="flex flex-col items-end">
-          <Badge 
-            className="text-[10px] bg-white text-blue-600 border border-blue-600 cursor-pointer hover:bg-blue-50 hover:border-blue-700 hover:text-blue-700 transition-colors duration-200"
+          <Button
+            variant="outline"
+            size="sm"
             onClick={(e) => {
               e.stopPropagation();
               onView(analysis);
             }}
+            className="text-[10px] h-6 px-2 bg-white text-blue-600 border border-blue-600 hover:bg-blue-50 hover:border-blue-700 hover:text-blue-700 transition-colors duration-200"
           >
             CV Analysis
-          </Badge>
+          </Button>
         </div>
       </div>
 
       {/* Action buttons row at bottom */}
-      <div className="flex items-center justify-end space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+      <div className="flex items-center justify-end space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
         {/* Cover Letter CTA */}
         {linkage.hasLinkedCoverLetter ? (
-          <span className="text-sm text-muted-foreground mr-4">✓ Cover Letter</span>
+          <span className="text-sm text-muted-foreground mr-2">✓ Cover Letter</span>
         ) : (
           <Button
             variant="ghost"
@@ -244,15 +246,16 @@ const EnhancedAnalysisCard: React.FC<EnhancedAnalysisCardProps> = ({
               e.stopPropagation();
               onGenerateCoverLetter(analysis);
             }}
-            className="text-sm font-medium text-muted-foreground hover:text-foreground mr-2"
+            className="text-sm font-medium text-muted-foreground hover:text-foreground mr-2 flex items-center gap-1"
           >
-            + Cover Letter
+            <FileText className="h-3 w-3" />
+            Cover Letter
           </Button>
         )}
 
         {/* Interview Prep CTA */}
         {linkage.hasLinkedInterviewPrep ? (
-          <span className="text-sm text-muted-foreground mr-4">✓ Interview Prep</span>
+          <span className="text-sm text-muted-foreground mr-2">✓ Interview Prep</span>
         ) : (
           <Button
             variant="ghost"
@@ -261,9 +264,10 @@ const EnhancedAnalysisCard: React.FC<EnhancedAnalysisCardProps> = ({
               e.stopPropagation();
               onCreateInterviewPrep(analysis);
             }}
-            className="text-sm font-medium text-muted-foreground hover:text-foreground mr-2"
+            className="text-sm font-medium text-muted-foreground hover:text-foreground mr-2 flex items-center gap-1"
           >
-            + Interview Prep
+            <MessageSquare className="h-3 w-3" />
+            Interview Prep
           </Button>
         )}
 
