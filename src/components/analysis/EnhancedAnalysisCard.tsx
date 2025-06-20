@@ -131,7 +131,7 @@ const EnhancedAnalysisCard: React.FC<EnhancedAnalysisCardProps> = ({
   return (
     <div
       className={cn(
-        "w-full bg-card border border-border rounded-lg p-6 hover:shadow-md transition-all duration-200 cursor-pointer relative border-t-4 border-t-[#FF6B35]",
+        "rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer relative border-t-4 border-t-[#FF6B35] p-6",
         className
       )}
       onClick={() => onView(analysis)}
