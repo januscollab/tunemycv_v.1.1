@@ -35,7 +35,7 @@ interface CVSelectorProps {
 const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploading }) => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState<'upload' | 'saved'>('upload');
+  const [activeTab, setActiveTab] = useState<'upload' | 'saved'>('saved');
   const [selectedCVId, setSelectedCVId] = useState<string | null>(null);
   const [fileUploading, setFileUploading] = useState(false);
   const [showVerificationModal, setShowVerificationModal] = useState(false);

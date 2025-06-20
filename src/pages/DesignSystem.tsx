@@ -608,30 +608,17 @@ const DesignSystem = () => {
       component: (
         <div className="space-y-4">
           <p className="text-caption text-muted-foreground">
-            Select any text below to see the new AI context menu design inspired by your brand colors:
+            AI Context Menu is now only available within Rich Text Editor components for security and UX consistency.
           </p>
-          <ExperimentalAIMenu
-            selectedText="This is sample selected text"
-          >
-            <div className="p-4 border border-border rounded-lg bg-background min-h-[120px]">
-              <h3 className="text-heading font-semibold mb-3">Enhanced AI Assistant</h3>
-              <p className="text-body leading-relaxed">
-                Select any portion of this text to trigger the enhanced AI context menu. 
-                The menu features improved search capabilities, better text alternatives, 
-                and seamless replace functionality with smart contextual filtering and 
-                developer-configurable avatar. Try selecting this sentence to see the 
-                enhanced menu appear with smooth gliding animations.
-              </p>
-              <p className="text-body mt-4">
-                Features include before/after text comparison, contextual action filtering,
-                and subtle orange branding aligned with the design system.
-              </p>
-            </div>
-          </ExperimentalAIMenu>
+          <div className="p-4 border border-border rounded-lg bg-background min-h-[120px] flex items-center justify-center">
+            <p className="text-body text-muted-foreground">
+              AI Context Menu disabled outside of Rich Text Editor context
+            </p>
+          </div>
         </div>
       ),
-      usage: 'New component',
-      description: 'AI-powered context menu with brand-aligned design for text enhancement'
+      usage: 'RTE only',
+      description: 'AI context menu restricted to Rich Text Editor'
     }
   ];
 
@@ -1279,40 +1266,15 @@ const DesignSystem = () => {
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {/* Demo Area */}
-                  <div className="border-2 border-dashed border-border rounded-lg p-8 bg-muted/30 relative min-h-[400px]">
-                    <ExperimentalAIMenu selectedText="sample text">
-                      <div className="space-y-4">
-                        <h3 className="text-heading font-semibold">Select any text below to see the AI assistant:</h3>
-                        
-                        <div className="space-y-4 text-body leading-relaxed">
-                          <p className="bg-background p-4 rounded-lg border">
-                            This is a sample paragraph with some text that you can select to trigger the experimental AI menu. 
-                            Try selecting different amounts of text to see how the AI's personality changes based on complexity.
-                          </p>
-                          
-                          <p className="bg-background p-4 rounded-lg border">
-                            Here's another paragraph! Notice how the AI responds differently to exclamation marks and questions? 
-                            The floating assistant adapts its mood and behavior based on what you select.
-                          </p>
-                          
-                          <p className="bg-background p-4 rounded-lg border">
-                            This is a much longer paragraph with complex sentence structures, technical terminology, and detailed explanations that should trigger the AI's "thinking" mode. The assistant recognizes text complexity and adjusts its visual feedback accordingly, showing a more contemplative expression when dealing with sophisticated content that requires deeper analysis and processing.
-                          </p>
-                        </div>
-                        
-                        <div className="bg-accent/50 p-4 rounded-lg border border-accent">
-                          <h4 className="font-semibold mb-2">🎯 Try These Features:</h4>
-                          <ul className="text-caption space-y-1 list-disc list-inside">
-                            <li>Select short text → Happy AI 😊</li>
-                            <li>Select text with ! or ? → Excited AI 🤖</li>
-                            <li>Select long/complex text → Thinking AI 🤔</li>
-                            <li>Hover over the floating circle → Orbital actions appear</li>
-                            <li>Click actions with arrows → Sub-menus slide out</li>
-                            <li>Watch the processing animation with particles</li>
-                          </ul>
-                        </div>
-                      </div>
-                    </ExperimentalAIMenu>
+                  <div className="border-2 border-dashed border-border rounded-lg p-8 bg-muted/30 relative min-h-[400px] flex items-center justify-center">
+                    <div className="text-center space-y-4">
+                      <h3 className="text-heading font-semibold">AI Context Menu Disabled</h3>
+                      <p className="text-body text-muted-foreground max-w-md">
+                        For security and consistency, the AI Context Menu is now only available 
+                        within Rich Text Editor components. This ensures proper context and 
+                        prevents accidental activation outside of editing workflows.
+                      </p>
+                    </div>
                   </div>
 
                   {/* Design Concept */}

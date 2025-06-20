@@ -826,7 +826,7 @@ const AuthenticatedCoverLetter = () => {
                             content={selectedCoverLetter.content}
                             fileName={`${selectedCoverLetter.company_name}_${selectedCoverLetter.job_title}_Cover_Letter`}
                             triggerComponent={
-                              <Button variant="outline" size="sm" className="gap-2">
+                              <Button variant="outline" size="sm" className="gap-2 font-normal">
                                 <Download className="h-4 w-4" />
                                 Download
                               </Button>

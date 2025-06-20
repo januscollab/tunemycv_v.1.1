@@ -402,7 +402,7 @@ const CoverLetterHistory: React.FC<CoverLetterHistoryProps> = ({
                         e.stopPropagation();
                         handleViewInterviewPrep(linkageCache[coverLetter.id].linkedInterviewPrepId);
                       }}
-                      className="text-caption font-medium transition-colors h-8 px-3 text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300"
+                      className="text-caption font-medium transition-colors h-8 px-3 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
                     >
                       <MessageSquare className="h-4 w-4 mr-2" />
                       View Interview Notes
