@@ -8,6 +8,8 @@ import N8nAnalysisResults from '@/components/analysis/N8nAnalysisResults';
 import CVSelector from '@/components/analyze/CVSelector';
 import JobDescriptionSelector from '@/components/analyze/JobDescriptionSelector';
 import CreditsPanel from '@/components/analyze/CreditsPanel';
+import { EngagingUploadModal } from '@/components/ui/file-upload-modals';
+
 import AnalyzeButton from '@/components/analyze/AnalyzeButton';
 import InterviewPrepAnalysisSelector from '@/components/analyze/InterviewPrepAnalysisSelector';
 import InterviewPrepModal from '@/components/analyze/InterviewPrepModal';
@@ -514,18 +516,11 @@ const AnalyzeCV = () => {
   return (
     <>
       <div className={`min-h-screen bg-gradient-to-br from-primary/5 via-background to-primary/3 dark:from-primary/10 dark:via-background dark:to-primary/5 ${analyzing ? 'pointer-events-none' : ''}`}>
-      {/* Loading overlay */}
-      {analyzing && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-          <div className="bg-white dark:bg-blueberry/90 rounded-lg p-6 text-center max-w-md">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-apricot mx-auto mb-4"></div>
-            <h3 className="text-heading font-semibold text-blueberry dark:text-citrus mb-2">Analyzing Your CV</h3>
-            <p className="text-blueberry/70 dark:text-apple-core/80 min-h-[1.5rem] transition-opacity duration-500 text-caption">
-              {currentLoadingMessage}
-            </p>
-          </div>
-        </div>
-      )}
+      <EngagingUploadModal
+        isOpen={analyzing}
+        title="Analyzing Your CV"
+        message={currentLoadingMessage}
+      />
       
       <div className="max-w-wider mx-auto px-4 py-8">
         {/* Breadcrumbs */}

@@ -41,7 +41,7 @@ import AdvancedGenerationOptions from '@/components/cover-letter/AdvancedGenerat
 
 import NoAnalysisModal from '@/components/cover-letter/NoAnalysisModal';
 import CoverLetterLoggedOut from '@/components/cover-letter/CoverLetterLoggedOut';
-import { ProgressIndicator } from '@/components/ui/progress-indicator';
+import { EngagingUploadModal } from '@/components/ui/file-upload-modals';
 
 
 interface CoverLetterProps {
@@ -520,29 +520,17 @@ const AuthenticatedCoverLetter = () => {
           onUseManualInput={() => setGenerationMethod('input')}
         />
 
-        {isRegenerating && (
-          <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-modal">
-            <ProgressIndicator 
-              value={generationProgress}
-              variant="default"
-              size="lg"
-              label="Regenerating Cover Letter"
-              showPercentage={true}
-            />
-          </div>
-        )}
+        <EngagingUploadModal
+          isOpen={isRegenerating}
+          title="Regenerating Cover Letter"
+          message="Creating a fresh version of your cover letter..."
+        />
 
-        {isGenerating && (
-          <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-modal">
-            <ProgressIndicator 
-              value={generationProgress}
-              variant="default"
-              size="lg"
-              label="Generating Cover Letter"
-              showPercentage={true}
-            />
-          </div>
-        )}
+        <EngagingUploadModal
+          isOpen={isGenerating}
+          title="Generating Cover Letter"
+          message="Our AI is crafting your personalized cover letter..."
+        />
 
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6">

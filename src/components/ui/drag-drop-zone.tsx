@@ -159,8 +159,8 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
       />
       
       {children || (
-        <div className="space-y-2">
-          <div className="mx-auto w-12 h-12 flex items-center justify-center">
+        <div className="flex flex-col items-center justify-center space-y-3 text-center">
+          <div className="w-12 h-12 flex items-center justify-center">
             {dragError ? (
               <AlertCircle className="h-8 w-8 text-destructive animate-bounce" />
             ) : (
@@ -171,7 +171,7 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
             )}
           </div>
           
-          <div>
+          <div className="space-y-1">
             <p className={cn(
               "font-medium transition-all duration-300",
               dragError ? "text-destructive animate-pulse" : 
@@ -180,7 +180,7 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
               {dragError || placeholder}
             </p>
             {!dragError && (
-              <p className="text-sm text-muted-foreground mt-1 transition-colors duration-300 group-hover:text-muted-foreground/80">
+              <p className="text-sm text-muted-foreground transition-colors duration-300 group-hover:text-muted-foreground/80">
                 {description} {accept && `(${accept})`}
                 {maxSize && ` • Max ${(maxSize / 1024 / 1024).toFixed(1)}MB`}
               </p>

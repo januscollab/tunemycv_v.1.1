@@ -77,41 +77,6 @@ export const AIReplacementDialog: React.FC<AIReplacementDialogProps> = ({
         </DialogHeader>
 
         <div className="space-y-6 overflow-y-auto max-h-[calc(90vh-120px)]">
-          {/* Ultra-Discreet Creativity Slider */}
-          <div className="bg-muted/10 rounded-md p-2 border border-muted/50">
-            <div className="flex items-center justify-between mb-1.5">
-              <h3 className="text-xs font-medium text-muted-foreground/80">Creativity</h3>
-              <div className="text-xs text-muted-foreground font-medium">
-                {getCreativityLabel()}
-              </div>
-            </div>
-            
-            <div className="space-y-1.5">
-              {/* Ultra-Compact Slider */}
-              <div className="relative">
-                <div className="w-full h-1 bg-gradient-to-r from-blue-300/40 via-indigo-300/40 via-purple-300/40 to-pink-300/40 rounded-full"></div>
-                <input
-                  type="range"
-                  min="0"
-                  max="3"
-                  step="1"
-                  value={creativityLevel}
-                  onChange={(e) => updateCreativityLevel(parseInt(e.target.value))}
-                  className="absolute top-0 w-full h-1 appearance-none bg-transparent cursor-pointer"
-                  style={{
-                    background: 'transparent'
-                  }}
-                />
-              </div>
-
-              {/* Minimal Level Labels */}
-              <div className="flex justify-between text-[10px] text-muted-foreground/60 px-0.5">
-                <span>Safe</span>
-                <span>Bold</span>
-              </div>
-            </div>
-          </div>
-
           {/* Text Comparison */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Original Text */}
@@ -143,17 +108,44 @@ export const AIReplacementDialog: React.FC<AIReplacementDialogProps> = ({
           </div>
         </div>
 
-        {/* Action Buttons */}
+        {/* Action Buttons with Discreet Creativity Slider */}
         <div className="flex justify-between items-center pt-4 border-t bg-background">
-          <Button
-            variant="ghost"
-            onClick={handleRegenerate}
-            disabled={isLoading}
-            className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
-          >
-            <RefreshCw className="h-4 w-4" />
-            Regenerate
-          </Button>
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              onClick={handleRegenerate}
+              disabled={isLoading}
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+            >
+              <RefreshCw className="h-4 w-4" />
+              Regenerate
+            </Button>
+            
+            {/* Discreet Creativity Slider */}
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] text-muted-foreground/60">Style:</span>
+              <div className="flex items-center gap-1">
+                <span className="text-[9px] text-muted-foreground/50">Safe</span>
+                <div className="relative w-16">
+                  <div className="w-full h-0.5 bg-gradient-to-r from-blue-300/30 via-indigo-300/30 via-purple-300/30 to-pink-300/30 rounded-full"></div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="3"
+                    step="1"
+                    value={creativityLevel}
+                    onChange={(e) => updateCreativityLevel(parseInt(e.target.value))}
+                    className="absolute top-0 w-full h-0.5 appearance-none bg-transparent cursor-pointer opacity-0"
+                  />
+                  <div 
+                    className="absolute top-[-1.5px] w-1 h-1 bg-primary rounded-full transition-all duration-200"
+                    style={{ left: `${(creativityLevel / 3) * 100}%`, transform: 'translateX(-50%)' }}
+                  />
+                </div>
+                <span className="text-[9px] text-muted-foreground/50">Bold</span>
+              </div>
+            </div>
+          </div>
 
           <div className="flex gap-3">
             <Button
