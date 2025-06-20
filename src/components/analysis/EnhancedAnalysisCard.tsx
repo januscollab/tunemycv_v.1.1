@@ -1,9 +1,12 @@
-import React from 'react';
-import { Calendar, Eye, Download, Trash2, FileText } from 'lucide-react';
+import React, { useState } from 'react';
+import { Calendar, Eye, Download, Trash2, FileText, Pen } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { VybeIconButton } from '@/components/design-system/VybeIconButton';
+import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import LinkageIndicators from '@/components/analysis/LinkageIndicators';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface AnalysisHistoryItem {
   id: string;
@@ -41,6 +44,7 @@ interface EnhancedAnalysisCardProps {
   onViewInterviewPrep: (interviewPrepId: string) => void;
   deletingId: string | null;
   className?: string;
+  onAnalysisUpdate?: (updatedAnalysis: AnalysisHistoryItem) => void;
 }
 
 const EnhancedAnalysisCard: React.FC<EnhancedAnalysisCardProps> = ({
@@ -54,8 +58,15 @@ const EnhancedAnalysisCard: React.FC<EnhancedAnalysisCardProps> = ({
   onCreateInterviewPrep,
   onViewInterviewPrep,
   deletingId,
-  className
+  className,
+  onAnalysisUpdate
 }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editJobTitle, setEditJobTitle] = useState(analysis.job_title || 'Untitled Position');
+  const [editCompanyName, setEditCompanyName] = useState(analysis.company_name || 'Company not specified');
+  const [isSaving, setIsSaving] = useState(false);
+  const { toast } = useToast();
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -66,14 +77,88 @@ const EnhancedAnalysisCard: React.FC<EnhancedAnalysisCardProps> = ({
     });
   };
 
+  const handleSaveEdit = async () => {
+    if (isSaving) return;
+    
+    setIsSaving(true);
+    try {
+      const { error } = await supabase
+        .from('analysis_results')
+        .update({
+          job_title: editJobTitle,
+          company_name: editCompanyName
+        })
+        .eq('id', analysis.id);
+
+      if (error) throw error;
+
+      // Update the analysis object and notify parent
+      const updatedAnalysis = {
+        ...analysis,
+        job_title: editJobTitle,
+        company_name: editCompanyName
+      };
+      
+      if (onAnalysisUpdate) {
+        onAnalysisUpdate(updatedAnalysis);
+      }
+
+      setIsEditing(false);
+      toast({
+        title: "Updated Successfully",
+        description: "Position and company name have been updated.",
+      });
+    } catch (error) {
+      console.error('Save failed:', error);
+      toast({
+        title: "Save Failed",
+        description: "Failed to update the analysis. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditJobTitle(analysis.job_title || 'Untitled Position');
+    setEditCompanyName(analysis.company_name || 'Company not specified');
+    setIsEditing(false);
+  };
+
+  const handleCardClick = () => {
+    if (!isEditing) {
+      onView(analysis);
+    }
+  };
+
+  const handleButtonClick = (e: React.MouseEvent, action: () => void) => {
+    e.stopPropagation();
+    action();
+  };
+
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsEditing(true);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSaveEdit();
+    } else if (e.key === 'Escape') {
+      handleCancelEdit();
+    }
+  };
+
   return (
     <div
       className={cn(
-        "bg-card dark:bg-surface border border-border rounded-lg cursor-pointer transition-all duration-normal relative group",
+        "bg-card dark:bg-surface border border-border rounded-lg transition-all duration-normal relative group",
         "hover:border-primary hover:shadow-md border-t-4 border-t-[#FF6B35]",
+        !isEditing && "cursor-pointer",
         className
       )}
-      onClick={() => onView(analysis)}
+      onClick={handleCardClick}
     >
       <div className="p-6">
         {/* Main content - Icon and content layout */}
@@ -85,10 +170,63 @@ const EnhancedAnalysisCard: React.FC<EnhancedAnalysisCardProps> = ({
           
           {/* Content */}
           <div className="flex-1 min-w-0">
-            {/* Title and company on same line */}
-            <h3 className="text-heading font-semibold text-foreground mb-1">
-              {analysis.job_title || 'Untitled Position'} - {analysis.company_name || 'Company not specified'}
-            </h3>
+            {/* Title and company on same line with edit functionality */}
+            <div className="group/edit relative">
+              {isEditing ? (
+                <div className="flex gap-2 mb-1">
+                  <Input
+                    value={editJobTitle}
+                    onChange={(e) => setEditJobTitle(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    className="text-heading font-semibold h-auto p-1 border-blue-300 focus:border-blue-500"
+                    placeholder="Position title"
+                    autoFocus
+                  />
+                  <span className="text-heading font-semibold text-foreground self-center">-</span>
+                  <Input
+                    value={editCompanyName}
+                    onChange={(e) => setEditCompanyName(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    className="text-heading font-semibold h-auto p-1 border-blue-300 focus:border-blue-500"
+                    placeholder="Company name"
+                  />
+                  <div className="flex gap-1 self-center">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSaveEdit();
+                      }}
+                      disabled={isSaving}
+                      className="text-green-600 hover:text-green-700 text-sm px-2 py-1 rounded bg-green-50 hover:bg-green-100"
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCancelEdit();
+                      }}
+                      className="text-gray-600 hover:text-gray-700 text-sm px-2 py-1 rounded bg-gray-50 hover:bg-gray-100"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="text-heading font-semibold text-foreground">
+                    {analysis.job_title || 'Untitled Position'} - {analysis.company_name || 'Company not specified'}
+                  </h3>
+                  <button
+                    onClick={handleEditClick}
+                    className="opacity-0 group-hover/edit:opacity-100 transition-opacity duration-200 p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded"
+                    title="Edit position and company"
+                  >
+                    <Pen className="h-3 w-3 text-muted-foreground hover:text-foreground" />
+                  </button>
+                </div>
+              )}
+            </div>
             
             {/* Date with timestamp */}
             <div className="flex items-center text-caption text-muted-foreground">
@@ -111,8 +249,8 @@ const EnhancedAnalysisCard: React.FC<EnhancedAnalysisCardProps> = ({
               </div>
             )}
             
-            {/* Badge */}
-            <Badge variant="subtle" className="text-micro">
+            {/* Badge - made blue to match icon */}
+            <Badge className="text-micro bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800">
               CV Analysis
             </Badge>
             
