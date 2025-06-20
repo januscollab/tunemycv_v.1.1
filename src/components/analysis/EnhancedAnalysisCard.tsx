@@ -201,29 +201,29 @@ const EnhancedAnalysisCard: React.FC<EnhancedAnalysisCardProps> = ({
               </Dialog>
             </div>
             
-            {/* Date */}
-            <div className="flex items-center text-sm text-muted-foreground">
-              <Calendar className="h-4 w-4 mr-2" />
-              <span>{formatDate(analysis.created_at)}</span>
+            {/* Date and Compatibility */}
+            <div className="flex items-center justify-between text-sm text-muted-foreground">
+              <div className="flex items-center">
+                <Calendar className="h-4 w-4 mr-2" />
+                <span>{formatDate(analysis.created_at)}</span>
+              </div>
+              {analysis.compatibility_score && (
+                <div className="flex items-center text-sm">
+                  <span className="text-lg font-bold text-[#FF6B35] mr-1">
+                    {analysis.compatibility_score}%
+                  </span>
+                  <span>compatibility</span>
+                </div>
+              )}
             </div>
           </div>
         </div>
         
-        {/* Right side - Badge and score */}
-        <div className="flex flex-col items-end space-y-1">
-          <Badge className="text-sm bg-muted text-muted-foreground border-none">
+        {/* Right side - Badge */}
+        <div className="flex flex-col items-end">
+          <Badge className="text-sm bg-blue-600 text-white border-none">
             CV Analysis
           </Badge>
-          {analysis.compatibility_score && (
-            <div className="text-right">
-              <div className="text-5xl font-bold text-[#FF6B35] leading-none">
-                {analysis.compatibility_score}%
-              </div>
-              <div className="text-sm text-muted-foreground mt-1">
-                compatibility
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
