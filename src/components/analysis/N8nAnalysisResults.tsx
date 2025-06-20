@@ -128,71 +128,84 @@ const N8nAnalysisResults: React.FC<N8nAnalysisResultsProps> = ({
 
       {/* Analysis Summary */}
       <Card className="border border-apple-core/20 dark:border-citrus/20">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <FileText className="h-5 w-5 text-zapier-orange" />
-            Analysis Summary
-          </CardTitle>
+        <CardHeader className="pb-4">
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2 text-heading">
+              <FileText className="h-5 w-5 text-zapier-orange" />
+              Analysis Summary
+            </CardTitle>
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={handleHtmlPreview}
+                variant="ghost"
+                size="sm"
+                className="text-blueberry dark:text-apple-core hover:text-zapier-orange dark:hover:text-citrus"
+              >
+                <ExternalLink className="h-4 w-4 mr-2" />
+                Review in Browser
+              </Button>
+              <DownloadMenu
+                buttonText="Download"
+                variant="outline"
+                size="sm"
+                className="text-blueberry dark:text-apple-core hover:text-zapier-orange dark:hover:text-citrus"
+                onDownloadPDF={result.n8n_pdf_url ? () => handleDownload(result.n8n_pdf_url!, 'pdf') : undefined}
+                onDownloadWord={() => console.log('Word download not implemented for n8n reports')}
+                onDownloadText={() => console.log('Text download not implemented for n8n reports')}
+              />
+            </div>
+          </div>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <CardContent className="pt-0">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            {/* Compatibility Score - Large Badge */}
+            {result.compatibility_score && (
+              <div className="flex items-center justify-center">
+                <div className="bg-zapier-orange/10 rounded-full p-4">
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-zapier-orange mb-1">
+                      {result.compatibility_score}%
+                    </div>
+                    <div className="text-micro font-medium text-blueberry/60 dark:text-apple-core/70 uppercase tracking-wide">
+                      Match Score
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* Position */}
             <div>
-              <p className="text-micro font-medium text-blueberry/60 dark:text-apple-core/70 uppercase tracking-wide">
+              <p className="text-micro font-medium text-blueberry/60 dark:text-apple-core/70 uppercase tracking-wide mb-2">
                 Position
               </p>
-              <p className="text-caption font-semibold text-blueberry dark:text-apple-core">
+              <p className="text-heading font-semibold text-blueberry dark:text-apple-core">
                 {getJobTitle()}
               </p>
             </div>
+            
+            {/* Company */}
             <div>
-              <p className="text-micro font-medium text-blueberry/60 dark:text-apple-core/70 uppercase tracking-wide">
+              <p className="text-micro font-medium text-blueberry/60 dark:text-apple-core/70 uppercase tracking-wide mb-2">
                 Company
               </p>
-              <p className="text-caption font-semibold text-blueberry dark:text-apple-core">
+              <p className="text-heading font-semibold text-blueberry dark:text-apple-core">
                 {getCompanyName()}
               </p>
             </div>
-            {result.compatibility_score && (
-              <div>
-                <p className="text-micro font-medium text-blueberry/60 dark:text-apple-core/70 uppercase tracking-wide">
-                  Compatibility Score
-                </p>
-                <Badge variant="secondary" className="bg-zapier-orange/10 text-zapier-orange">
-                  {result.compatibility_score}%
-                </Badge>
-              </div>
-            )}
           </div>
+          
+          {/* Executive Summary */}
           {result.executive_summary && (
-            <div>
-              <p className="text-micro font-medium text-blueberry/60 dark:text-apple-core/70 uppercase tracking-wide mb-2">
-                Summary
+            <div className="border-t border-apple-core/20 dark:border-citrus/20 pt-4">
+              <p className="text-micro font-medium text-blueberry/60 dark:text-apple-core/70 uppercase tracking-wide mb-3">
+                Executive Summary
               </p>
-              <p className="text-caption text-blueberry dark:text-apple-core">
+              <p className="text-caption text-blueberry/80 dark:text-apple-core/90 leading-relaxed">
                 {result.executive_summary}
               </p>
             </div>
           )}
-          
-          {/* Action Buttons */}
-          <div className="flex justify-end gap-2 mt-4">
-            <button
-              onClick={handleHtmlPreview}
-              className="story-link inline-flex items-center gap-2 px-3 py-1.5 text-sm text-blueberry dark:text-apple-core hover:text-zapier-orange dark:hover:text-citrus transition-colors"
-            >
-              <ExternalLink className="h-4 w-4" />
-              Review in Browser
-            </button>
-            <DownloadMenu
-              buttonText="Download"
-              variant="ghost"
-              size="sm"
-              className="story-link text-blueberry dark:text-apple-core hover:text-zapier-orange dark:hover:text-citrus"
-              onDownloadPDF={result.n8n_pdf_url ? () => handleDownload(result.n8n_pdf_url!, 'pdf') : undefined}
-              onDownloadWord={() => console.log('Word download not implemented for n8n reports')}
-              onDownloadText={() => console.log('Text download not implemented for n8n reports')}
-            />
-          </div>
         </CardContent>
       </Card>
 

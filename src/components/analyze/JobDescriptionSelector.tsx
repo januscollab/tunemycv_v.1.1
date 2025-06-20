@@ -8,6 +8,7 @@ import { DocumentJson, textToJson, generateFormattedText } from '@/utils/documen
 import { CaptureTextarea } from '@/components/ui/capture-textarea';
 import DocumentPreviewCard from '@/components/documents/DocumentPreviewCard';
 import DocumentVerificationModal from '@/components/documents/DocumentVerificationModal';
+import { EngagingUploadModal } from '@/components/ui/file-upload-modals';
 import { supabase } from '@/integrations/supabase/client';
 
 interface JobDescriptionSelectorProps {
@@ -23,6 +24,8 @@ const JobDescriptionSelector: React.FC<JobDescriptionSelectorProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'paste' | 'upload'>('paste');
   const [showVerificationModal, setShowVerificationModal] = useState(false);
+  const [showEngagingModal, setShowEngagingModal] = useState(false);
+  const [pastedText, setPastedText] = useState('');
   const { toast } = useToast();
 
   const handleFileSelect = (file: File, extractedText: string, documentJson: any, typeDetection: any, qualityAssessment: any) => {
@@ -45,38 +48,52 @@ const JobDescriptionSelector: React.FC<JobDescriptionSelectorProps> = ({
       return;
     }
 
-    const textFile = new File([text], 'job-description.txt', { type: 'text/plain' });
-    const uploadedFileData: UploadedFile = {
-      file: textFile,
-      extractedText: text,
-      type: 'job_description'
-    };
-
-    // Save to debug tracking system for job descriptions
+    // Show engaging modal and process
+    setShowEngagingModal(true);
+    
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user?.id) {
-        await supabase.functions.invoke('save-job-description', {
-          body: {
-            content: text,
-            jobTitle: 'Pasted Job Description',
-            companyName: 'Unknown Company',
-            userId: user.id
-          }
-        });
-      }
-    } catch (debugError) {
-      console.warn('Debug job description tracking failed:', debugError);
-      // Don't fail the main process for debug tracking issues
-    }
+      const textFile = new File([text], 'job-description.txt', { type: 'text/plain' });
+      const uploadedFileData: UploadedFile = {
+        file: textFile,
+        extractedText: text,
+        type: 'job_description'
+      };
 
-    onJobDescriptionSet(uploadedFileData);
-    toast({ title: 'Success', description: 'Job description added successfully!' });
+      // Save to debug tracking system for job descriptions
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user?.id) {
+          await supabase.functions.invoke('save-job-description', {
+            body: {
+              content: text,
+              jobTitle: 'Pasted Job Description',
+              companyName: 'Unknown Company',
+              userId: user.id
+            }
+          });
+        }
+      } catch (debugError) {
+        console.warn('Debug job description tracking failed:', debugError);
+        // Don't fail the main process for debug tracking issues
+      }
+
+      // Wait a moment for the modal effect
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      onJobDescriptionSet(uploadedFileData);
+      setShowEngagingModal(false);
+      setPastedText(''); // Clear the text area
+      toast({ title: 'Success', description: 'Job description added successfully!' });
+    } catch (error) {
+      setShowEngagingModal(false);
+      toast({ title: 'Error', description: 'Failed to process job description', variant: 'destructive' });
+    }
   };
 
   const removeFile = () => {
     // Reset to empty state - parent should handle this
     onJobDescriptionSet(undefined as any);
+    setPastedText(''); // Clear text when removing file
   };
 
   const handleVerificationSave = (updatedJson: DocumentJson) => {
@@ -119,6 +136,13 @@ const JobDescriptionSelector: React.FC<JobDescriptionSelectorProps> = ({
           documentType="job_description"
           onSave={handleVerificationSave}
           extractedText={uploadedFile.extractedText}
+        />
+        
+        <EngagingUploadModal
+          isOpen={showEngagingModal}
+          title="Processing Job Description"
+          message="We're processing your job description text..."
+          onCancel={() => setShowEngagingModal(false)}
         />
       </>
     );
@@ -169,9 +193,10 @@ const JobDescriptionSelector: React.FC<JobDescriptionSelectorProps> = ({
           {activeTab === 'paste' ? (
             <CaptureTextarea
               label="Job Description"
-              value=""
+              value={pastedText}
               onChange={(e) => {
                 const text = e.target.value;
+                setPastedText(text);
                 if (text.length >= 50) {
                   handleJobDescriptionText(text);
                 }
@@ -194,6 +219,13 @@ const JobDescriptionSelector: React.FC<JobDescriptionSelectorProps> = ({
           )}
         </div>
       </CardContent>
+      
+      <EngagingUploadModal
+        isOpen={showEngagingModal}
+        title="Processing Job Description"
+        message="We're processing your job description text..."
+        onCancel={() => setShowEngagingModal(false)}
+      />
     </Card>
   );
 };
