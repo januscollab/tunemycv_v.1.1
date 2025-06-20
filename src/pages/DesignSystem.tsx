@@ -32,13 +32,6 @@ import EnhancedAnalysisHistory from '@/components/analysis/EnhancedAnalysisHisto
 import { CategoryDocumentHistory } from '@/components/ui/category-document-history';
 import { DocumentHistory as ProfileDocumentHistory } from '@/components/ui/profile-document-history';
 
-// Experimental component redesigns
-import EnhancedAnalysisHistoryA from '@/components/experiments/EnhancedAnalysisHistoryA';
-import EnhancedAnalysisHistoryB from '@/components/experiments/EnhancedAnalysisHistoryB';
-import EnhancedAnalysisHistoryC from '@/components/experiments/EnhancedAnalysisHistoryC';
-import CategoryDocumentHistoryA from '@/components/experiments/CategoryDocumentHistoryA';
-import CategoryDocumentHistoryB from '@/components/experiments/CategoryDocumentHistoryB';
-import CategoryDocumentHistoryC from '@/components/experiments/CategoryDocumentHistoryC';
 
 
 const DesignSystem = () => {
@@ -672,7 +665,7 @@ const DesignSystem = () => {
             <TabsTrigger value="rte">Rich Text Editor</TabsTrigger>
             <TabsTrigger value="interactions">Interactions & Loading</TabsTrigger>
             <TabsTrigger value="missing">Missing Docs</TabsTrigger>
-            <TabsTrigger value="experiments">Experiments</TabsTrigger>
+            
           </TabsList>
 
           {/* Foundations Tab */}
@@ -1380,39 +1373,13 @@ const DesignSystem = () => {
                     Alternative designs for existing components - exploring different layouts and interaction patterns
                   </p>
                 </CardHeader>
-                <CardContent className="space-y-8">
-                  {/* Enhanced Analysis History Options */}
-                  <div>
-                    <h4 className="text-heading font-semibold mb-4">Enhanced Analysis History</h4>
-                    <Tabs defaultValue="optionA" className="w-full">
-                      <TabsList className="grid w-full grid-cols-2">
-                        <TabsTrigger value="optionA">Option A - Organized Cards</TabsTrigger>
-                        <TabsTrigger value="optionB">Option B - Compact List</TabsTrigger>
-                      </TabsList>
-                      <TabsContent value="optionA" className="mt-6">
-                        <EnhancedAnalysisHistoryA />
-                      </TabsContent>
-                      <TabsContent value="optionB" className="mt-6">
-                        <EnhancedAnalysisHistoryB />
-                      </TabsContent>
-                    </Tabs>
-                  </div>
-                  
-                  {/* Category Document History Options */}
-                  <div>
-                    <h4 className="text-heading font-semibold mb-4">Category Document History</h4>
-                    <Tabs defaultValue="optionA" className="w-full">
-                      <TabsList className="grid w-full grid-cols-2">
-                        <TabsTrigger value="optionA">Option A - Enhanced Layout</TabsTrigger>
-                        <TabsTrigger value="optionB">Option B - Grid/List Toggle</TabsTrigger>
-                      </TabsList>
-                      <TabsContent value="optionA" className="mt-6">
-                        <CategoryDocumentHistoryA />
-                      </TabsContent>
-                      <TabsContent value="optionB" className="mt-6">
-                        <CategoryDocumentHistoryB />
-                      </TabsContent>
-                    </Tabs>
+                <CardContent>
+                  <div className="bg-muted/30 rounded-lg p-6 text-center">
+                    <h4 className="text-heading font-semibold mb-2 text-foreground">Experimental Components Removed</h4>
+                    <p className="text-caption text-muted-foreground">
+                      Component variations have been removed to streamline the codebase. The main production components 
+                      can be found in their respective sections above.
+                    </p>
                   </div>
                 </CardContent>
               </Card>
@@ -1479,31 +1446,13 @@ const DesignSystem = () => {
                     Alternative designs and layouts for testing and comparison
                   </p>
                 </CardHeader>
-                <CardContent className="space-y-8">
-                  {/* CV Analysis History Variants */}
-                  <div>
-                    <h3 className="text-heading font-semibold mb-4">CV Analysis History</h3>
-                    <div className="space-y-6">
-                      <EnhancedAnalysisHistoryA />
-                      <Separator />
-                      <EnhancedAnalysisHistoryB />
-                      <Separator />
-                      <EnhancedAnalysisHistoryC />
-                    </div>
-                  </div>
-                  
-                  <Separator className="my-8" />
-                  
-                  {/* Cover Letter History Variants */}
-                  <div>
-                    <h3 className="text-heading font-semibold mb-4">Cover Letter History</h3>
-                    <div className="space-y-6">
-                      <CategoryDocumentHistoryA />
-                      <Separator />
-                      <CategoryDocumentHistoryB />
-                      <Separator />
-                      <CategoryDocumentHistoryC />
-                    </div>
+                <CardContent>
+                  <div className="bg-muted/30 rounded-lg p-6 text-center">
+                    <h4 className="text-heading font-semibold mb-2 text-foreground">Experimental Components Removed</h4>
+                    <p className="text-caption text-muted-foreground">
+                      All experimental component variations have been removed to streamline the codebase and improve maintainability.
+                      Production-ready components are available in their respective sections.
+                    </p>
                   </div>
                 </CardContent>
               </Card>
