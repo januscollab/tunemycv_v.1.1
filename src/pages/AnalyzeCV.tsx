@@ -546,7 +546,7 @@ const AnalyzeCV = () => {
           {/* Main Content Section */}
           <div>
             {/* Tabs Navigation */}
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-6">
               <TabsList className="grid w-full grid-cols-3 mb-6">
                 <TabsTrigger value="analysis" className="flex items-center space-x-2 text-caption">
                   <FileText className="h-4 w-4" />
