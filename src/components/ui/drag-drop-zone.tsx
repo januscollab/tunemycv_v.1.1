@@ -158,6 +158,12 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
         aria-label={placeholder}
       />
       
+      {/* Clickable overlay for entire tile */}
+      <div 
+        className="absolute inset-0 w-full h-full cursor-pointer z-0"
+        onClick={() => fileInputRef?.current?.click()}
+      />
+      
       {children || (
         <div className="flex flex-col items-center justify-center space-y-3 text-center w-full h-full">
           <div className="w-12 h-12 flex items-center justify-center mx-auto">

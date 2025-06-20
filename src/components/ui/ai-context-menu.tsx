@@ -147,6 +147,12 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
 
     // Wait for user to finish selecting (delay for triple-click and normal selection)
     selectionTimeoutRef.current = setTimeout(() => {
+      // Check if we're inside the AI Replacement Dialog
+      const dialogElement = document.querySelector('[role="dialog"]')
+      if (dialogElement && dialogElement.contains(selection.anchorNode)) {
+        return // Don't show menu in dialog
+      }
+      
       const range = selection.getRangeAt(0)
       const rect = range.getBoundingClientRect()
       const containerRect = containerRef.current?.getBoundingClientRect()
@@ -158,7 +164,7 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
         
         setMenuPosition({ x, y, visible: true })
       }
-    }, 300) // Wait 300ms for user to finish selecting
+    }, 500) // Wait 500ms for user to finish selecting
   }
 
   const handleSubmenuHover = (submenuType: string, event: React.MouseEvent) => {
@@ -334,46 +340,34 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
               <div className="h-px bg-gradient-to-r from-transparent via-orange-400 to-transparent mx-2.5 my-2"></div>
 
               {/* AI Creativity Slider */}
-              <div className="px-2.5 py-3">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-micro font-medium text-primary-foreground/90">AI Creativity</span>
-                  <Brain className="w-3.5 h-3.5 text-primary-foreground/70" />
+              <div className="px-2.5 py-2">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-tiny font-medium text-primary-foreground/90">Creativity: {getCurrentLevel().label}</span>
+                  <Brain className="w-3 h-3 text-primary-foreground/60" />
                 </div>
                 
-                <div className="space-y-3">
-                  {/* Current Level Display */}
-                  <div className="text-center">
-                    <div className="text-tiny font-semibold text-primary-foreground/90">
-                      {getCurrentLevel().label}
-                    </div>
-                    <div className="text-tiny text-primary-foreground/70">
-                      {getCurrentLevel().description}
-                    </div>
-                  </div>
+                {/* Slider */}
+                <div className="relative">
+                  <div className="w-full h-1 bg-gradient-to-r from-blue-400 via-orange-400 to-orange-500 rounded-full"></div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="3"
+                    step="1"
+                    value={creativityLevel}
+                    onChange={(e) => updateCreativityLevel(parseInt(e.target.value))}
+                    className="absolute top-0 w-full h-1 appearance-none bg-transparent cursor-pointer opacity-0"
+                  />
+                  <div 
+                    className="absolute top-[-1.5px] w-1 h-1 bg-white rounded-full shadow-sm border border-primary-400/50 transition-all duration-200"
+                    style={{ left: `${(creativityLevel / 3) * 100}%`, transform: 'translateX(-50%)' }}
+                  />
+                </div>
 
-                  {/* Slider */}
-                  <div className="relative">
-                    <input
-                      type="range"
-                      min="0"
-                      max="3"
-                      step="1"
-                      value={creativityLevel}
-                      onChange={(e) => updateCreativityLevel(parseInt(e.target.value))}
-                      className="w-full h-2 bg-primary-500/30 rounded-lg appearance-none cursor-pointer"
-                      style={{
-                        background: `linear-gradient(to right, #3b82f6 0%, #6366f1 33%, #8b5cf6 66%, #ec4899 100%)`
-                      }}
-                    />
-                  </div>
-
-                  {/* Level Labels */}
-                  <div className="flex justify-between text-tiny text-primary-foreground/60">
-                    <span>Safe</span>
-                    <span>Measured</span>
-                    <span>Bold</span>
-                    <span>Visionary</span>
-                  </div>
+                {/* Level Labels */}
+                <div className="flex justify-between text-tiny text-primary-foreground/60 mt-1">
+                  <span>Safe</span>
+                  <span>Bold</span>
                 </div>
               </div>
             </div>
