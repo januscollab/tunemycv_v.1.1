@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { ExternalLink, Eye, FileText, Globe, Download } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { DownloadMenu } from '@/components/ui/download-menu';
-import MultiTierPDFViewer from '@/components/ui/multi-tier-pdf-viewer';
+import UnifiedPDFViewer from '@/components/ui/unified-pdf-viewer';
 
 interface N8nAnalysisResultsProps {
   result: {
@@ -126,14 +126,32 @@ const N8nAnalysisResults: React.FC<N8nAnalysisResultsProps> = ({
         </div>
       )}
 
-      {/* Analysis Summary */}
+      {/* Compact Analysis Summary */}
       <Card className="border border-apple-core/20 dark:border-citrus/20">
-        <CardHeader className="pb-4">
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2 text-heading">
-              <FileText className="h-5 w-5 text-zapier-orange" />
-              Analysis Summary
-            </CardTitle>
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              {/* Compatibility Score - Compact Badge */}
+              {result.compatibility_score && (
+                <div className="bg-primary/10 rounded-lg px-3 py-2 border border-primary/20">
+                  <span className="text-lg font-bold text-primary">
+                    {result.compatibility_score}%
+                  </span>
+                </div>
+              )}
+              
+              {/* Position and Company - Inline */}
+              <div>
+                <p className="text-body font-semibold text-foreground">
+                  {getJobTitle()}
+                </p>
+                <p className="text-caption text-muted-foreground">
+                  {getCompanyName()}
+                </p>
+              </div>
+            </div>
+            
+            {/* Action Buttons */}
             <div className="flex items-center gap-2">
               <Button
                 onClick={handleHtmlPreview}
@@ -155,49 +173,12 @@ const N8nAnalysisResults: React.FC<N8nAnalysisResultsProps> = ({
               />
             </div>
           </div>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            {/* Compatibility Score - Large Badge */}
-            {result.compatibility_score && (
-              <div className="flex items-center justify-center">
-                <div className="bg-primary/10 rounded-xl p-6 border border-primary/20 shadow-sm">
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-primary">
-                      {result.compatibility_score}%
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-            
-            {/* Position */}
-            <div>
-              <p className="text-micro font-medium text-blueberry/60 dark:text-apple-core/70 uppercase tracking-wide mb-2">
-                Position
-              </p>
-              <p className="text-heading font-semibold text-blueberry dark:text-apple-core">
-                {getJobTitle()}
-              </p>
-            </div>
-            
-            {/* Company */}
-            <div>
-              <p className="text-micro font-medium text-blueberry/60 dark:text-apple-core/70 uppercase tracking-wide mb-2">
-                Company
-              </p>
-              <p className="text-heading font-semibold text-blueberry dark:text-apple-core">
-                {getCompanyName()}
-              </p>
-            </div>
-          </div>
-          
         </CardContent>
       </Card>
 
       {/* PDF Viewer */}
       {result.pdf_file_data ? (
-        <MultiTierPDFViewer
+        <UnifiedPDFViewer
           pdfData={result.pdf_file_data}
           fileName={result.pdf_file_name || 'analysis-report.pdf'}
           title="Analysis Report"
