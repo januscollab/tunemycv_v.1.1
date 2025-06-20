@@ -264,6 +264,7 @@ export default {
 				'slide-up': 'slide-up 0.3s ease-out',
 				'theme-switch': 'theme-switch 0.5s ease-in-out',
 				'pulse-soft': 'pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+				'spin-slow': 'spin 3s linear infinite',
 			}
 		}
 	},
