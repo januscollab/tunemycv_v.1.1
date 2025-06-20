@@ -90,18 +90,38 @@ const PDFViewerEnhanced: React.FC<PDFViewerEnhancedProps> = ({
   }
 
   if (error) {
+    // Still try to show the iframe even if there was an error processing
+    // as the browser might be able to handle it
     return (
-      <Card className={className}>
-        <CardContent className="flex items-center justify-center py-12">
-          <div className="text-center">
-            <FileText className="h-8 w-8 text-muted-foreground mx-auto mb-4" />
-            <p className="text-muted-foreground mb-4">{error}</p>
+      <Card className={cn("border border-border/60", className)}>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2 text-heading">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Eye className="h-4 w-4 text-primary" />
+              </div>
+              {title}
+            </CardTitle>
             {showDownloadButton && (
-              <Button onClick={handleDownload} variant="outline">
-                <Download className="h-4 w-4 mr-2" />
+              <Button
+                onClick={handleDownload}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2"
+              >
+                <Download className="h-4 w-4" />
                 Download PDF
               </Button>
             )}
+          </div>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="bg-muted/30 border-t border-border/60">
+            <iframe
+              src={`data:application/pdf;base64,${pdfData}`}
+              className="w-full h-96 border-none"
+              title={title}
+            />
           </div>
         </CardContent>
       </Card>
@@ -139,11 +159,6 @@ const PDFViewerEnhanced: React.FC<PDFViewerEnhancedProps> = ({
             title={title}
             onLoad={() => setIsLoading(false)}
           />
-        </div>
-        <div className="p-4 bg-muted/20 border-t border-border/30">
-          <p className="text-caption text-muted-foreground text-center">
-            PDF preview - Use browser controls to zoom, navigate, or download for full functionality
-          </p>
         </div>
       </CardContent>
     </Card>

@@ -12,6 +12,7 @@ import InterviewPrepSection from './InterviewPrepSection';
 import AnalysisHeader from './components/AnalysisHeader';
 import AnalysisScoreCard from './components/AnalysisScoreCard';
 import LegacySummarySection from './components/LegacySummarySection';
+import AnalysisSummarySection from './components/AnalysisSummarySection';
 import LegacyCompatibilitySection from './components/LegacyCompatibilitySection';
 import LegacyKeywordSection from './components/LegacyKeywordSection';
 import PriorityRecommendationsSection from './components/PriorityRecommendationsSection';
@@ -166,13 +167,14 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
             />
           </div>
 
-          {/* Right Column - Enhanced or Legacy Summary */}
+          {/* Right Column - Analysis Summary */}
           <div className="lg:col-span-2">
-            {hasEnhancedData && result.executiveSummary ? (
-              <ExecutiveSummarySection executiveSummary={result.executiveSummary} />
-            ) : (
-              <LegacySummarySection result={result} />
-            )}
+            <AnalysisSummarySection
+              compatibilityScore={compatibilityScore}
+              jobTitle={position}
+              companyName={companyName}
+              onDownload={downloadPDF}
+            />
           </div>
         </div>
 
