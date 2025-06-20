@@ -220,7 +220,7 @@ const EnhancedAnalysisCard: React.FC<EnhancedAnalysisCardProps> = ({
         {/* Right side - Badge */}
         <div className="flex flex-col items-end">
           <Badge 
-            className="text-micro bg-white text-blue-600 border border-blue-600 cursor-pointer hover:bg-blue-50 hover:border-blue-700 hover:text-blue-700 transition-colors duration-200"
+            className="text-[10px] bg-white text-blue-600 border border-blue-600 cursor-pointer hover:bg-blue-50 hover:border-blue-700 hover:text-blue-700 transition-colors duration-200"
             onClick={(e) => {
               e.stopPropagation();
               onView(analysis);
