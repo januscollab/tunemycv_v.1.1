@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FileText, Edit3, Upload } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import FileUploadArea from './upload/FileUploadArea';
+import FileUploadWithSave from './upload/FileUploadWithSave';
 import { useToast } from '@/hooks/use-toast';
 import { UploadedFile } from '@/types/fileTypes';
 import { DocumentJson, textToJson, generateFormattedText } from '@/utils/documentJsonUtils';
@@ -22,21 +22,19 @@ const JobDescriptionSelector: React.FC<JobDescriptionSelectorProps> = ({
   uploadedFile,
   disabled = false
 }) => {
-  const [activeTab, setActiveTab] = useState<'paste' | 'upload'>('paste');
+  const [activeTab, setActiveTab] = useState<'paste' | 'upload'>('upload');
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [showEngagingModal, setShowEngagingModal] = useState(false);
   const [pastedText, setPastedText] = useState('');
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
-  const handleFileSelect = (file: File, extractedText: string, documentJson: any, typeDetection: any, qualityAssessment: any) => {
-    // Always proceed with upload - type detection warnings will be shown in the document preview
+  const handleFileSelect = (file: File, extractedText: string, shouldSave: boolean) => {
+    // Job descriptions are processed but not saved to user's library by default
     const uploadedFileData: UploadedFile = {
       file,
       extractedText,
       type: 'job_description',
-      documentJson,
-      typeDetection,
-      qualityAssessment
     } as any;
     onJobDescriptionSet(uploadedFileData);
     toast({ title: 'Success', description: 'Job description uploaded successfully!' });
@@ -176,7 +174,18 @@ const JobDescriptionSelector: React.FC<JobDescriptionSelectorProps> = ({
               <span>Paste Job Description</span>
             </button>
             <button
-              onClick={() => setActiveTab('upload')}
+              onClick={() => {
+                // If switching from paste to upload, auto-open file dialog
+                if (activeTab === 'paste') {
+                  setActiveTab('upload');
+                  // Delay to ensure the tab content has rendered
+                  setTimeout(() => {
+                    fileInputRef.current?.click();
+                  }, 100);
+                } else {
+                  setActiveTab('upload');
+                }
+              }}
               className={`px-3 py-2 text-caption font-medium rounded-md transition-colors flex items-center justify-center space-x-2 ${
                 activeTab === 'upload'
                   ? 'text-primary border-b-2 border-primary bg-transparent'
@@ -208,13 +217,15 @@ const JobDescriptionSelector: React.FC<JobDescriptionSelectorProps> = ({
               description="Enter at least 50 characters to proceed"
             />
           ) : (
-            <FileUploadArea
+            <FileUploadWithSave
               onFileSelect={handleFileSelect}
               uploading={false}
               accept=".pdf,.docx,.txt"
               maxSize="5MB"
               label="Upload Job Description"
-              fileType="job_description"
+              currentCVCount={0}
+              maxCVCount={999}
+              fileInputRef={fileInputRef}
             />
           )}
         </div>
