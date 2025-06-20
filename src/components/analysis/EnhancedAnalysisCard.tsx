@@ -131,7 +131,7 @@ const EnhancedAnalysisCard: React.FC<EnhancedAnalysisCardProps> = ({
   return (
     <div
       className={cn(
-        "rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer relative border-t-4 border-t-[#FF6B35] p-6",
+        "group rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer relative border-t-4 border-t-[#FF6B35] p-6",
         className
       )}
       onClick={() => onView(analysis)}
@@ -202,14 +202,12 @@ const EnhancedAnalysisCard: React.FC<EnhancedAnalysisCardProps> = ({
             </div>
             
             {/* Date and Compatibility */}
-            <div className="flex items-center justify-between text-sm text-muted-foreground">
-              <div className="flex items-center">
-                <Calendar className="h-4 w-4 mr-2" />
-                <span>{formatDate(analysis.created_at)}</span>
-              </div>
+            <div className="flex items-center text-sm text-muted-foreground">
+              <Calendar className="h-4 w-4 mr-2" />
+              <span>{formatDate(analysis.created_at)}</span>
               {analysis.compatibility_score && (
-                <div className="flex items-center text-sm">
-                  <span className="text-lg font-bold text-[#FF6B35] mr-1">
+                <div className="flex items-center text-sm ml-4">
+                  <span className="text-sm font-bold text-[#FF6B35] mr-1">
                     {analysis.compatibility_score}%
                   </span>
                   <span>compatibility</span>
@@ -221,14 +219,14 @@ const EnhancedAnalysisCard: React.FC<EnhancedAnalysisCardProps> = ({
         
         {/* Right side - Badge */}
         <div className="flex flex-col items-end">
-          <Badge className="text-sm bg-blue-600 text-white border-none">
+          <Badge className="text-micro bg-white text-blue-600 border border-blue-600">
             CV Analysis
           </Badge>
         </div>
       </div>
 
       {/* Action buttons row at bottom */}
-      <div className="flex items-center justify-end space-x-1">
+      <div className="flex items-center justify-end space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
         {/* Cover Letter CTA */}
         {linkage.hasLinkedCoverLetter ? (
           <span className="text-sm text-muted-foreground mr-4">✓ Cover Letter</span>
