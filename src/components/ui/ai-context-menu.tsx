@@ -337,7 +337,7 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
               )}
 
               {/* Orange Separator Line */}
-              <div className="h-px bg-gradient-to-r from-transparent via-orange-400 to-transparent mx-2.5 my-2"></div>
+              <div className="h-px bg-gradient-to-r from-transparent via-orange-500 to-transparent mx-2.5 my-2 opacity-80"></div>
 
               {/* AI Creativity Slider */}
               <div className="px-2.5 py-2">
