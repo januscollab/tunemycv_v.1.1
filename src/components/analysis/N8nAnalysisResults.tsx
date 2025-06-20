@@ -195,17 +195,6 @@ const N8nAnalysisResults: React.FC<N8nAnalysisResultsProps> = ({
             </div>
           </div>
           
-          {/* Executive Summary */}
-          {result.executive_summary && (
-            <div className="border-t border-apple-core/20 dark:border-citrus/20 pt-4">
-              <p className="text-micro font-medium text-blueberry/60 dark:text-apple-core/70 uppercase tracking-wide mb-3">
-                Executive Summary
-              </p>
-              <p className="text-caption text-blueberry/80 dark:text-apple-core/90 leading-relaxed">
-                {result.executive_summary}
-              </p>
-            </div>
-          )}
         </CardContent>
       </Card>
 

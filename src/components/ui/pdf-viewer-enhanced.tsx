@@ -78,14 +78,9 @@ const PDFViewerEnhanced: React.FC<PDFViewerEnhancedProps> = ({
 
   if (isLoading) {
     return (
-      <Card className={className}>
-        <CardContent className="flex items-center justify-center py-12">
-          <div className="text-center">
-            <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
-            <p className="text-muted-foreground">Loading PDF viewer...</p>
-          </div>
-        </CardContent>
-      </Card>
+      <div className={cn("flex items-center justify-center py-12", className)}>
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
     );
   }
 
@@ -93,75 +88,25 @@ const PDFViewerEnhanced: React.FC<PDFViewerEnhancedProps> = ({
     // Still try to show the iframe even if there was an error processing
     // as the browser might be able to handle it
     return (
-      <Card className={cn("border border-border/60", className)}>
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2 text-heading">
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <Eye className="h-4 w-4 text-primary" />
-              </div>
-              {title}
-            </CardTitle>
-            {showDownloadButton && (
-              <Button
-                onClick={handleDownload}
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-2"
-              >
-                <Download className="h-4 w-4" />
-                Download PDF
-              </Button>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent className="p-0">
-          <div className="bg-muted/30 border-t border-border/60">
-            <iframe
-              src={`data:application/pdf;base64,${pdfData}`}
-              className="w-full h-96 border-none"
-              title={title}
-            />
-          </div>
-        </CardContent>
-      </Card>
+      <div className={className}>
+        <iframe
+          src={`data:application/pdf;base64,${pdfData}`}
+          className="w-full h-[600px] border-none rounded-lg"
+          title={title}
+        />
+      </div>
     );
   }
 
   return (
-    <Card className={cn("border border-border/60", className)}>
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2 text-heading">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <Eye className="h-4 w-4 text-primary" />
-            </div>
-            {title}
-          </CardTitle>
-          {showDownloadButton && (
-            <Button
-              onClick={handleDownload}
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-2"
-            >
-              <Download className="h-4 w-4" />
-              Download PDF
-            </Button>
-          )}
-        </div>
-      </CardHeader>
-      <CardContent className="p-0">
-        <div className="bg-muted/30 border-t border-border/60">
-          <iframe
-            src={pdfUrl}
-            className="w-full h-96 border-none"
-            title={title}
-            onLoad={() => setIsLoading(false)}
-          />
-        </div>
-      </CardContent>
-    </Card>
+    <div className={className}>
+      <iframe
+        src={pdfUrl}
+        className="w-full h-[600px] border-none rounded-lg"
+        title={title}
+        onLoad={() => setIsLoading(false)}
+      />
+    </div>
   );
 };
 

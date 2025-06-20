@@ -3,7 +3,6 @@ import { CheckCircle, Download, ArrowLeft, Bug } from 'lucide-react';
 
 import { useProfileData } from '@/hooks/useProfileData';
 import { FloatingFeedbackForm } from '@/components/common/FloatingFeedbackForm';
-import ExecutiveSummarySection from './ExecutiveSummarySection';
 import CompatibilityBreakdownSection from './CompatibilityBreakdownSection';
 import EnhancedKeywordAnalysis from './EnhancedKeywordAnalysis';
 import SkillsGapAnalysis from './SkillsGapAnalysis';

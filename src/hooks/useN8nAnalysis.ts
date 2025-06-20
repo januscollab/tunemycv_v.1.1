@@ -304,7 +304,7 @@ export const useN8nAnalysis = () => {
               html_file_name: 'analysis-report.html',
               n8n_pdf_url: 'https://aohrfehhyjdebaatzqdl.supabase.co/storage/v1/object/public/n8n-bucket/response/test-output.pdf',
               n8n_html_url: 'https://aohrfehhyjdebaatzqdl.supabase.co/storage/v1/object/public/n8n-bucket/response/test-output.html',
-              executive_summary: 'This is a test analysis result generated for development purposes.',
+              executive_summary: null,
               job_description_extracted_text: JSON.stringify(jobDescriptionJson)
             })
             .select('id')
