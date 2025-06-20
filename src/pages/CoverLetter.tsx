@@ -536,7 +536,7 @@ const AuthenticatedCoverLetter = () => {
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6">
           {/* Main Content */}
           <div>
-            <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
+            <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full space-y-6">
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="create" className="flex items-center space-x-2 text-caption">
                   <Sparkles className="h-4 w-4" />
