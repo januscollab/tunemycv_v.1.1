@@ -373,9 +373,9 @@ const CoverLetterHistory: React.FC<CoverLetterHistoryProps> = ({
                       e.stopPropagation();
                       handleView(coverLetter);
                     }}
-                    className="text-caption font-medium transition-colors h-8 px-3 flex items-center space-x-2"
+                    className="text-caption font-medium transition-colors h-8 px-3 flex items-center space-x-2 text-black hover:text-black"
                   >
-                    <Eye className="h-4 w-4" />
+                    <Eye className="h-4 w-4 text-black" />
                     <span>View</span>
                   </Button>
                   <Button
@@ -385,9 +385,9 @@ const CoverLetterHistory: React.FC<CoverLetterHistoryProps> = ({
                       e.stopPropagation();
                       handleDownload(coverLetter);
                     }}
-                    className="text-caption font-medium transition-colors h-8 px-3 flex items-center space-x-2"
+                    className="text-caption font-medium transition-colors h-8 px-3 flex items-center space-x-2 text-black hover:text-black"
                   >
-                    <Download className="h-4 w-4" />
+                    <Download className="h-4 w-4 text-black" />
                     <span>Download</span>
                   </Button>
                   <Button
