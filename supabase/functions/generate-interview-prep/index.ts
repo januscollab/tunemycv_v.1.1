@@ -1,7 +1,11 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { corsHeaders } from '../_shared/cors.ts'
 import { getSecureErrorResponse, logSecurityEvent } from '../shared/security.ts'
 import { establishLinkage } from '../shared/documentLinkage.ts'
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
 
 interface InterviewPrepRequest {
   analysisResultId?: string
