@@ -139,7 +139,7 @@ const N8nAnalysisResults: React.FC<N8nAnalysisResultsProps> = ({
                 onClick={handleHtmlPreview}
                 variant="ghost"
                 size="sm"
-                className="text-blueberry dark:text-apple-core hover:text-zapier-orange dark:hover:text-citrus"
+                className="menu-text-animation text-caption text-foreground hover:text-primary"
               >
                 <ExternalLink className="h-4 w-4 mr-2" />
                 Review in Browser
@@ -148,7 +148,7 @@ const N8nAnalysisResults: React.FC<N8nAnalysisResultsProps> = ({
                 buttonText="Download"
                 variant="outline"
                 size="sm"
-                className="text-blueberry dark:text-apple-core hover:text-zapier-orange dark:hover:text-citrus"
+                className="menu-text-animation text-caption text-foreground hover:text-primary"
                 onDownloadPDF={result.n8n_pdf_url ? () => handleDownload(result.n8n_pdf_url!, 'pdf') : undefined}
                 onDownloadWord={() => console.log('Word download not implemented for n8n reports')}
                 onDownloadText={() => console.log('Text download not implemented for n8n reports')}
@@ -161,13 +161,10 @@ const N8nAnalysisResults: React.FC<N8nAnalysisResultsProps> = ({
             {/* Compatibility Score - Large Badge */}
             {result.compatibility_score && (
               <div className="flex items-center justify-center">
-                <div className="bg-zapier-orange/10 rounded-full p-4">
+                <div className="bg-primary/10 rounded-xl p-6 border border-primary/20 shadow-sm">
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-zapier-orange mb-1">
+                    <div className="text-3xl font-bold text-primary">
                       {result.compatibility_score}%
-                    </div>
-                    <div className="text-micro font-medium text-blueberry/60 dark:text-apple-core/70 uppercase tracking-wide">
-                      Match Score
                     </div>
                   </div>
                 </div>
