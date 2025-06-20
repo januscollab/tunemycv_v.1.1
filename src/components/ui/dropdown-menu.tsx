@@ -46,7 +46,7 @@ const DropdownMenuSubContent = React.forwardRef<
   <DropdownMenuPrimitive.SubContent
     ref={ref}
       className={cn(
-        "z-[200] min-w-[8rem] overflow-hidden rounded-md border border-popover-border bg-popover p-1 text-popover-foreground shadow-lg",
+        "z-[200] min-w-[8rem] overflow-hidden rounded-md border border-popover-border bg-popover p-1 text-popover-foreground shadow-lg data-[state=open]:animate-none data-[state=closed]:animate-none",
         className
       )}
     {...props}
@@ -58,13 +58,13 @@ DropdownMenuSubContent.displayName =
 const DropdownMenuContent = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content>
->(({ className, sideOffset = 4, ...props }, ref) => (
+>(({ className, sideOffset = 0, ...props }, ref) => (
   <DropdownMenuPrimitive.Portal>
     <DropdownMenuPrimitive.Content
       ref={ref}
       sideOffset={sideOffset}
       className={cn(
-        "z-[200] min-w-[8rem] overflow-hidden rounded-md border border-popover-border bg-popover p-1 text-popover-foreground shadow-md",
+        "z-[200] min-w-[8rem] overflow-hidden rounded-md border border-popover-border bg-popover p-1 text-popover-foreground shadow-md data-[state=open]:animate-none data-[state=closed]:animate-none",
         className
       )}
       {...props}
