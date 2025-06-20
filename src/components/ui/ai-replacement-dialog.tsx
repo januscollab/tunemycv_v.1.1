@@ -77,19 +77,19 @@ export const AIReplacementDialog: React.FC<AIReplacementDialogProps> = ({
         </DialogHeader>
 
         <div className="space-y-6 overflow-y-auto max-h-[calc(90vh-120px)]">
-          {/* Creativity Slider - Compact Discreet Design */}
-          <div className="bg-muted/20 rounded-md p-3 border border-muted">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-xs font-medium text-muted-foreground">AI Creativity</h3>
-              <div className="text-xs text-primary font-medium">
+          {/* Ultra-Discreet Creativity Slider */}
+          <div className="bg-muted/10 rounded-md p-2 border border-muted/50">
+            <div className="flex items-center justify-between mb-1.5">
+              <h3 className="text-xs font-medium text-muted-foreground/80">Creativity</h3>
+              <div className="text-xs text-muted-foreground font-medium">
                 {getCreativityLabel()}
               </div>
             </div>
             
-            <div className="space-y-2">
-              {/* Compact Slider */}
+            <div className="space-y-1.5">
+              {/* Ultra-Compact Slider */}
               <div className="relative">
-                <div className="w-full h-1.5 bg-gradient-to-r from-blue-400 via-indigo-400 via-purple-400 to-pink-400 rounded-full opacity-60"></div>
+                <div className="w-full h-1 bg-gradient-to-r from-blue-300/40 via-indigo-300/40 via-purple-300/40 to-pink-300/40 rounded-full"></div>
                 <input
                   type="range"
                   min="0"
@@ -97,19 +97,17 @@ export const AIReplacementDialog: React.FC<AIReplacementDialogProps> = ({
                   step="1"
                   value={creativityLevel}
                   onChange={(e) => updateCreativityLevel(parseInt(e.target.value))}
-                  className="absolute top-0 w-full h-1.5 appearance-none bg-transparent cursor-pointer"
+                  className="absolute top-0 w-full h-1 appearance-none bg-transparent cursor-pointer"
                   style={{
                     background: 'transparent'
                   }}
                 />
               </div>
 
-              {/* Compact Level Labels */}
-              <div className="flex justify-between text-tiny text-muted-foreground px-0.5">
+              {/* Minimal Level Labels */}
+              <div className="flex justify-between text-[10px] text-muted-foreground/60 px-0.5">
                 <span>Safe</span>
-                <span>Measured</span>
                 <span>Bold</span>
-                <span>Visionary</span>
               </div>
             </div>
           </div>
@@ -117,20 +115,20 @@ export const AIReplacementDialog: React.FC<AIReplacementDialogProps> = ({
           {/* Text Comparison */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Original Text */}
-            <Card className="border-muted">
+            <Card className="border-muted/60">
               <CardContent className="p-4">
-                <h4 className="text-sm font-medium mb-3 text-muted-foreground">Original Text</h4>
-                <div className="text-sm bg-muted/50 p-3 rounded-md max-h-40 overflow-y-auto border text-foreground">
+                <h4 className="text-sm font-semibold mb-3 text-muted-foreground">Original Text</h4>
+                <div className="text-sm bg-muted/30 p-3 rounded-md max-h-40 overflow-y-auto border border-muted/30 text-foreground">
                   {originalText}
                 </div>
               </CardContent>
             </Card>
 
             {/* Generated Text */}
-            <Card className="border-primary/20">
+            <Card className="border-primary/30 bg-primary/5">
               <CardContent className="p-4">
-                <h4 className="text-sm font-medium mb-3 text-primary">AI Generated Text</h4>
-                <div className="text-sm bg-primary/5 p-3 rounded-md max-h-40 overflow-y-auto border border-primary/20">
+                <h4 className="text-sm font-semibold mb-3 text-primary">✨ AI Enhanced Text</h4>
+                <div className="text-sm bg-primary/10 p-3 rounded-md max-h-40 overflow-y-auto border border-primary/30">
                   {isLoading ? (
                     <div className="flex items-center justify-center py-8">
                       <Loader2 className="h-4 w-4 animate-spin mr-2 text-primary" />
