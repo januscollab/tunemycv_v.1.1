@@ -2,7 +2,17 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { History, FileText, Calendar, Building, Eye, Download, Trash2, MessageSquare, Target, Plus } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { 
+  Pagination, 
+  PaginationContent, 
+  PaginationItem, 
+  PaginationLink, 
+  PaginationNext, 
+  PaginationPrevious 
+} from '@/components/ui/pagination';
+import { History, FileText, Calendar, Building, Eye, Download, Trash2, MessageSquare, Target, Plus, Search } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -40,6 +50,9 @@ const CoverLetterHistory: React.FC<CoverLetterHistoryProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [linkageCache, setLinkageCache] = useState<Record<string, any>>({});
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -191,6 +204,25 @@ const CoverLetterHistory: React.FC<CoverLetterHistoryProps> = ({
     }
   }, [coverLetters]);
 
+  // Filter and search logic
+  const filteredCoverLetters = coverLetters.filter(coverLetter => {
+    const matchesSearch = searchQuery === '' || 
+      (coverLetter.job_title || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (coverLetter.company_name || '').toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesSearch;
+  });
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredCoverLetters.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedCoverLetters = filteredCoverLetters.slice(startIndex, endIndex);
+
+  // Reset to first page when search or items per page changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, itemsPerPage]);
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -252,13 +284,42 @@ const CoverLetterHistory: React.FC<CoverLetterHistoryProps> = ({
   return (
     <div className={className}>
       <div className="mb-6">
-        <h2 className="text-title font-bold flex items-center gap-2">
-          <History className="h-5 w-5 text-primary" />
-          Cover Letter History
-        </h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-title font-bold flex items-center gap-2">
+            <History className="h-5 w-5 text-primary" />
+            Cover Letter History
+          </h2>
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <Search className="h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search cover letters..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-64"
+              />
+            </div>
+            {filteredCoverLetters.length > 0 && (
+              <div className="flex items-center space-x-2">
+                <span className="text-caption text-muted-foreground">Show:</span>
+                <Select value={itemsPerPage.toString()} onValueChange={(value) => setItemsPerPage(Number(value))}>
+                  <SelectTrigger className="w-20">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="10">10</SelectItem>
+                    <SelectItem value="20">20</SelectItem>
+                    <SelectItem value="30">30</SelectItem>
+                  </SelectContent>
+                </Select>
+                <span className="text-caption text-muted-foreground">per page</span>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
       <div className="space-y-4">
-        {coverLetters.map((coverLetter) => (
+        {paginatedCoverLetters.map((coverLetter) => (
           <Card
             key={coverLetter.id}
             className="hover:shadow-md transition-all duration-200 hover:border-primary/50 hover:bg-muted/50 cursor-pointer border border-border relative"
@@ -407,6 +468,52 @@ const CoverLetterHistory: React.FC<CoverLetterHistoryProps> = ({
           </Card>
         ))}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="mt-6 flex justify-center">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious 
+                  href="#" 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (currentPage > 1) setCurrentPage(currentPage - 1);
+                  }}
+                  className={currentPage <= 1 ? "pointer-events-none opacity-50" : ""}
+                />
+              </PaginationItem>
+              
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <PaginationItem key={page}>
+                  <PaginationLink
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setCurrentPage(page);
+                    }}
+                    isActive={currentPage === page}
+                  >
+                    {page}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              
+              <PaginationItem>
+                <PaginationNext 
+                  href="#" 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+                  }}
+                  className={currentPage >= totalPages ? "pointer-events-none opacity-50" : ""}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )}
     </div>
   );
 };
