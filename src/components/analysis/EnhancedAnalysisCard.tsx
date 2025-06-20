@@ -131,26 +131,26 @@ const EnhancedAnalysisCard: React.FC<EnhancedAnalysisCardProps> = ({
   return (
     <div
       className={cn(
-        "bg-card border border-border rounded-lg p-4 hover:shadow-md transition-all duration-200 hover:border-primary/50 hover:bg-muted/50 cursor-pointer relative border-t-4 border-t-[#FF6B35]",
+        "bg-card border border-border rounded-lg p-6 hover:shadow-md transition-all duration-200 cursor-pointer relative border-t-4 border-t-[#FF6B35] max-w-4xl",
         className
       )}
       onClick={() => onView(analysis)}
     >
       {/* Main content layout */}
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between mb-6">
         {/* Left side - Icon and content */}
-        <div className="flex items-start space-x-3 flex-1">
+        <div className="flex items-start space-x-4 flex-1">
           {/* Document icon */}
-          <div className="flex-shrink-0 w-10 h-10 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
-            <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          <div className="flex-shrink-0 w-12 h-12 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
+            <FileText className="h-6 w-6 text-blue-600 dark:text-blue-400" />
           </div>
           
           {/* Content */}
           <div className="flex-1 min-w-0">
             {/* Title and company with edit */}
-            <div className="group/edit relative flex items-center gap-2 mb-1">
-              <h3 className="text-heading font-medium text-foreground truncate">
-                {analysis.job_title || 'Unknown Position'} - {analysis.company_name || 'Unknown Company'}
+            <div className="group/edit relative flex items-center gap-2 mb-2">
+              <h3 className="text-xl font-semibold text-foreground">
+                {analysis.job_title || 'Unknown Position'} – {analysis.company_name || 'Unknown Company'}
               </h3>
               <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
                 <DialogTrigger asChild>
@@ -159,7 +159,7 @@ const EnhancedAnalysisCard: React.FC<EnhancedAnalysisCardProps> = ({
                     className="opacity-0 group-hover/edit:opacity-100 transition-opacity duration-200 p-1 hover:bg-muted rounded"
                     title="Edit position and company"
                   >
-                    <Pen className="h-3 w-3 text-muted-foreground hover:text-foreground" />
+                    <Pen className="h-4 w-4 text-muted-foreground hover:text-foreground" />
                   </button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-md">
@@ -202,35 +202,24 @@ const EnhancedAnalysisCard: React.FC<EnhancedAnalysisCardProps> = ({
             </div>
             
             {/* Date */}
-            <div className="flex items-center text-caption text-muted-foreground mb-2">
-              <Calendar className="h-3 w-3 mr-1" />
-              <span>Updated {formatDate(analysis.created_at)}</span>
-            </div>
-            
-            {/* Linkage Indicators */}
-            <div className="mt-2">
-              <LinkageIndicators
-                hasLinkedCoverLetter={linkage.hasLinkedCoverLetter}
-                hasLinkedInterviewPrep={linkage.hasLinkedInterviewPrep}
-                onViewCoverLetter={() => linkage.linkedCoverLetterId && onViewCoverLetter(linkage.linkedCoverLetterId)}
-                onViewInterviewPrep={() => linkage.linkedInterviewPrepId && onViewInterviewPrep(linkage.linkedInterviewPrepId)}
-                compact={true}
-              />
+            <div className="flex items-center text-sm text-muted-foreground">
+              <Calendar className="h-4 w-4 mr-2" />
+              <span>{formatDate(analysis.created_at)}</span>
             </div>
           </div>
         </div>
         
         {/* Right side - Badge and score */}
-        <div className="flex flex-col items-end space-y-2">
-          <Badge className="text-micro bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800">
+        <div className="flex flex-col items-end space-y-1">
+          <Badge className="text-sm bg-muted text-muted-foreground border-none">
             CV Analysis
           </Badge>
           {analysis.compatibility_score && (
             <div className="text-right">
-              <div className="text-2xl font-bold text-[#FF6B35] leading-none">
+              <div className="text-5xl font-bold text-[#FF6B35] leading-none">
                 {analysis.compatibility_score}%
               </div>
-              <div className="text-tiny text-muted-foreground">
+              <div className="text-sm text-muted-foreground mt-1">
                 compatibility
               </div>
             </div>
@@ -239,108 +228,76 @@ const EnhancedAnalysisCard: React.FC<EnhancedAnalysisCardProps> = ({
       </div>
 
       {/* Action buttons row at bottom */}
-      <div className="flex items-center justify-between pt-3 mt-3 border-t border-border">
-        {/* Dynamic CTAs on the left */}
-        <div className="flex items-center space-x-2">
-          {/* Cover Letter CTA */}
-          {linkage.hasLinkedCoverLetter ? (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                linkage.linkedCoverLetterId && onViewCoverLetter(linkage.linkedCoverLetterId);
-              }}
-              className="text-caption font-medium transition-colors h-8 px-3 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
-            >
-              <FileText className="h-4 w-4 mr-2" />
-              View Cover Letter
-            </Button>
-          ) : (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                onGenerateCoverLetter(analysis);
-              }}
-              className="text-caption font-medium transition-colors h-8 px-3 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
-            >
-              <FileText className="h-4 w-4 mr-2" />
-              Create Cover Letter
-            </Button>
-          )}
+      <div className="flex items-center justify-end space-x-1">
+        {/* Cover Letter CTA */}
+        {linkage.hasLinkedCoverLetter ? (
+          <span className="text-sm text-muted-foreground mr-4">✓ Cover Letter</span>
+        ) : (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              onGenerateCoverLetter(analysis);
+            }}
+            className="text-sm font-medium text-muted-foreground hover:text-foreground mr-2"
+          >
+            + Cover Letter
+          </Button>
+        )}
 
-          {/* Interview Prep CTA */}
-          {linkage.hasLinkedInterviewPrep ? (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                linkage.linkedInterviewPrepId && onViewInterviewPrep(linkage.linkedInterviewPrepId);
-              }}
-              className="text-caption font-medium transition-colors h-8 px-3 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
-            >
-              <FileText className="h-4 w-4 mr-2" />
-              View Interview Prep
-            </Button>
-          ) : (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                onCreateInterviewPrep(analysis);
-              }}
-              className="text-caption font-medium transition-colors h-8 px-3 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
-            >
-              <FileText className="h-4 w-4 mr-2" />
-              Create Interview Prep
-            </Button>
-          )}
-        </div>
+        {/* Interview Prep CTA */}
+        {linkage.hasLinkedInterviewPrep ? (
+          <span className="text-sm text-muted-foreground mr-4">✓ Interview Prep</span>
+        ) : (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              onCreateInterviewPrep(analysis);
+            }}
+            className="text-sm font-medium text-muted-foreground hover:text-foreground mr-2"
+          >
+            + Interview Prep
+          </Button>
+        )}
 
-        {/* Action icons on the right */}
-        <div className="flex items-center space-x-1">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              onView(analysis);
-            }}
-            className="text-caption font-medium transition-colors h-8 px-3 flex items-center space-x-2 text-foreground hover:text-foreground"
-          >
-            <Eye className="h-4 w-4" />
-            <span>View</span>
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              onDownload(analysis);
-            }}
-            className="text-caption font-medium transition-colors h-8 px-3 flex items-center space-x-2 text-foreground hover:text-foreground"
-          >
-            <Download className="h-4 w-4" />
-            <span>Download</span>
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete(analysis);
-            }}
-            disabled={deletingId === analysis.id}
-            className="text-caption font-medium transition-colors h-8 px-3 flex items-center space-x-2 text-destructive hover:text-destructive hover:bg-destructive/10"
-          >
-            <Trash2 className="h-4 w-4" />
-            <span>Delete</span>
-          </Button>
-        </div>
+        {/* Action icons */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={(e) => {
+            e.stopPropagation();
+            onView(analysis);
+          }}
+          className="p-2"
+        >
+          <Eye className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDownload(analysis);
+          }}
+          className="p-2"
+        >
+          <Download className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(analysis);
+          }}
+          disabled={deletingId === analysis.id}
+          className="p-2 text-destructive hover:text-destructive"
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
       </div>
     </div>
   );
