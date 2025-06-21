@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -15,7 +16,7 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 // Define icons for components
-import { Button as ButtonIcon } from 'lucide-react';
+import { MousePointer as ButtonIcon } from 'lucide-react';
 import { List as SelectIcon } from 'lucide-react';
 import { Square as IconButtonIcon } from 'lucide-react';
 import { MessageSquare as TooltipIcon } from 'lucide-react';
@@ -58,7 +59,7 @@ const designSystemComponents: DesignSystemComponent[] = [
       return (
         <VybeSelect
           options={options}
-          onChange={handleSelectChange}
+          onValueChange={handleSelectChange}
           placeholder="Select an option"
           value={selectedValue}
         />
@@ -102,7 +103,23 @@ const designSystemComponents: DesignSystemComponent[] = [
   {
     name: 'DocumentDeleteDialog',
     description: 'Confirmation dialog for document deletion.',
-    component: () => <DocumentDeleteDialog onConfirm={() => console.log('Delete confirmed')} />,
+    component: () => {
+      const [isOpen, setIsOpen] = useState(false);
+      return (
+        <>
+          <VybeButton onClick={() => setIsOpen(true)}>Show Delete Dialog</VybeButton>
+          <DocumentDeleteDialog 
+            open={isOpen}
+            onOpenChange={setIsOpen}
+            onConfirm={() => {
+              console.log('Delete confirmed');
+              setIsOpen(false);
+            }}
+            documentType="cover letter"
+          />
+        </>
+      );
+    },
     icon: DeleteDialogIcon,
     color: '#9333ea',
   },
