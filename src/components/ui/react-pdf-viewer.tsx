@@ -8,8 +8,24 @@ import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';
 
-// Configure PDF.js worker
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+// Configure PDF.js worker - try multiple CDN sources
+const setupPDFWorker = () => {
+  if (!pdfjs.GlobalWorkerOptions.workerSrc) {
+    // Try multiple CDN sources for better reliability
+    const workerSources = [
+      `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`,
+      `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`,
+      `//cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`
+    ];
+    
+    pdfjs.GlobalWorkerOptions.workerSrc = workerSources[0];
+    console.log('PDF.js worker configured:', pdfjs.GlobalWorkerOptions.workerSrc);
+    console.log('PDF.js version:', pdfjs.version);
+  }
+};
+
+// Initialize worker setup
+setupPDFWorker();
 
 interface ReactPDFViewerProps {
   pdfData: string; // base64 encoded PDF data
@@ -32,10 +48,40 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
 
+  // Debug logging
+  console.log('ReactPDFViewer props:', {
+    pdfDataLength: pdfData?.length,
+    fileName,
+    title,
+    pdfDataStart: pdfData?.substring(0, 50) + '...'
+  });
+
   // Convert base64 to data URL for react-pdf
-  const pdfDataUrl = `data:application/pdf;base64,${pdfData}`;
+  const pdfDataUrl = React.useMemo(() => {
+    if (!pdfData) {
+      console.error('No PDF data provided');
+      return null;
+    }
+    
+    try {
+      // Check if data is already a data URL
+      if (pdfData.startsWith('data:')) {
+        console.log('PDF data is already a data URL');
+        return pdfData;
+      }
+      
+      // Create data URL from base64
+      const dataUrl = `data:application/pdf;base64,${pdfData}`;
+      console.log('Created PDF data URL, length:', dataUrl.length);
+      return dataUrl;
+    } catch (error) {
+      console.error('Error creating PDF data URL:', error);
+      return null;
+    }
+  }, [pdfData]);
 
   const onDocumentLoadSuccess = useCallback(({ numPages }: { numPages: number }) => {
+    console.log('PDF loaded successfully with', numPages, 'pages');
     setNumPages(numPages);
     setIsLoading(false);
     setError('');
@@ -43,8 +89,17 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
 
   const onDocumentLoadError = useCallback((error: Error) => {
     console.error('PDF load error:', error);
-    setError('Failed to load PDF document');
+    console.error('Error details:', {
+      name: error.name,
+      message: error.message,
+      stack: error.stack
+    });
+    setError(`Failed to load PDF: ${error.message}`);
     setIsLoading(false);
+  }, []);
+
+  const onDocumentLoadProgress = useCallback((progress: { loaded: number; total: number }) => {
+    console.log('PDF loading progress:', progress);
   }, []);
 
   const goToPrevPage = useCallback(() => {
@@ -89,6 +144,7 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
 
   const handleDownload = useCallback(() => {
     try {
+      console.log('Starting PDF download...');
       const binaryString = atob(pdfData);
       const bytes = new Uint8Array(binaryString.length);
       for (let i = 0; i < binaryString.length; i++) {
@@ -106,6 +162,7 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
       document.body.removeChild(link);
       
       URL.revokeObjectURL(url);
+      console.log('PDF download completed');
     } catch (error) {
       console.error('Download failed:', error);
     }
@@ -113,6 +170,7 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
 
   const openInNewWindow = useCallback(() => {
     try {
+      console.log('Opening PDF in new window...');
       const binaryString = atob(pdfData);
       const bytes = new Uint8Array(binaryString.length);
       for (let i = 0; i < binaryString.length; i++) {
@@ -129,11 +187,31 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
         
         // Clean up URL after a delay
         setTimeout(() => URL.revokeObjectURL(url), 1000);
+        console.log('PDF opened in new window');
       }
     } catch (error) {
       console.error('Failed to open in new window:', error);
     }
   }, [pdfData, title]);
+
+  // Early return if no PDF data
+  if (!pdfData) {
+    return (
+      <Card className={cn("border border-border/60", className)}>
+        <CardContent className="flex items-center justify-center py-12">
+          <div className="text-center max-w-md">
+            <AlertTriangle className="h-12 w-12 text-destructive mx-auto mb-4" />
+            <Alert variant="destructive">
+              <AlertDescription>
+                <p className="font-medium mb-2">No PDF Data</p>
+                <p className="text-sm">PDF data is missing or invalid.</p>
+              </AlertDescription>
+            </Alert>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (error) {
     return (
@@ -145,6 +223,9 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
               <AlertDescription>
                 <p className="font-medium mb-2">PDF Error</p>
                 <p className="text-sm mb-4">{error}</p>
+                <p className="text-xs text-muted-foreground">
+                  Check console for detailed error information.
+                </p>
               </AlertDescription>
             </Alert>
             {showDownloadButton && (
@@ -198,6 +279,9 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
             <div className="text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
               <p className="text-muted-foreground">Loading PDF...</p>
+              <p className="text-xs text-muted-foreground mt-2">
+                If this takes too long, check the console for errors.
+              </p>
             </div>
           </div>
         )}
@@ -207,7 +291,13 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
             file={pdfDataUrl}
             onLoadSuccess={onDocumentLoadSuccess}
             onLoadError={onDocumentLoadError}
+            onLoadProgress={onDocumentLoadProgress}
             loading=""
+            options={{
+              workerSrc: pdfjs.GlobalWorkerOptions.workerSrc,
+              cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/',
+              cMapPacked: true,
+            }}
           >
             <div className="flex justify-center bg-white p-4">
               <Page
@@ -216,6 +306,8 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
                 renderAnnotationLayer={false}
                 className="shadow-lg"
                 width={Math.min(800, window.innerWidth - 100)}
+                onLoadSuccess={() => console.log(`Page ${pageNumber} loaded successfully`)}
+                onLoadError={(error) => console.error(`Page ${pageNumber} load error:`, error)}
               />
             </div>
           </Document>
