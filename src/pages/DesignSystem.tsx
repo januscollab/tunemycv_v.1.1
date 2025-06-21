@@ -1,5 +1,3 @@
-
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -72,7 +70,13 @@ const designSystemComponents: DesignSystemComponent[] = [
   {
     name: 'VybeIconButton',
     description: 'Icon-only button for quick actions.',
-    component: VybeIconButton,
+    component: () => (
+      <VybeIconButton 
+        icon={IconButtonIcon} 
+        tooltip="Click me!" 
+        onClick={() => console.log('Icon button clicked')}
+      />
+    ),
     icon: IconButtonIcon,
     color: '#dc2626',
   },
@@ -208,4 +212,3 @@ const DesignSystem = () => {
 };
 
 export default DesignSystem;
-
