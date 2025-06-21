@@ -1,6 +1,5 @@
 import React from 'react';
 import DownloadOptions from '@/components/cover-letter/DownloadOptions';
-import jsPDF from 'jspdf';
 
 interface AnalysisResult {
   id: string;

@@ -12,7 +12,7 @@ import AnalysisHeader from './components/AnalysisHeader';
 import LegacySummarySection from './components/LegacySummarySection';
 import LegacyCompatibilitySection from './components/LegacyCompatibilitySection';
 import LegacyKeywordSection from './components/LegacyKeywordSection';
-import PriorityRecommendationsSection from './PriorityRecommendationsSection';
+import PriorityRecommendationsSection from './components/PriorityRecommendationsSection';
 import PersonalizedMatchMessage from './components/PersonalizedMatchMessage';
 import NextStepsSection from './components/NextStepsSection';
 import { Button } from '@/components/ui/button';
@@ -369,7 +369,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
   const creditsUsed = result.credits_used || 1;
 
   const downloadPDF = () => {
-    downloadAnalysisAsText(result);
+    downloadAnalysisAsText();
   };
 
   return (
