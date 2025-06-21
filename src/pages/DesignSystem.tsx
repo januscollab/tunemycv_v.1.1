@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Eye, Code, Palette, Type, Square, Circle, Triangle, Zap, AlertTriangle, Search, Star, Heart, Award, Sparkles, Layers, Grid, Layout, MousePointer, Users, TrendingUp, Menu, ChevronDown, Info, Download, Settings, Bell, MessageSquare, Play, Pause, Volume2, RefreshCw, Camera, Clock, MapPin, Shield, Unlock, Lock, Mail, Upload, FileText, Loader, Activity, History, Trash2, Brain } from 'lucide-react';
@@ -32,7 +33,8 @@ import EnhancedAnalysisHistory from '@/components/analysis/EnhancedAnalysisHisto
 import { CategoryDocumentHistory } from '@/components/ui/category-document-history';
 import { DocumentHistory as ProfileDocumentHistory } from '@/components/ui/profile-document-history';
 
-
+// Import design system components
+import { VubeUITooltip } from '@/components/design-system';
 
 const DesignSystem = () => {
   const [activeModal, setActiveModal] = useState<string | null>(null);
@@ -373,6 +375,29 @@ const DesignSystem = () => {
       ),
       usage: '89 usages',
       description: 'Accessible tooltips with proper z-index and positioning'
+    },
+    {
+      name: 'VubeUITooltip',
+      component: (
+        <VubeUITooltip
+          content={
+            <div className="space-y-2">
+              <p className="font-medium">Feature Details</p>
+              <p className="text-sm text-muted-foreground">
+                This advanced feature includes analytics, 
+                reporting, and custom configurations.
+              </p>
+            </div>
+          }
+        >
+          <Button variant="outline" size="sm">
+            <Info className="h-4 w-4 mr-1" />
+            Rich content tooltip
+          </Button>
+        </VubeUITooltip>
+      ),
+      usage: '23 usages',
+      description: 'Advanced tooltips with rich content, custom styling, and enhanced positioning controls'
     },
     {
       name: 'Menu Text Animation',
