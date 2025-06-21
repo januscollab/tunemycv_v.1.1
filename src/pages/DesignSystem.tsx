@@ -1,17 +1,30 @@
 import React, { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Link } from 'react-router-dom';
+import { ArrowLeft, Eye, Palette, Type, Square, Zap, AlertTriangle, ChevronDown, Info, Download, Settings, Bell, Sparkles, Layers, Grid, MousePointer, History as HistoryIcon, Activity, Loader, } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { Slider } from "@/components/ui/slider";
-import { Progress } from "@/components/ui/progress";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { AlertCircle, CheckCircle, Info, XCircle, Search, Filter, Download, Eye, Edit, Trash2, User, Settings, Bell } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { FloatingLabelInput } from '@/components/common/FloatingLabelInput';
+import { FloatingLabelTextarea } from '@/components/common/FloatingLabelTextarea';
+import { CaptureInput } from '@/components/ui/capture-input';
+import { CaptureTextarea } from '@/components/ui/capture-textarea';
+import { RichTextEditor } from '@/components/ui/rich-text-editor';
+import LegacyRichTextEditor from '@/components/ui/legacy-rich-text-editor';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel } from '@/components/ui/dropdown-menu';
+import { LoadingStatesShowcase } from '@/components/ui/loading-states-showcase';
+import { ContactSalesModal } from '@/components/ui/contact-sales-modal';
+import { WelcomeCreditsModal } from '@/components/ui/welcome-credits-modal';
+import ToastModal from '@/components/ui/toast-modal';
+import { MockPaymentModal } from '@/components/ui/mock-payment-modal';
+import { StepIndicator } from '@/components/ui/step-indicator';
+import { ProgressIndicator } from '@/components/ui/progress-indicator';
+import EnhancedAnalysisHistory from '@/components/analysis/EnhancedAnalysisHistory';
+import { CategoryDocumentHistory } from '@/components/ui/category-document-history';
+import { DocumentHistory as ProfileDocumentHistory } from '@/components/ui/profile-document-history';
 import { VybeButton, VybeSelect, VybeIconButton, VubeUITooltip, EnhancedCoverLetterHistory } from "@/components/design-system";
+import { Separator } from '@/components/ui/separator';
 
 const DesignSystem = () => {
   const [activeModal, setActiveModal] = useState<string | null>(null);
@@ -516,8 +529,6 @@ const DesignSystem = () => {
           onSave={(value) => {
             console.log('Auto-saving content:', value);
             setRteContent(value);
-            // In real implementation, this would save to backend
-            // For demo purposes, we'll show a save confirmation
           }}
           filename="design-system-sample"
           className="w-full"
@@ -624,22 +635,22 @@ const DesignSystem = () => {
       component: (
         <div className="space-y-4">
           <div className="flex flex-wrap gap-2">
-            <VybeButton variant="primary" size="sm">Primary Small</VybeButton>
-            <VybeButton variant="secondary" size="sm">Secondary Small</VybeButton>
-            <VybeButton variant="outline" size="sm">Outline Small</VybeButton>
-            <VybeButton variant="ghost" size="sm">Ghost Small</VybeButton>
+            <VybeButton vybeVariant="primary" vybeSize="sm">Primary Small</VybeButton>
+            <VybeButton vybeVariant="secondary" vybeSize="sm">Secondary Small</VybeButton>
+            <VybeButton vybeVariant="outline" vybeSize="sm">Outline Small</VybeButton>
+            <VybeButton vybeVariant="ghost" vybeSize="sm">Ghost Small</VybeButton>
           </div>
           <div className="flex flex-wrap gap-2">
-            <VybeButton variant="primary" size="md">Primary Medium</VybeButton>
-            <VybeButton variant="secondary" size="md">Secondary Medium</VybeButton>
-            <VybeButton variant="outline" size="md">Outline Medium</VybeButton>
-            <VybeButton variant="ghost" size="md">Ghost Medium</VybeButton>
+            <VybeButton vybeVariant="primary" vybeSize="default">Primary Medium</VybeButton>
+            <VybeButton vybeVariant="secondary" vybeSize="default">Secondary Medium</VybeButton>
+            <VybeButton vybeVariant="outline" vybeSize="default">Outline Medium</VybeButton>
+            <VybeButton vybeVariant="ghost" vybeSize="default">Ghost Medium</VybeButton>
           </div>
           <div className="flex flex-wrap gap-2">
-            <VybeButton variant="primary" size="lg">Primary Large</VybeButton>
-            <VybeButton variant="secondary" size="lg">Secondary Large</VybeButton>
-            <VybeButton variant="outline" size="lg">Outline Large</VybeButton>
-            <VybeButton variant="ghost" size="lg">Ghost Large</VybeButton>
+            <VybeButton vybeVariant="primary" vybeSize="lg">Primary Large</VybeButton>
+            <VybeButton vybeVariant="secondary" vybeSize="lg">Secondary Large</VybeButton>
+            <VybeButton vybeVariant="outline" vybeSize="lg">Outline Large</VybeButton>
+            <VybeButton vybeVariant="ghost" vybeSize="lg">Ghost Large</VybeButton>
           </div>
         </div>
       ),
@@ -661,10 +672,10 @@ const DesignSystem = () => {
           />
           <VybeSelect
             options={[
-              { value: "disabled", label: "This is disabled", disabled: true },
-              { value: "enabled", label: "This is enabled" }
+              { value: "enabled", label: "This is enabled" },
+              { value: "another", label: "Another option" }
             ]}
-            placeholder="With disabled option"
+            placeholder="Simple options"
           />
         </div>
       ),
@@ -676,20 +687,20 @@ const DesignSystem = () => {
       component: (
         <div className="flex gap-2">
           <VybeIconButton 
-            icon={<User className="h-4 w-4" />}
+            icon={User}
             tooltip="User Profile"
             onClick={() => console.log('User clicked')}
           />
           <VybeIconButton 
-            icon={<Settings className="h-4 w-4" />}
+            icon={Settings}
             tooltip="Settings"
-            variant="secondary"
+            vybeVariant="secondary"
             onClick={() => console.log('Settings clicked')}
           />
           <VybeIconButton 
-            icon={<Bell className="h-4 w-4" />}
+            icon={Bell}
             tooltip="Notifications"
-            variant="outline"
+            vybeVariant="outline"
             onClick={() => console.log('Notifications clicked')}
           />
         </div>
@@ -762,7 +773,6 @@ const DesignSystem = () => {
             <TabsTrigger value="rte">Rich Text Editor</TabsTrigger>
             <TabsTrigger value="interactions">Interactions & Loading</TabsTrigger>
             <TabsTrigger value="missing">Missing Docs</TabsTrigger>
-            
           </TabsList>
 
           {/* Foundations Tab */}
@@ -960,36 +970,43 @@ const DesignSystem = () => {
                   </Card>
                 ))}
               </div>
+            </section>
 
-              {/* Category Document History Component */}
-              <div className="space-y-4">
-                <h3 className="text-heading font-semibold">Category Document History</h3>
-                <Card className="group hover:shadow-lg transition-all duration-300">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-subheading">Category Document History</CardTitle>
-                      <Badge variant="outline" className="text-micro">
-                        12 usages
-                      </Badge>
-                    </div>
-                    <p className="text-caption text-muted-foreground">
-                      Unified history component for analysis, cover letters, and CV management across the app - identical to existing History UI
-                    </p>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="bg-muted/30 p-4 rounded-lg">
-                      <p className="text-sm text-muted-foreground">Category Document History component demo removed</p>
-                    </div>
-                  </CardContent>
-                </Card>
+            {/* Design System Components */}
+            <section>
+              <h2 className="text-title font-bold text-foreground mb-8 flex items-center gap-3">
+                <Grid className="h-6 w-6 text-primary" />
+                Design System Components
+              </h2>
+              
+              <div className="grid gap-6">
+                {componentExamples.map((component, index) => (
+                  <Card key={index} className="group hover:shadow-lg transition-all duration-300">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-subheading">{component.name}</CardTitle>
+                        <Badge variant="default" className="text-micro">
+                          {component.usage} usages
+                        </Badge>
+                      </div>
+                      <p className="text-caption text-muted-foreground">
+                        {component.description}
+                      </p>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="bg-muted/30 p-4 rounded-lg">
+                        {component.component}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
-
             </section>
 
             {/* History Components Section */}
             <section>
               <h2 className="text-title font-bold text-foreground mb-8 flex items-center gap-3">
-                <History className="h-6 w-6 text-primary" />
+                <HistoryIcon className="h-6 w-6 text-primary" />
                 History Components
               </h2>
               
@@ -1291,7 +1308,7 @@ const DesignSystem = () => {
             </section>
           </TabsContent>
 
-            {/* Missing Components Tab */}
+          {/* Missing Components Tab */}
           <TabsContent value="missing" className="space-y-8">
             <section>
               <h2 className="text-title font-bold text-foreground mb-8 flex items-center gap-3">
@@ -1368,10 +1385,10 @@ const DesignSystem = () => {
                   </div>
 
                   {/* Design Concept */}
-                  <div className="grid md:grid-cols-2 gap-6">
+                  <div className="grid md:grid-cols-2 gap-6 text-caption">
                     <div className="space-y-4">
                       <h4 className="text-heading font-semibold">🎨 Design Concept</h4>
-                      <div className="space-y-3 text-caption">
+                      <div className="space-y-3">
                         <div className="flex items-start gap-3">
                           <div className="w-6 h-6 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 flex-shrink-0 mt-0.5"></div>
                           <div>
@@ -1463,7 +1480,7 @@ const DesignSystem = () => {
               <Card className="mb-8">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Layout className="h-5 w-5 text-primary" />
+                    <Grid className="h-5 w-5 text-primary" />
                     Component Redesign Experiments
                   </CardTitle>
                   <p className="text-caption text-muted-foreground">
@@ -1524,32 +1541,6 @@ const DesignSystem = () => {
                       <div className="font-medium mb-1">Physics UI</div>
                       <div className="text-caption text-muted-foreground">Elements with realistic physics</div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </section>
-          </TabsContent>
-
-          {/* Experiments Tab */}
-          <TabsContent value="experiments" className="space-y-8">
-            <section>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Sparkles className="h-5 w-5 text-primary" />
-                    Component Experiments
-                  </CardTitle>
-                  <p className="text-muted-foreground">
-                    Alternative designs and layouts for testing and comparison
-                  </p>
-                </CardHeader>
-                <CardContent>
-                  <div className="bg-muted/30 rounded-lg p-6 text-center">
-                    <h4 className="text-heading font-semibold mb-2 text-foreground">Experimental Components Removed</h4>
-                    <p className="text-caption text-muted-foreground">
-                      All experimental component variations have been removed to streamline the codebase and improve maintainability.
-                      Production-ready components are available in their respective sections.
-                    </p>
                   </div>
                 </CardContent>
               </Card>
