@@ -119,14 +119,14 @@ const CoverLetterHistoryItem: React.FC<{
 
   return (
     <Card
-      className="group hover:shadow-md transition-all duration-200 hover:border-primary/50 hover:bg-muted/50 cursor-pointer border border-border relative border-t-4 border-t-green-500 h-[120px]"
+      className="group hover:shadow-md transition-all duration-200 hover:border-primary/50 hover:bg-muted/50 cursor-pointer border border-border relative border-t-4 border-t-orange-500 h-[120px]"
       onClick={() => onView(coverLetter)}
     >
       {/* Green Badge - Top Right */}
       <div className="absolute top-3 right-3 z-10 flex items-center gap-2">
         {/* Version Badge */}
         {totalVersions > 1 && (
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-full border border-green-500 bg-green-100 text-green-700 dark:bg-green-950/20 dark:text-green-300 dark:border-green-800">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-full border border-blue-500 bg-blue-100 text-blue-700 dark:bg-blue-950/20 dark:text-blue-300 dark:border-blue-800">
             <span>v{versionNumber}</span>
           </div>
         )}
