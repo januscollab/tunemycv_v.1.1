@@ -13,6 +13,7 @@ import {
   Pencil
 } from 'lucide-react';
 import EditTitleDialog from '@/components/ui/edit-title-dialog';
+import CoverLetterVersionBadge from '@/components/cover-letter/CoverLetterVersionBadge';
 
 interface CoverLetterItem {
   id: string;
@@ -70,20 +71,35 @@ const CoverLetterDocumentHistoryItem: React.FC<CoverLetterDocumentHistoryItemPro
 
   const currentTitle = `${coverLetter.job_title} - ${coverLetter.company_name}`;
 
+  // Calculate version number based on regeneration count
+  const versionNumber = (coverLetter.regeneration_count || 0) + 1;
+  const totalVersions = versionNumber;
+  const isLatestVersion = true; // Since we're showing the latest version
+
   return (
     <Card
-      className="group hover:shadow-md transition-all duration-200 hover:border-primary/50 hover:bg-muted/50 cursor-pointer border border-border relative border-t-4 border-t-orange-500"
+      className="group hover:shadow-md transition-all duration-200 hover:border-primary/50 hover:bg-muted/50 cursor-pointer border border-border relative border-t-4 border-t-orange-500 h-[120px]"
       onClick={() => onView(coverLetter)}
     >
       {/* Green Badge - Top Right */}
-      <div className="absolute top-3 right-3 z-10">
+      <div className="absolute top-3 right-3 z-10 flex items-center gap-2">
+        {/* Version Badge */}
+        {totalVersions > 1 && (
+          <CoverLetterVersionBadge
+            version={versionNumber}
+            isLatest={isLatestVersion}
+            totalVersions={totalVersions}
+          />
+        )}
+        
+        {/* Cover Letter Badge */}
         <div className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-full border border-green-500 bg-green-100 text-green-700 dark:bg-green-950/20 dark:text-green-300 dark:border-green-800">
           <span>Cover Letter</span>
         </div>
       </div>
       
-      <CardContent className="p-4 relative">
-        <div className="flex items-start space-x-4">
+      <CardContent className="p-4 relative h-full">
+        <div className="flex items-start space-x-4 h-full">
           {/* Green Edit Icon - Left */}
           <div className="flex-shrink-0">
             <div className="w-10 h-10 bg-green-50 dark:bg-green-950/20 rounded-lg flex items-center justify-center">
@@ -92,27 +108,29 @@ const CoverLetterDocumentHistoryItem: React.FC<CoverLetterDocumentHistoryItemPro
           </div>
 
           {/* Content - Stacked Title/Company, Date */}
-          <div className="flex-1 min-w-0 pr-20">
-            {/* Title and Company with Edit Icon */}
-            <div className="flex items-center gap-2 mb-1">
-              <h3 className="text-heading font-bold text-foreground truncate">
-                {coverLetter.job_title} - {coverLetter.company_name}
-              </h3>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsEditTitleOpen(true);
-                }}
-                className="h-auto p-1 hover:bg-gray-100 dark:hover:bg-gray-800"
-              >
-                <Pencil className="h-3 w-3 text-gray-500" />
-              </Button>
+          <div className="flex-1 min-w-0 pr-20 flex flex-col justify-between h-full">
+            <div>
+              {/* Title and Company with Edit Icon */}
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className="text-heading font-bold text-foreground truncate">
+                  {coverLetter.job_title} - {coverLetter.company_name}
+                </h3>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsEditTitleOpen(true);
+                  }}
+                  className="h-auto p-1 hover:bg-gray-100 dark:hover:bg-gray-800"
+                >
+                  <Pencil className="h-3 w-3 text-gray-500" />
+                </Button>
+              </div>
             </div>
             
             {/* Date */}
-            <div className="flex items-center text-caption text-muted-foreground">
+            <div className="flex items-center text-caption text-muted-foreground mt-auto">
               <Calendar className="h-3 w-3 mr-1" />
               <span>{formatDate(coverLetter.updated_at)}</span>
             </div>
