@@ -46,5 +46,9 @@ export default defineConfig(({ mode }) => ({
   },
   esbuild: {
     target: 'esnext'
-  }
+  },
+  worker: {
+    format: 'es'
+  },
+  assetsInclude: ['**/*.pdf']
 }));
