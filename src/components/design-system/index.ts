@@ -4,6 +4,7 @@ export { VybeButton } from './VybeButton';
 export { VybeSelect, type VybeSelectOption } from './VybeSelect';
 export { VybeIconButton } from './VybeIconButton';
 export { VubeUITooltip } from './VubeUITooltip';
+export { default as EnhancedCoverLetterHistory } from './EnhancedCoverLetterHistory';
 
 // Document Components
 export { default as DocumentDeleteDialog } from '../ui/document-delete-dialog';
@@ -14,4 +15,5 @@ export { default as DocumentDeleteDialog } from '../ui/document-delete-dialog';
 // 3. Use VybeIconButton for icon-only buttons with tooltips
 // 4. Use VubeUITooltip for rich content tooltips with advanced styling
 // 5. Use DocumentDeleteDialog for consistent delete confirmations
-// 6. All components follow the semantic token system from index.css
+// 6. Use EnhancedCoverLetterHistory for advanced cover letter management
+// 7. All components follow the semantic token system from index.css

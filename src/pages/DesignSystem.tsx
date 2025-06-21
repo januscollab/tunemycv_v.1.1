@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Eye, Code, Palette, Type, Square, Circle, Triangle, Zap, AlertTriangle, Search, Star, Heart, Award, Sparkles, Layers, Grid, Layout, MousePointer, Users, TrendingUp, Menu, ChevronDown, Info, Download, Settings, Bell, MessageSquare, Play, Pause, Volume2, RefreshCw, Camera, Clock, MapPin, Shield, Unlock, Lock, Mail, Upload, FileText, Loader, Activity, History, Trash2, Brain } from 'lucide-react';
@@ -34,10 +33,11 @@ import { CategoryDocumentHistory } from '@/components/ui/category-document-histo
 import { DocumentHistory as ProfileDocumentHistory } from '@/components/ui/profile-document-history';
 
 // Import design system components
-import { VubeUITooltip } from '@/components/design-system';
+import { VubeUITooltip, EnhancedCoverLetterHistory } from '@/components/design-system';
 
 const DesignSystem = () => {
   const [activeModal, setActiveModal] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState('foundations');
   const [rteContent, setRteContent] = useState("<h2>Sample Heading</h2><p>This is a paragraph with <strong>bold text</strong> and <em>italic text</em>.</p><ul><li>First item</li><li>Second item</li></ul>");
   const colorTokens = [
     { 
@@ -638,6 +638,22 @@ const DesignSystem = () => {
       usage: 'RTE only',
       description: 'AI context menu restricted to Rich Text Editor'
     }
+  ];
+
+  const componentExamples = [
+    {
+      name: 'Enhanced Cover Letter History',
+      component: (
+        <div className="w-full max-w-4xl">
+          <EnhancedCoverLetterHistory 
+            onSelectCoverLetter={(coverLetter) => console.log('Selected:', coverLetter)}
+            className="bg-background border border-border rounded-lg p-4"
+          />
+        </div>
+      ),
+      usage: '12 usages',
+      description: 'Advanced cover letter history management with search, pagination, and comprehensive actions'
+    },
   ];
 
   return (
