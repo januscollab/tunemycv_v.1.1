@@ -9,7 +9,6 @@ import SkillsGapAnalysis from './SkillsGapAnalysis';
 import ATSOptimizationSection from './ATSOptimizationSection';
 import InterviewPrepSection from './InterviewPrepSection';
 import AnalysisHeader from './components/AnalysisHeader';
-import AnalysisScoreCard from './components/AnalysisScoreCard';
 import LegacySummarySection from './components/LegacySummarySection';
 import LegacyCompatibilitySection from './components/LegacyCompatibilitySection';
 import LegacyKeywordSection from './components/LegacyKeywordSection';
@@ -166,17 +165,6 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
               </button>
             </div>
           </div>
-        </div>
-
-        {/* Main Content - Single Column Layout */}
-        <div className="space-y-8 mb-8">
-          {/* Score Card - Full Width */}
-          <AnalysisScoreCard 
-            score={compatibilityScore}
-            jobTitle={position}
-            companyName={companyName}
-            getMatchLevel={getMatchLevel}
-          />
         </div>
 
         {/* Personalized Match Message */}
