@@ -117,40 +117,27 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
   return (
     <div className="min-h-screen bg-gradient-to-br from-apple-core/20 via-white to-citrus/10 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
       <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Header with title, back button, and download icon */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center">
-            {!readOnly && (
-              <button
-                onClick={onStartNew}
-                className="flex items-center space-x-2 text-apricot hover:text-apricot/80 transition-colors mr-6"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                <span>Analyze Another CV</span>
-              </button>
-            )}
-            <div>
-              <h1 className="text-heading font-semibold text-gray-900 dark:text-citrus">
-                {companyName} - {position}
-              </h1>
-              <div className="flex items-center gap-4 mt-2 text-caption text-gray-600 dark:text-apple-core/70">
-                <div className="flex items-center gap-1">
-                  <span>Analyzed on {analysisDate}</span>
-                </div>
-                <span>•</span>
-                <span>Match Score: {compatibilityScore}%</span>
-                <span>•</span>
-                <span>Credits Used: {creditsUsed}</span>
-              </div>
+        {/* Analysis Header */}
+        <AnalysisHeader 
+          onStartNew={onStartNew}
+          onDownloadPDF={downloadPDF}
+          readOnly={readOnly}
+        />
+
+        {/* Title and metadata section */}
+        <div className="mb-6">
+          <h1 className="text-heading font-semibold text-gray-900 dark:text-citrus">
+            {companyName} - {position}
+          </h1>
+          <div className="flex items-center gap-4 mt-2 text-caption text-gray-600 dark:text-apple-core/70">
+            <div className="flex items-center gap-1">
+              <span>Analyzed on {analysisDate}</span>
             </div>
+            <span>•</span>
+            <span>Match Score: {compatibilityScore}%</span>
+            <span>•</span>
+            <span>Credits Used: {creditsUsed}</span>
           </div>
-          <button 
-            onClick={downloadPDF}
-            className="flex items-center space-x-2 text-apricot hover:text-apricot/80 transition-colors font-normal"
-          >
-            <Download className="h-4 w-4" />
-            <span className="font-normal">Download PDF</span>
-          </button>
         </div>
 
 
