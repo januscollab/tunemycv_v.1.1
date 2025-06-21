@@ -23,7 +23,7 @@ import { ProgressIndicator } from '@/components/ui/progress-indicator';
 import EnhancedAnalysisHistory from '@/components/analysis/EnhancedAnalysisHistory';
 import { CategoryDocumentHistory } from '@/components/ui/category-document-history';
 import { DocumentHistory as ProfileDocumentHistory } from '@/components/ui/profile-document-history';
-import { VybeButton, VybeSelect, VybeIconButton, VubeUITooltip, EnhancedCoverLetterHistory } from "@/components/design-system";
+import { VybeButton, VybeSelect, VybeIconButton, VubeUITooltip, EnhancedCoverLetterHistory, EnhancedInterviewPrepHistory } from "@/components/design-system";
 import { Separator } from '@/components/ui/separator';
 
 const DesignSystem = () => {
@@ -1004,6 +1004,19 @@ const DesignSystem = () => {
                 ))}
               </div>
             </section>
+
+            {/* Enhanced History Components */}
+            <div className="space-y-8">
+              <div>
+                <h3 className="text-lg font-semibold mb-4">Enhanced Cover Letter History</h3>
+                <EnhancedCoverLetterHistory className="max-w-4xl" />
+              </div>
+              
+              <div>
+                <h3 className="text-lg font-semibold mb-4">Enhanced Interview Prep History</h3>
+                <EnhancedInterviewPrepHistory className="max-w-4xl" />
+              </div>
+            </div>
 
             {/* History Components Section */}
             <section>
