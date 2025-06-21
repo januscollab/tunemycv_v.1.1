@@ -1,11 +1,10 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ExternalLink, Eye, FileText, Globe, Download } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { DownloadMenu } from '@/components/ui/download-menu';
-import UnifiedPDFViewer from '@/components/ui/unified-pdf-viewer';
+import ReactPDFViewer from '@/components/ui/react-pdf-viewer';
 
 interface N8nAnalysisResultsProps {
   result: {
@@ -128,7 +127,7 @@ const N8nAnalysisResults: React.FC<N8nAnalysisResultsProps> = ({
 
       {/* PDF Viewer */}
       {result.pdf_file_data ? (
-        <UnifiedPDFViewer
+        <ReactPDFViewer
           pdfData={result.pdf_file_data}
           fileName={result.pdf_file_name || 'analysis-report.pdf'}
           title="Analysis Report"
