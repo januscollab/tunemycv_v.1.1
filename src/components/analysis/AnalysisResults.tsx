@@ -117,26 +117,55 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
   return (
     <div className="min-h-screen bg-gradient-to-br from-apple-core/20 via-white to-citrus/10 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
       <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Analysis Header */}
-        <AnalysisHeader 
-          onStartNew={onStartNew}
-          onDownloadPDF={downloadPDF}
-          readOnly={readOnly}
-        />
-
-        {/* Title and metadata section */}
-        <div className="mb-6">
-          <h1 className="text-heading font-semibold text-gray-900 dark:text-citrus">
-            {companyName} - {position}
-          </h1>
-          <div className="flex items-center gap-4 mt-2 text-caption text-gray-600 dark:text-apple-core/70">
-            <div className="flex items-center gap-1">
-              <span>Analyzed on {analysisDate}</span>
+        {/* Modern Analysis Header */}
+        <div className="bg-gradient-to-r from-surface to-surface-secondary border border-border rounded-2xl p-8 mb-8 shadow-lg backdrop-blur-sm">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-6">
+              {/* Compatibility Score - Modern Badge */}
+              {compatibilityScore && (
+                <div className="bg-primary/15 rounded-xl px-6 py-4 border border-primary/30 shadow-md">
+                  <span className="text-3xl font-bold text-primary">
+                    {compatibilityScore}%
+                  </span>
+                  <p className="text-caption text-muted-foreground mt-1">Match Score</p>
+                </div>
+              )}
+              
+              {/* Position and Company - Modern Layout */}
+              <div className="space-y-1">
+                <h1 className="text-heading font-semibold text-foreground">
+                  {position}
+                </h1>
+                <p className="text-subheading text-muted-foreground">
+                  {companyName}
+                </p>
+                <div className="flex items-center gap-4 mt-2 text-caption text-muted-foreground">
+                  <span>Analyzed on {analysisDate}</span>
+                  <span>•</span>
+                  <span>Credits Used: {creditsUsed}</span>
+                </div>
+              </div>
             </div>
-            <span>•</span>
-            <span>Match Score: {compatibilityScore}%</span>
-            <span>•</span>
-            <span>Credits Used: {creditsUsed}</span>
+            
+            {/* Action Buttons - Modern Style */}
+            <div className="flex items-center space-x-4">
+              {!readOnly && (
+                <button
+                  onClick={onStartNew}
+                  className="group flex items-center space-x-3 px-6 py-3 text-foreground-secondary hover:text-foreground bg-surface-tertiary hover:bg-surface-hover rounded-xl transition-all duration-300 font-normal border border-border hover:border-primary/30 hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
+                  <span className="text-subheading">Analyze Another CV</span>
+                </button>
+              )}
+              <button 
+                onClick={downloadPDF}
+                className="group flex items-center space-x-3 px-6 py-3 bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl transition-all duration-300 font-normal shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] border border-primary/20"
+              >
+                <Download className="h-5 w-5 transition-transform group-hover:translate-y-0.5" />
+                <span className="text-subheading">Download Report</span>
+              </button>
+            </div>
           </div>
         </div>
 
