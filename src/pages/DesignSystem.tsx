@@ -1,39 +1,17 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, Eye, Code, Palette, Type, Square, Circle, Triangle, Zap, AlertTriangle, Search, Star, Heart, Award, Sparkles, Layers, Grid, Layout, MousePointer, Users, TrendingUp, Menu, ChevronDown, Info, Download, Settings, Bell, MessageSquare, Play, Pause, Volume2, RefreshCw, Camera, Clock, MapPin, Shield, Unlock, Lock, Mail, Upload, FileText, Loader, Activity, History, Trash2, Brain } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { FloatingLabelInput } from '@/components/common/FloatingLabelInput';
-import { FloatingLabelTextarea } from '@/components/common/FloatingLabelTextarea';
-import { CaptureInput } from '@/components/ui/capture-input';
-import { CaptureTextarea } from '@/components/ui/capture-textarea';
-import { RichTextEditor } from '@/components/ui/rich-text-editor';
-import LegacyRichTextEditor from '@/components/ui/legacy-rich-text-editor';
-// Using ExperimentalAIMenu as the new standard
-import { ExperimentalAIMenu } from '@/components/ui/experimental-ai-menu';
-import '@/components/ui/rich-text-editor.css';
-
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel } from '@/components/ui/dropdown-menu';
-import { LoadingStatesShowcase } from '@/components/ui/loading-states-showcase';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-
-// Import missing component examples
-import { ContactSalesModal } from '@/components/ui/contact-sales-modal';
-import { WelcomeCreditsModal } from '@/components/ui/welcome-credits-modal';
-import ToastModal from '@/components/ui/toast-modal';
-import { MockPaymentModal } from '@/components/ui/mock-payment-modal';
-
-import { StepIndicator } from '@/components/ui/step-indicator';
-import { ProgressIndicator } from '@/components/ui/progress-indicator';
-import EnhancedAnalysisHistory from '@/components/analysis/EnhancedAnalysisHistory';
-import { CategoryDocumentHistory } from '@/components/ui/category-document-history';
-import { DocumentHistory as ProfileDocumentHistory } from '@/components/ui/profile-document-history';
-
-// Import design system components
-import { VubeUITooltip, EnhancedCoverLetterHistory } from '@/components/design-system';
+import React, { useState } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
+import { Progress } from "@/components/ui/progress";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { AlertCircle, CheckCircle, Info, XCircle, Search, Filter, Download, Eye, Edit, Trash2, User, Settings, Bell } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { VybeButton, VybeSelect, VybeIconButton, VubeUITooltip, EnhancedCoverLetterHistory } from "@/components/design-system";
 
 const DesignSystem = () => {
   const [activeModal, setActiveModal] = useState<string | null>(null);
