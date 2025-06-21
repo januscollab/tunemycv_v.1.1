@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Eye, Palette, Type, Square, Zap, AlertTriangle, ChevronDown, Info, Download, Settings, Bell, Sparkles, Layers, Grid, MousePointer, History as HistoryIcon, Activity, Loader, } from 'lucide-react';
+import { ArrowLeft, Eye, Palette, Type, Square, Zap, AlertTriangle, ChevronDown, Info, Download, Settings, Bell, Sparkles, Layers, Grid, MousePointer, History as HistoryIcon, Activity, Loader, User } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -11,7 +11,7 @@ import { CaptureInput } from '@/components/ui/capture-input';
 import { CaptureTextarea } from '@/components/ui/capture-textarea';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import LegacyRichTextEditor from '@/components/ui/legacy-rich-text-editor';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel } from '@/components/ui/dropdown-menu';
 import { LoadingStatesShowcase } from '@/components/ui/loading-states-showcase';
 import { ContactSalesModal } from '@/components/ui/contact-sales-modal';
@@ -352,17 +352,19 @@ const DesignSystem = () => {
     {
       name: 'Tooltip System',
       component: (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="outline" size="sm">
-              <Info className="h-4 w-4 mr-1" />
-              Hover for tooltip
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>This is a helpful tooltip message</p>
-          </TooltipContent>
-        </Tooltip>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="outline" size="sm">
+                <Info className="h-4 w-4 mr-1" />
+                Hover for tooltip
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>This is a helpful tooltip message</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       ),
       usage: '89 usages',
       description: 'Accessible tooltips with proper z-index and positioning'
@@ -694,13 +696,13 @@ const DesignSystem = () => {
           <VybeIconButton 
             icon={Settings}
             tooltip="Settings"
-            vybeVariant="secondary"
+            variant="secondary"
             onClick={() => console.log('Settings clicked')}
           />
           <VybeIconButton 
             icon={Bell}
             tooltip="Notifications"
-            vybeVariant="outline"
+            variant="outline"
             onClick={() => console.log('Notifications clicked')}
           />
         </div>
