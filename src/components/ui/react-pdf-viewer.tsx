@@ -14,6 +14,12 @@ const loadPDFComponents = async () => {
     Page = reactPdf.Page;
     pdfjs = reactPdf.pdfjs;
     
+    // Set worker source - let react-pdf handle this
+    pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+      'pdfjs-dist/build/pdf.worker.min.js',
+      import.meta.url,
+    ).toString();
+    
     // Import CSS files dynamically
     await import('react-pdf/dist/esm/Page/AnnotationLayer.css');
     await import('react-pdf/dist/esm/Page/TextLayer.css');
@@ -320,11 +326,6 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
               onLoadSuccess={onDocumentLoadSuccess}
               onLoadError={onDocumentLoadError}
               loading=""
-              options={{
-                cMapUrl: 'https://unpkg.com/pdfjs-dist@3.11.174/cmaps/',
-                cMapPacked: true,
-                standardFontDataUrl: 'https://unpkg.com/pdfjs-dist@3.11.174/standard_fonts/',
-              }}
             >
               <Page
                 pageNumber={pageNumber}
