@@ -57,7 +57,7 @@ const SprintManager = () => {
       // First ensure default sprints exist
       await ensureDefaultSprintsExist();
 
-      // Load sprints with proper ordering (Priority first, Backlog last)
+      // Load sprints with proper ordering
       const { data: sprintsData, error: sprintsError } = await supabase
         .from('sprints')
         .select('*')
@@ -65,17 +65,19 @@ const SprintManager = () => {
 
       if (sprintsError) throw sprintsError;
 
-      // Sort sprints: Priority Sprint first, others by order_index
+      // Sort sprints: Priority Sprint first, Backlog - Future Enhancements last, others by order_index
       const sortedSprints = (sprintsData || []).sort((a, b) => {
         if (a.name === 'Priority Sprint') return -1;
         if (b.name === 'Priority Sprint') return 1;
+        if (a.name === 'Backlog - Future Enhancements') return 1;
+        if (b.name === 'Backlog - Future Enhancements') return -1;
         return a.order_index - b.order_index;
       });
 
       // Load tasks with story_number
       const { data: tasksData, error: tasksError } = await supabase
         .from('tasks')
-        .select('*, story_number')
+        .select('id, title, description, story_number, priority, tags, status, sprint_id, order_index, archived_at, user_id, created_at, updated_at, story_info')
         .is('archived_at', null)
         .order('order_index');
 
@@ -105,26 +107,29 @@ const SprintManager = () => {
 
       const existingSprintNames = existingSprints?.map(s => s.name) || [];
       
-      // Enhanced validation: ensure ONLY ONE Priority Sprint exists
-      const defaultSprints = ['Priority Sprint'];
+      // Default sprints that should exist
+      const defaultSprints = [
+        { name: 'Priority Sprint', order_index: 0 },
+        { name: 'Backlog - Future Enhancements', order_index: 999 } // Always last
+      ];
       const sprintsToCreate = [];
       
-      for (const sprintName of defaultSprints) {
-        const existingCount = existingSprintNames.filter(name => name === sprintName).length;
+      for (const defaultSprint of defaultSprints) {
+        const existingCount = existingSprintNames.filter(name => name === defaultSprint.name).length;
         
         if (existingCount === 0) {
           // Sprint doesn't exist, create it
           sprintsToCreate.push({
-            name: sprintName,
-            order_index: existingSprints ? existingSprints.length + sprintsToCreate.length : sprintsToCreate.length,
+            name: defaultSprint.name,
+            order_index: defaultSprint.order_index,
             user_id: user.id,
             status: 'active',
             is_hidden: false
           });
         } else if (existingCount > 1) {
           // Multiple sprints with same name exist, remove duplicates
-          console.warn(`Multiple ${sprintName} sprints found. Removing duplicates.`);
-          const duplicates = existingSprints?.filter(s => s.name === sprintName).slice(1) || [];
+          console.warn(`Multiple ${defaultSprint.name} sprints found. Removing duplicates.`);
+          const duplicates = existingSprints?.filter(s => s.name === defaultSprint.name).slice(1) || [];
           
           // Delete duplicate sprints
           if (duplicates.length > 0) {
@@ -213,8 +218,8 @@ const SprintManager = () => {
   };
 
   const handleDeleteSprint = async (sprint: Sprint) => {
-    // Enhanced protection logic - prevent deletion of Priority Sprint
-    if (sprint.name === 'Priority Sprint') {
+    // Enhanced protection logic - prevent deletion of system sprints
+    if (sprint.name === 'Priority Sprint' || sprint.name === 'Backlog - Future Enhancements') {
       toast.error(`Cannot delete ${sprint.name} - this is a protected system sprint`);
       return;
     }
@@ -225,13 +230,13 @@ const SprintManager = () => {
         return;
       }
       
-      // Find Priority Sprint to move tasks to
-      const prioritySprint = sprints.find(s => s.name === 'Priority Sprint');
-      if (prioritySprint) {
-        // Move all tasks to Priority Sprint
+      // Find Backlog sprint to move tasks to
+      const backlogSprint = sprints.find(s => s.name === 'Backlog - Future Enhancements');
+      if (backlogSprint) {
+        // Move all tasks to Backlog sprint
         const { error: moveError } = await supabase
           .from('tasks')
-          .update({ sprint_id: prioritySprint.id })
+          .update({ sprint_id: backlogSprint.id })
           .eq('sprint_id', sprint.id);
           
         if (moveError) throw moveError;
@@ -572,53 +577,50 @@ const SprintManager = () => {
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId="sprints" type="sprint">
           {(provided) => (
-            <div 
-              {...provided.droppableProps}
-              ref={provided.innerRef}
-              className={`grid gap-6 ${sprintLayout === 'two' ? 'md:grid-cols-2' : 'grid-cols-1'}`}
-            >
-              {sprints
-                .filter(sprint => !sprint.is_hidden)
-                .map((sprint, index) => {
-              const isBacklogSprint = false; // No more backlog sprint
-              const sprintTasks = getTasksForSprint(sprint.id);
-              
-              return (
-                <Draggable key={sprint.id} draggableId={sprint.id} index={index}>
-                  {(provided, snapshot) => (
-                    <ModernCard 
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      className={`h-fit animate-fade-in ${isBacklogSprint ? 'md:col-span-2' : ''} ${
-                        snapshot.isDragging ? 'shadow-lg ring-2 ring-apricot/50' : ''
-                      }`}
-                    >
-                      <ModernCardHeader className="pb-4">
-                        <div className="flex items-center gap-2">
-                          <div 
-                            {...provided.dragHandleProps}
-                            className="p-1 hover:bg-slate-100 rounded cursor-grab active:cursor-grabbing"
-                            title="Drag to reorder sprint"
-                          >
-                            <div className="w-1 h-1 bg-slate-400 rounded-full"></div>
-                            <div className="w-1 h-1 bg-slate-400 rounded-full mt-1"></div>
-                            <div className="w-1 h-1 bg-slate-400 rounded-full mt-1"></div>
+            <div className="space-y-6">
+              {/* Regular sprints in grid layout */}
+              <div 
+                {...provided.droppableProps}
+                ref={provided.innerRef}
+                className={`grid gap-6 ${sprintLayout === 'two' ? 'md:grid-cols-2' : 'grid-cols-1'}`}
+              >
+                {sprints
+                  .filter(sprint => !sprint.is_hidden && sprint.name !== 'Backlog - Future Enhancements')
+                  .map((sprint, index) => {
+                const sprintTasks = getTasksForSprint(sprint.id);
+                
+                return (
+                  <Draggable key={sprint.id} draggableId={sprint.id} index={index}>
+                    {(provided, snapshot) => (
+                      <ModernCard 
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        className={`h-fit animate-fade-in ${
+                          snapshot.isDragging ? 'shadow-lg ring-2 ring-apricot/50' : ''
+                        }`}
+                      >
+                        <ModernCardHeader className="pb-4">
+                          <div className="flex items-center gap-2">
+                            <div 
+                              {...provided.dragHandleProps}
+                              className="p-1 hover:bg-slate-100 rounded cursor-grab active:cursor-grabbing"
+                              title="Drag to reorder sprint"
+                            >
+                              <div className="w-1 h-1 bg-slate-400 rounded-full"></div>
+                              <div className="w-1 h-1 bg-slate-400 rounded-full mt-1"></div>
+                              <div className="w-1 h-1 bg-slate-400 rounded-full mt-1"></div>
+                            </div>
+                            <ModernCardTitle className="text-lg">{sprint.name}</ModernCardTitle>
                           </div>
-                          <ModernCardTitle className="text-lg">{sprint.name}</ModernCardTitle>
-                        </div>
-                      </ModernCardHeader>
-                  <ModernCardContent>
-                    <Droppable droppableId={sprint.id}>
-                      {(provided) => (
-                        <div
-                          {...provided.droppableProps}
-                          ref={provided.innerRef}
-                          className={`min-h-[100px] mb-4 ${
-                            isBacklogSprint 
-                              ? 'grid md:grid-cols-2 gap-3' 
-                              : 'space-y-3'
-                          }`}
-                        >
+                        </ModernCardHeader>
+                    <ModernCardContent>
+                      <Droppable droppableId={sprint.id}>
+                        {(provided) => (
+                          <div
+                            {...provided.droppableProps}
+                            ref={provided.innerRef}
+                            className="min-h-[100px] mb-4 space-y-3"
+                          >
                           {sprintTasks.map((task, index) => (
                             <Draggable
                               key={task.id}
@@ -754,7 +756,7 @@ const SprintManager = () => {
                         Archive Completed
                       </VybeButton>
                     )}
-                    {sprint.name !== 'Priority Sprint' && (
+                    {sprint.name !== 'Priority Sprint' && sprint.name !== 'Backlog - Future Enhancements' && (
                       <VybeButton
                         vybeSize="sm"
                         vybeVariant="destructive"
@@ -770,8 +772,160 @@ const SprintManager = () => {
                 </Draggable>
               );
             })}
-            {provided.placeholder}
-          </div>
+              </div>
+
+              {/* Backlog - Future Enhancements Sprint (Always Full Width at Bottom) */}
+              {(() => {
+                const backlogSprint = sprints.find(s => s.name === 'Backlog - Future Enhancements');
+                if (!backlogSprint || backlogSprint.is_hidden) return null;
+                
+                const backlogTasks = getTasksForSprint(backlogSprint.id);
+                
+                return (
+                  <ModernCard className="w-full animate-fade-in border-2 border-dashed border-primary/20">
+                    <ModernCardHeader className="pb-4">
+                      <div className="flex items-center gap-2">
+                        <ModernCardTitle className="text-lg text-muted-foreground">
+                          {backlogSprint.name}
+                        </ModernCardTitle>
+                        <Badge variant="outline" className="text-xs">
+                          Future Ideas
+                        </Badge>
+                      </div>
+                    </ModernCardHeader>
+                    <ModernCardContent>
+                      <Droppable droppableId={backlogSprint.id}>
+                        {(provided) => (
+                          <div
+                            {...provided.droppableProps}
+                            ref={provided.innerRef}
+                            className="min-h-[200px] mb-4 grid md:grid-cols-2 gap-4"
+                          >
+                            {backlogTasks.map((task, index) => (
+                              <Draggable
+                                key={task.id}
+                                draggableId={task.id}
+                                index={index}
+                              >
+                                {(provided) => (
+                                  <div
+                                    ref={provided.innerRef}
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
+                                    className={`p-3 border rounded-lg bg-card hover:shadow-md transition-shadow ${
+                                      task.status === 'completed' ? 'opacity-70' : ''
+                                    }`}
+                                   >
+                                     <div className="flex items-start justify-between mb-2">
+                                       <div className="flex-1">
+                                         {task.story_number && (
+                                           <div className="text-xs text-muted-foreground font-mono mb-1">
+                                             {task.story_number}
+                                           </div>
+                                         )}
+                                         <div 
+                                           className={`font-medium text-sm cursor-pointer ${
+                                             task.status === 'completed' ? 'line-through' : ''
+                                           }`}
+                                           onClick={() => handleEditTask(task)}
+                                         >
+                                           {task.title}
+                                         </div>
+                                       </div>
+                                      <div className="flex gap-1">
+                                         <button
+                                           onClick={(e) => {
+                                             e.stopPropagation();
+                                             handleToggleTaskStatus(task);
+                                           }}
+                                           className={`w-4 h-4 rounded border text-xs ${
+                                             task.status === 'completed' 
+                                               ? 'bg-green-500 text-white' 
+                                               : 'border-gray-300 hover:border-green-500'
+                                           }`}
+                                         >
+                                           {task.status === 'completed' ? '✓' : ''}
+                                         </button>
+                                         {task.status === 'completed' && (
+                                           <button
+                                             onClick={(e) => {
+                                               e.stopPropagation();
+                                               handleArchiveTask(task);
+                                             }}
+                                             className="w-4 h-4 text-blue-500 hover:text-blue-700 text-xs border border-blue-300 rounded bg-blue-50 hover:bg-blue-100 transition-colors"
+                                             title="Archive this story"
+                                           >
+                                             📁
+                                           </button>
+                                         )}
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleDeleteTask(task);
+                                          }}
+                                          className="w-4 h-4 text-red-500 hover:text-red-700 text-xs"
+                                        >
+                                          ×
+                                        </button>
+                                      </div>
+                                    </div>
+                                    {task.description && (
+                                      <div className="text-xs text-muted-foreground mb-2">
+                                        {task.description.slice(0, 100)}...
+                                      </div>
+                                    )}
+                                    <div className="flex items-center gap-2">
+                                      <Badge 
+                                        variant="secondary" 
+                                        className={`text-xs ${getStatusColor(task.status)}`}
+                                      >
+                                        {task.status}
+                                      </Badge>
+                                      <Badge 
+                                        variant="secondary" 
+                                        className={`text-xs ${getPriorityColor(task.priority)}`}
+                                      >
+                                        {task.priority}
+                                      </Badge>
+                                      {task.tags.map((tag, idx) => (
+                                        <Badge key={idx} variant="outline" className="text-xs">
+                                          {tag}
+                                        </Badge>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                              </Draggable>
+                            ))}
+                          {provided.placeholder}
+                        </div>
+                      )}
+                    </Droppable>
+                    
+                     {/* Backlog Sprint Action Buttons */}
+                    <div className="flex gap-2 pt-4 border-t border-border/50">
+                      <VybeButton
+                        vybeSize="sm"
+                        vybeVariant="primary"
+                        onClick={() => handleAddTask(backlogSprint)}
+                      >
+                        Add Future Idea
+                      </VybeButton>
+                      <VybeButton
+                        vybeSize="sm"
+                        vybeVariant="secondary"
+                        onClick={() => handleExecuteSprint(backlogSprint)}
+                      >
+                        Execute
+                      </VybeButton>
+                    </div>
+                  </ModernCardContent>
+                  </ModernCard>
+                );
+              })()}
+              
+              {provided.placeholder}
+            </div>
         )}
       </Droppable>
     </DragDropContext>
