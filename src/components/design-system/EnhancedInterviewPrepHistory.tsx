@@ -25,50 +25,50 @@ import {
   Search
 } from 'lucide-react';
 
-// Mock data for demonstration - matches CoverLetterDocumentHistoryItem structure
-const mockCoverLetters = [
+// Mock data for demonstration - interview prep items
+const mockInterviewPrepItems = [
   {
     id: '1',
     job_title: 'Senior Frontend Developer',
     company_name: 'TechCorp Inc.',
-    content: 'Dear Hiring Manager, I am writing to express my interest...',
-    template_id: 'professional',
+    content: 'Interview preparation for Senior Frontend Developer role...',
+    template_id: 'technical',
     created_at: '2024-01-15T10:30:00Z',
     updated_at: '2024-01-15T10:30:00Z',
     generation_parameters: {},
     regeneration_count: 2,
     analysis_result_id: 'analysis-1',
-    linked_interview_prep_id: 'prep-1'
+    linked_cover_letter_id: 'cover-1'
   },
   {
     id: '2',
     job_title: 'Product Manager',
     company_name: 'Innovation Labs',
-    content: 'Dear Hiring Team, With great enthusiasm...',
-    template_id: 'creative',
+    content: 'Behavioral and strategic interview preparation...',
+    template_id: 'behavioral',
     created_at: '2024-01-10T14:20:00Z',
     updated_at: '2024-01-10T14:20:00Z',
     generation_parameters: {},
     regeneration_count: 0,
     analysis_result_id: null,
-    linked_interview_prep_id: null
+    linked_cover_letter_id: null
   },
   {
     id: '3',
     job_title: 'Data Scientist',
     company_name: 'Analytics Pro',
-    content: 'Dear Data Team, I am excited to apply...',
+    content: 'Technical interview preparation for data science role...',
     template_id: 'technical',
     created_at: '2024-01-05T09:15:00Z',
     updated_at: '2024-01-05T09:15:00Z',
     generation_parameters: {},
     regeneration_count: 1,
     analysis_result_id: 'analysis-2',
-    linked_interview_prep_id: null
+    linked_cover_letter_id: null
   }
 ];
 
-interface CoverLetterItem {
+interface InterviewPrepItem {
   id: string;
   job_title: string;
   company_name: string;
@@ -79,22 +79,22 @@ interface CoverLetterItem {
   generation_parameters?: any;
   regeneration_count?: number;
   analysis_result_id?: string;
-  linked_interview_prep_id?: string;
+  linked_cover_letter_id?: string;
 }
 
-interface EnhancedCoverLetterHistoryProps {
-  onSelectCoverLetter?: (coverLetter: CoverLetterItem) => void;
+interface EnhancedInterviewPrepHistoryProps {
+  onSelectInterviewPrep?: (interviewPrep: InterviewPrepItem) => void;
   className?: string;
 }
 
-// Individual Cover Letter Item Component - matches CoverLetterDocumentHistoryItem exactly
-const CoverLetterHistoryItem: React.FC<{
-  coverLetter: CoverLetterItem;
+// Individual Interview Prep Item Component
+const InterviewPrepHistoryItem: React.FC<{
+  interviewPrep: InterviewPrepItem;
   linkageData: any;
-  onView: (coverLetter: CoverLetterItem) => void;
-  onDelete: (coverLetter: CoverLetterItem) => void;
+  onView: (interviewPrep: InterviewPrepItem) => void;
+  onDelete: (interviewPrep: InterviewPrepItem) => void;
   isDeleting: boolean;
-}> = ({ coverLetter, linkageData, onView, onDelete, isDeleting }) => {
+}> = ({ interviewPrep, linkageData, onView, onDelete, isDeleting }) => {
   const [isEditTitleOpen, setIsEditTitleOpen] = useState(false);
 
   const formatDate = (dateString: string) => {
@@ -109,20 +109,20 @@ const CoverLetterHistoryItem: React.FC<{
 
   const handleDeleteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onDelete(coverLetter);
+    onDelete(interviewPrep);
   };
 
   // Calculate version number based on regeneration count
-  const versionNumber = (coverLetter.regeneration_count || 0) + 1;
+  const versionNumber = (interviewPrep.regeneration_count || 0) + 1;
   const totalVersions = versionNumber;
   const isLatestVersion = true;
 
   return (
     <Card
-      className="group hover:shadow-md transition-all duration-200 hover:border-primary/50 hover:bg-muted/50 cursor-pointer border border-border relative border-t-4 border-t-orange-500 h-[120px]"
-      onClick={() => onView(coverLetter)}
+      className="group hover:shadow-md transition-all duration-200 hover:border-primary/50 hover:bg-muted/50 cursor-pointer border border-border relative border-t-4 border-t-blue-500 h-[120px]"
+      onClick={() => onView(interviewPrep)}
     >
-      {/* Green Badge - Top Right */}
+      {/* Blue Badge - Top Right */}
       <div className="absolute top-3 right-3 z-10 flex items-center gap-2">
         {/* Version Badge */}
         {totalVersions > 1 && (
@@ -131,18 +131,18 @@ const CoverLetterHistoryItem: React.FC<{
           </div>
         )}
         
-        {/* Cover Letter Badge */}
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-full border border-green-500 bg-green-100 text-green-700 dark:bg-green-950/20 dark:text-green-300 dark:border-green-800">
-          <span>Cover Letter</span>
+        {/* Interview Prep Badge */}
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-full border border-blue-500 bg-blue-100 text-blue-700 dark:bg-blue-950/20 dark:text-blue-300 dark:border-blue-800">
+          <span>Interview Prep</span>
         </div>
       </div>
       
       <CardContent className="p-4 relative h-full">
         <div className="flex items-start space-x-4 h-full">
-          {/* Green Edit Icon - Left */}
+          {/* Blue Message Icon - Left */}
           <div className="flex-shrink-0">
-            <div className="w-10 h-10 bg-green-50 dark:bg-green-950/20 rounded-lg flex items-center justify-center">
-              <Edit className="h-5 w-5 text-green-600 dark:text-green-400" />
+            <div className="w-10 h-10 bg-blue-50 dark:bg-blue-950/20 rounded-lg flex items-center justify-center">
+              <MessageSquare className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             </div>
           </div>
 
@@ -151,7 +151,7 @@ const CoverLetterHistoryItem: React.FC<{
             {/* Title and Company with Edit Icon */}
             <div className="flex items-center gap-2 mb-2">
               <h3 className="text-heading font-bold text-foreground truncate">
-                {coverLetter.job_title} - {coverLetter.company_name}
+                {interviewPrep.job_title} - {interviewPrep.company_name}
               </h3>
               <Button
                 variant="ghost"
@@ -169,7 +169,7 @@ const CoverLetterHistoryItem: React.FC<{
             {/* Date directly under title */}
             <div className="flex items-center text-caption text-muted-foreground">
               <Calendar className="h-3 w-3 mr-1" />
-              <span>{formatDate(coverLetter.updated_at)}</span>
+              <span>{formatDate(interviewPrep.updated_at)}</span>
             </div>
           </div>
         </div>
@@ -177,30 +177,30 @@ const CoverLetterHistoryItem: React.FC<{
         {/* Hover Menu - Bottom Right */}
         <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
           <div className="flex items-center space-x-1">
-            {/* Cover Letter Button */}
+            {/* Interview Prep Button */}
             <Button
               variant="ghost"
               size="sm"
               onClick={(e) => {
                 e.stopPropagation();
-                onView(coverLetter);
-              }}
-              className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800"
-            >
-              <FileText className="h-4 w-4 text-black dark:text-white" />
-            </Button>
-
-            {/* Interview Prep */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                console.log('Interview prep clicked');
+                onView(interviewPrep);
               }}
               className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800"
             >
               <MessageSquare className="h-4 w-4 text-black dark:text-white" />
+            </Button>
+
+            {/* Cover Letter */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                console.log('Cover letter clicked');
+              }}
+              className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800"
+            >
+              <FileText className="h-4 w-4 text-black dark:text-white" />
             </Button>
 
             {/* View Button */}
@@ -209,7 +209,7 @@ const CoverLetterHistoryItem: React.FC<{
               size="sm"
               onClick={(e) => {
                 e.stopPropagation();
-                onView(coverLetter);
+                onView(interviewPrep);
               }}
               className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800"
             >
@@ -246,11 +246,11 @@ const CoverLetterHistoryItem: React.FC<{
   );
 };
 
-const EnhancedCoverLetterHistory: React.FC<EnhancedCoverLetterHistoryProps> = ({
-  onSelectCoverLetter,
+const EnhancedInterviewPrepHistory: React.FC<EnhancedInterviewPrepHistoryProps> = ({
+  onSelectInterviewPrep,
   className = ''
 }) => {
-  const [coverLetters, setCoverLetters] = useState<CoverLetterItem[]>(mockCoverLetters);
+  const [interviewPrepItems, setInterviewPrepItems] = useState<InterviewPrepItem[]>(mockInterviewPrepItems);
   const [isLoading, setIsLoading] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [linkageCache, setLinkageCache] = useState<Record<string, any>>({});
@@ -261,52 +261,52 @@ const EnhancedCoverLetterHistory: React.FC<EnhancedCoverLetterHistoryProps> = ({
   // Mock linkage data
   useEffect(() => {
     const linkages: Record<string, any> = {};
-    coverLetters.forEach(coverLetter => {
-      linkages[coverLetter.id] = {
-        hasLinkedAnalysis: !!coverLetter.analysis_result_id,
-        hasLinkedInterviewPrep: !!coverLetter.linked_interview_prep_id,
-        linkedAnalysisId: coverLetter.analysis_result_id,
-        linkedInterviewPrepId: coverLetter.linked_interview_prep_id
+    interviewPrepItems.forEach(interviewPrep => {
+      linkages[interviewPrep.id] = {
+        hasLinkedAnalysis: !!interviewPrep.analysis_result_id,
+        hasLinkedCoverLetter: !!interviewPrep.linked_cover_letter_id,
+        linkedAnalysisId: interviewPrep.analysis_result_id,
+        linkedCoverLetterId: interviewPrep.linked_cover_letter_id
       };
     });
     setLinkageCache(linkages);
-  }, [coverLetters]);
+  }, [interviewPrepItems]);
 
-  const handleView = (coverLetter: CoverLetterItem) => {
-    console.log('Viewing cover letter:', coverLetter.id);
-    if (onSelectCoverLetter) {
-      onSelectCoverLetter(coverLetter);
+  const handleView = (interviewPrep: InterviewPrepItem) => {
+    console.log('Viewing interview prep:', interviewPrep.id);
+    if (onSelectInterviewPrep) {
+      onSelectInterviewPrep(interviewPrep);
     }
   };
 
-  const handleDelete = (coverLetter: CoverLetterItem) => {
-    if (!window.confirm(`Are you sure you want to delete this cover letter? This action cannot be undone.`)) {
+  const handleDelete = (interviewPrep: InterviewPrepItem) => {
+    if (!window.confirm(`Are you sure you want to delete this interview prep? This action cannot be undone.`)) {
       return;
     }
 
-    setDeletingId(coverLetter.id);
+    setDeletingId(interviewPrep.id);
     
     // Mock delete with timeout
     setTimeout(() => {
-      setCoverLetters(prev => prev.filter(item => item.id !== coverLetter.id));
+      setInterviewPrepItems(prev => prev.filter(item => item.id !== interviewPrep.id));
       setDeletingId(null);
-      console.log('Cover letter deleted:', coverLetter.id);
+      console.log('Interview prep deleted:', interviewPrep.id);
     }, 1000);
   };
 
   // Filter and search logic
-  const filteredCoverLetters = coverLetters.filter(coverLetter => {
+  const filteredInterviewPrepItems = interviewPrepItems.filter(interviewPrep => {
     const matchesSearch = searchQuery === '' || 
-      (coverLetter.job_title || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (coverLetter.company_name || '').toLowerCase().includes(searchQuery.toLowerCase());
+      (interviewPrep.job_title || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (interviewPrep.company_name || '').toLowerCase().includes(searchQuery.toLowerCase());
     return matchesSearch;
   });
 
   // Pagination logic
-  const totalPages = Math.ceil(filteredCoverLetters.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredInterviewPrepItems.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const paginatedCoverLetters = filteredCoverLetters.slice(startIndex, endIndex);
+  const paginatedInterviewPrepItems = filteredInterviewPrepItems.slice(startIndex, endIndex);
 
   // Reset to first page when search or items per page changes
   useEffect(() => {
@@ -319,29 +319,29 @@ const EnhancedCoverLetterHistory: React.FC<EnhancedCoverLetterHistoryProps> = ({
         <div className="flex items-center justify-center py-8">
           <div className="text-center space-y-4">
             <History className="h-8 w-8 animate-pulse mx-auto text-primary" />
-            <p className="text-muted-foreground">Loading your cover letter history...</p>
+            <p className="text-muted-foreground">Loading your interview prep history...</p>
           </div>
         </div>
       </div>
     );
   }
 
-  if (coverLetters.length === 0) {
+  if (interviewPrepItems.length === 0) {
     return (
       <div className={className}>
         <div className="mb-6">
           <h2 className="text-title font-bold flex items-center gap-2">
             <History className="h-5 w-5 text-primary" />
-            Enhanced Cover Letter History
+            Enhanced Interview Prep History
           </h2>
         </div>
         <div className="text-center py-8">
           <History className="h-12 w-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-            No Cover Letters
+            No Interview Prep Sessions
           </h3>
           <p className="text-gray-600 dark:text-gray-400">
-            Your generated cover letters will appear here.
+            Your generated interview preparations will appear here.
           </p>
         </div>
       </div>
@@ -354,19 +354,19 @@ const EnhancedCoverLetterHistory: React.FC<EnhancedCoverLetterHistoryProps> = ({
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-title font-bold flex items-center gap-2">
             <History className="h-5 w-5 text-primary" />
-            Enhanced Cover Letter History
+            Enhanced Interview Prep History
           </h2>
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
               <Search className="h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search cover letters..."
+                placeholder="Search interview prep..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-64"
               />
             </div>
-            {filteredCoverLetters.length > 0 && (
+            {filteredInterviewPrepItems.length > 0 && (
               <div className="flex items-center space-x-2">
                 <span className="text-caption text-muted-foreground">Show:</span>
                 <Select value={itemsPerPage.toString()} onValueChange={(value) => setItemsPerPage(Number(value))}>
@@ -387,16 +387,16 @@ const EnhancedCoverLetterHistory: React.FC<EnhancedCoverLetterHistoryProps> = ({
       </div>
 
       <div className="space-y-4">
-        {paginatedCoverLetters.map((coverLetter) => {
-          const linkageData = linkageCache[coverLetter.id] || {};
+        {paginatedInterviewPrepItems.map((interviewPrep) => {
+          const linkageData = linkageCache[interviewPrep.id] || {};
           return (
-            <CoverLetterHistoryItem
-              key={coverLetter.id}
-              coverLetter={coverLetter}
+            <InterviewPrepHistoryItem
+              key={interviewPrep.id}
+              interviewPrep={interviewPrep}
               linkageData={linkageData}
               onView={handleView}
               onDelete={handleDelete}
-              isDeleting={deletingId === coverLetter.id}
+              isDeleting={deletingId === interviewPrep.id}
             />
           );
         })}
@@ -451,4 +451,4 @@ const EnhancedCoverLetterHistory: React.FC<EnhancedCoverLetterHistoryProps> = ({
   );
 };
 
-export default EnhancedCoverLetterHistory;
+export default EnhancedInterviewPrepHistory;

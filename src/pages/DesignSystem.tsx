@@ -1,334 +1,277 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from "@/components/ui/textarea"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { Calendar } from "@/components/ui/calendar"
-import { CalendarIcon } from "lucide-react"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { cn } from "@/lib/utils"
-import { format } from "date-fns"
-
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { Slider } from '@/components/ui/slider';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Progress } from '@/components/ui/progress';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Separator } from '@/components/ui/separator';
 import { 
-  VybeButton, 
-  VybeSelect, 
-  VybeIconButton, 
-  VubeUITooltip,
-  EnhancedCoverLetterHistory,
-  type VybeSelectOption 
-} from '@/components/design-system';
+  Heart, 
+  Star, 
+  Trash2, 
+  Edit, 
+  Plus, 
+  Settings, 
+  User,
+  Bell,
+  Search,
+  Download,
+  Upload,
+  Mail,
+  Phone
+} from 'lucide-react';
 
-const data = [
-  {
-    name: "John Doe",
-    email: "john.doe@example.com",
-    age: 30,
-    city: "New York",
-    country: "USA",
-  },
-  {
-    name: "Jane Smith",
-    email: "jane.smith@example.com",
-    age: 25,
-    city: "Los Angeles",
-    country: "USA",
-  },
-  {
-    name: "Alice Johnson",
-    email: "alice.johnson@example.com",
-    age: 35,
-    city: "London",
-    country: "UK",
-  },
-  {
-    name: "Bob Williams",
-    email: "bob.williams@example.com",
-    age: 40,
-    city: "Paris",
-    country: "France",
-  },
-]
+// Import Design System Components
+import { VybeButton } from '@/components/design-system/VybeButton';
+import { VybeIconButton } from '@/components/design-system/VybeIconButton';
+import { VybeSelect } from '@/components/design-system/VybeSelect';
+import { VubeUITooltip } from '@/components/design-system/VubeUITooltip';
+import EnhancedCoverLetterHistory from '@/components/design-system/EnhancedCoverLetterHistory';
+import EnhancedInterviewPrepHistory from '@/components/design-system/EnhancedInterviewPrepHistory';
 
-const options: VybeSelectOption[] = [
-  { value: "option1", label: "Option 1" },
-  { value: "option2", label: "Option 2" },
-  { value: "option3", label: "Option 3" },
-];
+const DesignSystemPage: React.FC = () => {
+  const [sliderValue, setSliderValue] = useState(50);
+  const [switchState, setSwitchState] = useState(false);
 
-const DesignSystem = () => {
+  const selectOptions = [
+    { value: 'option1', label: 'Option 1' },
+    { value: 'option2', label: 'Option 2' },
+    { value: 'option3', label: 'Option 3' }
+  ];
+
   return (
-    <div className="container mx-auto p-8 space-y-12">
-      <header className="space-y-4">
-        <h1 className="text-4xl font-bold">Design System</h1>
-        <p className="text-muted-foreground">
-          A showcase of reusable components and styles for building consistent and beautiful UIs.
-        </p>
-      </header>
+    <div className="container mx-auto p-8">
+      <h1 className="text-3xl font-bold mb-8">Design System Components</h1>
 
-      {/* Button Components Section */}
-      <section className="space-y-6">
-        <div>
-          <h2 className="text-2xl font-bold mb-2">Button Components</h2>
-          <p className="text-muted-foreground mb-6">
-            Buttons are interactive elements that trigger actions. Use them to guide users through your application.
+      {/* Vybe Components */}
+      <section className="space-y-4">
+        <div className="space-y-2">
+          <h2 className="text-2xl font-semibold">Vybe Components</h2>
+          <p className="text-sm text-muted-foreground">
+            Custom components built for the Vybe application.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <VybeButton>Primary Button</VybeButton>
-          <VybeButton variant="secondary">Secondary Button</VybeButton>
-          <VybeButton variant="outline">Outline Button</VybeButton>
-          <VybeButton variant="destructive">Destructive Button</VybeButton>
-          <VybeButton variant="ghost">Ghost Button</VybeButton>
-          <VybeButton variant="link">Link Button</VybeButton>
-          <VybeButton disabled>Disabled Button</VybeButton>
-        </div>
-      </section>
-
-      {/* Select Components Section */}
-      <section className="space-y-6">
-        <div>
-          <h2 className="text-2xl font-bold mb-2">Select Components</h2>
-          <p className="text-muted-foreground mb-6">
-            Select components allow users to choose from a list of options. They are useful for forms and settings.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <VybeSelect options={options} placeholder="Select an option" />
-        </div>
-      </section>
-
-      {/* Icon Button Components Section */}
-      <section className="space-y-6">
-        <div>
-          <h2 className="text-2xl font-bold mb-2">Icon Button Components</h2>
-          <p className="text-muted-foreground mb-6">
-            Icon buttons are buttons that only contain an icon. They are useful for toolbars and other compact UIs.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <VybeIconButton icon="settings" tooltip="Settings" />
-          <VybeIconButton icon="edit" tooltip="Edit" />
-          <VybeIconButton icon="delete" tooltip="Delete" />
-        </div>
-      </section>
-
-      {/* Tooltip Components Section */}
-      <section className="space-y-6">
-        <div>
-          <h2 className="text-2xl font-bold mb-2">Tooltip Components</h2>
-          <p className="text-muted-foreground mb-6">
-            Tooltips provide additional information when users hover over an element.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <VubeUITooltip content="This is a tooltip">Hover me</VubeUITooltip>
-        </div>
-      </section>
-
-      {/* Card Components Section */}
-      <section className="space-y-6">
-        <div>
-          <h2 className="text-2xl font-bold mb-2">Card Components</h2>
-          <p className="text-muted-foreground mb-6">
-            Cards are versatile containers for grouping related information.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* Vybe Button */}
+        <div className="grid grid-cols-3 gap-4">
           <Card>
             <CardHeader>
-              <CardTitle>Card Title</CardTitle>
-              <CardDescription>Card Description</CardDescription>
+              <CardTitle>Vybe Button</CardTitle>
             </CardHeader>
-            <CardContent>
-              <p>Card Content</p>
+            <CardContent className="flex items-center justify-center">
+              <VybeButton>Click Me</VybeButton>
             </CardContent>
-            <CardFooter>
-              <Button>Action</Button>
-            </CardFooter>
+          </Card>
+
+          {/* Vybe Icon Button */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Vybe Icon Button</CardTitle>
+            </CardHeader>
+            <CardContent className="flex items-center justify-center">
+              <VybeIconButton icon={Heart} />
+            </CardContent>
+          </Card>
+
+          {/* Vybe Select */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Vybe Select</CardTitle>
+            </CardHeader>
+            <CardContent className="flex items-center justify-center">
+              <VybeSelect options={selectOptions} />
+            </CardContent>
           </Card>
         </div>
       </section>
 
-      {/* Input Components Section */}
-      <section className="space-y-6">
-        <div>
-          <h2 className="text-2xl font-bold mb-2">Input Components</h2>
-          <p className="text-muted-foreground mb-6">
-            Input fields allow users to enter text.
+      {/* UI Components */}
+      <section className="space-y-4">
+        <div className="space-y-2">
+          <h2 className="text-2xl font-semibold">UI Components</h2>
+          <p className="text-sm text-muted-foreground">
+            Standard UI components from the chosen library.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
-            <Input type="text" id="name" placeholder="Enter your name" />
-          </div>
-        </div>
-      </section>
+        <div className="grid grid-cols-3 gap-4">
+          {/* Button */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Button</CardTitle>
+            </CardHeader>
+            <CardContent className="flex items-center justify-center">
+              <Button>Click Me</Button>
+            </CardContent>
+          </Card>
 
-      {/* Textarea Components Section */}
-      <section className="space-y-6">
-        <div>
-          <h2 className="text-2xl font-bold mb-2">Textarea Components</h2>
-          <p className="text-muted-foreground mb-6">
-            Textareas allow users to enter multi-line text.
-          </p>
-        </div>
+          {/* Input */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Input</CardTitle>
+            </CardHeader>
+            <CardContent className="flex items-center justify-center">
+              <Input placeholder="Enter text" />
+            </CardContent>
+          </Card>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="message">Message</Label>
-            <Textarea id="message" placeholder="Enter your message" />
-          </div>
-        </div>
-      </section>
+          {/* Textarea */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Textarea</CardTitle>
+            </CardHeader>
+            <CardContent className="flex items-center justify-center">
+              <Textarea placeholder="Enter text" />
+            </CardContent>
+          </Card>
 
-      {/* Table Components Section */}
-      <section className="space-y-6">
-        <div>
-          <h2 className="text-2xl font-bold mb-2">Table Components</h2>
-          <p className="text-muted-foreground mb-6">
-            Tables display data in rows and columns.
-          </p>
-        </div>
+          {/* Badge */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Badge</CardTitle>
+            </CardHeader>
+            <CardContent className="flex items-center justify-center">
+              <Badge>Default</Badge>
+            </CardContent>
+          </Card>
 
-        <div className="overflow-x-auto">
-          <Table>
-            <TableCaption>A list of your recent invoices.</TableCaption>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[100px]">Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Age</TableHead>
-                <TableHead>City</TableHead>
-                <TableHead>Country</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {data.map((row, i) => (
-                <TableRow key={i}>
-                  <TableCell className="font-medium">{row.name}</TableCell>
-                  <TableCell>{row.email}</TableCell>
-                  <TableCell>{row.age}</TableCell>
-                  <TableCell>{row.city}</TableCell>
-                  <TableCell>{row.country}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      </section>
+          {/* Switch */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Switch</CardTitle>
+            </CardHeader>
+            <CardContent className="flex items-center justify-center">
+              <Switch checked={switchState} onCheckedChange={setSwitchState} />
+            </CardContent>
+          </Card>
 
-      {/* Badge Components Section */}
-      <section className="space-y-6">
-        <div>
-          <h2 className="text-2xl font-bold mb-2">Badge Components</h2>
-          <p className="text-muted-foreground mb-6">
-            Badges are used to highlight an item's status or state.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Badge>Default</Badge>
-          <Badge variant="secondary">Secondary</Badge>
-          <Badge variant="destructive">Destructive</Badge>
-          <Badge variant="outline">Outline</Badge>
-        </div>
-      </section>
-
-      {/* Calendar Components Section */}
-      <section className="space-y-6">
-        <div>
-          <h2 className="text-2xl font-bold mb-2">Calendar Components</h2>
-          <p className="text-muted-foreground mb-6">
-            A calendar component for date selection.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant={"outline"}
-                className={cn(
-                  "w-[280px] justify-start text-left font-normal",
-                  !Date ? "text-muted-foreground" : ""
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {Date ? format(Date, "PPP") : <span>Pick a date</span>}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="center" side="bottom">
-              <Calendar
-                mode="single"
-                selected={Date}
-                onSelect={() => {}}
-                disabled={(date) =>
-                  date > new Date() || date < new Date("1900-01-01")
-                }
-                initialFocus
+          {/* Slider */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Slider</CardTitle>
+            </CardHeader>
+            <CardContent className="flex items-center justify-center">
+              <Slider
+                defaultValue={[sliderValue]}
+                max={100}
+                step={1}
+                onValueChange={(value) => setSliderValue(value[0])}
               />
-            </PopoverContent>
-          </Popover>
+            </CardContent>
+          </Card>
+
+          {/* Tabs */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Tabs</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Tabs defaultValue="account" className="w-[400px]">
+                <TabsList>
+                  <TabsTrigger value="account">Account</TabsTrigger>
+                  <TabsTrigger value="billing">Billing</TabsTrigger>
+                  <TabsTrigger value="settings">Settings</TabsTrigger>
+                </TabsList>
+                <TabsContent value="account">Make changes to your account here.</TabsContent>
+                <TabsContent value="billing">Manage your billing details and subscription.</TabsContent>
+                <TabsContent value="settings">Configure your application settings.</TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
+
+          {/* Alert */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Alert</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Alert>
+                <AlertDescription>
+                  Your subscription is expiring soon. Renew now to continue uninterrupted service.
+                </AlertDescription>
+              </Alert>
+            </CardContent>
+          </Card>
+
+          {/* Progress */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Progress</CardTitle>
+            </CardHeader>
+            <CardContent className="flex items-center justify-center">
+              <Progress value={65} />
+            </CardContent>
+          </Card>
+
+          {/* Avatar */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Avatar</CardTitle>
+            </CardHeader>
+            <CardContent className="flex items-center justify-center">
+              <Avatar>
+                <AvatarImage src="https://github.com/shadcn.png" />
+                <AvatarFallback>CN</AvatarFallback>
+              </Avatar>
+            </CardContent>
+          </Card>
+
+          {/* Separator */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Separator</CardTitle>
+            </CardHeader>
+            <CardContent className="flex items-center justify-center">
+              <div className="w-full">
+                <Separator />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Tooltip */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Tooltip</CardTitle>
+            </CardHeader>
+            <CardContent className="flex items-center justify-center">
+              <VubeUITooltip content="This is a tooltip">
+                <Button variant="outline">Hover me</Button>
+              </VubeUITooltip>
+            </CardContent>
+          </Card>
         </div>
       </section>
 
-      {/* History Components Section */}
-      <section className="space-y-6">
-        <div>
-          <h2 className="text-2xl font-bold mb-2">History Components</h2>
-          <p className="text-muted-foreground mb-6">
-            Advanced history management components with enhanced functionality, search, and filtering capabilities.
+      {/* Enhanced Cover Letter History */}
+      <section className="space-y-4">
+        <div className="space-y-2">
+          <h3 className="text-xl font-semibold">Enhanced Cover Letter History</h3>
+          <p className="text-sm text-muted-foreground">
+            Component for displaying cover letter history with search, pagination, and document actions.
           </p>
         </div>
+        <EnhancedCoverLetterHistory />
+      </section>
 
-        {/* Enhanced Cover Letter History */}
-        <div className="space-y-4">
-          <div>
-            <h3 className="text-xl font-semibold mb-2">Enhanced Cover Letter History</h3>
-            <p className="text-muted-foreground mb-4">
-              Advanced cover letter management component with search, pagination, and action menus. 
-              Used in Profile pages and Cover Letter generation workflows for managing user's cover letter documents.
-            </p>
-            <div className="bg-muted/50 p-4 rounded-lg">
-              <EnhancedCoverLetterHistory />
-            </div>
-          </div>
+      {/* Enhanced Interview Prep History */}
+      <section className="space-y-4">
+        <div className="space-y-2">
+          <h3 className="text-xl font-semibold">Enhanced Interview Prep History</h3>
+          <p className="text-sm text-muted-foreground">
+            Component for displaying interview preparation history with search, pagination, and prep actions.
+          </p>
         </div>
+        <EnhancedInterviewPrepHistory />
       </section>
     </div>
   );
 };
 
-export default DesignSystem;
+export default DesignSystemPage;
