@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,13 +33,18 @@ import { VybeButton } from '@/components/design-system/VybeButton';
 import { VybeIconButton } from '@/components/design-system/VybeIconButton';
 import { VybeSelect } from '@/components/design-system/VybeSelect';
 import { VubeUITooltip } from '@/components/design-system/VubeUITooltip';
-import EnhancedAnalysisHistory from '@/components/design-system/EnhancedAnalysisHistory';
 import EnhancedCoverLetterHistory from '@/components/design-system/EnhancedCoverLetterHistory';
 import EnhancedInterviewPrepHistory from '@/components/design-system/EnhancedInterviewPrepHistory';
 
 const DesignSystemPage: React.FC = () => {
   const [sliderValue, setSliderValue] = useState(50);
   const [switchState, setSwitchState] = useState(false);
+
+  const selectOptions = [
+    { value: 'option1', label: 'Option 1' },
+    { value: 'option2', label: 'Option 2' },
+    { value: 'option3', label: 'Option 3' }
+  ];
 
   return (
     <div className="container mx-auto p-8">
@@ -70,7 +76,7 @@ const DesignSystemPage: React.FC = () => {
               <CardTitle>Vybe Icon Button</CardTitle>
             </CardHeader>
             <CardContent className="flex items-center justify-center">
-              <VybeIconButton icon={<Heart className="h-4 w-4" />} />
+              <VybeIconButton icon={Heart} />
             </CardContent>
           </Card>
 
@@ -80,7 +86,7 @@ const DesignSystemPage: React.FC = () => {
               <CardTitle>Vybe Select</CardTitle>
             </CardHeader>
             <CardContent className="flex items-center justify-center">
-              <VybeSelect />
+              <VybeSelect options={selectOptions} />
             </CardContent>
           </Card>
         </div>
@@ -235,21 +241,12 @@ const DesignSystemPage: React.FC = () => {
               <CardTitle>Tooltip</CardTitle>
             </CardHeader>
             <CardContent className="flex items-center justify-center">
-              <VubeUITooltip />
+              <VubeUITooltip content="This is a tooltip">
+                <Button variant="outline">Hover me</Button>
+              </VubeUITooltip>
             </CardContent>
           </Card>
         </div>
-      </section>
-
-      {/* Enhanced Analysis History */}
-      <section className="space-y-4">
-        <div className="space-y-2">
-          <h3 className="text-xl font-semibold">Enhanced Analysis History</h3>
-          <p className="text-sm text-muted-foreground">
-            Component for displaying analysis history with enhanced features like search, pagination, and actions.
-          </p>
-        </div>
-        <EnhancedAnalysisHistory />
       </section>
 
       {/* Enhanced Cover Letter History */}
