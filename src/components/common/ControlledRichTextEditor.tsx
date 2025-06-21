@@ -36,7 +36,7 @@ const ControlledRichTextEditor = forwardRef<ControlledRichTextEditorRef, Control
   className = '',
   placeholder = 'Start editing...',
   readOnly = false,
-  showAIFeatures = true,
+  showAIFeatures = false, // Changed default to false
   onAIRequest,
   enableAutoSave = true,
   debounceMs = 300
@@ -159,7 +159,7 @@ const ControlledRichTextEditor = forwardRef<ControlledRichTextEditorRef, Control
 
   return (
     <div className={`relative ${className}`}>
-      {/* AI Enhancement Toolbar */}
+      {/* AI Enhancement Toolbar - Only show if AI features are enabled */}
       {showAIFeatures && isAIEnabled && selectionInfo && (
         <div className="absolute top-2 right-2 z-10 flex space-x-2 bg-background border border-border rounded-lg p-2 shadow-lg">
           <Button
@@ -228,7 +228,7 @@ const ControlledRichTextEditor = forwardRef<ControlledRichTextEditorRef, Control
         className="rich-text-editor bg-background text-foreground border border-border rounded-md"
       />
 
-      {/* Selected Text Info */}
+      {/* Selected Text Info - Only show if AI features are enabled */}
       {showAIFeatures && selectionInfo && (
         <div className="mt-2 text-micro text-muted-foreground">
           Selected: {selectionInfo.selectedText.length > 50 

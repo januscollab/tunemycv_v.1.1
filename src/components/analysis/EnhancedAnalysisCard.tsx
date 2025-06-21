@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Calendar, Eye, Download, Trash2, FileText, Pen, MessageSquare, Zap } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -188,21 +187,21 @@ const EnhancedAnalysisCard: React.FC<EnhancedAnalysisCardProps> = ({
                   <Pen className="h-3 w-3 text-gray-500" />
                 </Button>
               </div>
+              
+              {/* Date directly under title */}
+              <div className="flex items-center text-caption text-muted-foreground mb-2">
+                <Calendar className="h-3 w-3 mr-1" />
+                <span>{formatDate(analysis.created_at)}</span>
+              </div>
             </div>
             
-            {/* Date and Compatibility */}
-            <div className="flex items-center text-caption text-muted-foreground mt-auto">
-              <Calendar className="h-3 w-3 mr-1" />
-              <span>{formatDate(analysis.created_at)}</span>
-              {analysis.compatibility_score && (
-                <div className="flex items-center text-sm ml-4">
-                  <span className="text-sm font-bold text-[#FF6B35] mr-1">
-                    {analysis.compatibility_score}%
-                  </span>
-                  <span>compatibility</span>
-                </div>
-              )}
-            </div>
+            {/* Compatibility at bottom */}
+            {analysis.compatibility_score && (
+              <div className="flex items-center text-body font-bold text-[#FF6B35] mt-auto">
+                <span className="mr-1">{analysis.compatibility_score}%</span>
+                <span className="text-body font-normal text-muted-foreground">compatibility</span>
+              </div>
+            )}
           </div>
         </div>
 

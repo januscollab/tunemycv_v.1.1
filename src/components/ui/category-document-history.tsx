@@ -1,9 +1,10 @@
-import React from 'react';
-import { FileText, Calendar, Building, Eye, Edit2, Trash2, Download, MessageSquare, Target, Edit, Zap, Pencil } from 'lucide-react';
+import React, { useState } from 'react';
+import { FileText, Calendar, Building, Eye, Edit2, Trash2, Download, MessageSquare, Target, Edit, Zap, Pencil, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
 import {
   Pagination,
   PaginationContent,
@@ -48,6 +49,8 @@ interface CategoryDocumentHistoryHeaderProps {
   onItemsPerPageChange: (count: number) => void;
   showPagination?: boolean;
   showFilter?: boolean;
+  searchQuery?: string;
+  onSearchChange?: (query: string) => void;
 }
 
 interface CategoryDocumentHistoryListProps {
@@ -75,63 +78,80 @@ interface CategoryDocumentHistoryProps extends CategoryDocumentHistoryListProps 
   className?: string;
 }
 
-// Category Document History Header Component
+// Category Document History Header Component with Search
 export const CategoryDocumentHistoryHeader: React.FC<CategoryDocumentHistoryHeaderProps> = ({
   title,
   totalCount,
   itemsPerPage,
   onItemsPerPageChange,
   showPagination = true,
-  showFilter = false
+  showFilter = false,
+  searchQuery = '',
+  onSearchChange
 }) => {
   return (
-    <div className="flex items-center justify-between">
-      <div>
-        <h2 className="text-title font-bold text-foreground">{title}</h2>
-        <p className="text-muted-foreground mt-1">
-          {totalCount} total
-        </p>
-      </div>
-      
-      <div className="flex items-center space-x-4">
-        {showFilter && (
-          <div className="flex items-center space-x-2">
-            <span className="text-caption text-muted-foreground">Filter:</span>
-            <Select value="all" onValueChange={() => {}}>
-              <SelectTrigger className="w-40">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Documents</SelectItem>
-                <SelectItem value="analysis">CV Analysis</SelectItem>
-                <SelectItem value="cover_letter">Cover Letters</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        )}
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-title font-bold text-foreground">{title}</h2>
+          <p className="text-muted-foreground mt-1">
+            {totalCount} total
+          </p>
+        </div>
         
-        {showPagination && totalCount > 0 && (
-          <div className="flex items-center space-x-2">
-            <span className="text-caption text-muted-foreground">Show:</span>
-            <Select value={itemsPerPage.toString()} onValueChange={(value) => onItemsPerPageChange(Number(value))}>
-              <SelectTrigger className="w-20">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="10">10</SelectItem>
-                <SelectItem value="20">20</SelectItem>
-                <SelectItem value="30">30</SelectItem>
-              </SelectContent>
-            </Select>
-            <span className="text-caption text-muted-foreground">per page</span>
-          </div>
-        )}
+        <div className="flex items-center space-x-4">
+          {showFilter && (
+            <div className="flex items-center space-x-2">
+              <span className="text-caption text-muted-foreground">Filter:</span>
+              <Select value="all" onValueChange={() => {}}>
+                <SelectTrigger className="w-40">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Documents</SelectItem>
+                  <SelectItem value="analysis">CV Analysis</SelectItem>
+                  <SelectItem value="cover_letter">Cover Letters</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+          
+          {showPagination && totalCount > 0 && (
+            <div className="flex items-center space-x-2">
+              <span className="text-caption text-muted-foreground">Show:</span>
+              <Select value={itemsPerPage.toString()} onValueChange={(value) => onItemsPerPageChange(Number(value))}>
+                <SelectTrigger className="w-20">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="20">20</SelectItem>
+                  <SelectItem value="30">30</SelectItem>
+                </SelectContent>
+              </Select>
+              <span className="text-caption text-muted-foreground">per page</span>
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Search Component */}
+      {onSearchChange && (
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+          <Input
+            placeholder="Search documents..."
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+      )}
     </div>
   );
 };
 
-// Category Document History Item Component
+// Category Document History Item Component - Updated to match cover letter design
 export const CategoryDocumentHistoryItem: React.FC<{
   document: DocumentItem;
   onDocumentClick?: (document: DocumentItem) => void;
@@ -141,8 +161,8 @@ export const CategoryDocumentHistoryItem: React.FC<{
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
+      month: 'short',
+      day: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
     });
@@ -218,40 +238,30 @@ export const CategoryDocumentHistoryItem: React.FC<{
           </div>
 
           {/* Content - Stacked Title/Company, Date */}
-          <div className="flex-1 min-w-0 pr-20 flex flex-col justify-between h-full">
-            <div>
-              {/* Title and Company with Edit Icon */}
-              <div className="flex items-center gap-2 mb-1">
-                <h3 className="text-heading font-bold text-foreground truncate">
-                  {document.title}
-                  {document.company_name && ` - ${document.company_name}`}
-                </h3>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    // Handle edit title logic here
-                  }}
-                  className="h-auto p-1 hover:bg-gray-100 dark:hover:bg-gray-800"
-                >
-                  <Pencil className="h-3 w-3 text-gray-500" />
-                </Button>
-              </div>
+          <div className="flex-1 min-w-0 pr-20">
+            {/* Title and Company with Edit Icon */}
+            <div className="flex items-center gap-2 mb-2">
+              <h3 className="text-heading font-bold text-foreground truncate">
+                {document.title}
+                {document.company_name && ` - ${document.company_name}`}
+              </h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  // Handle edit title logic here
+                }}
+                className="h-auto p-1 hover:bg-gray-100 dark:hover:bg-gray-800"
+              >
+                <Pencil className="h-3 w-3 text-gray-500" />
+              </Button>
             </div>
             
-            {/* Date */}
-            <div className="flex items-center text-caption text-muted-foreground mt-auto">
+            {/* Date directly under title */}
+            <div className="flex items-center text-caption text-muted-foreground">
               <Calendar className="h-3 w-3 mr-1" />
               <span>{formatDate(document.created_at)}</span>
-              {document.compatibility_score && (
-                <div className="flex items-center text-sm ml-4">
-                  <span className="text-sm font-bold text-[#FF6B35] mr-1">
-                    {document.compatibility_score}%
-                  </span>
-                  <span>compatibility</span>
-                </div>
-              )}
             </div>
           </div>
         </div>
