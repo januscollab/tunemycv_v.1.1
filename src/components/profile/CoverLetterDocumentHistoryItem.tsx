@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { 
@@ -9,9 +9,10 @@ import {
   Trash2, 
   Target, 
   MessageSquare,
-  Edit
+  Edit,
+  Pencil
 } from 'lucide-react';
-import { DocumentTypeBadge } from '@/components/ui/document-type-badge';
+import EditTitleDialog from '@/components/ui/edit-title-dialog';
 
 interface CoverLetterItem {
   id: string;
@@ -50,6 +51,8 @@ const CoverLetterDocumentHistoryItem: React.FC<CoverLetterDocumentHistoryItemPro
   onDelete,
   isDeleting
 }) => {
+  const [isEditTitleOpen, setIsEditTitleOpen] = useState(false);
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -59,6 +62,13 @@ const CoverLetterDocumentHistoryItem: React.FC<CoverLetterDocumentHistoryItemPro
       minute: '2-digit'
     });
   };
+
+  const handleTitleSave = (newTitle: string) => {
+    // TODO: Implement title update functionality
+    console.log('Updating title to:', newTitle);
+  };
+
+  const currentTitle = `${coverLetter.job_title} - ${coverLetter.company_name}`;
 
   return (
     <Card
@@ -81,28 +91,37 @@ const CoverLetterDocumentHistoryItem: React.FC<CoverLetterDocumentHistoryItemPro
             </div>
           </div>
 
-          {/* Content - Stacked Title, Company + Date */}
+          {/* Content - Stacked Title/Company, Date */}
           <div className="flex-1 min-w-0 pr-20">
-            {/* Title */}
-            <h3 className="text-heading font-medium text-foreground truncate mb-1">
-              {coverLetter.job_title}
-            </h3>
+            {/* Title and Company with Edit Icon */}
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className="text-heading font-bold text-foreground truncate">
+                {coverLetter.job_title} - {coverLetter.company_name}
+              </h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsEditTitleOpen(true);
+                }}
+                className="h-auto p-1 hover:bg-gray-100 dark:hover:bg-gray-800"
+              >
+                <Pencil className="h-3 w-3 text-gray-500" />
+              </Button>
+            </div>
             
-            {/* Company and Date on same line */}
-            <div className="flex items-center text-subheading text-muted-foreground mb-1">
-              <span className="truncate">{coverLetter.company_name}</span>
-              <span className="mx-2">•</span>
-              <div className="flex items-center text-caption">
-                <Calendar className="h-3 w-3 mr-1" />
-                <span>{formatDate(coverLetter.updated_at)}</span>
-              </div>
+            {/* Date */}
+            <div className="flex items-center text-caption text-muted-foreground">
+              <Calendar className="h-3 w-3 mr-1" />
+              <span>{formatDate(coverLetter.updated_at)}</span>
             </div>
           </div>
         </div>
 
         {/* Hover Menu - Bottom Right */}
         <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-1">
             {/* CV Analysis */}
             {linkageData?.hasLinkedAnalysis ? (
               <Button
@@ -112,10 +131,9 @@ const CoverLetterDocumentHistoryItem: React.FC<CoverLetterDocumentHistoryItemPro
                   e.stopPropagation();
                   onViewAnalysis(linkageData.linkedAnalysisId);
                 }}
-                className="h-auto p-1 flex flex-col items-center text-black hover:bg-gray-100 dark:hover:bg-gray-800"
+                className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800"
               >
-                <Target className="h-4 w-4 mb-1" />
-                <span className="text-xs">CV Analysis</span>
+                <Target className="h-4 w-4 text-black dark:text-white" />
               </Button>
             ) : null}
 
@@ -128,10 +146,9 @@ const CoverLetterDocumentHistoryItem: React.FC<CoverLetterDocumentHistoryItemPro
                   e.stopPropagation();
                   onViewInterviewPrep(linkageData.linkedInterviewPrepId);
                 }}
-                className="h-auto p-1 flex flex-col items-center text-black hover:bg-gray-100 dark:hover:bg-gray-800"
+                className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800"
               >
-                <MessageSquare className="h-4 w-4 mb-1" />
-                <span className="text-xs">Interview Prep</span>
+                <MessageSquare className="h-4 w-4 text-black dark:text-white" />
               </Button>
             ) : (
               <Button
@@ -141,10 +158,9 @@ const CoverLetterDocumentHistoryItem: React.FC<CoverLetterDocumentHistoryItemPro
                   e.stopPropagation();
                   onCreateInterviewPrep(coverLetter);
                 }}
-                className="h-auto p-1 flex flex-col items-center text-black hover:bg-gray-100 dark:hover:bg-gray-800"
+                className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800"
               >
-                <MessageSquare className="h-4 w-4 mb-1" />
-                <span className="text-xs">Interview Prep</span>
+                <MessageSquare className="h-4 w-4 text-black dark:text-white" />
               </Button>
             )}
 
@@ -156,10 +172,9 @@ const CoverLetterDocumentHistoryItem: React.FC<CoverLetterDocumentHistoryItemPro
                 e.stopPropagation();
                 onView(coverLetter);
               }}
-              className="h-auto p-1 flex flex-col items-center text-black hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800"
             >
-              <Eye className="h-4 w-4 mb-1" />
-              <span className="text-xs">View</span>
+              <Eye className="h-4 w-4 text-black dark:text-white" />
             </Button>
 
             {/* Download Button */}
@@ -170,10 +185,9 @@ const CoverLetterDocumentHistoryItem: React.FC<CoverLetterDocumentHistoryItemPro
                 e.stopPropagation();
                 onDownload(coverLetter);
               }}
-              className="h-auto p-1 flex flex-col items-center text-black hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800"
             >
-              <Download className="h-4 w-4 mb-1" />
-              <span className="text-xs">Download</span>
+              <Download className="h-4 w-4 text-black dark:text-white" />
             </Button>
 
             {/* Delete Button */}
@@ -185,14 +199,22 @@ const CoverLetterDocumentHistoryItem: React.FC<CoverLetterDocumentHistoryItemPro
                 onDelete(coverLetter);
               }}
               disabled={isDeleting}
-              className="h-auto p-1 flex flex-col items-center text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/20"
+              className="h-8 w-8 p-0 hover:bg-red-50 dark:hover:bg-red-950/20"
             >
-              <Trash2 className="h-4 w-4 mb-1" />
-              <span className="text-xs">Delete</span>
+              <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
             </Button>
           </div>
         </div>
       </CardContent>
+
+      {/* Edit Title Dialog */}
+      <EditTitleDialog
+        isOpen={isEditTitleOpen}
+        onClose={() => setIsEditTitleOpen(false)}
+        onSave={handleTitleSave}
+        currentTitle={currentTitle}
+        titleType="cover-letter"
+      />
     </Card>
   );
 };
