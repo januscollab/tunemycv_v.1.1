@@ -5,8 +5,14 @@ import { ChevronLeft, ChevronRight, Download, ZoomIn, ZoomOut, RotateCw, Externa
 import { Button } from './button';
 import { cn } from '@/lib/utils';
 
-// Set up PDF.js worker with fallback
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js`;
+// Set up PDF.js worker with better CSP handling
+try {
+  pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js`;
+} catch (error) {
+  console.warn('PDF.js worker setup failed, using fallback');
+  // Fallback to disable worker if CSP blocks it
+  pdfjs.GlobalWorkerOptions.workerSrc = '';
+}
 
 interface ReactPDFViewerProps {
   pdfData: string;
@@ -79,7 +85,12 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
 
   const onDocumentLoadError = (error: Error) => {
     console.error('❌ PDF load error:', error);
-    setError(`Failed to load PDF: ${error.message}`);
+    // More user-friendly error message for CSP issues
+    if (error.message.includes('worker') || error.message.includes('CSP')) {
+      setError('PDF viewer configuration issue. Please try downloading the PDF instead.');
+    } else {
+      setError(`Failed to load PDF: ${error.message}`);
+    }
     setIsLoading(false);
   };
 
@@ -198,39 +209,12 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
         </div>
         
         <div className="flex items-center gap-2">
-          {/* Zoom Controls */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setScale(prev => Math.max(0.5, prev - 0.1))}
-            disabled={scale <= 0.5}
-          >
-            <ZoomOut className="h-4 w-4" />
+          {/* Download - Always available */}
+          <Button variant="ghost" size="sm" onClick={downloadPDF}>
+            <Download className="h-4 w-4" />
           </Button>
           
-          <span className="text-sm text-muted-foreground px-2">
-            {Math.round(scale * 100)}%
-          </span>
-          
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setScale(prev => Math.min(3, prev + 0.1))}
-            disabled={scale >= 3}
-          >
-            <ZoomIn className="h-4 w-4" />
-          </Button>
-          
-          {/* Rotation */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setRotation(prev => (prev + 90) % 360)}
-          >
-            <RotateCw className="h-4 w-4" />
-          </Button>
-          
-          {/* New Tab */}
+          {/* New Tab - Always available */}
           <Button
             variant="ghost"
             size="sm"
@@ -240,20 +224,42 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
             <ExternalLink className="h-4 w-4" />
           </Button>
           
-          {/* Lightbox */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={openInLightbox}
-            title="Open in lightbox"
-          >
-            <Maximize className="h-4 w-4" />
-          </Button>
-          
-          {/* Download */}
-          <Button variant="ghost" size="sm" onClick={downloadPDF}>
-            <Download className="h-4 w-4" />
-          </Button>
+          {/* Only show viewer controls if PDF is loading successfully */}
+          {!error && (
+            <>
+              {/* Zoom Controls */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setScale(prev => Math.max(0.5, prev - 0.1))}
+                disabled={scale <= 0.5}
+              >
+                <ZoomOut className="h-4 w-4" />
+              </Button>
+              
+              <span className="text-sm text-muted-foreground px-2">
+                {Math.round(scale * 100)}%
+              </span>
+              
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setScale(prev => Math.min(3, prev + 0.1))}
+                disabled={scale >= 3}
+              >
+                <ZoomIn className="h-4 w-4" />
+              </Button>
+              
+              {/* Rotation */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setRotation(prev => (prev + 90) % 360)}
+              >
+                <RotateCw className="h-4 w-4" />
+              </Button>
+            </>
+          )}
         </div>
       </div>
 
@@ -267,34 +273,54 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
 
         {error && (
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-center text-red-500">
+            <div className="text-center text-red-500 max-w-md mx-auto p-4">
               <svg className="mx-auto h-12 w-12 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <p className="text-sm">{error}</p>
+              <p className="text-sm mb-4">{error}</p>
+              <div className="flex gap-2 justify-center">
+                <Button onClick={downloadPDF} size="sm">
+                  <Download className="h-4 w-4 mr-2" />
+                  Download PDF
+                </Button>
+                <Button onClick={openInNewTab} variant="outline" size="sm">
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  Open in New Tab
+                </Button>
+              </div>
             </div>
           </div>
         )}
 
-        <div className="flex justify-center p-4">
-          <Document
-            file={pdfDataUrl}
-            onLoadSuccess={onDocumentLoadSuccess}
-            onLoadError={onDocumentLoadError}
-            loading=""
-          >
-            <Page
-              pageNumber={pageNumber}
-              scale={scale}
-              rotate={rotation}
+        {!error && (
+          <div className="flex justify-center p-4">
+            <Document
+              file={pdfDataUrl}
+              onLoadSuccess={onDocumentLoadSuccess}
+              onLoadError={onDocumentLoadError}
               loading=""
-              className="shadow-lg"
-            />
-          </Document>
-        </div>
+              options={{
+                // Disable worker if CSP is blocking it
+                disableWorker: true,
+                // Use canvas rendering as fallback
+                disableWebGL: true,
+                // Reduce memory usage
+                maxImageSize: 1024 * 1024,
+              }}
+            >
+              <Page
+                pageNumber={pageNumber}
+                scale={scale}
+                rotate={rotation}
+                loading=""
+                className="shadow-lg"
+              />
+            </Document>
+          </div>
+        )}
 
         {/* Navigation */}
-        {numPages && numPages > 1 && (
+        {numPages && numPages > 1 && !error && (
           <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-background border rounded-lg shadow-lg px-4 py-2 flex items-center gap-4">
             <Button
               variant="ghost"
