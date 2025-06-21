@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { CheckCircle, Download, ArrowLeft, Bug, X, Send } from 'lucide-react';
 
@@ -11,11 +10,11 @@ import ATSOptimizationSection from './ATSOptimizationSection';
 import InterviewPrepSection from './InterviewPrepSection';
 import AnalysisHeader from './components/AnalysisHeader';
 import LegacySummarySection from './components/LegacySummarySection';
-import LegacyCompatibilitySection from './components/LegacyCompatibilitySection';
-import LegacyKeywordSection from './components/LegacyKeywordSection';
-import PriorityRecommendationsSection from './components/PriorityRecommendationsSection';
-import PersonalizedMatchMessage from './components/PersonalizedMatchMessage';
-import NextStepsSection from './components/NextStepsSection';
+import LegacyCompatibilitySection from './LegacyCompatibilitySection';
+import LegacyKeywordSection from './LegacyKeywordSection';
+import PriorityRecommendationsSection from './PriorityRecommendationsSection';
+import PersonalizedMatchMessage from './PersonalizedMatchMessage';
+import NextStepsSection from './NextStepsSection';
 import ReactPDFViewer from '@/components/ui/react-pdf-viewer';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';

@@ -14,8 +14,15 @@ const loadPDFComponents = async () => {
     Page = reactPdf.Page;
     pdfjs = reactPdf.pdfjs;
     
-    // Set worker source with correct path for Vite
-    pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
+    // Set worker source - let react-pdf handle this
+    pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+      'pdfjs-dist/build/pdf.worker.min.js',
+      import.meta.url,
+    ).toString();
+    
+    // Import CSS files dynamically
+    await import('react-pdf/dist/esm/Page/AnnotationLayer.css');
+    await import('react-pdf/dist/esm/Page/TextLayer.css');
     
     return true;
   } catch (error) {
@@ -158,7 +165,7 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
           <svg className="mx-auto h-12 w-12 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <p className="text-sm mb-4">Failed to load PDF document</p>
+          <p className="text-sm">Failed to load PDF document</p>
           <p className="text-xs text-muted-foreground mt-2">The PDF data format is invalid</p>
         </div>
       </div>
