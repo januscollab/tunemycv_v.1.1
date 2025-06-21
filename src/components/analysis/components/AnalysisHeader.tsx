@@ -10,26 +10,26 @@ interface AnalysisHeaderProps {
 
 const AnalysisHeader: React.FC<AnalysisHeaderProps> = ({ onStartNew, onDownloadPDF, readOnly = false }) => {
   return (
-    <div className="bg-white border border-slate-200 rounded-xl p-6 mb-6 shadow-sm">
+    <div className="bg-gradient-to-r from-surface to-surface-secondary border border-border rounded-2xl p-8 mb-8 shadow-lg backdrop-blur-sm">
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-6">
           {!readOnly && (
             <button
               onClick={onStartNew}
-              className="flex items-center space-x-2 px-4 py-2 text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all duration-200 font-normal"
+              className="group flex items-center space-x-3 px-6 py-3 text-foreground-secondary hover:text-foreground bg-surface-tertiary hover:bg-surface-hover rounded-xl transition-all duration-300 font-normal border border-border hover:border-primary/30 hover:scale-[1.02] active:scale-[0.98]"
             >
-              <ArrowLeft className="h-4 w-4" />
-              <span>Analyze Another CV</span>
+              <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
+              <span className="text-subheading">Analyze Another CV</span>
             </button>
           )}
         </div>
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-4">
           <button 
             onClick={onDownloadPDF}
-            className="flex items-center space-x-2 px-4 py-2 bg-apricot text-white hover:bg-apricot/90 rounded-lg transition-all duration-200 font-normal shadow-sm"
+            className="group flex items-center space-x-3 px-6 py-3 bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl transition-all duration-300 font-normal shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] border border-primary/20"
           >
-            <Download className="h-4 w-4" />
-            <span>Download</span>
+            <Download className="h-5 w-5 transition-transform group-hover:translate-y-0.5" />
+            <span className="text-subheading">Download Report</span>
           </button>
         </div>
       </div>
