@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,9 +22,9 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Toast } from "@/components/ui/toast";
 import { Skeleton } from "@/components/ui/skeleton";
-import EnhancedCoverLetterHistory from "@/components/design-system/EnhancedCoverLetterHistory";
-import EnhancedInterviewPrepHistory from "@/components/design-system/EnhancedInterviewPrepHistory";
-import DocumentDeleteDialog from "@/components/ui/document-delete-dialog";
+import { EnhancedCoverLetterHistory } from "@/components/design-system/EnhancedCoverLetterHistory";
+import { EnhancedInterviewPrepHistory } from "@/components/design-system/EnhancedInterviewPrepHistory";
+import { DocumentDeleteDialog } from "@/components/ui/document-delete-dialog";
 import { 
   Calendar as CalendarIcon,
   ChevronDown,
@@ -368,14 +369,14 @@ const DesignSystem = () => {
             </Button>
             
             <DocumentDeleteDialog
-              open={showDeleteDialog}
-              onOpenChange={setShowDeleteDialog}
+              isOpen={showDeleteDialog}
+              onClose={() => setShowDeleteDialog(false)}
               onConfirm={() => {
                 console.log('Delete confirmed');
                 setShowDeleteDialog(false);
               }}
+              documentTitle="Sample Document"
               documentType="Cover Letter"
-              title="Sample Document"
             />
           </div>
         </section>
