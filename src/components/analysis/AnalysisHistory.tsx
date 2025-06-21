@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -118,50 +117,54 @@ const AnalysisHistory: React.FC<AnalysisHistoryProps> = ({
 
   if (isLoading) {
     return (
-      <Card className={className}>
-        <CardContent className="flex items-center justify-center py-8">
+      <div className={className}>
+        <div className="mb-6">
+          <h2 className="text-title font-bold flex items-center gap-2">
+            <History className="h-5 w-5 text-primary" />
+            Analysis History
+          </h2>
+        </div>
+        <div className="flex items-center justify-center py-8">
           <div className="text-center space-y-4">
             <History className="h-8 w-8 animate-pulse mx-auto text-primary" />
             <p className="text-muted-foreground">Loading your analysis history...</p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     );
   }
 
   if (analyses.length === 0) {
     return (
-      <Card className={className}>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <div className={className}>
+        <div className="mb-6">
+          <h2 className="text-title font-bold flex items-center gap-2">
             <History className="h-5 w-5 text-primary" />
             Analysis History
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-8">
-            <History className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-              No Analysis History
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              Your completed analyses will appear here.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+          </h2>
+        </div>
+        <div className="text-center py-8">
+          <History className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+            No Analysis History
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400">
+            Your completed analyses will appear here.
+          </p>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Card className={className}>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+    <div className={className}>
+      <div className="mb-6">
+        <h2 className="text-title font-bold flex items-center gap-2">
           <History className="h-5 w-5 text-primary" />
           Analysis History
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+        </h2>
+      </div>
+      <div className="space-y-4">
         {analyses.map((analysis) => (
           <div
             key={analysis.id}
@@ -234,8 +237,8 @@ const AnalysisHistory: React.FC<AnalysisHistoryProps> = ({
             </div>
           </div>
         ))}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 
