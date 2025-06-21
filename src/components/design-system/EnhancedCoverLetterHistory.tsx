@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -12,10 +12,20 @@ import {
   PaginationNext, 
   PaginationPrevious 
 } from '@/components/ui/pagination';
-import { History, FileText, Calendar, Building, Eye, Download, Trash2, MessageSquare, Target, Plus, Search } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { 
+  History, 
+  Calendar, 
+  Eye, 
+  Download, 
+  Trash2, 
+  MessageSquare,
+  Edit,
+  Pencil,
+  FileText,
+  Search
+} from 'lucide-react';
 
-// Mock data for demonstration
+// Mock data for demonstration - matches CoverLetterDocumentHistoryItem structure
 const mockCoverLetters = [
   {
     id: '1',
@@ -77,6 +87,165 @@ interface EnhancedCoverLetterHistoryProps {
   className?: string;
 }
 
+// Individual Cover Letter Item Component - matches CoverLetterDocumentHistoryItem exactly
+const CoverLetterHistoryItem: React.FC<{
+  coverLetter: CoverLetterItem;
+  linkageData: any;
+  onView: (coverLetter: CoverLetterItem) => void;
+  onDelete: (coverLetter: CoverLetterItem) => void;
+  isDeleting: boolean;
+}> = ({ coverLetter, linkageData, onView, onDelete, isDeleting }) => {
+  const [isEditTitleOpen, setIsEditTitleOpen] = useState(false);
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onDelete(coverLetter);
+  };
+
+  // Calculate version number based on regeneration count
+  const versionNumber = (coverLetter.regeneration_count || 0) + 1;
+  const totalVersions = versionNumber;
+  const isLatestVersion = true;
+
+  return (
+    <Card
+      className="group hover:shadow-md transition-all duration-200 hover:border-primary/50 hover:bg-muted/50 cursor-pointer border border-border relative border-t-4 border-t-orange-500 h-[120px]"
+      onClick={() => onView(coverLetter)}
+    >
+      {/* Green Badge - Top Right */}
+      <div className="absolute top-3 right-3 z-10 flex items-center gap-2">
+        {/* Version Badge */}
+        {totalVersions > 1 && (
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-full border border-blue-500 bg-blue-100 text-blue-700 dark:bg-blue-950/20 dark:text-blue-300 dark:border-blue-800">
+            <span>v{versionNumber}</span>
+          </div>
+        )}
+        
+        {/* Cover Letter Badge */}
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-full border border-green-500 bg-green-100 text-green-700 dark:bg-green-950/20 dark:text-green-300 dark:border-green-800">
+          <span>Cover Letter</span>
+        </div>
+      </div>
+      
+      <CardContent className="p-4 relative h-full">
+        <div className="flex items-start space-x-4 h-full">
+          {/* Green Edit Icon - Left */}
+          <div className="flex-shrink-0">
+            <div className="w-10 h-10 bg-green-50 dark:bg-green-950/20 rounded-lg flex items-center justify-center">
+              <Edit className="h-5 w-5 text-green-600 dark:text-green-400" />
+            </div>
+          </div>
+
+          {/* Content - Title/Company and Date stacked */}
+          <div className="flex-1 min-w-0 pr-20">
+            {/* Title and Company with Edit Icon */}
+            <div className="flex items-center gap-2 mb-2">
+              <h3 className="text-heading font-bold text-foreground truncate">
+                {coverLetter.job_title} - {coverLetter.company_name}
+              </h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsEditTitleOpen(true);
+                }}
+                className="h-auto p-1 hover:bg-gray-100 dark:hover:bg-gray-800"
+              >
+                <Pencil className="h-3 w-3 text-gray-500" />
+              </Button>
+            </div>
+            
+            {/* Date directly under title */}
+            <div className="flex items-center text-caption text-muted-foreground">
+              <Calendar className="h-3 w-3 mr-1" />
+              <span>{formatDate(coverLetter.updated_at)}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Hover Menu - Bottom Right */}
+        <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+          <div className="flex items-center space-x-1">
+            {/* Cover Letter Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                onView(coverLetter);
+              }}
+              className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800"
+            >
+              <FileText className="h-4 w-4 text-black dark:text-white" />
+            </Button>
+
+            {/* Interview Prep */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                console.log('Interview prep clicked');
+              }}
+              className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800"
+            >
+              <MessageSquare className="h-4 w-4 text-black dark:text-white" />
+            </Button>
+
+            {/* View Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                onView(coverLetter);
+              }}
+              className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800"
+            >
+              <Eye className="h-4 w-4 text-black dark:text-white" />
+            </Button>
+
+            {/* Download Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                console.log('Download clicked');
+              }}
+              className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800"
+            >
+              <Download className="h-4 w-4 text-black dark:text-white" />
+            </Button>
+
+            {/* Delete Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleDeleteClick}
+              disabled={isDeleting}
+              className="h-8 w-8 p-0 hover:bg-red-50 dark:hover:bg-red-950/20"
+            >
+              <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
+            </Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
 const EnhancedCoverLetterHistory: React.FC<EnhancedCoverLetterHistoryProps> = ({
   onSelectCoverLetter,
   className = ''
@@ -110,21 +279,6 @@ const EnhancedCoverLetterHistory: React.FC<EnhancedCoverLetterHistoryProps> = ({
     }
   };
 
-  const handleDownload = (coverLetter: CoverLetterItem) => {
-    console.log('Downloading cover letter:', coverLetter.id);
-    // Mock download functionality
-    const content = `${coverLetter.content}`;
-    const blob = new Blob([content], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `Cover_Letter_${coverLetter.job_title}_${coverLetter.company_name}_${new Date(coverLetter.created_at).toISOString().split('T')[0]}.txt`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  };
-
   const handleDelete = (coverLetter: CoverLetterItem) => {
     if (!window.confirm(`Are you sure you want to delete this cover letter? This action cannot be undone.`)) {
       return;
@@ -138,18 +292,6 @@ const EnhancedCoverLetterHistory: React.FC<EnhancedCoverLetterHistoryProps> = ({
       setDeletingId(null);
       console.log('Cover letter deleted:', coverLetter.id);
     }, 1000);
-  };
-
-  const handleViewAnalysis = (analysisId: string) => {
-    console.log('Viewing analysis:', analysisId);
-  };
-
-  const handleViewInterviewPrep = (interviewPrepId: string) => {
-    console.log('Viewing interview prep:', interviewPrepId);
-  };
-
-  const handleCreateInterviewPrep = (coverLetter: CoverLetterItem) => {
-    console.log('Creating interview prep for:', coverLetter.id);
   };
 
   // Filter and search logic
@@ -171,29 +313,6 @@ const EnhancedCoverLetterHistory: React.FC<EnhancedCoverLetterHistoryProps> = ({
     setCurrentPage(1);
   }, [searchQuery, itemsPerPage]);
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  const getTemplateName = (templateId?: string) => {
-    switch (templateId) {
-      case 'creative':
-        return 'Creative';
-      case 'technical':
-        return 'Technical';
-      case 'executive':
-        return 'Executive';
-      default:
-        return 'Professional';
-    }
-  };
-
   if (isLoading) {
     return (
       <div className={className}>
@@ -213,7 +332,7 @@ const EnhancedCoverLetterHistory: React.FC<EnhancedCoverLetterHistoryProps> = ({
         <div className="mb-6">
           <h2 className="text-title font-bold flex items-center gap-2">
             <History className="h-5 w-5 text-primary" />
-            Cover Letter History
+            Enhanced Cover Letter History
           </h2>
         </div>
         <div className="text-center py-8">
@@ -271,103 +390,14 @@ const EnhancedCoverLetterHistory: React.FC<EnhancedCoverLetterHistoryProps> = ({
         {paginatedCoverLetters.map((coverLetter) => {
           const linkageData = linkageCache[coverLetter.id] || {};
           return (
-            <Card key={coverLetter.id} className="hover:shadow-md transition-shadow">
-              <CardContent className="p-4">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <h3 className="font-semibold text-lg">
-                        {coverLetter.job_title} - {coverLetter.company_name}
-                      </h3>
-                      <Badge variant="secondary">
-                        {getTemplateName(coverLetter.template_id)}
-                      </Badge>
-                      {(coverLetter.regeneration_count || 0) > 0 && (
-                        <Badge variant="outline">
-                          v{(coverLetter.regeneration_count || 0) + 1}
-                        </Badge>
-                      )}
-                    </div>
-                    
-                    <div className="flex items-center text-sm text-muted-foreground mb-3">
-                      <Calendar className="h-4 w-4 mr-1" />
-                      <span>{formatDate(coverLetter.created_at)}</span>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      {linkageData.hasLinkedAnalysis && (
-                        <Badge variant="secondary" className="text-xs">
-                          <Target className="h-3 w-3 mr-1" />
-                          Linked Analysis
-                        </Badge>
-                      )}
-                      {linkageData.hasLinkedInterviewPrep && (
-                        <Badge variant="secondary" className="text-xs">
-                          <MessageSquare className="h-3 w-3 mr-1" />
-                          Interview Prep
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleView(coverLetter)}
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    
-                    {linkageData.hasLinkedAnalysis ? (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleViewAnalysis(linkageData.linkedAnalysisId)}
-                      >
-                        <Target className="h-4 w-4" />
-                      </Button>
-                    ) : null}
-
-                    {linkageData.hasLinkedInterviewPrep ? (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleViewInterviewPrep(linkageData.linkedInterviewPrepId)}
-                      >
-                        <MessageSquare className="h-4 w-4" />
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleCreateInterviewPrep(coverLetter)}
-                      >
-                        <Plus className="h-4 w-4" />
-                      </Button>
-                    )}
-
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDownload(coverLetter)}
-                    >
-                      <Download className="h-4 w-4" />
-                    </Button>
-
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDelete(coverLetter)}
-                      disabled={deletingId === coverLetter.id}
-                      className="text-destructive hover:text-destructive"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <CoverLetterHistoryItem
+              key={coverLetter.id}
+              coverLetter={coverLetter}
+              linkageData={linkageData}
+              onView={handleView}
+              onDelete={handleDelete}
+              isDeleting={deletingId === coverLetter.id}
+            />
           );
         })}
       </div>
