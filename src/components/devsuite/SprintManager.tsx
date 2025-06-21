@@ -24,6 +24,7 @@ interface Task {
   id: string;
   title: string;
   description: string;
+  story_number?: string;
   priority: string;
   tags: string[];
   status: string;
@@ -73,10 +74,10 @@ const SprintManager = () => {
         return a.order_index - b.order_index;
       });
 
-      // Load tasks
+      // Load tasks with story_number
       const { data: tasksData, error: tasksError } = await supabase
         .from('tasks')
-        .select('*')
+        .select('*, story_number')
         .is('archived_at', null)
         .order('order_index');
 
@@ -567,16 +568,23 @@ const SprintManager = () => {
                                   className={`p-3 border rounded-lg bg-card hover:shadow-md transition-shadow ${
                                     task.status === 'completed' ? 'opacity-70' : ''
                                   }`}
-                                >
-                                  <div className="flex items-start justify-between mb-2">
-                                    <div 
-                                      className={`font-medium text-sm cursor-pointer ${
-                                        task.status === 'completed' ? 'line-through' : ''
-                                      }`}
-                                      onClick={() => handleEditTask(task)}
-                                    >
-                                      {task.title}
-                                    </div>
+                                 >
+                                   <div className="flex items-start justify-between mb-2">
+                                     <div className="flex-1">
+                                       {task.story_number && (
+                                         <div className="text-xs text-muted-foreground font-mono mb-1">
+                                           {task.story_number}
+                                         </div>
+                                       )}
+                                       <div 
+                                         className={`font-medium text-sm cursor-pointer ${
+                                           task.status === 'completed' ? 'line-through' : ''
+                                         }`}
+                                         onClick={() => handleEditTask(task)}
+                                       >
+                                         {task.title}
+                                       </div>
+                                     </div>
                                     <div className="flex gap-1">
                                        <button
                                          onClick={(e) => {

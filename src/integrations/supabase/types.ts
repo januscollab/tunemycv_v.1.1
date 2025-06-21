@@ -975,6 +975,7 @@ export type Database = {
           sprint_id: string
           status: string
           story_info: string | null
+          story_number: string | null
           tags: string[] | null
           title: string
           updated_at: string
@@ -993,6 +994,7 @@ export type Database = {
           sprint_id: string
           status?: string
           story_info?: string | null
+          story_number?: string | null
           tags?: string[] | null
           title: string
           updated_at?: string
@@ -1011,6 +1013,7 @@ export type Database = {
           sprint_id?: string
           status?: string
           story_info?: string | null
+          story_number?: string | null
           tags?: string[] | null
           title?: string
           updated_at?: string
@@ -1322,6 +1325,10 @@ export type Database = {
           existing_description?: string
           context_info?: string
         }
+        Returns: string
+      }
+      generate_story_number: {
+        Args: Record<PropertyKey, never>
         Returns: string
       }
       generate_user_id: {

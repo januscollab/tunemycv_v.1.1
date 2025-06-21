@@ -30,6 +30,7 @@ interface Task {
   title: string;
   description: string;
   story_info?: string;
+  story_number?: string;
   priority: string;
   tags: string[];
   status: string;
