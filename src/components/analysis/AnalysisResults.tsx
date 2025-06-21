@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { CheckCircle, Download, ArrowLeft, Bug } from 'lucide-react';
 
@@ -80,19 +81,26 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
   const [showBugReport, setShowBugReport] = useState(false);
   const { getUserDisplayName } = useProfileData();
   
+  // Helper function to check if job info is valid and meaningful
+  const hasValidJobInfo = (jobTitle: string, companyName: string) => {
+    const invalidTitles = ['unknown position', 'unknown', '', 'the position', 'position'];
+    const invalidCompanies = ['unknown company', 'unknown', '', 'the company', 'company'];
+    
+    return jobTitle && 
+           companyName && 
+           !invalidTitles.includes(jobTitle.toLowerCase()) && 
+           !invalidCompanies.includes(companyName.toLowerCase());
+  };
+  
   // Check if this is an n8n analysis result
   if (result.analysis_type === 'n8n') {
-    // Only show if we have valid job information
-    const hasValidJobInfo = result.job_title && result.company_name;
-    
-    if (!hasValidJobInfo) {
-      return null;
-    }
-
     // Extract transaction ID and analysis date
     const transactionId = result.id || result.analysis_id || 'N/A';
     const analysisDate = result.created_at ? new Date(result.created_at).toLocaleDateString() : new Date().toLocaleDateString();
     const creditsUsed = result.credits_used || 1;
+    
+    // Check if we have valid job information
+    const validJobInfo = hasValidJobInfo(result.job_title, result.company_name);
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-apple-core/20 via-white to-citrus/10 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
@@ -110,26 +118,51 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
             </div>
           )}
 
-          {/* Analysis Header */}
-          <div className="bg-gradient-to-r from-surface to-surface-secondary border border-border rounded-2xl p-8 mb-8 shadow-lg backdrop-blur-sm">
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <h1 className="text-heading font-semibold text-foreground">
-                  {result.job_title} - {result.company_name}
-                </h1>
-                {result.compatibility_score && (
-                  <p className="text-subheading text-zapier-orange font-semibold">
-                    {result.compatibility_score}% Compatibility Match
-                  </p>
-                )}
-                <div className="flex items-center gap-4 mt-2 text-caption text-muted-foreground">
-                  <span>Analyzed on {analysisDate}</span>
-                  <span>•</span>
-                  <span>Credits Used: {creditsUsed}</span>
+          {/* Analysis Header - Only show if we have valid job info */}
+          {validJobInfo && (
+            <div className="bg-gradient-to-r from-surface to-surface-secondary border border-border rounded-2xl p-8 mb-8 shadow-lg backdrop-blur-sm">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <h1 className="text-heading font-semibold text-foreground">
+                    {result.job_title} - {result.company_name}
+                  </h1>
+                  {result.compatibility_score && (
+                    <p className="text-subheading text-zapier-orange font-semibold">
+                      {result.compatibility_score}% Compatibility Match
+                    </p>
+                  )}
+                  <div className="flex items-center gap-4 mt-2 text-caption text-muted-foreground">
+                    <span>Analyzed on {analysisDate}</span>
+                    <span>•</span>
+                    <span>Credits Used: {creditsUsed}</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
+
+          {/* Simple header for cases without valid job info */}
+          {!validJobInfo && (
+            <div className="bg-gradient-to-r from-surface to-surface-secondary border border-border rounded-2xl p-8 mb-8 shadow-lg backdrop-blur-sm">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <h1 className="text-heading font-semibold text-foreground">
+                    CV Analysis Report
+                  </h1>
+                  {result.compatibility_score && (
+                    <p className="text-subheading text-zapier-orange font-semibold">
+                      {result.compatibility_score}% Compatibility Match
+                    </p>
+                  )}
+                  <div className="flex items-center gap-4 mt-2 text-caption text-muted-foreground">
+                    <span>Analyzed on {analysisDate}</span>
+                    <span>•</span>
+                    <span>Credits Used: {creditsUsed}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* PDF Viewer */}
           {result.pdf_file_data ? (
