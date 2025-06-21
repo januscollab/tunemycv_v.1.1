@@ -285,16 +285,6 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
               onLoadSuccess={onDocumentLoadSuccess}
               onLoadError={onDocumentLoadError}
               loading=""
-              options={{
-                // Use empty worker source to disable web workers
-                worker: '',
-                // Use main thread rendering
-                isEvalSupported: false,
-                // Additional fallback options
-                disableFontFace: false,
-                disableRange: false,
-                disableStream: false
-              }}
             >
               <Page
                 pageNumber={pageNumber}
