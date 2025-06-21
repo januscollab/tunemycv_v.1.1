@@ -122,50 +122,12 @@ const N8nAnalysisResults: React.FC<N8nAnalysisResultsProps> = ({
     }
   };
 
-  // Extract job title and company from job description if not directly available
-  const getJobTitle = () => {
-    if (result.job_title) return result.job_title;
-    
-    // Try to extract from job description text
-    if (result.job_description_extracted_text) {
-      const text = result.job_description_extracted_text;
-      const lines = text.split('\n').filter(line => line.trim());
-      
-      // Look for common job title patterns in first few lines
-      for (const line of lines.slice(0, 5)) {
-        const trimmed = line.trim();
-        if (trimmed.length > 5 && trimmed.length < 100 && 
-            !trimmed.toLowerCase().includes('company') &&
-            !trimmed.toLowerCase().includes('description') &&
-            !trimmed.toLowerCase().includes('about')) {
-          return trimmed;
-        }
-      }
-    }
-    
-    return 'Unknown Position';
-  };
-
-  const getCompanyName = () => {
-    if (result.company_name) return result.company_name;
-    
-    // Try to extract from job description text
-    if (result.job_description_extracted_text) {
-      const text = result.job_description_extracted_text;
-      const companyMatch = text.match(/(?:company|organization|firm|corp|inc|ltd|llc)[:\s]+([^\n]+)/i);
-      if (companyMatch && companyMatch[1]) {
-        return companyMatch[1].trim();
-      }
-      
-      // Look for patterns like "Join [Company Name]" or "At [Company Name]"
-      const joinMatch = text.match(/(?:join|at)\s+([A-Z][a-zA-Z\s&]+?)(?:\s|,|\.|\n)/);
-      if (joinMatch && joinMatch[1] && joinMatch[1].length < 50) {
-        return joinMatch[1].trim();
-      }
-    }
-    
-    return 'Unknown Company';
-  };
+  // Only show the component if we have actual job title and company name
+  const hasValidJobInfo = result.job_title && result.company_name;
+  
+  if (!hasValidJobInfo) {
+    return null; // Don't render anything if we don't have valid job information
+  }
 
   return (
     <div className="space-y-6">
@@ -184,7 +146,7 @@ const N8nAnalysisResults: React.FC<N8nAnalysisResultsProps> = ({
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-xl font-bold text-blueberry dark:text-citrus">
-                {getJobTitle()} - {getCompanyName()}
+                {result.job_title} - {result.company_name}
               </CardTitle>
               {result.compatibility_score && (
                 <p className="text-lg font-semibold text-zapier-orange mt-1">
