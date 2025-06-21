@@ -45,15 +45,15 @@ const BrowserPDFViewer: React.FC<BrowserPDFViewerProps> = ({ result, onDownloadT
         </div>
       </div>
 
-      {/* PDF Content Area */}
-      <div className="p-6 max-h-[800px] overflow-y-auto bg-white dark:bg-gray-50">
-        <div className="max-w-4xl mx-auto space-y-8 text-gray-900">
+      {/* PDF Content Area - Fixed height and proper overflow */}
+      <div className="h-[600px] overflow-y-auto bg-white dark:bg-gray-50">
+        <div className="p-8 max-w-4xl mx-auto space-y-6 text-gray-900 min-h-full">
           {/* Header Section */}
           <div className="text-center border-b border-gray-200 pb-6">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">
               CV COMPATIBILITY ANALYSIS REPORT
             </h1>
-            <div className="space-y-1 text-sm text-gray-600">
+            <div className="space-y-2 text-sm text-gray-600">
               {result.job_title && <p><strong>Position:</strong> {result.job_title}</p>}
               {result.company_name && result.company_name !== 'Company' && (
                 <p><strong>Company:</strong> {result.company_name}</p>
@@ -63,14 +63,14 @@ const BrowserPDFViewer: React.FC<BrowserPDFViewerProps> = ({ result, onDownloadT
           </div>
 
           {/* Compatibility Score */}
-          <div className="text-center py-6 bg-gray-50 rounded-lg">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">COMPATIBILITY SCORE</h2>
-            <div className="text-4xl font-bold text-primary mb-2">
+          <div className="text-center py-8 bg-gray-50 rounded-lg">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-6">COMPATIBILITY SCORE</h2>
+            <div className="text-6xl font-bold text-primary mb-4">
               {result.compatibility_score || 0}%
             </div>
-            <div className="w-full max-w-md mx-auto bg-gray-200 rounded-full h-3">
+            <div className="w-full max-w-md mx-auto bg-gray-200 rounded-full h-4">
               <div 
-                className="bg-primary h-3 rounded-full transition-all duration-300"
+                className="bg-primary h-4 rounded-full transition-all duration-300"
                 style={{ width: `${result.compatibility_score || 0}%` }}
               />
             </div>
@@ -78,27 +78,27 @@ const BrowserPDFViewer: React.FC<BrowserPDFViewerProps> = ({ result, onDownloadT
 
           {/* Executive Summary */}
           {result.executive_summary && (
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4 border-b border-gray-200 pb-2">
+            <div className="py-6">
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4 border-b border-gray-200 pb-2">
                 EXECUTIVE SUMMARY
               </h2>
-              <p className="text-gray-700 leading-relaxed">{result.executive_summary}</p>
+              <p className="text-gray-700 leading-relaxed text-base">{result.executive_summary}</p>
             </div>
           )}
 
           {/* Strengths */}
           {result.strengths && result.strengths.length > 0 && (
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4 border-b border-gray-200 pb-2">
+            <div className="py-6">
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4 border-b border-gray-200 pb-2">
                 STRENGTHS
               </h2>
-              <ul className="space-y-2">
+              <ul className="space-y-3">
                 {result.strengths.map((strength: string, index: number) => (
-                  <li key={index} className="flex items-start gap-3">
-                    <span className="flex-shrink-0 w-6 h-6 bg-green-100 text-green-700 rounded-full text-sm font-medium flex items-center justify-center">
+                  <li key={index} className="flex items-start gap-4">
+                    <span className="flex-shrink-0 w-8 h-8 bg-green-100 text-green-700 rounded-full text-sm font-medium flex items-center justify-center">
                       {index + 1}
                     </span>
-                    <span className="text-gray-700 leading-relaxed">{strength}</span>
+                    <span className="text-gray-700 leading-relaxed pt-1">{strength}</span>
                   </li>
                 ))}
               </ul>
@@ -107,17 +107,17 @@ const BrowserPDFViewer: React.FC<BrowserPDFViewerProps> = ({ result, onDownloadT
 
           {/* Areas for Improvement */}
           {result.weaknesses && result.weaknesses.length > 0 && (
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4 border-b border-gray-200 pb-2">
+            <div className="py-6">
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4 border-b border-gray-200 pb-2">
                 AREAS FOR IMPROVEMENT
               </h2>
-              <ul className="space-y-2">
+              <ul className="space-y-3">
                 {result.weaknesses.map((weakness: string, index: number) => (
-                  <li key={index} className="flex items-start gap-3">
-                    <span className="flex-shrink-0 w-6 h-6 bg-orange-100 text-orange-700 rounded-full text-sm font-medium flex items-center justify-center">
+                  <li key={index} className="flex items-start gap-4">
+                    <span className="flex-shrink-0 w-8 h-8 bg-orange-100 text-orange-700 rounded-full text-sm font-medium flex items-center justify-center">
                       {index + 1}
                     </span>
-                    <span className="text-gray-700 leading-relaxed">{weakness}</span>
+                    <span className="text-gray-700 leading-relaxed pt-1">{weakness}</span>
                   </li>
                 ))}
               </ul>
@@ -126,17 +126,17 @@ const BrowserPDFViewer: React.FC<BrowserPDFViewerProps> = ({ result, onDownloadT
 
           {/* Recommendations */}
           {result.recommendations && result.recommendations.length > 0 && (
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4 border-b border-gray-200 pb-2">
+            <div className="py-6">
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4 border-b border-gray-200 pb-2">
                 RECOMMENDATIONS
               </h2>
-              <ul className="space-y-2">
+              <ul className="space-y-3">
                 {result.recommendations.map((recommendation: string, index: number) => (
-                  <li key={index} className="flex items-start gap-3">
-                    <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-700 rounded-full text-sm font-medium flex items-center justify-center">
+                  <li key={index} className="flex items-start gap-4">
+                    <span className="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-700 rounded-full text-sm font-medium flex items-center justify-center">
                       {index + 1}
                     </span>
-                    <span className="text-gray-700 leading-relaxed">{recommendation}</span>
+                    <span className="text-gray-700 leading-relaxed pt-1">{recommendation}</span>
                   </li>
                 ))}
               </ul>
@@ -144,7 +144,7 @@ const BrowserPDFViewer: React.FC<BrowserPDFViewerProps> = ({ result, onDownloadT
           )}
 
           {/* Footer */}
-          <div className="text-center text-sm text-gray-500 border-t border-gray-200 pt-6">
+          <div className="text-center text-sm text-gray-500 border-t border-gray-200 pt-6 mt-8">
             <p>Generated by TuneMyCV.com</p>
           </div>
         </div>
