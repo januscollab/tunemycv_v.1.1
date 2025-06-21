@@ -11,9 +11,9 @@ import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { FileUploadSection } from '@/components/analyze/FileUploadSection';
-import { AnalyzeButton } from '@/components/analyze/AnalyzeButton';
-import { CreditsPanel } from '@/components/analyze/CreditsPanel';
+import FileUploadSection from '@/components/analyze/FileUploadSection';
+import AnalyzeButton from '@/components/analyze/AnalyzeButton';
+import CreditsPanel from '@/components/analyze/CreditsPanel';
 import AnalysisResults from '@/components/analysis/AnalysisResults';
 import CoverLetter from '@/pages/CoverLetter';
 import InterviewPrep from '@/pages/InterviewPrep';
@@ -34,6 +34,10 @@ const AnalyzeCV: React.FC = () => {
   // Initialize active tab based on navigation state
   const [activeTab, setActiveTab] = useState(targetTab);
   
+  // File upload state
+  const [uploadedFiles, setUploadedFiles] = useState<{ cv?: any; jobDescription?: any }>({});
+  const [jobTitle, setJobTitle] = useState('');
+  
   const { 
     analyzing, 
     analysisResult, 
@@ -41,17 +45,54 @@ const AnalyzeCV: React.FC = () => {
     performAnalysis 
   } = useAnalysis();
   
-  const {
-    uploadedFiles,
-    jobTitle,
-    setJobTitle,
-    handleFileUpload,
-    handleDeleteFile,
-    resetFiles
-  } = useUploadOrchestrator();
-
-  const { userCredits, refreshCredits } = useWelcomeCredits();
+  const { isProcessing, progress, processFile, cancel, reset } = useUploadOrchestrator();
+  const { showWelcomeModal, closeWelcomeModal } = useWelcomeCredits();
   const { getUserDisplayName } = useProfileData();
+
+  // Mock credits data - replace with actual hook when available
+  const userCredits = { credits: 10 };
+  const refreshCredits = () => {
+    // Implement credit refresh logic
+  };
+
+  // Handle file upload
+  const handleFileUpload = async (file: File, type: 'cv' | 'job_description') => {
+    try {
+      const result = await processFile(file, { fileType: type });
+      if (result.success) {
+        setUploadedFiles(prev => ({
+          ...prev,
+          [type]: {
+            file: result.file,
+            extractedText: result.extractedText,
+            type
+          }
+        }));
+      }
+    } catch (error) {
+      console.error('File upload failed:', error);
+      toast({
+        title: 'Upload Failed',
+        description: 'Failed to upload file. Please try again.',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  // Handle file deletion
+  const handleDeleteFile = (type: 'cv' | 'job_description') => {
+    setUploadedFiles(prev => {
+      const updated = { ...prev };
+      delete updated[type];
+      return updated;
+    });
+  };
+
+  // Reset files
+  const resetFiles = () => {
+    setUploadedFiles({});
+    reset();
+  };
 
   // Handle analysis from navigation state
   useEffect(() => {
@@ -168,20 +209,45 @@ const AnalyzeCV: React.FC = () => {
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <FileUploadSection
-                        uploadedFiles={uploadedFiles}
-                        onFileUpload={handleFileUpload}
-                        onDeleteFile={handleDeleteFile}
-                        jobTitle={jobTitle}
-                        setJobTitle={setJobTitle}
-                      />
+                      <div className="space-y-6">
+                        <FileUploadSection
+                          type="cv"
+                          uploadedFile={uploadedFiles.cv}
+                          onFileUpload={handleFileUpload}
+                          onRemoveFile={handleDeleteFile}
+                          onTogglePreview={() => {}}
+                          showPreview={false}
+                          uploading={isProcessing}
+                        />
+                        
+                        <FileUploadSection
+                          type="job_description"
+                          uploadedFile={uploadedFiles.jobDescription}
+                          onFileUpload={handleFileUpload}
+                          onRemoveFile={handleDeleteFile}
+                          onTogglePreview={() => {}}
+                          showPreview={false}
+                          uploading={isProcessing}
+                        />
+                        
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Job Title (Optional)</label>
+                          <input
+                            type="text"
+                            value={jobTitle}
+                            onChange={(e) => setJobTitle(e.target.value)}
+                            placeholder="e.g., Software Engineer"
+                            className="w-full px-3 py-2 border rounded-md"
+                          />
+                        </div>
+                      </div>
                       
                       <Separator className="my-6" />
                       
                       <AnalyzeButton
                         analyzing={analyzing}
-                        hasRequiredFiles={Boolean(uploadedFiles.cv && uploadedFiles.jobDescription)}
-                        hasCredits={Boolean(userCredits && userCredits.credits > 0)}
+                        canAnalyze={Boolean(uploadedFiles.cv && uploadedFiles.jobDescription)}
+                        hasCreditsForAI={Boolean(userCredits && userCredits.credits > 0)}
                         onAnalyze={handleAnalyze}
                       />
                     </CardContent>
@@ -189,7 +255,10 @@ const AnalyzeCV: React.FC = () => {
                 </div>
 
                 <div>
-                  <CreditsPanel userCredits={userCredits} />
+                  <CreditsPanel 
+                    credits={userCredits.credits}
+                    hasCreditsForAI={Boolean(userCredits && userCredits.credits > 0)}
+                  />
                 </div>
               </div>
             </TabsContent>
