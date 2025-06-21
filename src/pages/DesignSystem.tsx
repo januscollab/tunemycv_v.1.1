@@ -29,9 +29,6 @@ import {
 } from 'lucide-react';
 
 // Import Design System Components
-import { VybeButton } from '@/components/design-system/VybeButton';
-import { VybeIconButton } from '@/components/design-system/VybeIconButton';
-import { VybeSelect } from '@/components/design-system/VybeSelect';
 import { VubeUITooltip } from '@/components/design-system/VubeUITooltip';
 import EnhancedAnalysisHistory from '@/components/analysis/EnhancedAnalysisHistory';
 import EnhancedCoverLetterHistory from '@/components/design-system/EnhancedCoverLetterHistory';
@@ -41,68 +38,16 @@ const DesignSystemPage: React.FC = () => {
   const [sliderValue, setSliderValue] = useState(50);
   const [switchState, setSwitchState] = useState(false);
 
-  const selectOptions = [
-    { value: 'option1', label: 'Option 1' },
-    { value: 'option2', label: 'Option 2' },
-    { value: 'option3', label: 'Option 3' },
-  ];
-
   return (
     <div className="container mx-auto p-8">
       <h1 className="text-3xl font-bold mb-8">Design System Components</h1>
-
-      {/* Vybe Components */}
-      <section className="space-y-4">
-        <div className="space-y-2">
-          <h2 className="text-2xl font-semibold">Vybe Components</h2>
-          <p className="text-sm text-muted-foreground">
-            Custom components built for the Vybe application.
-          </p>
-        </div>
-
-        {/* Vybe Button */}
-        <div className="grid grid-cols-3 gap-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Vybe Button</CardTitle>
-            </CardHeader>
-            <CardContent className="flex items-center justify-center">
-              <VybeButton>Click Me</VybeButton>
-            </CardContent>
-          </Card>
-
-          {/* Vybe Icon Button */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Vybe Icon Button</CardTitle>
-            </CardHeader>
-            <CardContent className="flex items-center justify-center">
-              <VybeIconButton icon={Heart} tooltip="Like this" />
-            </CardContent>
-          </Card>
-
-          {/* Vybe Select */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Vybe Select</CardTitle>
-            </CardHeader>
-            <CardContent className="flex items-center justify-center">
-              <VybeSelect 
-                options={selectOptions}
-                placeholder="Select an option"
-                onValueChange={(value) => console.log('Selected:', value)}
-              />
-            </CardContent>
-          </Card>
-        </div>
-      </section>
 
       {/* UI Components */}
       <section className="space-y-4">
         <div className="space-y-2">
           <h2 className="text-2xl font-semibold">UI Components</h2>
           <p className="text-sm text-muted-foreground">
-            Standard UI components from the chosen library.
+            Standard UI components and enhanced features from the design system.
           </p>
         </div>
 
@@ -254,39 +199,39 @@ const DesignSystemPage: React.FC = () => {
             </CardContent>
           </Card>
         </div>
-      </section>
 
-      {/* Enhanced Analysis History */}
-      <section className="space-y-4">
-        <div className="space-y-2">
-          <h3 className="text-xl font-semibold">Enhanced Analysis History</h3>
-          <p className="text-sm text-muted-foreground">
-            Component for displaying analysis history with enhanced features like search, pagination, and actions.
-          </p>
-        </div>
-        <EnhancedAnalysisHistory />
-      </section>
+        {/* History Components - Full Width */}
+        <div className="space-y-6 mt-8">
+          {/* Enhanced Analysis History */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Enhanced Analysis History</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <EnhancedAnalysisHistory />
+            </CardContent>
+          </Card>
 
-      {/* Enhanced Cover Letter History */}
-      <section className="space-y-4">
-        <div className="space-y-2">
-          <h3 className="text-xl font-semibold">Enhanced Cover Letter History</h3>
-          <p className="text-sm text-muted-foreground">
-            Component for displaying cover letter history with search, pagination, and document actions.
-          </p>
-        </div>
-        <EnhancedCoverLetterHistory />
-      </section>
+          {/* Enhanced Cover Letter History */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Enhanced Cover Letter History</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <EnhancedCoverLetterHistory />
+            </CardContent>
+          </Card>
 
-      {/* Enhanced Interview Prep History */}
-      <section className="space-y-4">
-        <div className="space-y-2">
-          <h3 className="text-xl font-semibold">Enhanced Interview Prep History</h3>
-          <p className="text-sm text-muted-foreground">
-            Component for displaying interview preparation history with search, pagination, and prep actions.
-          </p>
+          {/* Enhanced Interview Prep History */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Enhanced Interview Prep History</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <EnhancedInterviewPrepHistory />
+            </CardContent>
+          </Card>
         </div>
-        <EnhancedInterviewPrepHistory />
       </section>
     </div>
   );
