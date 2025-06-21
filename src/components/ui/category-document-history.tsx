@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
-import { FileText, Calendar, Building, Eye, Edit2, Trash2, Download, MessageSquare, Target, Edit, Zap, Pencil, Search } from 'lucide-react';
+import React from 'react';
+import { FileText, Calendar, Building, Eye, Edit2, Trash2, Download, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
 import {
   Pagination,
   PaginationContent,
@@ -14,7 +13,6 @@ import {
   PaginationPrevious,
 } from '@/components/ui/pagination';
 import { cn } from '@/lib/utils';
-import CoverLetterVersionBadge from '@/components/cover-letter/CoverLetterVersionBadge';
 
 export interface DocumentItem {
   id: string;
@@ -49,8 +47,6 @@ interface CategoryDocumentHistoryHeaderProps {
   onItemsPerPageChange: (count: number) => void;
   showPagination?: boolean;
   showFilter?: boolean;
-  searchQuery?: string;
-  onSearchChange?: (query: string) => void;
 }
 
 interface CategoryDocumentHistoryListProps {
@@ -78,80 +74,63 @@ interface CategoryDocumentHistoryProps extends CategoryDocumentHistoryListProps 
   className?: string;
 }
 
-// Category Document History Header Component with Search
+// Category Document History Header Component
 export const CategoryDocumentHistoryHeader: React.FC<CategoryDocumentHistoryHeaderProps> = ({
   title,
   totalCount,
   itemsPerPage,
   onItemsPerPageChange,
   showPagination = true,
-  showFilter = false,
-  searchQuery = '',
-  onSearchChange
+  showFilter = false
 }) => {
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-title font-bold text-foreground">{title}</h2>
-          <p className="text-muted-foreground mt-1">
-            {totalCount} total
-          </p>
-        </div>
-        
-        <div className="flex items-center space-x-4">
-          {showFilter && (
-            <div className="flex items-center space-x-2">
-              <span className="text-caption text-muted-foreground">Filter:</span>
-              <Select value="all" onValueChange={() => {}}>
-                <SelectTrigger className="w-40">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Documents</SelectItem>
-                  <SelectItem value="analysis">CV Analysis</SelectItem>
-                  <SelectItem value="cover_letter">Cover Letters</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-          
-          {showPagination && totalCount > 0 && (
-            <div className="flex items-center space-x-2">
-              <span className="text-caption text-muted-foreground">Show:</span>
-              <Select value={itemsPerPage.toString()} onValueChange={(value) => onItemsPerPageChange(Number(value))}>
-                <SelectTrigger className="w-20">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="10">10</SelectItem>
-                  <SelectItem value="20">20</SelectItem>
-                  <SelectItem value="30">30</SelectItem>
-                </SelectContent>
-              </Select>
-              <span className="text-caption text-muted-foreground">per page</span>
-            </div>
-          )}
-        </div>
+    <div className="flex items-center justify-between">
+      <div>
+        <h2 className="text-title font-bold text-foreground">{title}</h2>
+        <p className="text-muted-foreground mt-1">
+          {totalCount} total
+        </p>
       </div>
-
-      {/* Search Component */}
-      {onSearchChange && (
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-          <Input
-            placeholder="Search documents..."
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-      )}
+      
+      <div className="flex items-center space-x-4">
+        {showFilter && (
+          <div className="flex items-center space-x-2">
+            <span className="text-caption text-muted-foreground">Filter:</span>
+            <Select value="all" onValueChange={() => {}}>
+              <SelectTrigger className="w-40">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Documents</SelectItem>
+                <SelectItem value="analysis">CV Analysis</SelectItem>
+                <SelectItem value="cover_letter">Cover Letters</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+        
+        {showPagination && totalCount > 0 && (
+          <div className="flex items-center space-x-2">
+            <span className="text-caption text-muted-foreground">Show:</span>
+            <Select value={itemsPerPage.toString()} onValueChange={(value) => onItemsPerPageChange(Number(value))}>
+              <SelectTrigger className="w-20">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="20">20</SelectItem>
+                <SelectItem value="30">30</SelectItem>
+              </SelectContent>
+            </Select>
+            <span className="text-caption text-muted-foreground">per page</span>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
-// Category Document History Item Component - Updated to match cover letter design
+// Category Document History Item Component
 export const CategoryDocumentHistoryItem: React.FC<{
   document: DocumentItem;
   onDocumentClick?: (document: DocumentItem) => void;
@@ -161,90 +140,50 @@ export const CategoryDocumentHistoryItem: React.FC<{
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
-      month: 'short',
-      day: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
       hour: '2-digit',
       minute: '2-digit'
     });
-  };
-
-  const getDocumentIcon = () => {
-    if (document.type === 'cover_letter') {
-      return <Edit className="h-5 w-5 text-green-600 dark:text-green-400" />;
-    }
-    return <Zap className="h-5 w-5 text-orange-600 dark:text-orange-400" />;
-  };
-
-  const getDocumentIconBg = () => {
-    if (document.type === 'cover_letter') {
-      return "bg-green-50 dark:bg-green-950/20";
-    }
-    return "bg-orange-50 dark:bg-orange-950/20";
   };
 
   const getDocumentBadge = () => {
     if (document.type === 'cover_letter') {
       const version = (document.regeneration_count || 0) + 1;
       return (
-        <div className="flex items-center gap-2">
-          {version > 1 && (
-            <CoverLetterVersionBadge
-              version={version}
-              isLatest={true}
-              totalVersions={version}
-            />
-          )}
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-full border border-green-500 bg-green-100 text-green-700 dark:bg-green-950/20 dark:text-green-300 dark:border-green-800">
-            <span>Cover Letter</span>
-          </div>
-        </div>
+        <Badge 
+          variant="compact" 
+          className="bg-green-100 text-green-700 border-green-300 dark:bg-green-900/20 dark:text-green-400 dark:border-green-600"
+        >
+          v{version}
+        </Badge>
       );
     }
-    return (
-      <div className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-full border border-orange-500 bg-orange-100 text-orange-700 dark:bg-orange-950/20 dark:text-orange-300 dark:border-orange-800">
-        <span>CV Analysis</span>
-      </div>
-    );
-  };
-
-  const getBorderColor = () => {
-    if (document.type === 'cover_letter') {
-      return "border-t-orange-500";
-    }
-    return "border-t-orange-500";
+    return null;
   };
 
   return (
     <Card 
       className={cn(
-        "group hover:shadow-md transition-all duration-200 hover:border-primary/50 hover:bg-muted/50 cursor-pointer",
-        "border border-border relative border-t-4 h-[120px]",
-        getBorderColor()
+        "hover:shadow-md transition-all duration-200 hover:border-primary/50 hover:bg-muted/50 cursor-pointer",
+        "border border-border relative"
       )}
       onClick={() => onDocumentClick?.(document)}
     >
-      {/* Document Type Badge - Top Right */}
-      <div className="absolute top-3 right-3 z-10">
-        {getDocumentBadge()}
-      </div>
+      {/* Document Type Badge */}
+      <Badge variant="subtle" className="absolute top-2 right-2 text-micro">
+        {document.type === 'analysis' ? 'cv analysis' : 'cover letter'}
+      </Badge>
       
-      <CardContent className="p-4 relative h-full">
-        <div className="flex items-start space-x-4 h-full">
-          {/* Document Icon - Left */}
-          <div className="flex-shrink-0">
-            <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center", getDocumentIconBg())}>
-              {getDocumentIcon()}
-            </div>
-          </div>
-
-          {/* Content - Stacked Title/Company, Date */}
-          <div className="flex-1 min-w-0 pr-20">
-            {/* Title and Company with Edit Icon */}
-            <div className="flex items-center gap-2 mb-2">
-              <h3 className="text-heading font-bold text-foreground truncate">
+      <CardContent className="p-6">
+        <div className="flex justify-between items-start mb-4">
+          <div className="flex-1">
+            <div className="flex items-center space-x-3 mb-2">
+              <h3 className="text-heading font-medium text-foreground">
                 {document.title}
                 {document.company_name && ` - ${document.company_name}`}
               </h3>
+              {getDocumentBadge()}
               <Button
                 variant="ghost"
                 size="sm"
@@ -252,58 +191,58 @@ export const CategoryDocumentHistoryItem: React.FC<{
                   e.stopPropagation();
                   // Handle edit title logic here
                 }}
-                className="h-auto p-1 hover:bg-gray-100 dark:hover:bg-gray-800"
+                className="p-1 h-auto text-muted-foreground hover:text-foreground"
               >
-                <Pencil className="h-3 w-3 text-gray-500" />
+                <Edit2 className="h-3 w-3" />
               </Button>
             </div>
             
-            {/* Date directly under title */}
-            <div className="flex items-center text-caption text-muted-foreground">
-              <Calendar className="h-3 w-3 mr-1" />
-              <span>{formatDate(document.created_at)}</span>
+            <div className="flex items-center space-x-4 text-caption text-muted-foreground mb-2">
+              {document.type === 'cover_letter' && (
+                <span className="text-muted-foreground">
+                  {document.analysis_result_id ? 'Generated from CV analysis' : 'Generated from manual input'}
+                </span>
+              )}
+              <div className="flex items-center space-x-1">
+                <Calendar className="h-3 w-3" />
+                <span>Updated {formatDate(document.created_at)}</span>
+              </div>
+              {document.compatibility_score && (
+                <div className="text-primary font-medium">
+                  Score: {document.compatibility_score}%
+                </div>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Hover Menu - Bottom Right */}
-        <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-          <div className="flex items-center space-x-1">
-            {actions.map((action, index) => {
-              if (action.condition && !action.condition(document)) {
-                return null;
-              }
-              
-              return (
-                <Button
-                  key={index}
-                  variant="ghost"
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    action.onClick(document);
-                  }}
-                  className={cn(
-                    "h-8 w-8 p-0 transition-colors",
-                    action.variant === 'destructive' 
-                      ? "hover:bg-red-50 dark:hover:bg-red-950/20" 
-                      : "hover:bg-gray-100 dark:hover:bg-gray-800"
-                  )}
-                >
-                  <div className={cn(
-                    "h-4 w-4",
-                    action.variant === 'destructive' 
-                      ? "text-red-600 dark:text-red-400"
-                      : action.variant === 'success'
-                      ? "text-blue-600 dark:text-blue-400"
-                      : "text-black dark:text-white"
-                  )}>
-                    {action.icon}
-                  </div>
-                </Button>
-              );
-            })}
-          </div>
+        {/* Action buttons row at bottom */}
+        <div className="flex items-center justify-end space-x-2 pt-3 border-t border-border">
+          {actions.map((action, index) => {
+            if (action.condition && !action.condition(document)) {
+              return null;
+            }
+            
+            return (
+              <Button
+                key={index}
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  action.onClick(document);
+                }}
+                className={cn(
+                  "text-caption font-medium transition-colors h-8 px-3",
+                  action.variant === 'destructive' && "text-destructive hover:text-destructive hover:bg-destructive/10",
+                  action.variant === 'success' && "text-success hover:text-success hover:bg-success/10"
+                )}
+              >
+                {action.icon}
+                {action.label}
+              </Button>
+            );
+          })}
         </div>
       </CardContent>
     </Card>

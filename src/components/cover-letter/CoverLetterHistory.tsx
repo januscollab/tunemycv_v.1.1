@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -20,7 +21,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getAnalysisLinkage } from '@/utils/documentLinkage';
 import LinkageIndicators from '@/components/analysis/LinkageIndicators';
 import { DocumentTypeBadge } from '@/components/ui/document-type-badge';
-import CoverLetterDocumentHistoryItem from '@/components/profile/CoverLetterDocumentHistoryItem';
 
 interface CoverLetterItem {
   id: string;
@@ -320,18 +320,152 @@ const CoverLetterHistory: React.FC<CoverLetterHistoryProps> = ({
       </div>
       <div className="space-y-4">
         {paginatedCoverLetters.map((coverLetter) => (
-          <CoverLetterDocumentHistoryItem
+          <Card
             key={coverLetter.id}
-            coverLetter={coverLetter}
-            linkageData={linkageCache[coverLetter.id] || {}}
-            onView={handleView}
-            onViewAnalysis={handleViewAnalysis}
-            onViewInterviewPrep={handleViewInterviewPrep}
-            onCreateInterviewPrep={handleCreateInterviewPrep}
-            onDownload={handleDownload}
-            onDelete={handleDelete}
-            isDeleting={deletingId === coverLetter.id}
-          />
+            className="hover:shadow-md transition-all duration-200 hover:border-primary/50 hover:bg-muted/50 cursor-pointer border border-border relative"
+            onClick={() => handleView(coverLetter)}
+          >
+            {/* Document Type Badge */}
+            <DocumentTypeBadge 
+              type="cover_letter" 
+              variant="secondary" 
+              size="sm" 
+              className="absolute top-2 right-2"
+            />
+            
+            <CardContent className="p-6">
+              <div className="flex justify-between items-start mb-4">
+                <div className="flex-1">
+                  <div className="flex items-center space-x-3 mb-2">
+                    <h3 className="text-heading font-medium text-foreground">
+                      {coverLetter.job_title}
+                    </h3>
+                    <Badge variant="compact" className="text-tiny">
+                      {getTemplateName(coverLetter.template_id)}
+                    </Badge>
+                  </div>
+                  
+                  <div className="flex items-center space-x-4 text-caption text-muted-foreground mb-2">
+                    <div className="flex items-center space-x-1">
+                      <Building className="h-3 w-3" />
+                      <span>{coverLetter.company_name}</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <Calendar className="h-3 w-3" />
+                      <span>Updated {formatDate(coverLetter.updated_at)}</span>
+                    </div>
+                    {coverLetter.regeneration_count && coverLetter.regeneration_count > 0 && (
+                      <div className="text-primary font-medium">
+                        Regenerated {coverLetter.regeneration_count} time{coverLetter.regeneration_count > 1 ? 's' : ''}
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Linkage Indicators */}
+                  <div className="mt-2">
+                    <LinkageIndicators
+                      hasLinkedCoverLetter={false}
+                      hasLinkedInterviewPrep={linkageCache[coverLetter.id]?.hasLinkedInterviewPrep || false}
+                      onViewInterviewPrep={() => handleViewInterviewPrep(linkageCache[coverLetter.id]?.linkedInterviewPrepId)}
+                      compact={true}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Action buttons row at bottom - reduced spacing by 50% and matching analysis design */}
+              <div className="flex items-center justify-between pt-1.5 border-t border-border">
+                {/* Dynamic CTAs on the left */}
+                <div className="flex items-center space-x-2">
+                  {/* View Source Analysis CTA */}
+                  {linkageCache[coverLetter.id]?.hasLinkedAnalysis && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleViewAnalysis(linkageCache[coverLetter.id].linkedAnalysisId);
+                      }}
+                      className="text-caption font-medium transition-colors h-8 px-3 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                    >
+                      <Target className="h-4 w-4 mr-2" />
+                      View Source Analysis
+                    </Button>
+                  )}
+
+                  {/* Dynamic CTA Logic for Interview Prep */}
+                  {linkageCache[coverLetter.id]?.hasLinkedInterviewPrep ? (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleViewInterviewPrep(linkageCache[coverLetter.id].linkedInterviewPrepId);
+                      }}
+                      className="text-caption font-medium transition-colors h-8 px-3 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                    >
+                      <MessageSquare className="h-4 w-4 mr-2" />
+                      View Interview Notes
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCreateInterviewPrep(coverLetter);
+                      }}
+                      className="text-caption font-medium transition-colors h-8 px-3 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Create Interview Prep
+                    </Button>
+                  )}
+                </div>
+
+                {/* Action icons on the right - matching analysis spacing */}
+                <div className="flex items-center space-x-6">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleView(coverLetter);
+                    }}
+                    className="text-caption font-medium transition-colors h-8 px-3 flex items-center space-x-2 text-black hover:text-black"
+                  >
+                    <Eye className="h-4 w-4 text-black" />
+                    <span>View</span>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDownload(coverLetter);
+                    }}
+                    className="text-caption font-medium transition-colors h-8 px-3 flex items-center space-x-2 text-black hover:text-black"
+                  >
+                    <Download className="h-4 w-4 text-black" />
+                    <span>Download</span>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(coverLetter);
+                    }}
+                    disabled={deletingId === coverLetter.id}
+                    className="text-caption font-medium transition-colors h-8 px-3 flex items-center space-x-2 text-destructive hover:text-destructive hover:bg-destructive/10"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    <span>Delete</span>
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         ))}
       </div>
 

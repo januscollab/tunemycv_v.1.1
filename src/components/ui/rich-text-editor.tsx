@@ -1,10 +1,10 @@
-
 import React, { useRef, useEffect, useState, useCallback, forwardRef, useImperativeHandle } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import './rich-text-editor.css';
 import { useJsonFirstEditor } from '@/hooks/useJsonFirstEditor';
 import { DocumentJson } from '@/utils/documentJsonUtils';
+import { ExperimentalAIMenu } from '@/components/ui/experimental-ai-menu';
 import { cn } from '@/lib/utils';
 
 interface RichTextEditorProps {
@@ -30,7 +30,7 @@ const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>(({
   className = '',
   placeholder = 'Start editing...',
   readOnly = false,
-  showAIFeatures = false,
+  showAIFeatures = true,
   enableAutoSave = true,
   debounceMs = 300
 }, ref) => {
@@ -86,6 +86,20 @@ const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>(({
     }
   }, [showAIFeatures]);
 
+  // Handle AI text replacement - now handled by ExperimentalAIMenu
+  const handleTextReplace = (originalText: string, newText: string) => {
+    if (quillRef.current) {
+      const editor = quillRef.current.getEditor();
+      const text = editor.getText();
+      const index = text.indexOf(originalText);
+      
+      if (index !== -1) {
+        editor.deleteText(index, originalText.length);
+        editor.insertText(index, newText);
+      }
+    }
+  };
+
   // Quill configuration with enhanced features
   const modules = {
     toolbar: [
@@ -140,7 +154,18 @@ const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>(({
     </div>
   );
 
-  // Only wrap with AI features in specific contexts - removed by default
+  // Wrap with AI Context Menu if AI features are enabled
+  if (showAIFeatures) {
+    return (
+      <ExperimentalAIMenu
+        selectedText={selectedText}
+        disabled={readOnly || isConverting}
+      >
+        {editorContent}
+      </ExperimentalAIMenu>
+    );
+  }
+
   return editorContent;
 });
 
