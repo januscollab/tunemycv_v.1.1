@@ -1,8 +1,6 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './components/theme-provider';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -85,19 +83,17 @@ function AppContent() {
 
 function App() {
   return (
-    <HelmetProvider>
-      <ThemeProvider defaultTheme="system" storageKey="ui-theme">
-        <TooltipProvider delayDuration={300} skipDelayDuration={100}>
-          <QueryClientProvider client={queryClient}>
-            <AuthProvider>
-              <Router>
-                <AppContent />
-              </Router>
-            </AuthProvider>
-          </QueryClientProvider>
-        </TooltipProvider>
-      </ThemeProvider>
-    </HelmetProvider>
+    <ThemeProvider defaultTheme="system" storageKey="ui-theme">
+      <TooltipProvider delayDuration={300} skipDelayDuration={100}>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <Router>
+              <AppContent />
+            </Router>
+          </AuthProvider>
+        </QueryClientProvider>
+      </TooltipProvider>
+    </ThemeProvider>
   );
 }
 

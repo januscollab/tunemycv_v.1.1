@@ -1,37 +1,84 @@
 
-import { Helmet } from 'react-helmet-async';
+import { useEffect } from 'react';
 
 const EnhancedSecurityHeaders = () => {
-  return (
-    <Helmet>
-      <meta
-        httpEquiv="Content-Security-Policy"
-        content={`
-          default-src 'self';
-          script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com;
-          style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-          font-src 'self' https://fonts.gstatic.com https://unpkg.com;
-          img-src 'self' data: blob: https:;
-          connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.openai.com https://fonts.googleapis.com https://unpkg.com;
-          frame-src 'self' blob:;
-          worker-src 'self' blob: https://unpkg.com;
-          object-src 'none';
-          base-uri 'self';
-          form-action 'self';
-          frame-ancestors 'none';
-          upgrade-insecure-requests;
-        `.replace(/\s+/g, ' ').trim()}
-      />
-      <meta httpEquiv="X-Content-Type-Options" content="nosniff" />
-      <meta httpEquiv="X-Frame-Options" content="DENY" />
-      <meta httpEquiv="X-XSS-Protection" content="1; mode=block" />
-      <meta httpEquiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
-      <meta
-        httpEquiv="Permissions-Policy"
-        content="camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()"
-      />
-    </Helmet>
-  );
+  useEffect(() => {
+    // Enhanced Content Security Policy with stricter controls
+    const cspMeta = document.createElement('meta');
+    cspMeta.httpEquiv = 'Content-Security-Policy';
+    cspMeta.content = [
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://apis.google.com",
+      "script-src-elem 'self' 'unsafe-inline' https://accounts.google.com https://apis.google.com",
+      "worker-src 'self' blob:",
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      "font-src 'self' https://fonts.gstatic.com data:",
+      "img-src 'self' data: https: blob:",
+      "connect-src 'self' https://aohrfehhyjdebaatzqdl.supabase.co wss://aohrfehhyjdebaatzqdl.supabase.co https://accounts.google.com https://api.openai.com",
+      "frame-src 'self' https://accounts.google.com",
+      "object-src 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
+      "upgrade-insecure-requests",
+      "block-all-mixed-content"
+    ].join('; ');
+    document.head.appendChild(cspMeta);
+
+    // X-Content-Type-Options
+    const contentTypeMeta = document.createElement('meta');
+    contentTypeMeta.httpEquiv = 'X-Content-Type-Options';
+    contentTypeMeta.content = 'nosniff';
+    document.head.appendChild(contentTypeMeta);
+
+    // X-XSS-Protection
+    const xssProtectionMeta = document.createElement('meta');
+    xssProtectionMeta.httpEquiv = 'X-XSS-Protection';
+    xssProtectionMeta.content = '1; mode=block';
+    document.head.appendChild(xssProtectionMeta);
+
+    // Referrer Policy
+    const referrerMeta = document.createElement('meta');
+    referrerMeta.name = 'referrer';
+    referrerMeta.content = 'strict-origin-when-cross-origin';
+    document.head.appendChild(referrerMeta);
+
+    // Enhanced Permissions Policy
+    const permissionsMeta = document.createElement('meta');
+    permissionsMeta.httpEquiv = 'Permissions-Policy';
+    permissionsMeta.content = [
+      'camera=()',
+      'microphone=()',
+      'geolocation=()',
+      'payment=()',
+      'usb=()',
+      'bluetooth=()',
+      'magnetometer=()',
+      'accelerometer=()',
+      'gyroscope=()',
+      'ambient-light-sensor=()',
+      'autoplay=()',
+      'encrypted-media=()',
+      'fullscreen=(self)',
+      'picture-in-picture=()'
+    ].join(', ');
+    document.head.appendChild(permissionsMeta);
+
+    return () => {
+      // Cleanup function to remove meta tags if component unmounts
+      try {
+        if (document.head.contains(cspMeta)) document.head.removeChild(cspMeta);
+        if (document.head.contains(contentTypeMeta)) document.head.removeChild(contentTypeMeta);
+        if (document.head.contains(xssProtectionMeta)) document.head.removeChild(xssProtectionMeta);
+        if (document.head.contains(referrerMeta)) document.head.removeChild(referrerMeta);
+        if (document.head.contains(permissionsMeta)) document.head.removeChild(permissionsMeta);
+      } catch (error) {
+        // Silently handle cleanup errors
+        console.warn('Security headers cleanup error:', error);
+      }
+    };
+  }, []);
+
+  return null;
 };
 
 export default EnhancedSecurityHeaders;
