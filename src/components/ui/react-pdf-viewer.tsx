@@ -1,10 +1,11 @@
 
-
 import React, { useState, useMemo } from 'react';
-import { Document, Page } from 'react-pdf';
-import { ChevronLeft, ChevronRight, Download, ZoomIn, ZoomOut, RotateCw, ExternalLink, Maximize } from 'lucide-react';
+import { Document, Page, pdfjs } from 'react-pdf';
+import { ChevronLeft, ChevronRight, Download, ZoomIn, ZoomOut, RotateCw, ExternalLink } from 'lucide-react';
 import { Button } from './button';
 import { cn } from '@/lib/utils';
+import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
+import 'react-pdf/dist/esm/Page/TextLayer.css';
 
 interface ReactPDFViewerProps {
   pdfData: string;
@@ -103,55 +104,6 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
   const openInNewTab = () => {
     if (pdfDataUrl) {
       window.open(pdfDataUrl, '_blank', 'noopener,noreferrer');
-    }
-  };
-
-  const openInLightbox = () => {
-    if (pdfDataUrl) {
-      // Create a modal overlay
-      const overlay = document.createElement('div');
-      overlay.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background: rgba(0,0,0,0.9);
-        z-index: 9999;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-      `;
-      
-      const iframe = document.createElement('iframe');
-      iframe.src = pdfDataUrl;
-      iframe.style.cssText = `
-        width: 90vw;
-        height: 90vh;
-        border: none;
-        background: white;
-        cursor: auto;
-      `;
-      
-      // Close on overlay click
-      overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) {
-          document.body.removeChild(overlay);
-        }
-      });
-
-      // Close on Escape key
-      const closeOnEscape = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') {
-          document.body.removeChild(overlay);
-          document.removeEventListener('keydown', closeOnEscape);
-        }
-      };
-      document.addEventListener('keydown', closeOnEscape);
-      
-      overlay.appendChild(iframe);
-      document.body.appendChild(overlay);
     }
   };
 
@@ -287,12 +239,9 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
               onLoadError={onDocumentLoadError}
               loading=""
               options={{
-                // Use main thread rendering (worker disabled globally in main.tsx)
-                isEvalSupported: false,
-                // Additional fallback options
-                disableFontFace: false,
-                disableRange: false,
-                disableStream: false
+                cMapUrl: 'https://unpkg.com/pdfjs-dist@3.11.174/cmaps/',
+                cMapPacked: true,
+                standardFontDataUrl: 'https://unpkg.com/pdfjs-dist@3.11.174/standard_fonts/',
               }}
             >
               <Page
@@ -301,6 +250,8 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
                 rotate={rotation}
                 loading=""
                 className="shadow-lg"
+                renderTextLayer={true}
+                renderAnnotationLayer={true}
               />
             </Document>
           </div>
@@ -338,4 +289,3 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
 };
 
 export default ReactPDFViewer;
-
