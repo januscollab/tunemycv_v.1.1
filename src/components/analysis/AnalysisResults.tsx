@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { CheckCircle, Download, ArrowLeft, Bug, X, Send } from 'lucide-react';
 
@@ -16,7 +17,7 @@ import PriorityRecommendationsSection from './components/PriorityRecommendations
 import PersonalizedMatchMessage from './components/PersonalizedMatchMessage';
 import NextStepsSection from './components/NextStepsSection';
 import ReactPDFViewer from '@/components/ui/react-pdf-viewer';
-import PDFGenerator from './utils/PDFGenerator';
+import { downloadAnalysisAsText } from './utils/ReactPDFGenerator';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { FloatingLabelTextarea } from '@/components/common/FloatingLabelTextarea';
@@ -309,8 +310,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
   const creditsUsed = result.credits_used || 1;
 
   const downloadPDF = () => {
-    const pdfGenerator = new PDFGenerator();
-    pdfGenerator.generatePDF(result);
+    downloadAnalysisAsText(result);
   };
 
   return (
