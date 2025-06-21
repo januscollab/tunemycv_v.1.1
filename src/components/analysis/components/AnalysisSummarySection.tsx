@@ -1,6 +1,7 @@
+
 import React from 'react';
-import { FileText, ExternalLink, Download, Target, TrendingUp } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Download, ExternalLink } from 'lucide-react';
+import { VybeButton } from '@/components/design-system/VybeButton';
 
 interface AnalysisSummarySectionProps {
   compatibilityScore: number;
@@ -18,100 +19,81 @@ const AnalysisSummarySection: React.FC<AnalysisSummarySectionProps> = ({
   onReviewInBrowser
 }) => {
   const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-emerald-600 dark:text-emerald-400';
-    if (score >= 70) return 'text-blue-600 dark:text-blue-400';
-    if (score >= 50) return 'text-amber-600 dark:text-amber-400';
-    return 'text-red-600 dark:text-red-400';
+    if (score >= 80) return 'text-green-600';
+    if (score >= 70) return 'text-blue-600';
+    if (score >= 50) return 'text-orange-600';
+    return 'text-red-600';
   };
 
   const getScoreBg = (score: number) => {
-    if (score >= 80) return 'from-emerald-500/20 to-emerald-600/20 dark:from-emerald-400/20 dark:to-emerald-500/20';
-    if (score >= 70) return 'from-blue-500/20 to-blue-600/20 dark:from-blue-400/20 dark:to-blue-500/20';
-    if (score >= 50) return 'from-amber-500/20 to-amber-600/20 dark:from-amber-400/20 dark:to-amber-500/20';
-    return 'from-red-500/20 to-red-600/20 dark:from-red-400/20 dark:to-red-500/20';
-  };
-
-  const getMatchLevel = (score: number) => {
-    if (score >= 80) return 'Excellent Match';
-    if (score >= 70) return 'Good Match';
-    if (score >= 50) return 'Moderate Match';
-    return 'Needs Improvement';
+    if (score >= 80) return 'bg-green-50 border-green-200';
+    if (score >= 70) return 'bg-blue-50 border-blue-200';
+    if (score >= 50) return 'bg-orange-50 border-orange-200';
+    return 'bg-red-50 border-red-200';
   };
 
   return (
-    <div className="bg-surface border border-border rounded-lg p-6">
-      {/* Clean header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <Target className="h-5 w-5 text-muted-foreground" />
-          <div>
-            <h2 className="text-lg font-semibold text-foreground">
-              Analysis Summary
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              CV-Job Compatibility Report
-            </p>
-          </div>
-        </div>
-        
-        <div className="flex items-center gap-2">
-          {onReviewInBrowser && (
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={onReviewInBrowser}
-              className="text-sm"
-            >
-              <ExternalLink className="h-4 w-4" />
-              Review
-            </Button>
-          )}
-          {onDownload && (
-            <Button 
-              variant="default" 
-              size="sm"
-              onClick={onDownload}
-              className="text-sm"
-            >
-              <Download className="h-4 w-4" />
-              Download
-            </Button>
-          )}
-        </div>
+    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+      {/* Header */}
+      <div className="px-6 py-4 bg-gray-50 border-b border-gray-100">
+        <h2 className="text-lg font-semibold text-gray-900">Analysis Summary</h2>
       </div>
 
-      {/* Content area */}
-      <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6">
-        {/* Simple score display */}
-        <div className="flex-shrink-0">
-          <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center border">
-            <span className={`text-xl font-semibold ${getScoreColor(compatibilityScore)}`}>
-              {compatibilityScore}%
-            </span>
+      {/* Content */}
+      <div className="p-6">
+        <div className="flex items-start gap-6">
+          {/* Score Circle */}
+          <div className={`flex-shrink-0 w-24 h-24 rounded-full border-2 flex items-center justify-center ${getScoreBg(compatibilityScore)}`}>
+            <div className="text-center">
+              <div className={`text-2xl font-bold ${getScoreColor(compatibilityScore)}`}>
+                {compatibilityScore}%
+              </div>
+              <div className="text-xs text-gray-500 font-medium">Match</div>
+            </div>
           </div>
-          <p className="text-center text-sm text-muted-foreground mt-2">
-            {getMatchLevel(compatibilityScore)}
-          </p>
-        </div>
 
-        {/* Job details */}
-        <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div className="bg-muted/50 rounded-lg p-4">
-            <h3 className="text-sm font-medium text-muted-foreground mb-1">
-              Position
-            </h3>
-            <p className="text-base font-medium text-foreground">
-              {jobTitle || 'Unknown Position'}
-            </p>
+          {/* Job Details */}
+          <div className="flex-1 min-w-0">
+            <div className="space-y-3">
+              <div>
+                <div className="text-sm font-medium text-gray-500 mb-1">Position</div>
+                <div className="text-lg font-semibold text-gray-900 break-words">
+                  {jobTitle || 'Unknown Position'}
+                </div>
+              </div>
+              <div>
+                <div className="text-sm font-medium text-gray-500 mb-1">Company</div>
+                <div className="text-lg font-semibold text-gray-900 break-words">
+                  {companyName || 'Unknown Company'}
+                </div>
+              </div>
+            </div>
           </div>
-          
-          <div className="bg-muted/50 rounded-lg p-4">
-            <h3 className="text-sm font-medium text-muted-foreground mb-1">
-              Company
-            </h3>
-            <p className="text-base font-medium text-foreground">
-              {companyName || 'Unknown Company'}
-            </p>
+
+          {/* Action Buttons */}
+          <div className="flex-shrink-0 flex flex-col gap-3">
+            {onReviewInBrowser && (
+              <VybeButton
+                vybeVariant="outline"
+                vybeSize="sm"
+                onClick={onReviewInBrowser}
+                icon={ExternalLink}
+                className="whitespace-nowrap"
+              >
+                Review
+              </VybeButton>
+            )}
+            {onDownload && (
+              <VybeButton
+                vybeVariant="primary"
+                vybeSize="sm"
+                onClick={onDownload}
+                icon={Download}
+                className="whitespace-nowrap"
+              >
+                Download
+              </VybeButton>
+            )}
           </div>
         </div>
       </div>
