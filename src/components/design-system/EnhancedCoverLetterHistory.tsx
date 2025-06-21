@@ -119,7 +119,7 @@ const CoverLetterHistoryItem: React.FC<{
 
   return (
     <Card
-      className="group hover:shadow-md transition-all duration-200 hover:border-primary/50 hover:bg-muted/50 cursor-pointer border border-border relative border-t-4 border-t-orange-500 h-[120px]"
+      className="group hover:shadow-md transition-all duration-200 hover:border-primary/50 hover:bg-muted/50 cursor-pointer border border-border relative border-t-4 border-t-green-500 h-[120px]"
       onClick={() => onView(coverLetter)}
     >
       {/* Green Badge - Top Right */}
