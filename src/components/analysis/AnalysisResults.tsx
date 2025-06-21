@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { CheckCircle, Download, ArrowLeft, Bug } from 'lucide-react';
 
@@ -119,16 +120,6 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
         <div className="bg-gradient-to-r from-surface to-surface-secondary border border-border rounded-2xl p-8 mb-8 shadow-lg backdrop-blur-sm">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-6">
-              {/* Compatibility Score - Modern Badge */}
-              {compatibilityScore && (
-                <div className="bg-primary/15 rounded-xl px-6 py-4 border border-primary/30 shadow-md">
-                  <span className="text-3xl font-bold text-primary">
-                    {compatibilityScore}%
-                  </span>
-                  <p className="text-caption text-muted-foreground mt-1">Match Score</p>
-                </div>
-              )}
-              
               {/* Position and Company - Modern Layout */}
               <div className="space-y-1">
                 <h1 className="text-heading font-semibold text-foreground">
