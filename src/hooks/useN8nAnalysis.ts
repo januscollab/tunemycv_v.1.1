@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -212,30 +213,44 @@ export const useN8nAnalysis = () => {
       });
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Download PDF file second - IMPROVED PDF HANDLING
+      // Download PDF file - FIXED BASE64 CONVERSION
       try {
         const pdfResponse = await downloadWithRetry('https://aohrfehhyjdebaatzqdl.supabase.co/storage/v1/object/public/n8n-bucket/response/test-output.pdf');
         if (pdfResponse) {
+          console.log('PDF response received, converting to base64...');
+          
+          // Get the response as ArrayBuffer
           const pdfArrayBuffer = await pdfResponse.arrayBuffer();
           console.log('PDF downloaded, size:', pdfArrayBuffer.byteLength, 'bytes');
           
-          // Convert ArrayBuffer to base64 using a more robust method
+          // Convert ArrayBuffer to base64 - PROPER METHOD
           const uint8Array = new Uint8Array(pdfArrayBuffer);
-          let binaryString = '';
           
-          // Convert in chunks to avoid stack overflow
-          const chunkSize = 8192;
+          // Use btoa with proper binary string conversion
+          let binaryString = '';
+          const chunkSize = 8192; // Process in 8KB chunks
+          
           for (let i = 0; i < uint8Array.length; i += chunkSize) {
             const chunk = uint8Array.slice(i, i + chunkSize);
-            binaryString += String.fromCharCode.apply(null, Array.from(chunk));
+            // Convert each byte to a character
+            const chunkString = Array.from(chunk, byte => String.fromCharCode(byte)).join('');
+            binaryString += chunkString;
           }
           
+          // Now convert to base64
           pdfData = btoa(binaryString);
           console.log('PDF converted to base64, length:', pdfData.length);
           
           // Validate base64 format
           if (pdfData && pdfData.length > 0) {
-            console.log('Base64 PDF data validation: Valid format, starts with:', pdfData.substring(0, 20));
+            try {
+              // Test the base64 by trying to decode it
+              const testDecode = atob(pdfData.substring(0, 100)); // Test first 100 chars
+              console.log('✅ Base64 PDF data validation: Valid format, starts with:', pdfData.substring(0, 20));
+            } catch (validateError) {
+              console.error('❌ Base64 validation failed:', validateError);
+              console.log('PDF data sample:', pdfData.substring(0, 100));
+            }
           } else {
             console.error('Base64 PDF data validation: Invalid or empty');
           }
