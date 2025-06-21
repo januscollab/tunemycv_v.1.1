@@ -19,5 +19,18 @@ export default defineConfig(({ mode }) => ({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+    dedupe: ['react', 'react-dom']
   },
+  optimizeDeps: {
+    exclude: ['react-pdf'],
+    include: ['react', 'react-dom', 'react-helmet-async']
+  },
+  define: {
+    global: 'globalThis',
+  },
+  build: {
+    rollupOptions: {
+      external: [],
+    }
+  }
 }));
