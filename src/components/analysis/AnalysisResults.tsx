@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { CheckCircle, Download, ArrowLeft, Bug, X, Send } from 'lucide-react';
 
@@ -10,11 +11,6 @@ import ATSOptimizationSection from './ATSOptimizationSection';
 import InterviewPrepSection from './InterviewPrepSection';
 import AnalysisHeader from './components/AnalysisHeader';
 import LegacySummarySection from './components/LegacySummarySection';
-import LegacyCompatibilitySection from './LegacyCompatibilitySection';
-import LegacyKeywordSection from './LegacyKeywordSection';
-import PriorityRecommendationsSection from './PriorityRecommendationsSection';
-import PersonalizedMatchMessage from './PersonalizedMatchMessage';
-import NextStepsSection from './NextStepsSection';
 import ReactPDFViewer from '@/components/ui/react-pdf-viewer';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -346,21 +342,27 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
         </div>
 
         {/* Personalized Match Message */}
-        <PersonalizedMatchMessage
-          score={compatibilityScore}
-          jobTitle={position}
-          companyName={companyName}
-          getMatchLevel={getMatchLevel}
-        />
+        <div className="text-center py-6">
+          <h2 className="text-title font-bold text-blueberry dark:text-citrus mb-2">
+            You are a{' '}
+            <span className={
+              compatibilityScore >= 70 ? 'text-green-600 dark:text-green-400' :
+              compatibilityScore >= 50 ? 'text-orange-600 dark:text-orange-400' :
+              'text-red-600 dark:text-red-400'
+            }>
+              {getMatchLevel(compatibilityScore)}
+            </span>
+            {' '}for the role of
+          </h2>
+          <p className="text-heading font-semibold text-blueberry/90 dark:text-apple-core">
+            <span className="text-apricot">{position}</span> at{' '}
+            <span className="text-apricot">{companyName === 'the Company' ? 'this company' : companyName}</span>
+          </p>
+        </div>
 
         {/* Enhanced Analysis Sections */}
         {hasEnhancedData ? (
           <div className="space-y-8">
-            {/* Priority Recommendations - Show first as it's most actionable */}
-            {result.priorityRecommendations && result.priorityRecommendations.length > 0 && (
-              <PriorityRecommendationsSection recommendations={result.priorityRecommendations} />
-            )}
-
             {/* Side-by-side sections: Compatibility Breakdown and Keyword Analysis */}
             <div className="grid lg:grid-cols-2 gap-8">
               {/* Compatibility Breakdown */}
@@ -381,8 +383,19 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
           </div>
         ) : (
           <div className="grid lg:grid-cols-2 gap-8 mb-8">
-            <LegacyCompatibilitySection result={result} />
-            <LegacyKeywordSection result={result} />
+            {/* Basic compatibility and keyword sections would go here */}
+            <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
+              <h3 className="text-subheading font-semibold text-blueberry dark:text-citrus mb-4">Compatibility Analysis</h3>
+              <p className="text-caption text-blueberry/70 dark:text-apple-core/80">
+                Analysis results will be displayed here based on your CV and job requirements.
+              </p>
+            </div>
+            <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
+              <h3 className="text-subheading font-semibold text-blueberry dark:text-citrus mb-4">Keyword Analysis</h3>
+              <p className="text-caption text-blueberry/70 dark:text-apple-core/80">
+                Keyword matching results will be displayed here.
+              </p>
+            </div>
           </div>
         )}
 
@@ -409,13 +422,6 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
             </button>
           </div>
         </div>
-
-        {/* Next Steps Section - only show if not in read-only mode */}
-        {!readOnly && (
-          <div className="mt-12">
-            <NextStepsSection onStartNew={onStartNew} />
-          </div>
-        )}
 
         {/* Bug Report Modal */}
         <BugReportModal
