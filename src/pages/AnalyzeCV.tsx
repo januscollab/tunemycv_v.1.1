@@ -159,10 +159,6 @@ const AnalyzeCV = () => {
       setActiveTab(navigationState.targetTab);
       if (navigationState.analysis) {
         setViewedAnalysis(navigationState.analysis);
-        
-        // If this is an n8n analysis with PDF data and user prefers PDF view,
-        // we'll let the N8nAnalysisResults component handle the tab switching
-        // The PDF viewer is already integrated into N8nAnalysisResults
       }
     }
   }, [navigationState]);
@@ -522,30 +518,31 @@ const AnalyzeCV = () => {
         message={currentLoadingMessage}
       />
       
-      <div className="max-w-wider mx-auto px-4 py-8">
-        {/* Breadcrumbs */}
-        <Breadcrumbs />
-        
-        {/* Header Section */}
-        <div className="mb-6">
-          <div className="flex items-start">
-            <Zap className="h-10 w-10 text-zapier-orange mr-4 mt-1" />
-            <div>
-              <h1 className="text-display font-bold text-foreground">
-                Analyze Your CV
-              </h1>
-              <p className="text-subheading text-earth/70 dark:text-white/70 max-w-2xl mt-1">
-                Upload your CV and job description to get comprehensive compatibility analysis with actionable recommendations.
-              </p>
+      {/* Main Container - Different layout for history tab */}
+      {activeTab === 'history' ? (
+        // Full width layout for history tab
+        <div className="w-full">
+          {/* Breadcrumbs and Header */}
+          <div className="max-w-wider mx-auto px-4 py-8">
+            <Breadcrumbs />
+            
+            <div className="mb-6">
+              <div className="flex items-start">
+                <Zap className="h-10 w-10 text-zapier-orange mr-4 mt-1" />
+                <div>
+                  <h1 className="text-display font-bold text-foreground">
+                    Analyze Your CV
+                  </h1>
+                  <p className="text-subheading text-earth/70 dark:text-white/70 max-w-2xl mt-1">
+                    Upload your CV and job description to get comprehensive compatibility analysis with actionable recommendations.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6">
-          {/* Main Content Section */}
-          <div>
-            {/* Tabs Navigation */}
+          {/* Tabs Navigation - Constrained width */}
+          <div className="max-w-wider mx-auto px-4">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-6">
               <TabsList className="grid w-full grid-cols-3 mb-6">
                 <TabsTrigger value="analysis" className="flex items-center space-x-2 text-caption">
@@ -561,135 +558,178 @@ const AnalyzeCV = () => {
                   <span>History</span>
                 </TabsTrigger>
               </TabsList>
-
-              {/* CV Analysis Tab */}
-              <TabsContent value="analysis" className="mt-0">
-                <div className="space-y-5">
-                  {/* Job Title */}
-                  <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-5 border border-apple-core/20 dark:border-citrus/20">
-                    <h3 className="text-heading font-semibold text-blueberry dark:text-citrus mb-3">Job Title</h3>
-                     <CaptureInput
-                       label=""
-                       value={jobTitle}
-                       onChange={(e) => setJobTitle(e.target.value)}
-                       placeholder="e.g., Senior Software Engineer (auto-extracted from job description)"
-                       disabled={analyzing}
-                     />
-                    <p className="text-micro text-blueberry/60 dark:text-apple-core/70 mt-2">
-                      Job title will be automatically extracted from the job description if not provided.
-                    </p>
-                  </div>
-
-                  {/* Job Description Input - Required */}
-                  <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-5 border border-apple-core/20 dark:border-citrus/20">
-                    <h3 className="text-heading font-semibold text-blueberry dark:text-citrus mb-3">
-                      Job Description <span className="text-red-500">*</span>
-                    </h3>
-                    <p className="text-micro text-blueberry/60 dark:text-apple-core/70 mb-3">
-                      Upload a file (PDF, DOCX, TXT) or paste the text directly
-                    </p>
-                    
-                    <JobDescriptionSelector
-                      onJobDescriptionSet={handleJobDescriptionSet}
-                      uploadedFile={uploadedFiles.jobDescription}
-                      disabled={uploading || analyzing}
-                    />
-                  </div>
-
-                  {/* CV Selection - Required */}
-                  <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm border border-apple-core/20 dark:border-citrus/20">
-                    <div className="p-5">
-                      <h3 className="text-heading font-semibold text-blueberry dark:text-citrus mb-3">
-                        Your CV <span className="text-red-500">*</span>
-                      </h3>
-                      <p className="text-micro text-blueberry/60 dark:text-apple-core/70 mb-3">
-                        Upload your CV or select from previously saved CVs
-                      </p>
-                      <CVSelector
-                        onCVSelect={handleCVSelect}
-                        selectedCV={uploadedFiles.cv}
-                        uploading={uploading || analyzing}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Hide Motivation Matters section */}
-
-                  {/* Analyze Button */}
-                  <AnalyzeButton
-                    onAnalyze={handleAnalysis}
-                    canAnalyze={canAnalyze}
-                    analyzing={analyzing}
-                    hasCreditsForAI={hasCreditsForAI}
-                  />
-                </div>
-              </TabsContent>
-
-              {/* View Analysis Tab */}
-              <TabsContent value="view-analysis" className="mt-0">
-                {viewedAnalysis ? (
-                  viewedAnalysis.analysis_type === 'n8n' ? (
-                    <N8nAnalysisResults 
-                      result={viewedAnalysis} 
-                      onStartNew={handleStartNew}
-                      readOnly={true}
-                    />
-                  ) : (
-                    <AnalysisResults 
-                      result={viewedAnalysis} 
-                      onStartNew={handleStartNew}
-                      readOnly={true}
-                    />
-                  )
-                ) : (
-                  <Card className="border border-gray-200 dark:border-gray-700">
-                    <CardContent className="text-center py-8">
-                      <FileText className="h-12 w-12 text-zapier-orange mx-auto mb-4" />
-                      <p className="text-gray-600 dark:text-gray-400 mb-2 font-normal">
-                        No analysis generated yet.
-                      </p>
-                      <p className="text-sm font-normal text-gray-500">
-                        Create one in the <Button variant="link" onClick={() => setActiveTab('analysis')} className="text-zapier-orange hover:text-zapier-orange/80 p-0 h-auto font-normal text-sm">Analyze CV</Button> tab or view previous analysis in <Button variant="link" onClick={() => setActiveTab('history')} className="text-zapier-orange hover:text-zapier-orange/80 p-0 h-auto font-normal text-sm">History</Button>.
-                      </p>
-                    </CardContent>
-                  </Card>
-                )}
-              </TabsContent>
-
-              {/* Analysis History Tab */}
-              <TabsContent value="history" className="mt-0">
-                <EnhancedAnalysisHistory 
-                  onSelectAnalysis={handleHistorySelect}
-                />
-              </TabsContent>
             </Tabs>
           </div>
 
-          {/* Personalization Survey Modal */}
-          <PersonalizationSurveyModal
-            isOpen={showPersonalizationSurvey}
-            onClose={() => setShowPersonalizationSurvey(false)}
-            onSubmit={handleSurveySubmit}
-          />
-
-          {/* Credits Panel - Fixed Width */}
-          <div>
-            <CreditsPanel
-              credits={userCredits?.credits || 0}
-              hasCreditsForAI={hasCreditsForAI}
-            />
-          </div>
-          
-          {/* Soft Skills Survey Panel */}
-          <div className="mt-4">
-            <SoftSkillsSurveyPanel
-              onTakeSurvey={() => setShowSurveyModal(true)}
-              onDismiss={dismissSurvey}
-              isVisible={shouldShowSurvey()}
+          {/* Full width history content */}
+          <div className="w-full px-4">
+            <EnhancedAnalysisHistory 
+              onSelectAnalysis={handleHistorySelect}
             />
           </div>
         </div>
-      </div>
+      ) : (
+        // Constrained layout for other tabs
+        <div className="max-w-wider mx-auto px-4 py-8">
+          {/* Breadcrumbs */}
+          <Breadcrumbs />
+          
+          {/* Header Section */}
+          <div className="mb-6">
+            <div className="flex items-start">
+              <Zap className="h-10 w-10 text-zapier-orange mr-4 mt-1" />
+              <div>
+                <h1 className="text-display font-bold text-foreground">
+                  Analyze Your CV
+                </h1>
+                <p className="text-subheading text-earth/70 dark:text-white/70 max-w-2xl mt-1">
+                  Upload your CV and job description to get comprehensive compatibility analysis with actionable recommendations.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Main Content Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6">
+            {/* Main Content Section */}
+            <div>
+              {/* Tabs Navigation */}
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-6">
+                <TabsList className="grid w-full grid-cols-3 mb-6">
+                  <TabsTrigger value="analysis" className="flex items-center space-x-2 text-caption">
+                    <FileText className="h-4 w-4" />
+                    <span>Analyze CV</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="view-analysis" className="flex items-center space-x-2 text-caption">
+                    <Eye className="h-4 w-4" />
+                    <span>View Analysis</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="history" className="flex items-center space-x-2 text-caption">
+                    <History className="h-4 w-4" />
+                    <span>History</span>
+                  </TabsTrigger>
+                </TabsList>
+
+                {/* CV Analysis Tab */}
+                <TabsContent value="analysis" className="mt-0">
+                  <div className="space-y-5">
+                    {/* Job Title */}
+                    <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-5 border border-apple-core/20 dark:border-citrus/20">
+                      <h3 className="text-heading font-semibold text-blueberry dark:text-citrus mb-3">Job Title</h3>
+                       <CaptureInput
+                         label=""
+                         value={jobTitle}
+                         onChange={(e) => setJobTitle(e.target.value)}
+                         placeholder="e.g., Senior Software Engineer (auto-extracted from job description)"
+                         disabled={analyzing}
+                       />
+                      <p className="text-micro text-blueberry/60 dark:text-apple-core/70 mt-2">
+                        Job title will be automatically extracted from the job description if not provided.
+                      </p>
+                    </div>
+
+                    {/* Job Description Input - Required */}
+                    <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-5 border border-apple-core/20 dark:border-citrus/20">
+                      <h3 className="text-heading font-semibold text-blueberry dark:text-citrus mb-3">
+                        Job Description <span className="text-red-500">*</span>
+                      </h3>
+                      <p className="text-micro text-blueberry/60 dark:text-apple-core/70 mb-3">
+                        Upload a file (PDF, DOCX, TXT) or paste the text directly
+                      </p>
+                      
+                      <JobDescriptionSelector
+                        onJobDescriptionSet={handleJobDescriptionSet}
+                        uploadedFile={uploadedFiles.jobDescription}
+                        disabled={uploading || analyzing}
+                      />
+                    </div>
+
+                    {/* CV Selection - Required */}
+                    <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm border border-apple-core/20 dark:border-citrus/20">
+                      <div className="p-5">
+                        <h3 className="text-heading font-semibold text-blueberry dark:text-citrus mb-3">
+                          Your CV <span className="text-red-500">*</span>
+                        </h3>
+                        <p className="text-micro text-blueberry/60 dark:text-apple-core/70 mb-3">
+                          Upload your CV or select from previously saved CVs
+                        </p>
+                        <CVSelector
+                          onCVSelect={handleCVSelect}
+                          selectedCV={uploadedFiles.cv}
+                          uploading={uploading || analyzing}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Analyze Button */}
+                    <AnalyzeButton
+                      onAnalyze={handleAnalysis}
+                      canAnalyze={canAnalyze}
+                      analyzing={analyzing}
+                      hasCreditsForAI={hasCreditsForAI}
+                    />
+                  </div>
+                </TabsContent>
+
+                {/* View Analysis Tab */}
+                <TabsContent value="view-analysis" className="mt-0">
+                  {viewedAnalysis ? (
+                    viewedAnalysis.analysis_type === 'n8n' ? (
+                      <N8nAnalysisResults 
+                        result={viewedAnalysis} 
+                        onStartNew={handleStartNew}
+                        readOnly={true}
+                      />
+                    ) : (
+                      <AnalysisResults 
+                        result={viewedAnalysis} 
+                        onStartNew={handleStartNew}
+                        readOnly={true}
+                      />
+                    )
+                  ) : (
+                    <Card className="border border-gray-200 dark:border-gray-700">
+                      <CardContent className="text-center py-8">
+                        <FileText className="h-12 w-12 text-zapier-orange mx-auto mb-4" />
+                        <p className="text-gray-600 dark:text-gray-400 mb-2 font-normal">
+                          No analysis generated yet.
+                        </p>
+                        <p className="text-sm font-normal text-gray-500">
+                          Create one in the <Button variant="link" onClick={() => setActiveTab('analysis')} className="text-zapier-orange hover:text-zapier-orange/80 p-0 h-auto font-normal text-sm">Analyze CV</Button> tab or view previous analysis in <Button variant="link" onClick={() => setActiveTab('history')} className="text-zapier-orange hover:text-zapier-orange/80 p-0 h-auto font-normal text-sm">History</Button>.
+                        </p>
+                      </CardContent>
+                    </Card>
+                  )}
+                </TabsContent>
+              </Tabs>
+            </div>
+
+            {/* Credits Panel - Fixed Width */}
+            <div>
+              <CreditsPanel
+                credits={userCredits?.credits || 0}
+                hasCreditsForAI={hasCreditsForAI}
+              />
+            </div>
+            
+            {/* Soft Skills Survey Panel */}
+            <div className="mt-4">
+              <SoftSkillsSurveyPanel
+                onTakeSurvey={() => setShowSurveyModal(true)}
+                onDismiss={dismissSurvey}
+                isVisible={shouldShowSurvey()}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Personalization Survey Modal */}
+      <PersonalizationSurveyModal
+        isOpen={showPersonalizationSurvey}
+        onClose={() => setShowPersonalizationSurvey(false)}
+        onSubmit={handleSurveySubmit}
+      />
 
       {/* Soft Skills Survey Modal */}
       <SoftSkillsSurveyModal
