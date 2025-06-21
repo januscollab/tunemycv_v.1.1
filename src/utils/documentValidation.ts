@@ -1,3 +1,4 @@
+
 import { createSecureFileObject } from '@/utils/secureFileValidation';
 
 export interface CVValidationResult {
@@ -5,6 +6,30 @@ export interface CVValidationResult {
   confidence: number;
   issues: string[];
   suggestions: string[];
+}
+
+export interface JobDescriptionValidation {
+  isValid: boolean;
+  confidence: number;
+  issues: string[];
+  suggestions: string[];
+}
+
+// Generic validation result type
+export type ValidationResult = CVValidationResult | JobDescriptionValidation;
+
+export interface DocumentTypeDetection {
+  detectedType: 'cv' | 'job_description' | 'unknown';
+  confidence: number;
+  needsUserConfirmation: boolean;
+}
+
+export interface QualityAssessment {
+  score: number;
+  issues: string[];
+  isAcceptable: boolean;
+  wordCount: number;
+  characterCount: number;
 }
 
 export const validateCV = (text: string, fileName: string = ''): CVValidationResult => {
@@ -89,13 +114,6 @@ export const validateCV = (text: string, fileName: string = ''): CVValidationRes
   };
 };
 
-export interface JobDescriptionValidation {
-  isValid: boolean;
-  confidence: number;
-  issues: string[];
-  suggestions: string[];
-}
-
 export const validateJobDescription = (text: string, fileName: string = ''): JobDescriptionValidation => {
   const issues: string[] = [];
   const suggestions: string[] = [];
@@ -169,19 +187,58 @@ export const validateJobDescription = (text: string, fileName: string = ''): Job
   };
 };
 
+export const detectDocumentType = (text: string, fileName: string = ''): DocumentTypeDetection => {
+  const lowerText = text.toLowerCase();
+  const fileNameLower = fileName.toLowerCase();
+  
+  // File name indicators
+  const cvIndicators = ['cv', 'resume', 'curriculum'];
+  const jdIndicators = ['job', 'position', 'role', 'vacancy', 'opening'];
+  
+  const hasCVIndicator = cvIndicators.some(indicator => fileNameLower.includes(indicator));
+  const hasJDIndicator = jdIndicators.some(indicator => fileNameLower.includes(indicator));
+  
+  // Content indicators for CV
+  const cvKeywords = [
+    'my name', 'i am', 'i have', 'my experience', 'my skills',
+    'i worked', 'i studied', 'my education', 'my background',
+    'personal statement', 'objective', 'profile'
+  ];
+  
+  // Content indicators for Job Description
+  const jdKeywords = [
+    'responsibilities', 'requirements', 'qualifications', 'duties',
+    'candidate', 'applicant', 'salary', 'benefits', 'hiring',
+    'we are looking for', 'join our team', 'apply now'
+  ];
+  
+  const cvScore = cvKeywords.filter(keyword => lowerText.includes(keyword)).length;
+  const jdScore = jdKeywords.filter(keyword => lowerText.includes(keyword)).length;
+  
+  let detectedType: 'cv' | 'job_description' | 'unknown' = 'unknown';
+  let confidence = 0;
+  
+  // Determine type based on combined file name and content analysis
+  if (hasCVIndicator || cvScore > jdScore) {
+    detectedType = 'cv';
+    confidence = Math.min(90, 50 + (cvScore * 10) + (hasCVIndicator ? 20 : 0));
+  } else if (hasJDIndicator || jdScore > cvScore) {
+    detectedType = 'job_description';
+    confidence = Math.min(90, 50 + (jdScore * 10) + (hasJDIndicator ? 20 : 0));
+  } else {
+    confidence = 30;
+  }
+  
+  return {
+    detectedType,
+    confidence,
+    needsUserConfirmation: confidence < 70
+  };
+};
+
 // Secure file validation (example - implement actual checks)
 export const validateSecureFile = (file: File): boolean => {
   // Implement actual checks here (e.g., file signature, content analysis)
   // This is a placeholder - replace with real security measures
   return true;
 };
-
-export interface DocumentTypeDetection {
-  type: 'cv' | 'job_description' | 'unknown';
-  confidence: number;
-}
-
-export interface QualityAssessment {
-  score: number;
-  feedback: string[];
-}
