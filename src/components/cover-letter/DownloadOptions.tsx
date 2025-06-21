@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
+import jsPDF from 'jspdf';
 import { Document, Packer, Paragraph, TextRun } from 'docx';
 
 interface DownloadOptionsProps {
@@ -55,6 +56,30 @@ const DownloadOptions: React.FC<DownloadOptionsProps> = ({
     return cleanText;
   };
 
+  const downloadAsPDF = async () => {
+    setIsDownloading(true);
+    try {
+      const cleanContent = convertHtmlToText(content);
+      const pdf = new jsPDF();
+      const splitText = pdf.splitTextToSize(cleanContent, 180);
+      pdf.text(splitText, 10, 10);
+      pdf.save(`${fileName}.pdf`);
+      
+      toast({
+        title: 'Success',
+        description: 'Cover letter downloaded as PDF',
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to download PDF',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   const downloadAsWord = async () => {
     setIsDownloading(true);
     try {
@@ -95,7 +120,7 @@ const DownloadOptions: React.FC<DownloadOptionsProps> = ({
       
       toast({
         title: 'Success',
-        description: 'Document downloaded as Word file',
+        description: 'Cover letter downloaded as Word document',
       });
     } catch (error) {
       toast({
@@ -121,7 +146,7 @@ const DownloadOptions: React.FC<DownloadOptionsProps> = ({
       
       toast({
         title: 'Success',
-        description: 'Document downloaded as text file',
+        description: 'Cover letter downloaded as text file',
       });
     } catch (error) {
       toast({
@@ -145,6 +170,13 @@ const DownloadOptions: React.FC<DownloadOptionsProps> = ({
         {triggerComponent || defaultTrigger}
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-48" align="end">
+        <DropdownMenuItem 
+          onClick={downloadAsPDF}
+          className="cursor-pointer"
+        >
+          <FileText className="h-4 w-4 mr-2" />
+          Download as PDF
+        </DropdownMenuItem>
         <DropdownMenuItem 
           onClick={downloadAsWord}
           className="cursor-pointer"

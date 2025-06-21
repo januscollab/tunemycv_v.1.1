@@ -19,32 +19,5 @@ export default defineConfig(({ mode }) => ({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
-    dedupe: ['react', 'react-dom']
   },
-  optimizeDeps: {
-    exclude: ['react-pdf'],
-    include: ['react', 'react-dom', 'react-helmet-async', 'pdfjs-dist'],
-    esbuildOptions: {
-      target: 'esnext'
-    }
-  },
-  define: {
-    global: 'globalThis',
-  },
-  build: {
-    rollupOptions: {
-      external: [],
-      output: {
-        format: 'es'
-      }
-    },
-    target: 'esnext',
-    commonjsOptions: {
-      include: [/node_modules/],
-      transformMixedEsModules: true
-    }
-  },
-  esbuild: {
-    target: 'esnext'
-  }
 }));
