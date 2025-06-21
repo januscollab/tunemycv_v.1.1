@@ -65,12 +65,10 @@ const SprintManager = () => {
 
       if (sprintsError) throw sprintsError;
 
-      // Sort sprints: Priority Sprint first, Backlog last, others in between by order_index
+      // Sort sprints: Priority Sprint first, others by order_index
       const sortedSprints = (sprintsData || []).sort((a, b) => {
         if (a.name === 'Priority Sprint') return -1;
         if (b.name === 'Priority Sprint') return 1;
-        if (a.name === 'Backlog - Future Enhancements') return 1;
-        if (b.name === 'Backlog - Future Enhancements') return -1;
         return a.order_index - b.order_index;
       });
 
@@ -107,8 +105,8 @@ const SprintManager = () => {
 
       const existingSprintNames = existingSprints?.map(s => s.name) || [];
       
-      // Enhanced validation: ensure ONLY ONE of each core sprint exists
-      const defaultSprints = ['Priority Sprint', 'Backlog - Future Enhancements'];
+      // Enhanced validation: ensure ONLY ONE Priority Sprint exists
+      const defaultSprints = ['Priority Sprint'];
       const sprintsToCreate = [];
       
       for (const sprintName of defaultSprints) {
@@ -175,9 +173,9 @@ const SprintManager = () => {
   const handleAddSprint = async () => {
     if (!newSprintName.trim()) return;
 
-    // Enhanced validation: prevent duplicate core sprints
+    // Enhanced validation: prevent duplicate Priority Sprint
     const trimmedName = newSprintName.trim();
-    if (trimmedName === 'Priority Sprint' || trimmedName === 'Backlog - Future Enhancements') {
+    if (trimmedName === 'Priority Sprint') {
       const existingSprint = sprints.find(s => s.name === trimmedName);
       if (existingSprint) {
         toast.error(`A ${trimmedName} already exists. Only one ${trimmedName} is allowed per user.`);
@@ -186,12 +184,11 @@ const SprintManager = () => {
     }
 
     try {
-      // Calculate proper order_index (between Priority Sprint and Backlog)
+      // Calculate proper order_index (after Priority Sprint)
       const prioritySprint = sprints.find(s => s.name === 'Priority Sprint');
-      const backlogSprint = sprints.find(s => s.name === 'Backlog');
-      const userSprints = sprints.filter(s => s.name !== 'Priority Sprint' && s.name !== 'Backlog - Future Enhancements');
+      const userSprints = sprints.filter(s => s.name !== 'Priority Sprint');
       
-      // New user sprints should be placed between Priority Sprint and Backlog
+      // New user sprints should be placed after Priority Sprint
       const maxUserOrder = userSprints.length > 0 ? Math.max(...userSprints.map(s => s.order_index)) : (prioritySprint?.order_index || 0);
       const newOrderIndex = maxUserOrder + 1;
 
@@ -216,8 +213,8 @@ const SprintManager = () => {
   };
 
   const handleDeleteSprint = async (sprint: Sprint) => {
-    // Enhanced protection logic - prevent deletion of core sprints
-    if (sprint.name === 'Priority Sprint' || sprint.name === 'Backlog - Future Enhancements') {
+    // Enhanced protection logic - prevent deletion of Priority Sprint
+    if (sprint.name === 'Priority Sprint') {
       toast.error(`Cannot delete ${sprint.name} - this is a protected system sprint`);
       return;
     }
@@ -228,13 +225,13 @@ const SprintManager = () => {
         return;
       }
       
-      // Find Backlog sprint (guaranteed to exist due to ensureDefaultSprintsExist)
-      const backlogSprint = sprints.find(s => s.name === 'Backlog - Future Enhancements');
-      if (backlogSprint) {
-        // Move all tasks to Backlog
+      // Find Priority Sprint to move tasks to
+      const prioritySprint = sprints.find(s => s.name === 'Priority Sprint');
+      if (prioritySprint) {
+        // Move all tasks to Priority Sprint
         const { error: moveError } = await supabase
           .from('tasks')
-          .update({ sprint_id: backlogSprint.id })
+          .update({ sprint_id: prioritySprint.id })
           .eq('sprint_id', sprint.id);
           
         if (moveError) throw moveError;
@@ -423,26 +420,74 @@ const SprintManager = () => {
       return;
     }
 
-    const taskId = result.draggableId;
-    const newSprintId = destination.droppableId;
-    
-    try {
-      const { error } = await supabase
-        .from('tasks')
-        .update({ 
-          sprint_id: newSprintId,
-          order_index: destination.index 
-        })
-        .eq('id', taskId);
+    // Check if dragging a sprint or a task
+    if (result.type === 'sprint') {
+      const sprintId = result.draggableId;
+      const newIndex = destination.index;
+      
+      try {
+        // Update the order_index of the dragged sprint
+        const { error } = await supabase
+          .from('sprints')
+          .update({ order_index: newIndex })
+          .eq('id', sprintId);
 
-      if (error) throw error;
+        if (error) throw error;
 
-      // Reload data to reflect changes
-      loadData();
-      toast.success('Task moved successfully');
-    } catch (error) {
-      console.error('Error moving task:', error);
-      toast.error('Failed to move task');
+        // Update other sprints' order_index to maintain proper ordering
+        const updatedSprints = [...sprints];
+        const draggedSprint = updatedSprints.find(s => s.id === sprintId);
+        if (draggedSprint) {
+          updatedSprints.forEach((sprint, index) => {
+            if (sprint.id !== sprintId) {
+              if (index >= newIndex && index < draggedSprint.order_index) {
+                sprint.order_index = index + 1;
+              } else if (index <= newIndex && index > draggedSprint.order_index) {
+                sprint.order_index = index - 1;
+              }
+            }
+          });
+          
+          // Update all changed sprints in batch
+          for (const sprint of updatedSprints) {
+            if (sprint.id !== sprintId) {
+              await supabase
+                .from('sprints')
+                .update({ order_index: sprint.order_index })
+                .eq('id', sprint.id);
+            }
+          }
+        }
+
+        loadData();
+        toast.success('Sprint reordered successfully');
+      } catch (error) {
+        console.error('Error reordering sprint:', error);
+        toast.error('Failed to reorder sprint');
+      }
+    } else {
+      // Task drag and drop
+      const taskId = result.draggableId;
+      const newSprintId = destination.droppableId;
+      
+      try {
+        const { error } = await supabase
+          .from('tasks')
+          .update({ 
+            sprint_id: newSprintId,
+            order_index: destination.index 
+          })
+          .eq('id', taskId);
+
+        if (error) throw error;
+
+        // Reload data to reflect changes
+        loadData();
+        toast.success('Task moved successfully');
+      } catch (error) {
+        console.error('Error moving task:', error);
+        toast.error('Failed to move task');
+      }
     }
   };
 
@@ -525,23 +570,43 @@ const SprintManager = () => {
       )}
 
       <DragDropContext onDragEnd={onDragEnd}>
-        <div className={`grid gap-6 ${sprintLayout === 'two' ? 'md:grid-cols-2' : 'grid-cols-1'}`}>
-          {sprints
-            .filter(sprint => !sprint.is_hidden)
-            .map((sprint) => {
-              const isBacklogSprint = sprint.name === 'Backlog - Future Enhancements';
+        <Droppable droppableId="sprints" type="sprint">
+          {(provided) => (
+            <div 
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+              className={`grid gap-6 ${sprintLayout === 'two' ? 'md:grid-cols-2' : 'grid-cols-1'}`}
+            >
+              {sprints
+                .filter(sprint => !sprint.is_hidden)
+                .map((sprint, index) => {
+              const isBacklogSprint = false; // No more backlog sprint
               const sprintTasks = getTasksForSprint(sprint.id);
               
               return (
-                <ModernCard 
-                  key={sprint.id} 
-                  className={`h-fit animate-fade-in ${isBacklogSprint ? 'md:col-span-2' : ''}`}
-                >
-                  <ModernCardHeader className="pb-4">
-                    <div className="flex items-center gap-2">
-                      <ModernCardTitle className="text-lg">{sprint.name}</ModernCardTitle>
-                    </div>
-                  </ModernCardHeader>
+                <Draggable key={sprint.id} draggableId={sprint.id} index={index}>
+                  {(provided, snapshot) => (
+                    <ModernCard 
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      className={`h-fit animate-fade-in ${isBacklogSprint ? 'md:col-span-2' : ''} ${
+                        snapshot.isDragging ? 'shadow-lg ring-2 ring-apricot/50' : ''
+                      }`}
+                    >
+                      <ModernCardHeader className="pb-4">
+                        <div className="flex items-center gap-2">
+                          <div 
+                            {...provided.dragHandleProps}
+                            className="p-1 hover:bg-slate-100 rounded cursor-grab active:cursor-grabbing"
+                            title="Drag to reorder sprint"
+                          >
+                            <div className="w-1 h-1 bg-slate-400 rounded-full"></div>
+                            <div className="w-1 h-1 bg-slate-400 rounded-full mt-1"></div>
+                            <div className="w-1 h-1 bg-slate-400 rounded-full mt-1"></div>
+                          </div>
+                          <ModernCardTitle className="text-lg">{sprint.name}</ModernCardTitle>
+                        </div>
+                      </ModernCardHeader>
                   <ModernCardContent>
                     <Droppable droppableId={sprint.id}>
                       {(provided) => (
@@ -689,7 +754,7 @@ const SprintManager = () => {
                         Archive Completed
                       </VybeButton>
                     )}
-                    {sprint.name !== 'Priority Sprint' && sprint.name !== 'Backlog' && (
+                    {sprint.name !== 'Priority Sprint' && (
                       <VybeButton
                         vybeSize="sm"
                         vybeVariant="destructive"
@@ -700,11 +765,16 @@ const SprintManager = () => {
                     )}
                   </div>
                 </ModernCardContent>
-              </ModernCard>
+                    </ModernCard>
+                  )}
+                </Draggable>
               );
             })}
-        </div>
-      </DragDropContext>
+            {provided.placeholder}
+          </div>
+        )}
+      </Droppable>
+    </DragDropContext>
 
       <TaskModal
         open={taskModalOpen}
