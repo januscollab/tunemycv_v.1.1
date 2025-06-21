@@ -642,18 +642,96 @@ const DesignSystem = () => {
 
   const componentExamples = [
     {
-      name: 'Enhanced Cover Letter History',
+      name: "VybeButton",
       component: (
-        <div className="w-full max-w-4xl">
-          <EnhancedCoverLetterHistory 
-            onSelectCoverLetter={(coverLetter) => console.log('Selected:', coverLetter)}
-            className="bg-background border border-border rounded-lg p-4"
+        <div className="space-y-4">
+          <div className="flex flex-wrap gap-2">
+            <VybeButton variant="primary" size="sm">Primary Small</VybeButton>
+            <VybeButton variant="secondary" size="sm">Secondary Small</VybeButton>
+            <VybeButton variant="outline" size="sm">Outline Small</VybeButton>
+            <VybeButton variant="ghost" size="sm">Ghost Small</VybeButton>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <VybeButton variant="primary" size="md">Primary Medium</VybeButton>
+            <VybeButton variant="secondary" size="md">Secondary Medium</VybeButton>
+            <VybeButton variant="outline" size="md">Outline Medium</VybeButton>
+            <VybeButton variant="ghost" size="md">Ghost Medium</VybeButton>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <VybeButton variant="primary" size="lg">Primary Large</VybeButton>
+            <VybeButton variant="secondary" size="lg">Secondary Large</VybeButton>
+            <VybeButton variant="outline" size="lg">Outline Large</VybeButton>
+            <VybeButton variant="ghost" size="lg">Ghost Large</VybeButton>
+          </div>
+        </div>
+      ),
+      usage: 127,
+      description: "Primary button component with consistent styling and semantic token integration"
+    },
+    {
+      name: "VybeSelect",
+      component: (
+        <div className="space-y-4">
+          <VybeSelect
+            options={[
+              { value: "option1", label: "Option 1" },
+              { value: "option2", label: "Option 2" },
+              { value: "option3", label: "Option 3" }
+            ]}
+            placeholder="Choose an option"
+            onValueChange={(value) => console.log(value)}
+          />
+          <VybeSelect
+            options={[
+              { value: "disabled", label: "This is disabled", disabled: true },
+              { value: "enabled", label: "This is enabled" }
+            ]}
+            placeholder="With disabled option"
           />
         </div>
       ),
-      usage: '12 usages',
-      description: 'Advanced cover letter history management with search, pagination, and comprehensive actions'
+      usage: 89,
+      description: "Dropdown select component with consistent styling and semantic token integration"
     },
+    {
+      name: "VybeIconButton", 
+      component: (
+        <div className="flex gap-2">
+          <VybeIconButton 
+            icon={<User className="h-4 w-4" />}
+            tooltip="User Profile"
+            onClick={() => console.log('User clicked')}
+          />
+          <VybeIconButton 
+            icon={<Settings className="h-4 w-4" />}
+            tooltip="Settings"
+            variant="secondary"
+            onClick={() => console.log('Settings clicked')}
+          />
+          <VybeIconButton 
+            icon={<Bell className="h-4 w-4" />}
+            tooltip="Notifications"
+            variant="outline"
+            onClick={() => console.log('Notifications clicked')}
+          />
+        </div>
+      ),
+      usage: 45,
+      description: "Icon-only button with built-in tooltip functionality"
+    },
+    {
+      name: "EnhancedCoverLetterHistory",
+      component: (
+        <div className="max-w-4xl">
+          <EnhancedCoverLetterHistory 
+            onSelectCoverLetter={(coverLetter) => console.log('Selected:', coverLetter)}
+            className="border rounded-lg p-4"
+          />
+        </div>
+      ),
+      usage: 3,
+      description: "Advanced cover letter history management component with search, pagination, and document actions"
+    }
   ];
 
   return (
