@@ -1,4 +1,5 @@
 
+
 import React, { useState, useMemo } from 'react';
 import { Document, Page } from 'react-pdf';
 import { ChevronLeft, ChevronRight, Download, ZoomIn, ZoomOut, RotateCw, ExternalLink, Maximize } from 'lucide-react';
@@ -286,9 +287,7 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
               onLoadError={onDocumentLoadError}
               loading=""
               options={{
-                // Use empty worker source to disable web workers
-                worker: '',
-                // Use main thread rendering
+                // Use main thread rendering (worker disabled globally in main.tsx)
                 isEvalSupported: false,
                 // Additional fallback options
                 disableFontFace: false,
@@ -339,3 +338,4 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
 };
 
 export default ReactPDFViewer;
+
