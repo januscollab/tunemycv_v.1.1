@@ -294,7 +294,7 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
             onLoadProgress={onDocumentLoadProgress}
             loading=""
             options={{
-              workerSrc: pdfjs.GlobalWorkerOptions.workerSrc,
+              worker: pdfjs.GlobalWorkerOptions.workerSrc,
               cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/',
               cMapPacked: true,
             }}
