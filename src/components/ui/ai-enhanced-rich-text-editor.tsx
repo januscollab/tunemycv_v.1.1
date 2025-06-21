@@ -1,8 +1,7 @@
+
 import React, { forwardRef, useImperativeHandle } from 'react';
 import { RichTextEditor, RichTextEditorRef, RichTextEditorProps } from './rich-text-editor';
-// Using new ExperimentalAIMenu - no action interface needed
-import { useAIContentProcessor } from '@/hooks/useAIContentProcessor';
-import { useToast } from '@/hooks/use-toast';
+import { AIContextMenu } from './ai-context-menu';
 
 interface AIEnhancedRichTextEditorProps extends RichTextEditorProps {
   // Enhanced with built-in AI processing
@@ -13,6 +12,7 @@ interface AIEnhancedRichTextEditorProps extends RichTextEditorProps {
  * This component wraps the base RichTextEditor and adds AI functionality
  */
 const AIEnhancedRichTextEditor = forwardRef<RichTextEditorRef, AIEnhancedRichTextEditorProps>(({
+  showAIFeatures = true,
   ...props
 }, ref) => {
   const richTextEditorRef = React.useRef<RichTextEditorRef>(null);
@@ -29,6 +29,7 @@ const AIEnhancedRichTextEditor = forwardRef<RichTextEditorRef, AIEnhancedRichTex
   return (
     <RichTextEditor
       ref={richTextEditorRef}
+      showAIFeatures={showAIFeatures}
       {...props}
     />
   );

@@ -6,6 +6,7 @@ import './rich-text-editor.css';
 import { useJsonFirstEditor } from '@/hooks/useJsonFirstEditor';
 import { DocumentJson } from '@/utils/documentJsonUtils';
 import { cn } from '@/lib/utils';
+import { AIContextMenu } from '@/components/ui/ai-context-menu';
 
 interface RichTextEditorProps {
   initialContent: string | DocumentJson;
@@ -30,7 +31,7 @@ const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>(({
   className = '',
   placeholder = 'Start editing...',
   readOnly = false,
-  showAIFeatures = false,
+  showAIFeatures = true,
   enableAutoSave = true,
   debounceMs = 300
 }, ref) => {
@@ -86,6 +87,16 @@ const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>(({
     }
   }, [showAIFeatures]);
 
+  // Handle AI text replacement
+  const handleTextReplace = useCallback((originalText: string, newText: string) => {
+    const editor = quillRef.current?.getEditor();
+    if (!editor) return;
+
+    const currentContent = editor.root.innerHTML;
+    const updatedContent = currentContent.replace(originalText, newText);
+    updateFromHtml(updatedContent);
+  }, [updateFromHtml]);
+
   // Quill configuration with enhanced features
   const modules = {
     toolbar: [
@@ -140,7 +151,19 @@ const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>(({
     </div>
   );
 
-  // Only wrap with AI features in specific contexts - removed by default
+  // Wrap with AI features if enabled
+  if (showAIFeatures) {
+    return (
+      <AIContextMenu
+        selectedText={selectedText}
+        onTextReplace={handleTextReplace}
+        disabled={readOnly || isConverting}
+      >
+        {editorContent}
+      </AIContextMenu>
+    );
+  }
+
   return editorContent;
 });
 
