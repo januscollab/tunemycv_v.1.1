@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { Document, Page } from 'react-pdf';
 import { ChevronLeft, ChevronRight, Download, ZoomIn, ZoomOut, RotateCw, ExternalLink, Maximize } from 'lucide-react';
@@ -285,6 +284,16 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
               onLoadSuccess={onDocumentLoadSuccess}
               onLoadError={onDocumentLoadError}
               loading=""
+              options={{
+                // Explicitly disable worker to prevent CSP issues
+                workerSrc: false,
+                // Use main thread rendering
+                isEvalSupported: false,
+                // Additional fallback options
+                disableFontFace: false,
+                disableRange: false,
+                disableStream: false
+              }}
             >
               <Page
                 pageNumber={pageNumber}
