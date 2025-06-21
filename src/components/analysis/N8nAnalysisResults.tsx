@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -30,6 +31,22 @@ const N8nAnalysisResults: React.FC<N8nAnalysisResultsProps> = ({
   onStartNew,
   readOnly = false
 }) => {
+
+  // Add comprehensive debugging
+  React.useEffect(() => {
+    console.log('=== N8N ANALYSIS RESULTS DEBUG ===');
+    console.log('Full result object:', result);
+    console.log('PDF file data type:', typeof result.pdf_file_data);
+    console.log('PDF file data length:', result.pdf_file_data?.length || 0);
+    console.log('PDF file data starts with:', result.pdf_file_data?.substring(0, 100) || 'EMPTY');
+    console.log('HTML file data type:', typeof result.html_file_data);
+    console.log('HTML file data length:', result.html_file_data?.length || 0);
+    console.log('N8N PDF URL:', result.n8n_pdf_url);
+    console.log('N8N HTML URL:', result.n8n_html_url);
+    console.log('PDF file name:', result.pdf_file_name);
+    console.log('HTML file name:', result.html_file_name);
+    console.log('===================================');
+  }, [result]);
   
   const handlePreview = (url: string, type: string) => {
     window.open(url, '_blank', 'noopener,noreferrer');
@@ -125,6 +142,27 @@ const N8nAnalysisResults: React.FC<N8nAnalysisResultsProps> = ({
         </div>
       )}
 
+      {/* Debug Information Panel */}
+      <Card className="border-2 border-blue-200 bg-blue-50/50 dark:border-blue-800 dark:bg-blue-950/20">
+        <CardContent className="pt-6">
+          <h4 className="text-sm font-semibold text-blue-800 dark:text-blue-200 mb-3">
+            🔧 Debug Information
+          </h4>
+          <div className="space-y-2 text-xs text-blue-700 dark:text-blue-300 font-mono">
+            <div>Analysis Type: {result.analysis_type || 'undefined'}</div>
+            <div>PDF Data: {result.pdf_file_data ? `${result.pdf_file_data.length} chars` : 'missing'}</div>
+            <div>HTML Data: {result.html_file_data ? `${result.html_file_data.length} chars` : 'missing'}</div>
+            <div>PDF URL: {result.n8n_pdf_url || 'missing'}</div>
+            <div>HTML URL: {result.n8n_html_url || 'missing'}</div>
+            <div>PDF File Name: {result.pdf_file_name || 'missing'}</div>
+            <div>HTML File Name: {result.html_file_name || 'missing'}</div>
+            {result.pdf_file_data && (
+              <div>PDF Starts With: {result.pdf_file_data.substring(0, 50)}...</div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
       {/* PDF Viewer */}
       {result.pdf_file_data ? (
         <ReactPDFViewer
@@ -139,6 +177,9 @@ const N8nAnalysisResults: React.FC<N8nAnalysisResultsProps> = ({
             <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-600 dark:text-gray-400">
               PDF report not available for this analysis
+            </p>
+            <p className="text-xs text-gray-500 mt-2">
+              Debug: pdf_file_data = {result.pdf_file_data ? 'exists' : 'missing'}
             </p>
           </CardContent>
         </Card>
