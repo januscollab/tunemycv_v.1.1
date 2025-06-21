@@ -1,12 +1,12 @@
 
 import React, { useState, useMemo } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
-import { ChevronLeft, ChevronRight, Download, ZoomIn, ZoomOut, RotateCw } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Download, ZoomIn, ZoomOut, RotateCw, ExternalLink, Maximize } from 'lucide-react';
 import { Button } from './button';
 import { cn } from '@/lib/utils';
 
-// Set up PDF.js worker
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js`;
+// Set up PDF.js worker with fallback
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js`;
 
 interface ReactPDFViewerProps {
   pdfData: string;
@@ -18,7 +18,7 @@ interface ReactPDFViewerProps {
 const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
   pdfData,
   fileName = 'document.pdf',
-  title = 'PDF Document',
+  title = 'CV Analysis Report',
   className
 }) => {
   const [numPages, setNumPages] = useState<number | null>(null);
@@ -102,6 +102,61 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
     }
   };
 
+  const openInNewTab = () => {
+    if (pdfDataUrl) {
+      window.open(pdfDataUrl, '_blank', 'noopener,noreferrer');
+    }
+  };
+
+  const openInLightbox = () => {
+    if (pdfDataUrl) {
+      // Create a modal overlay
+      const overlay = document.createElement('div');
+      overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0,0,0,0.9);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+      `;
+      
+      const iframe = document.createElement('iframe');
+      iframe.src = pdfDataUrl;
+      iframe.style.cssText = `
+        width: 90vw;
+        height: 90vh;
+        border: none;
+        background: white;
+        cursor: auto;
+      `;
+      
+      // Close on overlay click
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          document.body.removeChild(overlay);
+        }
+      });
+
+      // Close on Escape key
+      const closeOnEscape = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          document.body.removeChild(overlay);
+          document.removeEventListener('keydown', closeOnEscape);
+        }
+      };
+      document.addEventListener('keydown', closeOnEscape);
+      
+      overlay.appendChild(iframe);
+      document.body.appendChild(overlay);
+    }
+  };
+
   // Handle case where PDF data is not available
   if (!pdfData) {
     return (
@@ -173,6 +228,26 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
             onClick={() => setRotation(prev => (prev + 90) % 360)}
           >
             <RotateCw className="h-4 w-4" />
+          </Button>
+          
+          {/* New Tab */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={openInNewTab}
+            title="Open in new tab"
+          >
+            <ExternalLink className="h-4 w-4" />
+          </Button>
+          
+          {/* Lightbox */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={openInLightbox}
+            title="Open in lightbox"
+          >
+            <Maximize className="h-4 w-4" />
           </Button>
           
           {/* Download */}

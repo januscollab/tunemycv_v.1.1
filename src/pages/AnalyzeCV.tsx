@@ -3,7 +3,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { extractJobTitleFromText } from '@/utils/analysisUtils';
 import AnalysisResults from '@/components/analysis/AnalysisResults';
-import N8nAnalysisResults from '@/components/analysis/N8nAnalysisResults';
 
 import CVSelector from '@/components/analyze/CVSelector';
 import JobDescriptionSelector from '@/components/analyze/JobDescriptionSelector';
@@ -585,19 +584,11 @@ const AnalyzeCV = () => {
                 {/* View Analysis Tab */}
                 <TabsContent value="view-analysis" className="mt-0">
                   {viewedAnalysis ? (
-                    viewedAnalysis.analysis_type === 'n8n' ? (
-                      <N8nAnalysisResults 
-                        result={viewedAnalysis} 
-                        onStartNew={handleStartNew}
-                        readOnly={true}
-                      />
-                    ) : (
-                      <AnalysisResults 
-                        result={viewedAnalysis} 
-                        onStartNew={handleStartNew}
-                        readOnly={true}
-                      />
-                    )
+                    <AnalysisResults 
+                      result={viewedAnalysis} 
+                      onStartNew={handleStartNew}
+                      readOnly={true}
+                    />
                   ) : (
                     <Card className="border border-gray-200 dark:border-gray-700">
                       <CardContent className="text-center py-8">
