@@ -1,18 +1,9 @@
 
 import React, { useState, useMemo } from 'react';
-import { Document, Page, pdfjs } from 'react-pdf';
+import { Document, Page } from 'react-pdf';
 import { ChevronLeft, ChevronRight, Download, ZoomIn, ZoomOut, RotateCw, ExternalLink, Maximize } from 'lucide-react';
 import { Button } from './button';
 import { cn } from '@/lib/utils';
-
-// Set up PDF.js worker with better CSP handling
-try {
-  pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js`;
-} catch (error) {
-  console.warn('PDF.js worker setup failed, using fallback');
-  // Fallback to disable worker if CSP blocks it
-  pdfjs.GlobalWorkerOptions.workerSrc = '';
-}
 
 interface ReactPDFViewerProps {
   pdfData: string;
@@ -85,12 +76,7 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
 
   const onDocumentLoadError = (error: Error) => {
     console.error('❌ PDF load error:', error);
-    // More user-friendly error message for CSP issues
-    if (error.message.includes('worker') || error.message.includes('CSP')) {
-      setError('PDF viewer configuration issue. Please try downloading the PDF instead.');
-    } else {
-      setError(`Failed to load PDF: ${error.message}`);
-    }
+    setError(`Failed to load PDF: ${error.message}`);
     setIsLoading(false);
   };
 
@@ -299,14 +285,6 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
               onLoadSuccess={onDocumentLoadSuccess}
               onLoadError={onDocumentLoadError}
               loading=""
-              options={{
-                // Disable worker if CSP is blocking it
-                disableWorker: true,
-                // Use canvas rendering as fallback
-                disableWebGL: true,
-                // Reduce memory usage
-                maxImageSize: 1024 * 1024,
-              }}
             >
               <Page
                 pageNumber={pageNumber}
