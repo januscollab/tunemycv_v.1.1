@@ -263,9 +263,9 @@ const CoverLetterHistory: React.FC<CoverLetterHistoryProps> = ({
     return (
       <div className={className}>
         <div className="mb-6">
-          <h2 className="text-title font-bold flex items-center gap-2">
+          <h2 className="text-title flex items-center gap-2">
             <History className="h-5 w-5 text-primary" />
-            Cover Letter History
+            Cover Letters
           </h2>
         </div>
         <div className="text-center py-8">
@@ -285,9 +285,9 @@ const CoverLetterHistory: React.FC<CoverLetterHistoryProps> = ({
     <div className={className}>
       <div className="mb-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-title font-bold flex items-center gap-2">
+          <h2 className="text-title flex items-center gap-2">
             <History className="h-5 w-5 text-primary" />
-            Cover Letter History
+            Cover Letters
           </h2>
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">

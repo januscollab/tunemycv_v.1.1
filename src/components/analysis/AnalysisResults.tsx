@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { CheckCircle, Download, ArrowLeft, Bug } from 'lucide-react';
 
@@ -115,52 +114,6 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
                 <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
                 <span className="text-sm">Start New Analysis</span>
               </button>
-            </div>
-          )}
-
-          {/* Analysis Header - Only show if we have valid job info */}
-          {validJobInfo && (
-            <div className="bg-gradient-to-r from-surface to-surface-secondary border border-border rounded-2xl p-8 mb-8 shadow-lg backdrop-blur-sm">
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <h1 className="text-heading font-semibold text-foreground">
-                    {result.job_title} - {result.company_name}
-                  </h1>
-                  {result.compatibility_score && (
-                    <p className="text-subheading text-zapier-orange font-semibold">
-                      {result.compatibility_score}% Compatibility Match
-                    </p>
-                  )}
-                  <div className="flex items-center gap-4 mt-2 text-caption text-muted-foreground">
-                    <span>Analyzed on {analysisDate}</span>
-                    <span>•</span>
-                    <span>Credits Used: {creditsUsed}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Simple header for cases without valid job info */}
-          {!validJobInfo && (
-            <div className="bg-gradient-to-r from-surface to-surface-secondary border border-border rounded-2xl p-8 mb-8 shadow-lg backdrop-blur-sm">
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <h1 className="text-heading font-semibold text-foreground">
-                    CV Analysis Report
-                  </h1>
-                  {result.compatibility_score && (
-                    <p className="text-subheading text-zapier-orange font-semibold">
-                      {result.compatibility_score}% Compatibility Match
-                    </p>
-                  )}
-                  <div className="flex items-center gap-4 mt-2 text-caption text-muted-foreground">
-                    <span>Analyzed on {analysisDate}</span>
-                    <span>•</span>
-                    <span>Credits Used: {creditsUsed}</span>
-                  </div>
-                </div>
-              </div>
             </div>
           )}
 

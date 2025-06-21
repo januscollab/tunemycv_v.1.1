@@ -119,7 +119,7 @@ const AnalysisHistory: React.FC<AnalysisHistoryProps> = ({
     return (
       <div className={className}>
         <div className="mb-6">
-          <h2 className="text-title font-bold flex items-center gap-2">
+          <h2 className="text-title flex items-center gap-2">
             <History className="h-5 w-5 text-primary" />
             Analysis History
           </h2>
@@ -138,7 +138,7 @@ const AnalysisHistory: React.FC<AnalysisHistoryProps> = ({
     return (
       <div className={className}>
         <div className="mb-6">
-          <h2 className="text-title font-bold flex items-center gap-2">
+          <h2 className="text-title flex items-center gap-2">
             <History className="h-5 w-5 text-primary" />
             Analysis History
           </h2>
@@ -159,7 +159,7 @@ const AnalysisHistory: React.FC<AnalysisHistoryProps> = ({
   return (
     <div className={className}>
       <div className="mb-6">
-        <h2 className="text-title font-bold flex items-center gap-2">
+        <h2 className="text-title flex items-center gap-2">
           <History className="h-5 w-5 text-primary" />
           Analysis History
         </h2>
