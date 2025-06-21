@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,7 +15,7 @@ import {
 } from 'lucide-react';
 import EditTitleDialog from '@/components/ui/edit-title-dialog';
 import CoverLetterVersionBadge from '@/components/cover-letter/CoverLetterVersionBadge';
-import DocumentDeleteDialog from '@/components/ui/document-delete-dialog';
+import ConfirmationDialog from '@/components/ui/confirmation-dialog';
 import DownloadOptions from '@/components/cover-letter/DownloadOptions';
 
 interface CoverLetterItem {
@@ -246,12 +247,14 @@ const CoverLetterDocumentHistoryItem: React.FC<CoverLetterDocumentHistoryItemPro
       </Card>
 
       {/* Delete Confirmation Dialog */}
-      <DocumentDeleteDialog
+      <ConfirmationDialog
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
+        title="Delete Cover Letter"
+        description="Are you sure you want to delete this cover letter? This action cannot be undone and will permanently remove the cover letter and any associated data."
+        creditCost={0}
         onConfirm={handleDeleteConfirm}
-        documentType="Cover Letter"
-        title={`Delete "${coverLetter.job_title} - ${coverLetter.company_name}"?`}
+        onCancel={() => setIsDeleteDialogOpen(false)}
       />
     </>
   );
