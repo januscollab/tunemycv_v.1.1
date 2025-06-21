@@ -518,59 +518,9 @@ const AnalyzeCV = () => {
           message={currentLoadingMessage}
         />
         
-        {/* Conditional Layout Container */}
-        {activeTab === 'history' ? (
-          // Full width layout for history tab
-          <div className="w-full px-4 py-8">
-            {/* Breadcrumbs */}
-            <div className="max-w-wider mx-auto mb-6">
-              <Breadcrumbs />
-            </div>
-            
-            {/* Header Section */}
-            <div className="max-w-wider mx-auto mb-6">
-              <div className="flex items-start">
-                <Zap className="h-10 w-10 text-zapier-orange mr-4 mt-1" />
-                <div>
-                  <h1 className="text-display font-bold text-foreground">
-                    Analyze Your CV
-                  </h1>
-                  <p className="text-subheading text-earth/70 dark:text-white/70 max-w-2xl mt-1">
-                    Upload your CV and job description to get comprehensive compatibility analysis with actionable recommendations.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Tabs Navigation */}
-            <div className="max-w-wider mx-auto mb-6">
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="grid w-full grid-cols-3">
-                  <TabsTrigger value="analysis" className="flex items-center space-x-2 text-caption">
-                    <FileText className="h-4 w-4" />
-                    <span>Analyze CV</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="view-analysis" className="flex items-center space-x-2 text-caption">
-                    <Eye className="h-4 w-4" />
-                    <span>View Analysis</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="history" className="flex items-center space-x-2 text-caption">
-                    <History className="h-4 w-4" />
-                    <span>History</span>
-                  </TabsTrigger>
-                </TabsList>
-              </Tabs>
-            </div>
-
-            {/* Full width history content */}
-            <div className="w-full">
-              <EnhancedAnalysisHistory 
-                onSelectAnalysis={handleHistorySelect}
-              />
-            </div>
-          </div>
-        ) : (
-          // Constrained layout for other tabs
+        {/* Conditional Layout Container - REVERSED LOGIC */}
+        {activeTab !== 'history' ? (
+          // Constrained layout for analysis and view-analysis tabs
           <div className="max-w-wider mx-auto px-4 py-8">
             {/* Breadcrumbs */}
             <Breadcrumbs />
@@ -721,6 +671,56 @@ const AnalyzeCV = () => {
                   />
                 </div>
               </div>
+            </div>
+          </div>
+        ) : (
+          // Full width layout for history tab
+          <div className="w-full px-4 py-8">
+            {/* Breadcrumbs */}
+            <div className="max-w-wider mx-auto mb-6">
+              <Breadcrumbs />
+            </div>
+            
+            {/* Header Section */}
+            <div className="max-w-wider mx-auto mb-6">
+              <div className="flex items-start">
+                <Zap className="h-10 w-10 text-zapier-orange mr-4 mt-1" />
+                <div>
+                  <h1 className="text-display font-bold text-foreground">
+                    Analyze Your CV
+                  </h1>
+                  <p className="text-subheading text-earth/70 dark:text-white/70 max-w-2xl mt-1">
+                    Upload your CV and job description to get comprehensive compatibility analysis with actionable recommendations.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Tabs Navigation */}
+            <div className="max-w-wider mx-auto mb-6">
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="analysis" className="flex items-center space-x-2 text-caption">
+                    <FileText className="h-4 w-4" />
+                    <span>Analyze CV</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="view-analysis" className="flex items-center space-x-2 text-caption">
+                    <Eye className="h-4 w-4" />
+                    <span>View Analysis</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="history" className="flex items-center space-x-2 text-caption">
+                    <History className="h-4 w-4" />
+                    <span>History</span>
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </div>
+
+            {/* Full width history content */}
+            <div className="w-full">
+              <EnhancedAnalysisHistory 
+                onSelectAnalysis={handleHistorySelect}
+              />
             </div>
           </div>
         )}
