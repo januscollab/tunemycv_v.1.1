@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -115,7 +116,7 @@ const designSystemComponents: DesignSystemComponent[] = [
               console.log('Delete confirmed');
               setIsOpen(false);
             }}
-            documentType="cover letter"
+            documentType="Cover Letter"
           />
         </>
       );
@@ -207,3 +208,4 @@ const DesignSystem = () => {
 };
 
 export default DesignSystem;
+
