@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { Document, Page } from 'react-pdf';
 import { ChevronLeft, ChevronRight, Download, ZoomIn, ZoomOut, RotateCw, ExternalLink, Maximize } from 'lucide-react';
@@ -285,8 +286,8 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
               onLoadError={onDocumentLoadError}
               loading=""
               options={{
-                // Explicitly disable worker to prevent CSP issues
-                workerSrc: false,
+                // Use empty worker source to disable web workers
+                worker: '',
                 // Use main thread rendering
                 isEvalSupported: false,
                 // Additional fallback options
