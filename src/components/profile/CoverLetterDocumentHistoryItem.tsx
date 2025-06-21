@@ -9,11 +9,13 @@ import {
   Target, 
   MessageSquare,
   Edit,
-  Pencil
+  Pencil,
+  FileText
 } from 'lucide-react';
 import EditTitleDialog from '@/components/ui/edit-title-dialog';
 import CoverLetterVersionBadge from '@/components/cover-letter/CoverLetterVersionBadge';
 import DocumentDeleteDialog from '@/components/ui/document-delete-dialog';
+import DownloadOptions from '@/components/cover-letter/DownloadOptions';
 
 interface CoverLetterItem {
   id: string;
@@ -119,30 +121,28 @@ const CoverLetterDocumentHistoryItem: React.FC<CoverLetterDocumentHistoryItemPro
               </div>
             </div>
 
-            {/* Content - Stacked Title/Company, Date */}
-            <div className="flex-1 min-w-0 pr-20 flex flex-col justify-between h-full">
-              <div>
-                {/* Title and Company with Edit Icon */}
-                <div className="flex items-center gap-2 mb-1">
-                  <h3 className="text-heading font-bold text-foreground truncate">
-                    {coverLetter.job_title} - {coverLetter.company_name}
-                  </h3>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setIsEditTitleOpen(true);
-                    }}
-                    className="h-auto p-1 hover:bg-gray-100 dark:hover:bg-gray-800"
-                  >
-                    <Pencil className="h-3 w-3 text-gray-500" />
-                  </Button>
-                </div>
+            {/* Content - Title/Company and Date stacked */}
+            <div className="flex-1 min-w-0 pr-20">
+              {/* Title and Company with Edit Icon */}
+              <div className="flex items-center gap-2 mb-2">
+                <h3 className="text-heading font-bold text-foreground truncate">
+                  {coverLetter.job_title} - {coverLetter.company_name}
+                </h3>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsEditTitleOpen(true);
+                  }}
+                  className="h-auto p-1 hover:bg-gray-100 dark:hover:bg-gray-800"
+                >
+                  <Pencil className="h-3 w-3 text-gray-500" />
+                </Button>
               </div>
               
-              {/* Date */}
-              <div className="flex items-center text-caption text-muted-foreground mt-auto">
+              {/* Date directly under title */}
+              <div className="flex items-center text-caption text-muted-foreground">
                 <Calendar className="h-3 w-3 mr-1" />
                 <span>{formatDate(coverLetter.updated_at)}</span>
               </div>
@@ -152,20 +152,18 @@ const CoverLetterDocumentHistoryItem: React.FC<CoverLetterDocumentHistoryItemPro
           {/* Hover Menu - Bottom Right */}
           <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
             <div className="flex items-center space-x-1">
-              {/* CV Analysis */}
-              {linkageData?.hasLinkedAnalysis ? (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onViewAnalysis(linkageData.linkedAnalysisId);
-                  }}
-                  className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800"
-                >
-                  <Target className="h-4 w-4 text-black dark:text-white" />
-                </Button>
-              ) : null}
+              {/* Cover Letter Button */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onView(coverLetter);
+                }}
+                className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800"
+              >
+                <FileText className="h-4 w-4 text-black dark:text-white" />
+              </Button>
 
               {/* Interview Prep */}
               {linkageData?.hasLinkedInterviewPrep ? (
@@ -207,18 +205,21 @@ const CoverLetterDocumentHistoryItem: React.FC<CoverLetterDocumentHistoryItemPro
                 <Eye className="h-4 w-4 text-black dark:text-white" />
               </Button>
 
-              {/* Download Button */}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDownload(coverLetter);
-                }}
-                className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800"
-              >
-                <Download className="h-4 w-4 text-black dark:text-white" />
-              </Button>
+              {/* Download Options */}
+              <DownloadOptions
+                content={coverLetter.content}
+                fileName={`${coverLetter.job_title}-${coverLetter.company_name}-Cover-Letter`}
+                triggerComponent={
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => e.stopPropagation()}
+                    className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  >
+                    <Download className="h-4 w-4 text-black dark:text-white" />
+                  </Button>
+                }
+              />
 
               {/* Delete Button */}
               <Button
