@@ -126,7 +126,7 @@ const N8nAnalysisResults: React.FC<N8nAnalysisResultsProps> = ({
         </div>
       )}
 
-      {/* Modern Analysis Header */}
+      {/* Modern Analysis Header - Simplified without action buttons */}
       <div className="bg-gradient-to-r from-surface to-surface-secondary border border-border rounded-2xl p-8 mb-8 shadow-lg backdrop-blur-sm">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-6">
@@ -139,26 +139,6 @@ const N8nAnalysisResults: React.FC<N8nAnalysisResultsProps> = ({
                 {getCompanyName()}
               </p>
             </div>
-          </div>
-          
-          {/* Action Buttons - Modern Style */}
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={handleHtmlPreview}
-              className="group flex items-center space-x-3 px-6 py-3 text-foreground-secondary hover:text-foreground bg-surface-tertiary hover:bg-surface-hover rounded-xl transition-all duration-300 font-normal border border-border hover:border-primary/30 hover:scale-[1.02] active:scale-[0.98]"
-            >
-              <ExternalLink className="h-5 w-5 transition-transform group-hover:scale-110" />
-              <span className="text-subheading">Review in Browser</span>
-            </button>
-            <DownloadMenu
-              buttonText="Download Report"
-              variant="default"
-              size="default"
-              className="group flex items-center space-x-3 px-6 py-3 bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl transition-all duration-300 font-normal shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] border border-primary/20"
-              onDownloadPDF={result.n8n_pdf_url ? () => handleDownload(result.n8n_pdf_url!, 'pdf') : undefined}
-              onDownloadWord={() => console.log('Word download not implemented for n8n reports')}
-              onDownloadText={() => console.log('Text download not implemented for n8n reports')}
-            />
           </div>
         </div>
       </div>
@@ -181,7 +161,6 @@ const N8nAnalysisResults: React.FC<N8nAnalysisResultsProps> = ({
           </CardContent>
         </Card>
       )}
-
 
       {/* Additional Information */}
       <Card className="border border-apple-core/20 dark:border-citrus/20 bg-apple-core/5 dark:bg-citrus/5">
