@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -29,7 +30,7 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Calendar } from "@/components/ui/calendar"
-import { CalendarIcon } from "lucide-react"
+import { CalendarIcon, Settings, Edit, Trash2 } from "lucide-react"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 import { format } from "date-fns"
@@ -81,6 +82,8 @@ const options: VybeSelectOption[] = [
 ];
 
 const DesignSystem = () => {
+  const [selectedDate, setSelectedDate] = React.useState<Date>();
+
   return (
     <div className="container mx-auto p-8 space-y-12">
       <header className="space-y-4">
@@ -101,11 +104,11 @@ const DesignSystem = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <VybeButton>Primary Button</VybeButton>
-          <VybeButton variant="secondary">Secondary Button</VybeButton>
-          <VybeButton variant="outline">Outline Button</VybeButton>
-          <VybeButton variant="destructive">Destructive Button</VybeButton>
-          <VybeButton variant="ghost">Ghost Button</VybeButton>
-          <VybeButton variant="link">Link Button</VybeButton>
+          <VybeButton vybeVariant="secondary">Secondary Button</VybeButton>
+          <VybeButton vybeVariant="outline">Outline Button</VybeButton>
+          <VybeButton vybeVariant="destructive">Destructive Button</VybeButton>
+          <VybeButton vybeVariant="ghost">Ghost Button</VybeButton>
+          <VybeButton vybeVariant="white">White Button</VybeButton>
           <VybeButton disabled>Disabled Button</VybeButton>
         </div>
       </section>
@@ -134,9 +137,9 @@ const DesignSystem = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <VybeIconButton icon="settings" tooltip="Settings" />
-          <VybeIconButton icon="edit" tooltip="Edit" />
-          <VybeIconButton icon="delete" tooltip="Delete" />
+          <VybeIconButton icon={Settings} tooltip="Settings" />
+          <VybeIconButton icon={Edit} tooltip="Edit" />
+          <VybeIconButton icon={Trash2} tooltip="Delete" />
         </div>
       </section>
 
@@ -150,7 +153,9 @@ const DesignSystem = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <VubeUITooltip content="This is a tooltip">Hover me</VubeUITooltip>
+          <VubeUITooltip content="This is a tooltip">
+            <Button variant="outline">Hover me</Button>
+          </VubeUITooltip>
         </div>
       </section>
 
@@ -282,18 +287,18 @@ const DesignSystem = () => {
                 variant={"outline"}
                 className={cn(
                   "w-[280px] justify-start text-left font-normal",
-                  !Date ? "text-muted-foreground" : ""
+                  !selectedDate ? "text-muted-foreground" : ""
                 )}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                {Date ? format(Date, "PPP") : <span>Pick a date</span>}
+                {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="center" side="bottom">
               <Calendar
                 mode="single"
-                selected={Date}
-                onSelect={() => {}}
+                selected={selectedDate}
+                onSelect={setSelectedDate}
                 disabled={(date) =>
                   date > new Date() || date < new Date("1900-01-01")
                 }
