@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -369,14 +368,14 @@ const DesignSystem = () => {
             </Button>
             
             <DocumentDeleteDialog
-              isOpen={showDeleteDialog}
-              onClose={() => setShowDeleteDialog(false)}
+              open={showDeleteDialog}
+              onOpenChange={setShowDeleteDialog}
               onConfirm={() => {
                 console.log('Delete confirmed');
                 setShowDeleteDialog(false);
               }}
-              documentTitle="Sample Document"
               documentType="Cover Letter"
+              title="Sample Document"
             />
           </div>
         </section>
