@@ -164,27 +164,53 @@ const TaskModal: React.FC<TaskModalProps> = ({
   };
 
   const handleSave = async () => {
-    if ((!title && !storyInfo) || !sprint) {
+    // Validate: require either title OR storyInfo (not both)
+    if ((!title.trim() && !storyInfo.trim()) || !sprint) {
       toast.error('Please provide either a story title or story information');
       return;
     }
 
     setLoading(true);
     try {
+      console.log('Saving task for sprint:', sprint.id, 'user:', user?.id);
+      
       // Generate auto-tags based on title, description, and story info
       const autoTags = generateAutoTags(title, description, storyInfo);
       const finalTags = [...new Set([...tags, ...autoTags])]; // Remove duplicates
 
+      let order_index = 0;
+      
+      // Calculate order_index for new tasks
+      if (!task) {
+        const { data: existingTasks, error: fetchError } = await supabase
+          .from('tasks')
+          .select('order_index')
+          .eq('sprint_id', sprint.id)
+          .order('order_index', { ascending: false })
+          .limit(1);
+
+        if (fetchError) {
+          console.error('Error fetching existing tasks:', fetchError);
+          throw fetchError;
+        }
+
+        order_index = existingTasks && existingTasks.length > 0 ? existingTasks[0].order_index + 1 : 0;
+        console.log('Calculated order_index:', order_index);
+      }
+
       const taskData = {
-        title: title || storyInfo, // Use title if available, otherwise use story info
-        story_info: storyInfo || null,
-        description: description || null,
+        title: title.trim() || storyInfo.trim(), // Use title if available, otherwise use story info
+        story_info: storyInfo.trim() || null,
+        description: description.trim() || null,
         priority,
         status,
         tags: finalTags,
         sprint_id: sprint.id,
         user_id: user?.id,
+        ...((!task) && { order_index }) // Only set order_index for new tasks
       };
+
+      console.log('Task data to save:', taskData);
 
       if (task) {
         // Update existing task
@@ -193,23 +219,40 @@ const TaskModal: React.FC<TaskModalProps> = ({
           .update(taskData)
           .eq('id', task.id);
 
-        if (error) throw error;
+        if (error) {
+          console.error('Error updating task:', error);
+          throw error;
+        }
+        console.log('Task updated successfully');
         toast.success('Task updated successfully');
       } else {
         // Create new task
-        const { error } = await supabase
+        const { data: newTask, error } = await supabase
           .from('tasks')
-          .insert(taskData);
+          .insert(taskData)
+          .select('*')
+          .single();
 
-        if (error) throw error;
+        if (error) {
+          console.error('Error creating task:', error);
+          console.error('Task data that failed:', taskData);
+          throw error;
+        }
+        console.log('Task created successfully:', newTask);
         toast.success('Task created successfully');
       }
 
       onSave();
       onOpenChange(false);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving task:', error);
-      toast.error('Failed to save task');
+      console.error('Error details:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      });
+      toast.error(`Failed to save task: ${error.message || 'Unknown error'}`);
     } finally {
       setLoading(false);
     }
@@ -428,7 +471,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
           <VybeButton 
             vybeVariant="primary" 
             onClick={handleSave} 
-            disabled={loading || (!title && !storyInfo) || generating} 
+            disabled={loading || (!title.trim() && !storyInfo.trim()) || generating} 
             isLoading={loading}
           >
             {loading ? 'Saving...' : 'Save Story'}
