@@ -11,7 +11,6 @@ import InterviewPrepSection from './InterviewPrepSection';
 import AnalysisHeader from './components/AnalysisHeader';
 import AnalysisScoreCard from './components/AnalysisScoreCard';
 import LegacySummarySection from './components/LegacySummarySection';
-import AnalysisSummarySection from './components/AnalysisSummarySection';
 import LegacyCompatibilitySection from './components/LegacyCompatibilitySection';
 import LegacyKeywordSection from './components/LegacyKeywordSection';
 import PriorityRecommendationsSection from './components/PriorityRecommendationsSection';
@@ -169,28 +168,15 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
           </div>
         </div>
 
-
-        {/* Main Content Grid */}
-        <div className="grid lg:grid-cols-3 gap-8 mb-8">
-          {/* Left Column - Score Display */}
-          <div className="lg:col-span-1">
-            <AnalysisScoreCard 
-              score={compatibilityScore}
-              jobTitle={position}
-              companyName={companyName}
-              getMatchLevel={getMatchLevel}
-            />
-          </div>
-
-          {/* Right Column - Analysis Summary */}
-          <div className="lg:col-span-2">
-            <AnalysisSummarySection
-              compatibilityScore={compatibilityScore}
-              jobTitle={position}
-              companyName={companyName}
-              onDownload={downloadPDF}
-            />
-          </div>
+        {/* Main Content - Single Column Layout */}
+        <div className="space-y-8 mb-8">
+          {/* Score Card - Full Width */}
+          <AnalysisScoreCard 
+            score={compatibilityScore}
+            jobTitle={position}
+            companyName={companyName}
+            getMatchLevel={getMatchLevel}
+          />
         </div>
 
         {/* Personalized Match Message */}
