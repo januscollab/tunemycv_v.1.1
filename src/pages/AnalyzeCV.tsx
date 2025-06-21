@@ -512,20 +512,20 @@ const AnalyzeCV = () => {
   return (
     <>
       <div className={`min-h-screen bg-gradient-to-br from-primary/5 via-background to-primary/3 dark:from-primary/10 dark:via-background dark:to-primary/5 ${analyzing ? 'pointer-events-none' : ''}`}>
-        <EngagingUploadModal
-          isOpen={analyzing}
-          title="Analyzing Your CV"
-          message={currentLoadingMessage}
-        />
-        
-        {/* Conditional Layout Container - REVERSED LOGIC */}
-        {activeTab !== 'history' ? (
-          // Constrained layout for analysis and view-analysis tabs
+      <EngagingUploadModal
+        isOpen={analyzing}
+        title="Analyzing Your CV"
+        message={currentLoadingMessage}
+      />
+      
+      {/* Main Container - Different layout for history tab */}
+      {activeTab === 'history' ? (
+        // Full width layout for history tab
+        <div className="w-full">
+          {/* Breadcrumbs and Header */}
           <div className="max-w-wider mx-auto px-4 py-8">
-            {/* Breadcrumbs */}
             <Breadcrumbs />
             
-            {/* Header Section */}
             <div className="mb-6">
               <div className="flex items-start">
                 <Zap className="h-10 w-10 text-zapier-orange mr-4 mt-1" />
@@ -539,167 +539,63 @@ const AnalyzeCV = () => {
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Main Content Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6">
-              {/* Main Content Section */}
+          {/* Tabs Navigation - Constrained width */}
+          <div className="max-w-wider mx-auto px-4">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-6">
+              <TabsList className="grid w-full grid-cols-3 mb-6">
+                <TabsTrigger value="analysis" className="flex items-center space-x-2 text-caption">
+                  <FileText className="h-4 w-4" />
+                  <span>Analyze CV</span>
+                </TabsTrigger>
+                <TabsTrigger value="view-analysis" className="flex items-center space-x-2 text-caption">
+                  <Eye className="h-4 w-4" />
+                  <span>View Analysis</span>
+                </TabsTrigger>
+                <TabsTrigger value="history" className="flex items-center space-x-2 text-caption">
+                  <History className="h-4 w-4" />
+                  <span>History</span>
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+
+          {/* Full width history content */}
+          <div className="w-full px-4">
+            <EnhancedAnalysisHistory 
+              onSelectAnalysis={handleHistorySelect}
+            />
+          </div>
+        </div>
+      ) : (
+        // Constrained layout for other tabs
+        <div className="max-w-wider mx-auto px-4 py-8">
+          {/* Breadcrumbs */}
+          <Breadcrumbs />
+          
+          {/* Header Section */}
+          <div className="mb-6">
+            <div className="flex items-start">
+              <Zap className="h-10 w-10 text-zapier-orange mr-4 mt-1" />
               <div>
-                {/* Tabs Navigation */}
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-6">
-                  <TabsList className="grid w-full grid-cols-3 mb-6">
-                    <TabsTrigger value="analysis" className="flex items-center space-x-2 text-caption">
-                      <FileText className="h-4 w-4" />
-                      <span>Analyze CV</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="view-analysis" className="flex items-center space-x-2 text-caption">
-                      <Eye className="h-4 w-4" />
-                      <span>View Analysis</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="history" className="flex items-center space-x-2 text-caption">
-                      <History className="h-4 w-4" />
-                      <span>History</span>
-                    </TabsTrigger>
-                  </TabsList>
-
-                  {/* CV Analysis Tab */}
-                  <TabsContent value="analysis" className="mt-0">
-                    <div className="space-y-5">
-                      {/* Job Title */}
-                      <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-5 border border-apple-core/20 dark:border-citrus/20">
-                        <h3 className="text-heading font-semibold text-blueberry dark:text-citrus mb-3">Job Title</h3>
-                         <CaptureInput
-                           label=""
-                           value={jobTitle}
-                           onChange={(e) => setJobTitle(e.target.value)}
-                           placeholder="e.g., Senior Software Engineer (auto-extracted from job description)"
-                           disabled={analyzing}
-                         />
-                        <p className="text-micro text-blueberry/60 dark:text-apple-core/70 mt-2">
-                          Job title will be automatically extracted from the job description if not provided.
-                        </p>
-                      </div>
-
-                      {/* Job Description Input - Required */}
-                      <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-5 border border-apple-core/20 dark:border-citrus/20">
-                        <h3 className="text-heading font-semibold text-blueberry dark:text-citrus mb-3">
-                          Job Description <span className="text-red-500">*</span>
-                        </h3>
-                        <p className="text-micro text-blueberry/60 dark:text-apple-core/70 mb-3">
-                          Upload a file (PDF, DOCX, TXT) or paste the text directly
-                        </p>
-                        
-                        <JobDescriptionSelector
-                          onJobDescriptionSet={handleJobDescriptionSet}
-                          uploadedFile={uploadedFiles.jobDescription}
-                          disabled={uploading || analyzing}
-                        />
-                      </div>
-
-                      {/* CV Selection - Required */}
-                      <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm border border-apple-core/20 dark:border-citrus/20">
-                        <div className="p-5">
-                          <h3 className="text-heading font-semibold text-blueberry dark:text-citrus mb-3">
-                            Your CV <span className="text-red-500">*</span>
-                          </h3>
-                          <p className="text-micro text-blueberry/60 dark:text-apple-core/70 mb-3">
-                            Upload your CV or select from previously saved CVs
-                          </p>
-                          <CVSelector
-                            onCVSelect={handleCVSelect}
-                            selectedCV={uploadedFiles.cv}
-                            uploading={uploading || analyzing}
-                          />
-                        </div>
-                      </div>
-
-                      {/* Analyze Button */}
-                      <AnalyzeButton
-                        onAnalyze={handleAnalysis}
-                        canAnalyze={canAnalyze}
-                        analyzing={analyzing}
-                        hasCreditsForAI={hasCreditsForAI}
-                      />
-                    </div>
-                  </TabsContent>
-
-                  {/* View Analysis Tab */}
-                  <TabsContent value="view-analysis" className="mt-0">
-                    {viewedAnalysis ? (
-                      viewedAnalysis.analysis_type === 'n8n' ? (
-                        <N8nAnalysisResults 
-                          result={viewedAnalysis} 
-                          onStartNew={handleStartNew}
-                          readOnly={true}
-                        />
-                      ) : (
-                        <AnalysisResults 
-                          result={viewedAnalysis} 
-                          onStartNew={handleStartNew}
-                          readOnly={true}
-                        />
-                      )
-                    ) : (
-                      <Card className="border border-gray-200 dark:border-gray-700">
-                        <CardContent className="text-center py-8">
-                          <FileText className="h-12 w-12 text-zapier-orange mx-auto mb-4" />
-                          <p className="text-gray-600 dark:text-gray-400 mb-2 font-normal">
-                            No analysis generated yet.
-                          </p>
-                          <p className="text-sm font-normal text-gray-500">
-                            Create one in the <Button variant="link" onClick={() => setActiveTab('analysis')} className="text-zapier-orange hover:text-zapier-orange/80 p-0 h-auto font-normal text-sm">Analyze CV</Button> tab or view previous analysis in <Button variant="link" onClick={() => setActiveTab('history')} className="text-zapier-orange hover:text-zapier-orange/80 p-0 h-auto font-normal text-sm">History</Button>.
-                          </p>
-                        </CardContent>
-                      </Card>
-                    )}
-                  </TabsContent>
-                </Tabs>
-              </div>
-
-              {/* Credits Panel - Fixed Width */}
-              <div>
-                <CreditsPanel
-                  credits={userCredits?.credits || 0}
-                  hasCreditsForAI={hasCreditsForAI}
-                />
-                
-                {/* Soft Skills Survey Panel */}
-                <div className="mt-4">
-                  <SoftSkillsSurveyPanel
-                    onTakeSurvey={() => setShowSurveyModal(true)}
-                    onDismiss={dismissSurvey}
-                    isVisible={shouldShowSurvey()}
-                  />
-                </div>
+                <h1 className="text-display font-bold text-foreground">
+                  Analyze Your CV
+                </h1>
+                <p className="text-subheading text-earth/70 dark:text-white/70 max-w-2xl mt-1">
+                  Upload your CV and job description to get comprehensive compatibility analysis with actionable recommendations.
+                </p>
               </div>
             </div>
           </div>
-        ) : (
-          // Full width layout for history tab
-          <div className="w-full px-4 py-8">
-            {/* Breadcrumbs */}
-            <div className="max-w-wider mx-auto mb-6">
-              <Breadcrumbs />
-            </div>
-            
-            {/* Header Section */}
-            <div className="max-w-wider mx-auto mb-6">
-              <div className="flex items-start">
-                <Zap className="h-10 w-10 text-zapier-orange mr-4 mt-1" />
-                <div>
-                  <h1 className="text-display font-bold text-foreground">
-                    Analyze Your CV
-                  </h1>
-                  <p className="text-subheading text-earth/70 dark:text-white/70 max-w-2xl mt-1">
-                    Upload your CV and job description to get comprehensive compatibility analysis with actionable recommendations.
-                  </p>
-                </div>
-              </div>
-            </div>
 
-            {/* Tabs Navigation */}
-            <div className="max-w-wider mx-auto mb-6">
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="grid w-full grid-cols-3">
+          {/* Main Content Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6">
+            {/* Main Content Section */}
+            <div>
+              {/* Tabs Navigation */}
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-6">
+                <TabsList className="grid w-full grid-cols-3 mb-6">
                   <TabsTrigger value="analysis" className="flex items-center space-x-2 text-caption">
                     <FileText className="h-4 w-4" />
                     <span>Analyze CV</span>
@@ -713,49 +609,153 @@ const AnalyzeCV = () => {
                     <span>History</span>
                   </TabsTrigger>
                 </TabsList>
+
+                {/* CV Analysis Tab */}
+                <TabsContent value="analysis" className="mt-0">
+                  <div className="space-y-5">
+                    {/* Job Title */}
+                    <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-5 border border-apple-core/20 dark:border-citrus/20">
+                      <h3 className="text-heading font-semibold text-blueberry dark:text-citrus mb-3">Job Title</h3>
+                       <CaptureInput
+                         label=""
+                         value={jobTitle}
+                         onChange={(e) => setJobTitle(e.target.value)}
+                         placeholder="e.g., Senior Software Engineer (auto-extracted from job description)"
+                         disabled={analyzing}
+                       />
+                      <p className="text-micro text-blueberry/60 dark:text-apple-core/70 mt-2">
+                        Job title will be automatically extracted from the job description if not provided.
+                      </p>
+                    </div>
+
+                    {/* Job Description Input - Required */}
+                    <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm p-5 border border-apple-core/20 dark:border-citrus/20">
+                      <h3 className="text-heading font-semibold text-blueberry dark:text-citrus mb-3">
+                        Job Description <span className="text-red-500">*</span>
+                      </h3>
+                      <p className="text-micro text-blueberry/60 dark:text-apple-core/70 mb-3">
+                        Upload a file (PDF, DOCX, TXT) or paste the text directly
+                      </p>
+                      
+                      <JobDescriptionSelector
+                        onJobDescriptionSet={handleJobDescriptionSet}
+                        uploadedFile={uploadedFiles.jobDescription}
+                        disabled={uploading || analyzing}
+                      />
+                    </div>
+
+                    {/* CV Selection - Required */}
+                    <div className="bg-white dark:bg-blueberry/10 rounded-lg shadow-sm border border-apple-core/20 dark:border-citrus/20">
+                      <div className="p-5">
+                        <h3 className="text-heading font-semibold text-blueberry dark:text-citrus mb-3">
+                          Your CV <span className="text-red-500">*</span>
+                        </h3>
+                        <p className="text-micro text-blueberry/60 dark:text-apple-core/70 mb-3">
+                          Upload your CV or select from previously saved CVs
+                        </p>
+                        <CVSelector
+                          onCVSelect={handleCVSelect}
+                          selectedCV={uploadedFiles.cv}
+                          uploading={uploading || analyzing}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Analyze Button */}
+                    <AnalyzeButton
+                      onAnalyze={handleAnalysis}
+                      canAnalyze={canAnalyze}
+                      analyzing={analyzing}
+                      hasCreditsForAI={hasCreditsForAI}
+                    />
+                  </div>
+                </TabsContent>
+
+                {/* View Analysis Tab */}
+                <TabsContent value="view-analysis" className="mt-0">
+                  {viewedAnalysis ? (
+                    viewedAnalysis.analysis_type === 'n8n' ? (
+                      <N8nAnalysisResults 
+                        result={viewedAnalysis} 
+                        onStartNew={handleStartNew}
+                        readOnly={true}
+                      />
+                    ) : (
+                      <AnalysisResults 
+                        result={viewedAnalysis} 
+                        onStartNew={handleStartNew}
+                        readOnly={true}
+                      />
+                    )
+                  ) : (
+                    <Card className="border border-gray-200 dark:border-gray-700">
+                      <CardContent className="text-center py-8">
+                        <FileText className="h-12 w-12 text-zapier-orange mx-auto mb-4" />
+                        <p className="text-gray-600 dark:text-gray-400 mb-2 font-normal">
+                          No analysis generated yet.
+                        </p>
+                        <p className="text-sm font-normal text-gray-500">
+                          Create one in the <Button variant="link" onClick={() => setActiveTab('analysis')} className="text-zapier-orange hover:text-zapier-orange/80 p-0 h-auto font-normal text-sm">Analyze CV</Button> tab or view previous analysis in <Button variant="link" onClick={() => setActiveTab('history')} className="text-zapier-orange hover:text-zapier-orange/80 p-0 h-auto font-normal text-sm">History</Button>.
+                        </p>
+                      </CardContent>
+                    </Card>
+                  )}
+                </TabsContent>
               </Tabs>
             </div>
 
-            {/* Full width history content */}
-            <div className="w-full">
-              <EnhancedAnalysisHistory 
-                onSelectAnalysis={handleHistorySelect}
+            {/* Credits Panel - Fixed Width */}
+            <div>
+              <CreditsPanel
+                credits={userCredits?.credits || 0}
+                hasCreditsForAI={hasCreditsForAI}
+              />
+            </div>
+            
+            {/* Soft Skills Survey Panel */}
+            <div className="mt-4">
+              <SoftSkillsSurveyPanel
+                onTakeSurvey={() => setShowSurveyModal(true)}
+                onDismiss={dismissSurvey}
+                isVisible={shouldShowSurvey()}
               />
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Personalization Survey Modal */}
-        <PersonalizationSurveyModal
-          isOpen={showPersonalizationSurvey}
-          onClose={() => setShowPersonalizationSurvey(false)}
-          onSubmit={handleSurveySubmit}
-        />
+      {/* Personalization Survey Modal */}
+      <PersonalizationSurveyModal
+        isOpen={showPersonalizationSurvey}
+        onClose={() => setShowPersonalizationSurvey(false)}
+        onSubmit={handleSurveySubmit}
+      />
 
-        {/* Soft Skills Survey Modal */}
-        <SoftSkillsSurveyModal
-          isOpen={showSurveyModal}
-          onClose={() => setShowSurveyModal(false)}
-          onSubmit={saveSoftSkills}
-        />
+      {/* Soft Skills Survey Modal */}
+      <SoftSkillsSurveyModal
+        isOpen={showSurveyModal}
+        onClose={() => setShowSurveyModal(false)}
+        onSubmit={saveSoftSkills}
+      />
 
-        {/* Interview Prep Modal */}
-        <InterviewPrepModal
-          isOpen={showInterviewPrepModal}
-          onClose={() => setShowInterviewPrepModal(false)}
-        />
+      {/* Interview Prep Modal */}
+      <InterviewPrepModal
+        isOpen={showInterviewPrepModal}
+        onClose={() => setShowInterviewPrepModal(false)}
+      />
 
-        {/* N8N Debug Modal */}
-        <N8nDebugModal
-          open={showN8nDebugModal}
-          onOpenChange={setShowN8nDebugModal}
-          debugInfo={n8nDebugData?.debugInfo}
-          testFiles={n8nDebugData?.test_files}
-          pdfData={n8nDebugData?.pdfData}
-          htmlData={n8nDebugData?.htmlData}
-          retryLogs={n8nDebugData?.retryLogs}
-        />
+      {/* N8N Debug Modal */}
+      <N8nDebugModal
+        open={showN8nDebugModal}
+        onOpenChange={setShowN8nDebugModal}
+        debugInfo={n8nDebugData?.debugInfo}
+        testFiles={n8nDebugData?.test_files}
+        pdfData={n8nDebugData?.pdfData}
+        htmlData={n8nDebugData?.htmlData}
+        retryLogs={n8nDebugData?.retryLogs}
+      />
       </div>
+
     </>
   );
 };
