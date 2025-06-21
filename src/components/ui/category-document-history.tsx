@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileText, Calendar, Building, Eye, Edit2, Trash2, Download, MessageSquare } from 'lucide-react';
+import { FileText, Calendar, Building, Eye, Edit2, Trash2, Download, MessageSquare, Target, Edit, Zap, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -13,6 +13,7 @@ import {
   PaginationPrevious,
 } from '@/components/ui/pagination';
 import { cn } from '@/lib/utils';
+import CoverLetterVersionBadge from '@/components/cover-letter/CoverLetterVersionBadge';
 
 export interface DocumentItem {
   id: string;
@@ -147,102 +148,152 @@ export const CategoryDocumentHistoryItem: React.FC<{
     });
   };
 
+  const getDocumentIcon = () => {
+    if (document.type === 'cover_letter') {
+      return <Edit className="h-5 w-5 text-green-600 dark:text-green-400" />;
+    }
+    return <Zap className="h-5 w-5 text-orange-600 dark:text-orange-400" />;
+  };
+
+  const getDocumentIconBg = () => {
+    if (document.type === 'cover_letter') {
+      return "bg-green-50 dark:bg-green-950/20";
+    }
+    return "bg-orange-50 dark:bg-orange-950/20";
+  };
+
   const getDocumentBadge = () => {
     if (document.type === 'cover_letter') {
       const version = (document.regeneration_count || 0) + 1;
       return (
-        <Badge 
-          variant="compact" 
-          className="bg-green-100 text-green-700 border-green-300 dark:bg-green-900/20 dark:text-green-400 dark:border-green-600"
-        >
-          v{version}
-        </Badge>
+        <div className="flex items-center gap-2">
+          {version > 1 && (
+            <CoverLetterVersionBadge
+              version={version}
+              isLatest={true}
+              totalVersions={version}
+            />
+          )}
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-full border border-green-500 bg-green-100 text-green-700 dark:bg-green-950/20 dark:text-green-300 dark:border-green-800">
+            <span>Cover Letter</span>
+          </div>
+        </div>
       );
     }
-    return null;
+    return (
+      <div className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-full border border-orange-500 bg-orange-100 text-orange-700 dark:bg-orange-950/20 dark:text-orange-300 dark:border-orange-800">
+        <span>CV Analysis</span>
+      </div>
+    );
+  };
+
+  const getBorderColor = () => {
+    if (document.type === 'cover_letter') {
+      return "border-t-orange-500";
+    }
+    return "border-t-orange-500";
   };
 
   return (
     <Card 
       className={cn(
-        "hover:shadow-md transition-all duration-200 hover:border-primary/50 hover:bg-muted/50 cursor-pointer",
-        "border border-border relative"
+        "group hover:shadow-md transition-all duration-200 hover:border-primary/50 hover:bg-muted/50 cursor-pointer",
+        "border border-border relative border-t-4 h-[120px]",
+        getBorderColor()
       )}
       onClick={() => onDocumentClick?.(document)}
     >
-      {/* Document Type Badge */}
-      <Badge variant="subtle" className="absolute top-2 right-2 text-micro">
-        {document.type === 'analysis' ? 'cv analysis' : 'cover letter'}
-      </Badge>
+      {/* Document Type Badge - Top Right */}
+      <div className="absolute top-3 right-3 z-10">
+        {getDocumentBadge()}
+      </div>
       
-      <CardContent className="p-6">
-        <div className="flex justify-between items-start mb-4">
-          <div className="flex-1">
-            <div className="flex items-center space-x-3 mb-2">
-              <h3 className="text-heading font-medium text-foreground">
-                {document.title}
-                {document.company_name && ` - ${document.company_name}`}
-              </h3>
-              {getDocumentBadge()}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  // Handle edit title logic here
-                }}
-                className="p-1 h-auto text-muted-foreground hover:text-foreground"
-              >
-                <Edit2 className="h-3 w-3" />
-              </Button>
+      <CardContent className="p-4 relative h-full">
+        <div className="flex items-start space-x-4 h-full">
+          {/* Document Icon - Left */}
+          <div className="flex-shrink-0">
+            <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center", getDocumentIconBg())}>
+              {getDocumentIcon()}
+            </div>
+          </div>
+
+          {/* Content - Stacked Title/Company, Date */}
+          <div className="flex-1 min-w-0 pr-20 flex flex-col justify-between h-full">
+            <div>
+              {/* Title and Company with Edit Icon */}
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className="text-heading font-bold text-foreground truncate">
+                  {document.title}
+                  {document.company_name && ` - ${document.company_name}`}
+                </h3>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    // Handle edit title logic here
+                  }}
+                  className="h-auto p-1 hover:bg-gray-100 dark:hover:bg-gray-800"
+                >
+                  <Pencil className="h-3 w-3 text-gray-500" />
+                </Button>
+              </div>
             </div>
             
-            <div className="flex items-center space-x-4 text-caption text-muted-foreground mb-2">
-              {document.type === 'cover_letter' && (
-                <span className="text-muted-foreground">
-                  {document.analysis_result_id ? 'Generated from CV analysis' : 'Generated from manual input'}
-                </span>
-              )}
-              <div className="flex items-center space-x-1">
-                <Calendar className="h-3 w-3" />
-                <span>Updated {formatDate(document.created_at)}</span>
-              </div>
+            {/* Date */}
+            <div className="flex items-center text-caption text-muted-foreground mt-auto">
+              <Calendar className="h-3 w-3 mr-1" />
+              <span>{formatDate(document.created_at)}</span>
               {document.compatibility_score && (
-                <div className="text-primary font-medium">
-                  Score: {document.compatibility_score}%
+                <div className="flex items-center text-sm ml-4">
+                  <span className="text-sm font-bold text-[#FF6B35] mr-1">
+                    {document.compatibility_score}%
+                  </span>
+                  <span>compatibility</span>
                 </div>
               )}
             </div>
           </div>
         </div>
 
-        {/* Action buttons row at bottom */}
-        <div className="flex items-center justify-end space-x-2 pt-3 border-t border-border">
-          {actions.map((action, index) => {
-            if (action.condition && !action.condition(document)) {
-              return null;
-            }
-            
-            return (
-              <Button
-                key={index}
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  action.onClick(document);
-                }}
-                className={cn(
-                  "text-caption font-medium transition-colors h-8 px-3",
-                  action.variant === 'destructive' && "text-destructive hover:text-destructive hover:bg-destructive/10",
-                  action.variant === 'success' && "text-success hover:text-success hover:bg-success/10"
-                )}
-              >
-                {action.icon}
-                {action.label}
-              </Button>
-            );
-          })}
+        {/* Hover Menu - Bottom Right */}
+        <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+          <div className="flex items-center space-x-1">
+            {actions.map((action, index) => {
+              if (action.condition && !action.condition(document)) {
+                return null;
+              }
+              
+              return (
+                <Button
+                  key={index}
+                  variant="ghost"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    action.onClick(document);
+                  }}
+                  className={cn(
+                    "h-8 w-8 p-0 transition-colors",
+                    action.variant === 'destructive' 
+                      ? "hover:bg-red-50 dark:hover:bg-red-950/20" 
+                      : "hover:bg-gray-100 dark:hover:bg-gray-800"
+                  )}
+                >
+                  <div className={cn(
+                    "h-4 w-4",
+                    action.variant === 'destructive' 
+                      ? "text-red-600 dark:text-red-400"
+                      : action.variant === 'success'
+                      ? "text-blue-600 dark:text-blue-400"
+                      : "text-black dark:text-white"
+                  )}>
+                    {action.icon}
+                  </div>
+                </Button>
+              );
+            })}
+          </div>
         </div>
       </CardContent>
     </Card>
