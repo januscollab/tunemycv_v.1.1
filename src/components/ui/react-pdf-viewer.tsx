@@ -1,11 +1,29 @@
 
 import React, { useState, useMemo } from 'react';
-import { Document, Page, pdfjs } from 'react-pdf';
 import { ChevronLeft, ChevronRight, Download, ZoomIn, ZoomOut, RotateCw, ExternalLink } from 'lucide-react';
 import { Button } from './button';
 import { cn } from '@/lib/utils';
-import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
-import 'react-pdf/dist/esm/Page/TextLayer.css';
+
+// Dynamic imports to avoid module resolution conflicts
+let Document: any, Page: any, pdfjs: any;
+
+const loadPDFComponents = async () => {
+  try {
+    const reactPdf = await import('react-pdf');
+    Document = reactPdf.Document;
+    Page = reactPdf.Page;
+    pdfjs = reactPdf.pdfjs;
+    
+    // Import CSS files dynamically
+    await import('react-pdf/dist/esm/Page/AnnotationLayer.css');
+    await import('react-pdf/dist/esm/Page/TextLayer.css');
+    
+    return true;
+  } catch (error) {
+    console.error('Failed to load PDF components:', error);
+    return false;
+  }
+};
 
 interface ReactPDFViewerProps {
   pdfData: string;
@@ -26,6 +44,18 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
   const [rotation, setRotation] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [pdfComponentsLoaded, setPdfComponentsLoaded] = useState(false);
+
+  // Load PDF components on mount
+  React.useEffect(() => {
+    loadPDFComponents().then((loaded) => {
+      setPdfComponentsLoaded(loaded);
+      if (!loaded) {
+        setError('PDF viewer components failed to load');
+        setIsLoading(false);
+      }
+    });
+  }, []);
 
   // Create PDF data URL with proper error handling
   const pdfDataUrl = useMemo(() => {
@@ -136,6 +166,58 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
     );
   }
 
+  // Handle case where PDF components failed to load
+  if (!pdfComponentsLoaded) {
+    return (
+      <div className={cn('border rounded-lg overflow-hidden', className)}>
+        {/* Header */}
+        <div className="bg-muted/50 px-4 py-3 border-b flex items-center justify-between">
+          <div>
+            <h3 className="font-medium text-sm">{title}</h3>
+            {fileName && (
+              <p className="text-xs text-muted-foreground">{fileName}</p>
+            )}
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" onClick={downloadPDF}>
+              <Download className="h-4 w-4" />
+            </Button>
+            
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={openInNewTab}
+              title="Open in new tab"
+            >
+              <ExternalLink className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+
+        {/* Fallback content */}
+        <div className="relative bg-gray-100 dark:bg-gray-900 min-h-[600px] flex items-center justify-center">
+          <div className="text-center text-muted-foreground max-w-md mx-auto p-4">
+            <svg className="mx-auto h-12 w-12 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <p className="text-sm mb-4">PDF viewer unavailable</p>
+            <div className="flex gap-2 justify-center">
+              <Button onClick={downloadPDF} size="sm">
+                <Download className="h-4 w-4 mr-2" />
+                Download PDF
+              </Button>
+              <Button onClick={openInNewTab} variant="outline" size="sm">
+                <ExternalLink className="h-4 w-4 mr-2" />
+                Open in New Tab
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={cn('border rounded-lg overflow-hidden', className)}>
       {/* Header */}
@@ -231,7 +313,7 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
           </div>
         )}
 
-        {!error && (
+        {!error && Document && Page && (
           <div className="flex justify-center p-4">
             <Document
               file={pdfDataUrl}

@@ -23,7 +23,10 @@ export default defineConfig(({ mode }) => ({
   },
   optimizeDeps: {
     exclude: ['react-pdf'],
-    include: ['react', 'react-dom', 'react-helmet-async']
+    include: ['react', 'react-dom', 'react-helmet-async', 'pdfjs-dist'],
+    esbuildOptions: {
+      target: 'esnext'
+    }
   },
   define: {
     global: 'globalThis',
@@ -31,6 +34,17 @@ export default defineConfig(({ mode }) => ({
   build: {
     rollupOptions: {
       external: [],
+      output: {
+        format: 'es'
+      }
+    },
+    target: 'esnext',
+    commonjsOptions: {
+      include: [/node_modules/],
+      transformMixedEsModules: true
     }
+  },
+  esbuild: {
+    target: 'esnext'
   }
 }));
