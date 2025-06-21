@@ -126,55 +126,52 @@ const N8nAnalysisResults: React.FC<N8nAnalysisResultsProps> = ({
         </div>
       )}
 
-      {/* Compact Analysis Summary */}
-      <Card className="border border-apple-core/20 dark:border-citrus/20">
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              {/* Compatibility Score - Compact Badge */}
-              {result.compatibility_score && (
-                <div className="bg-primary/10 rounded-lg px-3 py-2 border border-primary/20">
-                  <span className="text-lg font-bold text-primary">
-                    {result.compatibility_score}%
-                  </span>
-                </div>
-              )}
-              
-              {/* Position and Company - Inline */}
-              <div>
-                <p className="text-body font-semibold text-foreground">
-                  {getJobTitle()}
-                </p>
-                <p className="text-caption text-muted-foreground">
-                  {getCompanyName()}
-                </p>
+      {/* Modern Analysis Header */}
+      <div className="bg-gradient-to-r from-surface to-surface-secondary border border-border rounded-2xl p-8 mb-8 shadow-lg backdrop-blur-sm">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-6">
+            {/* Compatibility Score - Modern Badge */}
+            {result.compatibility_score && (
+              <div className="bg-primary/15 rounded-xl px-6 py-4 border border-primary/30 shadow-md">
+                <span className="text-3xl font-bold text-primary">
+                  {result.compatibility_score}%
+                </span>
+                <p className="text-caption text-muted-foreground mt-1">Match Score</p>
               </div>
-            </div>
+            )}
             
-            {/* Action Buttons */}
-            <div className="flex items-center gap-2">
-              <Button
-                onClick={handleHtmlPreview}
-                variant="ghost"
-                size="sm"
-                className="menu-text-animation text-caption text-foreground hover:text-primary"
-              >
-                <ExternalLink className="h-4 w-4 mr-2" />
-                Review in Browser
-              </Button>
-              <DownloadMenu
-                buttonText="Download"
-                variant="outline"
-                size="sm"
-                className="menu-text-animation text-caption text-foreground hover:text-primary"
-                onDownloadPDF={result.n8n_pdf_url ? () => handleDownload(result.n8n_pdf_url!, 'pdf') : undefined}
-                onDownloadWord={() => console.log('Word download not implemented for n8n reports')}
-                onDownloadText={() => console.log('Text download not implemented for n8n reports')}
-              />
+            {/* Position and Company - Modern Layout */}
+            <div className="space-y-1">
+              <h1 className="text-heading font-semibold text-foreground">
+                {getJobTitle()}
+              </h1>
+              <p className="text-subheading text-muted-foreground">
+                {getCompanyName()}
+              </p>
             </div>
           </div>
-        </CardContent>
-      </Card>
+          
+          {/* Action Buttons - Modern Style */}
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={handleHtmlPreview}
+              className="group flex items-center space-x-3 px-6 py-3 text-foreground-secondary hover:text-foreground bg-surface-tertiary hover:bg-surface-hover rounded-xl transition-all duration-300 font-normal border border-border hover:border-primary/30 hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <ExternalLink className="h-5 w-5 transition-transform group-hover:scale-110" />
+              <span className="text-subheading">Review in Browser</span>
+            </button>
+            <DownloadMenu
+              buttonText="Download Report"
+              variant="default"
+              size="default"
+              className="group flex items-center space-x-3 px-6 py-3 bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl transition-all duration-300 font-normal shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] border border-primary/20"
+              onDownloadPDF={result.n8n_pdf_url ? () => handleDownload(result.n8n_pdf_url!, 'pdf') : undefined}
+              onDownloadWord={() => console.log('Word download not implemented for n8n reports')}
+              onDownloadText={() => console.log('Text download not implemented for n8n reports')}
+            />
+          </div>
+        </div>
+      </div>
 
       {/* PDF Viewer */}
       {result.pdf_file_data ? (
