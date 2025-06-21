@@ -126,23 +126,6 @@ const N8nAnalysisResults: React.FC<N8nAnalysisResultsProps> = ({
         </div>
       )}
 
-      {/* Modern Analysis Header - Simplified without action buttons */}
-      <div className="bg-gradient-to-r from-surface to-surface-secondary border border-border rounded-2xl p-8 mb-8 shadow-lg backdrop-blur-sm">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-6">
-            {/* Position and Company - Modern Layout */}
-            <div className="space-y-1">
-              <h1 className="text-heading font-semibold text-foreground">
-                {getJobTitle()}
-              </h1>
-              <p className="text-subheading text-muted-foreground">
-                {getCompanyName()}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* PDF Viewer */}
       {result.pdf_file_data ? (
         <UnifiedPDFViewer
