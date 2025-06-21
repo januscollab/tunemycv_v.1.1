@@ -631,7 +631,7 @@ const DesignSystem = () => {
     }
   ];
 
-  const componentExamples = [
+  const designSystemComponents = [
     {
       name: "VybeButton",
       component: (
@@ -713,15 +713,26 @@ const DesignSystem = () => {
     {
       name: "EnhancedCoverLetterHistory",
       component: (
-        <div className="max-w-4xl">
-          <EnhancedCoverLetterHistory 
-            onSelectCoverLetter={(coverLetter) => console.log('Selected:', coverLetter)}
-            className="border rounded-lg p-4"
-          />
+        <div className="h-96 overflow-hidden">
+          <EnhancedCoverLetterHistory className="h-full" />
         </div>
       ),
-      usage: 3,
-      description: "Advanced cover letter history management component with search, pagination, and document actions"
+      props: [
+        { name: "onSelectCoverLetter", type: "(coverLetter: CoverLetterItem) => void", description: "Callback when a cover letter is selected" },
+        { name: "className", type: "string", description: "Additional CSS classes" }
+      ]
+    },
+    {
+      name: "EnhancedInterviewPrepHistory",
+      component: (
+        <div className="h-96 overflow-hidden">
+          <EnhancedInterviewPrepHistory className="h-full" />
+        </div>
+      ),
+      props: [
+        { name: "onSelectInterviewPrep", type: "(interviewPrep: InterviewPrepItem) => void", description: "Callback when an interview prep is selected" },
+        { name: "className", type: "string", description: "Additional CSS classes" }
+      ]
     }
   ];
 
@@ -750,819 +761,802 @@ const DesignSystem = () => {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
-        {/* Overview Section */}
-        <div className="mb-12">
-          <div className="text-center max-w-3xl mx-auto">
-            <h2 className="text-display font-bold text-foreground mb-4">
-              TuneMyCV Design System
-            </h2>
-            <p className="text-subheading text-muted-foreground mb-8">
-              A comprehensive design system built for consistency, accessibility, and scalability.
-              All components use semantic tokens that automatically adapt to light and dark themes.
-            </p>
-            
-          </div>
-        </div>
+      <main className="container mx-auto px-4 py-8">
+        <div className="space-y-12">
+          {/* Tabbed Navigation */}
+          <Tabs defaultValue="foundations" className="w-full">
+            <TabsList className="grid w-full grid-cols-6">
+              <TabsTrigger value="foundations">Foundations</TabsTrigger>
+              <TabsTrigger value="components">Components</TabsTrigger>
+              <TabsTrigger value="rte">Rich Text Editor</TabsTrigger>
+              <TabsTrigger value="interactions">Interactions & Loading</TabsTrigger>
+              <TabsTrigger value="missing">Missing Docs</TabsTrigger>
+            </TabsList>
 
-        {/* Tabbed Navigation */}
-        <Tabs defaultValue="foundations" className="w-full">
-          <TabsList className="grid w-full grid-cols-6">
-            <TabsTrigger value="foundations">Foundations</TabsTrigger>
-            <TabsTrigger value="components">Components</TabsTrigger>
-            <TabsTrigger value="rte">Rich Text Editor</TabsTrigger>
-            <TabsTrigger value="interactions">Interactions & Loading</TabsTrigger>
-            <TabsTrigger value="missing">Missing Docs</TabsTrigger>
-          </TabsList>
-
-          {/* Foundations Tab */}
-          <TabsContent value="foundations" className="space-y-8">
-            {/* Color System */}
-            <section>
-              <h2 className="text-title font-bold text-foreground mb-8 flex items-center gap-3">
-                <Palette className="h-6 w-6 text-primary" />
-                Color System
-              </h2>
-              
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {colorTokens.map((token) => (
-                  <Card key={token.name} className="group hover:shadow-lg transition-all duration-300">
-                    <CardContent className="p-0">
-                      <div className={`${token.class} h-24 rounded-t-lg relative overflow-hidden`}>
-                        <div className="absolute top-2 right-2">
-                          <Badge variant="secondary" className="text-micro">
-                            {token.usage}
-                          </Badge>
-                        </div>
-                      </div>
-                      <div className="p-4">
-                        <h3 className="text-subheading font-semibold text-foreground mb-2">{token.name}</h3>
-                        <p className="text-caption text-muted-foreground mb-3">{token.description}</p>
-                        <div className="space-y-1">
-                          <div className="flex justify-between text-micro">
-                            <span className="text-muted-foreground">Light:</span>
-                            <code className="text-foreground font-mono">{token.lightHex}</code>
-                          </div>
-                          <div className="flex justify-between text-micro">
-                            <span className="text-muted-foreground">Dark:</span>
-                            <code className="text-foreground font-mono">{token.darkHex}</code>
-                          </div>
-                          <div className="flex justify-between text-micro">
-                            <span className="text-muted-foreground">CSS:</span>
-                            <code className="text-foreground font-mono">{token.class}</code>
+            {/* Foundations Tab */}
+            <TabsContent value="foundations" className="space-y-8">
+              {/* Color System */}
+              <section>
+                <h2 className="text-title font-bold text-foreground mb-8 flex items-center gap-3">
+                  <Palette className="h-6 w-6 text-primary" />
+                  Color System
+                </h2>
+                
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  {colorTokens.map((token) => (
+                    <Card key={token.name} className="group hover:shadow-lg transition-all duration-300">
+                      <CardContent className="p-0">
+                        <div className={`${token.class} h-24 rounded-t-lg relative overflow-hidden`}>
+                          <div className="absolute top-2 right-2">
+                            <Badge variant="secondary" className="text-micro">
+                              {token.usage}
+                            </Badge>
                           </div>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </section>
-
-            {/* Typography System */}
-            <section>
-              <h2 className="text-title font-bold text-foreground mb-8 flex items-center gap-3">
-                <Type className="h-6 w-6 text-primary" />
-                Typography System
-              </h2>
-              
-              {/* Font Families */}
-              <div className="mb-8">
-                <h3 className="text-heading font-semibold mb-4">Font Families</h3>
-                <div className="grid gap-4 md:grid-cols-2">
-                  {fontFamilies.map((font) => (
-                    <Card key={font.name} className="p-6">
-                      <div className="mb-3">
-                        <div className="flex items-center justify-between mb-2">
-                          <h4 className="text-subheading font-medium">{font.name}</h4>
-                          <Badge variant="outline">{font.cssClass}</Badge>
+                        <div className="p-4">
+                          <h3 className="text-subheading font-semibold text-foreground mb-2">{token.name}</h3>
+                          <p className="text-caption text-muted-foreground mb-3">{token.description}</p>
+                          <div className="space-y-1">
+                            <div className="flex justify-between text-micro">
+                              <span className="text-muted-foreground">Light:</span>
+                              <code className="text-foreground font-mono">{token.lightHex}</code>
+                            </div>
+                            <div className="flex justify-between text-micro">
+                              <span className="text-muted-foreground">Dark:</span>
+                              <code className="text-foreground font-mono">{token.darkHex}</code>
+                            </div>
+                            <div className="flex justify-between text-micro">
+                              <span className="text-muted-foreground">CSS:</span>
+                              <code className="text-foreground font-mono">{token.class}</code>
+                            </div>
+                          </div>
                         </div>
-                        <p className="text-caption text-muted-foreground">{font.usage}</p>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </section>
+
+              {/* Typography System */}
+              <section>
+                <h2 className="text-title font-bold text-foreground mb-8 flex items-center gap-3">
+                  <Type className="h-6 w-6 text-primary" />
+                  Typography System
+                </h2>
+                
+                {/* Font Families */}
+                <div className="mb-8">
+                  <h3 className="text-heading font-semibold mb-4">Font Families</h3>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {fontFamilies.map((font) => (
+                      <Card key={font.name} className="p-6">
+                        <div className="mb-3">
+                          <div className="flex items-center justify-between mb-2">
+                            <h4 className="text-subheading font-medium">{font.name}</h4>
+                            <Badge variant="outline">{font.cssClass}</Badge>
+                          </div>
+                          <p className="text-caption text-muted-foreground">{font.usage}</p>
+                        </div>
+                        {font.element}
+                        <div className="mt-3 text-micro text-muted-foreground">
+                          Fallbacks: {font.fallbacks}
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Typography Scale */}
+                <div className="mb-8">
+                  <h3 className="text-heading font-semibold mb-4">Typography Scale</h3>
+                  <div className="space-y-6">
+                    {typographyElements.map((element) => (
+                      <Card key={element.name} className="p-6">
+                        <div className="flex items-start justify-between mb-4">
+                          <div>
+                            <h4 className="text-subheading font-medium mb-1">{element.name}</h4>
+                            <div className="flex items-center gap-4">
+                              <Badge variant="outline">{element.semantic}</Badge>
+                              <span className="text-caption text-muted-foreground">{element.usage}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="bg-muted/30 p-4 rounded-lg">
+                          {element.element}
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              </section>
+
+              {/* Experimental Color Elements */}
+              <section>
+                <h2 className="text-title font-bold text-foreground mb-8 flex items-center gap-3">
+                  <AlertTriangle className="h-6 w-6 text-warning" />
+                  Experimental Color Elements
+                </h2>
+                <p className="text-body text-muted-foreground mb-6">
+                  These are experimental color components that may be used for inspiration or future implementation.
+                </p>
+                
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  {experimentalColorElements.map((element, index) => (
+                    <Card key={index} className="p-4 hover:shadow-lg transition-all duration-300">
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="text-caption font-medium">{element.name}</h3>
+                        <Badge variant="outline" className="text-tiny">Experimental</Badge>
                       </div>
-                      {font.element}
-                      <div className="mt-3 text-micro text-muted-foreground">
-                        Fallbacks: {font.fallbacks}
+                      <div className="bg-muted/30 p-3 rounded-lg flex items-center justify-center min-h-[60px]">
+                        {element.component}
                       </div>
                     </Card>
                   ))}
                 </div>
-              </div>
+              </section>
+            </TabsContent>
 
-              {/* Typography Scale */}
-              <div className="mb-8">
-                <h3 className="text-heading font-semibold mb-4">Typography Scale</h3>
-                <div className="space-y-6">
-                  {typographyElements.map((element) => (
-                    <Card key={element.name} className="p-6">
-                      <div className="flex items-start justify-between mb-4">
-                        <div>
-                          <h4 className="text-subheading font-medium mb-1">{element.name}</h4>
-                          <div className="flex items-center gap-4">
-                            <Badge variant="outline">{element.semantic}</Badge>
-                            <span className="text-caption text-muted-foreground">{element.usage}</span>
+            {/* Components Tab */}
+            <TabsContent value="components" className="space-y-8">
+              {/* Input Components */}
+              <section>
+                <h2 className="text-title font-bold text-foreground mb-8 flex items-center gap-3">
+                  <Square className="h-6 w-6 text-primary" />
+                  Input Components
+                </h2>
+                
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {inputComponents.map((input, index) => (
+                    <Card key={index} className="group hover:shadow-lg transition-all duration-300">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-subheading">{input.name}</CardTitle>
+                          <div className="flex items-center gap-2">
+                            <Badge variant={input.status === 'current' ? 'default' : input.status === 'legacy' ? 'secondary' : 'outline'}>
+                              {input.status}
+                            </Badge>
+                            <Badge variant="outline" className="text-micro">
+                              {input.usage}
+                            </Badge>
                           </div>
                         </div>
-                      </div>
-                      <div className="bg-muted/30 p-4 rounded-lg">
-                        {element.element}
-                      </div>
+                        <p className="text-caption text-muted-foreground">
+                          {input.description}
+                        </p>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="bg-muted/30 p-4 rounded-lg mb-4">
+                          {input.component}
+                        </div>
+                        <div className="text-micro text-muted-foreground bg-muted/50 p-2 rounded border-l-2 border-primary/50">
+                          <strong>Migration:</strong> {input.migration}
+                        </div>
+                      </CardContent>
                     </Card>
                   ))}
                 </div>
-              </div>
-            </section>
+              </section>
 
-            {/* Experimental Color Elements */}
-            <section>
-              <h2 className="text-title font-bold text-foreground mb-8 flex items-center gap-3">
-                <AlertTriangle className="h-6 w-6 text-warning" />
-                Experimental Color Elements
-              </h2>
-              <p className="text-body text-muted-foreground mb-6">
-                These are experimental color components that may be used for inspiration or future implementation.
-              </p>
-              
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {experimentalColorElements.map((element, index) => (
-                  <Card key={index} className="p-4 hover:shadow-lg transition-all duration-300">
-                    <div className="flex items-center justify-between mb-3">
-                      <h3 className="text-caption font-medium">{element.name}</h3>
-                      <Badge variant="outline" className="text-tiny">Experimental</Badge>
-                    </div>
-                    <div className="bg-muted/30 p-3 rounded-lg flex items-center justify-center min-h-[60px]">
-                      {element.component}
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            </section>
-          </TabsContent>
-
-          {/* Components Tab */}
-          <TabsContent value="components" className="space-y-8">
-            {/* Input Components */}
-            <section>
-              <h2 className="text-title font-bold text-foreground mb-8 flex items-center gap-3">
-                <Square className="h-6 w-6 text-primary" />
-                Input Components
-              </h2>
-              
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {inputComponents.map((input, index) => (
-                  <Card key={index} className="group hover:shadow-lg transition-all duration-300">
-                    <CardHeader className="pb-3">
-                      <div className="flex items-center justify-between">
-                        <CardTitle className="text-subheading">{input.name}</CardTitle>
-                        <div className="flex items-center gap-2">
-                          <Badge variant={input.status === 'current' ? 'default' : input.status === 'legacy' ? 'secondary' : 'outline'}>
-                            {input.status}
-                          </Badge>
+              {/* Button System */}
+              <section>
+                <h2 className="text-title font-bold text-foreground mb-8 flex items-center gap-3">
+                  <MousePointer className="h-6 w-6 text-primary" />
+                  Button System
+                </h2>
+                
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {buttonVariants.map((button, index) => (
+                    <Card key={index} className="group hover:shadow-lg transition-all duration-300">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-subheading">{button.name}</CardTitle>
                           <Badge variant="outline" className="text-micro">
-                            {input.usage}
+                            {button.usage}
                           </Badge>
                         </div>
-                      </div>
-                      <p className="text-caption text-muted-foreground">
-                        {input.description}
-                      </p>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="bg-muted/30 p-4 rounded-lg mb-4">
-                        {input.component}
-                      </div>
-                      <div className="text-micro text-muted-foreground bg-muted/50 p-2 rounded border-l-2 border-primary/50">
-                        <strong>Migration:</strong> {input.migration}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </section>
+                        <p className="text-caption text-muted-foreground">
+                          {button.description}
+                        </p>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="bg-muted/30 p-4 rounded-lg flex items-center justify-center">
+                          <Button variant={button.variant as any} size="default">
+                            {button.name} Button
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </section>
 
-            {/* Button System */}
-            <section>
-              <h2 className="text-title font-bold text-foreground mb-8 flex items-center gap-3">
-                <MousePointer className="h-6 w-6 text-primary" />
-                Button System
-              </h2>
-              
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {buttonVariants.map((button, index) => (
-                  <Card key={index} className="group hover:shadow-lg transition-all duration-300">
+              {/* Design System Components */}
+              <section>
+                <h2 className="text-title font-bold text-foreground mb-8 flex items-center gap-3">
+                  <Grid className="h-6 w-6 text-primary" />
+                  Design System Components
+                </h2>
+                
+                <div className="grid gap-6">
+                  {designSystemComponents.map((component, index) => (
+                    <Card key={index} className="group hover:shadow-lg transition-all duration-300">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-subheading">{component.name}</CardTitle>
+                          <Badge variant="default" className="text-micro">
+                            {component.usage} usages
+                          </Badge>
+                        </div>
+                        <p className="text-caption text-muted-foreground">
+                          {component.description}
+                        </p>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="bg-muted/30 p-4 rounded-lg">
+                          {component.component}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </section>
+
+              {/* Enhanced History Components */}
+              <div className="space-y-8">
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Enhanced Cover Letter History</h3>
+                  <EnhancedCoverLetterHistory className="max-w-4xl" />
+                </div>
+                
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Enhanced Interview Prep History</h3>
+                  <EnhancedInterviewPrepHistory className="max-w-4xl" />
+                </div>
+              </div>
+
+              {/* History Components Section */}
+              <section>
+                <div className="mb-8">
+                  <h2 className="text-2xl font-bold mb-2">History & Analysis Components</h2>
+                  <p className="text-muted-foreground">Components for displaying user history and analysis results</p>
+                </div>
+                
+                <div className="grid gap-8">
+                  <Card className="group hover:shadow-lg transition-all duration-300">
                     <CardHeader className="pb-3">
                       <div className="flex items-center justify-between">
-                        <CardTitle className="text-subheading">{button.name}</CardTitle>
-                        <Badge variant="outline" className="text-micro">
-                          {button.usage}
-                        </Badge>
+                        <CardTitle className="text-subheading">EnhancedAnalysisHistory</CardTitle>
+                        <Badge variant="default" className="text-micro">Current</Badge>
                       </div>
                       <p className="text-caption text-muted-foreground">
-                        {button.description}
+                        Advanced analysis history with view, download, delete actions and CTA buttons for generating cover letters and interview prep.
                       </p>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="bg-muted/30 p-4 rounded-lg flex items-center justify-center">
-                        <Button variant={button.variant as any} size="default">
-                          {button.name} Button
-                        </Button>
+                      <div className="text-micro text-muted-foreground mt-2">
+                        <strong>Used in:</strong> src/pages/AnalyzeCV.tsx
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </section>
-
-            {/* Design System Components */}
-            <section>
-              <h2 className="text-title font-bold text-foreground mb-8 flex items-center gap-3">
-                <Grid className="h-6 w-6 text-primary" />
-                Design System Components
-              </h2>
-              
-              <div className="grid gap-6">
-                {componentExamples.map((component, index) => (
-                  <Card key={index} className="group hover:shadow-lg transition-all duration-300">
-                    <CardHeader className="pb-3">
-                      <div className="flex items-center justify-between">
-                        <CardTitle className="text-subheading">{component.name}</CardTitle>
-                        <Badge variant="default" className="text-micro">
-                          {component.usage} usages
-                        </Badge>
-                      </div>
-                      <p className="text-caption text-muted-foreground">
-                        {component.description}
-                      </p>
                     </CardHeader>
                     <CardContent>
                       <div className="bg-muted/30 p-4 rounded-lg">
-                        {component.component}
+                        <EnhancedAnalysisHistory className="w-full" />
                       </div>
                     </CardContent>
                   </Card>
-                ))}
-              </div>
-            </section>
 
-            {/* Enhanced History Components */}
-            <div className="space-y-8">
-              <div>
-                <h3 className="text-lg font-semibold mb-4">Enhanced Cover Letter History</h3>
-                <EnhancedCoverLetterHistory className="max-w-4xl" />
-              </div>
-              
-              <div>
-                <h3 className="text-lg font-semibold mb-4">Enhanced Interview Prep History</h3>
-                <EnhancedInterviewPrepHistory className="max-w-4xl" />
-              </div>
-            </div>
-
-            {/* History Components Section */}
-            <section>
-              <h2 className="text-title font-bold text-foreground mb-8 flex items-center gap-3">
-                <HistoryIcon className="h-6 w-6 text-primary" />
-                History Components
-              </h2>
-              
-              <div className="w-[80%] mx-auto grid gap-6 grid-cols-1">
-
-                {/* EnhancedAnalysisHistory */}
-                <Card className="group hover:shadow-lg transition-all duration-300">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-subheading">EnhancedAnalysisHistory</CardTitle>
-                      <Badge variant="default" className="text-micro">Current</Badge>
-                    </div>
-                    <p className="text-caption text-muted-foreground">
-                      Advanced analysis history with view, download, delete actions and CTA buttons for generating cover letters and interview prep.
-                    </p>
-                    <div className="text-micro text-muted-foreground mt-2">
-                      <strong>Used in:</strong> src/pages/AnalyzeCV.tsx
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="bg-muted/30 p-4 rounded-lg">
-                      <EnhancedAnalysisHistory className="w-full" />
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* CategoryDocumentHistory */}
-                <Card className="group hover:shadow-lg transition-all duration-300">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-subheading">CategoryDocumentHistory</CardTitle>
-                      <Badge variant="secondary" className="text-micro">Restored</Badge>
-                    </div>
-                    <p className="text-caption text-muted-foreground">
-                      Categorized document history with comprehensive filtering, sorting, and management capabilities.
-                    </p>
-                    <div className="text-micro text-muted-foreground mt-2">
-                      <strong>Used in:</strong> src/pages/CoverLetter.tsx, src/pages/InterviewToolkit.tsx
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="bg-muted/30 p-4 rounded-lg">
-                      <CategoryDocumentHistory
-                        header={{
-                          title: "Sample Document History",
-                          totalCount: 5,
-                          itemsPerPage: 10,
-                          onItemsPerPageChange: () => {}
-                        }}
-                        documents={[
-                          {
-                            id: "1",
-                            type: "cover_letter",
-                            title: "Software Engineer Cover Letter",
-                            created_at: new Date().toISOString(),
-                            job_title: "Software Engineer"
-                          },
-                          {
-                            id: "2", 
-                            type: "analysis",
-                            title: "CV Analysis Report",
-                            created_at: new Date().toISOString(),
-                            compatibility_score: 85
-                          }
-                        ]}
-                        actions={[
-                          { label: "View", onClick: () => {}, icon: <Eye className="h-4 w-4 mr-2" /> },
-                          { label: "Download", onClick: () => {}, icon: <Download className="h-4 w-4 mr-2" /> }
-                        ]}
-                        className="w-full"
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* ProfileDocumentHistory */}
-                <Card className="group hover:shadow-lg transition-all duration-300">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-subheading">ProfileDocumentHistory</CardTitle>
-                      <Badge variant="secondary" className="text-micro">Restored</Badge>
-                    </div>
-                    <p className="text-caption text-muted-foreground">
-                      Profile-specific document history component for user profile management interfaces.
-                    </p>
-                    <div className="text-micro text-muted-foreground mt-2">
-                      <strong>Used in:</strong> src/components/profile/AnalysisHistoryTab.tsx, src/components/profile/DocumentHistoryTab.tsx
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="bg-muted/30 p-4 rounded-lg">
-                      <ProfileDocumentHistory
-                        header={{
-                          title: "User Documents",
-                          totalCount: 2,
-                          filterType: "all",
-                          onFilterChange: () => {},
-                          itemsPerPage: 10,
-                          onItemsPerPageChange: () => {}
-                        }}
-                        documents={[
-                          {
-                            id: "1",
-                            type: "analysis",
-                            title: "Senior Developer CV",
-                            created_at: new Date().toISOString(),
-                            compatibility_score: 92
-                          },
-                          {
-                            id: "2",
-                            type: "cover_letter", 
-                            title: "Marketing Manager Application",
-                            created_at: new Date().toISOString(),
-                            job_title: "Marketing Manager"
-                          }
-                        ]}
-                        actions={[
-                          { label: "Edit", onClick: () => {}, icon: <Eye className="h-4 w-4 mr-2" /> },
-                          { label: "View", onClick: () => {}, icon: <Eye className="h-4 w-4 mr-2" /> },
-                          { label: "Download", onClick: () => {}, icon: <Download className="h-4 w-4 mr-2" /> }
-                        ]}
-                        className="w-full"
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
-
-              </div>
-            </section>
-          </TabsContent>
-
-          {/* Rich Text Editor Tab */}
-          <TabsContent value="rte" className="mt-6">
-            <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Type className="h-5 w-5 text-primary mr-2" />
-                    Rich Text Editor Components
-                  </CardTitle>
-                  <p className="text-caption text-muted-foreground">
-                    Modular rich text editor with multiple variants, states, and AI-powered features for content editing throughout the application.
-                  </p>
-                </CardHeader>
-                <CardContent className="space-y-8">
-                  {richTextEditorExamples.map((example, index) => (
-                    <div key={index} className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h3 className="text-subheading font-semibold">{example.name}</h3>
-                          <p className="text-caption text-muted-foreground">{example.description}</p>
-                        </div>
-                        <Badge variant="outline" className="text-micro">
-                          {example.usage}
-                        </Badge>
-                      </div>
-                      <div className="border border-border rounded-lg p-4 bg-background">
-                        {example.component}
-                      </div>
-                      {index < richTextEditorExamples.length - 1 && <Separator />}
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-
-              {/* Implementation Guidelines */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Implementation Guidelines</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-3">
-                      <h4 className="text-body font-semibold">Usage Patterns</h4>
-                      <ul className="text-caption space-y-1 text-muted-foreground">
-                        <li>• Use <code>default</code> variant for main content editing</li>
-                        <li>• Enable AI features for advanced editing workflows</li>
-                        <li>• Use read-only mode for content display</li>
-                        <li>• All menu items are left-aligned with adequate spacing</li>
-                        <li>• Save and download functionality included by default</li>
-                      </ul>
-                    </div>
-                    <div className="space-y-3">
-                      <h4 className="text-body font-semibold">Technical Notes</h4>
-                      <ul className="text-caption space-y-1 text-muted-foreground">
-                        <li>• Built on ReactQuill with custom styling</li>
-                        <li>• Supports theming with design tokens</li>
-                        <li>• Includes AI context selection features</li>
-                        <li>• Responsive and accessibility-compliant</li>
-                        <li>• Modular CSS with variant support</li>
-                      </ul>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          {/* Interactions Tab */}
-          <TabsContent value="interactions" className="space-y-8">
-            {/* Animation System */}
-            <section>
-              <h2 className="text-title font-bold text-foreground mb-8 flex items-center gap-3">
-                <Zap className="h-6 w-6 text-primary" />
-                Animation System
-              </h2>
-              
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {animationTypes.map((animation, index) => (
-                  <Card key={index} className="group hover:shadow-lg transition-all duration-300">
+                  {/* CategoryDocumentHistory */}
+                  <Card className="group hover:shadow-lg transition-all duration-300">
                     <CardHeader className="pb-3">
                       <div className="flex items-center justify-between">
-                        <CardTitle className="text-subheading">{animation.name}</CardTitle>
-                        <Badge variant="outline" className="text-micro">
-                          {animation.usage}
-                        </Badge>
+                        <CardTitle className="text-subheading">CategoryDocumentHistory</CardTitle>
+                        <Badge variant="secondary" className="text-micro">Restored</Badge>
                       </div>
                       <p className="text-caption text-muted-foreground">
-                        {animation.description}
+                        Categorized document history with comprehensive filtering, sorting, and management capabilities.
                       </p>
+                      <div className="text-micro text-muted-foreground mt-2">
+                        <strong>Used in:</strong> src/pages/CoverLetter.tsx, src/pages/InterviewToolkit.tsx
+                      </div>
                     </CardHeader>
                     <CardContent>
-                      <div className="bg-muted/30 p-4 rounded-lg flex items-center justify-center min-h-[80px]">
-                        {animation.example}
+                      <div className="bg-muted/30 p-4 rounded-lg">
+                        <CategoryDocumentHistory
+                          header={{
+                            title: "Sample Document History",
+                            totalCount: 5,
+                            itemsPerPage: 10,
+                            onItemsPerPageChange: () => {}
+                          }}
+                          documents={[
+                            {
+                              id: "1",
+                              type: "cover_letter",
+                              title: "Software Engineer Cover Letter",
+                              created_at: new Date().toISOString(),
+                              job_title: "Software Engineer"
+                            },
+                            {
+                              id: "2", 
+                              type: "analysis",
+                              title: "CV Analysis Report",
+                              created_at: new Date().toISOString(),
+                              compatibility_score: 85
+                            }
+                          ]}
+                          actions={[
+                            { label: "View", onClick: () => {}, icon: <Eye className="h-4 w-4 mr-2" /> },
+                            { label: "Download", onClick: () => {}, icon: <Download className="h-4 w-4 mr-2" /> }
+                          ]}
+                          className="w-full"
+                        />
                       </div>
                     </CardContent>
                   </Card>
-                ))}
-              </div>
-            </section>
 
-            {/* Interaction Components */}
-            <section>
-              <h2 className="text-title font-bold text-foreground mb-8 flex items-center gap-3">
-                <Layers className="h-6 w-6 text-primary" />
-                Interaction Components
-              </h2>
-              
-              <div className="grid gap-6 md:grid-cols-2">
-                {interactionExamples.map((interaction, index) => (
-                  <Card key={index} className="group hover:shadow-lg transition-all duration-300">
+                  {/* ProfileDocumentHistory */}
+                  <Card className="group hover:shadow-lg transition-all duration-300">
                     <CardHeader className="pb-3">
                       <div className="flex items-center justify-between">
-                        <CardTitle className="text-subheading">{interaction.name}</CardTitle>
-                        <Badge variant="outline" className="text-micro">
-                          {interaction.usage}
-                        </Badge>
+                        <CardTitle className="text-subheading">ProfileDocumentHistory</CardTitle>
+                        <Badge variant="secondary" className="text-micro">Restored</Badge>
                       </div>
                       <p className="text-caption text-muted-foreground">
-                        {interaction.description}
+                        Profile-specific document history component for user profile management interfaces.
                       </p>
+                      <div className="text-micro text-muted-foreground mt-2">
+                        <strong>Used in:</strong> src/components/profile/AnalysisHistoryTab.tsx, src/components/profile/DocumentHistoryTab.tsx
+                      </div>
                     </CardHeader>
                     <CardContent>
-                      <div className="bg-muted/30 p-4 rounded-lg flex items-center justify-center min-h-[100px]">
-                        {interaction.component}
+                      <div className="bg-muted/30 p-4 rounded-lg">
+                        <ProfileDocumentHistory
+                          header={{
+                            title: "User Documents",
+                            totalCount: 2,
+                            filterType: "all",
+                            onFilterChange: () => {},
+                            itemsPerPage: 10,
+                            onItemsPerPageChange: () => {}
+                          }}
+                          documents={[
+                            {
+                              id: "1",
+                              type: "analysis",
+                              title: "Senior Developer CV",
+                              created_at: new Date().toISOString(),
+                              compatibility_score: 92
+                            },
+                            {
+                              id: "2",
+                              type: "cover_letter", 
+                              title: "Marketing Manager Application",
+                              created_at: new Date().toISOString(),
+                              job_title: "Marketing Manager"
+                            }
+                          ]}
+                          actions={[
+                            { label: "Edit", onClick: () => {}, icon: <Eye className="h-4 w-4 mr-2" /> },
+                            { label: "View", onClick: () => {}, icon: <Eye className="h-4 w-4 mr-2" /> },
+                            { label: "Download", onClick: () => {}, icon: <Download className="h-4 w-4 mr-2" /> }
+                          ]}
+                          className="w-full"
+                        />
                       </div>
                     </CardContent>
                   </Card>
-                ))}
-              </div>
-            </section>
+                </div>
+              </section>
+            </TabsContent>
 
-            {/* Experimental Animation Elements */}
-            <section>
-              <h2 className="text-title font-bold text-foreground mb-8 flex items-center gap-3">
-                <Activity className="h-6 w-6 text-warning" />
-                Experimental Animation Elements
-              </h2>
-              <p className="text-body text-muted-foreground mb-6">
-                These are experimental animation components for creative interactions and micro-animations.
-              </p>
-              
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {experimentalAnimationElements.map((element, index) => (
-                  <Card key={index} className="p-4 hover:shadow-lg transition-all duration-300">
-                    <div className="flex items-center justify-between mb-3">
-                      <h3 className="text-caption font-medium">{element.name}</h3>
-                      <Badge variant="outline" className="text-tiny">Experimental</Badge>
-                    </div>
-                    <div className="bg-muted/30 p-3 rounded-lg flex items-center justify-center min-h-[60px]">
-                      {element.component}
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            </section>
-
-            {/* Loading States Section */}
-            <section>
-              <h2 className="text-title font-bold text-foreground mb-8 flex items-center gap-3">
-                <Loader className="h-6 w-6 text-primary" />
-                Loading States
-              </h2>
-              
-              <LoadingStatesShowcase 
-                activeModal={activeModal} 
-                setActiveModal={setActiveModal}
-              />
-            </section>
-          </TabsContent>
-
-          {/* Missing Components Tab */}
-          <TabsContent value="missing" className="space-y-8">
-            <section>
-              <h2 className="text-title font-bold text-foreground mb-8 flex items-center gap-3">
-                <AlertTriangle className="h-6 w-6 text-warning" />
-                Missing Components Documentation
-              </h2>
-              <p className="text-body text-muted-foreground mb-6">
-                These components are actively used in the live site but missing from design system documentation.
-              </p>
-              
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {missingComponents.map((component, index) => (
-                  <Card key={index} className="group hover:shadow-lg transition-all duration-300 border-warning/30">
-                    <CardHeader className="pb-3">
-                      <div className="flex items-center justify-between">
-                        <CardTitle className="text-subheading flex items-center gap-2">
-                          {component.name}
-                          <Badge variant="outline" className="text-tiny bg-warning/10 text-warning border-warning/30">
-                            {component.status}
+            {/* Rich Text Editor Tab */}
+            <TabsContent value="rte" className="mt-6">
+              <div className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <Type className="h-5 w-5 text-primary mr-2" />
+                      Rich Text Editor Components
+                    </CardTitle>
+                    <p className="text-caption text-muted-foreground">
+                      Modular rich text editor with multiple variants, states, and AI-powered features for content editing throughout the application.
+                    </p>
+                  </CardHeader>
+                  <CardContent className="space-y-8">
+                    {richTextEditorExamples.map((example, index) => (
+                      <div key={index} className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h3 className="text-subheading font-semibold">{example.name}</h3>
+                            <p className="text-caption text-muted-foreground">{example.description}</p>
+                          </div>
+                          <Badge variant="outline" className="text-micro">
+                            {example.usage}
                           </Badge>
-                        </CardTitle>
-                        <Badge variant="outline" className="text-micro">
-                          {component.usage}
-                        </Badge>
+                        </div>
+                        <div className="border border-border rounded-lg p-4 bg-background">
+                          {example.component}
+                        </div>
+                        {index < richTextEditorExamples.length - 1 && <Separator />}
                       </div>
-                      <p className="text-caption text-muted-foreground">
-                        {component.description}
-                      </p>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="bg-warning/5 border border-warning/20 p-4 rounded-lg flex items-center justify-center min-h-[80px]">
-                        {component.component}
-                      </div>
-                      <div className="text-micro text-warning bg-warning/10 p-2 rounded border-l-2 border-warning/50 mt-3">
-                        <strong>Action Required:</strong> Add component documentation and examples to design system
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </section>
-          </TabsContent>
+                    ))}
+                  </CardContent>
+                </Card>
 
-          {/* Experiments Tab */}
-          <TabsContent value="experiments" className="space-y-8">
-            <section>
-              <h2 className="text-display font-bold mb-4">🧪 Experimental Components</h2>
-              <p className="text-body text-muted-foreground mb-8">
-                Creative explorations and experimental UI concepts. These are production-ready components with advanced features.
-              </p>
-
-              {/* Enhanced AI Assistant */}
-              <Card className="mb-8">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Sparkles className="h-5 w-5 text-primary" />
-                    Enhanced AI Text Assistant
-                  </CardTitle>
-                  <p className="text-caption text-muted-foreground">
-                    Contextual AI menu with nested actions, custom avatars, and before/after comparison dialog
-                  </p>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  {/* Demo Area */}
-                  <div className="border-2 border-dashed border-border rounded-lg p-8 bg-muted/30 relative min-h-[400px] flex items-center justify-center">
-                    <div className="text-center space-y-4">
-                      <h3 className="text-heading font-semibold">AI Context Menu Disabled</h3>
-                      <p className="text-body text-muted-foreground max-w-md">
-                        For security and consistency, the AI Context Menu is now only available 
-                        within Rich Text Editor components. This ensures proper context and 
-                        prevents accidental activation outside of editing workflows.
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Design Concept */}
-                  <div className="grid md:grid-cols-2 gap-6 text-caption">
-                    <div className="space-y-4">
-                      <h4 className="text-heading font-semibold">🎨 Design Concept</h4>
+                {/* Implementation Guidelines */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Implementation Guidelines</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-3">
-                        <div className="flex items-start gap-3">
-                          <div className="w-6 h-6 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 flex-shrink-0 mt-0.5"></div>
-                          <div>
-                            <div className="font-medium">Orbital Interface</div>
-                            <div className="text-muted-foreground">Actions orbit around central AI like planets</div>
-                          </div>
-                        </div>
-                        <div className="flex items-start gap-3">
-                          <div className="w-6 h-6 rounded-full bg-gradient-to-r from-blue-400 to-cyan-400 flex-shrink-0 mt-0.5"></div>
-                          <div>
-                            <div className="font-medium">Adaptive Personality</div>
-                            <div className="text-muted-foreground">AI mood changes based on text complexity</div>
-                          </div>
-                        </div>
-                        <div className="flex items-start gap-3">
-                          <div className="w-6 h-6 rounded-full bg-gradient-to-r from-green-400 to-emerald-400 flex-shrink-0 mt-0.5"></div>
-                          <div>
-                            <div className="font-medium">Magnetic Positioning</div>
-                            <div className="text-muted-foreground">Smart positioning that avoids content overlap</div>
-                          </div>
-                        </div>
-                        <div className="flex items-start gap-3">
-                          <div className="w-6 h-6 rounded-full bg-gradient-to-r from-orange-400 to-red-400 flex-shrink-0 mt-0.5"></div>
-                          <div>
-                            <div className="font-medium">Particle Effects</div>
-                            <div className="text-muted-foreground">Visual feedback during AI processing</div>
-                          </div>
-                        </div>
+                        <h4 className="text-body font-semibold">Usage Patterns</h4>
+                        <ul className="text-caption space-y-1 text-muted-foreground">
+                          <li>• Use <code>default</code> variant for main content editing</li>
+                          <li>• Enable AI features for advanced editing workflows</li>
+                          <li>• Use read-only mode for content display</li>
+                          <li>• All menu items are left-aligned with adequate spacing</li>
+                          <li>• Save and download functionality included by default</li>
+                        </ul>
+                      </div>
+                      <div className="space-y-3">
+                        <h4 className="text-body font-semibold">Technical Notes</h4>
+                        <ul className="text-caption space-y-1 text-muted-foreground">
+                          <li>• Built on ReactQuill with custom styling</li>
+                          <li>• Supports theming with design tokens</li>
+                          <li>• Includes AI context selection features</li>
+                          <li>• Responsive and accessibility-compliant</li>
+                          <li>• Modular CSS with variant support</li>
+                        </ul>
                       </div>
                     </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
 
-                    <div className="space-y-4">
-                      <h4 className="text-heading font-semibold">⚡ Interactive Features</h4>
-                      <div className="space-y-2 text-caption">
-                        <div className="p-3 bg-accent/30 rounded-lg border border-accent">
-                          <div className="font-medium mb-1">Breathing Animation</div>
-                          <div className="text-muted-foreground">Subtle life-like animation when idle</div>
+            {/* Interactions Tab */}
+            <TabsContent value="interactions" className="space-y-8">
+              {/* Animation System */}
+              <section>
+                <h2 className="text-title font-bold text-foreground mb-8 flex items-center gap-3">
+                  <Zap className="h-6 w-6 text-primary" />
+                  Animation System
+                </h2>
+                
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {animationTypes.map((animation, index) => (
+                    <Card key={index} className="group hover:shadow-lg transition-all duration-300">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-subheading">{animation.name}</CardTitle>
+                          <Badge variant="outline" className="text-micro">
+                            {animation.usage}
+                          </Badge>
                         </div>
-                        <div className="p-3 bg-accent/30 rounded-lg border border-accent">
-                          <div className="font-medium mb-1">Progressive Disclosure</div>
-                          <div className="text-muted-foreground">Actions reveal based on interaction depth</div>
+                        <p className="text-caption text-muted-foreground">
+                          {animation.description}
+                        </p>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="bg-muted/30 p-4 rounded-lg flex items-center justify-center min-h-[80px]">
+                          {animation.example}
                         </div>
-                        <div className="p-3 bg-accent/30 rounded-lg border border-accent">
-                          <div className="font-medium mb-1">Smooth Transitions</div>
-                          <div className="text-muted-foreground">Fluid animations between states</div>
-                        </div>
-                        <div className="p-3 bg-accent/30 rounded-lg border border-accent">
-                          <div className="font-medium mb-1">Contextual Intelligence</div>
-                          <div className="text-muted-foreground">Responds to text characteristics</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </section>
 
-                  {/* Technical Details */}
-                  <div className="bg-muted/50 p-4 rounded-lg border border-muted">
-                    <h4 className="text-heading font-semibold mb-3">🔧 Technical Implementation</h4>
-                    <div className="grid md:grid-cols-3 gap-4 text-caption">
-                      <div>
-                        <div className="font-medium mb-2">Positioning Logic</div>
-                        <div className="text-muted-foreground space-y-1">
-                          <div>• Magnetic snap to optimal positions</div>
-                          <div>• Boundary detection & adjustment</div>
-                          <div>• Content overlap prevention</div>
+              {/* Interaction Components */}
+              <section>
+                <h2 className="text-title font-bold text-foreground mb-8 flex items-center gap-3">
+                  <Layers className="h-6 w-6 text-primary" />
+                  Interaction Components
+                </h2>
+                
+                <div className="grid gap-6 md:grid-cols-2">
+                  {interactionExamples.map((interaction, index) => (
+                    <Card key={index} className="group hover:shadow-lg transition-all duration-300">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-subheading">{interaction.name}</CardTitle>
+                          <Badge variant="outline" className="text-micro">
+                            {interaction.usage}
+                          </Badge>
                         </div>
-                      </div>
-                      <div>
-                        <div className="font-medium mb-2">Animation System</div>
-                        <div className="text-muted-foreground space-y-1">
-                          <div>• CSS transforms for orbiting</div>
-                          <div>• Staggered animation delays</div>
-                          <div>• Particle system with random positioning</div>
+                        <p className="text-caption text-muted-foreground">
+                          {interaction.description}
+                        </p>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="bg-muted/30 p-4 rounded-lg flex items-center justify-center min-h-[100px]">
+                          {interaction.component}
                         </div>
-                      </div>
-                      <div>
-                        <div className="font-medium mb-2">State Management</div>
-                        <div className="text-muted-foreground space-y-1">
-                          <div>• AI mood based on text analysis</div>
-                          <div>• Progressive menu states</div>
-                          <div>• Processing feedback loops</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </section>
 
-              {/* Component Redesigns */}
-              <Card className="mb-8">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Grid className="h-5 w-5 text-primary" />
-                    Component Redesign Experiments
-                  </CardTitle>
-                  <p className="text-caption text-muted-foreground">
-                    Alternative designs for existing components - exploring different layouts and interaction patterns
-                  </p>
-                </CardHeader>
-                <CardContent>
-                  <div className="bg-muted/30 rounded-lg p-6 text-center">
-                    <h4 className="text-heading font-semibold mb-2 text-foreground">Experimental Components Removed</h4>
+              {/* Experimental Animation Elements */}
+              <section>
+                <h2 className="text-title font-bold text-foreground mb-8 flex items-center gap-3">
+                  <Activity className="h-6 w-6 text-warning" />
+                  Experimental Animation Elements
+                </h2>
+                <p className="text-body text-muted-foreground mb-6">
+                  These are experimental animation components for creative interactions and micro-animations.
+                </p>
+                
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  {experimentalAnimationElements.map((element, index) => (
+                    <Card key={index} className="p-4 hover:shadow-lg transition-all duration-300">
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="text-caption font-medium">{element.name}</h3>
+                        <Badge variant="outline" className="text-tiny">Experimental</Badge>
+                      </div>
+                      <div className="bg-muted/30 p-3 rounded-lg flex items-center justify-center min-h-[60px]">
+                        {element.component}
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </section>
+
+              {/* Loading States Section */}
+              <section>
+                <h2 className="text-title font-bold text-foreground mb-8 flex items-center gap-3">
+                  <Loader className="h-6 w-6 text-primary" />
+                  Loading States
+                </h2>
+                
+                <LoadingStatesShowcase 
+                  activeModal={activeModal} 
+                  setActiveModal={setActiveModal}
+                />
+              </section>
+            </TabsContent>
+
+            {/* Missing Components Tab */}
+            <TabsContent value="missing" className="space-y-8">
+              <section>
+                <h2 className="text-title font-bold text-foreground mb-8 flex items-center gap-3">
+                  <AlertTriangle className="h-6 w-6 text-warning" />
+                  Missing Components Documentation
+                </h2>
+                <p className="text-body text-muted-foreground mb-6">
+                  These components are actively used in the live site but missing from design system documentation.
+                </p>
+                
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {missingComponents.map((component, index) => (
+                    <Card key={index} className="group hover:shadow-lg transition-all duration-300 border-warning/30">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-subheading flex items-center gap-2">
+                            {component.name}
+                            <Badge variant="outline" className="text-tiny bg-warning/10 text-warning border-warning/30">
+                              {component.status}
+                            </Badge>
+                          </CardTitle>
+                          <Badge variant="outline" className="text-micro">
+                            {component.usage}
+                          </Badge>
+                        </div>
+                        <p className="text-caption text-muted-foreground">
+                          {component.description}
+                        </p>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="bg-warning/5 border border-warning/20 p-4 rounded-lg flex items-center justify-center min-h-[80px]">
+                          {component.component}
+                        </div>
+                        <div className="text-micro text-warning bg-warning/10 p-2 rounded border-l-2 border-warning/50 mt-3">
+                          <strong>Action Required:</strong> Add component documentation and examples to design system
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </section>
+            </TabsContent>
+
+            {/* Experiments Tab */}
+            <TabsContent value="experiments" className="space-y-8">
+              <section>
+                <h2 className="text-display font-bold mb-4">🧪 Experimental Components</h2>
+                <p className="text-body text-muted-foreground mb-8">
+                  Creative explorations and experimental UI concepts. These are production-ready components with advanced features.
+                </p>
+
+                {/* Enhanced AI Assistant */}
+                <Card className="mb-8">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Sparkles className="h-5 w-5 text-primary" />
+                      Enhanced AI Text Assistant
+                    </CardTitle>
                     <p className="text-caption text-muted-foreground">
-                      Component variations have been removed to streamline the codebase. The main production components 
-                      can be found in their respective sections above.
+                      Contextual AI menu with nested actions, custom avatars, and before/after comparison dialog
                     </p>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    {/* Demo Area */}
+                    <div className="border-2 border-dashed border-border rounded-lg p-8 bg-muted/30 relative min-h-[400px] flex items-center justify-center">
+                      <div className="text-center space-y-4">
+                        <h3 className="text-heading font-semibold">AI Context Menu Disabled</h3>
+                        <p className="text-body text-muted-foreground max-w-md">
+                          For security and consistency, the AI Context Menu is now only available 
+                          within Rich Text Editor components. This ensures proper context and 
+                          prevents accidental activation outside of editing workflows.
+                        </p>
+                      </div>
+                    </div>
 
-              {/* Future Experiments Placeholder */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Zap className="h-5 w-5 text-warning" />
-                    Future Experiments
-                  </CardTitle>
-                  <p className="text-caption text-muted-foreground">
-                    Ideas for future experimental components and interactions
-                  </p>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div className="p-4 border border-dashed border-border rounded-lg text-center opacity-75">
-                      <div className="text-2xl mb-2">🎭</div>
-                      <div className="font-medium mb-1">Morphing Buttons</div>
-                      <div className="text-caption text-muted-foreground">Buttons that transform based on context</div>
+                    {/* Design Concept */}
+                    <div className="grid md:grid-cols-2 gap-6 text-caption">
+                      <div className="space-y-4">
+                        <h4 className="text-heading font-semibold">🎨 Design Concept</h4>
+                        <div className="space-y-3">
+                          <div className="flex items-start gap-3">
+                            <div className="w-6 h-6 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 flex-shrink-0 mt-0.5"></div>
+                            <div>
+                              <div className="font-medium">Orbital Interface</div>
+                              <div className="text-muted-foreground">Actions orbit around central AI like planets</div>
+                            </div>
+                          </div>
+                          <div className="flex items-start gap-3">
+                            <div className="w-6 h-6 rounded-full bg-gradient-to-r from-blue-400 to-cyan-400 flex-shrink-0 mt-0.5"></div>
+                            <div>
+                              <div className="font-medium">Adaptive Personality</div>
+                              <div className="text-muted-foreground">AI mood changes based on text complexity</div>
+                            </div>
+                          </div>
+                          <div className="flex items-start gap-3">
+                            <div className="w-6 h-6 rounded-full bg-gradient-to-r from-green-400 to-emerald-400 flex-shrink-0 mt-0.5"></div>
+                            <div>
+                              <div className="font-medium">Magnetic Positioning</div>
+                              <div className="text-muted-foreground">Smart positioning that avoids content overlap</div>
+                            </div>
+                          </div>
+                          <div className="flex items-start gap-3">
+                            <div className="w-6 h-6 rounded-full bg-gradient-to-r from-orange-400 to-red-400 flex-shrink-0 mt-0.5"></div>
+                            <div>
+                              <div className="font-medium">Particle Effects</div>
+                              <div className="text-muted-foreground">Visual feedback during AI processing</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <h4 className="text-heading font-semibold">⚡ Interactive Features</h4>
+                        <div className="space-y-2 text-caption">
+                          <div className="p-3 bg-accent/30 rounded-lg border border-accent">
+                            <div className="font-medium mb-1">Breathing Animation</div>
+                            <div className="text-muted-foreground">Subtle life-like animation when idle</div>
+                          </div>
+                          <div className="p-3 bg-accent/30 rounded-lg border border-accent">
+                            <div className="font-medium mb-1">Progressive Disclosure</div>
+                            <div className="text-muted-foreground">Actions reveal based on interaction depth</div>
+                          </div>
+                          <div className="p-3 bg-accent/30 rounded-lg border border-accent">
+                            <div className="font-medium mb-1">Smooth Transitions</div>
+                            <div className="text-muted-foreground">Fluid animations between states</div>
+                          </div>
+                          <div className="p-3 bg-accent/30 rounded-lg border border-accent">
+                            <div className="font-medium mb-1">Contextual Intelligence</div>
+                            <div className="text-muted-foreground">Responds to text characteristics</div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <div className="p-4 border border-dashed border-border rounded-lg text-center opacity-75">
-                      <div className="text-2xl mb-2">🌊</div>
-                      <div className="font-medium mb-1">Fluid Navigation</div>
-                      <div className="text-caption text-muted-foreground">Liquid-like menu transitions</div>
+
+                    {/* Technical Details */}
+                    <div className="bg-muted/50 p-4 rounded-lg border border-muted">
+                      <h4 className="text-heading font-semibold mb-3">🔧 Technical Implementation</h4>
+                      <div className="grid md:grid-cols-3 gap-4 text-caption">
+                        <div>
+                          <div className="font-medium mb-2">Positioning Logic</div>
+                          <div className="text-muted-foreground space-y-1">
+                            <div>• Magnetic snap to optimal positions</div>
+                            <div>• Boundary detection & adjustment</div>
+                            <div>• Content overlap prevention</div>
+                          </div>
+                        </div>
+                        <div>
+                          <div className="font-medium mb-2">Animation System</div>
+                          <div className="text-muted-foreground space-y-1">
+                            <div>• CSS transforms for orbiting</div>
+                            <div>• Staggered animation delays</div>
+                            <div>• Particle system with random positioning</div>
+                          </div>
+                        </div>
+                        <div>
+                          <div className="font-medium mb-2">State Management</div>
+                          <div className="text-muted-foreground space-y-1">
+                            <div>• AI mood based on text analysis</div>
+                            <div>• Progressive menu states</div>
+                            <div>• Processing feedback loops</div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <div className="p-4 border border-dashed border-border rounded-lg text-center opacity-75">
-                      <div className="text-2xl mb-2">🎨</div>
-                      <div className="font-medium mb-1">Adaptive Themes</div>
-                      <div className="text-caption text-muted-foreground">Colors that change with content</div>
+                  </CardContent>
+                </Card>
+
+                {/* Component Redesigns */}
+                <Card className="mb-8">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Grid className="h-5 w-5 text-primary" />
+                      Component Redesign Experiments
+                    </CardTitle>
+                    <p className="text-caption text-muted-foreground">
+                      Alternative designs for existing components - exploring different layouts and interaction patterns
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="bg-muted/30 rounded-lg p-6 text-center">
+                      <h4 className="text-heading font-semibold mb-2 text-foreground">Experimental Components Removed</h4>
+                      <p className="text-caption text-muted-foreground">
+                        Component variations have been removed to streamline the codebase. The main production components 
+                        can be found in their respective sections above.
+                      </p>
                     </div>
-                    <div className="p-4 border border-dashed border-border rounded-lg text-center opacity-75">
-                      <div className="text-2xl mb-2">🔮</div>
-                      <div className="font-medium mb-1">Predictive UI</div>
-                      <div className="text-caption text-muted-foreground">Interface that anticipates actions</div>
+                  </CardContent>
+                </Card>
+
+                {/* Future Experiments Placeholder */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Zap className="h-5 w-5 text-warning" />
+                      Future Experiments
+                    </CardTitle>
+                    <p className="text-caption text-muted-foreground">
+                      Ideas for future experimental components and interactions
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      <div className="p-4 border border-dashed border-border rounded-lg text-center opacity-75">
+                        <div className="text-2xl mb-2">🎭</div>
+                        <div className="font-medium mb-1">Morphing Buttons</div>
+                        <div className="text-caption text-muted-foreground">Buttons that transform based on context</div>
+                      </div>
+                      <div className="p-4 border border-dashed border-border rounded-lg text-center opacity-75">
+                        <div className="text-2xl mb-2">🌊</div>
+                        <div className="font-medium mb-1">Fluid Navigation</div>
+                        <div className="text-caption text-muted-foreground">Liquid-like menu transitions</div>
+                      </div>
+                      <div className="p-4 border border-dashed border-border rounded-lg text-center opacity-75">
+                        <div className="text-2xl mb-2">🎨</div>
+                        <div className="font-medium mb-1">Adaptive Themes</div>
+                        <div className="text-caption text-muted-foreground">Colors that change with content</div>
+                      </div>
+                      <div className="p-4 border border-dashed border-border rounded-lg text-center opacity-75">
+                        <div className="text-2xl mb-2">🔮</div>
+                        <div className="font-medium mb-1">Predictive UI</div>
+                        <div className="text-caption text-muted-foreground">Interface that anticipates actions</div>
+                      </div>
+                      <div className="p-4 border border-dashed border-border rounded-lg text-center opacity-75">
+                        <div className="text-2xl mb-2">⚡</div>
+                        <div className="font-medium mb-1">Gesture Controls</div>
+                        <div className="text-caption text-muted-foreground">Hand gesture-based interactions</div>
+                      </div>
+                      <div className="p-4 border border-dashed border-border rounded-lg text-center opacity-75">
+                        <div className="text-2xl mb-2">🎪</div>
+                        <div className="font-medium mb-1">Physics UI</div>
+                        <div className="text-caption text-muted-foreground">Elements with realistic physics</div>
+                      </div>
                     </div>
-                    <div className="p-4 border border-dashed border-border rounded-lg text-center opacity-75">
-                      <div className="text-2xl mb-2">⚡</div>
-                      <div className="font-medium mb-1">Gesture Controls</div>
-                      <div className="text-caption text-muted-foreground">Hand gesture-based interactions</div>
-                    </div>
-                    <div className="p-4 border border-dashed border-border rounded-lg text-center opacity-75">
-                      <div className="text-2xl mb-2">🎪</div>
-                      <div className="font-medium mb-1">Physics UI</div>
-                      <div className="text-caption text-muted-foreground">Elements with realistic physics</div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </section>
-          </TabsContent>
-        </Tabs>
-      </div>
+                  </CardContent>
+                </Card>
+              </section>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </main>
 
       {/* Modal Examples */}
       <ContactSalesModal 
