@@ -472,104 +472,15 @@ const AnalyzeCV = () => {
     );
   }
 
-  // Analysis steps for step indicator
-  const analysisSteps = [
-    {
-      id: 'upload',
-      title: 'Upload Files',
-      description: 'Upload CV and job description',
-      icon: <Upload className="w-4 h-4" />
-    },
-    {
-      id: 'analyze',
-      title: 'AI Analysis',
-      description: 'Process compatibility and keywords',
-      icon: <BarChart3 className="w-4 h-4" />
-    },
-    {
-      id: 'results',
-      title: 'View Results',
-      description: 'Review recommendations',
-      icon: <Eye className="w-4 h-4" />
-    }
-  ];
-
-  const getCurrentStep = () => {
-    if (viewedAnalysis || analysisResult) return 'results';
-    if (uploadedFiles.cv || uploadedFiles.jobDescription) return 'analyze';
-    return 'upload';
-  };
-
-  const getCompletedSteps = () => {
-    const completed = [];
-    if (uploadedFiles.cv || uploadedFiles.jobDescription) completed.push('upload');
-    if (viewedAnalysis || analysisResult) {
-      completed.push('analyze', 'results');
-    }
-    return completed;
-  };
-
   return (
     <>
       <div className={`min-h-screen bg-gradient-to-br from-primary/5 via-background to-primary/3 dark:from-primary/10 dark:via-background dark:to-primary/5 ${analyzing ? 'pointer-events-none' : ''}`}>
-      <EngagingUploadModal
-        isOpen={analyzing}
-        title="Analyzing Your CV"
-        message={currentLoadingMessage}
-      />
-      
-      {/* Main Container - Different layout for history tab */}
-      {activeTab === 'history' ? (
-        // Full width layout for history tab
-        <div className="w-full">
-          {/* Breadcrumbs and Header */}
-          <div className="max-w-wider mx-auto px-4 py-8">
-            <Breadcrumbs />
-            
-            <div className="mb-6">
-              <div className="flex items-start">
-                <Zap className="h-10 w-10 text-zapier-orange mr-4 mt-1" />
-                <div>
-                  <h1 className="text-display font-bold text-foreground">
-                    Analyze Your CV
-                  </h1>
-                  <p className="text-subheading text-earth/70 dark:text-white/70 max-w-2xl mt-1">
-                    Upload your CV and job description to get comprehensive compatibility analysis with actionable recommendations.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Tabs Navigation - Constrained width */}
-          <div className="max-w-wider mx-auto px-4">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-6">
-              <TabsList className="grid w-full grid-cols-3 mb-6">
-                <TabsTrigger value="analysis" className="flex items-center space-x-2 text-caption">
-                  <FileText className="h-4 w-4" />
-                  <span>Analyze CV</span>
-                </TabsTrigger>
-                <TabsTrigger value="view-analysis" className="flex items-center space-x-2 text-caption">
-                  <Eye className="h-4 w-4" />
-                  <span>View Analysis</span>
-                </TabsTrigger>
-                <TabsTrigger value="history" className="flex items-center space-x-2 text-caption">
-                  <History className="h-4 w-4" />
-                  <span>History</span>
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
-          </div>
-
-          {/* Full width history content */}
-          <div className="w-full px-4">
-            <EnhancedAnalysisHistory 
-              onSelectAnalysis={handleHistorySelect}
-            />
-          </div>
-        </div>
-      ) : (
-        // Constrained layout for other tabs
+        <EngagingUploadModal
+          isOpen={analyzing}
+          title="Analyzing Your CV"
+          message={currentLoadingMessage}
+        />
+        
         <div className="max-w-wider mx-auto px-4 py-8">
           {/* Breadcrumbs */}
           <Breadcrumbs />
@@ -701,6 +612,13 @@ const AnalyzeCV = () => {
                     </Card>
                   )}
                 </TabsContent>
+
+                {/* History Tab */}
+                <TabsContent value="history" className="mt-0">
+                  <EnhancedAnalysisHistory 
+                    onSelectAnalysis={handleHistorySelect}
+                  />
+                </TabsContent>
               </Tabs>
             </div>
 
@@ -710,52 +628,50 @@ const AnalyzeCV = () => {
                 credits={userCredits?.credits || 0}
                 hasCreditsForAI={hasCreditsForAI}
               />
-            </div>
-            
-            {/* Soft Skills Survey Panel */}
-            <div className="mt-4">
-              <SoftSkillsSurveyPanel
-                onTakeSurvey={() => setShowSurveyModal(true)}
-                onDismiss={dismissSurvey}
-                isVisible={shouldShowSurvey()}
-              />
+              
+              {/* Soft Skills Survey Panel */}
+              <div className="mt-4">
+                <SoftSkillsSurveyPanel
+                  onTakeSurvey={() => setShowSurveyModal(true)}
+                  onDismiss={dismissSurvey}
+                  isVisible={shouldShowSurvey()}
+                />
+              </div>
             </div>
           </div>
         </div>
-      )}
 
-      {/* Personalization Survey Modal */}
-      <PersonalizationSurveyModal
-        isOpen={showPersonalizationSurvey}
-        onClose={() => setShowPersonalizationSurvey(false)}
-        onSubmit={handleSurveySubmit}
-      />
+        {/* Personalization Survey Modal */}
+        <PersonalizationSurveyModal
+          isOpen={showPersonalizationSurvey}
+          onClose={() => setShowPersonalizationSurvey(false)}
+          onSubmit={handleSurveySubmit}
+        />
 
-      {/* Soft Skills Survey Modal */}
-      <SoftSkillsSurveyModal
-        isOpen={showSurveyModal}
-        onClose={() => setShowSurveyModal(false)}
-        onSubmit={saveSoftSkills}
-      />
+        {/* Soft Skills Survey Modal */}
+        <SoftSkillsSurveyModal
+          isOpen={showSurveyModal}
+          onClose={() => setShowSurveyModal(false)}
+          onSubmit={saveSoftSkills}
+        />
 
-      {/* Interview Prep Modal */}
-      <InterviewPrepModal
-        isOpen={showInterviewPrepModal}
-        onClose={() => setShowInterviewPrepModal(false)}
-      />
+        {/* Interview Prep Modal */}
+        <InterviewPrepModal
+          isOpen={showInterviewPrepModal}
+          onClose={() => setShowInterviewPrepModal(false)}
+        />
 
-      {/* N8N Debug Modal */}
-      <N8nDebugModal
-        open={showN8nDebugModal}
-        onOpenChange={setShowN8nDebugModal}
-        debugInfo={n8nDebugData?.debugInfo}
-        testFiles={n8nDebugData?.test_files}
-        pdfData={n8nDebugData?.pdfData}
-        htmlData={n8nDebugData?.htmlData}
-        retryLogs={n8nDebugData?.retryLogs}
-      />
+        {/* N8N Debug Modal */}
+        <N8nDebugModal
+          open={showN8nDebugModal}
+          onOpenChange={setShowN8nDebugModal}
+          debugInfo={n8nDebugData?.debugInfo}
+          testFiles={n8nDebugData?.test_files}
+          pdfData={n8nDebugData?.pdfData}
+          htmlData={n8nDebugData?.htmlData}
+          retryLogs={n8nDebugData?.retryLogs}
+        />
       </div>
-
     </>
   );
 };

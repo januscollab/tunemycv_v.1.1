@@ -1,3 +1,4 @@
+
 import { createSecureFileObject } from '@/utils/secureFileValidation';
 
 export interface CVValidationResult {
@@ -6,6 +7,80 @@ export interface CVValidationResult {
   issues: string[];
   suggestions: string[];
 }
+
+export interface JobDescriptionValidation {
+  isValid: boolean;
+  confidence: number;
+  issues: string[];
+  suggestions: string[];
+}
+
+// Union type for validation results
+export type ValidationResult = CVValidationResult | JobDescriptionValidation;
+
+export interface DocumentTypeDetection {
+  type: 'cv' | 'job_description' | 'unknown';
+  detectedType: 'cv' | 'job_description' | 'unknown';
+  confidence: number;
+  needsUserConfirmation: boolean;
+}
+
+export interface QualityAssessment {
+  score: number;
+  feedback: string[];
+}
+
+export const detectDocumentType = (text: string, fileName: string = ''): DocumentTypeDetection => {
+  const lowerText = text.toLowerCase();
+  const lowerFileName = fileName.toLowerCase();
+  
+  let confidence = 50;
+  let detectedType: 'cv' | 'job_description' | 'unknown' = 'unknown';
+  
+  // CV indicators
+  const cvKeywords = [
+    'experience', 'education', 'skills', 'qualifications', 'career', 'employment',
+    'work history', 'professional experience', 'achievements', 'accomplishments',
+    'my name', 'i am', 'i have', 'my experience', 'my skills', 'i worked', 'i studied'
+  ];
+  
+  // Job description indicators
+  const jdKeywords = [
+    'responsibilities', 'requirements', 'duties', 'job title', 'position', 'role',
+    'candidate', 'applicant', 'salary', 'benefits', 'we are looking', 'join our team',
+    'apply', 'application', 'hiring', 'recruitment'
+  ];
+  
+  // File name indicators
+  const cvFileIndicators = ['cv', 'resume', 'curriculum'];
+  const jdFileIndicators = ['job', 'position', 'role', 'vacancy', 'opening'];
+  
+  // Count keyword matches
+  const cvMatches = cvKeywords.filter(keyword => lowerText.includes(keyword)).length;
+  const jdMatches = jdKeywords.filter(keyword => lowerText.includes(keyword)).length;
+  
+  // Check file name
+  const hasCvFileName = cvFileIndicators.some(indicator => lowerFileName.includes(indicator));
+  const hasJdFileName = jdFileIndicators.some(indicator => lowerFileName.includes(indicator));
+  
+  // Determine type based on matches
+  if (cvMatches > jdMatches || hasCvFileName) {
+    detectedType = 'cv';
+    confidence = Math.min(90, 60 + (cvMatches * 5) + (hasCvFileName ? 15 : 0));
+  } else if (jdMatches > cvMatches || hasJdFileName) {
+    detectedType = 'job_description';
+    confidence = Math.min(90, 60 + (jdMatches * 5) + (hasJdFileName ? 15 : 0));
+  }
+  
+  const needsUserConfirmation = confidence < 70;
+  
+  return {
+    type: detectedType,
+    detectedType,
+    confidence,
+    needsUserConfirmation
+  };
+};
 
 export const validateCV = (text: string, fileName: string = ''): CVValidationResult => {
   const issues: string[] = [];
@@ -89,13 +164,6 @@ export const validateCV = (text: string, fileName: string = ''): CVValidationRes
   };
 };
 
-export interface JobDescriptionValidation {
-  isValid: boolean;
-  confidence: number;
-  issues: string[];
-  suggestions: string[];
-}
-
 export const validateJobDescription = (text: string, fileName: string = ''): JobDescriptionValidation => {
   const issues: string[] = [];
   const suggestions: string[] = [];
@@ -175,13 +243,3 @@ export const validateSecureFile = (file: File): boolean => {
   // This is a placeholder - replace with real security measures
   return true;
 };
-
-export interface DocumentTypeDetection {
-  type: 'cv' | 'job_description' | 'unknown';
-  confidence: number;
-}
-
-export interface QualityAssessment {
-  score: number;
-  feedback: string[];
-}
