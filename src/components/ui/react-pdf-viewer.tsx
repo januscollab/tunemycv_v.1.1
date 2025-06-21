@@ -1,6 +1,5 @@
 
 import React, { useState, useMemo } from 'react';
-import { Document, Page } from 'react-pdf';
 import { ChevronLeft, ChevronRight, Download, ZoomIn, ZoomOut, RotateCw, ExternalLink, Maximize } from 'lucide-react';
 import { Button } from './button';
 import { cn } from '@/lib/utils';
@@ -18,11 +17,6 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
   title = 'CV Analysis Report',
   className
 }) => {
-  const [numPages, setNumPages] = useState<number | null>(null);
-  const [pageNumber, setPageNumber] = useState(1);
-  const [scale, setScale] = useState(1.0);
-  const [rotation, setRotation] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Create PDF data URL with proper error handling
@@ -66,19 +60,6 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
       return null;
     }
   }, [pdfData]);
-
-  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
-    setNumPages(numPages);
-    setIsLoading(false);
-    setError(null);
-    console.log('✅ PDF loaded successfully, pages:', numPages);
-  };
-
-  const onDocumentLoadError = (error: Error) => {
-    console.error('❌ PDF load error:', error);
-    setError(`Failed to load PDF: ${error.message}`);
-    setIsLoading(false);
-  };
 
   const downloadPDF = () => {
     try {
@@ -210,55 +191,29 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
             <ExternalLink className="h-4 w-4" />
           </Button>
           
-          {/* Only show viewer controls if PDF is loading successfully */}
-          {!error && (
-            <>
-              {/* Zoom Controls */}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setScale(prev => Math.max(0.5, prev - 0.1))}
-                disabled={scale <= 0.5}
-              >
-                <ZoomOut className="h-4 w-4" />
-              </Button>
-              
-              <span className="text-sm text-muted-foreground px-2">
-                {Math.round(scale * 100)}%
-              </span>
-              
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setScale(prev => Math.min(3, prev + 0.1))}
-                disabled={scale >= 3}
-              >
-                <ZoomIn className="h-4 w-4" />
-              </Button>
-              
-              {/* Rotation */}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setRotation(prev => (prev + 90) % 360)}
-              >
-                <RotateCw className="h-4 w-4" />
-              </Button>
-            </>
-          )}
+          {/* Lightbox View */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={openInLightbox}
+            title="View in lightbox"
+          >
+            <Maximize className="h-4 w-4" />
+          </Button>
         </div>
       </div>
 
-      {/* PDF Content */}
+      {/* PDF Content - Use iframe for direct PDF viewing */}
       <div className="relative bg-gray-100 dark:bg-gray-900 min-h-[600px]">
-        {isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          </div>
-        )}
-
+        <iframe
+          src={pdfDataUrl}
+          className="w-full h-[600px] border-none"
+          title={title}
+          onError={() => setError('Failed to load PDF in viewer')}
+        />
+        
         {error && (
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div className="absolute inset-0 flex items-center justify-center bg-white dark:bg-gray-900">
             <div className="text-center text-red-500 max-w-md mx-auto p-4">
               <svg className="mx-auto h-12 w-12 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -275,52 +230,6 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
                 </Button>
               </div>
             </div>
-          </div>
-        )}
-
-        {!error && (
-          <div className="flex justify-center p-4">
-            <Document
-              file={pdfDataUrl}
-              onLoadSuccess={onDocumentLoadSuccess}
-              onLoadError={onDocumentLoadError}
-              loading=""
-            >
-              <Page
-                pageNumber={pageNumber}
-                scale={scale}
-                rotate={rotation}
-                loading=""
-                className="shadow-lg"
-              />
-            </Document>
-          </div>
-        )}
-
-        {/* Navigation */}
-        {numPages && numPages > 1 && !error && (
-          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-background border rounded-lg shadow-lg px-4 py-2 flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setPageNumber(prev => Math.max(1, prev - 1))}
-              disabled={pageNumber <= 1}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            
-            <span className="text-sm">
-              Page {pageNumber} of {numPages}
-            </span>
-            
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setPageNumber(prev => Math.min(numPages, prev + 1))}
-              disabled={pageNumber >= numPages}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
           </div>
         )}
       </div>
