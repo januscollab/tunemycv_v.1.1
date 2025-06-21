@@ -1,5 +1,4 @@
 
-
 import React, { useState, useMemo } from 'react';
 import { Document, Page } from 'react-pdf';
 import { ChevronLeft, ChevronRight, Download, ZoomIn, ZoomOut, RotateCw, ExternalLink, Maximize } from 'lucide-react';
@@ -196,12 +195,12 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
         </div>
         
         <div className="flex items-center gap-2">
-          {/* Download - Always available */}
+          {/* Download Button */}
           <Button variant="ghost" size="sm" onClick={downloadPDF}>
             <Download className="h-4 w-4" />
           </Button>
           
-          {/* New Tab - Always available */}
+          {/* Open in New Tab Button */}
           <Button
             variant="ghost"
             size="sm"
@@ -209,6 +208,16 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
             title="Open in new tab"
           >
             <ExternalLink className="h-4 w-4" />
+          </Button>
+          
+          {/* Open in Lightbox Button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={openInLightbox}
+            title="Open in fullscreen"
+          >
+            <Maximize className="h-4 w-4" />
           </Button>
           
           {/* Only show viewer controls if PDF is loading successfully */}
@@ -250,8 +259,8 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
         </div>
       </div>
 
-      {/* PDF Content */}
-      <div className="relative bg-gray-100 dark:bg-gray-900 min-h-[600px]">
+      {/* PDF Content - Removed background styling */}
+      <div className="relative min-h-[600px]">
         {isLoading && (
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -287,7 +296,7 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
               onLoadError={onDocumentLoadError}
               loading=""
               options={{
-                // Use main thread rendering (worker disabled globally in main.tsx)
+                // Use main thread rendering (worker disabled in main.tsx)
                 isEvalSupported: false,
                 // Additional fallback options
                 disableFontFace: false,
@@ -338,4 +347,3 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
 };
 
 export default ReactPDFViewer;
-

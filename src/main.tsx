@@ -7,8 +7,8 @@ import './index.css';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
-// Configure react-pdf to use CDN worker for better reliability
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
+// Disable external worker to avoid CORS issues - use main thread rendering instead
+pdfjs.GlobalWorkerOptions.workerSrc = false;
 
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
