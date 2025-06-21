@@ -147,23 +147,23 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
               </div>
             </div>
             
-            {/* Action Buttons - Modern Style */}
-            <div className="flex items-center space-x-4">
+            {/* Action Buttons - Clean Modern Style */}
+            <div className="flex items-center gap-3">
               {!readOnly && (
                 <button
                   onClick={onStartNew}
-                  className="group flex items-center space-x-3 px-6 py-3 text-foreground-secondary hover:text-foreground bg-surface-tertiary hover:bg-surface-hover rounded-xl transition-all duration-300 font-normal border border-border hover:border-primary/30 hover:scale-[1.02] active:scale-[0.98]"
+                  className="group flex items-center gap-2.5 px-5 py-2.5 text-muted-foreground hover:text-foreground bg-surface border border-border hover:border-border-hover rounded-lg transition-all duration-200 font-normal hover:bg-surface-hover"
                 >
-                  <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
-                  <span className="text-subheading">Analyze Another CV</span>
+                  <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
+                  <span className="text-sm">Analyze Another CV</span>
                 </button>
               )}
               <button 
                 onClick={downloadPDF}
-                className="group flex items-center space-x-3 px-6 py-3 bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl transition-all duration-300 font-normal shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] border border-primary/20"
+                className="group flex items-center gap-2.5 px-5 py-2.5 bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg transition-all duration-200 font-normal shadow-sm hover:shadow-md border border-primary/20"
               >
-                <Download className="h-5 w-5 transition-transform group-hover:translate-y-0.5" />
-                <span className="text-subheading">Download Report</span>
+                <Download className="h-4 w-4" />
+                <span className="text-sm">Download Report</span>
               </button>
             </div>
           </div>

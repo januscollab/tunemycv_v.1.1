@@ -59,13 +59,13 @@ const AnalysisSummarySection: React.FC<AnalysisSummarySectionProps> = ({
           </div>
         </div>
         
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           {onReviewInBrowser && (
             <Button 
               variant="outline" 
               size="sm"
               onClick={onReviewInBrowser}
-              className="flex items-center gap-2 hover:bg-primary/10 hover:border-primary/30 transition-all duration-200"
+              className="flex items-center gap-2 font-normal hover:bg-primary/5 hover:border-primary/30 transition-all duration-200 text-sm h-9"
             >
               <ExternalLink className="h-4 w-4" />
               Review in Browser
@@ -76,7 +76,7 @@ const AnalysisSummarySection: React.FC<AnalysisSummarySectionProps> = ({
               variant="default" 
               size="sm"
               onClick={onDownload}
-              className="flex items-center gap-2 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-md hover:shadow-lg transition-all duration-200"
+              className="flex items-center gap-2 font-normal bg-primary hover:bg-primary/90 shadow-sm hover:shadow-md transition-all duration-200 text-sm h-9"
             >
               <Download className="h-4 w-4" />
               Download Report
