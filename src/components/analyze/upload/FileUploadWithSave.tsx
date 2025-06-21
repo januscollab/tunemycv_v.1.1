@@ -30,7 +30,6 @@ const FileUploadWithSave: React.FC<FileUploadWithSaveProps> = ({
   fileInputRef
 }) => {
   const [retryCount, setRetryCount] = useState(0);
-  const shouldSave = false; // CVs are not automatically saved to user's list
   const { user } = useAuth();
   const orchestrator = useUploadOrchestrator();
 
@@ -45,11 +44,12 @@ const FileUploadWithSave: React.FC<FileUploadWithSaveProps> = ({
     try {
       const result = await orchestrator.processFile(file, { 
         fileType: 'cv',
-        shouldStore: shouldSave // Only save to user's CV list if shouldSave is true
+        shouldStore: false // NEVER auto-save, only save when explicitly requested
       });
       
       if (result.success && result.file && result.extractedText) {
-        onFileSelect(result.file, result.extractedText, shouldSave);
+        // Pass false for shouldSave - no automatic saving
+        onFileSelect(result.file, result.extractedText, false);
         setRetryCount(0);
       } else {
         throw new Error(result.error || 'Processing failed');
@@ -96,12 +96,9 @@ const FileUploadWithSave: React.FC<FileUploadWithSaveProps> = ({
             variant="default"
             size="md"
             label="Processing CV"
-            
           />
         </div>
       )}
-
-      {/* Remove Save CV checkbox section */}
     </div>
   );
 };
