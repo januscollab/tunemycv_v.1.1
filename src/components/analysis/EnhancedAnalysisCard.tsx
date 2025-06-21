@@ -131,13 +131,13 @@ const EnhancedAnalysisCard: React.FC<EnhancedAnalysisCardProps> = ({
   return (
     <div
       className={cn(
-        "group rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer relative border-t-4 border-t-[#FF6B35] p-6",
+        "group rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer relative border-t-4 border-t-[#FF6B35] p-4",
         className
       )}
       onClick={() => onView(analysis)}
     >
       {/* Main content layout */}
-      <div className="flex items-start justify-between mb-6">
+      <div className="flex items-start justify-between mb-4">
         {/* Left side - Icon and content */}
         <div className="flex items-start space-x-4 flex-1">
           {/* Document icon */}
@@ -148,7 +148,7 @@ const EnhancedAnalysisCard: React.FC<EnhancedAnalysisCardProps> = ({
           {/* Content */}
           <div className="flex-1 min-w-0">
             {/* Title and company with edit */}
-            <div className="group/edit relative flex items-center gap-2 mb-2">
+            <div className="group/edit relative flex items-center gap-2 mb-1">
               <h3 className="text-xl font-semibold text-foreground">
                 {analysis.job_title || 'Unknown Position'} – {analysis.company_name || 'Unknown Company'}
               </h3>
