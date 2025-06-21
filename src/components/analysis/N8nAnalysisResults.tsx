@@ -86,6 +86,42 @@ const N8nAnalysisResults: React.FC<N8nAnalysisResultsProps> = ({
     }
   };
 
+  const handlePdfDownload = () => {
+    if (result.pdf_file_data) {
+      try {
+        // Clean the base64 string
+        const cleanBase64 = result.pdf_file_data.replace(/\s+/g, '');
+        
+        // Convert base64 to blob
+        const binaryString = atob(cleanBase64);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+        
+        const blob = new Blob([bytes], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = result.pdf_file_name || 'analysis-report.pdf';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        
+        console.log('✅ PDF download completed successfully');
+      } catch (error) {
+        console.error('❌ PDF download failed:', error);
+        // Fallback to URL download if available
+        if (result.n8n_pdf_url) {
+          handleDownload(result.n8n_pdf_url, 'pdf');
+        }
+      }
+    } else if (result.n8n_pdf_url) {
+      handleDownload(result.n8n_pdf_url, 'pdf');
+    }
+  };
+
   // Extract job title and company from job description if not directly available
   const getJobTitle = () => {
     if (result.job_title) return result.job_title;
@@ -142,25 +178,37 @@ const N8nAnalysisResults: React.FC<N8nAnalysisResultsProps> = ({
         </div>
       )}
 
-      {/* Debug Information Panel */}
-      <Card className="border-2 border-blue-200 bg-blue-50/50 dark:border-blue-800 dark:bg-blue-950/20">
-        <CardContent className="pt-6">
-          <h4 className="text-sm font-semibold text-blue-800 dark:text-blue-200 mb-3">
-            🔧 Debug Information
-          </h4>
-          <div className="space-y-2 text-xs text-blue-700 dark:text-blue-300 font-mono">
-            <div>Analysis Type: {result.analysis_type || 'undefined'}</div>
-            <div>PDF Data: {result.pdf_file_data ? `${result.pdf_file_data.length} chars` : 'missing'}</div>
-            <div>HTML Data: {result.html_file_data ? `${result.html_file_data.length} chars` : 'missing'}</div>
-            <div>PDF URL: {result.n8n_pdf_url || 'missing'}</div>
-            <div>HTML URL: {result.n8n_html_url || 'missing'}</div>
-            <div>PDF File Name: {result.pdf_file_name || 'missing'}</div>
-            <div>HTML File Name: {result.html_file_name || 'missing'}</div>
-            {result.pdf_file_data && (
-              <div>PDF Starts With: {result.pdf_file_data.substring(0, 50)}...</div>
-            )}
+      {/* Analysis Header */}
+      <Card className="border border-apple-core/20 dark:border-citrus/20">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-xl font-bold text-blueberry dark:text-citrus">
+                {getJobTitle()} - {getCompanyName()}
+              </CardTitle>
+              {result.compatibility_score && (
+                <p className="text-lg font-semibold text-zapier-orange mt-1">
+                  {result.compatibility_score}% Compatibility Match
+                </p>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary" className="bg-zapier-orange/10 text-zapier-orange">
+                N8N Analysis
+              </Badge>
+              {result.html_file_data && (
+                <Button onClick={handleHtmlPreview} variant="outline" size="sm">
+                  <Globe className="h-4 w-4 mr-2" />
+                  View HTML Report
+                </Button>
+              )}
+              <Button onClick={handlePdfDownload} variant="outline" size="sm">
+                <Download className="h-4 w-4 mr-2" />
+                Download PDF
+              </Button>
+            </div>
           </div>
-        </CardContent>
+        </CardHeader>
       </Card>
 
       {/* PDF Viewer */}
@@ -168,7 +216,7 @@ const N8nAnalysisResults: React.FC<N8nAnalysisResultsProps> = ({
         <ReactPDFViewer
           pdfData={result.pdf_file_data}
           fileName={result.pdf_file_name || 'analysis-report.pdf'}
-          title="Analysis Report"
+          title="N8N Analysis Report"
           className="border border-apple-core/20 dark:border-citrus/20"
         />
       ) : (
@@ -178,9 +226,16 @@ const N8nAnalysisResults: React.FC<N8nAnalysisResultsProps> = ({
             <p className="text-gray-600 dark:text-gray-400">
               PDF report not available for this analysis
             </p>
-            <p className="text-xs text-gray-500 mt-2">
-              Debug: pdf_file_data = {result.pdf_file_data ? 'exists' : 'missing'}
-            </p>
+            {result.n8n_pdf_url && (
+              <Button 
+                onClick={() => handleExternalLink(result.n8n_pdf_url!)} 
+                variant="outline" 
+                className="mt-4"
+              >
+                <ExternalLink className="h-4 w-4 mr-2" />
+                View External PDF
+              </Button>
+            )}
           </CardContent>
         </Card>
       )}
@@ -194,10 +249,10 @@ const N8nAnalysisResults: React.FC<N8nAnalysisResultsProps> = ({
             </div>
             <div>
               <h4 className="text-heading font-semibold text-blueberry dark:text-citrus mb-2">
-                About Your Analysis
+                About Your N8N Analysis
               </h4>
               <p className="text-caption text-blueberry/70 dark:text-apple-core/80">
-                Your documents were processed using our advanced analysis workflow, which provides comprehensive analysis 
+                Your documents were processed using our advanced N8N workflow, which provides comprehensive analysis 
                 and generates both interactive HTML and downloadable PDF reports. These reports contain detailed 
                 insights about CV-job compatibility, keyword analysis, and actionable recommendations.
               </p>

@@ -1,400 +1,251 @@
-import React, { useState, useCallback } from 'react';
-import { Document, Page } from 'react-pdf';
-import { ChevronLeft, ChevronRight, Download, ExternalLink, FileText, AlertTriangle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+
+import React, { useState, useMemo } from 'react';
+import { Document, Page, pdfjs } from 'react-pdf';
+import { ChevronLeft, ChevronRight, Download, ZoomIn, ZoomOut, RotateCw } from 'lucide-react';
+import { Button } from './button';
 import { cn } from '@/lib/utils';
 
+// Set up PDF.js worker
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js`;
+
 interface ReactPDFViewerProps {
-  pdfData: string; // base64 encoded PDF data
+  pdfData: string;
   fileName?: string;
   title?: string;
   className?: string;
-  showDownloadButton?: boolean;
 }
 
 const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({
   pdfData,
   fileName = 'document.pdf',
   title = 'PDF Document',
-  className = '',
-  showDownloadButton = true
+  className
 }) => {
-  const [numPages, setNumPages] = useState<number>(0);
-  const [pageNumber, setPageNumber] = useState<number>(1);
-  const [pageInput, setPageInput] = useState<string>('1');
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string>('');
-  const [debugInfo, setDebugInfo] = useState<string>('');
+  const [numPages, setNumPages] = useState<number | null>(null);
+  const [pageNumber, setPageNumber] = useState(1);
+  const [scale, setScale] = useState(1.0);
+  const [rotation, setRotation] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Convert base64 to data URL for react-pdf
-  const pdfDataUrl = React.useMemo(() => {
-    console.log('=== PDF DATA URL CREATION DEBUG ===');
-    console.log('Input pdfData type:', typeof pdfData);
-    console.log('Input pdfData length:', pdfData?.length || 0);
-    console.log('Input pdfData starts with:', pdfData?.substring(0, 50) || 'EMPTY');
-    
-    if (!pdfData) {
-      console.error('❌ No PDF data provided');
-      setDebugInfo('❌ No PDF data provided');
-      return null;
-    }
-    
+  // Create PDF data URL with proper error handling
+  const pdfDataUrl = useMemo(() => {
     try {
-      // Check if data is already a data URL
-      if (pdfData.startsWith('data:')) {
-        console.log('✅ PDF data is already a data URL');
-        setDebugInfo('✅ PDF data is already a data URL');
-        return pdfData;
-      }
-      
-      // Check if it's valid base64
-      try {
-        atob(pdfData);
-        console.log('✅ PDF data is valid base64');
-      } catch (base64Error) {
-        console.error('❌ Invalid base64 data:', base64Error);
-        setDebugInfo(`❌ Invalid base64 data: ${base64Error.message}`);
+      console.log('=== PDF DATA URL CREATION DEBUG ===');
+      console.log('Input pdfData type:', typeof pdfData);
+      console.log('Input pdfData length:', pdfData?.length || 0);
+      console.log('Input pdfData starts with:', pdfData?.substring(0, 50) || 'EMPTY');
+
+      if (!pdfData || typeof pdfData !== 'string') {
+        console.error('❌ Invalid PDF data: not a string or empty');
         return null;
       }
+
+      // Clean the base64 string - remove any whitespace or newlines
+      const cleanBase64 = pdfData.replace(/\s+/g, '');
       
-      // Create data URL from base64
-      const dataUrl = `data:application/pdf;base64,${pdfData}`;
-      console.log('✅ Created data URL, length:', dataUrl.length);
-      setDebugInfo(`✅ Created data URL, length: ${dataUrl.length}`);
+      // Validate base64 format
+      const base64Regex = /^[A-Za-z0-9+/]*={0,2}$/;
+      if (!base64Regex.test(cleanBase64)) {
+        console.error('❌ Invalid base64 format detected');
+        return null;
+      }
+
+      // Test decode a small portion to verify it's valid base64
+      try {
+        atob(cleanBase64.substring(0, Math.min(100, cleanBase64.length)));
+        console.log('✅ Base64 validation successful');
+      } catch (testError) {
+        console.error('❌ Base64 decode test failed:', testError);
+        return null;
+      }
+
+      // Create data URL
+      const dataUrl = `data:application/pdf;base64,${cleanBase64}`;
+      console.log('✅ PDF data URL created successfully, length:', dataUrl.length);
       return dataUrl;
     } catch (error) {
       console.error('❌ Error creating PDF data URL:', error);
-      setDebugInfo(`❌ Error creating PDF data URL: ${error.message}`);
       return null;
     }
   }, [pdfData]);
 
-  const onDocumentLoadSuccess = useCallback(({ numPages }: { numPages: number }) => {
-    console.log('✅ PDF Document loaded successfully!');
-    console.log('Number of pages:', numPages);
+  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
     setIsLoading(false);
-    setError('');
-    setDebugInfo(`✅ PDF loaded successfully with ${numPages} pages`);
-  }, []);
+    setError(null);
+    console.log('✅ PDF loaded successfully, pages:', numPages);
+  };
 
-  const onDocumentLoadError = useCallback((error: Error) => {
-    console.error('❌ PDF Document load error:', error);
-    console.error('Error name:', error.name);
-    console.error('Error message:', error.message);
-    console.error('Error stack:', error.stack);
-    
-    const errorMsg = `Failed to load PDF: ${error.message}`;
-    setError(errorMsg);
+  const onDocumentLoadError = (error: Error) => {
+    console.error('❌ PDF load error:', error);
+    setError(`Failed to load PDF: ${error.message}`);
     setIsLoading(false);
-    setDebugInfo(`❌ Load error: ${error.name} - ${error.message}`);
-  }, []);
+  };
 
-  const onDocumentLoadProgress = useCallback(({ loaded, total }: { loaded: number; total: number }) => {
-    const progress = total > 0 ? Math.round((loaded / total) * 100) : 0;
-    console.log(`📊 PDF loading progress: ${loaded}/${total} bytes (${progress}%)`);
-    setDebugInfo(`📊 Loading progress: ${progress}%`);
-  }, []);
-
-  const goToPrevPage = useCallback(() => {
-    if (pageNumber > 1) {
-      const newPage = pageNumber - 1;
-      setPageNumber(newPage);
-      setPageInput(newPage.toString());
-    }
-  }, [pageNumber]);
-
-  const goToNextPage = useCallback(() => {
-    if (pageNumber < numPages) {
-      const newPage = pageNumber + 1;
-      setPageNumber(newPage);
-      setPageInput(newPage.toString());
-    }
-  }, [pageNumber, numPages]);
-
-  const goToFirstPage = useCallback(() => {
-    setPageNumber(1);
-    setPageInput('1');
-  }, []);
-
-  const goToLastPage = useCallback(() => {
-    setPageNumber(numPages);
-    setPageInput(numPages.toString());
-  }, [numPages]);
-
-  const handlePageInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setPageInput(e.target.value);
-  }, []);
-
-  const handlePageInputSubmit = useCallback((e: React.FormEvent) => {
-    e.preventDefault();
-    const page = parseInt(pageInput, 10);
-    if (page >= 1 && page <= numPages) {
-      setPageNumber(page);
-    } else {
-      setPageInput(pageNumber.toString());
-    }
-  }, [pageInput, numPages, pageNumber]);
-
-  const handleDownload = useCallback(() => {
+  const downloadPDF = () => {
     try {
-      console.log('🔽 Starting PDF download...');
-      const binaryString = atob(pdfData);
-      const bytes = new Uint8Array(binaryString.length);
-      for (let i = 0; i < binaryString.length; i++) {
-        bytes[i] = binaryString.charCodeAt(i);
+      if (!pdfDataUrl) {
+        console.error('No PDF data available for download');
+        return;
       }
-      
-      const blob = new Blob([bytes], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
-      
+
       const link = document.createElement('a');
-      link.href = url;
+      link.href = pdfDataUrl;
       link.download = fileName;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
-      URL.revokeObjectURL(url);
-      console.log('✅ PDF download completed');
+      console.log('✅ PDF download initiated');
     } catch (error) {
-      console.error('❌ Download failed:', error);
+      console.error('❌ PDF download failed:', error);
     }
-  }, [pdfData, fileName]);
+  };
 
-  const openInNewWindow = useCallback(() => {
-    try {
-      console.log('🔗 Opening PDF in new window...');
-      const binaryString = atob(pdfData);
-      const bytes = new Uint8Array(binaryString.length);
-      for (let i = 0; i < binaryString.length; i++) {
-        bytes[i] = binaryString.charCodeAt(i);
-      }
-      
-      const blob = new Blob([bytes], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
-      
-      const newWindow = window.open('', '_blank', 'width=1000,height=800,scrollbars=yes,resizable=yes');
-      if (newWindow) {
-        newWindow.document.title = title;
-        newWindow.location.href = url;
-        
-        // Clean up URL after a delay
-        setTimeout(() => URL.revokeObjectURL(url), 1000);
-        console.log('✅ PDF opened in new window');
-      }
-    } catch (error) {
-      console.error('❌ Failed to open in new window:', error);
-    }
-  }, [pdfData, title]);
-
-  // Early return if no PDF data
+  // Handle case where PDF data is not available
   if (!pdfData) {
     return (
-      <Card className={cn("border border-border/60", className)}>
-        <CardContent className="flex items-center justify-center py-12">
-          <div className="text-center max-w-md">
-            <AlertTriangle className="h-12 w-12 text-destructive mx-auto mb-4" />
-            <Alert variant="destructive">
-              <AlertDescription>
-                <p className="font-medium mb-2">No PDF Data</p>
-                <p className="text-sm">PDF data is missing or invalid.</p>
-                <p className="text-xs mt-2 font-mono">{debugInfo}</p>
-              </AlertDescription>
-            </Alert>
-          </div>
-        </CardContent>
-      </Card>
+      <div className={cn('border rounded-lg p-8 text-center', className)}>
+        <div className="text-muted-foreground">
+          <svg className="mx-auto h-12 w-12 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <p className="text-sm">PDF document not available</p>
+        </div>
+      </div>
     );
   }
 
-  if (error) {
+  // Handle case where PDF data URL creation failed
+  if (!pdfDataUrl) {
     return (
-      <Card className={cn("border border-border/60", className)}>
-        <CardContent className="flex items-center justify-center py-12">
-          <div className="text-center max-w-md">
-            <AlertTriangle className="h-12 w-12 text-destructive mx-auto mb-4" />
-            <Alert variant="destructive">
-              <AlertDescription>
-                <p className="font-medium mb-2">PDF Error</p>
-                <p className="text-sm mb-4">{error}</p>
-                <p className="text-xs font-mono mb-2">{debugInfo}</p>
-                <p className="text-xs text-muted-foreground">
-                  Check console for detailed error information.
-                </p>
-              </AlertDescription>
-            </Alert>
-            {showDownloadButton && (
-              <Button onClick={handleDownload} variant="outline" className="mt-4">
-                <Download className="h-4 w-4 mr-2" />
-                Download PDF
-              </Button>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      <div className={cn('border rounded-lg p-8 text-center', className)}>
+        <div className="text-red-500">
+          <svg className="mx-auto h-12 w-12 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p className="text-sm">Failed to load PDF document</p>
+          <p className="text-xs text-muted-foreground mt-2">The PDF data format is invalid</p>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Card className={cn("border border-border/60", className)}>
-      {/* Header with controls */}
-      <div className="flex justify-between items-center p-3 border-b border-border/30">
-        <div className="flex items-center space-x-2">
-          <FileText className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm font-medium text-foreground">{title}</span>
+    <div className={cn('border rounded-lg overflow-hidden', className)}>
+      {/* Header */}
+      <div className="bg-muted/50 px-4 py-3 border-b flex items-center justify-between">
+        <div>
+          <h3 className="font-medium text-sm">{title}</h3>
+          {fileName && (
+            <p className="text-xs text-muted-foreground">{fileName}</p>
+          )}
         </div>
         
         <div className="flex items-center gap-2">
-          {showDownloadButton && (
-            <Button
-              onClick={handleDownload}
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-2"
-            >
-              <Download className="h-4 w-4" />
-              Download
-            </Button>
-          )}
+          {/* Zoom Controls */}
           <Button
-            onClick={openInNewWindow}
-            variant="outline"
+            variant="ghost"
             size="sm"
-            className="flex items-center gap-2"
+            onClick={() => setScale(prev => Math.max(0.5, prev - 0.1))}
+            disabled={scale <= 0.5}
           >
-            <ExternalLink className="h-4 w-4" />
-            New Window
+            <ZoomOut className="h-4 w-4" />
+          </Button>
+          
+          <span className="text-sm text-muted-foreground px-2">
+            {Math.round(scale * 100)}%
+          </span>
+          
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setScale(prev => Math.min(3, prev + 0.1))}
+            disabled={scale >= 3}
+          >
+            <ZoomIn className="h-4 w-4" />
+          </Button>
+          
+          {/* Rotation */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setRotation(prev => (prev + 90) % 360)}
+          >
+            <RotateCw className="h-4 w-4" />
+          </Button>
+          
+          {/* Download */}
+          <Button variant="ghost" size="sm" onClick={downloadPDF}>
+            <Download className="h-4 w-4" />
           </Button>
         </div>
       </div>
 
-      <CardContent className="p-0">
-        {/* Debug Info Panel */}
-        {(isLoading || debugInfo) && (
-          <div className="bg-yellow-50 dark:bg-yellow-900/20 border-b border-yellow-200 dark:border-yellow-800 p-3">
-            <p className="text-xs font-mono text-yellow-800 dark:text-yellow-200">
-              🔧 Debug: {debugInfo}
-            </p>
+      {/* PDF Content */}
+      <div className="relative bg-gray-100 dark:bg-gray-900 min-h-[600px]">
+        {isLoading && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           </div>
         )}
 
-        {isLoading && (
-          <div className="flex items-center justify-center py-12">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-              <p className="text-muted-foreground">Loading PDF...</p>
-              <p className="text-xs text-muted-foreground mt-2">
-                If this persists, check console for detailed logs
-              </p>
+        {error && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="text-center text-red-500">
+              <svg className="mx-auto h-12 w-12 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p className="text-sm">{error}</p>
             </div>
           </div>
         )}
 
-        <div className="bg-muted/30">
+        <div className="flex justify-center p-4">
           <Document
             file={pdfDataUrl}
             onLoadSuccess={onDocumentLoadSuccess}
             onLoadError={onDocumentLoadError}
-            onLoadProgress={onDocumentLoadProgress}
             loading=""
           >
-            <div className="flex justify-center bg-white p-4">
-              <Page
-                pageNumber={pageNumber}
-                renderTextLayer={false}
-                renderAnnotationLayer={false}
-                className="shadow-lg"
-                width={Math.min(800, window.innerWidth - 100)}
-              />
-            </div>
+            <Page
+              pageNumber={pageNumber}
+              scale={scale}
+              rotate={rotation}
+              loading=""
+              className="shadow-lg"
+            />
           </Document>
-
-          {/* Page Navigation Controls */}
-          {numPages > 0 && (
-            <div className="flex items-center justify-center gap-4 p-4 bg-muted/20 border-t border-border/30">
-              <Button
-                onClick={() => {
-                  setPageNumber(1);
-                  setPageInput('1');
-                }}
-                disabled={pageNumber === 1}
-                variant="outline"
-                size="sm"
-              >
-                First
-              </Button>
-              
-              <Button
-                onClick={() => {
-                  if (pageNumber > 1) {
-                    const newPage = pageNumber - 1;
-                    setPageNumber(newPage);
-                    setPageInput(newPage.toString());
-                  }
-                }}
-                disabled={pageNumber === 1}
-                variant="outline"
-                size="sm"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-
-              <form onSubmit={(e) => {
-                e.preventDefault();
-                const page = parseInt(pageInput, 10);
-                if (page >= 1 && page <= numPages) {
-                  setPageNumber(page);
-                } else {
-                  setPageInput(pageNumber.toString());
-                }
-              }} className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">Page</span>
-                <Input
-                  type="number"
-                  min="1"
-                  max={numPages}
-                  value={pageInput}
-                  onChange={(e) => setPageInput(e.target.value)}
-                  className="w-16 h-8 text-center text-sm"
-                />
-                <span className="text-sm text-muted-foreground">of {numPages}</span>
-              </form>
-
-              <Button
-                onClick={() => {
-                  if (pageNumber < numPages) {
-                    const newPage = pageNumber + 1;
-                    setPageNumber(newPage);
-                    setPageInput(newPage.toString());
-                  }
-                }}
-                disabled={pageNumber === numPages}
-                variant="outline"
-                size="sm"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-              
-              <Button
-                onClick={() => {
-                  setPageNumber(numPages);
-                  setPageInput(numPages.toString());
-                }}
-                disabled={pageNumber === numPages}
-                variant="outline"
-                size="sm"
-              >
-                Last
-              </Button>
-            </div>
-          )}
         </div>
-      </CardContent>
-    </Card>
+
+        {/* Navigation */}
+        {numPages && numPages > 1 && (
+          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-background border rounded-lg shadow-lg px-4 py-2 flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setPageNumber(prev => Math.max(1, prev - 1))}
+              disabled={pageNumber <= 1}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            
+            <span className="text-sm">
+              Page {pageNumber} of {numPages}
+            </span>
+            
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setPageNumber(prev => Math.min(numPages, prev + 1))}
+              disabled={pageNumber >= numPages}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 
