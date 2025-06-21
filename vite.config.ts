@@ -20,17 +20,4 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  optimizeDeps: {
-    include: ['react-pdf', 'pdfjs-dist']
-  },
-  build: {
-    rollupOptions: {
-      external: [],
-      output: {
-        manualChunks: {
-          'react-pdf': ['react-pdf', 'pdfjs-dist']
-        }
-      }
-    }
-  }
 }));

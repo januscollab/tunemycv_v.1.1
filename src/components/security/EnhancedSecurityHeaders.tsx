@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 
 const EnhancedSecurityHeaders = () => {
@@ -8,13 +7,13 @@ const EnhancedSecurityHeaders = () => {
     cspMeta.httpEquiv = 'Content-Security-Policy';
     cspMeta.content = [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://apis.google.com https://unpkg.com",
-      "script-src-elem 'self' 'unsafe-inline' https://accounts.google.com https://apis.google.com https://unpkg.com",
-      "worker-src 'self' blob: https://unpkg.com",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://apis.google.com",
+      "script-src-elem 'self' 'unsafe-inline' https://accounts.google.com https://apis.google.com",
+      "worker-src 'self' blob:",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com data:",
       "img-src 'self' data: https: blob:",
-      "connect-src 'self' https://aohrfehhyjdebaatzqdl.supabase.co wss://aohrfehhyjdebaatzqdl.supabase.co https://accounts.google.com https://api.openai.com https://unpkg.com",
+      "connect-src 'self' https://aohrfehhyjdebaatzqdl.supabase.co wss://aohrfehhyjdebaatzqdl.supabase.co https://accounts.google.com https://api.openai.com",
       "frame-src 'self' https://accounts.google.com",
       "object-src 'none'",
       "base-uri 'self'",
