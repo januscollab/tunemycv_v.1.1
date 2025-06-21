@@ -10,13 +10,12 @@ import ATSOptimizationSection from './ATSOptimizationSection';
 import InterviewPrepSection from './InterviewPrepSection';
 import AnalysisHeader from './components/AnalysisHeader';
 import LegacySummarySection from './components/LegacySummarySection';
-import LegacyCompatibilitySection from './components/LegacyCompatibilitySection';
-import LegacyKeywordSection from './components/LegacyKeywordSection';
-import PriorityRecommendationsSection from './components/PriorityRecommendationsSection';
-import PersonalizedMatchMessage from './components/PersonalizedMatchMessage';
-import NextStepsSection from './components/NextStepsSection';
+import LegacyCompatibilitySection from './LegacyCompatibilitySection';
+import LegacyKeywordSection from './LegacyKeywordSection';
+import PriorityRecommendationsSection from './PriorityRecommendationsSection';
+import PersonalizedMatchMessage from './PersonalizedMatchMessage';
+import NextStepsSection from './NextStepsSection';
 import ReactPDFViewer from '@/components/ui/react-pdf-viewer';
-import PDFGenerator from './utils/PDFGenerator';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { FloatingLabelTextarea } from '@/components/common/FloatingLabelTextarea';
@@ -308,11 +307,6 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
   const analysisDate = result.created_at ? new Date(result.created_at).toLocaleDateString() : new Date().toLocaleDateString();
   const creditsUsed = result.credits_used || 1;
 
-  const downloadPDF = () => {
-    const pdfGenerator = new PDFGenerator();
-    pdfGenerator.generatePDF(result);
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-apple-core/20 via-white to-citrus/10 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
       <div className="max-w-6xl mx-auto px-4 py-8">
@@ -347,13 +341,6 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
                   <span className="text-sm">Analyze Another CV</span>
                 </button>
               )}
-              <button 
-                onClick={downloadPDF}
-                className="group flex items-center gap-2.5 px-5 py-2.5 bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg transition-all duration-200 font-normal shadow-sm hover:shadow-md border border-primary/20"
-              >
-                <Download className="h-4 w-4" />
-                <span className="text-sm">Download Report</span>
-              </button>
             </div>
           </div>
         </div>
