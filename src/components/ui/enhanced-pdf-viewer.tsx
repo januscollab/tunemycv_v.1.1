@@ -29,6 +29,7 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [pdfSource, setPdfSource] = useState<string | null>(null);
   const [workerUrl, setWorkerUrl] = useState<string>('');
+  const [workerLoaded, setWorkerLoaded] = useState(false);
 
   // COMPREHENSIVE DEBUG LOGGING
   useEffect(() => {
@@ -60,27 +61,66 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
     ],
   });
 
-  // Determine the best worker URL to use
+  // Simplified worker URL determination with fallbacks
   useEffect(() => {
-    const determineWorkerUrl = () => {
-      // Try local worker first (will be available in production build)
-      const localWorkerUrl = '/assets/pdf.worker.min.js';
+    const determineWorkerUrl = async () => {
+      console.log('=== WORKER URL DETERMINATION START ===');
       
-      // For development, we'll use the node_modules path
-      const devWorkerUrl = '/node_modules/pdfjs-dist/build/pdf.worker.min.js';
+      // Primary worker URL - use the copied asset
+      const primaryWorkerUrl = '/assets/pdf.worker.min.js';
       
-      // Set the appropriate worker URL based on environment
-      if (import.meta.env.PROD) {
-        setWorkerUrl(localWorkerUrl);
-      } else {
-        setWorkerUrl(devWorkerUrl);
+      // Fallback worker URLs
+      const fallbackWorkerUrls = [
+        'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js',
+        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'
+      ];
+
+      // Test if primary worker exists
+      try {
+        console.log('Testing primary worker URL:', primaryWorkerUrl);
+        const response = await fetch(primaryWorkerUrl, { method: 'HEAD' });
+        if (response.ok) {
+          console.log('Primary worker URL is accessible');
+          setWorkerUrl(primaryWorkerUrl);
+          setWorkerLoaded(true);
+          console.log('=== WORKER URL DETERMINATION END (SUCCESS) ===');
+          return;
+        }
+        console.log('Primary worker URL failed with status:', response.status);
+      } catch (error) {
+        console.log('Primary worker URL test failed:', error);
       }
+
+      // Try fallback URLs
+      for (const fallbackUrl of fallbackWorkerUrls) {
+        try {
+          console.log('Testing fallback worker URL:', fallbackUrl);
+          const response = await fetch(fallbackUrl, { method: 'HEAD' });
+          if (response.ok) {
+            console.log('Fallback worker URL is accessible:', fallbackUrl);
+            setWorkerUrl(fallbackUrl);
+            setWorkerLoaded(true);
+            console.log('=== WORKER URL DETERMINATION END (FALLBACK SUCCESS) ===');
+            return;
+          }
+          console.log('Fallback worker URL failed with status:', response.status);
+        } catch (error) {
+          console.log('Fallback worker URL test failed:', fallbackUrl, error);
+        }
+      }
+
+      // If all failed, set error
+      console.error('All worker URLs failed, PDF viewer cannot initialize');
+      setError('Failed to load PDF worker. Please check your internet connection.');
+      console.log('=== WORKER URL DETERMINATION END (FAILED) ===');
     };
 
     determineWorkerUrl();
   }, []);
 
   useEffect(() => {
+    if (!workerLoaded) return;
+
     const preparePdfSource = async () => {
       console.log('=== PDF SOURCE PREPARATION START ===');
       setLoading(true);
@@ -132,10 +172,8 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
       }
     };
 
-    if (workerUrl) {
-      preparePdfSource();
-    }
-  }, [pdfData, pdfUrl, workerUrl]);
+    preparePdfSource();
+  }, [pdfData, pdfUrl, workerLoaded]);
 
   const handleDownload = () => {
     console.log('=== PDF DOWNLOAD START ===');
@@ -181,12 +219,19 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
     setError(null);
   };
 
-  if (!workerUrl) {
+  const handleDocumentLoadError = (error: any) => {
+    console.error('PDF document load error:', error);
+    setError(`Failed to load PDF document: ${error?.message || 'Unknown error'}`);
+    setLoading(false);
+  };
+
+  if (!workerLoaded && !error) {
     return (
       <div className={`bg-surface border border-border rounded-lg p-8 ${className}`}>
         <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
           <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
           <p className="text-muted-foreground">Initializing PDF viewer...</p>
+          <p className="text-xs text-muted-foreground mt-2">Loading PDF.js worker...</p>
         </div>
       </div>
     );
@@ -206,13 +251,13 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
     );
   }
 
-  if (error || !pdfSource) {
+  if (error) {
     return (
       <div className={`bg-surface border border-border rounded-lg p-8 ${className}`}>
         <Alert variant="destructive" className="mb-4">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            {error || 'Unable to load PDF document'}
+            {error}
           </AlertDescription>
         </Alert>
         <div className="text-xs text-muted-foreground mb-4">
@@ -220,6 +265,8 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
           <p>- PDF Data Available: {!!pdfData ? 'Yes' : 'No'}</p>
           <p>- PDF URL Available: {!!pdfUrl ? 'Yes' : 'No'}</p>
           <p>- PDF Source Set: {!!pdfSource ? 'Yes' : 'No'}</p>
+          <p>- Worker Loaded: {workerLoaded ? 'Yes' : 'No'}</p>
+          <p>- Worker URL: {workerUrl || 'Not set'}</p>
           {pdfData && <p>- Data Length: {pdfData.length}</p>}
         </div>
         <div className="flex justify-center">
@@ -232,7 +279,21 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
     );
   }
 
+  if (!pdfSource) {
+    return (
+      <div className={`bg-surface border border-border rounded-lg p-8 ${className}`}>
+        <Alert variant="destructive" className="mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            No PDF source available to display
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
   console.log('Rendering PDF viewer with source:', pdfSource ? pdfSource.substring(0, 100) + '...' : 'none');
+  console.log('Using worker URL:', workerUrl);
 
   return (
     <div className={`bg-surface border border-border rounded-lg overflow-hidden ${className}`}>
@@ -259,6 +320,7 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
               fileUrl={pdfSource}
               plugins={[defaultLayoutPluginInstance]}
               onDocumentLoad={handleDocumentLoad}
+              onDocumentLoadError={handleDocumentLoadError}
             />
           </div>
         </Worker>
