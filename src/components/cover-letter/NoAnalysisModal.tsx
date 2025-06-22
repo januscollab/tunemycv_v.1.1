@@ -33,7 +33,7 @@ const NoAnalysisModal: React.FC<NoAnalysisModalProps> = ({ isOpen, onClose, onUs
             <DialogTitle>No CV Analysis Found</DialogTitle>
           </div>
           <DialogDescription>
-            You haven't analyzed a CV against a role yet. To generate a cover letter from analysis, you'll need to analyze your CV first, or you can use manual input instead.
+            You haven't analyzed a CV against a role yet. To generate a cover letter from analysis, you'll need to analyze your CV first.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">

@@ -66,20 +66,16 @@ export const useN8nAnalysis = () => {
 
       console.log('FormData created with cv and jd fields');
 
-      // Test connectivity directly to N8N endpoint with lightweight HEAD request
-      console.log('Testing N8N endpoint connectivity...');
+      // Test network connectivity first
+      console.log('Testing network connectivity...');
       let networkTestResult = 'unknown';
       try {
-        const testResponse = await fetch('https://januscollab.app.n8n.cloud/webhook/cv-analysis', { 
-          method: 'HEAD',
-          mode: 'no-cors' // Allow cross-origin HEAD request
-        });
-        networkTestResult = `N8N endpoint reachable`;
-        console.log('N8N connectivity test successful');
+        const testResponse = await fetch('https://httpbin.org/get', { method: 'GET' });
+        networkTestResult = `success: ${testResponse.status}`;
+        console.log('Network test successful:', testResponse.status);
       } catch (networkError) {
-        networkTestResult = `N8N endpoint test failed: ${networkError.message}`;
-        console.warn('N8N connectivity test failed:', networkError);
-        // Continue anyway - the actual POST might still work
+        networkTestResult = `failed: ${networkError.message}`;
+        console.error('Network connectivity test failed:', networkError);
       }
       
       console.log('Sending request to n8n webhook: https://januscollab.app.n8n.cloud/webhook/cv-analysis');
