@@ -91,14 +91,21 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
           console.log('Processing pdfData...');
           console.log('Raw pdfData length:', pdfData.length);
           
-          // Handle base64 PDF data
+          // Handle base64 PDF data with improved validation
           let base64Data: string;
           if (pdfData.startsWith('data:')) {
             console.log('PDF data already has data: prefix');
             base64Data = pdfData;
           } else {
             console.log('Adding data: prefix to PDF data');
-            base64Data = `data:application/pdf;base64,${pdfData}`;
+            // Validate if it looks like base64 before adding prefix
+            if (/^[A-Za-z0-9+/]*={0,2}$/.test(pdfData.substring(0, 100))) {
+              base64Data = `data:application/pdf;base64,${pdfData}`;
+            } else {
+              console.error('PDF data does not appear to be valid base64');
+              setError('Invalid PDF data format');
+              return;
+            }
           }
           
           console.log('Final base64Data length:', base64Data.length);
@@ -252,10 +259,6 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
               fileUrl={pdfSource}
               plugins={[defaultLayoutPluginInstance]}
               onDocumentLoad={handleDocumentLoad}
-              onLoadError={(error) => {
-                console.error('PDF load error:', error);
-                setError(`Failed to load PDF: ${error.message || 'Unknown error'}`);
-              }}
             />
           </div>
         </Worker>
