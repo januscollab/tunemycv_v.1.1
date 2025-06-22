@@ -175,9 +175,21 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
            !invalidCompanies.includes(companyName.toLowerCase());
   };
   
-  // Check if PDF data is available
+  // IMPROVED: Check if PDF data is available with comprehensive debugging
   const hasPdfData = () => {
-    return result.pdf_file_data || result.html_file_data || result.n8n_pdf_url || result.n8n_html_url;
+    console.log('=== PDF DATA AVAILABILITY CHECK ===');
+    console.log('Result object keys:', Object.keys(result));
+    console.log('result.pdf_file_data:', !!result.pdf_file_data, result.pdf_file_data ? result.pdf_file_data.length : 'null');
+    console.log('result.html_file_data:', !!result.html_file_data, result.html_file_data ? result.html_file_data.length : 'null');
+    console.log('result.n8n_pdf_url:', result.n8n_pdf_url);
+    console.log('result.n8n_html_url:', result.n8n_html_url);
+    console.log('result.analysis_type:', result.analysis_type);
+    
+    const hasData = result.pdf_file_data || result.html_file_data || result.n8n_pdf_url || result.n8n_html_url;
+    console.log('Has PDF data overall:', hasData);
+    console.log('=== PDF DATA AVAILABILITY CHECK END ===');
+    
+    return hasData;
   };
   
   // Check if this is an n8n analysis result
@@ -189,6 +201,16 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
     
     // Check if we have valid job information
     const validJobInfo = hasValidJobInfo(result.job_title, result.company_name);
+
+    console.log('=== N8N ANALYSIS RESULT RENDERING ===');
+    console.log('About to render EnhancedPDFViewer with:');
+    console.log('- pdfData (pdf_file_data):', !!result.pdf_file_data, result.pdf_file_data ? result.pdf_file_data.length : 'null');
+    console.log('- pdfUrl (n8n_pdf_url):', result.n8n_pdf_url);
+    console.log('- fileName calculation base:', result.job_title, result.company_name);
+    
+    const fileName = `CV_Analysis_${result.job_title || 'Report'}_${new Date().toISOString().split('T')[0]}.pdf`;
+    console.log('- Final fileName:', fileName);
+    console.log('=== N8N ANALYSIS RESULT RENDERING END ===');
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-apple-core/20 via-white to-citrus/10 dark:from-blueberry/10 dark:via-gray-900 dark:to-citrus/5">
@@ -206,15 +228,16 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
             </div>
           )}
 
-          {/* PDF Viewer or Coming Soon */}
+          {/* PDF Viewer or Coming Soon - FIXED PROPERTY MAPPING */}
           <div className="mb-8">
             {hasPdfData() ? (
               <EnhancedPDFViewer
                 pdfData={result.pdf_file_data}
                 pdfUrl={result.n8n_pdf_url}
-                fileName={`CV_Analysis_${result.job_title || 'Report'}_${new Date().toISOString().split('T')[0]}.pdf`}
+                fileName={fileName}
                 onDownload={() => {
-                  // Use existing download logic
+                  console.log('PDF download triggered from AnalysisResults');
+                  // Use existing download logic - this will be called by the PDF viewer
                   downloadAnalysisAsText();
                 }}
               />
@@ -301,6 +324,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
   const creditsUsed = result.credits_used || 1;
 
   const downloadAnalysisAsText = () => {
+    console.log('=== DOWNLOAD ANALYSIS AS TEXT START ===');
     const analysisDate = result.created_at ? new Date(result.created_at).toLocaleDateString() : new Date().toLocaleDateString();
     
     let content = `CV COMPATIBILITY ANALYSIS REPORT\n\n`;
@@ -358,6 +382,9 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
     link.click();
     document.body.removeChild(link);
     window.URL.revokeObjectURL(url);
+    
+    console.log('Download completed:', fileName);
+    console.log('=== DOWNLOAD ANALYSIS AS TEXT END ===');
   };
 
   const downloadPDF = () => {
