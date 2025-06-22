@@ -20,28 +20,14 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  optimizeDeps: {
-    include: ['react-pdf', 'pdfjs-dist']
-  },
   build: {
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          'react-pdf': ['react-pdf'],
-          'pdfjs': ['pdfjs-dist']
-        }
-      }
-    },
     assetsDir: 'assets',
     copyPublicDir: true
   },
-  // Ensure PDF.js worker files are properly handled
-  assetsInclude: ['**/*.worker.js', '**/*.worker.min.js'],
-  // Add worker support
+  // Add worker support for general use
   worker: {
     format: 'es'
   },
-  // Copy PDF.js worker to the correct location
   define: {
     'process.env.NODE_ENV': JSON.stringify(mode)
   }

@@ -1,9 +1,8 @@
-import React, { useState, Suspense } from 'react';
+import React, { useState } from 'react';
 import { CheckCircle, Download, ArrowLeft, Bug, X, Send } from 'lucide-react';
 
 import { useProfileData } from '@/hooks/useProfileData';
 import { FloatingFeedbackForm } from '@/components/common/FloatingFeedbackForm';
-// Remove the direct import of ReactPDFViewer - we'll lazy load it
 import CompatibilityBreakdownSection from './CompatibilityBreakdownSection';
 import EnhancedKeywordAnalysis from './EnhancedKeywordAnalysis';
 import SkillsGapAnalysis from './SkillsGapAnalysis';
@@ -22,9 +21,7 @@ import { FloatingLabelTextarea } from '@/components/common/FloatingLabelTextarea
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-
-// Lazy load the ReactPDFViewer component to prevent unnecessary PDF.js loading
-const ReactPDFViewer = React.lazy(() => import('@/components/common/ReactPDFViewer'));
+import { ComingSoonPDF } from '@/components/ui/coming-soon-pdf';
 
 interface AnalysisResultsProps {
   result: any;
@@ -264,44 +261,10 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
             </div>
           )}
 
-          {/* PDF Viewer - Only render if PDF URL is available */}
-          {result.n8n_pdf_url && (
-            <div className="mb-8">
-              <Suspense fallback={
-                <div className="flex items-center justify-center h-96 bg-surface border border-border rounded-lg">
-                  <div className="text-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-                    <p className="text-muted-foreground">Loading PDF viewer...</p>
-                  </div>
-                </div>
-              }>
-                <ReactPDFViewer 
-                  pdfUrl={result.n8n_pdf_url}
-                  fileName={`CV_Analysis_Report_${result.job_title || 'Report'}_${new Date().toISOString().split('T')[0]}.pdf`}
-                />
-              </Suspense>
-            </div>
-          )}
-
-          {/* Fallback for no PDF */}
-          {!result.n8n_pdf_url && (
-            <div className="border border-apple-core/20 dark:border-citrus/20 rounded-lg p-8 text-center mb-8 bg-surface">
-              <div className="text-muted-foreground">
-                <svg className="mx-auto h-16 w-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                <h3 className="text-lg font-medium mb-2">Analysis Report Processing</h3>
-                <p className="text-sm mb-4">Your CV analysis has been completed, but the PDF is still being generated.</p>
-                <button 
-                  onClick={downloadAnalysisAsText}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-                >
-                  <Download className="h-4 w-4" />
-                  Download Report as Text
-                </button>
-              </div>
-            </div>
-          )}
+          {/* Coming Soon PDF Viewer */}
+          <div className="mb-8">
+            <ComingSoonPDF onDownloadText={downloadAnalysisAsText} />
+          </div>
 
           {/* Additional Information */}
           <div className="bg-apple-core/5 dark:bg-citrus/5 border border-apple-core/20 dark:border-citrus/20 rounded-lg p-6 mb-8">
