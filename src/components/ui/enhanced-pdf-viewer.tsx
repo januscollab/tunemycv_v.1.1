@@ -28,6 +28,7 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pdfSource, setPdfSource] = useState<string | null>(null);
+  const [workerUrl, setWorkerUrl] = useState<string>('');
 
   // Configure default layout plugin
   const defaultLayoutPluginInstance = defaultLayoutPlugin({
@@ -36,6 +37,26 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
       defaultTabs[1], // Outline tab
     ],
   });
+
+  // Determine the best worker URL to use
+  useEffect(() => {
+    const determineWorkerUrl = () => {
+      // Try local worker first (will be available in production build)
+      const localWorkerUrl = '/assets/pdf.worker.min.js';
+      
+      // For development, we'll use the node_modules path
+      const devWorkerUrl = '/node_modules/pdfjs-dist/build/pdf.worker.min.js';
+      
+      // Set the appropriate worker URL based on environment
+      if (import.meta.env.PROD) {
+        setWorkerUrl(localWorkerUrl);
+      } else {
+        setWorkerUrl(devWorkerUrl);
+      }
+    };
+
+    determineWorkerUrl();
+  }, []);
 
   useEffect(() => {
     const preparePdfSource = async () => {
@@ -62,8 +83,10 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
       }
     };
 
-    preparePdfSource();
-  }, [pdfData, pdfUrl]);
+    if (workerUrl) {
+      preparePdfSource();
+    }
+  }, [pdfData, pdfUrl, workerUrl]);
 
   const handleDownload = () => {
     if (onDownload) {
@@ -95,6 +118,22 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
     setLoading(false);
     setError(null);
   };
+
+  const handleWorkerError = () => {
+    console.error('PDF worker failed to load');
+    setError('PDF viewer unavailable - worker failed to load');
+  };
+
+  if (!workerUrl) {
+    return (
+      <div className={`bg-surface border border-border rounded-lg p-8 ${className}`}>
+        <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+          <p className="text-muted-foreground">Initializing PDF viewer...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -139,7 +178,10 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
 
       {/* PDF Viewer */}
       <div className="pdf-viewer-container" style={{ height: '600px' }}>
-        <Worker workerUrl={`https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js`}>
+        <Worker 
+          workerUrl={workerUrl}
+          onError={handleWorkerError}
+        >
           <div
             style={{ height: '100%' }}
             onError={() => {
