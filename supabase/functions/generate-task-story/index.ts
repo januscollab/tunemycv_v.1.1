@@ -13,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const { title, existingDescription, context } = await req.json();
+    const { storyInfo, existingTitle, existingDescription, context } = await req.json();
 
     // Get Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -50,29 +50,31 @@ serve(async (req) => {
     const model = settings.preferred_model || 'gpt-4';
 
     // Generate story using OpenAI
-    const prompt = `You are a product manager helping to write user stories for development tasks.
+    const prompt = `You are an expert Agile coach helping to transform user input into proper agile user stories.
 
-Task Title: ${title}
+User Input/Requirements: ${storyInfo}
 Context/Sprint: ${context}
-${existingDescription ? `Existing Description: ${existingDescription}` : ''}
+${existingTitle ? `Current Title: ${existingTitle}` : ''}
+${existingDescription ? `Current Description: ${existingDescription}` : ''}
 
-Please generate a clear, actionable user story or task description following these guidelines:
-1. If it's a user-facing feature, use "As a [user type], I want [goal] so that [benefit]" format
-2. If it's a technical task, provide clear implementation details and acceptance criteria
-3. Include specific acceptance criteria as bullet points
-4. Keep it concise but comprehensive
-5. Focus on what needs to be delivered
-6. Include progress tracking considerations - mention how completion can be measured
-7. Add any dependencies or blockers that should be considered
-8. Suggest metrics or success criteria where applicable
+Please generate TWO things:
+1. A proper user story TITLE in the exact format: "As a [user type], I want [goal], so that [benefit]"
+2. A detailed DESCRIPTION with acceptance criteria
 
-Format your response to include:
-- Clear task description
-- Acceptance criteria (bulleted)
-- Progress tracking notes
-- Any dependencies or considerations
+Guidelines:
+- The title MUST follow the standard agile format exactly
+- The description should include specific, testable acceptance criteria
+- Include technical considerations if applicable
+- Make it actionable and measurable
+- Focus on progress tracking (how will we know it's done?)
 
-Generate only the story/description text, no additional formatting or explanations.`;
+Respond with a JSON object containing exactly these two fields:
+{
+  "title": "As a [user], I want [goal], so that [benefit]",
+  "description": "Detailed story description with acceptance criteria..."
+}
+
+Important: Respond ONLY with valid JSON, no additional text or formatting.`;
 
     const openAIResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -83,7 +85,7 @@ Generate only the story/description text, no additional formatting or explanatio
       body: JSON.stringify({
         model: model,
         messages: [
-          { role: 'system', content: 'You are a helpful product manager assistant that writes clear, actionable user stories and task descriptions.' },
+          { role: 'system', content: 'You are an expert Agile coach. Always respond with valid JSON containing title and description fields.' },
           { role: 'user', content: prompt }
         ],
         max_tokens: 500,
@@ -96,13 +98,72 @@ Generate only the story/description text, no additional formatting or explanatio
     }
 
     const data = await openAIResponse.json();
-    const story = data.choices[0]?.message?.content;
+    const content = data.choices[0]?.message?.content;
 
-    if (!story) {
-      throw new Error('No story generated from OpenAI');
+    if (!content) {
+      throw new Error('No content generated from OpenAI');
     }
 
-    return new Response(JSON.stringify({ story }), {
+    // Enhanced JSON parsing with content sanitization
+    let result;
+    try {
+      // Clean up potential JSON artifacts from content
+      const cleanContent = content.trim().replace(/^```json\s*/, '').replace(/\s*```$/, '');
+      
+      result = JSON.parse(cleanContent);
+      if (!result.title || !result.description) {
+        throw new Error('Invalid response format');
+      }
+
+      // Sanitize title and description to remove JSON artifacts
+      result.title = sanitizeText(result.title);
+      result.description = sanitizeText(result.description);
+      
+    } catch (parseError) {
+      console.log('JSON parse failed, using fallback extraction');
+      
+      // Enhanced fallback: extract title and description from raw content
+      const cleanedContent = sanitizeText(content);
+      const lines = cleanedContent.split('\n').filter(line => line.trim());
+      
+      // Look for title pattern
+      let titleLine = lines.find(line => 
+        line.toLowerCase().includes('as a') && 
+        line.toLowerCase().includes('i want') &&
+        line.toLowerCase().includes('so that')
+      );
+      
+      if (!titleLine) {
+        titleLine = `As a user, I want ${storyInfo}, so that I can achieve my goals`;
+      }
+      
+      // Use cleaned content for description
+      result = {
+        title: titleLine,
+        description: cleanedContent
+      };
+    }
+
+    // Helper function to sanitize text content
+    function sanitizeText(text: string): string {
+      if (!text) return '';
+      
+      return text
+        // Remove JSON structure artifacts
+        .replace(/^["'\s]*{[\s\S]*?["'\s]*title["'\s]*:\s*["']/, '')
+        .replace(/["'\s]*,?\s*["'\s]*description["'\s]*:\s*["'][\s\S]*$/, '')
+        // Remove JSON key prefixes
+        .replace(/^["'\s]*title["'\s]*:\s*["']?/, '')
+        .replace(/^["'\s]*description["'\s]*:\s*["']?/, '')
+        // Remove trailing JSON artifacts
+        .replace(/["'\s]*}?\s*$/, '')
+        .replace(/["'\s]*,?\s*$/, '')
+        // Clean up quotes and whitespace
+        .replace(/^["'\s]+|["'\s]+$/g, '')
+        .trim();
+    }
+
+    return new Response(JSON.stringify(result), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {

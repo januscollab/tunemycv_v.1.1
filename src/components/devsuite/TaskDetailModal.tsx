@@ -1,8 +1,8 @@
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Calendar, User, Archive, Tag } from 'lucide-react';
+import { ModernButton } from './ui/ModernButton';
 
 interface ArchivedTask {
   id: string;
@@ -37,9 +37,9 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high': return 'bg-destructive text-destructive-foreground';
-      case 'medium': return 'bg-zapier-orange text-white';
-      case 'low': return 'bg-secondary text-secondary-foreground';
+      case 'high': return 'bg-red-500 text-white';
+      case 'medium': return 'bg-slate-500 text-white';
+      case 'low': return 'bg-slate-300 text-slate-700';
       default: return 'bg-muted text-muted-foreground';
     }
   };
@@ -70,7 +70,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
               <Badge variant="outline">
                 {task.sprint_name || 'Unknown Sprint'}
               </Badge>
-              <Badge variant="secondary" className="bg-green-500 text-white">
+              <Badge variant="secondary" className="bg-emerald-500 text-white">
                 {task.status}
               </Badge>
             </div>
@@ -126,26 +126,25 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
 
           {/* Action Buttons */}
           <div className="flex justify-between items-center pt-4 border-t">
-            <Button variant="outline" onClick={onClose} className="menu-text-animation">
+            <ModernButton modernVariant="ghost" onClick={onClose}>
               Close
-            </Button>
+            </ModernButton>
             <div className="flex gap-2">
               {onRestore && (
-                <Button
+                <ModernButton
+                  modernVariant="success"
                   onClick={() => onRestore(task)}
-                  className="menu-text-animation"
                 >
                   Restore Task
-                </Button>
+                </ModernButton>
               )}
               {onDelete && (
-                <Button
-                  variant="destructive"
+                <ModernButton
+                  modernVariant="destructive"
                   onClick={() => onDelete(task)}
-                  className="menu-text-animation"
                 >
                   Delete Permanently
-                </Button>
+                </ModernButton>
               )}
             </div>
           </div>

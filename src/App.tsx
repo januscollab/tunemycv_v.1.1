@@ -18,10 +18,10 @@ import Resources from './pages/Resources';
 import HelpCentre from './pages/HelpCentre';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
-import Template from './pages/Template';
+
 import PricingScale from './pages/PricingScale';
 import DesignSystem from './pages/DesignSystem';
-import DebugTest from './pages/DebugTest';
+
 import DevSuite from './pages/DevSuite';
 import Navigation from './components/Navigation';
 import Footer from './components/Footer';
@@ -57,18 +57,20 @@ function AppContent() {
           <Route path="/auth" element={<Auth />} />
           <Route path="/analyze" element={<AnalyzeCV />} />
           <Route path="/cover-letter" element={<CoverLetter />} />
+          <Route path="/cover-letter/view/:id" element={<CoverLetter viewMode={true} />} />
           <Route path="/interview-prep" element={<InterviewPrep />} />
           <Route path="/interview-toolkit" element={<InterviewToolkit />} />
+          <Route path="/interview-toolkit/view/:id" element={<InterviewToolkit viewMode={true} />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
-          <Route path="/template" element={<Template />} />
+          
           <Route path="/pricing-scale" element={<PricingScale />} />
           <Route path="/resources" element={<Resources />} />
           <Route path="/help-centre" element={<HelpCentre />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-of-service" element={<TermsOfService />} />
           <Route path="/design-system" element={<DesignSystem />} />
-          <Route path="/debug-test" element={<DebugTest />} />
+          
           <Route path="/devsuite" element={<DevSuite />} />
         </Routes>
       </main>

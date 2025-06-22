@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect, useState, useCallback, forwardRef, useImperativeHandle } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
@@ -8,6 +9,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useJsonFirstEditor } from '@/hooks/useJsonFirstEditor';
 import { DocumentJson } from '@/utils/documentJsonUtils';
 import { validateSecureContent, sanitizeHtmlContent, logSecurityEvent } from '@/utils/enhancedSecurityValidation';
+import { AIContextMenu } from '@/components/ui/ai-context-menu';
 
 interface AIContext {
   selectedText: string;
@@ -50,6 +52,7 @@ const SafeRichTextEditor = forwardRef<SafeRichTextEditorRef, SafeRichTextEditorP
   const [editorError, setEditorError] = useState<string | null>(null);
   const [isQuillReady, setIsQuillReady] = useState(false);
   const [securityWarnings, setSecurityWarnings] = useState<string[]>([]);
+  const [selectedText, setSelectedText] = useState('');
 
   // Use the JSON-first editor hook
   const {
@@ -80,13 +83,11 @@ const SafeRichTextEditor = forwardRef<SafeRichTextEditorRef, SafeRichTextEditorP
         return '<p><br></p>';
       }
       
-      // Basic validation - ensure it's not empty and has proper structure
       const trimmed = html.trim();
       if (!trimmed) {
         return '<p><br></p>';
       }
       
-      // Test if HTML can be parsed safely
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = trimmed;
       
@@ -130,7 +131,6 @@ const SafeRichTextEditor = forwardRef<SafeRichTextEditorRef, SafeRichTextEditorP
         const selectedText = editor.getText(range.index, range.length);
         const fullText = getPlainText();
         
-        // Get selection position for menu positioning
         const bounds = quillRef.current?.getEditor().getBounds(range.index, range.length);
         
         setSelectionInfo({
@@ -139,24 +139,30 @@ const SafeRichTextEditor = forwardRef<SafeRichTextEditorRef, SafeRichTextEditorP
           fullText: fullText,
           bounds: bounds
         });
+        setSelectedText(selectedText.trim());
         setIsAIEnabled(selectedText.trim().length > 10);
       } else {
         setSelectionInfo(null);
+        setSelectedText('');
         setIsAIEnabled(false);
       }
     } catch (error) {
       console.error('Selection change error:', error);
       setSelectionInfo(null);
+      setSelectedText('');
       setIsAIEnabled(false);
     }
   }, [showAIFeatures, getPlainText, isQuillReady]);
 
-  // AI improvement handlers
-  const handleAIImprovement = useCallback((action: 'improve' | 'rewrite' | 'tone') => {
-    if (selectionInfo && onAIRequest) {
-      onAIRequest(selectionInfo, action);
-    }
-  }, [selectionInfo, onAIRequest]);
+  // Handle AI text replacement
+  const handleTextReplace = useCallback((originalText: string, newText: string) => {
+    const editor = quillRef.current?.getEditor();
+    if (!editor) return;
+
+    const currentContent = editor.root.innerHTML;
+    const updatedContent = currentContent.replace(originalText, newText);
+    updateFromHtml(updatedContent);
+  }, [updateFromHtml]);
 
   // Reset editor error
   const handleResetError = useCallback(() => {
@@ -164,7 +170,7 @@ const SafeRichTextEditor = forwardRef<SafeRichTextEditorRef, SafeRichTextEditorP
     resetToOriginal();
   }, [resetToOriginal]);
 
-  // Quill configuration with enhanced error handling and cleaned toolbar (removed "T" icon)
+  // Quill configuration with enhanced error handling and cleaned toolbar
   const modules = {
     toolbar: [
       [{ 'header': [1, 2, 3, false] }],
@@ -204,49 +210,8 @@ const SafeRichTextEditor = forwardRef<SafeRichTextEditorRef, SafeRichTextEditorP
     );
   }
 
-  return (
+  const editorContent = (
     <div className={`relative ${className}`}>
-      {/* AI Enhancement Toolbar - Positioned below selection */}
-      {showAIFeatures && isAIEnabled && selectionInfo && selectionInfo.bounds && (
-        <div 
-          className="absolute z-50 flex space-x-2 bg-background border border-border rounded-lg p-2 shadow-lg"
-          style={{
-            top: `${selectionInfo.bounds.top + selectionInfo.bounds.height + 8}px`,
-            left: `${Math.max(8, selectionInfo.bounds.left)}px`,
-            maxWidth: '300px'
-          }}
-        >
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => handleAIImprovement('improve')}
-            className="text-micro px-2 py-1 whitespace-nowrap"
-          >
-            <WandSparkles className="h-3 w-3 mr-1" />
-            Improve
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => handleAIImprovement('rewrite')}
-            className="text-micro px-2 py-1 whitespace-nowrap"
-          >
-            <WandSparkles className="h-3 w-3 mr-1" />
-            Rewrite
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => handleAIImprovement('tone')}
-            className="text-micro px-2 py-1 whitespace-nowrap"
-          >
-            <WandSparkles className="h-3 w-3 mr-1" />
-            Tone
-          </Button>
-        </div>
-      )}
-
-
       {/* Loading indicator */}
       {isConverting && (
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 bg-background/80 rounded-lg p-2">
@@ -286,6 +251,21 @@ const SafeRichTextEditor = forwardRef<SafeRichTextEditorRef, SafeRichTextEditorP
       )}
     </div>
   );
+
+  // Wrap with AI features if enabled
+  if (showAIFeatures) {
+    return (
+      <AIContextMenu
+        selectedText={selectedText}
+        onTextReplace={handleTextReplace}
+        disabled={readOnly || isConverting}
+      >
+        {editorContent}
+      </AIContextMenu>
+    );
+  }
+
+  return editorContent;
 });
 
 SafeRichTextEditor.displayName = 'SafeRichTextEditor';

@@ -5,6 +5,7 @@ import 'react-quill/dist/quill.snow.css';
 import { jsonToHtml, htmlToJson } from '@/utils/jsonHtmlConverters';
 import { DocumentJson, textToJson, generateFormattedText } from '@/utils/documentJsonUtils';
 import DownloadOptions from '@/components/cover-letter/DownloadOptions';
+import { useTabChangeAutoSave } from '@/hooks/useTabChangeAutoSave';
 
 
 interface EditableCoverLetterProps {
@@ -175,6 +176,12 @@ const EditableCoverLetter = forwardRef<EditableCoverLetterRef, EditableCoverLett
   useImperativeHandle(ref, () => ({
     forceSave
   }), [forceSave]);
+
+  // Auto-save on tab change
+  useTabChangeAutoSave({
+    onSave: forceSave,
+    enabled: isInitialized
+  });
 
   // Enhanced content change handler with initialization fix and immediate save
   const handleContentChange = useCallback(async (html: string) => {

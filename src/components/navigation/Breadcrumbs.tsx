@@ -111,7 +111,7 @@ export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
     <Breadcrumb className={cn("mb-4", className)}>
       <BreadcrumbList>
         {breadcrumbItems.map((item, index) => (
-          <React.Fragment key={index}>
+          <div key={index}>
             <BreadcrumbItem>
               {item.href && !item.isActive ? (
                 <BreadcrumbLink asChild>
@@ -131,7 +131,7 @@ export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
               )}
             </BreadcrumbItem>
             {index < breadcrumbItems.length - 1 && <BreadcrumbSeparator />}
-          </React.Fragment>
+          </div>
         ))}
       </BreadcrumbList>
     </Breadcrumb>

@@ -6,7 +6,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+import { VybeButton } from '@/components/design-system/VybeButton';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -24,6 +24,7 @@ interface Task {
   id: string;
   title: string;
   description: string;
+  story_info?: string;
   priority: string;
   tags: string[];
 }
@@ -173,14 +174,12 @@ Format your response to help track progress and completion status.`;
               />
             </div>
             <div className="flex gap-2">
-              <Button onClick={handleCopyPrompt} variant="outline" className="menu-text-animation">
-                <Copy className="h-4 w-4 mr-2" />
+              <VybeButton onClick={handleCopyPrompt} vybeVariant="outline" icon={Copy}>
                 Copy Prompt
-              </Button>
-              <Button onClick={handleSendToLovable} className="menu-text-animation">
-                <Send className="h-4 w-4 mr-2" />
+              </VybeButton>
+              <VybeButton onClick={handleSendToLovable} vybeVariant="primary" icon={Send}>
                 Send to Lovable
-              </Button>
+              </VybeButton>
             </div>
           </TabsContent>
 
@@ -195,20 +194,21 @@ Format your response to help track progress and completion status.`;
                 className="font-mono text-sm"
               />
             </div>
-            <Button 
+            <VybeButton 
               onClick={handleProcessAIResponse} 
               disabled={loading || !aiResponse}
-              className="menu-text-animation"
+              isLoading={loading}
+              vybeVariant="primary"
             >
               {loading ? 'Processing...' : 'Process Response & Update Tasks'}
-            </Button>
+            </VybeButton>
           </TabsContent>
         </Tabs>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} className="menu-text-animation">
+          <VybeButton vybeVariant="outline" onClick={() => onOpenChange(false)}>
             Close
-          </Button>
+          </VybeButton>
         </DialogFooter>
       </DialogContent>
     </Dialog>

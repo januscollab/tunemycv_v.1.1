@@ -96,59 +96,14 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
       return;
     }
 
-    // Check if we're at the 5 CV limit when trying to save
-    if (shouldSave && savedCVs.length >= 5) {
-      toast({ title: 'Limit Reached', description: 'You can save up to 5 CVs. Please delete one first.', variant: 'destructive' });
-      return;
-    }
-
-    try {
-      setFileUploading(true);
-      
-      // Only save to database if user explicitly requested it AND we're under the limit
-      if (shouldSave && user?.id && savedCVs.length < 5) {
-        const { error: saveError } = await supabase
-          .from('uploads')
-          .insert({
-            user_id: user.id,
-            file_name: file.name,
-            file_type: file.type,
-            file_size: file.size,
-            upload_type: 'cv',
-            extracted_text: extractedText
-          });
-
-        if (saveError) {
-          console.error('Error saving CV:', saveError);
-          toast({ title: 'Warning', description: 'CV uploaded but not saved for future use', variant: 'destructive' });
-        } else {
-          toast({ title: 'Success', description: 'CV uploaded and saved for future use!' });
-          // Refetch saved CVs to update the list
-          refetch();
-        }
-      } else if (!shouldSave) {
-        toast({ title: 'Success', description: 'CV uploaded for one-time use!' });
-      }
-
-      const uploadedFile: UploadedFile = {
-        file,
-        extractedText,
-        type: 'cv'
-      };
-
-      onCVSelect(uploadedFile);
-    } catch (error) {
-      toast({ title: 'Error', description: 'Failed to process CV file', variant: 'destructive' });
-    } finally {
-      setFileUploading(false);
-    }
+    // NEVER automatically save - only proceed with file processing
+    await finalizeUpload(file, extractedText, false); // Always pass false for shouldSave
   };
 
   const handleValidationConfirm = async () => {
     if (pendingFile) {
-      // User confirmed, proceed with upload using existing logic
-      const shouldSave = false; // Default to not saving when validation failed
-      await finalizeUpload(pendingFile.file, pendingFile.extractedText, shouldSave);
+      // User confirmed, proceed with upload but don't auto-save
+      await finalizeUpload(pendingFile.file, pendingFile.extractedText, false);
     }
     setShowValidationDialog(false);
     setPendingFile(null);
@@ -160,40 +115,12 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
   };
 
   const finalizeUpload = async (file: File, extractedText: string, shouldSave: boolean) => {
-    // Check if we're at the 5 CV limit when trying to save
-    if (shouldSave && savedCVs.length >= 5) {
-      toast({ title: 'Limit Reached', description: 'You can save up to 5 CVs. Please delete one first.', variant: 'destructive' });
-      return;
-    }
-
     try {
       setFileUploading(true);
       
-      // Only save to database if user explicitly requested it AND we're under the limit
-      if (shouldSave && user?.id && savedCVs.length < 5) {
-        const { error: saveError } = await supabase
-          .from('uploads')
-          .insert({
-            user_id: user.id,
-            file_name: file.name,
-            file_type: file.type,
-            file_size: file.size,
-            upload_type: 'cv',
-            extracted_text: extractedText
-          });
-
-        if (saveError) {
-          console.error('Error saving CV:', saveError);
-          toast({ title: 'Warning', description: 'CV uploaded but not saved for future use', variant: 'destructive' });
-        } else {
-          toast({ title: 'Success', description: 'CV uploaded and saved for future use!' });
-          // Refetch saved CVs to update the list
-          refetch();
-        }
-      } else if (!shouldSave) {
-        toast({ title: 'Success', description: 'CV uploaded for one-time use!' });
-      }
-
+      // REMOVED: All automatic save logic - files are only uploaded for analysis, not saved
+      // The only way to save is through the explicit "Save to CVs" button in DocumentPreviewCard
+      
       const uploadedFile: UploadedFile = {
         file,
         extractedText,
@@ -201,6 +128,8 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
       };
 
       onCVSelect(uploadedFile);
+      toast({ title: 'Success', description: 'CV uploaded for analysis!' });
+      
     } catch (error) {
       toast({ title: 'Error', description: 'Failed to process CV file', variant: 'destructive' });
     } finally {
@@ -252,7 +181,7 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
               documentType="cv"
               onOpenVerification={() => setShowVerificationModal(true)}
               onRemove={() => window.location.reload()}
-               onSaveToCVs={selectedCVId ? undefined : async () => {
+              onSaveToCVs={selectedCVId ? undefined : async () => {
                 if (user?.id && savedCVs.length < 5) {
                   try {
                     const { error: saveError } = await supabase

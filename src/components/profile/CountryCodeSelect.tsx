@@ -1,5 +1,6 @@
 import React from 'react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { VybeSelect } from '@/components/design-system/VybeSelect';
+import { Phone } from 'lucide-react';
 
 interface CountryCodeSelectProps {
   value: string;
@@ -216,22 +217,22 @@ const COUNTRY_CODES = [
 ].sort((a, b) => parseInt(a.code.substring(1)) - parseInt(b.code.substring(1)));
 
 const CountryCodeSelect: React.FC<CountryCodeSelectProps> = ({ value, onChange, className }) => {
+  const countryOptions = COUNTRY_CODES.map((country) => ({
+    value: country.code,
+    label: country.code,
+    description: `${country.country} - ${country.name}`,
+    icon: Phone
+  }));
+
   return (
-    <Select value={value} onValueChange={onChange}>
-      <SelectTrigger className={className}>
-        <SelectValue placeholder="Select country code" />
-      </SelectTrigger>
-      <SelectContent>
-        {COUNTRY_CODES.map((country) => (
-          <SelectItem key={country.code} value={country.code}>
-            <span className="flex items-center">
-              <span className="font-mono text-caption mr-2">{country.code}</span>
-              <span className="text-micro text-gray-500">{country.country}</span>
-            </span>
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <VybeSelect
+      placeholder="Select country code"
+      value={value}
+      onValueChange={onChange}
+      options={countryOptions}
+      className={className}
+      icon={Phone}
+    />
   );
 };
 

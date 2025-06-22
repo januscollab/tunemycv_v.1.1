@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Eye, Clock, AlertCircle, CheckCircle, ChevronLeft, ChevronRight, Calendar, Tag } from 'lucide-react';
+import { Search, Eye, Clock, AlertCircle, CheckCircle, ChevronLeft, ChevronRight, Calendar, Tag, Filter } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { VybeSelect } from '@/components/design-system/VybeSelect';
 import { Button } from '@/components/ui/button';
 import AnalysisLogDetailModal from './AnalysisLogDetailModal';
 
@@ -167,52 +167,60 @@ const AnalysisLogsManagement = () => {
             />
           </div>
           
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder="Filter by Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="success">Success</SelectItem>
-              <SelectItem value="error">Error</SelectItem>
-            </SelectContent>
-          </Select>
+          <VybeSelect
+            placeholder="Filter by Status"
+            value={statusFilter}
+            onValueChange={setStatusFilter}
+            options={[
+              { value: 'all', label: 'All Status', icon: Filter },
+              { value: 'success', label: 'Success', icon: CheckCircle },
+              { value: 'error', label: 'Error', icon: AlertCircle }
+            ]}
+            className="w-48"
+            icon={Filter}
+          />
 
-          <Select value={operationFilter} onValueChange={setOperationFilter}>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder="Filter by Type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
-              <SelectItem value="cv_analysis">CV Analysis</SelectItem>
-              <SelectItem value="cover_letter_generation">Cover Letter</SelectItem>
-            </SelectContent>
-          </Select>
+          <VybeSelect
+            placeholder="Filter by Type"
+            value={operationFilter}
+            onValueChange={setOperationFilter}
+            options={[
+              { value: 'all', label: 'All Types', icon: Filter },
+              { value: 'cv_analysis', label: 'CV Analysis', icon: Eye },
+              { value: 'cover_letter_generation', label: 'Cover Letter', icon: Tag }
+            ]}
+            className="w-48"
+            icon={Filter}
+          />
 
-          <Select value={entryStatusFilter} onValueChange={setEntryStatusFilter}>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder="Filter by Entry Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Entries</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="deleted">Deleted</SelectItem>
-            </SelectContent>
-          </Select>
+          <VybeSelect
+            placeholder="Filter by Entry Status"
+            value={entryStatusFilter}
+            onValueChange={setEntryStatusFilter}
+            options={[
+              { value: 'all', label: 'All Entries', icon: Filter },
+              { value: 'active', label: 'Active', icon: CheckCircle },
+              { value: 'deleted', label: 'Deleted', icon: AlertCircle }
+            ]}
+            className="w-48"
+            icon={Tag}
+          />
 
-          <Select value={pageSize.toString()} onValueChange={(value) => {
-            setPageSize(value === 'all' ? 999999 : parseInt(value));
-            setCurrentPage(1);
-          }}>
-            <SelectTrigger className="w-32">
-              <SelectValue placeholder="Page Size" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="50">50</SelectItem>
-              <SelectItem value="100">100</SelectItem>
-              <SelectItem value="all">All</SelectItem>
-            </SelectContent>
-          </Select>
+          <VybeSelect
+            placeholder="Page Size"
+            value={pageSize.toString()}
+            onValueChange={(value) => {
+              setPageSize(value === 'all' ? 999999 : parseInt(value));
+              setCurrentPage(1);
+            }}
+            options={[
+              { value: '50', label: '50', icon: Filter },
+              { value: '100', label: '100', icon: Filter },
+              { value: 'all', label: 'All', icon: Filter }
+            ]}
+            className="w-32"
+            icon={Filter}
+          />
         </div>
       </div>
 

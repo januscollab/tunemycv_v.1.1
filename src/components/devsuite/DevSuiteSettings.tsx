@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { CaptureInput } from '@/components/ui/capture-input';
+import { ModernCard, ModernCardContent, ModernCardHeader, ModernCardTitle } from './ui/ModernCard';
+import { VybeButton } from '@/components/design-system/VybeButton';
+import { VybeSelect } from '@/components/design-system/VybeSelect';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { Save } from 'lucide-react';
 
 interface Settings {
   openai_api_key_encrypted: string;
@@ -112,39 +114,34 @@ const DevSuiteSettings = () => {
   }
 
   return (
-    <div className="space-y-6 max-w-2xl">
-      <Card>
-        <CardHeader>
-          <CardTitle>OpenAI Integration</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+    <div className="space-y-8 max-w-2xl">
+      <ModernCard className="animate-fade-in">
+        <ModernCardHeader>
+          <ModernCardTitle>🤖 OpenAI Integration</ModernCardTitle>
+        </ModernCardHeader>
+        <ModernCardContent className="space-y-6">
           <div>
-            <Label htmlFor="apiKey">OpenAI API Key</Label>
-            <Input
-              id="apiKey"
+            <CaptureInput
+              label="OpenAI API Key"
               type="password"
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
               placeholder="sk-..."
+              description="Required for AI story generation and sprint execution features"
             />
-            <p className="text-sm text-muted-foreground mt-1">
-              Required for AI story generation and sprint execution features
-            </p>
           </div>
 
-          <div>
-            <Label htmlFor="model">Preferred Model</Label>
-            <select
-              id="model"
-              value={settings.preferred_model}
-              onChange={(e) => setSettings(prev => ({ ...prev, preferred_model: e.target.value }))}
-              className="w-full p-2 border border-input rounded-md bg-background"
-            >
-              <option value="gpt-4">GPT-4</option>
-              <option value="gpt-4-turbo">GPT-4 Turbo</option>
-              <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-            </select>
-          </div>
+          <VybeSelect
+            label="Preferred Model"
+            value={settings.preferred_model}
+            onValueChange={(value) => setSettings(prev => ({ ...prev, preferred_model: value }))}
+            placeholder="Select AI model"
+            options={[
+              { value: 'gpt-4', label: 'GPT-4', description: 'Most capable model for complex tasks' },
+              { value: 'gpt-4-turbo', label: 'GPT-4 Turbo', description: 'Faster and more efficient version' },
+              { value: 'gpt-3.5-turbo', label: 'GPT-3.5 Turbo', description: 'Fast and cost-effective option' }
+            ]}
+          />
 
           <div className="flex items-center justify-between">
             <div>
@@ -160,36 +157,20 @@ const DevSuiteSettings = () => {
               }
             />
           </div>
-        </CardContent>
-      </Card>
+        </ModernCardContent>
+      </ModernCard>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Sprint Configuration</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <Label>Show Priority Sprint</Label>
-              <p className="text-sm text-muted-foreground">
-                Display the Priority sprint in sprint manager
-              </p>
-            </div>
-            <Switch
-              checked={settings.show_priority_sprint}
-              onCheckedChange={handleTogglePrioritySprint}
-            />
-          </div>
-        </CardContent>
-      </Card>
 
-      <Button 
+      <VybeButton 
+        vybeVariant="primary"
         onClick={handleSaveSettings} 
         disabled={saveLoading}
-        className="w-full menu-text-animation"
+        isLoading={saveLoading}
+        fullWidth
+        icon={saveLoading ? undefined : Save}
       >
         {saveLoading ? 'Saving...' : 'Save Settings'}
-      </Button>
+      </VybeButton>
     </div>
   );
 };

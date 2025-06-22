@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
+import { CaptureInput } from '@/components/ui/capture-input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { Search, Archive, Undo2, Eye } from 'lucide-react';
 import TaskDetailModal from './TaskDetailModal';
+import { ModernButton } from './ui/ModernButton';
 
 interface ArchivedTask {
   id: string;
@@ -31,7 +31,9 @@ const ArchivedStoriesTab = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
   const [sprintFilter, setSprintFilter] = useState<string>('all');
+  const [tagsFilter, setTagsFilter] = useState<string>('all');
   const [availableSprints, setAvailableSprints] = useState<{id: string, name: string}[]>([]);
+  const [availableTags, setAvaileTags] = useState<string[]>([]);
   const [selectedTask, setSelectedTask] = useState<ArchivedTask | null>(null);
   const [showTaskDetail, setShowTaskDetail] = useState(false);
 
@@ -61,6 +63,11 @@ const ArchivedStoriesTab = () => {
       })) || [];
 
       setArchivedTasks(tasksWithSprintName);
+      
+      // Extract unique tags
+      const allTags = tasksWithSprintName.flatMap(task => task.tags || []);
+      const uniqueTags = [...new Set(allTags)].sort();
+      setAvaileTags(uniqueTags);
     } catch (error) {
       console.error('Error loading archived tasks:', error);
       toast.error('Failed to load archived tasks');
@@ -143,8 +150,9 @@ const ArchivedStoriesTab = () => {
     
     const matchesPriority = priorityFilter === 'all' || task.priority === priorityFilter;
     const matchesSprint = sprintFilter === 'all' || task.sprint_id === sprintFilter;
+    const matchesTags = tagsFilter === 'all' || task.tags.includes(tagsFilter);
 
-    return matchesSearch && matchesPriority && matchesSprint;
+    return matchesSearch && matchesPriority && matchesSprint && matchesTags;
   });
 
   const getPriorityColor = (priority: string) => {
@@ -168,18 +176,19 @@ const ArchivedStoriesTab = () => {
           <h2 className="text-2xl font-semibold">Archived Stories</h2>
           <Badge variant="secondary">{filteredTasks.length}</Badge>
         </div>
-        <Button onClick={loadArchivedTasks} className="menu-text-animation">
+        <ModernButton modernVariant="ghost" onClick={loadArchivedTasks}>
           Refresh
-        </Button>
+        </ModernButton>
       </div>
 
       {/* Search and Filters */}
       <Card>
         <CardContent className="pt-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
+              <CaptureInput
+                label=""
                 placeholder="Search tasks, descriptions, or tags..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -208,6 +217,20 @@ const ArchivedStoriesTab = () => {
                 {availableSprints.map(sprint => (
                   <SelectItem key={sprint.id} value={sprint.id}>
                     {sprint.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={tagsFilter} onValueChange={setTagsFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="Filter by tags" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Tags</SelectItem>
+                {availableTags.map(tag => (
+                  <SelectItem key={tag} value={tag}>
+                    {tag}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -270,32 +293,29 @@ const ArchivedStoriesTab = () => {
                   </div>
                   
                   <div className="flex gap-2 ml-4">
-                    <Button
+                    <ModernButton
                       size="sm"
-                      variant="outline"
+                      modernVariant="secondary"
                       onClick={() => handleViewTask(task)}
-                      className="menu-text-animation"
+                      icon={Eye}
                     >
-                      <Eye className="h-4 w-4 mr-1" />
                       View
-                    </Button>
-                    <Button
+                    </ModernButton>
+                    <ModernButton
                       size="sm"
-                      variant="outline"
+                      modernVariant="success"
                       onClick={() => handleRestoreTask(task)}
-                      className="menu-text-animation"
+                      icon={Undo2}
                     >
-                      <Undo2 className="h-4 w-4 mr-1" />
                       Restore
-                    </Button>
-                    <Button
+                    </ModernButton>
+                    <ModernButton
                       size="sm"
-                      variant="destructive"
+                      modernVariant="destructive"
                       onClick={() => handlePermanentDelete(task)}
-                      className="menu-text-animation"
                     >
                       Delete
-                    </Button>
+                    </ModernButton>
                   </div>
                 </div>
               </CardContent>

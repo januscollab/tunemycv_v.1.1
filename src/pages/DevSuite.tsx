@@ -6,6 +6,8 @@ import DevSuiteSettings from '@/components/devsuite/DevSuiteSettings';
 import ExecutionLogs from '@/components/devsuite/ExecutionLogs';
 import SprintAnalytics from '@/components/devsuite/SprintAnalytics';
 import ArchivedStoriesTab from '@/components/devsuite/ArchivedStoriesTab';
+import ModularExportSystem from '@/components/devsuite/ModularExportSystem';
+import DevSuiteSetupWizard from '@/components/devsuite/DevSuiteSetupWizard';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -38,20 +40,24 @@ const DevSuite = () => {
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-foreground mb-2">DevSuite</h1>
-          <p className="text-muted-foreground">
-            Modular sprint management with AI integration
+        <div className="mb-8 animate-fade-in">
+          <h1 className="text-4xl font-bold text-foreground mb-3 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+            🚀 DevSuite
+          </h1>
+          <p className="text-muted-foreground text-lg">
+            Modern, modular sprint management with AI integration
           </p>
         </div>
 
         <Tabs defaultValue="sprints" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="sprints">Sprint Manager</TabsTrigger>
-            <TabsTrigger value="archived">Archived Stories</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
-            <TabsTrigger value="settings">Settings</TabsTrigger>
-            <TabsTrigger value="logs">Execution Logs</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-7">
+            <TabsTrigger value="sprints">🏃‍♂️ Sprints</TabsTrigger>
+            <TabsTrigger value="archived">📦 Archive</TabsTrigger>
+            <TabsTrigger value="analytics">📊 Analytics</TabsTrigger>
+            <TabsTrigger value="settings">⚙️ Settings</TabsTrigger>
+            <TabsTrigger value="logs">📝 Logs</TabsTrigger>
+            <TabsTrigger value="export">📤 Export</TabsTrigger>
+            <TabsTrigger value="setup">🧙‍♂️ Setup</TabsTrigger>
           </TabsList>
 
           <TabsContent value="sprints">
@@ -72,6 +78,14 @@ const DevSuite = () => {
 
           <TabsContent value="logs">
             <ExecutionLogs />
+          </TabsContent>
+
+          <TabsContent value="export">
+            <ModularExportSystem />
+          </TabsContent>
+
+          <TabsContent value="setup">
+            <DevSuiteSetupWizard />
           </TabsContent>
         </Tabs>
       </div>

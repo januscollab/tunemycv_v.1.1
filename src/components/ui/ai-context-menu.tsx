@@ -1,3 +1,4 @@
+
 import * as React from "react"
 import { useState, useRef, useEffect } from "react"
 import { 
@@ -18,12 +19,14 @@ import {
 import { AIReplacementDialog } from "@/components/ui/ai-replacement-dialog"
 import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
+import { useCreativitySlider } from "@/hooks/useCreativitySlider"
 
 interface AIAction {
   type: 'rephrase' | 'improve' | 'adjust_length' | 'role_specific'
   subType?: string
   selectedText: string
   context: string
+  temperature: number
 }
 
 interface AIContextMenuProps {
@@ -46,6 +49,7 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
   disabled = false
 }) => {
   const { toast } = useToast()
+  const { creativityLevel, updateCreativityLevel, getCurrentLevel, getTemperature, levels } = useCreativitySlider()
   const [showReplacementDialog, setShowReplacementDialog] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [generatedText, setGeneratedText] = useState("")
@@ -82,7 +86,8 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
         body: JSON.stringify({
           selectedText: currentSelectedText,
           action: { type, subType },
-          context: "editor"
+          context: "editor",
+          temperature: getTemperature()
         })
       })
 
@@ -142,6 +147,12 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
 
     // Wait for user to finish selecting (delay for triple-click and normal selection)
     selectionTimeoutRef.current = setTimeout(() => {
+      // Check if we're inside the AI Replacement Dialog
+      const dialogElement = document.querySelector('[role="dialog"]')
+      if (dialogElement && dialogElement.contains(selection.anchorNode)) {
+        return // Don't show menu in dialog
+      }
+      
       const range = selection.getRangeAt(0)
       const rect = range.getBoundingClientRect()
       const containerRect = containerRef.current?.getBoundingClientRect()
@@ -153,7 +164,7 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
         
         setMenuPosition({ x, y, visible: true })
       }
-    }, 300) // Wait 300ms for user to finish selecting
+    }, 500) // Wait 500ms for user to finish selecting
   }
 
   const handleSubmenuHover = (submenuType: string, event: React.MouseEvent) => {
@@ -324,6 +335,41 @@ const AIContextMenu: React.FC<AIContextMenuProps> = ({
                   Select 10+ characters to use AI features
                 </div>
               )}
+
+              {/* Orange Separator Line */}
+              <div className="h-px bg-gradient-to-r from-transparent via-orange-500 to-transparent mx-2.5 my-2 opacity-80"></div>
+
+              {/* AI Creativity Slider */}
+              <div className="px-2.5 py-2">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-tiny font-medium text-primary-foreground/90">Creativity: {getCurrentLevel().label}</span>
+                  <Brain className="w-3 h-3 text-primary-foreground/60" />
+                </div>
+                
+                {/* Slider */}
+                <div className="relative">
+                  <div className="w-full h-1 bg-gradient-to-r from-blue-400 via-orange-400 to-orange-500 rounded-full"></div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="3"
+                    step="1"
+                    value={creativityLevel}
+                    onChange={(e) => updateCreativityLevel(parseInt(e.target.value))}
+                    className="absolute top-0 w-full h-1 appearance-none bg-transparent cursor-pointer opacity-0"
+                  />
+                  <div 
+                    className="absolute top-[-1.5px] w-1 h-1 bg-white rounded-full shadow-sm border border-primary-400/50 transition-all duration-200"
+                    style={{ left: `${(creativityLevel / 3) * 100}%`, transform: 'translateX(-50%)' }}
+                  />
+                </div>
+
+                {/* Level Labels */}
+                <div className="flex justify-between text-tiny text-primary-foreground/60 mt-1">
+                  <span>Safe</span>
+                  <span>Bold</span>
+                </div>
+              </div>
             </div>
           </div>
         )}

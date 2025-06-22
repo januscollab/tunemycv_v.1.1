@@ -1,11 +1,12 @@
+
 import React, { useRef, useEffect, useState, useCallback, forwardRef, useImperativeHandle } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import './rich-text-editor.css';
 import { useJsonFirstEditor } from '@/hooks/useJsonFirstEditor';
 import { DocumentJson } from '@/utils/documentJsonUtils';
-import { ExperimentalAIMenu } from '@/components/ui/experimental-ai-menu';
 import { cn } from '@/lib/utils';
+import { AIContextMenu } from '@/components/ui/ai-context-menu';
 
 interface RichTextEditorProps {
   initialContent: string | DocumentJson;
@@ -86,19 +87,15 @@ const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>(({
     }
   }, [showAIFeatures]);
 
-  // Handle AI text replacement - now handled by ExperimentalAIMenu
-  const handleTextReplace = (originalText: string, newText: string) => {
-    if (quillRef.current) {
-      const editor = quillRef.current.getEditor();
-      const text = editor.getText();
-      const index = text.indexOf(originalText);
-      
-      if (index !== -1) {
-        editor.deleteText(index, originalText.length);
-        editor.insertText(index, newText);
-      }
-    }
-  };
+  // Handle AI text replacement
+  const handleTextReplace = useCallback((originalText: string, newText: string) => {
+    const editor = quillRef.current?.getEditor();
+    if (!editor) return;
+
+    const currentContent = editor.root.innerHTML;
+    const updatedContent = currentContent.replace(originalText, newText);
+    updateFromHtml(updatedContent);
+  }, [updateFromHtml]);
 
   // Quill configuration with enhanced features
   const modules = {
@@ -154,15 +151,16 @@ const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>(({
     </div>
   );
 
-  // Wrap with AI Context Menu if AI features are enabled
+  // Wrap with AI features if enabled
   if (showAIFeatures) {
     return (
-      <ExperimentalAIMenu
+      <AIContextMenu
         selectedText={selectedText}
+        onTextReplace={handleTextReplace}
         disabled={readOnly || isConverting}
       >
         {editorContent}
-      </ExperimentalAIMenu>
+      </AIContextMenu>
     );
   }
 

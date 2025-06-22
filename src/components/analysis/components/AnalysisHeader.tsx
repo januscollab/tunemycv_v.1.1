@@ -1,32 +1,28 @@
 
 import React from 'react';
-import { ArrowLeft, Download } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 
 interface AnalysisHeaderProps {
   onStartNew: () => void;
-  onDownloadPDF: () => void;
   readOnly?: boolean;
 }
 
-const AnalysisHeader: React.FC<AnalysisHeaderProps> = ({ onStartNew, onDownloadPDF, readOnly = false }) => {
+const AnalysisHeader: React.FC<AnalysisHeaderProps> = ({ onStartNew, readOnly = false }) => {
   return (
-    <div className="flex items-center justify-between mb-6">
-      {!readOnly && (
-        <button
-          onClick={onStartNew}
-          className="flex items-center space-x-2 text-apricot hover:text-apricot/80 transition-colors"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          <span>Analyze Another CV</span>
-        </button>
-      )}
-      {readOnly && <div></div>} {/* Spacer for alignment */}
-      <button 
-        onClick={onDownloadPDF}
-        className="flex items-center space-x-2 text-apricot hover:text-apricot/80 transition-colors"
-      >
-        <Download className="h-4 w-4" />
-      </button>
+    <div className="bg-gradient-to-r from-surface to-surface-secondary border border-border rounded-2xl p-8 mb-8 shadow-lg backdrop-blur-sm">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-6">
+          {!readOnly && (
+            <button
+              onClick={onStartNew}
+              className="group flex items-center space-x-3 px-6 py-3 text-foreground-secondary hover:text-foreground bg-surface-tertiary hover:bg-surface-hover rounded-xl transition-all duration-300 font-normal border border-border hover:border-primary/30 hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
+              <span className="text-subheading">Analyze Another CV</span>
+            </button>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

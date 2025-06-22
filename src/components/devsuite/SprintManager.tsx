@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
+import { CaptureInput } from '@/components/ui/capture-input';
+import { ModernCard, ModernCardContent, ModernCardHeader, ModernCardTitle } from './ui/ModernCard';
+import { VybeButton } from '@/components/design-system/VybeButton';
+import { VybeIconButton } from '@/components/design-system/VybeIconButton';
+import { Grid2X2, Plus, RefreshCw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -22,6 +24,7 @@ interface Task {
   id: string;
   title: string;
   description: string;
+  story_number?: string;
   priority: string;
   tags: string[];
   status: string;
@@ -41,6 +44,7 @@ const SprintManager = () => {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [newSprintName, setNewSprintName] = useState('');
   const [addingNewSprint, setAddingNewSprint] = useState(false);
+  const [sprintLayout, setSprintLayout] = useState<'one' | 'two'>('two');
 
   useEffect(() => {
     if (user) {
@@ -53,7 +57,7 @@ const SprintManager = () => {
       // First ensure default sprints exist
       await ensureDefaultSprintsExist();
 
-      // Load sprints
+      // Load sprints with proper ordering
       const { data: sprintsData, error: sprintsError } = await supabase
         .from('sprints')
         .select('*')
@@ -61,16 +65,25 @@ const SprintManager = () => {
 
       if (sprintsError) throw sprintsError;
 
-      // Load tasks
+      // Sort sprints: Priority Sprint first, Backlog - Future Enhancements last, others by order_index
+      const sortedSprints = (sprintsData || []).sort((a, b) => {
+        if (a.name === 'Priority Sprint') return -1;
+        if (b.name === 'Priority Sprint') return 1;
+        if (a.name === 'Backlog - Future Enhancements') return 1;
+        if (b.name === 'Backlog - Future Enhancements') return -1;
+        return a.order_index - b.order_index;
+      });
+
+      // Load tasks with story_number
       const { data: tasksData, error: tasksError } = await supabase
         .from('tasks')
-        .select('*')
+        .select('id, title, description, story_number, priority, tags, status, sprint_id, order_index, archived_at, user_id, created_at, updated_at, story_info')
         .is('archived_at', null)
         .order('order_index');
 
       if (tasksError) throw tasksError;
 
-      setSprints(sprintsData || []);
+      setSprints(sortedSprints);
       setTasks(tasksData || []);
     } catch (error) {
       console.error('Error loading data:', error);
@@ -94,26 +107,29 @@ const SprintManager = () => {
 
       const existingSprintNames = existingSprints?.map(s => s.name) || [];
       
-      // Enhanced validation: ensure ONLY ONE of each core sprint exists
-      const defaultSprints = ['Priority Sprint', 'Backlog'];
+      // Default sprints that should exist
+      const defaultSprints = [
+        { name: 'Priority Sprint', order_index: 0 },
+        { name: 'Backlog - Future Enhancements', order_index: 999 } // Always last
+      ];
       const sprintsToCreate = [];
       
-      for (const sprintName of defaultSprints) {
-        const existingCount = existingSprintNames.filter(name => name === sprintName).length;
+      for (const defaultSprint of defaultSprints) {
+        const existingCount = existingSprintNames.filter(name => name === defaultSprint.name).length;
         
         if (existingCount === 0) {
           // Sprint doesn't exist, create it
           sprintsToCreate.push({
-            name: sprintName,
-            order_index: existingSprints ? existingSprints.length + sprintsToCreate.length : sprintsToCreate.length,
+            name: defaultSprint.name,
+            order_index: defaultSprint.order_index,
             user_id: user.id,
             status: 'active',
             is_hidden: false
           });
         } else if (existingCount > 1) {
           // Multiple sprints with same name exist, remove duplicates
-          console.warn(`Multiple ${sprintName} sprints found. Removing duplicates.`);
-          const duplicates = existingSprints?.filter(s => s.name === sprintName).slice(1) || [];
+          console.warn(`Multiple ${defaultSprint.name} sprints found. Removing duplicates.`);
+          const duplicates = existingSprints?.filter(s => s.name === defaultSprint.name).slice(1) || [];
           
           // Delete duplicate sprints
           if (duplicates.length > 0) {
@@ -162,9 +178,9 @@ const SprintManager = () => {
   const handleAddSprint = async () => {
     if (!newSprintName.trim()) return;
 
-    // Enhanced validation: prevent duplicate core sprints
+    // Enhanced validation: prevent duplicate Priority Sprint
     const trimmedName = newSprintName.trim();
-    if (trimmedName === 'Priority Sprint' || trimmedName === 'Backlog') {
+    if (trimmedName === 'Priority Sprint') {
       const existingSprint = sprints.find(s => s.name === trimmedName);
       if (existingSprint) {
         toast.error(`A ${trimmedName} already exists. Only one ${trimmedName} is allowed per user.`);
@@ -173,12 +189,19 @@ const SprintManager = () => {
     }
 
     try {
-      const maxOrder = Math.max(...sprints.map(s => s.order_index), -1);
+      // Calculate proper order_index (after Priority Sprint)
+      const prioritySprint = sprints.find(s => s.name === 'Priority Sprint');
+      const userSprints = sprints.filter(s => s.name !== 'Priority Sprint');
+      
+      // New user sprints should be placed after Priority Sprint
+      const maxUserOrder = userSprints.length > 0 ? Math.max(...userSprints.map(s => s.order_index)) : (prioritySprint?.order_index || 0);
+      const newOrderIndex = maxUserOrder + 1;
+
       const { error } = await supabase
         .from('sprints')
         .insert({
           name: trimmedName,
-          order_index: maxOrder + 1,
+          order_index: newOrderIndex,
           user_id: user?.id,
         });
 
@@ -195,8 +218,8 @@ const SprintManager = () => {
   };
 
   const handleDeleteSprint = async (sprint: Sprint) => {
-    // Enhanced protection logic - prevent deletion of core sprints
-    if (sprint.name === 'Priority Sprint' || sprint.name === 'Backlog') {
+    // Enhanced protection logic - prevent deletion of system sprints
+    if (sprint.name === 'Priority Sprint' || sprint.name === 'Backlog - Future Enhancements') {
       toast.error(`Cannot delete ${sprint.name} - this is a protected system sprint`);
       return;
     }
@@ -207,10 +230,10 @@ const SprintManager = () => {
         return;
       }
       
-      // Find Backlog sprint (guaranteed to exist due to ensureDefaultSprintsExist)
-      const backlogSprint = sprints.find(s => s.name === 'Backlog');
+      // Find Backlog sprint to move tasks to
+      const backlogSprint = sprints.find(s => s.name === 'Backlog - Future Enhancements');
       if (backlogSprint) {
-        // Move all tasks to Backlog
+        // Move all tasks to Backlog sprint
         const { error: moveError } = await supabase
           .from('tasks')
           .update({ sprint_id: backlogSprint.id })
@@ -273,6 +296,26 @@ const SprintManager = () => {
     } catch (error) {
       console.error('Error updating task status:', error);
       toast.error('Failed to update task status');
+    }
+  };
+
+  const handleArchiveTask = async (task: Task) => {
+    try {
+      const { error } = await supabase
+        .from('tasks')
+        .update({ 
+          status: 'archived',
+          archived_at: new Date().toISOString()
+        })
+        .eq('id', task.id);
+
+      if (error) throw error;
+      
+      loadData();
+      toast.success('Task archived successfully');
+    } catch (error) {
+      console.error('Error archiving task:', error);
+      toast.error('Failed to archive task');
     }
   };
 
@@ -382,26 +425,74 @@ const SprintManager = () => {
       return;
     }
 
-    const taskId = result.draggableId;
-    const newSprintId = destination.droppableId;
-    
-    try {
-      const { error } = await supabase
-        .from('tasks')
-        .update({ 
-          sprint_id: newSprintId,
-          order_index: destination.index 
-        })
-        .eq('id', taskId);
+    // Check if dragging a sprint or a task
+    if (result.type === 'sprint') {
+      const sprintId = result.draggableId;
+      const newIndex = destination.index;
+      
+      try {
+        // Update the order_index of the dragged sprint
+        const { error } = await supabase
+          .from('sprints')
+          .update({ order_index: newIndex })
+          .eq('id', sprintId);
 
-      if (error) throw error;
+        if (error) throw error;
 
-      // Reload data to reflect changes
-      loadData();
-      toast.success('Task moved successfully');
-    } catch (error) {
-      console.error('Error moving task:', error);
-      toast.error('Failed to move task');
+        // Update other sprints' order_index to maintain proper ordering
+        const updatedSprints = [...sprints];
+        const draggedSprint = updatedSprints.find(s => s.id === sprintId);
+        if (draggedSprint) {
+          updatedSprints.forEach((sprint, index) => {
+            if (sprint.id !== sprintId) {
+              if (index >= newIndex && index < draggedSprint.order_index) {
+                sprint.order_index = index + 1;
+              } else if (index <= newIndex && index > draggedSprint.order_index) {
+                sprint.order_index = index - 1;
+              }
+            }
+          });
+          
+          // Update all changed sprints in batch
+          for (const sprint of updatedSprints) {
+            if (sprint.id !== sprintId) {
+              await supabase
+                .from('sprints')
+                .update({ order_index: sprint.order_index })
+                .eq('id', sprint.id);
+            }
+          }
+        }
+
+        loadData();
+        toast.success('Sprint reordered successfully');
+      } catch (error) {
+        console.error('Error reordering sprint:', error);
+        toast.error('Failed to reorder sprint');
+      }
+    } else {
+      // Task drag and drop
+      const taskId = result.draggableId;
+      const newSprintId = destination.droppableId;
+      
+      try {
+        const { error } = await supabase
+          .from('tasks')
+          .update({ 
+            sprint_id: newSprintId,
+            order_index: destination.index 
+          })
+          .eq('id', taskId);
+
+        if (error) throw error;
+
+        // Reload data to reflect changes
+        loadData();
+        toast.success('Task moved successfully');
+      } catch (error) {
+        console.error('Error moving task:', error);
+        toast.error('Failed to move task');
+      }
     }
   };
 
@@ -411,19 +502,19 @@ const SprintManager = () => {
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high': return 'bg-destructive';
-      case 'medium': return 'bg-zapier-orange';
-      case 'low': return 'bg-secondary';
+      case 'high': return 'bg-red-500 text-white';
+      case 'medium': return 'bg-slate-500 text-white';
+      case 'low': return 'bg-slate-300 text-slate-700';
       default: return 'bg-muted';
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed': return 'bg-green-500';
-      case 'in-progress': return 'bg-blue-500';
-      case 'todo': return 'bg-gray-500';
-      default: return 'bg-gray-500';
+      case 'completed': return 'bg-emerald-500 text-white';
+      case 'in-progress': return 'bg-slate-600 text-white';
+      case 'todo': return 'bg-slate-400 text-white';
+      default: return 'bg-slate-400 text-white';
     }
   };
 
@@ -435,208 +526,409 @@ const SprintManager = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold">Sprint Manager</h2>
-        <div className="flex gap-2">
-          <Button 
-            variant="outline" 
+        <div className="flex gap-2 items-center">
+          <VybeIconButton
+            icon={sprintLayout === 'one' ? Grid2X2 : Grid2X2}
+            tooltip={sprintLayout === 'one' ? '2 Per Row' : '1 Per Row'}
+            variant="outline"
+            onClick={() => setSprintLayout(sprintLayout === 'one' ? 'two' : 'one')}
+          />
+          <VybeIconButton
+            icon={Plus}
+            tooltip="Add Sprint"
+            variant="secondary"
             onClick={() => setAddingNewSprint(true)}
-            className="menu-text-animation"
-          >
-            Add Sprint
-          </Button>
-          <Button 
-            variant="destructive"
-            onClick={handleClearAllTasks}
-            className="menu-text-animation"
-          >
-            Clear All Tasks
-          </Button>
-          <Button onClick={() => loadData()} className="menu-text-animation">Refresh</Button>
+          />
+          <VybeIconButton
+            icon={RefreshCw}
+            tooltip="Refresh"
+            variant="ghost"
+            onClick={() => loadData()}
+          />
         </div>
       </div>
 
       {addingNewSprint && (
-        <Card>
-          <CardContent className="pt-6">
+        <ModernCard className="animate-fade-in">
+          <ModernCardContent className="pt-6">
             <div className="flex gap-2">
-              <Input
+              <CaptureInput
+                label="Sprint Name"
                 value={newSprintName}
                 onChange={(e) => setNewSprintName(e.target.value)}
                 placeholder="Enter sprint name"
                 onKeyPress={(e) => e.key === 'Enter' && handleAddSprint()}
               />
-              <Button onClick={handleAddSprint} className="menu-text-animation">Create</Button>
-              <Button 
-                variant="outline" 
+              <VybeButton onClick={handleAddSprint} vybeVariant="primary">Create</VybeButton>
+              <VybeButton 
+                vybeVariant="ghost" 
                 onClick={() => {
                   setAddingNewSprint(false);
                   setNewSprintName('');
                 }}
-                className="menu-text-animation"
               >
                 Cancel
-              </Button>
+              </VybeButton>
             </div>
-          </CardContent>
-        </Card>
+          </ModernCardContent>
+        </ModernCard>
       )}
 
       <DragDropContext onDragEnd={onDragEnd}>
-        <div className="grid gap-6 md:grid-cols-2">
-          {sprints
-            .filter(sprint => !sprint.is_hidden)
-            .map((sprint) => (
-              <Card key={sprint.id} className="h-fit">
-                <CardHeader>
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <CardTitle className="text-lg">{sprint.name}</CardTitle>
-                      <Badge variant={sprint.status === 'completed' ? 'default' : 'secondary'}>
-                        {sprint.status}
-                      </Badge>
-                    </div>
-                    <div className="flex gap-1">
-                      <Button
-                        size="sm"
-                        onClick={() => handleAddTask(sprint)}
-                        className="menu-text-animation"
-                      >
-                        Add Task
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleExecuteSprint(sprint)}
-                        className="menu-text-animation"
-                      >
-                        Execute
-                      </Button>
-                      {sprint.status !== 'completed' && (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleCloseSprint(sprint)}
-                          className="menu-text-animation"
-                        >
-                          Close
-                        </Button>
-                      )}
-                      {sprint.name === 'Priority Sprint' && getTasksForSprint(sprint.id).some(task => task.status === 'completed') && (
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          onClick={() => handleArchiveCompletedTasks(sprint)}
-                          className="menu-text-animation"
-                        >
-                          Archive Completed
-                        </Button>
-                      )}
-                      {sprint.name !== 'Priority Sprint' && sprint.name !== 'Backlog' && (
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => handleDeleteSprint(sprint)}
-                          className="menu-text-animation"
-                        >
-                          Delete
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <Droppable droppableId={sprint.id}>
-                    {(provided) => (
-                      <div
-                        {...provided.droppableProps}
+        <Droppable droppableId="sprints" type="sprint">
+          {(provided) => (
+            <div className="space-y-6">
+              {/* Regular sprints in grid layout */}
+              <div 
+                {...provided.droppableProps}
+                ref={provided.innerRef}
+                className={`grid gap-6 ${sprintLayout === 'two' ? 'md:grid-cols-2' : 'grid-cols-1'}`}
+              >
+                {sprints
+                  .filter(sprint => !sprint.is_hidden && sprint.name !== 'Backlog - Future Enhancements')
+                  .map((sprint, index) => {
+                const sprintTasks = getTasksForSprint(sprint.id);
+                
+                return (
+                  <Draggable key={sprint.id} draggableId={sprint.id} index={index}>
+                    {(provided, snapshot) => (
+                      <ModernCard 
                         ref={provided.innerRef}
-                        className="space-y-3 min-h-[100px]"
+                        {...provided.draggableProps}
+                        className={`h-fit animate-fade-in ${
+                          snapshot.isDragging ? 'shadow-lg ring-2 ring-apricot/50' : ''
+                        }`}
                       >
-                        {getTasksForSprint(sprint.id).map((task, index) => (
-                          <Draggable
-                            key={task.id}
-                            draggableId={task.id}
-                            index={index}
+                        <ModernCardHeader className="pb-4">
+                          <div className="flex items-center gap-2">
+                            <div 
+                              {...provided.dragHandleProps}
+                              className="p-1 hover:bg-slate-100 rounded cursor-grab active:cursor-grabbing"
+                              title="Drag to reorder sprint"
+                            >
+                              <div className="w-1 h-1 bg-slate-400 rounded-full"></div>
+                              <div className="w-1 h-1 bg-slate-400 rounded-full mt-1"></div>
+                              <div className="w-1 h-1 bg-slate-400 rounded-full mt-1"></div>
+                            </div>
+                            <ModernCardTitle className="text-lg">{sprint.name}</ModernCardTitle>
+                          </div>
+                        </ModernCardHeader>
+                    <ModernCardContent>
+                      <Droppable droppableId={sprint.id}>
+                        {(provided) => (
+                          <div
+                            {...provided.droppableProps}
+                            ref={provided.innerRef}
+                            className="min-h-[100px] mb-4 space-y-3"
                           >
-                            {(provided) => (
-                              <div
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                                className={`p-3 border rounded-lg bg-card hover:shadow-md transition-shadow ${
-                                  task.status === 'completed' ? 'opacity-70' : ''
-                                }`}
-                              >
-                                <div className="flex items-start justify-between mb-2">
-                                  <div 
-                                    className={`font-medium text-sm cursor-pointer ${
-                                      task.status === 'completed' ? 'line-through' : ''
-                                    }`}
-                                    onClick={() => handleEditTask(task)}
-                                  >
-                                    {task.title}
+                          {sprintTasks.map((task, index) => (
+                            <Draggable
+                              key={task.id}
+                              draggableId={task.id}
+                              index={index}
+                            >
+                              {(provided) => (
+                                <div
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
+                                  className={`p-3 border rounded-lg bg-card hover:shadow-md transition-shadow ${
+                                    task.status === 'completed' ? 'opacity-70' : ''
+                                  }`}
+                                 >
+                                   <div className="flex items-start justify-between mb-2">
+                                     <div className="flex-1">
+                                       {task.story_number && (
+                                         <div className="text-xs text-muted-foreground font-mono mb-1">
+                                           {task.story_number}
+                                         </div>
+                                       )}
+                                       <div 
+                                         className={`font-medium text-sm cursor-pointer ${
+                                           task.status === 'completed' ? 'line-through' : ''
+                                         }`}
+                                         onClick={() => handleEditTask(task)}
+                                       >
+                                         {task.title}
+                                       </div>
+                                     </div>
+                                    <div className="flex gap-1">
+                                       <button
+                                         onClick={(e) => {
+                                           e.stopPropagation();
+                                           handleToggleTaskStatus(task);
+                                         }}
+                                         className={`w-4 h-4 rounded border text-xs ${
+                                           task.status === 'completed' 
+                                             ? 'bg-green-500 text-white' 
+                                             : 'border-gray-300 hover:border-green-500'
+                                         }`}
+                                       >
+                                         {task.status === 'completed' ? '✓' : ''}
+                                       </button>
+                                       {task.status === 'completed' && (
+                                         <button
+                                           onClick={(e) => {
+                                             e.stopPropagation();
+                                             handleArchiveTask(task);
+                                           }}
+                                           className="w-4 h-4 text-blue-500 hover:text-blue-700 text-xs border border-blue-300 rounded bg-blue-50 hover:bg-blue-100 transition-colors"
+                                           title="Archive this story"
+                                         >
+                                           📁
+                                         </button>
+                                       )}
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleDeleteTask(task);
+                                        }}
+                                        className="w-4 h-4 text-red-500 hover:text-red-700 text-xs"
+                                      >
+                                        ×
+                                      </button>
+                                    </div>
                                   </div>
-                                  <div className="flex gap-1">
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleToggleTaskStatus(task);
-                                      }}
-                                      className={`w-4 h-4 rounded border text-xs ${
-                                        task.status === 'completed' 
-                                          ? 'bg-green-500 text-white' 
-                                          : 'border-gray-300 hover:border-green-500'
-                                      }`}
+                                  {task.description && (
+                                    <div className="text-xs text-muted-foreground mb-2">
+                                      {task.description.slice(0, 100)}...
+                                    </div>
+                                  )}
+                                  <div className="flex items-center gap-2">
+                                    <Badge 
+                                      variant="secondary" 
+                                      className={`text-xs ${getStatusColor(task.status)}`}
                                     >
-                                      {task.status === 'completed' ? '✓' : ''}
-                                    </button>
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleDeleteTask(task);
-                                      }}
-                                      className="w-4 h-4 text-red-500 hover:text-red-700 text-xs"
-                                    >
-                                      ×
-                                    </button>
-                                  </div>
-                                </div>
-                                {task.description && (
-                                  <div className="text-xs text-muted-foreground mb-2">
-                                    {task.description.slice(0, 100)}...
-                                  </div>
-                                )}
-                                <div className="flex items-center gap-2">
-                                  <Badge 
-                                    variant="secondary" 
-                                    className={`text-xs ${getStatusColor(task.status)}`}
-                                  >
-                                    {task.status}
-                                  </Badge>
-                                  <Badge 
-                                    variant="secondary" 
-                                    className={`text-xs ${getPriorityColor(task.priority)}`}
-                                  >
-                                    {task.priority}
-                                  </Badge>
-                                  {task.tags.map((tag, idx) => (
-                                    <Badge key={idx} variant="outline" className="text-xs">
-                                      {tag}
+                                      {task.status}
                                     </Badge>
-                                  ))}
+                                    <Badge 
+                                      variant="secondary" 
+                                      className={`text-xs ${getPriorityColor(task.priority)}`}
+                                    >
+                                      {task.priority}
+                                    </Badge>
+                                    {task.tags.map((tag, idx) => (
+                                      <Badge key={idx} variant="outline" className="text-xs">
+                                        {tag}
+                                      </Badge>
+                                    ))}
+                                  </div>
                                 </div>
-                              </div>
-                            )}
-                          </Draggable>
-                        ))}
+                              )}
+                            </Draggable>
+                          ))}
                         {provided.placeholder}
                       </div>
                     )}
                   </Droppable>
-                </CardContent>
-              </Card>
-            ))}
-        </div>
-      </DragDropContext>
+                  
+                   {/* Sprint Action Buttons - Moved to Bottom */}
+                  <div className="flex gap-2 pt-4 border-t border-border/50">
+                    <VybeButton
+                      vybeSize="sm"
+                      vybeVariant="primary"
+                      onClick={() => handleAddTask(sprint)}
+                    >
+                      Add Task
+                    </VybeButton>
+                    <VybeButton
+                      vybeSize="sm"
+                      vybeVariant="secondary"
+                      onClick={() => handleExecuteSprint(sprint)}
+                    >
+                      Execute
+                    </VybeButton>
+                    {sprint.status !== 'completed' && (
+                      <VybeButton
+                        vybeSize="sm"
+                        vybeVariant="outline"
+                        onClick={() => handleCloseSprint(sprint)}
+                      >
+                        Close
+                      </VybeButton>
+                    )}
+                    {sprint.name === 'Priority Sprint' && getTasksForSprint(sprint.id).some(task => task.status === 'completed') && (
+                      <VybeButton
+                        vybeSize="sm"
+                        vybeVariant="ghost"
+                        onClick={() => handleArchiveCompletedTasks(sprint)}
+                      >
+                        Archive Completed
+                      </VybeButton>
+                    )}
+                    {sprint.name !== 'Priority Sprint' && sprint.name !== 'Backlog - Future Enhancements' && (
+                      <VybeButton
+                        vybeSize="sm"
+                        vybeVariant="destructive"
+                        onClick={() => handleDeleteSprint(sprint)}
+                      >
+                        Delete
+                      </VybeButton>
+                    )}
+                  </div>
+                </ModernCardContent>
+                    </ModernCard>
+                  )}
+                </Draggable>
+              );
+            })}
+              </div>
+
+              {/* Backlog - Future Enhancements Sprint (Always Full Width at Bottom) */}
+              {(() => {
+                const backlogSprint = sprints.find(s => s.name === 'Backlog - Future Enhancements');
+                if (!backlogSprint || backlogSprint.is_hidden) return null;
+                
+                const backlogTasks = getTasksForSprint(backlogSprint.id);
+                
+                return (
+                  <ModernCard className="w-full animate-fade-in border-2 border-dashed border-primary/20">
+                    <ModernCardHeader className="pb-4">
+                      <div className="flex items-center gap-2">
+                        <ModernCardTitle className="text-lg text-muted-foreground">
+                          {backlogSprint.name}
+                        </ModernCardTitle>
+                        <Badge variant="outline" className="text-xs">
+                          Future Ideas
+                        </Badge>
+                      </div>
+                    </ModernCardHeader>
+                    <ModernCardContent>
+                      <Droppable droppableId={backlogSprint.id}>
+                        {(provided) => (
+                          <div
+                            {...provided.droppableProps}
+                            ref={provided.innerRef}
+                            className="min-h-[200px] mb-4 grid md:grid-cols-2 gap-4"
+                          >
+                            {backlogTasks.map((task, index) => (
+                              <Draggable
+                                key={task.id}
+                                draggableId={task.id}
+                                index={index}
+                              >
+                                {(provided) => (
+                                  <div
+                                    ref={provided.innerRef}
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
+                                    className={`p-3 border rounded-lg bg-card hover:shadow-md transition-shadow ${
+                                      task.status === 'completed' ? 'opacity-70' : ''
+                                    }`}
+                                   >
+                                     <div className="flex items-start justify-between mb-2">
+                                       <div className="flex-1">
+                                         {task.story_number && (
+                                           <div className="text-xs text-muted-foreground font-mono mb-1">
+                                             {task.story_number}
+                                           </div>
+                                         )}
+                                         <div 
+                                           className={`font-medium text-sm cursor-pointer ${
+                                             task.status === 'completed' ? 'line-through' : ''
+                                           }`}
+                                           onClick={() => handleEditTask(task)}
+                                         >
+                                           {task.title}
+                                         </div>
+                                       </div>
+                                      <div className="flex gap-1">
+                                         <button
+                                           onClick={(e) => {
+                                             e.stopPropagation();
+                                             handleToggleTaskStatus(task);
+                                           }}
+                                           className={`w-4 h-4 rounded border text-xs ${
+                                             task.status === 'completed' 
+                                               ? 'bg-green-500 text-white' 
+                                               : 'border-gray-300 hover:border-green-500'
+                                           }`}
+                                         >
+                                           {task.status === 'completed' ? '✓' : ''}
+                                         </button>
+                                         {task.status === 'completed' && (
+                                           <button
+                                             onClick={(e) => {
+                                               e.stopPropagation();
+                                               handleArchiveTask(task);
+                                             }}
+                                             className="w-4 h-4 text-blue-500 hover:text-blue-700 text-xs border border-blue-300 rounded bg-blue-50 hover:bg-blue-100 transition-colors"
+                                             title="Archive this story"
+                                           >
+                                             📁
+                                           </button>
+                                         )}
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleDeleteTask(task);
+                                          }}
+                                          className="w-4 h-4 text-red-500 hover:text-red-700 text-xs"
+                                        >
+                                          ×
+                                        </button>
+                                      </div>
+                                    </div>
+                                    {task.description && (
+                                      <div className="text-xs text-muted-foreground mb-2">
+                                        {task.description.slice(0, 100)}...
+                                      </div>
+                                    )}
+                                    <div className="flex items-center gap-2">
+                                      <Badge 
+                                        variant="secondary" 
+                                        className={`text-xs ${getStatusColor(task.status)}`}
+                                      >
+                                        {task.status}
+                                      </Badge>
+                                      <Badge 
+                                        variant="secondary" 
+                                        className={`text-xs ${getPriorityColor(task.priority)}`}
+                                      >
+                                        {task.priority}
+                                      </Badge>
+                                      {task.tags.map((tag, idx) => (
+                                        <Badge key={idx} variant="outline" className="text-xs">
+                                          {tag}
+                                        </Badge>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                              </Draggable>
+                            ))}
+                          {provided.placeholder}
+                        </div>
+                      )}
+                    </Droppable>
+                    
+                     {/* Backlog Sprint Action Buttons */}
+                    <div className="flex gap-2 pt-4 border-t border-border/50">
+                      <VybeButton
+                        vybeSize="sm"
+                        vybeVariant="primary"
+                        onClick={() => handleAddTask(backlogSprint)}
+                      >
+                        Add Future Idea
+                      </VybeButton>
+                      <VybeButton
+                        vybeSize="sm"
+                        vybeVariant="secondary"
+                        onClick={() => handleExecuteSprint(backlogSprint)}
+                      >
+                        Execute
+                      </VybeButton>
+                    </div>
+                  </ModernCardContent>
+                  </ModernCard>
+                );
+              })()}
+              
+              {provided.placeholder}
+            </div>
+        )}
+      </Droppable>
+    </DragDropContext>
 
       <TaskModal
         open={taskModalOpen}

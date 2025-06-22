@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useCreativitySlider } from '@/hooks/useCreativitySlider';
 
 interface GenerateCoverLetterParams {
   jobTitle: string;
@@ -47,6 +48,7 @@ export const useCoverLetter = () => {
   const [generationProgress, setGenerationProgress] = useState(0);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
+  const { getTemperature } = useCreativitySlider();
 
   const startProgressTracking = useCallback(() => {
     setGenerationProgress(0);
@@ -90,7 +92,10 @@ export const useCoverLetter = () => {
     
     try {
       const { data, error } = await supabase.functions.invoke('generate-cover-letter', {
-        body: params
+        body: {
+          ...params,
+          temperature: getTemperature()
+        }
       });
 
       if (error) throw error;
@@ -146,7 +151,8 @@ export const useCoverLetter = () => {
           workExperienceHighlights: params.workExperienceHighlights,
           customHookOpener: params.customHookOpener,
           personalValues: params.personalValues,
-          includeLinkedInUrl: params.includeLinkedInUrl
+          includeLinkedInUrl: params.includeLinkedInUrl,
+          temperature: getTemperature()
         }
       });
 
@@ -217,7 +223,8 @@ export const useCoverLetter = () => {
           workExperienceHighlights: originalData.work_experience_highlights,
           customHookOpener: originalData.custom_hook_opener,
           personalValues: originalData.personal_values,
-          includeLinkedInUrl: originalData.include_linkedin_url
+          includeLinkedInUrl: originalData.include_linkedin_url,
+          temperature: getTemperature()
         }
       });
 
@@ -226,8 +233,8 @@ export const useCoverLetter = () => {
       // Safely handle generation_parameters - ensure it's an object and cast to Json
       const existingParams = originalData.generation_parameters || {};
       const updatedParams = typeof existingParams === 'object' && existingParams !== null 
-        ? { ...existingParams as Record<string, any>, length: params.length, tone: params.tone }
-        : { length: params.length, tone: params.tone };
+        ? { ...existingParams as Record<string, any>, length: params.length, tone: params.tone, temperature: getTemperature() }
+        : { length: params.length, tone: params.tone, temperature: getTemperature() };
 
       // Update the original cover letter with new content and increment regeneration count
       const { error: updateError } = await supabase

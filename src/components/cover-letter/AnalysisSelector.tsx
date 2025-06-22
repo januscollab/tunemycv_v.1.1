@@ -3,7 +3,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { VybeSelect } from '@/components/design-system/VybeSelect';
 import { FileText, Calendar } from 'lucide-react';
 
 interface AnalysisSelectorProps {
@@ -64,32 +64,23 @@ const AnalysisSelector: React.FC<AnalysisSelectorProps> = ({
     );
   }
 
+  const analysisOptions = analyses.map((analysis) => ({
+    value: analysis.id,
+    label: `${analysis.job_title} at ${analysis.company_name}`,
+    description: `${formatDate(analysis.created_at!)} • ${analysis.compatibility_score}% match`,
+    icon: FileText
+  }));
+
   return (
     <div className="space-y-3">
-      <Select onValueChange={onAnalysisSelect} value={selectedAnalysisId} disabled={disabled}>
-        <SelectTrigger className="w-full">
-          <SelectValue placeholder="Select from your previous analyses" />
-        </SelectTrigger>
-        <SelectContent>
-          {analyses.map((analysis) => (
-            <SelectItem key={analysis.id} value={analysis.id}>
-              <div className="flex items-center justify-between w-full">
-                <div className="flex flex-col items-start">
-                  <span className="font-medium">
-                    {analysis.job_title} at {analysis.company_name}
-                  </span>
-                  <div className="flex items-center space-x-2 text-micro text-gray-500">
-                    <Calendar className="h-3 w-3" />
-                    <span>{formatDate(analysis.created_at!)}</span>
-                    <span>•</span>
-                    <span>{analysis.compatibility_score}% match</span>
-                  </div>
-                </div>
-              </div>
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <VybeSelect
+        placeholder="Select from your previous analyses"
+        value={selectedAnalysisId}
+        onValueChange={onAnalysisSelect}
+        options={analysisOptions}
+        disabled={disabled}
+        icon={FileText}
+      />
       
       {selectedAnalysisId && (
         <div className="text-caption text-green-600 bg-green-50 p-2 rounded">

@@ -43,6 +43,7 @@ const ExperimentalAIMenu: React.FC<ExperimentalAIMenuProps> = ({
   const [showUpload, setShowUpload] = useState(false)
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null)
   const [hoveredAction, setHoveredAction] = useState<string | null>(null)
+  const [creativityLevel, setCreativityLevel] = useState<number>(1) // Local state for creativity
   const [dialogState, setDialogState] = useState<{
     open: boolean
     originalText: string
@@ -60,6 +61,16 @@ const ExperimentalAIMenu: React.FC<ExperimentalAIMenuProps> = ({
   const containerRef = useRef<HTMLDivElement>(null)
   const menuRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Creativity levels configuration
+  const CREATIVITY_LEVELS = [
+    { level: 0, temperature: 0.2, label: 'Safe', description: 'Conservative, formal language' },
+    { level: 1, temperature: 0.6, label: 'Balanced', description: 'Balanced professional tone' },
+    { level: 2, temperature: 1.2, label: 'Bold', description: 'Creative with impact' },
+    { level: 3, temperature: 1.6, label: 'Visionary', description: 'Highly creative and unique' }
+  ]
+
+  const getCurrentLevel = () => CREATIVITY_LEVELS[creativityLevel]
 
   const handleTextSelection = () => {
     const selection = window.getSelection()
@@ -126,7 +137,8 @@ const ExperimentalAIMenu: React.FC<ExperimentalAIMenuProps> = ({
         body: JSON.stringify({
           selectedText: currentText,
           action: { type: action, subType: subAction },
-          context: "editor"
+          context: "editor",
+          temperature: CREATIVITY_LEVELS[creativityLevel].temperature
         })
       })
 
@@ -367,7 +379,6 @@ const ExperimentalAIMenu: React.FC<ExperimentalAIMenuProps> = ({
               </div>
             </div>
 
-
             {/* Contextual Actions with Nested Menus */}
             <div className="p-4 space-y-1">
               {!isProcessing ? (
@@ -457,6 +468,35 @@ const ExperimentalAIMenu: React.FC<ExperimentalAIMenuProps> = ({
                       )}
                     </div>
                   ))}
+
+                  {/* Discreet AI Creativity Slider */}
+                  <div className="mt-3 pt-3 border-t border-border/20">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs text-muted-foreground">Creativity: {getCurrentLevel().label}</span>
+                      <Brain className="w-3 h-3 text-muted-foreground/60" />
+                    </div>
+                    
+                    <div className="space-y-1">
+                      {/* Compact Slider */}
+                      <div className="relative">
+                        <input
+                          type="range"
+                          min="0"
+                          max="3"
+                          step="1"
+                          value={creativityLevel}
+                          onChange={(e) => setCreativityLevel(parseInt(e.target.value))}
+                          className="w-full h-1 bg-muted rounded-full appearance-none cursor-pointer compact-slider"
+                        />
+                      </div>
+
+                      {/* Minimal Level Indicators */}
+                      <div className="flex justify-between text-[10px] text-muted-foreground/70">
+                        <span>Safe</span>
+                        <span>Bold</span>
+                      </div>
+                    </div>
+                  </div>
                 </>
               ) : (
                 <div className="flex items-center justify-center py-8">
@@ -487,6 +527,47 @@ const ExperimentalAIMenu: React.FC<ExperimentalAIMenuProps> = ({
           onRegenerate={handleRegenerateText}
         />
       </div>
+
+      {/* Compact Slider Styles */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          .compact-slider::-webkit-slider-track {
+            height: 4px;
+            background: linear-gradient(to right, #10b981 0%, #3b82f6 33%, #8b5cf6 66%, #ec4899 100%);
+            border-radius: 2px;
+          }
+          .compact-slider::-webkit-slider-thumb {
+            appearance: none;
+            height: 12px;
+            width: 12px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid #6b7280;
+            cursor: pointer;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+          }
+          .compact-slider::-webkit-slider-thumb:hover {
+            border-color: #3b82f6;
+            transform: scale(1.1);
+          }
+          .compact-slider::-moz-range-track {
+            height: 4px;
+            background: linear-gradient(to right, #10b981 0%, #3b82f6 33%, #8b5cf6 66%, #ec4899 100%);
+            border-radius: 2px;
+            border: none;
+          }
+          .compact-slider::-moz-range-thumb {
+            height: 12px;
+            width: 12px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid #6b7280;
+            cursor: pointer;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+          }
+        `
+      }} />
     </>
   )
 }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { ModernCard, ModernCardContent, ModernCardHeader, ModernCardTitle } from './ui/ModernCard';
+import { ModernButton } from './ui/ModernButton';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -91,51 +91,55 @@ const ExecutionLogs = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold">Execution Logs</h2>
-        <Button onClick={loadLogs}>Refresh</Button>
+        <ModernButton modernVariant="ghost" onClick={loadLogs}>Refresh</ModernButton>
       </div>
 
       {logs.length === 0 ? (
-        <Card>
-          <CardContent className="text-center py-8">
-            <p className="text-muted-foreground">
-              No execution logs yet. Execute a sprint to see logs here.
+        <ModernCard className="animate-fade-in">
+          <ModernCardContent className="text-center py-12">
+            <div className="text-6xl mb-4">📝</div>
+            <p className="text-muted-foreground text-lg mb-2">
+              No execution logs yet
             </p>
-          </CardContent>
-        </Card>
+            <p className="text-muted-foreground text-sm opacity-75">
+              Execute a sprint to see logs here
+            </p>
+          </ModernCardContent>
+        </ModernCard>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-6">
           {logs.map((log) => (
-            <Card key={log.id}>
-              <CardHeader>
+            <ModernCard key={log.id} className="animate-fade-in hover-scale">
+              <ModernCardHeader>
                 <div className="flex justify-between items-start">
                   <div>
-                    <CardTitle className="text-lg">
-                      {log.sprints?.name || 'Unknown Sprint'}
-                    </CardTitle>
+                    <ModernCardTitle className="text-lg">
+                      🚀 {log.sprints?.name || 'Unknown Sprint'}
+                    </ModernCardTitle>
                     <p className="text-sm text-muted-foreground">
                       {format(new Date(log.execution_date), 'PPpp')}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge variant="outline">{log.model_used}</Badge>
-                    <Button
+                    <ModernButton
                       size="sm"
-                      variant="outline"
+                      modernVariant="secondary"
                       onClick={() => handleViewDetails(log)}
                     >
-                      View Details
-                    </Button>
-                    <Button
+                      👁 View Details
+                    </ModernButton>
+                    <ModernButton
                       size="sm"
-                      variant="destructive"
+                      modernVariant="destructive"
                       onClick={() => handleDeleteLog(log.id)}
                     >
-                      Delete
-                    </Button>
+                      🗑 Delete
+                    </ModernButton>
                   </div>
                 </div>
-              </CardHeader>
-              <CardContent>
+              </ModernCardHeader>
+              <ModernCardContent>
                 <div className="space-y-2">
                   <div>
                     <p className="text-sm font-medium">Prompt Preview:</p>
@@ -152,8 +156,8 @@ const ExecutionLogs = () => {
                     </div>
                   )}
                 </div>
-              </CardContent>
-            </Card>
+              </ModernCardContent>
+            </ModernCard>
           ))}
         </div>
       )}

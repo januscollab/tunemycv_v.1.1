@@ -23,8 +23,8 @@ const CoverLetterVersionBadge: React.FC<CoverLetterVersionBadgeProps> = ({
 
   return (
     <Badge 
-      variant="outline" 
-      className={`text-micro ${
+      variant="compact" 
+      className={`${
         isLatest 
           ? 'bg-green-100 text-green-700 border-green-300 dark:bg-green-900/20 dark:text-green-400 dark:border-green-600' 
           : 'bg-orange-100 text-orange-700 border-orange-300 dark:bg-orange-900/20 dark:text-orange-400 dark:border-orange-600'

@@ -1,40 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Eye, Code, Palette, Type, Square, Circle, Triangle, Zap, AlertTriangle, Search, Star, Heart, Award, Sparkles, Layers, Grid, Layout, MousePointer, Users, TrendingUp, Menu, ChevronDown, Info, Download, Settings, Bell, MessageSquare, Play, Pause, Volume2, RefreshCw, Camera, Clock, MapPin, Shield, Unlock, Lock, Mail, Upload, FileText, Loader, Activity, History, Trash2, Brain } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
+import { ArrowLeft, Eye, Palette, Type, Square, Zap, AlertTriangle, ChevronDown, Info, Download, Settings, Bell, Sparkles, Layers, Grid, MousePointer, History as HistoryIcon, Activity, Loader, User } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { FloatingLabelInput } from '@/components/common/FloatingLabelInput';
 import { FloatingLabelTextarea } from '@/components/common/FloatingLabelTextarea';
 import { CaptureInput } from '@/components/ui/capture-input';
 import { CaptureTextarea } from '@/components/ui/capture-textarea';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import LegacyRichTextEditor from '@/components/ui/legacy-rich-text-editor';
-// Using ExperimentalAIMenu as the new standard
-import { ExperimentalAIMenu } from '@/components/ui/experimental-ai-menu';
-import '@/components/ui/rich-text-editor.css';
-
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel } from '@/components/ui/dropdown-menu';
 import { LoadingStatesShowcase } from '@/components/ui/loading-states-showcase';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-
-// Import missing component examples
 import { ContactSalesModal } from '@/components/ui/contact-sales-modal';
 import { WelcomeCreditsModal } from '@/components/ui/welcome-credits-modal';
 import ToastModal from '@/components/ui/toast-modal';
 import { MockPaymentModal } from '@/components/ui/mock-payment-modal';
-
 import { StepIndicator } from '@/components/ui/step-indicator';
 import { ProgressIndicator } from '@/components/ui/progress-indicator';
-import { HistorySection, HistoryHeader, HistoryList, HistoryEmptyState } from '@/components/ui/history-section';
-import { CategoryDocumentHistory, CategoryDocumentHistoryHeader, CategoryDocumentHistoryList, CategoryDocumentHistoryItem } from '@/components/ui/category-document-history';
-import { DocumentHistory, DocumentHistoryHeader, DocumentHistoryList, DocumentHistoryItem } from '@/components/ui/profile-document-history';
-
+import EnhancedAnalysisHistory from '@/components/analysis/EnhancedAnalysisHistory';
+import { CategoryDocumentHistory } from '@/components/ui/category-document-history';
+import { DocumentHistory as ProfileDocumentHistory } from '@/components/ui/profile-document-history';
+import { VybeButton, VybeSelect, VybeIconButton, VubeUITooltip, EnhancedCoverLetterHistory, EnhancedInterviewPrepHistory } from "@/components/design-system";
+import { Separator } from '@/components/ui/separator';
 
 const DesignSystem = () => {
   const [activeModal, setActiveModal] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState('foundations');
   const [rteContent, setRteContent] = useState("<h2>Sample Heading</h2><p>This is a paragraph with <strong>bold text</strong> and <em>italic text</em>.</p><ul><li>First item</li><li>Second item</li></ul>");
   const colorTokens = [
     { 
@@ -251,152 +245,6 @@ const DesignSystem = () => {
       description: 'Progress bars with multiple variants, sizes, and animations',
       status: 'active',
       trigger: () => {}
-    },
-    { 
-      name: 'HistorySection', 
-      component: (
-        <div className="w-full max-w-4xl">
-          <HistorySection
-            header={{
-              title: "Saved Cover Letters",
-              count: 3,
-              countLabel: "cover letter",
-              icon: <History className="h-5 w-5" />,
-              actions: (
-                <div className="flex items-center gap-2">
-                  <span className="text-caption text-muted-foreground">Show:</span>
-                  <select className="text-caption border rounded px-2 py-1 bg-background">
-                    <option>10</option>
-                    <option>20</option>
-                    <option>30</option>
-                  </select>
-                  <span className="text-caption text-muted-foreground">per page</span>
-                </div>
-              )
-            }}
-            items={[
-              {
-                id: '1',
-                title: 'Senior Frontend Developer at Google',
-                subtitle: 'Generated from CV analysis',
-                date: 'Updated 15/06/2025 at 14:30',
-                status: 'completed',
-                badge: { text: 'v3', variant: 'default' },
-                actions: [
-                  { label: 'View', variant: 'outline', onClick: () => {} },
-                  { label: 'Download', variant: 'outline', onClick: () => {} },
-                  { label: 'CV Analysis', variant: 'outline', onClick: () => {} }
-                ]
-              },
-              {
-                id: '2',
-                title: 'Backend Engineer at Microsoft',
-                subtitle: 'Generated from manual input',
-                date: 'Updated 14/06/2025 at 10:15',
-                status: 'completed',
-                badge: { text: 'v2', variant: 'secondary' },
-                actions: [
-                  { label: 'View', variant: 'outline', onClick: () => {} },
-                  { label: 'Download', variant: 'outline', onClick: () => {} }
-                ]
-              },
-              {
-                id: '3',
-                title: 'Data Scientist at Meta',
-                subtitle: 'Original version',
-                date: 'Updated 13/06/2025 at 16:45',
-                status: 'completed',
-                badge: { text: 'v1', variant: 'secondary' },
-                actions: [
-                  { label: 'View', variant: 'outline', onClick: () => {} },
-                  { label: 'Download', variant: 'outline', onClick: () => {} }
-                ]
-              }
-            ]}
-            variant="default"
-            onItemClick={(item) => console.log('Clicked:', item.title)}
-          />
-        </div>
-      ), 
-      usage: '34 usages',
-      description: 'Unified history component for cover letters with versioning - shows latest version with green badge, past versions with orange badge',
-      status: 'active',
-      trigger: () => {}
-    },
-    { 
-      name: 'CategoryDocumentHistory', 
-      component: (
-        <div style={{ width: '100%', maxWidth: '600px', margin: '0 auto' }}>
-          <CategoryDocumentHistory
-            header={{
-              title: "Document History",
-              totalCount: 3,
-              itemsPerPage: 10,
-              onItemsPerPageChange: () => {},
-              showPagination: true,
-              showFilter: true
-            }}
-            documents={[
-              {
-                id: '1',
-                type: 'analysis',
-                title: 'Program Director',
-                job_title: 'Program Director',
-                company_name: 'Oracle',
-                created_at: '2025-06-14T23:57:00Z',
-                compatibility_score: 88,
-                has_cover_letter: true,
-                executive_summary: 'Strong candidate with relevant experience',
-                strengths: ['Leadership', 'Strategic Planning'],
-                weaknesses: ['Communication'],
-                recommendations: ['Improve presentation skills']
-              },
-              {
-                id: '2',
-                type: 'cover_letter',
-                title: 'Software Engineer Cover Letter',
-                job_title: 'Software Engineer',
-                company_name: 'TechCorp',
-                created_at: '2025-06-13T15:30:00Z',
-                content: 'Dear Hiring Manager...',
-                regeneration_count: 2,
-                analysis_result_id: 'analysis-123'
-              }
-            ]}
-            actions={[
-              {
-                label: 'View',
-                icon: <Eye className="h-4 w-4 mr-2" />,
-                onClick: (doc) => console.log('View:', doc.title)
-              },
-              {
-                label: 'Download',
-                icon: <Download className="h-4 w-4 mr-2" />,
-                onClick: (doc) => console.log('Download:', doc.title)
-              },
-              {
-                label: 'Delete',
-                icon: <Trash2 className="h-4 w-4 mr-2" />,
-                onClick: (doc) => console.log('Delete:', doc.title),
-                variant: 'destructive'
-              }
-            ]}
-            emptyState={{
-              title: "No documents found",
-              description: "You haven't created any analyses or cover letters yet."
-            }}
-            pagination={{
-              currentPage: 1,
-              totalPages: 1,
-              onPageChange: () => {}
-            }}
-          />
-        </div>
-      ), 
-      usage: '8 usages',
-      description: 'Specialized document history component for profile page with filtering, pagination, and advanced actions',
-      status: 'active',
-      trigger: () => {}
     }
   ];
 
@@ -504,20 +352,45 @@ const DesignSystem = () => {
     {
       name: 'Tooltip System',
       component: (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="outline" size="sm">
-              <Info className="h-4 w-4 mr-1" />
-              Hover for tooltip
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>This is a helpful tooltip message</p>
-          </TooltipContent>
-        </Tooltip>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="outline" size="sm">
+                <Info className="h-4 w-4 mr-1" />
+                Hover for tooltip
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>This is a helpful tooltip message</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       ),
       usage: '89 usages',
       description: 'Accessible tooltips with proper z-index and positioning'
+    },
+    {
+      name: 'VubeUITooltip',
+      component: (
+        <VubeUITooltip
+          content={
+            <div className="space-y-2">
+              <p className="font-medium">Feature Details</p>
+              <p className="text-sm text-muted-foreground">
+                This advanced feature includes analytics, 
+                reporting, and custom configurations.
+              </p>
+            </div>
+          }
+        >
+          <Button variant="outline" size="sm">
+            <Info className="h-4 w-4 mr-1" />
+            Rich content tooltip
+          </Button>
+        </VubeUITooltip>
+      ),
+      usage: '23 usages',
+      description: 'Advanced tooltips with rich content, custom styling, and enhanced positioning controls'
     },
     {
       name: 'Menu Text Animation',
@@ -658,8 +531,6 @@ const DesignSystem = () => {
           onSave={(value) => {
             console.log('Auto-saving content:', value);
             setRteContent(value);
-            // In real implementation, this would save to backend
-            // For demo purposes, we'll show a save confirmation
           }}
           filename="design-system-sample"
           className="w-full"
@@ -746,30 +617,111 @@ const DesignSystem = () => {
       component: (
         <div className="space-y-4">
           <p className="text-caption text-muted-foreground">
-            Select any text below to see the new AI context menu design inspired by your brand colors:
+            AI Context Menu is now only available within Rich Text Editor components for security and UX consistency.
           </p>
-          <ExperimentalAIMenu
-            selectedText="This is sample selected text"
-          >
-            <div className="p-4 border border-border rounded-lg bg-background min-h-[120px]">
-              <h3 className="text-heading font-semibold mb-3">Enhanced AI Assistant</h3>
-              <p className="text-body leading-relaxed">
-                Select any portion of this text to trigger the enhanced AI context menu. 
-                The menu features improved search capabilities, better text alternatives, 
-                and seamless replace functionality with smart contextual filtering and 
-                developer-configurable avatar. Try selecting this sentence to see the 
-                enhanced menu appear with smooth gliding animations.
-              </p>
-              <p className="text-body mt-4">
-                Features include before/after text comparison, contextual action filtering,
-                and subtle orange branding aligned with the design system.
-              </p>
-            </div>
-          </ExperimentalAIMenu>
+          <div className="p-4 border border-border rounded-lg bg-background min-h-[120px] flex items-center justify-center">
+            <p className="text-body text-muted-foreground">
+              AI Context Menu disabled outside of Rich Text Editor context
+            </p>
+          </div>
         </div>
       ),
-      usage: 'New component',
-      description: 'AI-powered context menu with brand-aligned design for text enhancement'
+      usage: 'RTE only',
+      description: 'AI context menu restricted to Rich Text Editor'
+    }
+  ];
+
+  const componentExamples = [
+    {
+      name: "VybeButton",
+      component: (
+        <div className="space-y-4">
+          <div className="flex flex-wrap gap-2">
+            <VybeButton vybeVariant="primary" vybeSize="sm">Primary Small</VybeButton>
+            <VybeButton vybeVariant="secondary" vybeSize="sm">Secondary Small</VybeButton>
+            <VybeButton vybeVariant="outline" vybeSize="sm">Outline Small</VybeButton>
+            <VybeButton vybeVariant="ghost" vybeSize="sm">Ghost Small</VybeButton>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <VybeButton vybeVariant="primary" vybeSize="default">Primary Medium</VybeButton>
+            <VybeButton vybeVariant="secondary" vybeSize="default">Secondary Medium</VybeButton>
+            <VybeButton vybeVariant="outline" vybeSize="default">Outline Medium</VybeButton>
+            <VybeButton vybeVariant="ghost" vybeSize="default">Ghost Medium</VybeButton>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <VybeButton vybeVariant="primary" vybeSize="lg">Primary Large</VybeButton>
+            <VybeButton vybeVariant="secondary" vybeSize="lg">Secondary Large</VybeButton>
+            <VybeButton vybeVariant="outline" vybeSize="lg">Outline Large</VybeButton>
+            <VybeButton vybeVariant="ghost" vybeSize="lg">Ghost Large</VybeButton>
+          </div>
+        </div>
+      ),
+      usage: 127,
+      description: "Primary button component with consistent styling and semantic token integration"
+    },
+    {
+      name: "VybeSelect",
+      component: (
+        <div className="space-y-4">
+          <VybeSelect
+            options={[
+              { value: "option1", label: "Option 1" },
+              { value: "option2", label: "Option 2" },
+              { value: "option3", label: "Option 3" }
+            ]}
+            placeholder="Choose an option"
+            onValueChange={(value) => console.log(value)}
+          />
+          <VybeSelect
+            options={[
+              { value: "enabled", label: "This is enabled" },
+              { value: "another", label: "Another option" }
+            ]}
+            placeholder="Simple options"
+          />
+        </div>
+      ),
+      usage: 89,
+      description: "Dropdown select component with consistent styling and semantic token integration"
+    },
+    {
+      name: "VybeIconButton", 
+      component: (
+        <div className="flex gap-2">
+          <VybeIconButton 
+            icon={User}
+            tooltip="User Profile"
+            onClick={() => console.log('User clicked')}
+          />
+          <VybeIconButton 
+            icon={Settings}
+            tooltip="Settings"
+            variant="secondary"
+            onClick={() => console.log('Settings clicked')}
+          />
+          <VybeIconButton 
+            icon={Bell}
+            tooltip="Notifications"
+            variant="outline"
+            onClick={() => console.log('Notifications clicked')}
+          />
+        </div>
+      ),
+      usage: 45,
+      description: "Icon-only button with built-in tooltip functionality"
+    },
+    {
+      name: "EnhancedCoverLetterHistory",
+      component: (
+        <div className="max-w-4xl">
+          <EnhancedCoverLetterHistory 
+            onSelectCoverLetter={(coverLetter) => console.log('Selected:', coverLetter)}
+            className="border rounded-lg p-4"
+          />
+        </div>
+      ),
+      usage: 3,
+      description: "Advanced cover letter history management component with search, pagination, and document actions"
     }
   ];
 
@@ -812,36 +764,17 @@ const DesignSystem = () => {
               All components use semantic tokens that automatically adapt to light and dark themes.
             </p>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <Card className="text-center p-6">
-                <Palette className="h-8 w-8 mx-auto mb-3 text-primary" />
-                <h3 className="text-heading font-semibold mb-2">Color System</h3>
-                <p className="text-caption text-muted-foreground">Semantic color tokens with automatic theme switching</p>
-              </Card>
-              <Card className="text-center p-6">
-                <Type className="h-8 w-8 mx-auto mb-3 text-primary" />
-                <h3 className="text-heading font-semibold mb-2">Typography</h3>
-                <p className="text-caption text-muted-foreground">Hierarchical text system with responsive scaling</p>
-              </Card>
-              <Card className="text-center p-6">
-                <Grid className="h-8 w-8 mx-auto mb-3 text-primary" />
-                <h3 className="text-heading font-semibold mb-2">Components</h3>
-                <p className="text-caption text-muted-foreground">Reusable components following design principles</p>
-              </Card>
-            </div>
           </div>
         </div>
 
         {/* Tabbed Navigation */}
         <Tabs defaultValue="foundations" className="w-full">
-          <TabsList className="grid w-full grid-cols-7">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="foundations">Foundations</TabsTrigger>
             <TabsTrigger value="components">Components</TabsTrigger>
             <TabsTrigger value="rte">Rich Text Editor</TabsTrigger>
-            <TabsTrigger value="interactions">Interactions</TabsTrigger>
+            <TabsTrigger value="interactions">Interactions & Loading</TabsTrigger>
             <TabsTrigger value="missing">Missing Docs</TabsTrigger>
-            <TabsTrigger value="loading">Loading States</TabsTrigger>
-            <TabsTrigger value="experiments">Experiments</TabsTrigger>
           </TabsList>
 
           {/* Foundations Tab */}
@@ -1039,199 +972,183 @@ const DesignSystem = () => {
                   </Card>
                 ))}
               </div>
+            </section>
 
-              {/* Category Document History Component */}
-              <div className="space-y-4">
-                <h3 className="text-heading font-semibold">Category Document History</h3>
+            {/* Design System Components */}
+            <section>
+              <h2 className="text-title font-bold text-foreground mb-8 flex items-center gap-3">
+                <Grid className="h-6 w-6 text-primary" />
+                Design System Components
+              </h2>
+              
+              <div className="grid gap-6">
+                {componentExamples.map((component, index) => (
+                  <Card key={index} className="group hover:shadow-lg transition-all duration-300">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-subheading">{component.name}</CardTitle>
+                        <Badge variant="default" className="text-micro">
+                          {component.usage} usages
+                        </Badge>
+                      </div>
+                      <p className="text-caption text-muted-foreground">
+                        {component.description}
+                      </p>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="bg-muted/30 p-4 rounded-lg">
+                        {component.component}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </section>
+
+            {/* Enhanced History Components */}
+            <div className="space-y-8">
+              <div>
+                <h3 className="text-lg font-semibold mb-4">Enhanced Cover Letter History</h3>
+                <EnhancedCoverLetterHistory className="max-w-4xl" />
+              </div>
+              
+              <div>
+                <h3 className="text-lg font-semibold mb-4">Enhanced Interview Prep History</h3>
+                <EnhancedInterviewPrepHistory className="max-w-4xl" />
+              </div>
+            </div>
+
+            {/* History Components Section */}
+            <section>
+              <h2 className="text-title font-bold text-foreground mb-8 flex items-center gap-3">
+                <HistoryIcon className="h-6 w-6 text-primary" />
+                History Components
+              </h2>
+              
+              <div className="w-[80%] mx-auto grid gap-6 grid-cols-1">
+
+                {/* EnhancedAnalysisHistory */}
                 <Card className="group hover:shadow-lg transition-all duration-300">
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-subheading">Category Document History</CardTitle>
-                      <Badge variant="outline" className="text-micro">
-                        12 usages
-                      </Badge>
+                      <CardTitle className="text-subheading">EnhancedAnalysisHistory</CardTitle>
+                      <Badge variant="default" className="text-micro">Current</Badge>
                     </div>
                     <p className="text-caption text-muted-foreground">
-                      Unified history component for analysis, cover letters, and CV management across the app - identical to existing History UI
+                      Advanced analysis history with view, download, delete actions and CTA buttons for generating cover letters and interview prep.
                     </p>
+                    <div className="text-micro text-muted-foreground mt-2">
+                      <strong>Used in:</strong> src/pages/AnalyzeCV.tsx
+                    </div>
                   </CardHeader>
                   <CardContent>
                     <div className="bg-muted/30 p-4 rounded-lg">
-                      <HistorySection
-                        header={{
-                          title: "Saved Cover Letters",
-                          count: 1,
-                          countLabel: "cover letter",
-                          icon: <History className="h-5 w-5" />,
-                          actions: (
-                            <div className="flex items-center gap-2">
-                              <span className="text-caption text-muted-foreground">Show:</span>
-                              <select className="text-caption border rounded px-2 py-1 bg-background">
-                                <option>10</option>
-                              </select>
-                              <span className="text-caption text-muted-foreground">per page</span>
-                            </div>
-                          )
-                        }}
-                        items={[
-                          {
-                            id: "1",
-                            title: "Senior Frontend Developer at Google",
-                            subtitle: "Generated from CV analysis",
-                            date: "Updated 15/06/2025 at 14:30",
-                            status: 'completed' as const,
-                            badge: { text: 'v3', variant: 'default' as const },
-                            actions: [
-                              {
-                                label: "View",
-                                variant: "outline" as const,
-                                onClick: () => {}
-                              },
-                              {
-                                label: "Download", 
-                                variant: "outline" as const,
-                                onClick: () => {}
-                              },
-                              {
-                                label: "CV Analysis",
-                                variant: "outline" as const,
-                                onClick: () => {}
-                              }
-                            ]
-                          },
-                          {
-                            id: "2",
-                            title: "Backend Engineer at Microsoft",
-                            subtitle: "Generated from manual input",
-                            date: "Updated 14/06/2025 at 10:15",
-                            status: 'completed' as const,
-                            badge: { text: 'v2', variant: 'secondary' as const },
-                            actions: [
-                              {
-                                label: "View",
-                                variant: "outline" as const,
-                                onClick: () => {}
-                              },
-                              {
-                                label: "Download", 
-                                variant: "outline" as const,
-                                onClick: () => {}
-                              }
-                            ]
-                          },
-                          {
-                            id: "3",
-                            title: "Data Scientist at Meta",
-                            subtitle: "Original version", 
-                            date: "Updated 13/06/2025 at 16:45",
-                            status: 'completed' as const,
-                            badge: { text: 'v1', variant: 'secondary' as const },
-                            actions: [
-                              {
-                                label: "View",
-                                variant: "outline" as const,
-                                onClick: () => {}
-                              },
-                              {
-                                label: "Download", 
-                                variant: "outline" as const,
-                                onClick: () => {}
-                              }
-                            ]
-                          }
-                        ]}
-                        variant="default"
-                      />
+                      <EnhancedAnalysisHistory className="w-full" />
                     </div>
                   </CardContent>
                 </Card>
-              </div>
 
-              {/* Profile Document History Component */}
-              <div className="space-y-4">
-                <h3 className="text-heading font-semibold">Profile Document History</h3>
+                {/* CategoryDocumentHistory */}
                 <Card className="group hover:shadow-lg transition-all duration-300">
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-subheading">Profile Document History</CardTitle>
-                      <Badge variant="outline" className="text-micro">
-                        8 usages
-                      </Badge>
+                      <CardTitle className="text-subheading">CategoryDocumentHistory</CardTitle>
+                      <Badge variant="secondary" className="text-micro">Restored</Badge>
                     </div>
                     <p className="text-caption text-muted-foreground">
-                      Specialized document history component for profile page with filtering, pagination, and dynamic per-document actions
+                      Categorized document history with comprehensive filtering, sorting, and management capabilities.
                     </p>
+                    <div className="text-micro text-muted-foreground mt-2">
+                      <strong>Used in:</strong> src/pages/CoverLetter.tsx, src/pages/InterviewToolkit.tsx
+                    </div>
                   </CardHeader>
                   <CardContent>
                     <div className="bg-muted/30 p-4 rounded-lg">
-                       <DocumentHistory
+                      <CategoryDocumentHistory
                         header={{
-                          title: "Document History",
-                          totalCount: 3,
-                          filterType: 'all',
-                          onFilterChange: () => {},
+                          title: "Sample Document History",
+                          totalCount: 5,
                           itemsPerPage: 10,
-                          onItemsPerPageChange: () => {},
-                          showPagination: true
+                          onItemsPerPageChange: () => {}
                         }}
                         documents={[
                           {
-                            id: '1',
-                            type: 'analysis',
-                            title: 'Program Director',
-                            job_title: 'Program Director',
-                            company_name: 'Oracle',
-                            created_at: '2025-06-14T23:57:00Z',
-                            compatibility_score: 88,
-                            has_cover_letter: true,
-                            executive_summary: 'Strong candidate with relevant experience',
-                            strengths: ['Leadership', 'Strategic Planning'],
-                            weaknesses: ['Communication'],
-                            recommendations: ['Improve presentation skills']
+                            id: "1",
+                            type: "cover_letter",
+                            title: "Software Engineer Cover Letter",
+                            created_at: new Date().toISOString(),
+                            job_title: "Software Engineer"
                           },
                           {
-                            id: '2',
-                            type: 'cover_letter',
-                            title: 'Software Engineer Cover Letter',
-                            job_title: 'Software Engineer',
-                            company_name: 'TechCorp',
-                            created_at: '2025-06-13T15:30:00Z',
-                            content: 'Dear Hiring Manager...',
-                            regeneration_count: 2,
-                            analysis_result_id: 'analysis-123'
+                            id: "2", 
+                            type: "analysis",
+                            title: "CV Analysis Report",
+                            created_at: new Date().toISOString(),
+                            compatibility_score: 85
                           }
                         ]}
                         actions={[
-                          {
-                            label: 'View',
-                            icon: <Eye className="h-4 w-4 mr-2" />,
-                            onClick: (doc) => console.log('View:', doc.title)
-                          },
-                          {
-                            label: 'Download',
-                            icon: <Download className="h-4 w-4 mr-2" />,
-                            onClick: (doc) => console.log('Download:', doc.title)
-                          },
-                          {
-                            label: 'Delete',
-                            icon: <Trash2 className="h-4 w-4 mr-2" />,
-                            onClick: (doc) => console.log('Delete:', doc.title),
-                            variant: 'destructive'
-                          }
+                          { label: "View", onClick: () => {}, icon: <Eye className="h-4 w-4 mr-2" /> },
+                          { label: "Download", onClick: () => {}, icon: <Download className="h-4 w-4 mr-2" /> }
                         ]}
-                        emptyState={{
-                          title: "No documents found",
-                          description: "You haven't created any analyses or cover letters yet."
-                        }}
-                        pagination={{
-                          currentPage: 1,
-                          totalPages: 1,
-                          onPageChange: () => {}
-                        }}
+                        className="w-full"
                       />
                     </div>
                   </CardContent>
                 </Card>
+
+                {/* ProfileDocumentHistory */}
+                <Card className="group hover:shadow-lg transition-all duration-300">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-subheading">ProfileDocumentHistory</CardTitle>
+                      <Badge variant="secondary" className="text-micro">Restored</Badge>
+                    </div>
+                    <p className="text-caption text-muted-foreground">
+                      Profile-specific document history component for user profile management interfaces.
+                    </p>
+                    <div className="text-micro text-muted-foreground mt-2">
+                      <strong>Used in:</strong> src/components/profile/AnalysisHistoryTab.tsx, src/components/profile/DocumentHistoryTab.tsx
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="bg-muted/30 p-4 rounded-lg">
+                      <ProfileDocumentHistory
+                        header={{
+                          title: "User Documents",
+                          totalCount: 2,
+                          filterType: "all",
+                          onFilterChange: () => {},
+                          itemsPerPage: 10,
+                          onItemsPerPageChange: () => {}
+                        }}
+                        documents={[
+                          {
+                            id: "1",
+                            type: "analysis",
+                            title: "Senior Developer CV",
+                            created_at: new Date().toISOString(),
+                            compatibility_score: 92
+                          },
+                          {
+                            id: "2",
+                            type: "cover_letter", 
+                            title: "Marketing Manager Application",
+                            created_at: new Date().toISOString(),
+                            job_title: "Marketing Manager"
+                          }
+                        ]}
+                        actions={[
+                          { label: "Edit", onClick: () => {}, icon: <Eye className="h-4 w-4 mr-2" /> },
+                          { label: "View", onClick: () => {}, icon: <Eye className="h-4 w-4 mr-2" /> },
+                          { label: "Download", onClick: () => {}, icon: <Download className="h-4 w-4 mr-2" /> }
+                        ]}
+                        className="w-full"
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+
               </div>
             </section>
           </TabsContent>
@@ -1391,9 +1308,22 @@ const DesignSystem = () => {
                 ))}
               </div>
             </section>
+
+            {/* Loading States Section */}
+            <section>
+              <h2 className="text-title font-bold text-foreground mb-8 flex items-center gap-3">
+                <Loader className="h-6 w-6 text-primary" />
+                Loading States
+              </h2>
+              
+              <LoadingStatesShowcase 
+                activeModal={activeModal} 
+                setActiveModal={setActiveModal}
+              />
+            </section>
           </TabsContent>
 
-            {/* Missing Components Tab */}
+          {/* Missing Components Tab */}
           <TabsContent value="missing" className="space-y-8">
             <section>
               <h2 className="text-title font-bold text-foreground mb-8 flex items-center gap-3">
@@ -1437,14 +1367,6 @@ const DesignSystem = () => {
             </section>
           </TabsContent>
 
-            {/* Loading States Tab */}
-          <TabsContent value="loading" className="space-y-8">
-            <LoadingStatesShowcase 
-              activeModal={activeModal} 
-              setActiveModal={setActiveModal}
-            />
-          </TabsContent>
-
           {/* Experiments Tab */}
           <TabsContent value="experiments" className="space-y-8">
             <section>
@@ -1466,47 +1388,22 @@ const DesignSystem = () => {
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {/* Demo Area */}
-                  <div className="border-2 border-dashed border-border rounded-lg p-8 bg-muted/30 relative min-h-[400px]">
-                    <ExperimentalAIMenu selectedText="sample text">
-                      <div className="space-y-4">
-                        <h3 className="text-heading font-semibold">Select any text below to see the AI assistant:</h3>
-                        
-                        <div className="space-y-4 text-body leading-relaxed">
-                          <p className="bg-background p-4 rounded-lg border">
-                            This is a sample paragraph with some text that you can select to trigger the experimental AI menu. 
-                            Try selecting different amounts of text to see how the AI's personality changes based on complexity.
-                          </p>
-                          
-                          <p className="bg-background p-4 rounded-lg border">
-                            Here's another paragraph! Notice how the AI responds differently to exclamation marks and questions? 
-                            The floating assistant adapts its mood and behavior based on what you select.
-                          </p>
-                          
-                          <p className="bg-background p-4 rounded-lg border">
-                            This is a much longer paragraph with complex sentence structures, technical terminology, and detailed explanations that should trigger the AI's "thinking" mode. The assistant recognizes text complexity and adjusts its visual feedback accordingly, showing a more contemplative expression when dealing with sophisticated content that requires deeper analysis and processing.
-                          </p>
-                        </div>
-                        
-                        <div className="bg-accent/50 p-4 rounded-lg border border-accent">
-                          <h4 className="font-semibold mb-2">🎯 Try These Features:</h4>
-                          <ul className="text-caption space-y-1 list-disc list-inside">
-                            <li>Select short text → Happy AI 😊</li>
-                            <li>Select text with ! or ? → Excited AI 🤖</li>
-                            <li>Select long/complex text → Thinking AI 🤔</li>
-                            <li>Hover over the floating circle → Orbital actions appear</li>
-                            <li>Click actions with arrows → Sub-menus slide out</li>
-                            <li>Watch the processing animation with particles</li>
-                          </ul>
-                        </div>
-                      </div>
-                    </ExperimentalAIMenu>
+                  <div className="border-2 border-dashed border-border rounded-lg p-8 bg-muted/30 relative min-h-[400px] flex items-center justify-center">
+                    <div className="text-center space-y-4">
+                      <h3 className="text-heading font-semibold">AI Context Menu Disabled</h3>
+                      <p className="text-body text-muted-foreground max-w-md">
+                        For security and consistency, the AI Context Menu is now only available 
+                        within Rich Text Editor components. This ensures proper context and 
+                        prevents accidental activation outside of editing workflows.
+                      </p>
+                    </div>
                   </div>
 
                   {/* Design Concept */}
-                  <div className="grid md:grid-cols-2 gap-6">
+                  <div className="grid md:grid-cols-2 gap-6 text-caption">
                     <div className="space-y-4">
                       <h4 className="text-heading font-semibold">🎨 Design Concept</h4>
-                      <div className="space-y-3 text-caption">
+                      <div className="space-y-3">
                         <div className="flex items-start gap-3">
                           <div className="w-6 h-6 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 flex-shrink-0 mt-0.5"></div>
                           <div>
@@ -1590,6 +1487,28 @@ const DesignSystem = () => {
                         </div>
                       </div>
                     </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Component Redesigns */}
+              <Card className="mb-8">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Grid className="h-5 w-5 text-primary" />
+                    Component Redesign Experiments
+                  </CardTitle>
+                  <p className="text-caption text-muted-foreground">
+                    Alternative designs for existing components - exploring different layouts and interaction patterns
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <div className="bg-muted/30 rounded-lg p-6 text-center">
+                    <h4 className="text-heading font-semibold mb-2 text-foreground">Experimental Components Removed</h4>
+                    <p className="text-caption text-muted-foreground">
+                      Component variations have been removed to streamline the codebase. The main production components 
+                      can be found in their respective sections above.
+                    </p>
                   </div>
                 </CardContent>
               </Card>

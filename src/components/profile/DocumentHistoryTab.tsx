@@ -71,7 +71,7 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
         created_at: analysis.created_at,
         compatibility_score: analysis.compatibility_score,
         job_title: analysis.job_title,
-        has_cover_letter: analysis.cover_letters && analysis.cover_letters.length > 0,
+        has_cover_letter: Array.isArray(analysis.cover_letters) && analysis.cover_letters.length > 0,
         executive_summary: analysis.executive_summary,
         strengths: analysis.strengths,
         weaknesses: analysis.weaknesses,
@@ -218,7 +218,7 @@ const DocumentHistoryTab: React.FC<DocumentHistoryTabProps> = ({ credits, member
         label: 'Download',
         icon: <Download className="h-4 w-4 mr-2" />,
         onClick: (doc) => {
-          // Handle download logic here
+          // Create download content
           const content = doc.type === 'analysis' 
             ? `CV ANALYSIS REPORT
 ==================
