@@ -1,0 +1,153 @@
+
+import React, { useState, useEffect } from 'react';
+import { Viewer, Worker } from '@react-pdf-viewer/core';
+import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
+import { AlertCircle, Download, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+
+// Import CSS
+import '@react-pdf-viewer/core/lib/styles/index.css';
+import '@react-pdf-viewer/default-layout/lib/styles/index.css';
+
+interface EnhancedPDFViewerProps {
+  pdfData?: string; // base64 PDF data
+  pdfUrl?: string; // PDF URL
+  fileName?: string;
+  className?: string;
+  onDownload?: () => void;
+}
+
+export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
+  pdfData,
+  pdfUrl,
+  fileName = 'document.pdf',
+  className = '',
+  onDownload
+}) => {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [pdfSource, setPdfSource] = useState<string | null>(null);
+
+  // Configure default layout plugin
+  const defaultLayoutPluginInstance = defaultLayoutPlugin({
+    sidebarTabs: (defaultTabs) => [
+      defaultTabs[0], // Thumbnail tab
+      defaultTabs[1], // Outline tab
+    ],
+  });
+
+  useEffect(() => {
+    const preparePdfSource = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        if (pdfData) {
+          // Handle base64 PDF data
+          const base64Data = pdfData.startsWith('data:') ? pdfData : `data:application/pdf;base64,${pdfData}`;
+          setPdfSource(base64Data);
+        } else if (pdfUrl) {
+          // Handle PDF URL
+          setPdfSource(pdfUrl);
+        } else {
+          setError('No PDF data or URL provided');
+          return;
+        }
+      } catch (err) {
+        console.error('Error preparing PDF source:', err);
+        setError('Failed to load PDF document');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    preparePdfSource();
+  }, [pdfData, pdfUrl]);
+
+  const handleDownload = () => {
+    if (onDownload) {
+      onDownload();
+      return;
+    }
+
+    // Fallback download logic
+    if (pdfData) {
+      const base64Data = pdfData.startsWith('data:') ? pdfData : `data:application/pdf;base64,${pdfData}`;
+      const link = document.createElement('a');
+      link.href = base64Data;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else if (pdfUrl) {
+      const link = document.createElement('a');
+      link.href = pdfUrl;
+      link.download = fileName;
+      link.target = '_blank';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className={`bg-surface border border-border rounded-lg p-8 ${className}`}>
+        <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+          <p className="text-muted-foreground">Loading PDF document...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !pdfSource) {
+    return (
+      <div className={`bg-surface border border-border rounded-lg p-8 ${className}`}>
+        <Alert variant="destructive" className="mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            {error || 'Unable to load PDF document'}
+          </AlertDescription>
+        </Alert>
+        <div className="flex justify-center">
+          <Button onClick={handleDownload} variant="outline">
+            <Download className="h-4 w-4 mr-2" />
+            Download PDF Instead
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={`bg-surface border border-border rounded-lg overflow-hidden ${className}`}>
+      {/* Header with download button */}
+      <div className="flex items-center justify-between p-4 border-b border-border bg-surface-secondary">
+        <h3 className="text-sm font-medium text-foreground">PDF Report</h3>
+        <Button onClick={handleDownload} variant="outline" size="sm">
+          <Download className="h-4 w-4 mr-2" />
+          Download
+        </Button>
+      </div>
+
+      {/* PDF Viewer */}
+      <div className="pdf-viewer-container" style={{ height: '600px' }}>
+        <Worker workerUrl={`https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js`}>
+          <Viewer
+            fileUrl={pdfSource}
+            plugins={[defaultLayoutPluginInstance]}
+            onDocumentLoad={() => setLoading(false)}
+            onLoadError={(error) => {
+              console.error('PDF load error:', error);
+              setError('Failed to load PDF document');
+            }}
+          />
+        </Worker>
+      </div>
+    </div>
+  );
+};
+
+export default EnhancedPDFViewer;

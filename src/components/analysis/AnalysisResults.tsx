@@ -22,6 +22,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { ComingSoonPDF } from '@/components/ui/coming-soon-pdf';
+import { EnhancedPDFViewer } from '@/components/ui/enhanced-pdf-viewer';
 
 interface AnalysisResultsProps {
   result: any;
@@ -174,6 +175,11 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
            !invalidCompanies.includes(companyName.toLowerCase());
   };
   
+  // Check if PDF data is available
+  const hasPdfData = () => {
+    return result.pdf_file_data || result.html_file_data || result.n8n_pdf_url || result.n8n_html_url;
+  };
+  
   // Check if this is an n8n analysis result
   if (result.analysis_type === 'n8n') {
     // Extract transaction ID and analysis date
@@ -200,9 +206,21 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
             </div>
           )}
 
-          {/* Coming Soon PDF Viewer */}
+          {/* PDF Viewer or Coming Soon */}
           <div className="mb-8">
-            <ComingSoonPDF />
+            {hasPdfData() ? (
+              <EnhancedPDFViewer
+                pdfData={result.pdf_file_data}
+                pdfUrl={result.n8n_pdf_url}
+                fileName={`CV_Analysis_${result.job_title || 'Report'}_${new Date().toISOString().split('T')[0]}.pdf`}
+                onDownload={() => {
+                  // Use existing download logic
+                  downloadAnalysisAsText();
+                }}
+              />
+            ) : (
+              <ComingSoonPDF />
+            )}
           </div>
 
           {/* Additional Information */}
