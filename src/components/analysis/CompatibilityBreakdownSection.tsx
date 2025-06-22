@@ -41,9 +41,9 @@ const CompatibilityBreakdownSection: React.FC<CompatibilityBreakdownSectionProps
   if (!compatibilityBreakdown) return null;
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-green-600 bg-green-100';
-    if (score >= 60) return 'text-yellow-600 bg-yellow-100';
-    return 'text-red-600 bg-red-100';
+    if (score >= 80) return 'text-success bg-success-50';
+    if (score >= 60) return 'text-warning bg-warning-50';
+    return 'text-destructive bg-destructive-50';
   };
 
   const sections = [
@@ -77,13 +77,13 @@ const CompatibilityBreakdownSection: React.FC<CompatibilityBreakdownSectionProps
               {/* Present/Relevant Items */}
               {((section.data as any).present || (section.data as any).relevantExperience || (section.data as any).relevantQualifications) && (
                 <div>
-                  <h4 className="text-caption font-medium text-green-600 mb-2 flex items-center">
+                  <h4 className="text-caption font-medium text-success mb-2 flex items-center">
                     <CheckCircle className="h-4 w-4 mr-1" />
                     Present/Relevant
                   </h4>
                   <div className="flex flex-wrap gap-2">
                     {((section.data as any).present || (section.data as any).relevantExperience || (section.data as any).relevantQualifications || []).map((item: string, index: number) => (
-                      <span key={index} className="bg-green-100 text-green-800 px-2 py-1 rounded text-micro">
+                      <span key={index} className="bg-success-50 text-success px-2 py-1 rounded text-micro">
                         {item}
                       </span>
                     ))}
@@ -94,13 +94,13 @@ const CompatibilityBreakdownSection: React.FC<CompatibilityBreakdownSectionProps
               {/* Missing Items */}
               {((section.data as any).missing || (section.data as any).missingExperience || (section.data as any).missingQualifications) && (
                 <div>
-                  <h4 className="text-caption font-medium text-red-600 mb-2 flex items-center">
+                  <h4 className="text-caption font-medium text-destructive mb-2 flex items-center">
                     <XCircle className="h-4 w-4 mr-1" />
                     Missing/Needed
                   </h4>
                   <div className="flex flex-wrap gap-2">
                     {((section.data as any).missing || (section.data as any).missingExperience || (section.data as any).missingQualifications || []).map((item: string, index: number) => (
-                      <span key={index} className="bg-red-100 text-red-800 px-2 py-1 rounded text-micro">
+                      <span key={index} className="bg-destructive-50 text-destructive px-2 py-1 rounded text-micro">
                         {item}
                       </span>
                     ))}

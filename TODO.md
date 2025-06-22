@@ -1,8 +1,69 @@
 # To-Do List
 
-## UI/UX Improvements
+## ✅ PHASE 1 COMPLETE: Critical Issues Resolution
+All critical blocking issues have been successfully resolved:
+
+- [x] **CV Content Loading Fixed**: Migrated CVContentEditModal to ControlledRichTextEditor with error boundaries
+- [x] **DOCX Upload Fixed**: Implemented dynamic mammoth import to resolve module loading errors
+- [x] **Cover Letter Editor Fixed**: Updated EditableCoverLetter to use new JSON-first architecture
+- [x] **Editor Migration Complete**: All components now use ControlledRichTextEditor with proper data handling
+- [x] **Error Boundaries Added**: Robust error handling for editor components with fallback content
+- [x] **Loading States Enhanced**: BounceLoader component for all document actions
+
+## Critical Bugs (Previously Completed)
+- [x] **Toast Notifications Still Appearing**: Auto-save toast notifications are still showing in the rich text editor despite implementation to remove them
+- [x] **Ctrl+Z Undo Not Working**: Keyboard shortcut Ctrl+Z for undo functionality is not working in the rich text editor
+
+## UI/UX Improvements - COMPLETED ✅
 - [x] Analyze CV > Paste Job Description edit text area needs to be updated to the correct "Floating Label Textarea"
 - [x] **CV Upload UX**: Remove "Type Confirmation Needed" tag for all CV uploads to streamline the upload process
+- [x] **Document Modal Enhancement**: Review Document modal > remove "Document Content" from inside the text edit area
+- [x] **Missing Breadcrumbs**: Add breadcrumbs to pricing scale page
+- [x] **Auto-Open File Dialog**: When a user clicks the "Upload New CV" tab on the CV analysis page, the file upload dialog should auto-open
+- [x] **Auto-Open File Dialog on Tab Switch**: When the "Saved CVs" tab is active in the Analyze Your CV section and a user clicks the "Upload New CV" tab, the file upload dialog should automatically open
+- [x] **Button State Verification**: Ensure "Add to Saved CV's" button disappears after successfully saving uploaded CV to saved CV log
+
+## Next Sprint
+
+## Backlog
+
+## Phase 3 (Major Features - Requires Planning)
+
+- [ ] **Add "Edit with AI" Toggle Button**: 
+  - Add toggle button to main menu (default: on)
+  - When toggled 'on': AI Context menu appears on text selection
+  - When toggled 'off': AI Context menu is hidden
+  - Add tooltip: "Allows AI interface to improve content"
+  - Requires state management and conditional rendering logic
+
+- [ ] **Fix AI Context Menu Positioning**: 
+  - Position menu slightly BELOW highlighted text (currently covering text)
+  - Ensure menu doesn't collision with selected text
+  - Make text remain editable when menu is visible
+  - Test across different screen sizes and text positions
+
+- [ ] **AI Context Menu in Cover Letter Editor**: 
+  - Make AI context menu visible in Generate Cover Letter > View Letter
+  - Apply "Edit with AI" toggle to cover letter editing
+  - Ensure consistent behavior across all rich text editors
+  - Test integration with cover letter save functionality
+
+- [ ] **Fix Tooltips Site-wide**: Review entire site and implement proper tooltip behavior
+  - Default hidden state until hover trigger (300ms delay)
+  - Non-interactive popup with contextual information
+  - Auto-dismiss when cursor leaves trigger area
+  - Proper positioning (above/below/beside based on space)
+  - Keyboard accessibility (Tab focus support)
+  - Screen reader support via aria-label/aria-describedby
+
+- [ ] **Fix Dropdown Menus Site-wide**: Review entire site and "Dropdown Menu" in design system 
+  - Closed by default until user interaction (click/keyboard)
+  - Opens adjacent to trigger with proper positioning logic
+  - Single open instance (auto-close others)
+  - Dismisses on outside click and Escape key
+  - Full keyboard navigation (arrow keys, Enter, Esc)
+  - Proper z-index and background (non-transparent)
+  - Selectable options that trigger actions/selections
 
 ## Adobe PDF Processing
 - [x] Fix Adobe ZIP extraction sequence (Download → Save ZIP → Unzip → Save Text)
@@ -60,5 +121,26 @@
 - [x] **Fix CV Auto-Save Issue**: CVs uploaded are automatically saving to the saved CV section. The user must explicitly request a save or upload the CV via their profile page > CV management
 - [x] **"Add to Saved CVs" Button State Management**: When a user uploads a CV they get presented an "Add to Saved CVs" button. If the user chooses to click and add this active CV to their saved CVs, then the "Add to Saved CVs" button should disappear
 - [x] **Hide "Add to Saved CVs" for Selected CVs**: If a user chooses a CV from their saved CVs to perform the analysis, then the "Add to Saved CVs" button should disappear/be hidden from the user
+
+## Current Critical Issues - COMPLETED ✅
+- [x] **DOCX Upload Failure**: DOCX files failing with "Failed to fetch dynamically imported module" error for mammoth library - PDF uploads work fine
+- [x] **Saved CVs Editor Loading Issue**: When selecting saved CVs (TXT or DOCX), they are not loading into the rich text editor
+- [x] **Cover Letter Editor Empty**: Rich text editor in "Generate Cover Letter" > "View Cover Letter" is showing empty
+
+## UI/UX Improvements - COMPLETED ✅
+- [x] **"Add to Saved CVs" Button Disappear**: On Analyze CV page, when user uploads CV and clicks "Add to Saved CVs", button should immediately disappear
+- [x] **Bounce Loader for Document Actions**: Show "Bounce Loader" when clicking "Remove" or "Review and edit" buttons while information loads
+- [x] **Enhanced CV Upload Progress Modal**: Update to "Standard Progress" "Small" with humorous messages like "CV gremlins at work" - after 30 seconds show patience message with cancel CTA
+- [x] **Enhanced Cover Letter Progress Modal**: Update cover letter generation/regeneration to "Standard Progress" "Small" with humorous messages and 30-second patience prompt
+
+## Technical Infrastructure - COMPLETED ✅
+- [x] **Complete Editor Architecture Migration**: Migrated DocumentVerificationModal from RichTextEditor to ControlledRichTextEditor
+- [x] **Enhanced Error Boundaries**: Implemented EnhancedEditorErrorBoundary with retry mechanisms and content restoration
+- [x] **Data Type Standardization**: Created robust conversion utilities for seamless string/JSON data handling
+- [x] **Button State Management**: Implemented useButtonState hook for consistent loading/success states across components
+- [x] **Legacy Component Cleanup**: Removed old RichTextEditor dependencies and standardized on new architecture
+- [x] **Editor Content Loading Fixed**: Fixed CV and Cover Letter editors failing to load content properly - now uses robust content initialization
+- [x] **Profile Page UI Cleanup**: Removed double headers/labels in Personal Info and Password Change tabs for cleaner UX
+- [x] **Content Converter Utilities**: Created text-to-HTML conversion system for proper editor initialization
 
 ## Future Enhancements

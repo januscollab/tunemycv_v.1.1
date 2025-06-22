@@ -12,6 +12,7 @@ interface DragDropZoneProps {
   children?: React.ReactNode;
   placeholder?: string;
   description?: string;
+  fileInputRef?: React.RefObject<HTMLInputElement>;
 }
 
 export const DragDropZone: React.FC<DragDropZoneProps> = ({
@@ -23,7 +24,8 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
   className,
   children,
   placeholder = "Click to upload or drag and drop files here",
-  description = "Supported file types"
+  description = "Supported file types",
+  fileInputRef
 }) => {
   const [isDragOver, setIsDragOver] = useState(false);
   const [dragError, setDragError] = useState<string | null>(null);
@@ -146,17 +148,25 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
       onDrop={handleDrop}
     >
       <input
+        ref={fileInputRef}
         type="file"
-        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed z-10"
         accept={accept}
         multiple={multiple}
         disabled={disabled}
         onChange={handleFileInput}
+        aria-label={placeholder}
+      />
+      
+      {/* Clickable overlay for entire tile */}
+      <div 
+        className="absolute inset-0 w-full h-full cursor-pointer z-0"
+        onClick={() => fileInputRef?.current?.click()}
       />
       
       {children || (
-        <div className="space-y-2">
-          <div className="mx-auto w-12 h-12 flex items-center justify-center">
+        <div className="flex flex-col items-center justify-center space-y-3 text-center w-full h-full">
+          <div className="w-12 h-12 flex items-center justify-center mx-auto">
             {dragError ? (
               <AlertCircle className="h-8 w-8 text-destructive animate-bounce" />
             ) : (
@@ -167,16 +177,16 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
             )}
           </div>
           
-          <div>
+          <div className="space-y-1 w-full">
             <p className={cn(
-              "font-medium transition-all duration-300",
+              "font-medium transition-all duration-300 text-center",
               dragError ? "text-destructive animate-pulse" : 
               isDragOver ? "text-primary" : "text-foreground group-hover:text-primary"
             )}>
               {dragError || placeholder}
             </p>
             {!dragError && (
-              <p className="text-sm text-muted-foreground mt-1 transition-colors duration-300 group-hover:text-muted-foreground/80">
+              <p className="text-sm text-muted-foreground transition-colors duration-300 group-hover:text-muted-foreground/80 text-center">
                 {description} {accept && `(${accept})`}
                 {maxSize && ` • Max ${(maxSize / 1024 / 1024).toFixed(1)}MB`}
               </p>

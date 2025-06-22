@@ -192,14 +192,14 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
           <>
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
-                <Send className="h-5 w-5 text-green-600" />
+                <Send className="h-5 w-5 text-success" />
                 Message Sent Successfully!
               </DialogTitle>
             </DialogHeader>
             
             <div className="space-y-6 text-center">
-              <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-6">
-                <Send className="h-12 w-12 text-green-600 mx-auto mb-4" />
+              <div className="bg-success-50 border border-success rounded-lg p-6">
+                <Send className="h-12 w-12 text-success mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-earth dark:text-white mb-2">
                   Thank you for reaching out!
                 </h3>

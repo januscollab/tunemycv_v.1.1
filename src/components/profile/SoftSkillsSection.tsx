@@ -3,7 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Slider } from '@/components/ui/slider';
 import { Brain, Info } from 'lucide-react';
 import { useSoftSkills } from '@/hooks/useSoftSkills';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Textarea } from '@/components/ui/textarea';
 
 interface SoftSkillsData extends Record<string, number> {
   communication: number;
@@ -16,6 +17,19 @@ interface SoftSkillsData extends Record<string, number> {
   emotional_intelligence: number;
   critical_thinking: number;
   conflict_resolution: number;
+}
+
+interface SoftSkillsQualifyingStatements extends Record<string, string> {
+  communication: string;
+  leadership: string;
+  teamwork: string;
+  problem_solving: string;
+  adaptability: string;
+  time_management: string;
+  creativity: string;
+  emotional_intelligence: string;
+  critical_thinking: string;
+  conflict_resolution: string;
 }
 
 const skillDefinitions = {
@@ -31,9 +45,35 @@ const skillDefinitions = {
   conflict_resolution: 'Conflict Resolution'
 };
 
+const skillDescriptions = {
+  communication: 'Your ability to clearly express ideas, listen effectively, and adapt your communication style to different audiences.',
+  leadership: 'Your capacity to inspire, motivate, and guide others toward achieving common goals.',
+  teamwork: 'How well you collaborate, support team members, and contribute to group success.',
+  problem_solving: 'Your ability to analyze complex situations, identify solutions, and implement effective approaches.',
+  adaptability: 'How quickly you adjust to change, learn new skills, and thrive in evolving environments.',
+  time_management: 'Your skill in prioritizing tasks, meeting deadlines, and efficiently organizing your workload.',
+  creativity: 'Your ability to think outside the box, generate innovative ideas, and approach challenges creatively.',
+  emotional_intelligence: 'Your awareness of emotions (yours and others) and ability to manage relationships effectively.',
+  critical_thinking: 'Your capacity to analyze information objectively, evaluate evidence, and make logical decisions.',
+  conflict_resolution: 'Your ability to address disagreements constructively and find mutually beneficial solutions.'
+};
+
 const SoftSkillsSection: React.FC = () => {
   const { softSkills, loading, saveSoftSkills } = useSoftSkills();
   const [currentSkills, setCurrentSkills] = useState<SoftSkillsData | null>(null);
+  const [qualifyingStatements, setQualifyingStatements] = useState<SoftSkillsQualifyingStatements>({
+    communication: '',
+    leadership: '',
+    teamwork: '',
+    problem_solving: '',
+    adaptability: '',
+    time_management: '',
+    creativity: '',
+    emotional_intelligence: '',
+    critical_thinking: '',
+    conflict_resolution: ''
+  });
+  const [expandedSkill, setExpandedSkill] = useState<string | null>(null);
 
   const defaultSkills: SoftSkillsData = {
     communication: 0,
@@ -96,18 +136,16 @@ const SoftSkillsSection: React.FC = () => {
         <div className="flex items-center mb-6">
           <Brain className="h-5 w-5 text-gray-500 dark:text-apple-core/60 mr-2" />
           <h3 className="text-lg font-medium text-gray-900 dark:text-citrus">Soft Skills Assessment</h3>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:text-apple-core/60 dark:hover:text-apple-core/80 cursor-help ml-2" />
-              </TooltipTrigger>
-              <TooltipContent side="bottom" className="max-w-sm">
-                <p className="text-sm">
-                  <strong>Boost Your CV Analysis Accuracy by 40%</strong> - Complete this 2-minute assessment to get personalized insights into how your soft skills match specific roles.
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:text-apple-core/60 dark:hover:text-apple-core/80 cursor-help ml-2" />
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="max-w-sm">
+              <p className="text-sm">
+                <strong>Boost Your CV Analysis Accuracy by 40%</strong> - Complete this 2-minute assessment to get personalized insights into how your soft skills match specific roles.
+              </p>
+            </TooltipContent>
+          </Tooltip>
         </div>
         <p className="text-sm text-gray-500 dark:text-apple-core/60 mb-6">
           Your soft skills assessment used to enhance CV analysis
@@ -135,11 +173,31 @@ const SoftSkillsSection: React.FC = () => {
               </div>
             )}
             {Object.entries(skillDefinitions).map(([key, label]) => (
-              <div key={key} className="space-y-2">
+              <div key={key} className="space-y-3 border border-gray-200 dark:border-border rounded-lg p-4">
                 <div className="flex justify-between items-center">
-                  <label className="font-medium text-gray-900 dark:text-citrus">
-                    {label}
-                  </label>
+                  <div className="flex items-center gap-2">
+                    <label className="font-medium text-gray-900 dark:text-citrus">
+                      {label}
+                    </label>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:text-apple-core/60 dark:hover:text-apple-core/80 cursor-help" />
+                      </TooltipTrigger>
+                      <TooltipContent side="top" className="max-w-sm">
+                        <p className="text-sm">
+                          {skillDescriptions[key as keyof typeof skillDescriptions]}
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                    {currentSkills[key as keyof SoftSkillsData] > 0 && (
+                      <button
+                        onClick={() => setExpandedSkill(expandedSkill === key ? null : key)}
+                        className="text-sm text-gray-600 dark:text-apple-core/80 hover:text-gray-800 dark:hover:text-apple-core"
+                      >
+                        {expandedSkill === key ? "− Hide" : "+ Add"} context/example
+                      </button>
+                    )}
+                  </div>
                   <span className="text-sm text-gray-500 dark:text-apple-core/60 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
                     {currentSkills[key as keyof SoftSkillsData]}/10
                   </span>
@@ -156,6 +214,22 @@ const SoftSkillsSection: React.FC = () => {
                   <span>Beginner</span>
                   <span>Expert</span>
                 </div>
+                
+                {/* Qualifying Statement Section */}
+                {expandedSkill === key && currentSkills[key as keyof SoftSkillsData] > 0 && (
+                  <div className="space-y-2 pt-2 border-t border-gray-200 dark:border-border">
+                    <Textarea
+                      value={qualifyingStatements[key as keyof SoftSkillsQualifyingStatements]}
+                      onChange={(e) => setQualifyingStatements(prev => ({
+                        ...prev,
+                        [key]: e.target.value
+                      }))}
+                      placeholder={`Describe specific examples of your ${label.toLowerCase()} skills...`}
+                      className="w-full text-sm"
+                      rows={3}
+                    />
+                  </div>
+                )}
               </div>
             ))}
           </div>

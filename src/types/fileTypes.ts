@@ -1,8 +1,15 @@
 
+import { DocumentJson } from '@/utils/documentJsonUtils';
+
 export interface UploadedFile {
-  file: File;
+  id?: string;
+  file?: File;
+  fileName?: string;
   extractedText: string;
-  type: 'cv' | 'job_description';
+  documentJson?: DocumentJson;
+  type?: 'cv' | 'job_description';
+  fileType?: string;
+  uploadType?: string;
 }
 
 export interface JobDescriptionFile {

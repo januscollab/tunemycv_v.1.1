@@ -1,9 +1,10 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { extractJobTitleFromText, extractCompanyFromText } from '@/utils/analysisUtils';
-import { saveFilesToDatabase, performAIAnalysis, saveAnalysisResults } from '@/services/analysisService';
-import { performComprehensiveAnalysis } from '@/utils/analysisEngine';
+import { saveFilesToDatabase, saveAnalysisResults } from '@/services/analysisService';
+import { useN8nAnalysis } from '@/hooks/useN8nAnalysis';
 import { UploadedFile } from '@/types/fileTypes';
+import { supabase } from '@/integrations/supabase/client';
 
 interface AnalysisOptions {
   saveCV: boolean;
@@ -15,6 +16,7 @@ interface AnalysisOptions {
 export const useAnalysisExecution = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const n8nAnalysis = useN8nAnalysis();
 
   const executeAnalysis = async (
     uploadedFiles: { cv?: UploadedFile; jobDescription?: UploadedFile },
@@ -27,7 +29,7 @@ export const useAnalysisExecution = () => {
       throw new Error('Please upload both CV and job description');
     }
 
-    console.log('Starting enhanced comprehensive CV analysis with options:', options);
+    console.log('Starting n8n-only CV analysis with options:', options);
 
     const finalJobTitle = jobTitle || extractJobTitleFromText(uploadedFiles.jobDescription.extractedText);
     const extractedCompany = extractCompanyFromText(uploadedFiles.jobDescription.extractedText);
@@ -40,151 +42,138 @@ export const useAnalysisExecution = () => {
       options
     );
 
-    console.log('Files handled successfully, starting enhanced comprehensive analysis...');
+    console.log('Files handled successfully, starting n8n-only analysis...');
 
+    // CV Analysis - ONLY use n8n workflow (no fallbacks)
+    console.log('Starting n8n-only CV analysis...');
+    
     let analysisResult;
-    const hasCreditsForAI = userCredits?.credits && userCredits.credits > 0;
+    
+    try {
+      console.log('Attempting n8n analysis with document JSON...');
+      
+      // Use document JSON if available, otherwise convert from extracted text
+      const cvJson = uploadedFiles.cv.documentJson || {
+        content: uploadedFiles.cv.extractedText,
+        metadata: {
+          fileName: uploadedFiles.cv.file.name,
+          fileSize: uploadedFiles.cv.file.size
+        }
+      };
+      
+      const jdJson = uploadedFiles.jobDescription.documentJson || {
+        content: uploadedFiles.jobDescription.extractedText,
+        metadata: {
+          fileName: uploadedFiles.jobDescription.file.name,
+          fileSize: uploadedFiles.jobDescription.file.size
+        }
+      };
 
-    // Always try enhanced AI analysis if user has credits, otherwise use comprehensive local analysis
-    if (hasCreditsForAI) {
-      try {
-        const aiResult = await performAIAnalysis(uploadedFiles, finalJobTitle, user?.id!);
+      const n8nResult = await n8nAnalysis.submitForAnalysis(cvJson, jdJson);
+
+      if (n8nResult.success && n8nResult.test_files) {
+        console.log('n8n analysis successful');
         
-        console.log('Enhanced AI-powered comprehensive analysis successful');
-        
-        // Preserve the full enhanced structure from AI response
-        const enhancedAnalysis = aiResult.analysis;
-        
-        // Add necessary metadata for database storage while preserving enhanced structure
         analysisResult = {
-          ...enhancedAnalysis,
           user_id: user?.id,
-          cv_upload_id: cvUpload?.id || null, // Can be null for temporary analyses
-          job_description_upload_id: jobUpload?.id || null, // Can be null for temporary analyses
-          // Store CV metadata directly in analysis for decoupling
+          cv_upload_id: cvUpload?.id || null,
+          job_description_upload_id: jobUpload?.id || null,
           cv_file_name: uploadedFiles.cv.file.name,
           cv_file_size: uploadedFiles.cv.file.size,
           cv_extracted_text: uploadedFiles.cv.extractedText,
-          // Store job description metadata directly for temporary analyses
           job_description_file_name: uploadedFiles.jobDescription.file.name,
           job_description_extracted_text: uploadedFiles.jobDescription.extractedText,
-          // Keep legacy fields for backward compatibility
-          job_title: enhancedAnalysis.position || finalJobTitle,
-          company_name: enhancedAnalysis.companyName || extractedCompany,
-          compatibility_score: enhancedAnalysis.compatibilityScore,
-          executive_summary: enhancedAnalysis.executiveSummary?.overview || 'Enhanced AI analysis completed successfully.',
-          // Extract simple arrays for legacy database fields
-          keywords_found: enhancedAnalysis.keywordAnalysis?.keywords?.filter((k: any) => k.found).map((k: any) => k.keyword) || [],
-          keywords_missing: enhancedAnalysis.keywordAnalysis?.keywords?.filter((k: any) => !k.found).map((k: any) => k.keyword) || [],
-          strengths: enhancedAnalysis.executiveSummary?.strengths?.map((s: any) => s.title || s) || [],
-          weaknesses: enhancedAnalysis.executiveSummary?.weaknesses?.map((w: any) => w.title || w) || [],
-          recommendations: enhancedAnalysis.priorityRecommendations?.map((r: any) => r.title || r) || []
+          job_title: finalJobTitle,
+          company_name: extractedCompany,
+          compatibility_score: 85, // Default score for n8n results
+          executive_summary: 'Analysis completed via n8n processing workflow.',
+          analysis_type: 'n8n',
+          n8n_html_url: n8nResult.test_files.html,
+          n8n_pdf_url: n8nResult.test_files.pdf,
+          pdf_file_data: n8nResult.pdfData,
+          html_file_data: n8nResult.htmlData,
+          pdf_file_name: `analysis_${finalJobTitle}_${extractedCompany}.pdf`,
+          html_file_name: `analysis_${finalJobTitle}_${extractedCompany}.html`,
+          keywords_found: [],
+          keywords_missing: [],
+          strengths: [],
+          weaknesses: [],
+          recommendations: []
         };
 
-        toast({ 
-          title: 'Enhanced Analysis Complete!', 
-          description: `Comprehensive AI-powered analysis with detailed insights completed. ${aiResult.creditsRemaining || 0} credits remaining.` 
+        // Save analysis results to database immediately for n8n
+        const savedResult = await saveAnalysisResults({
+          user_id: analysisResult.user_id,
+          cv_upload_id: analysisResult.cv_upload_id,
+          job_description_upload_id: analysisResult.job_description_upload_id,
+          cv_file_name: analysisResult.cv_file_name,
+          cv_file_size: analysisResult.cv_file_size,
+          cv_extracted_text: analysisResult.cv_extracted_text,
+          job_description_file_name: analysisResult.job_description_file_name,
+          job_description_extracted_text: analysisResult.job_description_extracted_text,
+          job_title: analysisResult.job_title,
+          company_name: analysisResult.company_name,
+          compatibility_score: analysisResult.compatibility_score,
+          keywords_found: analysisResult.keywords_found,
+          keywords_missing: analysisResult.keywords_missing,
+          strengths: analysisResult.strengths,
+          weaknesses: analysisResult.weaknesses,
+          recommendations: analysisResult.recommendations,
+          executive_summary: analysisResult.executive_summary,
+          analysis_type: analysisResult.analysis_type,
+          n8n_html_url: analysisResult.n8n_html_url,
+          n8n_pdf_url: analysisResult.n8n_pdf_url,
+          pdf_file_data: analysisResult.pdf_file_data,
+          html_file_data: analysisResult.html_file_data,
+          pdf_file_name: analysisResult.pdf_file_name,
+          html_file_name: analysisResult.html_file_name
         });
-      } catch (aiError) {
-        console.error('Enhanced AI analysis failed, falling back to comprehensive algorithmic analysis:', aiError);
+
+        console.log('n8n CV analysis completed successfully:', { ...savedResult, ...analysisResult });
         
-        // Fall back to comprehensive local analysis
-        analysisResult = await performComprehensiveAnalysis(
-          cvUpload || { 
-            id: 'temp', 
-            file_name: uploadedFiles.cv.file.name,
-            extracted_text: uploadedFiles.cv.extractedText 
-          }, 
-          jobUpload || { 
-            id: 'temp', 
-            file_name: uploadedFiles.jobDescription.file.name,
-            extracted_text: uploadedFiles.jobDescription.extractedText 
-          }, 
-          finalJobTitle, 
-          extractedCompany, 
-          uploadedFiles, 
-          user?.id!
-        );
-        
-        // Add metadata for decoupling and temporary analyses
-        analysisResult.cv_file_name = uploadedFiles.cv.file.name;
-        analysisResult.cv_file_size = uploadedFiles.cv.file.size;
-        analysisResult.cv_extracted_text = uploadedFiles.cv.extractedText;
-        analysisResult.job_description_file_name = uploadedFiles.jobDescription.file.name;
-        analysisResult.job_description_extracted_text = uploadedFiles.jobDescription.extractedText;
-        analysisResult.cv_upload_id = cvUpload?.id || null;
-        analysisResult.job_description_upload_id = jobUpload?.id || null;
+        // Deduct credits for successful n8n analysis with returned documents
+        try {
+          const { data: currentCredits, error: creditsError } = await supabase
+            .from('user_credits')
+            .select('credits')
+            .eq('user_id', user?.id)
+            .single();
+
+          if (creditsError) {
+            console.warn('Could not fetch current credits for deduction:', creditsError);
+          } else if (currentCredits && currentCredits.credits > 0) {
+            const { error: updateError } = await supabase
+              .from('user_credits')
+              .update({ credits: Math.max(0, currentCredits.credits - 1) })
+              .eq('user_id', user?.id);
+
+            if (updateError) {
+              console.warn('Could not deduct credit:', updateError);
+            } else {
+              console.log('Credit deducted for successful n8n analysis');
+            }
+          }
+        } catch (creditError) {
+          console.warn('Credit deduction failed:', creditError);
+        }
         
         toast({ 
           title: 'Analysis Complete!', 
-          description: 'Comprehensive analysis completed using advanced algorithms.'
+          description: 'Your CV analysis has been completed successfully via n8n. 1 credit has been deducted.'
         });
+        
+        return { ...savedResult, ...analysisResult };
+      } else {
+        // n8n failed - no fallbacks, just throw error
+        throw new Error(n8nResult.error || 'n8n analysis failed to produce valid results');
       }
-    } else {
-      console.log('No credits available, using comprehensive algorithmic analysis');
+    } catch (n8nError) {
+      console.error('n8n CV analysis failed:', n8nError);
       
-      // Use comprehensive local analysis
-      analysisResult = await performComprehensiveAnalysis(
-        cvUpload || { 
-          id: 'temp', 
-          file_name: uploadedFiles.cv.file.name,
-          extracted_text: uploadedFiles.cv.extractedText 
-        }, 
-        jobUpload || { 
-          id: 'temp', 
-          file_name: uploadedFiles.jobDescription.file.name,
-          extracted_text: uploadedFiles.jobDescription.extractedText 
-        }, 
-        finalJobTitle, 
-        extractedCompany, 
-        uploadedFiles, 
-        user?.id!
-      );
-      
-      // Add metadata for decoupling and temporary analyses
-      analysisResult.cv_file_name = uploadedFiles.cv.file.name;
-      analysisResult.cv_file_size = uploadedFiles.cv.file.size;
-      analysisResult.cv_extracted_text = uploadedFiles.cv.extractedText;
-      analysisResult.job_description_file_name = uploadedFiles.jobDescription.file.name;
-      analysisResult.job_description_extracted_text = uploadedFiles.jobDescription.extractedText;
-      analysisResult.cv_upload_id = cvUpload?.id || null;
-      analysisResult.job_description_upload_id = jobUpload?.id || null;
-      
-      toast({ 
-        title: 'Analysis Complete!', 
-        description: 'Comprehensive analysis completed using advanced algorithms.'
-      });
+      // No fallbacks - rethrow the error to be handled by the calling function
+      throw new Error(`CV analysis failed: ${n8nError instanceof Error ? n8nError.message : 'n8n processing error'}`);
     }
 
-    // Save analysis results to database
-    const savedResult = await saveAnalysisResults({
-      user_id: analysisResult.user_id,
-      cv_upload_id: analysisResult.cv_upload_id,
-      job_description_upload_id: analysisResult.job_description_upload_id,
-      cv_file_name: analysisResult.cv_file_name,
-      cv_file_size: analysisResult.cv_file_size,
-      cv_extracted_text: analysisResult.cv_extracted_text,
-      job_description_file_name: analysisResult.job_description_file_name,
-      job_description_extracted_text: analysisResult.job_description_extracted_text,
-      job_title: analysisResult.job_title,
-      company_name: analysisResult.company_name,
-      compatibility_score: analysisResult.compatibility_score,
-      keywords_found: analysisResult.keywords_found,
-      keywords_missing: analysisResult.keywords_missing,
-      strengths: analysisResult.strengths,
-      weaknesses: analysisResult.weaknesses,
-      recommendations: analysisResult.recommendations,
-      executive_summary: analysisResult.executive_summary
-    });
-
-    // Return the full enhanced result for frontend display
-    const finalResult = {
-      ...savedResult,
-      ...analysisResult // Include all enhanced data for frontend
-    };
-
-    console.log('Enhanced comprehensive analysis completed successfully:', finalResult);
-    return finalResult;
   };
 
   return { executeAnalysis };

@@ -8,6 +8,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { UploadedFile } from '@/types/fileTypes';
+import { DocumentJson, textToJson, generateFormattedText } from '@/utils/documentJsonUtils';
 import { validateFile, extractTextFromFile } from '@/utils/fileUtils';
 import FileUploadWithSave from './upload/FileUploadWithSave';
 import SavedCVList from './upload/SavedCVList';
@@ -15,12 +17,6 @@ import DocumentPreviewCard from '@/components/documents/DocumentPreviewCard';
 import DocumentVerificationModal from '@/components/documents/DocumentVerificationModal';
 import DocumentValidationDialog from '@/components/ui/document-validation-dialog';
 import { validateCV } from '@/utils/documentValidation';
-
-interface UploadedFile {
-  file: File;
-  extractedText: string;
-  type: 'cv' | 'job_description';
-}
 
 interface CVUpload {
   id: string;
@@ -45,6 +41,7 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [showValidationDialog, setShowValidationDialog] = useState(false);
   const [pendingFile, setPendingFile] = useState<{ file: File; extractedText: string } | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   // Fetch saved CVs from database
   const { data: savedCVs = [], isLoading, refetch } = useQuery({
@@ -99,59 +96,14 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
       return;
     }
 
-    // Check if we're at the 5 CV limit when trying to save
-    if (shouldSave && savedCVs.length >= 5) {
-      toast({ title: 'Limit Reached', description: 'You can save up to 5 CVs. Please delete one first.', variant: 'destructive' });
-      return;
-    }
-
-    try {
-      setFileUploading(true);
-      
-      // Only save to database if user explicitly requested it AND we're under the limit
-      if (shouldSave && user?.id && savedCVs.length < 5) {
-        const { error: saveError } = await supabase
-          .from('uploads')
-          .insert({
-            user_id: user.id,
-            file_name: file.name,
-            file_type: file.type,
-            file_size: file.size,
-            upload_type: 'cv',
-            extracted_text: extractedText
-          });
-
-        if (saveError) {
-          console.error('Error saving CV:', saveError);
-          toast({ title: 'Warning', description: 'CV uploaded but not saved for future use', variant: 'destructive' });
-        } else {
-          toast({ title: 'Success', description: 'CV uploaded and saved for future use!' });
-          // Refetch saved CVs to update the list
-          refetch();
-        }
-      } else if (!shouldSave) {
-        toast({ title: 'Success', description: 'CV uploaded for one-time use!' });
-      }
-
-      const uploadedFile: UploadedFile = {
-        file,
-        extractedText,
-        type: 'cv'
-      };
-
-      onCVSelect(uploadedFile);
-    } catch (error) {
-      toast({ title: 'Error', description: 'Failed to process CV file', variant: 'destructive' });
-    } finally {
-      setFileUploading(false);
-    }
+    // NEVER automatically save - only proceed with file processing
+    await finalizeUpload(file, extractedText, false); // Always pass false for shouldSave
   };
 
   const handleValidationConfirm = async () => {
     if (pendingFile) {
-      // User confirmed, proceed with upload using existing logic
-      const shouldSave = false; // Default to not saving when validation failed
-      await finalizeUpload(pendingFile.file, pendingFile.extractedText, shouldSave);
+      // User confirmed, proceed with upload but don't auto-save
+      await finalizeUpload(pendingFile.file, pendingFile.extractedText, false);
     }
     setShowValidationDialog(false);
     setPendingFile(null);
@@ -163,40 +115,12 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
   };
 
   const finalizeUpload = async (file: File, extractedText: string, shouldSave: boolean) => {
-    // Check if we're at the 5 CV limit when trying to save
-    if (shouldSave && savedCVs.length >= 5) {
-      toast({ title: 'Limit Reached', description: 'You can save up to 5 CVs. Please delete one first.', variant: 'destructive' });
-      return;
-    }
-
     try {
       setFileUploading(true);
       
-      // Only save to database if user explicitly requested it AND we're under the limit
-      if (shouldSave && user?.id && savedCVs.length < 5) {
-        const { error: saveError } = await supabase
-          .from('uploads')
-          .insert({
-            user_id: user.id,
-            file_name: file.name,
-            file_type: file.type,
-            file_size: file.size,
-            upload_type: 'cv',
-            extracted_text: extractedText
-          });
-
-        if (saveError) {
-          console.error('Error saving CV:', saveError);
-          toast({ title: 'Warning', description: 'CV uploaded but not saved for future use', variant: 'destructive' });
-        } else {
-          toast({ title: 'Success', description: 'CV uploaded and saved for future use!' });
-          // Refetch saved CVs to update the list
-          refetch();
-        }
-      } else if (!shouldSave) {
-        toast({ title: 'Success', description: 'CV uploaded for one-time use!' });
-      }
-
+      // REMOVED: All automatic save logic - files are only uploaded for analysis, not saved
+      // The only way to save is through the explicit "Save to CVs" button in DocumentPreviewCard
+      
       const uploadedFile: UploadedFile = {
         file,
         extractedText,
@@ -204,6 +128,8 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
       };
 
       onCVSelect(uploadedFile);
+      toast({ title: 'Success', description: 'CV uploaded for analysis!' });
+      
     } catch (error) {
       toast({ title: 'Error', description: 'Failed to process CV file', variant: 'destructive' });
     } finally {
@@ -211,13 +137,16 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
     }
   };
 
-  const handleVerificationSave = (updatedText: string) => {
+  const handleVerificationSave = (updatedJson: DocumentJson) => {
     if (!selectedCV) return;
     
+    console.log('[CVSelector] Saving updated CV JSON with', updatedJson.sections?.length || 0, 'sections');
+    const updatedText = generateFormattedText(updatedJson);
     const updatedFile = new File([updatedText], selectedCV.file.name, { type: selectedCV.file.type });
     const updatedUploadedFile: UploadedFile = {
       file: updatedFile,
       extractedText: updatedText,
+      documentJson: updatedJson,
       type: 'cv'
     };
     
@@ -226,17 +155,17 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
   };
 
   return (
-    <Card className="bg-white dark:bg-blueberry/20 border border-apple-core/20 dark:border-citrus/20">
+    <Card className="bg-card border border-border">
       <CardHeader>
-        <CardTitle className="text-heading font-semibold text-blueberry dark:text-citrus flex items-center">
-          <FileText className="h-5 w-5 text-apricot mr-2" />
+        <CardTitle className="text-heading font-semibold text-foreground flex items-center">
+          <FileText className="h-5 w-5 text-primary mr-2" />
           Your CV
         </CardTitle>
-        <p className="text-body text-blueberry/70 dark:text-apple-core/80">
+        <p className="text-caption text-muted-foreground">
           Upload a new CV or select from your saved CVs. 
           <Link 
             to="/profile?tab=files" 
-            className="text-apricot hover:text-apricot/80 ml-1 underline"
+            className="text-primary hover:text-primary/80 ml-1 underline"
           >
             Manage your CVs in your Profile
           </Link>
@@ -252,7 +181,7 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
               documentType="cv"
               onOpenVerification={() => setShowVerificationModal(true)}
               onRemove={() => window.location.reload()}
-               onSaveToCVs={selectedCVId ? undefined : async () => {
+              onSaveToCVs={selectedCVId ? undefined : async () => {
                 if (user?.id && savedCVs.length < 5) {
                   try {
                     const { error: saveError } = await supabase
@@ -287,21 +216,22 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
               onClose={() => setShowVerificationModal(false)}
               fileName={selectedCV.file.name}
               fileSize={selectedCV.file.size}
-              extractedText={selectedCV.extractedText}
+              documentJson={selectedCV.documentJson || textToJson(selectedCV.extractedText)}
               documentType="cv"
               onSave={handleVerificationSave}
+              extractedText={selectedCV.extractedText}
             />
           </>
         ) : (
           <div className="space-y-4">
             {/* Tab Navigation */}
-            <div className="grid grid-cols-2 gap-2 bg-apple-core/10 dark:bg-citrus/10 p-1 rounded-lg">
+            <div className="grid grid-cols-2 gap-2 bg-muted p-1 rounded-lg">
               <button
                 onClick={() => setActiveTab('saved')}
                 className={`px-3 py-2 text-caption font-medium rounded-md transition-colors flex items-center justify-center space-x-2 ${
                   activeTab === 'saved'
-                    ? 'text-zapier-orange border-b-2 border-zapier-orange bg-transparent'
-                    : 'text-blueberry/70 dark:text-apple-core/70 hover:bg-apple-core/10 dark:hover:bg-citrus/10'
+                    ? 'text-primary border-b-2 border-primary bg-transparent'
+                    : 'text-muted-foreground hover:bg-accent'
                 }`}
                 disabled={uploading || isLoading}
               >
@@ -309,11 +239,22 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
                 <span>Saved CVs ({savedCVs.length})</span>
               </button>
               <button
-                onClick={() => setActiveTab('upload')}
+                onClick={() => {
+                  // If switching from saved CVs to upload, auto-open file dialog
+                  if (activeTab === 'saved') {
+                    setActiveTab('upload');
+                    // Delay to ensure the tab content has rendered
+                    setTimeout(() => {
+                      fileInputRef.current?.click();
+                    }, 100);
+                  } else {
+                    setActiveTab('upload');
+                  }
+                }}
                 className={`px-3 py-2 text-caption font-medium rounded-md transition-colors flex items-center justify-center space-x-2 ${
                   activeTab === 'upload'
-                    ? 'text-zapier-orange border-b-2 border-zapier-orange bg-transparent'
-                    : 'text-blueberry/70 dark:text-apple-core/70 hover:bg-apple-core/10 dark:hover:bg-citrus/10'
+                    ? 'text-primary border-b-2 border-primary bg-transparent'
+                    : 'text-muted-foreground hover:bg-accent'
                 }`}
                 disabled={uploading || isLoading}
               >
@@ -338,6 +279,7 @@ const CVSelector: React.FC<CVSelectorProps> = ({ onCVSelect, selectedCV, uploadi
                 label="Upload your CV"
                 currentCVCount={savedCVs.length}
                 maxCVCount={5}
+                fileInputRef={fileInputRef}
               />
             )}
           </div>

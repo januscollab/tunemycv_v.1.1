@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Download, FileText, FileDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -9,7 +8,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
-import jsPDF from 'jspdf';
 import { Document, Packer, Paragraph, TextRun } from 'docx';
 
 interface DownloadOptionsProps {
@@ -26,42 +24,63 @@ const DownloadOptions: React.FC<DownloadOptionsProps> = ({
   const { toast } = useToast();
   const [isDownloading, setIsDownloading] = useState(false);
 
-  const downloadAsPDF = async () => {
-    setIsDownloading(true);
-    try {
-      const pdf = new jsPDF();
-      const splitText = pdf.splitTextToSize(content, 180);
-      pdf.text(splitText, 10, 10);
-      pdf.save(`${fileName}.pdf`);
-      
-      toast({
-        title: 'Success',
-        description: 'Cover letter downloaded as PDF',
-      });
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to download PDF',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsDownloading(false);
-    }
+  // Function to properly convert HTML content to clean text
+  const convertHtmlToText = (htmlContent: string): string => {
+    // Create a temporary div to parse HTML
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = htmlContent;
+    
+    // Replace <br> tags with newlines before getting text content
+    const brTags = tempDiv.querySelectorAll('br');
+    brTags.forEach(br => {
+      br.replaceWith('\n');
+    });
+    
+    // Replace </p> tags with double newlines for paragraph breaks
+    const pTags = tempDiv.querySelectorAll('p');
+    pTags.forEach(p => {
+      p.after('\n\n');
+    });
+    
+    // Get clean text content
+    let cleanText = tempDiv.textContent || tempDiv.innerText || '';
+    
+    // Clean up excessive whitespace and newlines
+    cleanText = cleanText
+      .replace(/\n\s*\n\s*\n/g, '\n\n') // Replace multiple newlines with double newlines
+      .replace(/^\s+|\s+$/g, '') // Trim start and end
+      .replace(/[ \t]+/g, ' '); // Replace multiple spaces/tabs with single space
+    
+    return cleanText;
   };
 
   const downloadAsWord = async () => {
     setIsDownloading(true);
     try {
+      const cleanContent = convertHtmlToText(content);
+      
+      // Split content into paragraphs for better Word formatting
+      const paragraphs = cleanContent.split('\n\n').filter(p => p.trim().length > 0);
+      const docParagraphs = paragraphs.map(paragraph => 
+        new Paragraph({
+          children: [new TextRun(paragraph.trim())],
+          spacing: { after: 240 } // Add spacing between paragraphs
+        })
+      );
+      
       const doc = new Document({
         sections: [{
-          properties: {},
-          children: [
-            new Paragraph({
-              children: [
-                new TextRun(content)
-              ],
-            }),
-          ],
+          properties: {
+            page: {
+              margin: {
+                top: 720,
+                right: 720,
+                bottom: 720,
+                left: 720,
+              },
+            },
+          },
+          children: docParagraphs,
         }],
       });
 
@@ -90,7 +109,8 @@ const DownloadOptions: React.FC<DownloadOptionsProps> = ({
 
   const downloadAsText = () => {
     try {
-      const blob = new Blob([content], { type: 'text/plain' });
+      const cleanContent = convertHtmlToText(content);
+      const blob = new Blob([cleanContent], { type: 'text/plain' });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -123,24 +143,17 @@ const DownloadOptions: React.FC<DownloadOptionsProps> = ({
       <DropdownMenuTrigger asChild>
         {triggerComponent || defaultTrigger}
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700" align="end">
-        <DropdownMenuItem 
-          onClick={downloadAsPDF}
-          className="hover:bg-zapier-orange/10 hover:text-zapier-orange cursor-pointer"
-        >
-          <FileText className="h-4 w-4 mr-2" />
-          Download as PDF
-        </DropdownMenuItem>
+      <DropdownMenuContent className="w-48" align="end">
         <DropdownMenuItem 
           onClick={downloadAsWord}
-          className="hover:bg-zapier-orange/10 hover:text-zapier-orange cursor-pointer"
+          className="cursor-pointer"
         >
           <FileDown className="h-4 w-4 mr-2" />
           Download as Word
         </DropdownMenuItem>
         <DropdownMenuItem 
           onClick={downloadAsText}
-          className="hover:bg-zapier-orange/10 hover:text-zapier-orange cursor-pointer"
+          className="cursor-pointer"
         >
           <FileText className="h-4 w-4 mr-2" />
           Download as Text

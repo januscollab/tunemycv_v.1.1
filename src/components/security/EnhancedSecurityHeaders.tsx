@@ -9,10 +9,12 @@ const EnhancedSecurityHeaders = () => {
     cspMeta.content = [
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://apis.google.com",
+      "script-src-elem 'self' 'unsafe-inline' https://accounts.google.com https://apis.google.com",
+      "worker-src 'self' blob:",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com data:",
       "img-src 'self' data: https: blob:",
-      "connect-src 'self' https://aohrfehhyjdebaatzqdl.supabase.co wss://aohrfehhyjdebaatzqdl.supabase.co https://accounts.google.com https://api.openai.com",
+      "connect-src 'self' https://aohrfehhyjdebaatzqdl.supabase.co wss://aohrfehhyjdebaatzqdl.supabase.co https://accounts.google.com https://api.openai.com https://januscollab.app.n8n.cloud",
       "frame-src 'self' https://accounts.google.com",
       "object-src 'none'",
       "base-uri 'self'",

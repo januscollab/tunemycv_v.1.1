@@ -4,6 +4,9 @@ import { useToast } from '@/hooks/use-toast';
 
 interface StorageOptions {
   uploadType: 'cv' | 'job_description';
+  extractedText?: string;
+  prettyJsonString?: string;
+  saveToUserList?: boolean; // Whether to add CV to user's saved list
 }
 
 export const useFileStorage = () => {
@@ -24,18 +27,31 @@ export const useFileStorage = () => {
     setIsStoring(true);
     
     try {
+      // Add size validation to prevent stack overflow
+      const jsonSize = options.prettyJsonString ? new Blob([options.prettyJsonString]).size / 1024 : 0;
+      console.log('[useFileStorage] Storing file with JSON size:', jsonSize.toFixed(1), 'KB');
+      
       // Convert original file to base64 for storage
       const fileContent = await file.arrayBuffer();
       const base64Content = btoa(String.fromCharCode(...new Uint8Array(fileContent)));
       
       const { supabase } = await import('@/integrations/supabase/client');
+      console.log('[useFileStorage] Storing file with structured JSON as master:', {
+        fileName: file.name,
+        hasExtractedText: !!options.extractedText,
+        hasDocumentJson: !!options.prettyJsonString,
+        jsonSize: options.prettyJsonString ? (options.prettyJsonString.length / 1024).toFixed(1) + 'KB' : 'N/A'
+      });
+      
       const { data, error } = await supabase.functions.invoke('save-primary-upload', {
         body: {
           fileContent: base64Content,
           fileName: file.name,
           fileType: file.type,
           uploadType: options.uploadType,
-          userId: user.id
+          userId: user.id,
+          extractedText: options.extractedText,
+          documentJson: options.prettyJsonString // This will be parsed and stored as document_content_json (master)
         }
       });
 

@@ -1,4 +1,3 @@
-
 import { validateFileSecurely, createSecureFileObject } from '@/utils/secureFileValidation';
 
 // File type detection from extension (more reliable than browser MIME types)
@@ -87,8 +86,6 @@ const cleanExtractedText = (text: string): string => {
 
 export const extractTextFromFile = async (file: File, signal?: AbortSignal): Promise<string> => {
   if (file.type === 'application/pdf') {
-    console.log(`Processing PDF with Adobe PDF Services: ${file.name}`);
-    
     // Check for cancellation before starting
     if (signal?.aborted) {
       throw new Error('Processing cancelled by user');
@@ -119,7 +116,6 @@ export const extractTextFromFile = async (file: File, signal?: AbortSignal): Pro
     });
     
     if (adobeError) {
-      console.error('Adobe PDF Services error:', adobeError);
       throw new Error(adobeError.message || 'PDF processing service temporarily unavailable. Please try again.');
     }
     
@@ -128,18 +124,15 @@ export const extractTextFromFile = async (file: File, signal?: AbortSignal): Pro
       throw new Error(errorMessage);
     }
     
-    console.log(`Adobe PDF extraction successful: ${data.wordCount} words extracted in ${data.processingTime}ms`);
     return cleanExtractedText(data.extractedText);
   }
   
   if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
     try {
-      console.log(`Extracting text from DOCX: ${file.name}`);
-      
-      // Import mammoth dynamically
-      const mammoth = await import('mammoth');
       const arrayBuffer = await file.arrayBuffer();
       
+      // Dynamic import to avoid build issues
+      const { default: mammoth } = await import('mammoth');
       const result = await mammoth.extractRawText({ arrayBuffer });
       let extractedText = result.value;
       
@@ -150,11 +143,9 @@ export const extractTextFromFile = async (file: File, signal?: AbortSignal): Pro
       // Apply smart formatting cleanup
       extractedText = cleanExtractedText(extractedText);
       
-      console.log(`Successfully extracted ${extractedText.split(/\s+/).length} words from ${file.name}`);
       return extractedText;
       
     } catch (error) {
-      console.error('DOCX extraction error:', error);
       throw new Error(`Failed to extract text from DOCX: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Eye, Clock, AlertCircle, CheckCircle, ChevronLeft, ChevronRight, Calendar, Tag } from 'lucide-react';
+import { Search, Eye, Clock, AlertCircle, CheckCircle, ChevronLeft, ChevronRight, Calendar, Tag, Filter } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { VybeSelect } from '@/components/design-system/VybeSelect';
 import { Button } from '@/components/ui/button';
 import AnalysisLogDetailModal from './AnalysisLogDetailModal';
 
@@ -94,22 +94,22 @@ const AnalysisLogsManagement = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'success':
-        return <CheckCircle className="h-4 w-4 text-green-600" />;
+        return <CheckCircle className="h-4 w-4 text-success" />;
       case 'error':
-        return <AlertCircle className="h-4 w-4 text-red-600" />;
+        return <AlertCircle className="h-4 w-4 text-destructive" />;
       default:
-        return <Clock className="h-4 w-4 text-yellow-600" />;
+        return <Clock className="h-4 w-4 text-warning" />;
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'success':
-        return 'bg-green-100 text-green-800';
+        return 'bg-success-50 text-success';
       case 'error':
-        return 'bg-red-100 text-red-800';
+        return 'bg-destructive-50 text-destructive';
       default:
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-warning-50 text-warning';
     }
   };
 
@@ -126,7 +126,7 @@ const AnalysisLogsManagement = () => {
 
   const getEntryStatusBadge = (entryStatus: string) => {
     const variant = entryStatus === 'active' ? 'default' : 'secondary';
-    const color = entryStatus === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800';
+    const color = entryStatus === 'active' ? 'bg-success-50 text-success' : 'bg-muted text-muted-foreground';
     
     return (
       <Badge variant={variant} className={`${color} flex items-center gap-1`}>
@@ -139,7 +139,7 @@ const AnalysisLogsManagement = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -148,71 +148,79 @@ const AnalysisLogsManagement = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-title font-bold text-foreground">Analysis Logs</h1>
-        <div className="text-caption text-gray-500">
+        <div className="text-caption text-muted-foreground">
           Total Logs: {logs.length} | Filtered: {filteredLogs.length} | Page: {currentPage} of {totalPages}
         </div>
       </div>
 
       {/* Filters Section */}
-      <div className="bg-white p-4 rounded-lg border border-gray-200 space-y-4">
+      <div className="bg-card p-4 rounded-lg border border-border space-y-4">
         <div className="flex items-center space-x-4 flex-wrap gap-4">
           <div className="relative flex-1 min-w-64">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <input
               type="text"
               placeholder="Search by user, job title, or company..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             />
           </div>
           
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder="Filter by Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="success">Success</SelectItem>
-              <SelectItem value="error">Error</SelectItem>
-            </SelectContent>
-          </Select>
+          <VybeSelect
+            placeholder="Filter by Status"
+            value={statusFilter}
+            onValueChange={setStatusFilter}
+            options={[
+              { value: 'all', label: 'All Status', icon: Filter },
+              { value: 'success', label: 'Success', icon: CheckCircle },
+              { value: 'error', label: 'Error', icon: AlertCircle }
+            ]}
+            className="w-48"
+            icon={Filter}
+          />
 
-          <Select value={operationFilter} onValueChange={setOperationFilter}>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder="Filter by Type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
-              <SelectItem value="cv_analysis">CV Analysis</SelectItem>
-              <SelectItem value="cover_letter_generation">Cover Letter</SelectItem>
-            </SelectContent>
-          </Select>
+          <VybeSelect
+            placeholder="Filter by Type"
+            value={operationFilter}
+            onValueChange={setOperationFilter}
+            options={[
+              { value: 'all', label: 'All Types', icon: Filter },
+              { value: 'cv_analysis', label: 'CV Analysis', icon: Eye },
+              { value: 'cover_letter_generation', label: 'Cover Letter', icon: Tag }
+            ]}
+            className="w-48"
+            icon={Filter}
+          />
 
-          <Select value={entryStatusFilter} onValueChange={setEntryStatusFilter}>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder="Filter by Entry Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Entries</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="deleted">Deleted</SelectItem>
-            </SelectContent>
-          </Select>
+          <VybeSelect
+            placeholder="Filter by Entry Status"
+            value={entryStatusFilter}
+            onValueChange={setEntryStatusFilter}
+            options={[
+              { value: 'all', label: 'All Entries', icon: Filter },
+              { value: 'active', label: 'Active', icon: CheckCircle },
+              { value: 'deleted', label: 'Deleted', icon: AlertCircle }
+            ]}
+            className="w-48"
+            icon={Tag}
+          />
 
-          <Select value={pageSize.toString()} onValueChange={(value) => {
-            setPageSize(value === 'all' ? 999999 : parseInt(value));
-            setCurrentPage(1);
-          }}>
-            <SelectTrigger className="w-32">
-              <SelectValue placeholder="Page Size" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="50">50</SelectItem>
-              <SelectItem value="100">100</SelectItem>
-              <SelectItem value="all">All</SelectItem>
-            </SelectContent>
-          </Select>
+          <VybeSelect
+            placeholder="Page Size"
+            value={pageSize.toString()}
+            onValueChange={(value) => {
+              setPageSize(value === 'all' ? 999999 : parseInt(value));
+              setCurrentPage(1);
+            }}
+            options={[
+              { value: '50', label: '50', icon: Filter },
+              { value: '100', label: '100', icon: Filter },
+              { value: 'all', label: 'All', icon: Filter }
+            ]}
+            className="w-32"
+            icon={Filter}
+          />
         </div>
       </div>
 

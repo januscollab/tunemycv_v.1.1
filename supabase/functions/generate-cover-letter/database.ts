@@ -1,5 +1,6 @@
 import { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { CoverLetterRequest, GenerationResult, UserCredits } from './types.ts'
+import { establishLinkage } from '../shared/documentLinkage.ts'
 
 export async function saveCoverLetter(
   supabaseClient: SupabaseClient,
@@ -33,6 +34,16 @@ export async function saveCoverLetter(
 
   if (coverLetterError) {
     throw new Error(`Failed to save cover letter: ${coverLetterError.message}`)
+  }
+
+  // Establish linkage if generated from analysis
+  if (request.analysisResultId && coverLetterData) {
+    try {
+      await establishLinkage(request.analysisResultId, coverLetterData.id, 'cover_letter')
+      console.log('[generate-cover-letter] Linkage established')
+    } catch (linkageError) {
+      console.error('[generate-cover-letter] Linkage failed:', linkageError)
+    }
   }
 
   return coverLetterData

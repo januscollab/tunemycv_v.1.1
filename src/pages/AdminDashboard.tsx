@@ -8,6 +8,7 @@ import AIPromptsManagement from '@/components/admin/AIPromptsManagement';
 import SiteSettingsManagement from '@/components/admin/SiteSettingsManagement';
 
 import AdminNavigation from '@/components/admin/AdminNavigation';
+import Breadcrumbs from '@/components/navigation/Breadcrumbs';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -204,6 +205,7 @@ const AdminDashboard = () => {
           </div>
         </div>
         <div className="flex-1 p-8">
+          <Breadcrumbs />
           {renderContent()}
         </div>
       </div>

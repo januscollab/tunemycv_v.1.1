@@ -351,6 +351,7 @@ export type Database = {
       }
       analysis_results: {
         Row: {
+          analysis_type: string | null
           company_name: string | null
           compatibility_score: number
           created_at: string | null
@@ -360,6 +361,8 @@ export type Database = {
           cv_upload_id: string | null
           deleted_at: string | null
           executive_summary: string | null
+          html_file_data: string | null
+          html_file_name: string | null
           id: string
           job_description_extracted_text: string | null
           job_description_file_name: string | null
@@ -367,12 +370,19 @@ export type Database = {
           job_title: string | null
           keywords_found: Json | null
           keywords_missing: Json | null
+          linked_cover_letter_id: string | null
+          linked_interview_prep_id: string | null
+          n8n_html_url: string | null
+          n8n_pdf_url: string | null
+          pdf_file_data: string | null
+          pdf_file_name: string | null
           recommendations: string[] | null
           strengths: string[] | null
           user_id: string
           weaknesses: string[] | null
         }
         Insert: {
+          analysis_type?: string | null
           company_name?: string | null
           compatibility_score: number
           created_at?: string | null
@@ -382,6 +392,8 @@ export type Database = {
           cv_upload_id?: string | null
           deleted_at?: string | null
           executive_summary?: string | null
+          html_file_data?: string | null
+          html_file_name?: string | null
           id?: string
           job_description_extracted_text?: string | null
           job_description_file_name?: string | null
@@ -389,12 +401,19 @@ export type Database = {
           job_title?: string | null
           keywords_found?: Json | null
           keywords_missing?: Json | null
+          linked_cover_letter_id?: string | null
+          linked_interview_prep_id?: string | null
+          n8n_html_url?: string | null
+          n8n_pdf_url?: string | null
+          pdf_file_data?: string | null
+          pdf_file_name?: string | null
           recommendations?: string[] | null
           strengths?: string[] | null
           user_id: string
           weaknesses?: string[] | null
         }
         Update: {
+          analysis_type?: string | null
           company_name?: string | null
           compatibility_score?: number
           created_at?: string | null
@@ -404,6 +423,8 @@ export type Database = {
           cv_upload_id?: string | null
           deleted_at?: string | null
           executive_summary?: string | null
+          html_file_data?: string | null
+          html_file_name?: string | null
           id?: string
           job_description_extracted_text?: string | null
           job_description_file_name?: string | null
@@ -411,6 +432,12 @@ export type Database = {
           job_title?: string | null
           keywords_found?: Json | null
           keywords_missing?: Json | null
+          linked_cover_letter_id?: string | null
+          linked_interview_prep_id?: string | null
+          n8n_html_url?: string | null
+          n8n_pdf_url?: string | null
+          pdf_file_data?: string | null
+          pdf_file_name?: string | null
           recommendations?: string[] | null
           strengths?: string[] | null
           user_id?: string
@@ -429,6 +456,20 @@ export type Database = {
             columns: ["job_description_upload_id"]
             isOneToOne: false
             referencedRelation: "uploads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analysis_results_linked_cover_letter_id_fkey"
+            columns: ["linked_cover_letter_id"]
+            isOneToOne: false
+            referencedRelation: "cover_letters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analysis_results_linked_interview_prep_id_fkey"
+            columns: ["linked_interview_prep_id"]
+            isOneToOne: false
+            referencedRelation: "interview_prep"
             referencedColumns: ["id"]
           },
         ]
@@ -472,6 +513,7 @@ export type Database = {
           id: string
           include_linkedin_url: boolean | null
           job_title: string
+          linked_interview_prep_id: string | null
           personal_values: string | null
           regeneration_count: number | null
           template_id: string | null
@@ -490,6 +532,7 @@ export type Database = {
           id?: string
           include_linkedin_url?: boolean | null
           job_title: string
+          linked_interview_prep_id?: string | null
           personal_values?: string | null
           regeneration_count?: number | null
           template_id?: string | null
@@ -508,6 +551,7 @@ export type Database = {
           id?: string
           include_linkedin_url?: boolean | null
           job_title?: string
+          linked_interview_prep_id?: string | null
           personal_values?: string | null
           regeneration_count?: number | null
           template_id?: string | null
@@ -523,7 +567,154 @@ export type Database = {
             referencedRelation: "analysis_results"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "cover_letters_linked_interview_prep_id_fkey"
+            columns: ["linked_interview_prep_id"]
+            isOneToOne: false
+            referencedRelation: "interview_prep"
+            referencedColumns: ["id"]
+          },
         ]
+      }
+      execution_logs: {
+        Row: {
+          ai_response: string | null
+          execution_date: string
+          id: string
+          model_used: string | null
+          prompt_sent: string
+          sprint_id: string
+          user_id: string
+        }
+        Insert: {
+          ai_response?: string | null
+          execution_date?: string
+          id?: string
+          model_used?: string | null
+          prompt_sent: string
+          sprint_id: string
+          user_id: string
+        }
+        Update: {
+          ai_response?: string | null
+          execution_date?: string
+          id?: string
+          model_used?: string | null
+          prompt_sent?: string
+          sprint_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "execution_logs_sprint_id_fkey"
+            columns: ["sprint_id"]
+            isOneToOne: false
+            referencedRelation: "sprints"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      interview_prep: {
+        Row: {
+          analysis_result_id: string | null
+          company_name: string
+          content: string
+          created_at: string | null
+          credits_used: number | null
+          generation_parameters: Json | null
+          id: string
+          job_title: string
+          linked_cover_letter_id: string | null
+          regeneration_count: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          analysis_result_id?: string | null
+          company_name: string
+          content: string
+          created_at?: string | null
+          credits_used?: number | null
+          generation_parameters?: Json | null
+          id?: string
+          job_title: string
+          linked_cover_letter_id?: string | null
+          regeneration_count?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          analysis_result_id?: string | null
+          company_name?: string
+          content?: string
+          created_at?: string | null
+          credits_used?: number | null
+          generation_parameters?: Json | null
+          id?: string
+          job_title?: string
+          linked_cover_letter_id?: string | null
+          regeneration_count?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "interview_prep_analysis_result_id_fkey"
+            columns: ["analysis_result_id"]
+            isOneToOne: false
+            referencedRelation: "analysis_results"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "interview_prep_linked_cover_letter_id_fkey"
+            columns: ["linked_cover_letter_id"]
+            isOneToOne: false
+            referencedRelation: "cover_letters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      n8n_tmp: {
+        Row: {
+          activity_id: string
+          content_type: string | null
+          created_at: string | null
+          document_type: string | null
+          file_extension: string | null
+          file_name: string
+          file_size: string | null
+          file_type: string
+          id: string
+          original_name: string | null
+          storage_path: string | null
+        }
+        Insert: {
+          activity_id: string
+          content_type?: string | null
+          created_at?: string | null
+          document_type?: string | null
+          file_extension?: string | null
+          file_name: string
+          file_size?: string | null
+          file_type: string
+          id?: string
+          original_name?: string | null
+          storage_path?: string | null
+        }
+        Update: {
+          activity_id?: string
+          content_type?: string | null
+          created_at?: string | null
+          document_type?: string | null
+          file_extension?: string | null
+          file_name?: string
+          file_size?: string | null
+          file_type?: string
+          id?: string
+          original_name?: string | null
+          storage_path?: string | null
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -585,6 +776,81 @@ export type Database = {
         }
         Relationships: []
       }
+      security_incidents: {
+        Row: {
+          created_at: string | null
+          details: Json | null
+          endpoint: string | null
+          id: string
+          incident_type: string
+          ip_address: unknown | null
+          resolved: boolean | null
+          resolved_at: string | null
+          severity: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          details?: Json | null
+          endpoint?: string | null
+          id?: string
+          incident_type: string
+          ip_address?: unknown | null
+          resolved?: boolean | null
+          resolved_at?: string | null
+          severity?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          details?: Json | null
+          endpoint?: string | null
+          id?: string
+          incident_type?: string
+          ip_address?: unknown | null
+          resolved?: boolean | null
+          resolved_at?: string | null
+          severity?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      security_rate_limits: {
+        Row: {
+          blocked_until: string | null
+          created_at: string | null
+          endpoint: string
+          id: string
+          identifier: string
+          request_count: number | null
+          updated_at: string | null
+          window_start: string | null
+        }
+        Insert: {
+          blocked_until?: string | null
+          created_at?: string | null
+          endpoint: string
+          id?: string
+          identifier: string
+          request_count?: number | null
+          updated_at?: string | null
+          window_start?: string | null
+        }
+        Update: {
+          blocked_until?: string | null
+          created_at?: string | null
+          endpoint?: string
+          id?: string
+          identifier?: string
+          request_count?: number | null
+          updated_at?: string | null
+          window_start?: string | null
+        }
+        Relationships: []
+      }
       site_settings: {
         Row: {
           admin_email: string | null
@@ -593,6 +859,7 @@ export type Database = {
           debug_mode: boolean | null
           id: string
           monthly_adobe_limit: number | null
+          openai_api_key_encrypted: string | null
           reset_day: number | null
           support_email: string | null
           updated_at: string
@@ -604,6 +871,7 @@ export type Database = {
           debug_mode?: boolean | null
           id?: string
           monthly_adobe_limit?: number | null
+          openai_api_key_encrypted?: string | null
           reset_day?: number | null
           support_email?: string | null
           updated_at?: string
@@ -615,11 +883,151 @@ export type Database = {
           debug_mode?: boolean | null
           id?: string
           monthly_adobe_limit?: number | null
+          openai_api_key_encrypted?: string | null
           reset_day?: number | null
           support_email?: string | null
           updated_at?: string
         }
         Relationships: []
+      }
+      sprints: {
+        Row: {
+          created_at: string
+          id: string
+          is_hidden: boolean
+          name: string
+          order_index: number
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_hidden?: boolean
+          name: string
+          order_index?: number
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_hidden?: boolean
+          name?: string
+          order_index?: number
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      task_images: {
+        Row: {
+          created_at: string
+          file_name: string
+          file_size: number
+          id: string
+          image_url: string
+          task_id: string
+          uploaded_by: string
+        }
+        Insert: {
+          created_at?: string
+          file_name: string
+          file_size: number
+          id?: string
+          image_url: string
+          task_id: string
+          uploaded_by: string
+        }
+        Update: {
+          created_at?: string
+          file_name?: string
+          file_size?: number
+          id?: string
+          image_url?: string
+          task_id?: string
+          uploaded_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_images_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tasks: {
+        Row: {
+          archive_reason: string | null
+          archived_at: string | null
+          archived_by: string | null
+          created_at: string
+          description: string | null
+          id: string
+          images: string[] | null
+          order_index: number
+          priority: string | null
+          sprint_id: string
+          status: string
+          story_info: string | null
+          story_number: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          archive_reason?: string | null
+          archived_at?: string | null
+          archived_by?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          images?: string[] | null
+          order_index?: number
+          priority?: string | null
+          sprint_id: string
+          status?: string
+          story_info?: string | null
+          story_number?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          archive_reason?: string | null
+          archived_at?: string | null
+          archived_by?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          images?: string[] | null
+          order_index?: number
+          priority?: string | null
+          sprint_id?: string
+          status?: string
+          story_info?: string | null
+          story_number?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_sprint_id_fkey"
+            columns: ["sprint_id"]
+            isOneToOne: false
+            referencedRelation: "sprints"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       uploads: {
         Row: {
@@ -722,6 +1130,39 @@ export type Database = {
           credits?: number
           id?: string
           updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_devsuite_settings: {
+        Row: {
+          created_at: string
+          id: string
+          openai_api_key_encrypted: string | null
+          preferred_model: string | null
+          show_priority_sprint: boolean | null
+          story_generation_enabled: boolean | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          openai_api_key_encrypted?: string | null
+          preferred_model?: string | null
+          show_priority_sprint?: boolean | null
+          story_generation_enabled?: boolean | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          openai_api_key_encrypted?: string | null
+          preferred_model?: string | null
+          show_priority_sprint?: boolean | null
+          story_generation_enabled?: boolean | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -853,6 +1294,19 @@ export type Database = {
       }
     }
     Functions: {
+      archive_completed_tasks: {
+        Args: { sprint_id_param: string }
+        Returns: number
+      }
+      check_enhanced_rate_limit: {
+        Args: {
+          identifier_key: string
+          endpoint_name: string
+          max_requests?: number
+          window_minutes?: number
+        }
+        Returns: boolean
+      }
       cleanup_adobe_debug_files: {
         Args: Record<PropertyKey, never>
         Returns: undefined
@@ -864,6 +1318,18 @@ export type Database = {
       delete_user_admin_secure: {
         Args: { _user_id: string }
         Returns: boolean
+      }
+      enhance_task_story: {
+        Args: {
+          task_title: string
+          existing_description?: string
+          context_info?: string
+        }
+        Returns: string
+      }
+      generate_story_number: {
+        Args: Record<PropertyKey, never>
+        Returns: string
       }
       generate_user_id: {
         Args: Record<PropertyKey, never>
@@ -895,6 +1361,25 @@ export type Database = {
           action_type: string
           target_user?: string
           action_details?: Json
+        }
+        Returns: undefined
+      }
+      log_security_event: {
+        Args: {
+          event_type: string
+          event_details?: Json
+          target_user_id?: string
+          severity?: string
+        }
+        Returns: undefined
+      }
+      log_security_incident: {
+        Args: {
+          incident_type: string
+          incident_details?: Json
+          target_user_id?: string
+          severity?: string
+          endpoint_name?: string
         }
         Returns: undefined
       }

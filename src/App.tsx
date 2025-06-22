@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-route
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './components/theme-provider';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 import Index from './pages/Index';
 import Auth from './pages/Auth';
@@ -17,10 +18,11 @@ import Resources from './pages/Resources';
 import HelpCentre from './pages/HelpCentre';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
-import Template from './pages/Template';
+
 import PricingScale from './pages/PricingScale';
 import DesignSystem from './pages/DesignSystem';
-import DebugTest from './pages/DebugTest';
+
+import DevSuite from './pages/DevSuite';
 import Navigation from './components/Navigation';
 import Footer from './components/Footer';
 import EnhancedSecurityHeaders from './components/security/EnhancedSecurityHeaders';
@@ -42,6 +44,8 @@ function ScrollToTop() {
 }
 
 function AppContent() {
+  const location = useLocation();
+
   return (
     <div className="flex flex-col min-h-screen w-full transition-colors duration-normal">
       <EnhancedSecurityHeaders />
@@ -53,18 +57,21 @@ function AppContent() {
           <Route path="/auth" element={<Auth />} />
           <Route path="/analyze" element={<AnalyzeCV />} />
           <Route path="/cover-letter" element={<CoverLetter />} />
+          <Route path="/cover-letter/view/:id" element={<CoverLetter viewMode={true} />} />
           <Route path="/interview-prep" element={<InterviewPrep />} />
           <Route path="/interview-toolkit" element={<InterviewToolkit />} />
+          <Route path="/interview-toolkit/view/:id" element={<InterviewToolkit viewMode={true} />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
-          <Route path="/template" element={<Template />} />
+          
           <Route path="/pricing-scale" element={<PricingScale />} />
           <Route path="/resources" element={<Resources />} />
           <Route path="/help-centre" element={<HelpCentre />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-of-service" element={<TermsOfService />} />
           <Route path="/design-system" element={<DesignSystem />} />
-          <Route path="/debug-test" element={<DebugTest />} />
+          
+          <Route path="/devsuite" element={<DevSuite />} />
         </Routes>
       </main>
       <Footer />
@@ -77,13 +84,15 @@ function AppContent() {
 function App() {
   return (
     <ThemeProvider defaultTheme="system" storageKey="ui-theme">
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <Router>
-            <AppContent />
-          </Router>
-        </AuthProvider>
-      </QueryClientProvider>
+      <TooltipProvider delayDuration={300} skipDelayDuration={100}>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <Router>
+              <AppContent />
+            </Router>
+          </AuthProvider>
+        </QueryClientProvider>
+      </TooltipProvider>
     </ThemeProvider>
   );
 }

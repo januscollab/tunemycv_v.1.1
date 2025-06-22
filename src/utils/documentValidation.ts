@@ -1,242 +1,245 @@
-export interface ValidationResult {
+
+import { createSecureFileObject } from '@/utils/secureFileValidation';
+
+export interface CVValidationResult {
   isValid: boolean;
-  confidence: number; // 0-100
+  confidence: number;
   issues: string[];
   suggestions: string[];
 }
+
+export interface JobDescriptionValidation {
+  isValid: boolean;
+  confidence: number;
+  issues: string[];
+  suggestions: string[];
+}
+
+// Union type for validation results
+export type ValidationResult = CVValidationResult | JobDescriptionValidation;
 
 export interface DocumentTypeDetection {
+  type: 'cv' | 'job_description' | 'unknown';
   detectedType: 'cv' | 'job_description' | 'unknown';
-  confidence: number; // 0-100
-  cvConfidence: number; // 0-100  
-  jobDescriptionConfidence: number; // 0-100
-  needsUserConfirmation: boolean; // true if confidence < 70%
-  issues: string[];
-  suggestions: string[];
+  confidence: number;
+  needsUserConfirmation: boolean;
 }
 
-export const validateJobDescription = (extractedText: string, fileName: string): ValidationResult => {
-  const lowerText = extractedText.toLowerCase();
-  const wordCount = extractedText.split(/\s+/).filter(word => word.length > 0).length;
-  
-  let confidence = 50; // Start neutral
-  const issues: string[] = [];
-  const suggestions: string[] = [];
-  
-  // Job description specific keywords
-  const jobKeywords = [
-    'responsibilities', 'duties', 'requirements', 'qualifications', 'experience',
-    'skills', 'position', 'role', 'job', 'candidate', 'applicant', 'hiring',
-    'salary', 'benefits', 'location', 'department', 'company', 'team',
-    'reports to', 'manages', 'supervises', 'degree', 'education',
-    'years of experience', 'preferred', 'required', 'must have',
-    'job description', 'job posting', 'vacancy', 'opening'
-  ];
-  
-  // CV-specific keywords that would indicate this is NOT a job description
-  const cvKeywords = [
-    'curriculum vitae', 'resume', 'cv', 'personal statement', 'objective',
-    'summary of qualifications', 'work history', 'employment history',
-    'achievements', 'accomplishments', 'references available',
-    'contact information', 'phone number', 'email address',
-    'linkedin profile', 'portfolio', 'certifications earned'
-  ];
-  
-  // Count job description indicators
-  const jobKeywordMatches = jobKeywords.filter(keyword => lowerText.includes(keyword)).length;
-  const cvKeywordMatches = cvKeywords.filter(keyword => lowerText.includes(keyword)).length;
-  
-  // Boost confidence for job description indicators
-  confidence += Math.min(jobKeywordMatches * 8, 40);
-  
-  // Reduce confidence for CV indicators
-  confidence -= Math.min(cvKeywordMatches * 15, 50);
-  
-  // Check for typical job description structure
-  const hasJobTitle = /job title|position|role/i.test(extractedText);
-  const hasResponsibilities = /responsibilities|duties|accountable|responsible/i.test(lowerText);
-  const hasRequirements = /requirements|qualifications|required|must have|preferred/i.test(lowerText);
-  const hasCompanyInfo = /company|organization|department/i.test(lowerText);
-  
-  if (hasJobTitle) confidence += 10;
-  if (hasResponsibilities) confidence += 10;
-  if (hasRequirements) confidence += 10;
-  if (hasCompanyInfo) confidence += 5;
-  
-  // Check document length (job descriptions are typically substantial)
-  if (wordCount < 50) {
-    confidence -= 20;
-    issues.push('Document seems too short for a typical job description');
-  } else if (wordCount > 100 && wordCount < 500) {
-    confidence += 10;
-  }
-  
-  // Strong indicators this might be a CV instead
-  if (cvKeywordMatches > jobKeywordMatches && cvKeywordMatches > 2) {
-    issues.push('This document appears to be a CV/Resume rather than a job description');
-    suggestions.push('Please upload the job description for the role you\'re applying to');
-  }
-  
-  // Check for personal pronouns (common in CVs, less common in job descriptions)
-  const personalPronouns = (lowerText.match(/\b(i |my |me |myself |i'm |i've |i'll )\b/g) || []).length;
-  if (personalPronouns > 5) {
-    confidence -= 15;
-    issues.push('Contains many personal pronouns, which is unusual for job descriptions');
-  }
-  
-  // Final assessment
-  confidence = Math.max(0, Math.min(100, confidence));
-  
-  if (confidence < 60) {
-    issues.push('This doesn\'t appear to be a typical job description');
-    suggestions.push('Ensure you\'re uploading the job posting/description, not your CV');
-  }
-  
-  return {
-    isValid: confidence >= 60,
-    confidence,
-    issues,
-    suggestions
-  };
-};
+export interface QualityAssessment {
+  score: number;
+  feedback: string[];
+}
 
-export const validateCV = (extractedText: string, fileName: string): ValidationResult => {
-  const lowerText = extractedText.toLowerCase();
-  const wordCount = extractedText.split(/\s+/).filter(word => word.length > 0).length;
+export const detectDocumentType = (text: string, fileName: string = ''): DocumentTypeDetection => {
+  const lowerText = text.toLowerCase();
+  const lowerFileName = fileName.toLowerCase();
   
-  let confidence = 50; // Start neutral
-  const issues: string[] = [];
-  const suggestions: string[] = [];
-  
-  // CV-specific keywords
-  const cvKeywords = [
-    'experience', 'education', 'skills', 'qualifications', 'achievements',
-    'accomplishments', 'employment', 'work history', 'career', 'professional',
-    'university', 'college', 'degree', 'certification', 'training',
-    'resume', 'curriculum vitae', 'cv', 'personal statement', 'objective',
-    'summary', 'profile', 'references', 'contact', 'phone', 'email',
-    'linkedin', 'portfolio', 'projects', 'volunteer', 'languages'
-  ];
-  
-  // Job description keywords that would indicate this is NOT a CV
-  const jobDescKeywords = [
-    'job description', 'job posting', 'position available', 'we are looking for',
-    'the ideal candidate', 'responsibilities include', 'you will be responsible',
-    'we offer', 'salary range', 'benefits package', 'apply now',
-    'job requirements', 'company description', 'about the role',
-    'reporting to', 'team structure', 'office location'
-  ];
-  
-  // Count CV indicators
-  const cvKeywordMatches = cvKeywords.filter(keyword => lowerText.includes(keyword)).length;
-  const jobDescKeywordMatches = jobDescKeywords.filter(keyword => lowerText.includes(keyword)).length;
-  
-  // Boost confidence for CV indicators
-  confidence += Math.min(cvKeywordMatches * 6, 35);
-  
-  // Reduce confidence for job description indicators
-  confidence -= Math.min(jobDescKeywordMatches * 12, 40);
-  
-  // Check for typical CV structure
-  const hasExperience = /experience|work|employment|job|position|role|career|professional/i.test(lowerText);
-  const hasEducation = /education|university|college|degree|school|qualification|diploma|certificate/i.test(lowerText);
-  const hasEmail = /@/.test(extractedText);
-  const hasSkills = /skills|competencies|proficiencies|abilities/i.test(lowerText);
-  
-  if (hasExperience) confidence += 10;
-  if (hasEducation) confidence += 10;
-  if (hasEmail) confidence += 8;
-  if (hasSkills) confidence += 5;
-  
-  // Check for personal pronouns (common in CVs)
-  const personalPronouns = (lowerText.match(/\b(i |my |me |myself |i'm |i've |i'll )\b/g) || []).length;
-  if (personalPronouns > 3) {
-    confidence += 10;
-  }
-  
-  // Check document length (CVs are typically substantial)
-  if (wordCount < 75) {
-    confidence -= 15;
-    issues.push('CV seems quite short for a typical resume');
-  } else if (wordCount > 150 && wordCount < 800) {
-    confidence += 10;
-  }
-  
-  // Strong indicators this might be a job description instead
-  if (jobDescKeywordMatches > cvKeywordMatches && jobDescKeywordMatches > 2) {
-    issues.push('This document appears to be a job description rather than a CV/Resume');
-    suggestions.push('Please upload your CV/Resume, not the job description');
-  }
-  
-  // Check for company-centric language (indicates job description)
-  const companyLanguage = (lowerText.match(/\b(we are|our company|our team|join us|apply now)\b/g) || []).length;
-  if (companyLanguage > 2) {
-    confidence -= 20;
-    issues.push('Contains company-centric language typical of job descriptions');
-  }
-  
-  // Final assessment
-  confidence = Math.max(0, Math.min(100, confidence));
-  
-  if (confidence < 60) {
-    issues.push('This doesn\'t appear to be a typical CV/Resume');
-    suggestions.push('Ensure you\'re uploading your CV/Resume, not a job description');
-  }
-  
-  return {
-    isValid: confidence >= 60,
-    confidence,
-    issues,
-    suggestions
-  };
-};
-
-// Automatic document type detection function
-export const detectDocumentType = (extractedText: string, fileName: string): DocumentTypeDetection => {
-  const cvValidation = validateCV(extractedText, fileName);
-  const jobDescValidation = validateJobDescription(extractedText, fileName);
-  
-  const cvConfidence = cvValidation.confidence;
-  const jobDescriptionConfidence = jobDescValidation.confidence;
-  
-  // Determine the most likely document type
+  let confidence = 50;
   let detectedType: 'cv' | 'job_description' | 'unknown' = 'unknown';
-  let confidence = 0;
   
-  if (cvConfidence > jobDescriptionConfidence && cvConfidence >= 60) {
+  // CV indicators
+  const cvKeywords = [
+    'experience', 'education', 'skills', 'qualifications', 'career', 'employment',
+    'work history', 'professional experience', 'achievements', 'accomplishments',
+    'my name', 'i am', 'i have', 'my experience', 'my skills', 'i worked', 'i studied'
+  ];
+  
+  // Job description indicators
+  const jdKeywords = [
+    'responsibilities', 'requirements', 'duties', 'job title', 'position', 'role',
+    'candidate', 'applicant', 'salary', 'benefits', 'we are looking', 'join our team',
+    'apply', 'application', 'hiring', 'recruitment'
+  ];
+  
+  // File name indicators
+  const cvFileIndicators = ['cv', 'resume', 'curriculum'];
+  const jdFileIndicators = ['job', 'position', 'role', 'vacancy', 'opening'];
+  
+  // Count keyword matches
+  const cvMatches = cvKeywords.filter(keyword => lowerText.includes(keyword)).length;
+  const jdMatches = jdKeywords.filter(keyword => lowerText.includes(keyword)).length;
+  
+  // Check file name
+  const hasCvFileName = cvFileIndicators.some(indicator => lowerFileName.includes(indicator));
+  const hasJdFileName = jdFileIndicators.some(indicator => lowerFileName.includes(indicator));
+  
+  // Determine type based on matches
+  if (cvMatches > jdMatches || hasCvFileName) {
     detectedType = 'cv';
-    confidence = cvConfidence;
-  } else if (jobDescriptionConfidence > cvConfidence && jobDescriptionConfidence >= 60) {
+    confidence = Math.min(90, 60 + (cvMatches * 5) + (hasCvFileName ? 15 : 0));
+  } else if (jdMatches > cvMatches || hasJdFileName) {
     detectedType = 'job_description';
-    confidence = jobDescriptionConfidence;
-  } else {
-    // Neither type has high confidence
-    detectedType = 'unknown';
-    confidence = Math.max(cvConfidence, jobDescriptionConfidence);
+    confidence = Math.min(90, 60 + (jdMatches * 5) + (hasJdFileName ? 15 : 0));
   }
   
-  const needsUserConfirmation = confidence < 70 || detectedType === 'unknown';
-  
-  const issues: string[] = [];
-  const suggestions: string[] = [];
-  
-  if (needsUserConfirmation) {
-    if (detectedType === 'unknown') {
-      issues.push('Unable to automatically determine document type');
-      suggestions.push('Please confirm if this is a CV/Resume or Job Description');
-    } else {
-      issues.push(`Detected as ${detectedType === 'cv' ? 'CV/Resume' : 'Job Description'} with ${confidence}% confidence`);
-      suggestions.push('Please confirm if this document type is correct');
-    }
-  }
+  const needsUserConfirmation = confidence < 70;
   
   return {
+    type: detectedType,
     detectedType,
     confidence,
-    cvConfidence,
-    jobDescriptionConfidence,
-    needsUserConfirmation,
+    needsUserConfirmation
+  };
+};
+
+export const validateCV = (text: string, fileName: string = ''): CVValidationResult => {
+  const issues: string[] = [];
+  const suggestions: string[] = [];
+  let confidence = 100;
+
+  // Check minimum length
+  if (text.length < 100) {
+    issues.push('CV is too short to be effective');
+    confidence -= 20;
+  }
+
+  // Check for essential sections
+  const sectionKeywords = ['experience', 'education', 'skills'];
+  const foundSections = sectionKeywords.filter(keyword =>
+    text.toLowerCase().includes(keyword)
+  );
+
+  if (foundSections.length < 2) {
+    issues.push('CV lacks essential sections (experience, education, skills)');
+    confidence -= 25;
+    suggestions.push('Ensure your CV includes sections detailing your experience, education, and skills');
+  }
+
+  // Check for contact information
+  const contactKeywords = ['phone', 'email', 'linkedin'];
+  const foundContactInfo = contactKeywords.filter(keyword =>
+    text.toLowerCase().includes(keyword)
+  );
+
+  if (foundContactInfo.length === 0) {
+    issues.push('CV lacks contact information');
+    confidence -= 15;
+    suggestions.push('Include your phone number, email address, and LinkedIn profile URL');
+  }
+
+  // Check for action verbs
+  const actionVerbs = ['managed', 'developed', 'led', 'created', 'implemented'];
+  const foundActionVerbs = actionVerbs.filter(verb =>
+    text.toLowerCase().includes(verb)
+  );
+
+  if (foundActionVerbs.length < 3) {
+    issues.push('CV lacks strong action verbs to describe accomplishments');
+    confidence -= 10;
+    suggestions.push('Use action verbs to start sentences and describe your accomplishments');
+  }
+
+  // Check for formatting issues (simulated)
+  if (text.split('\n').length < 5) {
+    issues.push('CV appears to have poor formatting');
+    confidence -= 10;
+    suggestions.push('Use clear formatting, bullet points, and headings to improve readability');
+  }
+
+  // Check file name for hints
+  const cvIndicators = ['cv', 'resume', 'curriculum'];
+  const jdIndicators = ['job', 'position', 'role', 'vacancy', 'opening'];
+  
+  const fileNameLower = fileName.toLowerCase();
+  const hasCVIndicator = cvIndicators.some(indicator => fileNameLower.includes(indicator));
+  const hasJDIndicator = jdIndicators.some(indicator => fileNameLower.includes(indicator));
+
+  if (hasJDIndicator && !hasCVIndicator) {
+    issues.push('File name suggests this might be a job description rather than a CV');
+    confidence -= 15;
+  }
+
+  // Determine if valid
+  const isValid = confidence >= 70;
+
+  if (!isValid) {
+    suggestions.push('Consider reviewing the document content to ensure it includes all necessary information');
+  }
+
+  return {
+    isValid,
+    confidence,
     issues,
     suggestions
   };
+};
+
+export const validateJobDescription = (text: string, fileName: string = ''): JobDescriptionValidation => {
+  const issues: string[] = [];
+  const suggestions: string[] = [];
+  let confidence = 100;
+
+  // Check minimum length
+  if (text.length < 50) {
+    issues.push('Document is too short to be a job description');
+    confidence -= 30;
+  }
+
+  // Check for job description indicators
+  const jobDescriptionKeywords = [
+    'responsibilities', 'requirements', 'qualifications', 'duties',
+    'job title', 'position', 'role', 'candidate', 'applicant',
+    'salary', 'benefits', 'company', 'team', 'department',
+    'apply', 'application', 'hiring', 'recruitment'
+  ];
+
+  const foundKeywords = jobDescriptionKeywords.filter(keyword =>
+    text.toLowerCase().includes(keyword)
+  );
+
+  if (foundKeywords.length < 3) {
+    issues.push('Document may not be a job description - lacks typical job posting keywords');
+    confidence -= 20;
+    suggestions.push('Ensure this document contains job requirements, responsibilities, and qualifications');
+  }
+
+  // Check for personal information (suggests it might be a CV)
+  const personalKeywords = [
+    'my name', 'i am', 'i have', 'my experience', 'my skills',
+    'i worked', 'i studied', 'my education', 'my background'
+  ];
+
+  const foundPersonalKeywords = personalKeywords.filter(keyword =>
+    text.toLowerCase().includes(keyword)
+  );
+
+  if (foundPersonalKeywords.length > 2) {
+    issues.push('Document appears to contain personal information - may be a CV instead of job description');
+    confidence -= 25;
+    suggestions.push('Please ensure you are uploading a job description, not a CV');
+  }
+
+  // Check file name for hints
+  const cvIndicators = ['cv', 'resume', 'curriculum'];
+  const jdIndicators = ['job', 'position', 'role', 'vacancy', 'opening'];
+  
+  const fileNameLower = fileName.toLowerCase();
+  const hasCVIndicator = cvIndicators.some(indicator => fileNameLower.includes(indicator));
+  const hasJDIndicator = jdIndicators.some(indicator => fileNameLower.includes(indicator));
+
+  if (hasCVIndicator && !hasJDIndicator) {
+    issues.push('File name suggests this might be a CV rather than job description');
+    confidence -= 15;
+  }
+
+  // Determine if valid
+  const isValid = confidence >= 70;
+
+  if (!isValid) {
+    suggestions.push('Consider reviewing the document content to ensure it describes a job role and requirements');
+  }
+
+  return {
+    isValid,
+    confidence,
+    issues,
+    suggestions
+  };
+};
+
+// Secure file validation (example - implement actual checks)
+export const validateSecureFile = (file: File): boolean => {
+  // Implement actual checks here (e.g., file signature, content analysis)
+  // This is a placeholder - replace with real security measures
+  return true;
 };

@@ -51,7 +51,7 @@ export const FloatingLabelTextarea: React.FC<FloatingLabelTextareaProps> = ({
         onFocus={handleFocus}
         onBlur={handleBlur}
         className={cn(
-          "peer w-full min-h-[100px] px-4 pt-6 pb-2 bg-white dark:bg-surface border-2 rounded-lg resize-none",
+          "peer w-full min-h-[100px] px-4 pt-8 pb-2 bg-white dark:bg-surface border-2 rounded-lg resize-none",
           "border-apple-core/20 dark:border-citrus/20",
           "focus:border-zapier-orange focus:ring-0 focus:outline-none",
            "text-blueberry dark:text-citrus text-caption",
@@ -60,6 +60,7 @@ export const FloatingLabelTextarea: React.FC<FloatingLabelTextareaProps> = ({
            "disabled:opacity-50 disabled:cursor-not-allowed",
            className
          )}
+         placeholder={!isFloating ? "" : "Mention specific achievements, metrics, or experiences you want emphasized in your cover letter..."}
          {...props}
        />
         <label
@@ -67,9 +68,9 @@ export const FloatingLabelTextarea: React.FC<FloatingLabelTextareaProps> = ({
           className={cn(
             "absolute left-4 cursor-text transition-all duration-200 pointer-events-none",
             "text-blueberry/60 dark:text-apple-core/60",
-            isFloating
-              ? "top-1.5 text-micro font-medium text-zapier-orange"
-              : "top-5 text-caption"
+             isFloating
+               ? "top-1.5 text-tiny font-medium text-zapier-orange"
+               : "top-6 text-caption"
         )}
       >
         {label}

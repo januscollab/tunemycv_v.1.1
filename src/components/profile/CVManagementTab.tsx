@@ -203,19 +203,19 @@ const CVManagementTab: React.FC<CVManagementTabProps> = ({ credits, memberSince 
 
   if (loading) {
     return (
-      <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6">
+      <div className="bg-card rounded-lg shadow p-6">
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-apricot"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white dark:bg-blueberry/20 rounded-lg shadow p-6 border border-apple-core/20 dark:border-citrus/20">
+    <div className="bg-card rounded-lg shadow p-6 border border-border">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-title font-semibold text-slate-900 dark:text-citrus">My CVs</h2>
-        <span className="text-caption text-slate-600 dark:text-apple-core/80">{cvs.length}/5 CVs uploaded</span>
+        <h2 className="text-title font-semibold text-foreground">My CVs</h2>
+        <span className="text-caption text-muted-foreground">{cvs.length}/5 CVs uploaded</span>
       </div>
       
       {cvs.length < 5 && (
@@ -227,38 +227,38 @@ const CVManagementTab: React.FC<CVManagementTabProps> = ({ credits, memberSince 
             disabled={uploading}
             placeholder={uploading ? "Uploading..." : "Upload New CV"}
             description="PDF or DOCX • Max 5MB"
-            className="border-apple-core/30 dark:border-citrus/30 hover:border-apricot hover:bg-apricot/5"
+            className="border-border hover:border-primary hover:bg-primary/5"
           />
         </div>
       )}
 
       {cvs.length === 0 ? (
         <div className="text-center py-8">
-          <FileText className="mx-auto h-12 w-12 text-blueberry/40 dark:text-apple-core/40 mb-4" />
-          <h3 className="text-heading font-medium text-slate-900 dark:text-citrus mb-2">No CVs uploaded</h3>
-          <p className="text-slate-600 dark:text-apple-core/80">
+          <FileText className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+          <h3 className="text-heading font-medium text-foreground mb-2">No CVs uploaded</h3>
+          <p className="text-muted-foreground">
             Upload your first CV to get started with analysis.
           </p>
         </div>
       ) : (
         <div className="space-y-4">
           {cvs.map((cv) => (
-            <div key={cv.id} className="border border-apple-core/20 dark:border-citrus/20 rounded-lg p-4">
+            <div key={cv.id} className="border border-border rounded-lg p-4">
               <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
-                    <FileText className="h-8 w-8 text-apricot" />
+                    <FileText className="h-8 w-8 text-primary" />
                     <div className="flex-1">
                       <div className="flex items-center space-x-2">
-                        <h3 className="font-medium text-slate-900 dark:text-citrus">{cv.file_name}</h3>
+                        <h3 className="font-medium text-foreground">{cv.file_name}</h3>
                         <button
                           onClick={() => setEditingCV(cv)}
-                          className="p-1 text-blueberry/60 hover:text-apricot dark:text-apple-core/60 dark:hover:text-citrus transition-colors"
+                          className="p-1 text-muted-foreground hover:text-primary transition-colors"
                           title="Edit CV name"
                         >
                           <Pencil className="h-3 w-3" />
                         </button>
                       </div>
-                      <p className="text-caption text-slate-600 dark:text-apple-core/80">
+                      <p className="text-caption text-muted-foreground">
                         {formatFileSize(cv.file_size)} • {new Date(cv.created_at).toLocaleDateString()}
                       </p>
                     </div>
@@ -266,14 +266,14 @@ const CVManagementTab: React.FC<CVManagementTabProps> = ({ credits, memberSince 
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={() => {}}
-                      className="p-2 text-zapier-orange hover:bg-zapier-orange/10 rounded-md transition-colors"
+                      className="p-2 text-primary hover:bg-primary/10 rounded-md transition-colors"
                       title="Edit CV (future functionality)"
                     >
                       <Edit className="h-4 w-4" />
                     </button>
                   <button
                     onClick={() => deleteCV(cv.id)}
-                    className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
+                    className="p-2 text-destructive hover:bg-destructive/10 rounded-md transition-colors"
                     title="Delete CV"
                   >
                     <Trash2 className="h-4 w-4" />

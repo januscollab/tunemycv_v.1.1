@@ -6,7 +6,8 @@ import {
   textToJson, 
   DocumentJson, 
   enforceFormattingRules, 
-  syncJsonAndText,
+  generateFormattedText,
+  prettifyDocumentJson,
   isWellStructuredDocument 
 } from '@/utils/documentJsonUtils';
 import { useToast } from '@/hooks/use-toast';
@@ -80,16 +81,20 @@ export const useDocumentExtraction = () => {
         extractTextFromFile(file, controller.signal),
         cancellationPromise
       ]);
-      setState(prev => ({ ...prev, progress: 'Applying formatting rules and creating structured document...' }));
+      setState(prev => ({ ...prev, progress: 'Applying comprehensive formatting rules and creating structured document...' }));
       
-      // Generate structured JSON from text with formatting rules applied
+      // JSON AS MASTER: Generate structured JSON from text with comprehensive formatting rules applied
       const rawDocumentJson = textToJson(extractedText);
+      console.log('[useDocumentExtraction] Created raw JSON with', rawDocumentJson.sections.length, 'sections');
       
-      // Enforce JSON formatting rules (bold only, H1-H3, single font, "-" bullets)
-      const enforcedDocumentJson = enforceFormattingRules(rawDocumentJson);
+      // Enforce comprehensive JSON formatting rules (bold only, H1-H3, single font, "-" bullets)
+      const documentJson = enforceFormattingRules(rawDocumentJson);
+      console.log('[useDocumentExtraction] Applied formatting rules, final sections:', documentJson.sections.length);
+      console.log('[useDocumentExtraction] Formatted sections with bold:', documentJson.sections.filter(s => s.formatting?.bold).length);
       
-      // Ensure bidirectional sync and consistency
-      const { json: documentJson, text: consistentText } = syncJsonAndText(enforcedDocumentJson, extractedText);
+      // Generate formatted text from JSON (JSON is now the authoritative master)
+      const consistentText = generateFormattedText(documentJson);
+      console.log('[useDocumentExtraction] Generated consistent text from JSON, length:', consistentText.length);
       
       // Validate document structure (not a text blob)
       const isWellStructured = isWellStructuredDocument(documentJson);
