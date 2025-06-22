@@ -15,7 +15,6 @@ import LegacyKeywordSection from './components/LegacyKeywordSection';
 import PriorityRecommendationsSection from './components/PriorityRecommendationsSection';
 import PersonalizedMatchMessage from './components/PersonalizedMatchMessage';
 import NextStepsSection from './components/NextStepsSection';
-import BrowserPDFViewer from './BrowserPDFViewer';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { FloatingLabelTextarea } from '@/components/common/FloatingLabelTextarea';
@@ -261,12 +260,35 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
             </div>
           )}
 
-          {/* Browser PDF Viewer */}
-          <div className="mb-8">
-            <BrowserPDFViewer 
-              result={result} 
-              onDownloadText={downloadAnalysisAsText}
-            />
+          {/* PDF Placeholder */}
+          <div className="border border-apple-core/20 dark:border-citrus/20 rounded-lg p-8 text-center mb-8 bg-surface">
+            <div className="text-muted-foreground">
+              <svg className="mx-auto h-16 w-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <h3 className="text-lg font-medium mb-2">Analysis Report Available</h3>
+              <p className="text-sm mb-4">Your CV analysis has been completed successfully.</p>
+              <button 
+                onClick={downloadAnalysisAsText}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+              >
+                <Download className="h-4 w-4" />
+                Download Report as Text
+              </button>
+              {result.n8n_pdf_url && (
+                <div className="mt-4">
+                  <button 
+                    onClick={() => window.open(result.n8n_pdf_url, '_blank', 'noopener,noreferrer')} 
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/90 transition-colors"
+                  >
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                    View External PDF
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Additional Information */}
