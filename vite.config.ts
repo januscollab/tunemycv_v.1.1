@@ -30,16 +30,15 @@ export default defineConfig(({ mode }) => ({
           'react-pdf': ['react-pdf'],
           'pdfjs': ['pdfjs-dist']
         }
-      },
-      external: (id) => {
-        // Don't externalize the worker, let it be bundled
-        return false;
       }
     },
     assetsDir: 'assets',
-    // Ensure PDF.js worker files are copied to the build output
     copyPublicDir: true
   },
-  // Add specific handling for PDF.js worker files
-  assetsInclude: ['**/*.worker.js', '**/*.worker.min.js']
+  // Ensure PDF.js worker files are properly handled
+  assetsInclude: ['**/*.worker.js', '**/*.worker.min.js'],
+  // Add worker support
+  worker: {
+    format: 'es'
+  }
 }));

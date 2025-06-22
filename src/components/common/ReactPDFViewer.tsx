@@ -15,48 +15,50 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({ pdfUrl, fileName = 'doc
   const [scale, setScale] = useState<number>(1.0);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [loadingTimeout, setLoadingTimeout] = useState<boolean>(false);
+  const [timeoutError, setTimeoutError] = useState<boolean>(false);
 
-  // Add timeout for loading state
+  // Enhanced timeout handling - automatically trigger error state
   React.useEffect(() => {
+    if (!loading) return;
+    
     const timeout = setTimeout(() => {
-      if (loading) {
-        console.warn('PDF loading timeout reached');
-        setLoadingTimeout(true);
-      }
-    }, 15000); // 15 second timeout
+      console.warn('PDF loading timeout reached - triggering error state');
+      setLoading(false);
+      setTimeoutError(true);
+      setError('The PDF is taking too long to load. This might be due to a large file size or network issues.');
+    }, 10000); // 10 second timeout
 
     return () => clearTimeout(timeout);
   }, [loading]);
 
-  // Log PDF URL for debugging
+  // Reset states when URL changes
   React.useEffect(() => {
-    console.log('ReactPDFViewer: Attempting to load PDF from URL:', pdfUrl);
-    console.log('ReactPDFViewer: PDF filename:', fileName);
-  }, [pdfUrl, fileName]);
+    console.log('ReactPDFViewer: Loading PDF from URL:', pdfUrl);
+    setLoading(true);
+    setError(null);
+    setTimeoutError(false);
+    setNumPages(0);
+    setPageNumber(1);
+  }, [pdfUrl]);
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     console.log('ReactPDFViewer: PDF loaded successfully with', numPages, 'pages');
     setNumPages(numPages);
     setLoading(false);
     setError(null);
-    setLoadingTimeout(false);
+    setTimeoutError(false);
   };
 
   const onDocumentLoadError = (error: Error) => {
     console.error('ReactPDFViewer: PDF load error:', error);
-    console.error('ReactPDFViewer: Error details:', {
-      message: error.message,
-      name: error.name,
-      stack: error.stack
-    });
-    setError(`Failed to load PDF: ${error.message}`);
+    setError(`We're sorry, but we couldn't load this PDF. ${error.message}`);
     setLoading(false);
-    setLoadingTimeout(false);
+    setTimeoutError(false);
   };
 
   const onDocumentLoadProgress = (progressData: { loaded: number; total: number }) => {
-    console.log('ReactPDFViewer: Loading progress:', Math.round((progressData.loaded / progressData.total) * 100) + '%');
+    const progress = Math.round((progressData.loaded / progressData.total) * 100);
+    console.log('ReactPDFViewer: Loading progress:', progress + '%');
   };
 
   const changePage = (offset: number) => {
@@ -71,7 +73,7 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({ pdfUrl, fileName = 'doc
   };
 
   const downloadPDF = () => {
-    console.log('ReactPDFViewer: Attempting to download PDF from:', pdfUrl);
+    console.log('ReactPDFViewer: Downloading PDF from:', pdfUrl);
     const link = document.createElement('a');
     link.href = pdfUrl;
     link.download = fileName;
@@ -81,7 +83,7 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({ pdfUrl, fileName = 'doc
   };
 
   const openInNewTab = () => {
-    console.log('ReactPDFViewer: Opening PDF in new tab:', pdfUrl);
+    console.log('ReactPDFViewer: Opening PDF in new tab');
     window.open(pdfUrl, '_blank', 'noopener,noreferrer');
   };
 
@@ -90,44 +92,16 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({ pdfUrl, fileName = 'doc
       <div className="flex items-center justify-center h-96 bg-surface border border-border rounded-lg">
         <div className="text-center max-w-md">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground mb-4">Loading PDF...</p>
-          
-          {loadingTimeout && (
-            <div className="space-y-3">
-              <p className="text-sm text-muted-foreground">
-                PDF is taking longer than expected to load.
-              </p>
-              <div className="flex gap-2 justify-center">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={openInNewTab}
-                  className="flex items-center gap-2"
-                >
-                  <ExternalLink className="h-4 w-4" />
-                  Open in New Tab
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={downloadPDF}
-                  className="flex items-center gap-2"
-                >
-                  <Download className="h-4 w-4" />
-                  Download PDF
-                </Button>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                URL: {pdfUrl.substring(0, 60)}...
-              </p>
-            </div>
-          )}
+          <p className="text-muted-foreground mb-2">Loading PDF document...</p>
+          <p className="text-xs text-muted-foreground">
+            This may take a moment for larger files
+          </p>
         </div>
       </div>
     );
   }
 
-  if (error) {
+  if (error || timeoutError) {
     return (
       <div className="flex items-center justify-center h-96 bg-surface border border-border rounded-lg">
         <div className="text-center max-w-md">
@@ -136,12 +110,21 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({ pdfUrl, fileName = 'doc
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
             </svg>
           </div>
-          <p className="text-destructive font-medium mb-2">PDF Loading Error</p>
-          <p className="text-muted-foreground text-sm mb-4">{error}</p>
           
-          <div className="flex gap-2 justify-center mb-3">
+          <h3 className="text-lg font-medium text-foreground mb-2">
+            We're Sorry - PDF Loading Issue
+          </h3>
+          
+          <p className="text-muted-foreground text-sm mb-4">
+            {timeoutError 
+              ? "The PDF is taking longer than expected to load. This might be due to file size or network connectivity."
+              : error
+            }
+          </p>
+          
+          <div className="flex gap-3 justify-center mb-4">
             <Button
-              variant="outline"
+              variant="default"
               size="sm"
               onClick={openInNewTab}
               className="flex items-center gap-2"
@@ -160,14 +143,20 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({ pdfUrl, fileName = 'doc
             </Button>
           </div>
           
+          <p className="text-xs text-muted-foreground mb-3">
+            You can try opening the PDF directly or downloading it to view offline.
+          </p>
+          
           <details className="text-left">
             <summary className="text-xs cursor-pointer text-muted-foreground hover:text-foreground">
-              Debug Information
+              Technical Details
             </summary>
-            <div className="mt-2 p-2 bg-muted rounded text-xs font-mono text-left">
-              <p><strong>URL:</strong> {pdfUrl}</p>
-              <p><strong>Filename:</strong> {fileName}</p>
-              <p><strong>Error:</strong> {error}</p>
+            <div className="mt-2 p-2 bg-muted rounded text-xs font-mono text-left space-y-1">
+              <div><strong>Document:</strong> {fileName}</div>
+              <div><strong>Error Type:</strong> {timeoutError ? 'Timeout' : 'Loading Error'}</div>
+              {error && !timeoutError && (
+                <div><strong>Details:</strong> {error}</div>
+              )}
             </div>
           </details>
         </div>
