@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import { CheckCircle, Download, ArrowLeft, Bug, X, Send } from 'lucide-react';
 
 import { useProfileData } from '@/hooks/useProfileData';
 import { FloatingFeedbackForm } from '@/components/common/FloatingFeedbackForm';
-import ReactPDFViewer from '@/components/common/ReactPDFViewer';
+// Remove the direct import of ReactPDFViewer - we'll lazy load it
 import CompatibilityBreakdownSection from './CompatibilityBreakdownSection';
 import EnhancedKeywordAnalysis from './EnhancedKeywordAnalysis';
 import SkillsGapAnalysis from './SkillsGapAnalysis';
@@ -22,6 +22,9 @@ import { FloatingLabelTextarea } from '@/components/common/FloatingLabelTextarea
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+
+// Lazy load the ReactPDFViewer component to prevent unnecessary PDF.js loading
+const ReactPDFViewer = React.lazy(() => import('@/components/common/ReactPDFViewer'));
 
 interface AnalysisResultsProps {
   result: any;
@@ -261,13 +264,22 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
             </div>
           )}
 
-          {/* PDF Viewer - Show if PDF URL is available */}
+          {/* PDF Viewer - Only render if PDF URL is available */}
           {result.n8n_pdf_url && (
             <div className="mb-8">
-              <ReactPDFViewer 
-                pdfUrl={result.n8n_pdf_url}
-                fileName={`CV_Analysis_Report_${result.job_title || 'Report'}_${new Date().toISOString().split('T')[0]}.pdf`}
-              />
+              <Suspense fallback={
+                <div className="flex items-center justify-center h-96 bg-surface border border-border rounded-lg">
+                  <div className="text-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+                    <p className="text-muted-foreground">Loading PDF viewer...</p>
+                  </div>
+                </div>
+              }>
+                <ReactPDFViewer 
+                  pdfUrl={result.n8n_pdf_url}
+                  fileName={`CV_Analysis_Report_${result.job_title || 'Report'}_${new Date().toISOString().split('T')[0]}.pdf`}
+                />
+              </Suspense>
             </div>
           )}
 

@@ -108,7 +108,7 @@ export const StepIndicator: React.FC<StepIndicatorProps> = ({
         const upcoming = isStepUpcoming(step.id);
 
         return (
-          <React.Fragment key={step.id}>
+          <div key={step.id} className="flex items-center">
             <div className="flex flex-col items-center space-y-2 min-w-0 flex-1">
               <div
                 className={cn(
@@ -162,7 +162,7 @@ export const StepIndicator: React.FC<StepIndicatorProps> = ({
                 )}
               />
             )}
-          </React.Fragment>
+          </div>
         );
       })}
     </div>
