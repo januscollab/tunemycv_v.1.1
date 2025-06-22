@@ -1,8 +1,52 @@
-
 import React, { useState } from 'react';
 import { Document, Page } from 'react-pdf';
 import { ChevronLeft, ChevronRight, Download, ZoomIn, ZoomOut, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+
+// Lazy load PDF.js setup
+let pdfjsInitialized = false;
+
+const initializePdfJs = async () => {
+  if (pdfjsInitialized) return;
+  
+  try {
+    const { pdfjs } = await import('react-pdf');
+    
+    // Import CSS only when needed
+    await import('react-pdf/dist/esm/Page/AnnotationLayer.css');
+    await import('react-pdf/dist/esm/Page/TextLayer.css');
+    
+    // Try bundled worker first, then CDN fallback
+    try {
+      const workerSrc = new URL(
+        'pdfjs-dist/build/pdf.worker.min.js',
+        import.meta.url,
+      ).toString();
+      
+      console.log('ReactPDFViewer: Attempting to use bundled PDF.js worker:', workerSrc);
+      pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
+      
+      // Test if worker loads
+      await pdfjs.getDocument({ 
+        data: new Uint8Array([37, 80, 68, 70, 45, 49, 46, 52]) // "%PDF-1.4" header
+      }).promise;
+      
+      console.log('ReactPDFViewer: PDF.js bundled worker loaded successfully');
+    } catch (error) {
+      console.warn('ReactPDFViewer: Bundled PDF.js worker failed, using CDN fallback:', error);
+      
+      const cdnWorkerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
+      console.log('ReactPDFViewer: Using CDN PDF.js worker:', cdnWorkerSrc);
+      pdfjs.GlobalWorkerOptions.workerSrc = cdnWorkerSrc;
+    }
+    
+    console.log('ReactPDFViewer: PDF.js version:', pdfjs.version);
+    pdfjsInitialized = true;
+  } catch (error) {
+    console.error('ReactPDFViewer: PDF.js initialization failed:', error);
+    throw error;
+  }
+};
 
 interface ReactPDFViewerProps {
   pdfUrl: string;
@@ -16,30 +60,49 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({ pdfUrl, fileName = 'doc
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [timeoutError, setTimeoutError] = useState<boolean>(false);
+  const [pdfJsReady, setPdfJsReady] = useState<boolean>(false);
 
-  // Enhanced timeout handling - automatically trigger error state
+  // Initialize PDF.js when component mounts
   React.useEffect(() => {
-    if (!loading) return;
+    const setupPdfJs = async () => {
+      try {
+        await initializePdfJs();
+        setPdfJsReady(true);
+      } catch (error) {
+        console.error('ReactPDFViewer: Failed to initialize PDF.js:', error);
+        setError('Failed to initialize PDF viewer. Please try refreshing the page.');
+        setLoading(false);
+      }
+    };
+
+    setupPdfJs();
+  }, []);
+
+  // Enhanced timeout handling - increased to 30 seconds
+  React.useEffect(() => {
+    if (!loading || !pdfJsReady) return;
     
     const timeout = setTimeout(() => {
-      console.warn('PDF loading timeout reached - triggering error state');
+      console.warn('ReactPDFViewer: PDF loading timeout reached - triggering error state');
       setLoading(false);
       setTimeoutError(true);
-      setError('The PDF is taking too long to load. This might be due to a large file size or network issues.');
-    }, 10000); // 10 second timeout
+      setError('The PDF is taking longer than expected to load. This might be due to file size or network connectivity.');
+    }, 30000); // Increased to 30 seconds
 
     return () => clearTimeout(timeout);
-  }, [loading]);
+  }, [loading, pdfJsReady]);
 
   // Reset states when URL changes
   React.useEffect(() => {
+    if (!pdfJsReady) return;
+    
     console.log('ReactPDFViewer: Loading PDF from URL:', pdfUrl);
     setLoading(true);
     setError(null);
     setTimeoutError(false);
     setNumPages(0);
     setPageNumber(1);
-  }, [pdfUrl]);
+  }, [pdfUrl, pdfJsReady]);
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     console.log('ReactPDFViewer: PDF loaded successfully with', numPages, 'pages');
@@ -87,12 +150,15 @@ const ReactPDFViewer: React.FC<ReactPDFViewerProps> = ({ pdfUrl, fileName = 'doc
     window.open(pdfUrl, '_blank', 'noopener,noreferrer');
   };
 
-  if (loading) {
+  // Show loading while PDF.js is initializing
+  if (!pdfJsReady || loading) {
     return (
       <div className="flex items-center justify-center h-96 bg-surface border border-border rounded-lg">
         <div className="text-center max-w-md">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground mb-2">Loading PDF document...</p>
+          <p className="text-muted-foreground mb-2">
+            {!pdfJsReady ? 'Initializing PDF viewer...' : 'Loading PDF document...'}
+          </p>
           <p className="text-xs text-muted-foreground">
             This may take a moment for larger files
           </p>

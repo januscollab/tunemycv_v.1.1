@@ -40,5 +40,9 @@ export default defineConfig(({ mode }) => ({
   // Add worker support
   worker: {
     format: 'es'
+  },
+  // Copy PDF.js worker to the correct location
+  define: {
+    'process.env.NODE_ENV': JSON.stringify(mode)
   }
 }));
