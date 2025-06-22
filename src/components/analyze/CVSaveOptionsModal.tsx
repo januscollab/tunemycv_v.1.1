@@ -1,9 +1,11 @@
+
 import React from 'react';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
 import { VybeButton } from '@/components/design-system/VybeButton';
@@ -31,6 +33,9 @@ const CVSaveOptionsModal: React.FC<CVSaveOptionsModalProps> = ({
             <Save className="h-5 w-5 text-zapier-orange" />
             Save CV to Profile?
           </DialogTitle>
+          <DialogDescription>
+            Choose whether to save this CV file to your profile for future use, or continue without saving.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
