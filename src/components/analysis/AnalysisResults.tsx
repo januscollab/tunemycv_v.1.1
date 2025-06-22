@@ -3,6 +3,7 @@ import { CheckCircle, Download, ArrowLeft, Bug, X, Send } from 'lucide-react';
 
 import { useProfileData } from '@/hooks/useProfileData';
 import { FloatingFeedbackForm } from '@/components/common/FloatingFeedbackForm';
+import ReactPDFViewer from '@/components/common/ReactPDFViewer';
 import CompatibilityBreakdownSection from './CompatibilityBreakdownSection';
 import EnhancedKeywordAnalysis from './EnhancedKeywordAnalysis';
 import SkillsGapAnalysis from './SkillsGapAnalysis';
@@ -260,36 +261,35 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
             </div>
           )}
 
-          {/* PDF Placeholder */}
-          <div className="border border-apple-core/20 dark:border-citrus/20 rounded-lg p-8 text-center mb-8 bg-surface">
-            <div className="text-muted-foreground">
-              <svg className="mx-auto h-16 w-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              <h3 className="text-lg font-medium mb-2">Analysis Report Available</h3>
-              <p className="text-sm mb-4">Your CV analysis has been completed successfully.</p>
-              <button 
-                onClick={downloadAnalysisAsText}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-              >
-                <Download className="h-4 w-4" />
-                Download Report as Text
-              </button>
-              {result.n8n_pdf_url && (
-                <div className="mt-4">
-                  <button 
-                    onClick={() => window.open(result.n8n_pdf_url, '_blank', 'noopener,noreferrer')} 
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/90 transition-colors"
-                  >
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
-                    View External PDF
-                  </button>
-                </div>
-              )}
+          {/* PDF Viewer - Show if PDF URL is available */}
+          {result.n8n_pdf_url && (
+            <div className="mb-8">
+              <ReactPDFViewer 
+                pdfUrl={result.n8n_pdf_url}
+                fileName={`CV_Analysis_Report_${result.job_title || 'Report'}_${new Date().toISOString().split('T')[0]}.pdf`}
+              />
             </div>
-          </div>
+          )}
+
+          {/* Fallback for no PDF */}
+          {!result.n8n_pdf_url && (
+            <div className="border border-apple-core/20 dark:border-citrus/20 rounded-lg p-8 text-center mb-8 bg-surface">
+              <div className="text-muted-foreground">
+                <svg className="mx-auto h-16 w-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <h3 className="text-lg font-medium mb-2">Analysis Report Processing</h3>
+                <p className="text-sm mb-4">Your CV analysis has been completed, but the PDF is still being generated.</p>
+                <button 
+                  onClick={downloadAnalysisAsText}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+                >
+                  <Download className="h-4 w-4" />
+                  Download Report as Text
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Additional Information */}
           <div className="bg-apple-core/5 dark:bg-citrus/5 border border-apple-core/20 dark:border-citrus/20 rounded-lg p-6 mb-8">
