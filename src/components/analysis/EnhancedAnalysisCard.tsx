@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, Eye, Download, Trash2, FileText, Pen, MessageSquare, Zap } from 'lucide-react';
+import { Calendar, Eye, Trash2, FileText, Pen, MessageSquare, Zap } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -140,11 +140,6 @@ const EnhancedAnalysisCard: React.FC<EnhancedAnalysisCardProps> = ({
     setDeleteDialogOpen(false);
   };
 
-  const handleDownloadPDF = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onDownload(analysis);
-  };
-
   return (
     <>
       <div
@@ -277,16 +272,6 @@ const EnhancedAnalysisCard: React.FC<EnhancedAnalysisCardProps> = ({
               className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800"
             >
               <Eye className="h-4 w-4 text-black dark:text-white" />
-            </Button>
-
-            {/* Download PDF Button */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleDownloadPDF}
-              className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800"
-            >
-              <Download className="h-4 w-4 text-black dark:text-white" />
             </Button>
 
             {/* Delete Button */}

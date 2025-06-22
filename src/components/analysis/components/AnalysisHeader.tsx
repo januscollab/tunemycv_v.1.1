@@ -1,14 +1,13 @@
 
 import React from 'react';
-import { ArrowLeft, Download } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 
 interface AnalysisHeaderProps {
   onStartNew: () => void;
-  onDownloadPDF: () => void;
   readOnly?: boolean;
 }
 
-const AnalysisHeader: React.FC<AnalysisHeaderProps> = ({ onStartNew, onDownloadPDF, readOnly = false }) => {
+const AnalysisHeader: React.FC<AnalysisHeaderProps> = ({ onStartNew, readOnly = false }) => {
   return (
     <div className="bg-gradient-to-r from-surface to-surface-secondary border border-border rounded-2xl p-8 mb-8 shadow-lg backdrop-blur-sm">
       <div className="flex items-center justify-between">
@@ -22,15 +21,6 @@ const AnalysisHeader: React.FC<AnalysisHeaderProps> = ({ onStartNew, onDownloadP
               <span className="text-subheading">Analyze Another CV</span>
             </button>
           )}
-        </div>
-        <div className="flex items-center space-x-4">
-          <button 
-            onClick={onDownloadPDF}
-            className="group flex items-center space-x-3 px-6 py-3 bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl transition-all duration-300 font-normal shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] border border-primary/20"
-          >
-            <Download className="h-5 w-5 transition-transform group-hover:translate-y-0.5" />
-            <span className="text-subheading">Download Report</span>
-          </button>
         </div>
       </div>
     </div>
