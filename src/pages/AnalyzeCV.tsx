@@ -182,7 +182,6 @@ const AnalyzeCV = () => {
         setViewedAnalysis(data);
       }
     } catch (error) {
-      console.error('Error loading analysis:', error);
       toast({
         title: "Error",
         description: "Failed to load analysis details",
@@ -193,8 +192,6 @@ const AnalyzeCV = () => {
 
   // Handle history selection - fixed missing function
   const handleHistorySelect = (analysis: any) => {
-    console.log('History selection:', analysis);
-    
     // Handle PDF data conversion if it exists
     let processedAnalysis = { ...analysis };
     if (analysis.pdf_file_data) {
@@ -211,7 +208,6 @@ const AnalyzeCV = () => {
           }
           processedAnalysis.pdf_file_data = btoa(binaryString);
         } catch (error) {
-          console.error('Error converting PDF data:', error);
           processedAnalysis.pdf_file_data = null;
         }
       }
@@ -280,13 +276,6 @@ const AnalyzeCV = () => {
     const cvJson = (uploadedFiles.cv as any).documentContentJson || {};
     const jobDescriptionJson = (uploadedFiles.jobDescription as any).documentContentJson || {};
 
-    console.log('Starting N8N Analysis with:', {
-      cvFile: (uploadedFiles.cv as any).fileName || 'CV',
-      jdFile: (uploadedFiles.jobDescription as any).fileName || 'Job Description',
-      cvJsonLength: JSON.stringify(cvJson).length,
-      jdJsonLength: JSON.stringify(jobDescriptionJson).length
-    });
-
     try {
       const result = await submitForAnalysis(cvJson, jobDescriptionJson);
       
@@ -305,9 +294,7 @@ const AnalyzeCV = () => {
         }
       }
       
-      console.log('N8N Analysis completed:', result);
     } catch (error) {
-      console.error('N8N Analysis failed:', error);
       toast({
         title: "Analysis Failed",
         description: error instanceof Error ? error.message : "An unexpected error occurred",
@@ -329,7 +316,6 @@ const AnalyzeCV = () => {
   const handleSurveySubmit = (responses: any) => {
     setSurveyResponses(responses);
     // Here you could save the responses to enhance the analysis
-    console.log('Survey responses:', responses);
   };
 
   const handleDeselectAnalysis = () => {

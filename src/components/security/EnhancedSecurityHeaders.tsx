@@ -42,7 +42,7 @@ const EnhancedSecurityHeaders = () => {
     referrerMeta.content = 'strict-origin-when-cross-origin';
     document.head.appendChild(referrerMeta);
 
-    // Enhanced Permissions Policy
+    // Updated Permissions Policy with only supported features
     const permissionsMeta = document.createElement('meta');
     permissionsMeta.httpEquiv = 'Permissions-Policy';
     permissionsMeta.content = [
@@ -55,7 +55,6 @@ const EnhancedSecurityHeaders = () => {
       'magnetometer=()',
       'accelerometer=()',
       'gyroscope=()',
-      'ambient-light-sensor=()',
       'autoplay=()',
       'encrypted-media=()',
       'fullscreen=(self)',

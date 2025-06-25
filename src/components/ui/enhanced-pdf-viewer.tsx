@@ -118,6 +118,10 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
     setError(null);
   };
 
+  const handleDocumentError = () => {
+    setError('Failed to render PDF document');
+  };
+
   if (!workerUrl) {
     return (
       <div className={`bg-surface border border-border rounded-lg p-8 ${className}`}>
@@ -173,16 +177,12 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
       {/* PDF Viewer */}
       <div className="pdf-viewer-container" style={{ height: '600px' }}>
         <Worker workerUrl={workerUrl}>
-          <div
-            style={{ height: '100%' }}
-            onError={() => {
-              setError('Failed to render PDF document');
-            }}
-          >
+          <div style={{ height: '100%' }}>
             <Viewer
               fileUrl={pdfSource}
               plugins={[defaultLayoutPluginInstance]}
               onDocumentLoad={handleDocumentLoad}
+              onLoadError={handleDocumentError}
             />
           </div>
         </Worker>
