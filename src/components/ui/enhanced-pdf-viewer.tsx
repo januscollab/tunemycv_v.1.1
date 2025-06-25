@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Viewer, Worker } from '@react-pdf-viewer/core';
 import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
 import { AlertCircle, Download, Loader2, Bug, CheckCircle } from 'lucide-react';
@@ -35,7 +35,9 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
 
   const addDebugInfo = (message: string) => {
     console.log(`[PDF Viewer Debug]: ${message}`);
-    setDebugInfo(prev => [...prev, `${new Date().toLocaleTimeString()}: ${message}`]);
+    if (debugMode) {
+      setDebugInfo(prev => [...prev, `${new Date().toLocaleTimeString()}: ${message}`]);
+    }
   };
 
   // Configure default layout plugin
@@ -58,47 +60,55 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
   // Determine the best worker URL to use
   useEffect(() => {
     const determineWorkerUrl = () => {
-      addDebugInfo('Starting worker URL determination...');
-      
       const localWorkerUrl = '/assets/pdf.worker.min.js';
       const devWorkerUrl = '/node_modules/pdfjs-dist/build/pdf.worker.min.js';
       
       if (import.meta.env.PROD) {
         setWorkerUrl(localWorkerUrl);
-        addDebugInfo(`Production mode: Using local worker URL: ${localWorkerUrl}`);
+        console.log(`[PDF Viewer Debug]: Production mode: Using local worker URL: ${localWorkerUrl}`);
       } else {
         setWorkerUrl(devWorkerUrl);
-        addDebugInfo(`Development mode: Using dev worker URL: ${devWorkerUrl}`);
+        console.log(`[PDF Viewer Debug]: Development mode: Using dev worker URL: ${devWorkerUrl}`);
       }
     };
 
     determineWorkerUrl();
   }, []);
 
-  // Determine PDF source - SIMPLIFIED: No transformation, just use what's provided
-  const getPdfSource = (): string => {
+  // Memoize PDF source calculation to prevent re-renders
+  const pdfSource = useMemo(() => {
     if (debugMode) {
-      addDebugInfo('Debug mode enabled - no PDF will be loaded');
       return '';
     }
 
     // Priority: pdfUrl first (direct URL), then pdfData (base64)
     if (pdfUrl) {
-      addDebugInfo(`Using PDF URL: ${pdfUrl}`);
       return pdfUrl;
     }
     
     if (pdfData) {
-      addDebugInfo(`Using PDF base64 data, length: ${pdfData.length}`);
       // Use data as-is, only add data URL prefix if not already present
       return pdfData.startsWith('data:') ? pdfData : `data:application/pdf;base64,${pdfData}`;
     }
     
-    addDebugInfo('No PDF source provided');
     return '';
-  };
+  }, [pdfUrl, pdfData, debugMode]);
 
-  const pdfSource = getPdfSource();
+  // Debug logging for PDF source changes (moved to useEffect)
+  useEffect(() => {
+    if (debugMode) {
+      addDebugInfo('Debug mode enabled - no PDF will be loaded');
+      return;
+    }
+
+    if (pdfUrl) {
+      addDebugInfo(`Using PDF URL: ${pdfUrl}`);
+    } else if (pdfData) {
+      addDebugInfo(`Using PDF base64 data, length: ${pdfData.length}`);
+    } else {
+      addDebugInfo('No PDF source provided');
+    }
+  }, [pdfUrl, pdfData, debugMode]);
 
   // Set up loading timeout when we have a source
   useEffect(() => {
