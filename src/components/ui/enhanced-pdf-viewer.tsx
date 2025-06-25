@@ -199,7 +199,7 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
     }
   };
 
-  const handleDocumentLoad = () => {
+  const handleDocumentLoad = (e: any) => {
     addDebugInfo('PDF document loaded successfully');
     setLoading(false);
     setError(null);
@@ -208,15 +208,21 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
     }
   };
 
-  const handleDocumentLoadError = (error: any) => {
-    const errorMsg = error?.message || 'Failed to load PDF document';
-    addDebugInfo(`PDF load error: ${errorMsg}`);
-    setError(errorMsg);
-    setLoading(false);
-    if (loadingTimeoutRef.current) {
-      clearTimeout(loadingTimeoutRef.current);
+  // Handle document load errors by checking if the PDF failed to load
+  useEffect(() => {
+    if (pdfSource && !loading && !error) {
+      // Additional check to ensure PDF actually loaded
+      const checkIfLoaded = setTimeout(() => {
+        if (loading) {
+          addDebugInfo('PDF failed to load within expected time');
+          setError('Failed to load PDF document');
+          setLoading(false);
+        }
+      }, 5000);
+
+      return () => clearTimeout(checkIfLoaded);
     }
-  };
+  }, [pdfSource, loading, error]);
 
   if (!workerUrl) {
     return (
@@ -387,7 +393,6 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
                 fileUrl={pdfSource}
                 plugins={[defaultLayoutPluginInstance]}
                 onDocumentLoad={handleDocumentLoad}
-                onDocumentLoadError={handleDocumentLoadError}
               />
             ) : (
               <div className="flex flex-col items-center justify-center h-full bg-muted/20 text-center p-8">
