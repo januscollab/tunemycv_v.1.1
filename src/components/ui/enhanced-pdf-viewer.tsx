@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Viewer, Worker } from '@react-pdf-viewer/core';
 import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
@@ -68,7 +67,9 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
 
     // Priority: pdfUrl first (direct URL), then pdfData (base64)
     if (pdfUrl) {
-      return pdfUrl;
+      // Use our PDF proxy to serve the PDF with proper CORS headers
+      const proxyUrl = `https://aohrfehhyjdebaatzqdl.supabase.co/functions/v1/pdf-proxy?url=${encodeURIComponent(pdfUrl)}`;
+      return proxyUrl;
     }
     
     if (pdfData) {
