@@ -16,7 +16,7 @@ interface EnhancedPDFViewerProps {
   fileName?: string;
   className?: string;
   onDownload?: () => void;
-  debugMode?: boolean; // New prop for debugging
+  debugMode?: boolean;
 }
 
 export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
@@ -31,7 +31,6 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [workerUrl, setWorkerUrl] = useState<string>('');
   const [debugInfo, setDebugInfo] = useState<string[]>([]);
-  const [pdfSource, setPdfSource] = useState<string>('');
   const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const addDebugInfo = (message: string) => {
@@ -61,13 +60,9 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
     const determineWorkerUrl = () => {
       addDebugInfo('Starting worker URL determination...');
       
-      // Try local worker first (will be available in production build)
       const localWorkerUrl = '/assets/pdf.worker.min.js';
-      
-      // For development, we'll use the node_modules path
       const devWorkerUrl = '/node_modules/pdfjs-dist/build/pdf.worker.min.js';
       
-      // Set the appropriate worker URL based on environment
       if (import.meta.env.PROD) {
         setWorkerUrl(localWorkerUrl);
         addDebugInfo(`Production mode: Using local worker URL: ${localWorkerUrl}`);
@@ -80,126 +75,97 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
     determineWorkerUrl();
   }, []);
 
-  // Process PDF source and set up timeout
+  // Determine PDF source - SIMPLIFIED: No transformation, just use what's provided
+  const getPdfSource = (): string => {
+    if (debugMode) {
+      addDebugInfo('Debug mode enabled - no PDF will be loaded');
+      return '';
+    }
+
+    // Priority: pdfUrl first (direct URL), then pdfData (base64)
+    if (pdfUrl) {
+      addDebugInfo(`Using PDF URL: ${pdfUrl}`);
+      return pdfUrl;
+    }
+    
+    if (pdfData) {
+      addDebugInfo(`Using PDF base64 data, length: ${pdfData.length}`);
+      // Use data as-is, only add data URL prefix if not already present
+      return pdfData.startsWith('data:') ? pdfData : `data:application/pdf;base64,${pdfData}`;
+    }
+    
+    addDebugInfo('No PDF source provided');
+    return '';
+  };
+
+  const pdfSource = getPdfSource();
+
+  // Set up loading timeout when we have a source
   useEffect(() => {
-    if (!workerUrl) return;
+    if (!pdfSource || debugMode) {
+      setLoading(false);
+      return;
+    }
 
-    const preparePdfSource = async () => {
-      addDebugInfo('Starting PDF source preparation...');
-      setLoading(true);
-      setError(null);
-      setPdfSource('');
+    setLoading(true);
+    setError(null);
+    addDebugInfo('Starting PDF load with 10 second timeout');
 
-      // Set up 10-second timeout
+    // Set up 10-second timeout
+    if (loadingTimeoutRef.current) {
+      clearTimeout(loadingTimeoutRef.current);
+    }
+    
+    loadingTimeoutRef.current = setTimeout(() => {
+      addDebugInfo('PDF loading timeout - 10 seconds exceeded');
+      setError('PDF loading timeout. The document may be taking too long to load.');
+      setLoading(false);
+    }, 10000);
+
+    return () => {
       if (loadingTimeoutRef.current) {
         clearTimeout(loadingTimeoutRef.current);
       }
-      
-      loadingTimeoutRef.current = setTimeout(() => {
-        addDebugInfo('PDF loading timeout - 10 seconds exceeded');
-        setError('PDF loading timeout. The document may be corrupted or too large.');
-        setLoading(false);
-      }, 10000);
-
-      try {
-        if (debugMode) {
-          addDebugInfo('Debug mode enabled - skipping PDF loading');
-          setLoading(false);
-          if (loadingTimeoutRef.current) {
-            clearTimeout(loadingTimeoutRef.current);
-          }
-          return;
-        }
-
-        let finalPdfSource = '';
-
-        if (pdfData) {
-          addDebugInfo('Processing base64 PDF data...');
-          
-          // Validate base64 data
-          if (!pdfData || pdfData.length < 100) {
-            throw new Error('Invalid PDF data: too short or empty');
-          }
-          
-          finalPdfSource = pdfData.startsWith('data:') ? pdfData : `data:application/pdf;base64,${pdfData}`;
-          addDebugInfo(`Base64 PDF data prepared, length: ${finalPdfSource.length}`);
-          
-          // Test if base64 is valid
-          try {
-            if (!pdfData.startsWith('data:')) {
-              atob(pdfData); // Test base64 decoding
-            }
-          } catch (decodeError) {
-            throw new Error('Invalid base64 PDF data');
-          }
-          
-        } else if (pdfUrl) {
-          addDebugInfo(`Processing PDF URL: ${pdfUrl}`);
-          
-          // Test the URL accessibility
-          try {
-            const response = await fetch(pdfUrl, { method: 'HEAD' });
-            if (!response.ok) {
-              throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-            addDebugInfo('PDF URL is accessible');
-            finalPdfSource = pdfUrl;
-          } catch (fetchError) {
-            addDebugInfo(`URL fetch error: ${fetchError.message}`);
-            throw new Error(`Cannot access PDF URL: ${fetchError.message}`);
-          }
-        } else {
-          throw new Error('No PDF data or URL provided');
-        }
-
-        addDebugInfo(`Setting PDF source: ${finalPdfSource.substring(0, 100)}...`);
-        setPdfSource(finalPdfSource);
-        
-        // Don't set loading to false here - let onDocumentLoad handle it
-        addDebugInfo('PDF source set, waiting for document load...');
-        
-      } catch (err) {
-        const errorMsg = err instanceof Error ? err.message : 'Failed to load PDF document';
-        addDebugInfo(`Error in preparePdfSource: ${errorMsg}`);
-        setError(errorMsg);
-        setLoading(false);
-        if (loadingTimeoutRef.current) {
-          clearTimeout(loadingTimeoutRef.current);
-        }
-      }
     };
+  }, [pdfSource, debugMode]);
 
-    preparePdfSource();
-  }, [pdfData, pdfUrl, workerUrl, debugMode]);
-
+  // SIMPLIFIED download function - fixed the scoping issue
   const handleDownload = () => {
     addDebugInfo('Download button clicked');
+    
     if (onDownload) {
       onDownload();
       return;
     }
 
     // Fallback download logic
-    if (pdfData) {
-      const base64Data = pdfData.startsWith('data:') ? pdfData : `data:application/pdf;base64,${pdfData}`;
-      const link = document.createElement('a');
-      link.href = base64Data;
-      link.download = fileName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } else if (pdfUrl) {
-      const link = document.createElement('a');
-      link.href = pdfUrl;
-      link.download = fileName;
-      link.target = '_blank';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+    try {
+      if (pdfUrl) {
+        // For URL, open in new tab for download
+        const link = document.createElement('a');
+        link.href = pdfUrl;
+        link.download = fileName;
+        link.target = '_blank';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else if (pdfData) {
+        // For base64 data, create download link
+        const base64Data = pdfData.startsWith('data:') ? pdfData : `data:application/pdf;base64,${pdfData}`;
+        const link = document.createElement('a');
+        link.href = base64Data;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    } catch (error) {
+      console.error('Download failed:', error);
+      addDebugInfo(`Download failed: ${error.message}`);
     }
   };
 
-  const handleDocumentLoad = (e: any) => {
+  const handleDocumentLoad = () => {
     addDebugInfo('PDF document loaded successfully');
     setLoading(false);
     setError(null);
@@ -208,21 +174,15 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
     }
   };
 
-  // Handle document load errors by checking if the PDF failed to load
-  useEffect(() => {
-    if (pdfSource && !loading && !error) {
-      // Additional check to ensure PDF actually loaded
-      const checkIfLoaded = setTimeout(() => {
-        if (loading) {
-          addDebugInfo('PDF failed to load within expected time');
-          setError('Failed to load PDF document');
-          setLoading(false);
-        }
-      }, 5000);
-
-      return () => clearTimeout(checkIfLoaded);
+  const handleDocumentLoadError = (error: any) => {
+    const errorMsg = error?.message || 'Failed to load PDF document';
+    addDebugInfo(`PDF load error: ${errorMsg}`);
+    setError(errorMsg);
+    setLoading(false);
+    if (loadingTimeoutRef.current) {
+      clearTimeout(loadingTimeoutRef.current);
     }
-  }, [pdfSource, loading, error]);
+  };
 
   if (!workerUrl) {
     return (
@@ -230,15 +190,20 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
         <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
           <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
           <p className="text-muted-foreground">Initializing PDF viewer...</p>
-          {debugMode && (
-            <div className="mt-4 text-left text-xs text-muted-foreground max-w-lg">
-              <h4 className="font-semibold mb-2">Debug Info:</h4>
-              <div className="bg-muted/50 p-2 rounded text-xs">
-                Worker URL not yet determined...
-              </div>
-            </div>
-          )}
         </div>
+      </div>
+    );
+  }
+
+  if (!pdfSource && !debugMode) {
+    return (
+      <div className={`bg-surface border border-border rounded-lg p-8 ${className}`}>
+        <Alert variant="destructive" className="mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            No PDF source provided. Please provide either pdfData or pdfUrl.
+          </AlertDescription>
+        </Alert>
       </div>
     );
   }
@@ -256,9 +221,6 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
                 {debugInfo.map((info, idx) => (
                   <div key={idx}>{info}</div>
                 ))}
-              </div>
-              <div className="mt-2 text-xs">
-                <strong>PDF Source:</strong> {pdfSource ? `${pdfSource.substring(0, 50)}...` : 'Not set'}
               </div>
             </div>
           )}
@@ -332,26 +294,9 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
               </div>
             </div>
             <div>
-              <strong>Environment:</strong>
-              <div className="bg-background p-2 rounded mt-1">
-                {import.meta.env.PROD ? 'Production' : 'Development'}
-              </div>
-            </div>
-            <div>
-              <strong>Props:</strong>
-              <div className="bg-background p-2 rounded mt-1">
-                PDF Data: {pdfData ? 'Present' : 'None'}<br/>
-                PDF URL: {pdfUrl || 'None'}<br/>
-                File Name: {fileName}
-              </div>
-            </div>
-            <div>
-              <strong>Status:</strong>
-              <div className="bg-background p-2 rounded mt-1">
-                Loading: {loading.toString()}<br/>
-                Error: {error || 'None'}<br/>
-                Worker: {workerUrl ? 'Ready' : 'Not Ready'}<br/>
-                PDF Source: {pdfSource ? 'Set' : 'Not Set'}
+              <strong>PDF Source:</strong>
+              <div className="bg-background p-2 rounded mt-1 break-all">
+                {pdfSource ? `${pdfSource.substring(0, 100)}...` : 'None'}
               </div>
             </div>
           </div>
@@ -366,7 +311,7 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
         </div>
       )}
 
-      {/* PDF Viewer or Debug Placeholder */}
+      {/* PDF Viewer */}
       <div className="pdf-viewer-container" style={{ height: '600px' }}>
         <Worker workerUrl={workerUrl}>
           <div style={{ height: '100%' }}>
@@ -379,29 +324,19 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
                   Worker URL is set and the layout plugin is ready.
                 </p>
                 <div className="text-sm text-muted-foreground bg-background p-4 rounded border">
-                  <strong>Next Steps:</strong><br/>
-                  • Basic viewer structure: ✅ Working<br/>
-                  • PDF.js Worker: ✅ Initialized<br/>
+                  <strong>Ready to display PDF!</strong><br/>
+                  • PDF.js Worker: ✅ {workerUrl ? 'Loaded' : 'Not Ready'}<br/>
+                  • PDF Source: ✅ {pdfSource ? 'Available' : 'Not Set'}<br/>
                   • Layout Plugin: ✅ Configured<br/>
-                  • CSS Styles: ✅ Loaded<br/>
-                  <br/>
-                  Ready to test with actual PDF content!
                 </div>
               </div>
-            ) : pdfSource ? (
+            ) : (
               <Viewer
                 fileUrl={pdfSource}
                 plugins={[defaultLayoutPluginInstance]}
                 onDocumentLoad={handleDocumentLoad}
+                onDocumentLoadError={handleDocumentLoadError}
               />
-            ) : (
-              <div className="flex flex-col items-center justify-center h-full bg-muted/20 text-center p-8">
-                <AlertCircle className="h-16 w-16 text-orange-500 mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No PDF Source</h3>
-                <p className="text-muted-foreground">
-                  PDF source is being prepared...
-                </p>
-              </div>
             )}
           </div>
         </Worker>
