@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { CheckCircle, Download, ArrowLeft, Bug, X, Send } from 'lucide-react';
 
@@ -206,11 +207,10 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
             </div>
           )}
 
-          {/* PDF Viewer - testing with test PDF URL */}
+          {/* PDF Viewer - Use only the working n8n_pdf_url */}
           <div className="mb-8">
             <EnhancedPDFViewer
-              pdfData={result.pdf_file_data}
-              pdfUrl={result.n8n_pdf_url || "https://aohrfehhyjdebaatzqdl.supabase.co/storage/v1/object/public/n8n-bucket/response/test-output.pdf"}
+              pdfUrl={result.n8n_pdf_url}
               fileName={`CV_Analysis_${result.job_title || 'Report'}_${new Date().toISOString().split('T')[0]}.pdf`}
               onDownload={() => {
                 // Use existing download logic
