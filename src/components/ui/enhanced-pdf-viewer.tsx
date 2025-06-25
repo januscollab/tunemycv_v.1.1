@@ -29,10 +29,12 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
 }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [workerUrl, setWorkerUrl] = useState<string>('');
   const [debugInfo, setDebugInfo] = useState<string[]>([]);
   const [showFallback, setShowFallback] = useState(false);
   const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Use the correct worker URL that matches our pdfjs-dist version (5.3.31)
+  const workerUrl = 'https://unpkg.com/pdfjs-dist@5.3.31/build/pdf.worker.min.js';
 
   const addDebugInfo = (message: string) => {
     console.log(`[PDF Viewer Debug]: ${message}`);
@@ -56,31 +58,6 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
         clearTimeout(loadingTimeoutRef.current);
       }
     };
-  }, []);
-
-  // Check if PDF worker exists and determine the best worker URL to use
-  useEffect(() => {
-    const checkWorkerAndSetUrl = async () => {
-      const localWorkerUrl = '/assets/pdf.worker.min.js';
-      const cdnWorkerUrl = 'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
-      
-      try {
-        // Try to fetch the local worker file
-        const response = await fetch(localWorkerUrl, { method: 'HEAD' });
-        if (response.ok) {
-          setWorkerUrl(localWorkerUrl);
-          addDebugInfo(`Using local worker URL: ${localWorkerUrl}`);
-        } else {
-          throw new Error('Local worker not found');
-        }
-      } catch (error) {
-        // Fallback to CDN worker
-        setWorkerUrl(cdnWorkerUrl);
-        addDebugInfo(`Local worker not found, using CDN worker: ${cdnWorkerUrl}`);
-      }
-    };
-
-    checkWorkerAndSetUrl();
   }, []);
 
   // Memoize PDF source calculation to prevent re-renders
@@ -109,6 +86,8 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
       return;
     }
 
+    addDebugInfo(`Using worker URL: ${workerUrl}`);
+    
     if (pdfUrl) {
       addDebugInfo(`Using PDF URL: ${pdfUrl}`);
     } else if (pdfData) {
@@ -116,7 +95,7 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
     } else {
       addDebugInfo('No PDF source provided');
     }
-  }, [pdfUrl, pdfData, debugMode]);
+  }, [pdfUrl, pdfData, debugMode, workerUrl]);
 
   // Set up loading timeout when we have a source
   useEffect(() => {
@@ -185,16 +164,15 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
     }
   };
 
-  if (!workerUrl) {
-    return (
-      <div className={`bg-surface border border-border rounded-lg p-8 ${className}`}>
-        <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
-          <p className="text-muted-foreground">Initializing PDF viewer...</p>
-        </div>
-      </div>
-    );
-  }
+  const handleLoadError = (error: any) => {
+    addDebugInfo(`PDF load error: ${error.message || 'Unknown error'}`);
+    setError('Failed to load PDF document');
+    setLoading(false);
+    setShowFallback(true);
+    if (loadingTimeoutRef.current) {
+      clearTimeout(loadingTimeoutRef.current);
+    }
+  };
 
   if (!pdfSource && !debugMode) {
     return (
@@ -271,7 +249,7 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
               <div>
                 <strong>Worker URL:</strong>
                 <div className="bg-background p-2 rounded mt-1 font-mono break-all">
-                  {workerUrl || 'Not set'}
+                  {workerUrl}
                 </div>
               </div>
               <div>
@@ -364,6 +342,7 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
                 fileUrl={pdfSource}
                 plugins={[defaultLayoutPluginInstance]}
                 onDocumentLoad={handleDocumentLoad}
+                onLoadError={handleLoadError}
               />
             )}
           </div>
