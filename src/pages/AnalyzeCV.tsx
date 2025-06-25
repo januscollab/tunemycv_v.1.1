@@ -35,7 +35,6 @@ import { CaptureInput } from '@/components/ui/capture-input';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Breadcrumbs from '@/components/navigation/Breadcrumbs';
 import StepIndicator from '@/components/ui/step-indicator';
-import N8nDebugModal from '@/components/debug/N8nDebugModal';
 import EnhancedAnalysisHistory from '@/components/analysis/EnhancedAnalysisHistory';
 
 const AnalyzeCV = () => {
@@ -73,9 +72,6 @@ const AnalyzeCV = () => {
   const [showSurveyModal, setShowSurveyModal] = useState(false);
   const { saveSoftSkills, dismissSurvey, shouldShowSurvey } = useSoftSkills();
   
-  // N8N Debug states
-  const [showN8nDebugModal, setShowN8nDebugModal] = useState(false);
-  const [n8nDebugData, setN8nDebugData] = useState<any>(null);
   const { submitForAnalysis, isProcessing } = useN8nAnalysis();
   
   // Get initial tab from URL parameter or location state
@@ -294,9 +290,6 @@ const AnalyzeCV = () => {
     try {
       const result = await submitForAnalysis(cvJson, jobDescriptionJson);
       
-      // Store debug data for the modal
-      setN8nDebugData(result);
-      
       // Create analysis result for display
       if (result.success && result.analysisResultId) {
         // Load the stored analysis result
@@ -311,9 +304,6 @@ const AnalyzeCV = () => {
           setActiveTab('view-analysis');
         }
       }
-      
-      // Show the debug modal
-      setShowN8nDebugModal(true);
       
       console.log('N8N Analysis completed:', result);
     } catch (error) {
@@ -650,17 +640,6 @@ const AnalyzeCV = () => {
         <InterviewPrepModal
           isOpen={showInterviewPrepModal}
           onClose={() => setShowInterviewPrepModal(false)}
-        />
-
-        {/* N8N Debug Modal */}
-        <N8nDebugModal
-          open={showN8nDebugModal}
-          onOpenChange={setShowN8nDebugModal}
-          debugInfo={n8nDebugData?.debugInfo}
-          testFiles={n8nDebugData?.test_files}
-          pdfData={n8nDebugData?.pdfData}
-          htmlData={n8nDebugData?.htmlData}
-          retryLogs={n8nDebugData?.retryLogs}
         />
       </div>
     </>
