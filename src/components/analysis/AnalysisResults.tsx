@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { CheckCircle, Download, ArrowLeft, Bug, X, Send } from 'lucide-react';
 
@@ -207,15 +206,11 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
             </div>
           )}
 
-          {/* PDF Viewer - Use only the working n8n_pdf_url */}
+          {/* PDF Viewer - Remove the onDownload prop to let viewer handle downloads internally */}
           <div className="mb-8">
             <EnhancedPDFViewer
               pdfUrl={result.n8n_pdf_url}
               fileName={`CV_Analysis_${result.job_title || 'Report'}_${new Date().toISOString().split('T')[0]}.pdf`}
-              onDownload={() => {
-                // Use existing download logic
-                downloadAnalysisAsText();
-              }}
               debugMode={false}
             />
           </div>
