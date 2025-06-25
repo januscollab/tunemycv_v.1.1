@@ -153,13 +153,6 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
     setError(null);
   };
 
-  const handleDocumentLoadError = (error: any) => {
-    const errorMsg = error?.message || 'Failed to load PDF document';
-    addDebugInfo(`PDF load error: ${errorMsg}`);
-    setError(errorMsg);
-    setLoading(false);
-  };
-
   if (!workerUrl) {
     return (
       <div className={`bg-surface border border-border rounded-lg p-8 ${className}`}>
@@ -325,7 +318,6 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
                 fileUrl={pdfData ? (pdfData.startsWith('data:') ? pdfData : `data:application/pdf;base64,${pdfData}`) : pdfUrl || ''}
                 plugins={[defaultLayoutPluginInstance]}
                 onDocumentLoad={handleDocumentLoad}
-                onDocumentLoadError={handleDocumentLoadError}
               />
             )}
           </div>
