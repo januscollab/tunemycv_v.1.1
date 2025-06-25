@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Viewer, Worker } from '@react-pdf-viewer/core';
 import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
-import { AlertCircle, Download, Loader2, Bug, CheckCircle } from 'lucide-react';
+import { AlertCircle, Download, Loader2, Bug, CheckCircle, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
@@ -31,6 +31,7 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [workerUrl, setWorkerUrl] = useState<string>('');
   const [debugInfo, setDebugInfo] = useState<string[]>([]);
+  const [showFallback, setShowFallback] = useState(false);
   const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const addDebugInfo = (message: string) => {
@@ -57,22 +58,29 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
     };
   }, []);
 
-  // Determine the best worker URL to use
+  // Check if PDF worker exists and determine the best worker URL to use
   useEffect(() => {
-    const determineWorkerUrl = () => {
+    const checkWorkerAndSetUrl = async () => {
       const localWorkerUrl = '/assets/pdf.worker.min.js';
-      const devWorkerUrl = '/node_modules/pdfjs-dist/build/pdf.worker.min.js';
+      const cdnWorkerUrl = 'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
       
-      if (import.meta.env.PROD) {
-        setWorkerUrl(localWorkerUrl);
-        console.log(`[PDF Viewer Debug]: Production mode: Using local worker URL: ${localWorkerUrl}`);
-      } else {
-        setWorkerUrl(devWorkerUrl);
-        console.log(`[PDF Viewer Debug]: Development mode: Using dev worker URL: ${devWorkerUrl}`);
+      try {
+        // Try to fetch the local worker file
+        const response = await fetch(localWorkerUrl, { method: 'HEAD' });
+        if (response.ok) {
+          setWorkerUrl(localWorkerUrl);
+          addDebugInfo(`Using local worker URL: ${localWorkerUrl}`);
+        } else {
+          throw new Error('Local worker not found');
+        }
+      } catch (error) {
+        // Fallback to CDN worker
+        setWorkerUrl(cdnWorkerUrl);
+        addDebugInfo(`Local worker not found, using CDN worker: ${cdnWorkerUrl}`);
       }
     };
 
-    determineWorkerUrl();
+    checkWorkerAndSetUrl();
   }, []);
 
   // Memoize PDF source calculation to prevent re-renders
@@ -94,7 +102,7 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
     return '';
   }, [pdfUrl, pdfData, debugMode]);
 
-  // Debug logging for PDF source changes (moved to useEffect)
+  // Debug logging for PDF source changes
   useEffect(() => {
     if (debugMode) {
       addDebugInfo('Debug mode enabled - no PDF will be loaded');
@@ -119,6 +127,7 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
 
     setLoading(true);
     setError(null);
+    setShowFallback(false);
     addDebugInfo('Starting PDF load with 10 second timeout');
 
     // Set up 10-second timeout
@@ -127,9 +136,10 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
     }
     
     loadingTimeoutRef.current = setTimeout(() => {
-      addDebugInfo('PDF loading timeout - 10 seconds exceeded');
+      addDebugInfo('PDF loading timeout - 10 seconds exceeded, showing fallback');
       setError('PDF loading timeout. The document may be taking too long to load.');
       setLoading(false);
+      setShowFallback(true);
     }, 10000);
 
     return () => {
@@ -139,39 +149,29 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
     };
   }, [pdfSource, debugMode]);
 
-  // SIMPLIFIED download function
-  const handleDownload = () => {
-    addDebugInfo('Download button clicked');
+  // Direct download function that opens PDF in new tab
+  const handleDirectDownload = () => {
+    addDebugInfo('Direct download/view button clicked');
     
     if (onDownload) {
       onDownload();
       return;
     }
 
-    // Fallback download logic
-    try {
-      if (pdfUrl) {
-        // For URL, open in new tab for download
-        const link = document.createElement('a');
-        link.href = pdfUrl;
-        link.download = fileName;
-        link.target = '_blank';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      } else if (pdfData) {
-        // For base64 data, create download link
-        const base64Data = pdfData.startsWith('data:') ? pdfData : `data:application/pdf;base64,${pdfData}`;
-        const link = document.createElement('a');
-        link.href = base64Data;
-        link.download = fileName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }
-    } catch (error) {
-      console.error('Download failed:', error);
-      addDebugInfo(`Download failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    // Fallback: open PDF URL in new tab
+    if (pdfUrl) {
+      window.open(pdfUrl, '_blank');
+      addDebugInfo('Opened PDF URL in new tab');
+    } else if (pdfData) {
+      // For base64 data, create download link
+      const base64Data = pdfData.startsWith('data:') ? pdfData : `data:application/pdf;base64,${pdfData}`;
+      const link = document.createElement('a');
+      link.href = base64Data;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      addDebugInfo('Downloaded base64 PDF data');
     }
   };
 
@@ -179,6 +179,7 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
     addDebugInfo('PDF document loaded successfully');
     setLoading(false);
     setError(null);
+    setShowFallback(false);
     if (loadingTimeoutRef.current) {
       clearTimeout(loadingTimeoutRef.current);
     }
@@ -208,12 +209,101 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
     );
   }
 
+  // Show fallback when PDF fails to load
+  if (showFallback || error) {
+    return (
+      <div className={`bg-surface border border-border rounded-lg overflow-hidden ${className}`}>
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b border-border bg-surface-secondary">
+          <h3 className="text-sm font-medium text-foreground">PDF Report</h3>
+          <Button onClick={handleDirectDownload} variant="outline" size="sm">
+            <ExternalLink className="h-4 w-4 mr-2" />
+            View PDF
+          </Button>
+        </div>
+
+        {/* Fallback Content */}
+        <div className="p-8 text-center">
+          <AlertCircle className="h-12 w-12 text-orange-500 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold mb-2">PDF Viewer Not Available</h3>
+          <p className="text-muted-foreground mb-6">
+            The PDF couldn't be displayed in the browser, but you can still access it directly.
+          </p>
+          
+          <div className="space-y-3">
+            <Button onClick={handleDirectDownload} className="w-full max-w-xs">
+              <ExternalLink className="h-4 w-4 mr-2" />
+              Open PDF in New Tab
+            </Button>
+            
+            {pdfUrl && (
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  const link = document.createElement('a');
+                  link.href = pdfUrl;
+                  link.download = fileName;
+                  link.click();
+                }}
+                className="w-full max-w-xs"
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Download PDF
+              </Button>
+            )}
+          </div>
+
+          {error && (
+            <Alert className="mt-6 max-w-md mx-auto">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription className="text-sm">
+                {error}
+              </AlertDescription>
+            </Alert>
+          )}
+        </div>
+
+        {/* Debug Info Panel */}
+        {debugMode && (
+          <div className="p-4 bg-muted/50 border-t border-border">
+            <h4 className="text-sm font-semibold mb-2">Debug Information</h4>
+            <div className="text-xs space-y-2">
+              <div>
+                <strong>Worker URL:</strong>
+                <div className="bg-background p-2 rounded mt-1 font-mono break-all">
+                  {workerUrl || 'Not set'}
+                </div>
+              </div>
+              <div>
+                <strong>PDF Source:</strong>
+                <div className="bg-background p-2 rounded mt-1 break-all">
+                  {pdfSource ? `${pdfSource.substring(0, 100)}...` : 'None'}
+                </div>
+              </div>
+              <div>
+                <strong>Debug Log:</strong>
+                <div className="bg-background p-2 rounded mt-1 max-h-32 overflow-auto">
+                  {debugInfo.map((info, idx) => (
+                    <div key={idx} className="py-0.5">{info}</div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className={`bg-surface border border-border rounded-lg p-8 ${className}`}>
         <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
           <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
           <p className="text-muted-foreground">Loading PDF document...</p>
+          <p className="text-xs text-muted-foreground mt-2">
+            If this takes too long, a fallback download option will appear
+          </p>
           {debugMode && (
             <div className="mt-4 text-left text-xs text-muted-foreground max-w-lg">
               <h4 className="font-semibold mb-2">Debug Info:</h4>
@@ -225,35 +315,6 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
             </div>
           )}
         </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className={`bg-surface border border-border rounded-lg p-8 ${className}`}>
-        <Alert variant="destructive" className="mb-4">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            {error}
-          </AlertDescription>
-        </Alert>
-        <div className="flex justify-center">
-          <Button onClick={handleDownload} variant="outline">
-            <Download className="h-4 w-4 mr-2" />
-            Download PDF Instead
-          </Button>
-        </div>
-        {debugMode && (
-          <div className="mt-4 text-left text-xs text-muted-foreground">
-            <h4 className="font-semibold mb-2">Debug Info:</h4>
-            <div className="bg-muted/50 p-2 rounded text-xs max-h-32 overflow-auto">
-              {debugInfo.map((info, idx) => (
-                <div key={idx}>{info}</div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     );
   }
@@ -272,44 +333,12 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
               Debug Mode
             </div>
           )}
-          <Button onClick={handleDownload} variant="outline" size="sm">
+          <Button onClick={handleDirectDownload} variant="outline" size="sm">
             <Download className="h-4 w-4 mr-2" />
             Download
           </Button>
         </div>
       </div>
-
-      {/* Debug Info Panel */}
-      {debugMode && (
-        <div className="p-4 bg-muted/50 border-b border-border">
-          <h4 className="text-sm font-semibold mb-2 flex items-center gap-2">
-            <CheckCircle className="h-4 w-4 text-green-600" />
-            Debug Information
-          </h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-            <div>
-              <strong>Worker URL:</strong>
-              <div className="bg-background p-2 rounded mt-1 font-mono break-all">
-                {workerUrl || 'Not set'}
-              </div>
-            </div>
-            <div>
-              <strong>PDF Source:</strong>
-              <div className="bg-background p-2 rounded mt-1 break-all">
-                {pdfSource ? `${pdfSource.substring(0, 100)}...` : 'None'}
-              </div>
-            </div>
-          </div>
-          <div className="mt-4">
-            <strong>Debug Log:</strong>
-            <div className="bg-background p-2 rounded mt-1 max-h-32 overflow-auto text-xs">
-              {debugInfo.map((info, idx) => (
-                <div key={idx} className="py-0.5">{info}</div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* PDF Viewer */}
       <div className="pdf-viewer-container" style={{ height: '600px' }}>
