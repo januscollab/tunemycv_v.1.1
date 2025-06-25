@@ -91,13 +91,24 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
             addDebugInfo('Base64 PDF data prepared');
           } else if (pdfUrl) {
             addDebugInfo(`Processing PDF URL: ${pdfUrl}`);
+            // Test the URL accessibility
+            try {
+              const response = await fetch(pdfUrl, { method: 'HEAD' });
+              if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+              }
+              addDebugInfo('PDF URL is accessible');
+            } catch (fetchError) {
+              addDebugInfo(`URL fetch error: ${fetchError.message}`);
+              throw new Error(`Cannot access PDF URL: ${fetchError.message}`);
+            }
           } else {
             addDebugInfo('No PDF data or URL provided');
             setError('No PDF data or URL provided');
             return;
           }
         } catch (err) {
-          const errorMsg = 'Failed to load PDF document';
+          const errorMsg = err instanceof Error ? err.message : 'Failed to load PDF document';
           addDebugInfo(`Error: ${errorMsg}`);
           setError(errorMsg);
         } finally {
@@ -140,6 +151,13 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
     addDebugInfo('PDF document loaded successfully');
     setLoading(false);
     setError(null);
+  };
+
+  const handleDocumentLoadError = (error: any) => {
+    const errorMsg = error?.message || 'Failed to load PDF document';
+    addDebugInfo(`PDF load error: ${errorMsg}`);
+    setError(errorMsg);
+    setLoading(false);
   };
 
   if (!workerUrl) {
@@ -307,6 +325,7 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
                 fileUrl={pdfData ? (pdfData.startsWith('data:') ? pdfData : `data:application/pdf;base64,${pdfData}`) : pdfUrl || ''}
                 plugins={[defaultLayoutPluginInstance]}
                 onDocumentLoad={handleDocumentLoad}
+                onDocumentLoadError={handleDocumentLoadError}
               />
             )}
           </div>

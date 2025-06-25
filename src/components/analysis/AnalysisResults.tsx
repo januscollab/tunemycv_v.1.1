@@ -206,17 +206,17 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
             </div>
           )}
 
-          {/* PDF Viewer in Debug Mode - temporarily set debugMode to true */}
+          {/* PDF Viewer - testing with test PDF URL */}
           <div className="mb-8">
             <EnhancedPDFViewer
               pdfData={result.pdf_file_data}
-              pdfUrl={result.n8n_pdf_url}
+              pdfUrl={result.n8n_pdf_url || "https://aohrfehhyjdebaatzqdl.supabase.co/storage/v1/object/public/n8n-bucket/response/test-output.pdf"}
               fileName={`CV_Analysis_${result.job_title || 'Report'}_${new Date().toISOString().split('T')[0]}.pdf`}
               onDownload={() => {
                 // Use existing download logic
                 downloadAnalysisAsText();
               }}
-              debugMode={true}
+              debugMode={false}
             />
           </div>
 
