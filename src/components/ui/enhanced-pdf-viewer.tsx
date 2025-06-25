@@ -129,7 +129,7 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
     };
   }, [pdfSource, debugMode]);
 
-  // SIMPLIFIED download function - fixed the scoping issue
+  // SIMPLIFIED download function
   const handleDownload = () => {
     addDebugInfo('Download button clicked');
     
@@ -161,7 +161,7 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
       }
     } catch (error) {
       console.error('Download failed:', error);
-      addDebugInfo(`Download failed: ${error.message}`);
+      addDebugInfo(`Download failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
@@ -169,16 +169,6 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
     addDebugInfo('PDF document loaded successfully');
     setLoading(false);
     setError(null);
-    if (loadingTimeoutRef.current) {
-      clearTimeout(loadingTimeoutRef.current);
-    }
-  };
-
-  const handleDocumentLoadError = (error: any) => {
-    const errorMsg = error?.message || 'Failed to load PDF document';
-    addDebugInfo(`PDF load error: ${errorMsg}`);
-    setError(errorMsg);
-    setLoading(false);
     if (loadingTimeoutRef.current) {
       clearTimeout(loadingTimeoutRef.current);
     }
@@ -335,7 +325,6 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
                 fileUrl={pdfSource}
                 plugins={[defaultLayoutPluginInstance]}
                 onDocumentLoad={handleDocumentLoad}
-                onDocumentLoadError={handleDocumentLoadError}
               />
             )}
           </div>
