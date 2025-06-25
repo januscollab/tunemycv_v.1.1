@@ -76,7 +76,6 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
           return;
         }
       } catch (err) {
-        console.error('Error preparing PDF source:', err);
         setError('Failed to load PDF document');
       } finally {
         setLoading(false);
@@ -177,7 +176,6 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
           <div
             style={{ height: '100%' }}
             onError={() => {
-              console.error('PDF rendering error');
               setError('Failed to render PDF document');
             }}
           >

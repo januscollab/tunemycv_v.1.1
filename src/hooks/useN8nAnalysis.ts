@@ -3,16 +3,6 @@ import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
-interface RetryLog {
-  url: string;
-  attempt: number;
-  timestamp: number;
-  status: 'success' | 'failed' | 'error';
-  statusCode?: number;
-  error?: string;
-  delay?: number;
-}
-
 interface N8nAnalysisResponse {
   success: boolean;
   message: string;
@@ -23,13 +13,6 @@ interface N8nAnalysisResponse {
   pdfData?: string | null;
   htmlData?: string | null;
   error?: string;
-  debugInfo?: {
-    networkTest: string;
-    webhookStatus: string;
-    webhookResponse: any;
-    webhookError: string | null;
-  };
-  retryLogs?: RetryLog[];
   analysisResultId?: string;
 }
 
@@ -44,11 +27,6 @@ export const useN8nAnalysis = () => {
     setIsProcessing(true);
     
     try {
-      console.log('=== N8N ANALYSIS DEBUG START ===');
-      console.log('Submitting CV and JD JSON to n8n webhook...');
-      console.log('CV JSON length:', JSON.stringify(cvJson).length);
-      console.log('JD JSON length:', JSON.stringify(jobDescriptionJson).length);
-      
       // Create JSON files as Blob objects
       const cvBlob = new Blob([JSON.stringify(cvJson, null, 2)], { 
         type: 'application/json' 
@@ -57,34 +35,13 @@ export const useN8nAnalysis = () => {
         type: 'application/json' 
       });
 
-      console.log('Created blobs - CV:', cvBlob.size, 'bytes, JD:', jdBlob.size, 'bytes');
-
       // Create form data with correct field names
       const formData = new FormData();
       formData.append('cv', cvBlob, 'cv.json');
       formData.append('jd', jdBlob, 'job_description.json');
-
-      console.log('FormData created with cv and jd fields');
-
-      // Test network connectivity first
-      console.log('Testing network connectivity...');
-      let networkTestResult = 'unknown';
-      try {
-        const testResponse = await fetch('https://httpbin.org/get', { method: 'GET' });
-        networkTestResult = `success: ${testResponse.status}`;
-        console.log('Network test successful:', testResponse.status);
-      } catch (networkError) {
-        networkTestResult = `failed: ${networkError.message}`;
-        console.error('Network connectivity test failed:', networkError);
-      }
-      
-      console.log('Sending request to n8n webhook: https://januscollab.app.n8n.cloud/webhook/cv-analysis');
-      console.log('Request method: POST');
-      console.log('Request headers: FormData (auto-generated)');
       
       let webhookResponse = null;
       let webhookError = null;
-      let webhookStatus = 'unknown';
       
       try {
         const response = await fetch('https://januscollab.app.n8n.cloud/webhook/cv-analysis', {
@@ -92,89 +49,40 @@ export const useN8nAnalysis = () => {
           body: formData,
         });
 
-        webhookStatus = `${response.status} ${response.statusText}`;
-        console.log('n8n response received!');
-        console.log('Response status:', response.status);
-        console.log('Response statusText:', response.statusText);
-        console.log('Response headers:', Object.fromEntries(response.headers.entries()));
-
         if (!response.ok) {
           let responseText = '';
           try {
             responseText = await response.text();
-            console.error('n8n error response body:', responseText);
           } catch (textError) {
-            console.error('Could not read error response text:', textError);
+            // Silent fail
           }
           webhookError = `HTTP ${response.status}: ${responseText}`;
-          console.error(`n8n HTTP error! Status: ${response.status} ${response.statusText}. Response: ${responseText}`);
         } else {
           webhookResponse = await response.json();
-          console.log('n8n response received:', webhookResponse);
         }
       } catch (error) {
         webhookError = error instanceof Error ? error.message : 'Unknown webhook error';
-        console.error('Webhook call failed:', error);
       }
 
-      // Always fetch test files regardless of webhook success/failure
-      console.log('Fetching test files from public bucket...');
+      // Fetch test files from public bucket
       let pdfData: string | null = null;
       let htmlData: string | null = null;
-      const retryLogs: RetryLog[] = [];
 
-      // Helper function for retrying file downloads with detailed logging
+      // Helper function for retrying file downloads
       const downloadWithRetry = async (url: string, maxRetries = 3): Promise<Response | null> => {
         for (let attempt = 1; attempt <= maxRetries; attempt++) {
-          const startTime = Date.now();
-          
           try {
-            console.log(`Attempting to fetch ${url} (attempt ${attempt}/${maxRetries})`);
             const response = await fetch(url);
             
             if (response.ok) {
-              console.log(`Successfully fetched ${url} on attempt ${attempt}`);
-              retryLogs.push({
-                url,
-                attempt,
-                timestamp: startTime,
-                status: 'success',
-                statusCode: response.status
-              });
               return response;
-            } else {
-              console.warn(`Failed to fetch ${url} on attempt ${attempt}: ${response.status}`);
-              retryLogs.push({
-                url,
-                attempt,
-                timestamp: startTime,
-                status: 'failed',
-                statusCode: response.status,
-                error: `HTTP ${response.status}: ${response.statusText}`
-              });
             }
           } catch (error) {
-            console.warn(`Error fetching ${url} on attempt ${attempt}:`, error);
-            retryLogs.push({
-              url,
-              attempt,
-              timestamp: startTime,
-              status: 'error',
-              error: error instanceof Error ? error.message : 'Unknown error'
-            });
+            // Silent fail on errors
           }
           
           // Wait 1 second before retry (except on last attempt)
           if (attempt < maxRetries) {
-            console.log('Waiting 1 second before retry...');
-            retryLogs.push({
-              url,
-              attempt,
-              timestamp: Date.now(),
-              status: 'failed',
-              delay: 1000,
-              error: 'Waiting 1 second before retry'
-            });
             await new Promise(resolve => setTimeout(resolve, 1000));
           }
         }
@@ -186,44 +94,22 @@ export const useN8nAnalysis = () => {
         const htmlResponse = await downloadWithRetry('https://aohrfehhyjdebaatzqdl.supabase.co/storage/v1/object/public/n8n-bucket/response/test-output.html');
         if (htmlResponse) {
           htmlData = await htmlResponse.text();
-          console.log('Test HTML file downloaded successfully');
-        } else {
-          console.error('Failed to fetch test HTML after all retries');
         }
       } catch (error) {
-        console.error('Error fetching test HTML:', error);
-        retryLogs.push({
-          url: 'test-output.html',
-          attempt: 0,
-          timestamp: Date.now(),
-          status: 'error',
-          error: `Outer catch: ${error instanceof Error ? error.message : 'Unknown error'}`
-        });
+        // Silent fail
       }
 
       // Wait 1 second before downloading PDF
-      console.log('Waiting 1 second before downloading PDF...');
-      retryLogs.push({
-        url: 'inter-file-delay',
-        attempt: 0,
-        timestamp: Date.now(),
-        status: 'success',
-        delay: 1000,
-        error: 'Waiting 1 second between file downloads'
-      });
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Download PDF file - FIXED BASE64 CONVERSION
+      // Download PDF file
       try {
         const pdfResponse = await downloadWithRetry('https://aohrfehhyjdebaatzqdl.supabase.co/storage/v1/object/public/n8n-bucket/response/test-output.pdf');
         if (pdfResponse) {
-          console.log('PDF response received, converting to base64...');
-          
           // Get the response as ArrayBuffer
           const pdfArrayBuffer = await pdfResponse.arrayBuffer();
-          console.log('PDF downloaded, size:', pdfArrayBuffer.byteLength, 'bytes');
           
-          // Convert ArrayBuffer to base64 - PROPER METHOD
+          // Convert ArrayBuffer to base64
           const uint8Array = new Uint8Array(pdfArrayBuffer);
           
           // Use btoa with proper binary string conversion
@@ -239,33 +125,9 @@ export const useN8nAnalysis = () => {
           
           // Now convert to base64
           pdfData = btoa(binaryString);
-          console.log('PDF converted to base64, length:', pdfData.length);
-          
-          // Validate base64 format
-          if (pdfData && pdfData.length > 0) {
-            try {
-              // Test the base64 by trying to decode it
-              const testDecode = atob(pdfData.substring(0, 100)); // Test first 100 chars
-              console.log('✅ Base64 PDF data validation: Valid format, starts with:', pdfData.substring(0, 20));
-            } catch (validateError) {
-              console.error('❌ Base64 validation failed:', validateError);
-              console.log('PDF data sample:', pdfData.substring(0, 100));
-            }
-          } else {
-            console.error('Base64 PDF data validation: Invalid or empty');
-          }
-        } else {
-          console.error('Failed to fetch test PDF after all retries');
         }
       } catch (error) {
-        console.error('Error fetching test PDF:', error);
-        retryLogs.push({
-          url: 'test-output.pdf',
-          attempt: 0,
-          timestamp: Date.now(),
-          status: 'error',
-          error: `PDF processing error: ${error instanceof Error ? error.message : 'Unknown error'}`
-        });
+        // Silent fail
       }
 
       // Extract job information from job description JSON
@@ -325,15 +187,12 @@ export const useN8nAnalysis = () => {
             .select('id')
             .single();
 
-          if (dbError) {
-            console.error('Error storing analysis result:', dbError);
-          } else if (analysisResult) {
+          if (!dbError && analysisResult) {
             analysisResultId = analysisResult.id;
-            console.log('Analysis result stored with ID:', analysisResultId);
           }
         }
       } catch (dbError) {
-        console.error('Database operation failed:', dbError);
+        // Silent fail
       }
 
       // Show success toast
@@ -351,22 +210,10 @@ export const useN8nAnalysis = () => {
         },
         pdfData,
         htmlData,
-        debugInfo: {
-          networkTest: networkTestResult,
-          webhookStatus,
-          webhookResponse,
-          webhookError
-        },
-        retryLogs,
         analysisResultId
       };
 
     } catch (error) {
-      console.error('=== N8N ANALYSIS ERROR ===');
-      console.error('Error type:', error instanceof Error ? error.constructor.name : typeof error);
-      console.error('Error message:', error instanceof Error ? error.message : String(error));
-      console.error('Full error object:', error);
-      
       // Provide more specific error messages based on error type
       let userFriendlyMessage = "Sorry — something went wrong while processing your documents. Please try again, or contact support if the issue continues.";
       let errorDetails = "";
@@ -383,9 +230,6 @@ export const useN8nAnalysis = () => {
       } else if (error instanceof Error) {
         errorDetails = error.message;
       }
-      
-      console.error('User-friendly message:', userFriendlyMessage);
-      console.error('Error details:', errorDetails);
       
       toast({
         title: "Processing Failed",

@@ -1,3 +1,4 @@
+
 import { useEffect } from 'react';
 
 const EnhancedSecurityHeaders = () => {
@@ -71,8 +72,7 @@ const EnhancedSecurityHeaders = () => {
         if (document.head.contains(referrerMeta)) document.head.removeChild(referrerMeta);
         if (document.head.contains(permissionsMeta)) document.head.removeChild(permissionsMeta);
       } catch (error) {
-        // Silently handle cleanup errors
-        console.warn('Security headers cleanup error:', error);
+        // Silent cleanup
       }
     };
   }, []);
