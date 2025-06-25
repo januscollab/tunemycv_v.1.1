@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -190,7 +191,7 @@ const AnalyzeCV = () => {
     }
   };
 
-  // Handle history selection - fixed missing function
+  // Handle history selection - using EnhancedAnalysisHistory
   const handleHistorySelect = (analysis: any) => {
     // Handle PDF data conversion if it exists
     let processedAnalysis = { ...analysis };
