@@ -206,21 +206,18 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, onStartNew, r
             </div>
           )}
 
-          {/* PDF Viewer or Coming Soon */}
+          {/* PDF Viewer in Debug Mode - temporarily set debugMode to true */}
           <div className="mb-8">
-            {hasPdfData() ? (
-              <EnhancedPDFViewer
-                pdfData={result.pdf_file_data}
-                pdfUrl={result.n8n_pdf_url}
-                fileName={`CV_Analysis_${result.job_title || 'Report'}_${new Date().toISOString().split('T')[0]}.pdf`}
-                onDownload={() => {
-                  // Use existing download logic
-                  downloadAnalysisAsText();
-                }}
-              />
-            ) : (
-              <ComingSoonPDF />
-            )}
+            <EnhancedPDFViewer
+              pdfData={result.pdf_file_data}
+              pdfUrl={result.n8n_pdf_url}
+              fileName={`CV_Analysis_${result.job_title || 'Report'}_${new Date().toISOString().split('T')[0]}.pdf`}
+              onDownload={() => {
+                // Use existing download logic
+                downloadAnalysisAsText();
+              }}
+              debugMode={true}
+            />
           </div>
 
           {/* Additional Information */}
