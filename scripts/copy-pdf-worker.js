@@ -18,7 +18,7 @@ console.log('Source:', workerUrl);
 console.log('Target:', targetFile);
 
 // Check if existing file is a placeholder
-const isPlaceholderFile = (filePath) => {
+const isPlaceholderFile = (filePath: string) => {
   if (!existsSync(filePath)) return false;
   
   try {
@@ -28,11 +28,12 @@ const isPlaceholderFile = (filePath) => {
     // Check for placeholder indicators
     const hasPlaceholderComment = content.includes('PDF.js worker placeholder');
     const hasPlaceholderWarning = content.includes('actual worker not loaded');
-    const isTooSmall = stats.size < 1000; // Real worker should be ~500KB+
+    const isTooSmall = stats.size < 10000; // Real worker should be ~500KB+
     
     return hasPlaceholderComment || hasPlaceholderWarning || isTooSmall;
   } catch (error) {
-    console.log('Error reading existing file:', error.message);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.log('Error reading existing file:', errorMessage);
     return true; // Treat as placeholder if we can't read it
   }
 };
@@ -90,7 +91,8 @@ try {
     process.exit(1);
   }
 } catch (error) {
-  console.error('❌ Error downloading PDF worker:', error.message);
+  const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+  console.error('❌ Error downloading PDF worker:', errorMessage);
   console.error('💡 This might be due to network issues. The app will fall back to iframe viewing.');
   // Don't exit with error - let the app handle fallback
   process.exit(0);
