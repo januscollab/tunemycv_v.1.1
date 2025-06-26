@@ -24,17 +24,21 @@ export default defineConfig(({ mode }) => ({
     assetsDir: 'assets',
     copyPublicDir: true,
   },
-  // Add worker support for general use
+  // Enhanced worker support for PDF.js
   worker: {
-    format: 'es'
+    format: 'es',
+    plugins: () => [react()]
   },
   define: {
     'process.env.NODE_ENV': JSON.stringify(mode)
   },
   // Optimize PDF.js dependencies
   optimizeDeps: {
-    include: ['pdfjs-dist', '@react-pdf-viewer/core']
+    include: ['pdfjs-dist', '@react-pdf-viewer/core'],
+    exclude: ['pdfjs-dist/build/pdf.worker.min.js']
   },
   // Configure asset handling
-  publicDir: 'public'
+  publicDir: 'public',
+  // Ensure PDF.js worker can be imported
+  assetsInclude: ['**/*.worker.js', '**/*.worker.min.js']
 }));

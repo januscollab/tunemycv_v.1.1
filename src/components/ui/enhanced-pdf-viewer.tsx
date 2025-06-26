@@ -34,10 +34,8 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
   const [proxyStatus, setProxyStatus] = useState<'testing' | 'success' | 'failed' | 'idle'>('idle');
   const [actualPdfUrl, setActualPdfUrl] = useState<string>('');
   const [viewerKey, setViewerKey] = useState(0); // Force re-render when URL changes
+  const [workerUrl, setWorkerUrl] = useState<string>('');
   const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Use the correct worker URL that matches our pdfjs-dist version (5.3.31)
-  const workerUrl = 'https://unpkg.com/pdfjs-dist@5.3.31/build/pdf.worker.min.js';
 
   const addDebugInfo = (message: string) => {
     console.log(`[PDF Viewer Debug]: ${message}`);
@@ -45,6 +43,27 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
       setDebugInfo(prev => [...prev, `${new Date().toLocaleTimeString()}: ${message}`]);
     }
   };
+
+  // Dynamically load worker when needed
+  const initializeWorker = useMemo(() => {
+    return async () => {
+      try {
+        // Try to use local worker first
+        const workerModule = await import('pdfjs-dist/build/pdf.worker.min.js?url');
+        const localWorkerUrl = workerModule.default;
+        addDebugInfo(`Using local PDF.js worker: ${localWorkerUrl}`);
+        setWorkerUrl(localWorkerUrl);
+        return localWorkerUrl;
+      } catch (error) {
+        // Fallback to CDN if local worker fails
+        const fallbackWorkerUrl = 'https://unpkg.com/pdfjs-dist@5.3.31/build/pdf.worker.min.js';
+        addDebugInfo(`Local worker failed, using CDN fallback: ${fallbackWorkerUrl}`);
+        addDebugInfo(`Worker error: ${error.message}`);
+        setWorkerUrl(fallbackWorkerUrl);
+        return fallbackWorkerUrl;
+      }
+    };
+  }, []);
 
   // Configure default layout plugin
   const defaultLayoutPluginInstance = defaultLayoutPlugin({
@@ -62,6 +81,13 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
       }
     };
   }, []);
+
+  // Initialize worker when component mounts
+  useEffect(() => {
+    if (!debugMode && (pdfUrl || pdfData)) {
+      initializeWorker();
+    }
+  }, [initializeWorker, debugMode, pdfUrl, pdfData]);
 
   // Test proxy function
   const testProxyFunction = async (originalUrl: string): Promise<string> => {
@@ -108,7 +134,7 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
         return;
       }
 
-      addDebugInfo(`Using worker URL: ${workerUrl}`);
+      addDebugInfo(`Using worker URL: ${workerUrl || 'Loading...'}`);
       
       let finalUrl = '';
       
@@ -136,12 +162,15 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
       setViewerKey(prev => prev + 1); // Force viewer re-render
     };
 
-    initializePdfSource();
+    // Only initialize if worker is ready
+    if (workerUrl) {
+      initializePdfSource();
+    }
   }, [pdfUrl, pdfData, debugMode, workerUrl]);
 
   // Handle loading state when URL is ready
   useEffect(() => {
-    if (!actualPdfUrl || debugMode) {
+    if (!actualPdfUrl || debugMode || !workerUrl) {
       setLoading(false);
       return;
     }
@@ -178,7 +207,7 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
       }
       clearTimeout(successTimeout);
     };
-  }, [actualPdfUrl, debugMode]);
+  }, [actualPdfUrl, debugMode, workerUrl]);
 
   // Direct download function that opens PDF in new tab
   const handleDirectDownload = () => {
@@ -341,7 +370,7 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
               <div>
                 <strong>Worker URL:</strong>
                 <div className="bg-background p-2 rounded mt-1 font-mono break-all">
-                  {workerUrl}
+                  {workerUrl || 'Loading...'}
                 </div>
               </div>
               <div>
@@ -371,12 +400,14 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
     );
   }
 
-  if (loading) {
+  if (loading || !workerUrl) {
     return (
       <div className={`bg-surface border border-border rounded-lg p-8 ${className}`}>
         <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
           <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
-          <p className="text-muted-foreground">Loading PDF document...</p>
+          <p className="text-muted-foreground">
+            {!workerUrl ? 'Initializing PDF viewer...' : 'Loading PDF document...'}
+          </p>
           <p className="text-xs text-muted-foreground mt-2">
             If this takes too long, an iframe fallback will appear
           </p>
@@ -448,36 +479,38 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
 
       {/* PDF Viewer */}
       <div className="pdf-viewer-container" style={{ height: '600px' }}>
-        <Worker workerUrl={workerUrl}>
-          <div style={{ height: '100%' }}>
-            {debugMode ? (
-              <div className="flex flex-col items-center justify-center h-full bg-muted/20 text-center p-8">
-                <CheckCircle className="h-16 w-16 text-green-600 mb-4" />
-                <h3 className="text-lg font-semibold mb-2">PDF Viewer Debug Mode</h3>
-                <p className="text-muted-foreground mb-4 max-w-md">
-                  The PDF viewer components are successfully loaded and initialized. 
-                  Worker URL is set and the layout plugin is ready.
-                </p>
-                <div className="text-sm text-muted-foreground bg-background p-4 rounded border">
-                  <strong>Ready to display PDF!</strong><br/>
-                  • PDF.js Worker: ✅ {workerUrl ? 'Loaded' : 'Not Ready'}<br/>
-                  • Original PDF URL: ✅ {pdfUrl ? 'Available' : 'Not Set'}<br/>
-                  • Actual PDF URL: ✅ {actualPdfUrl ? 'Available' : 'Not Set'}<br/>
-                  • Layout Plugin: ✅ Configured<br/>
-                  • Proxy Status: {proxyStatus}<br/>
+        {workerUrl && (
+          <Worker workerUrl={workerUrl}>
+            <div style={{ height: '100%' }}>
+              {debugMode ? (
+                <div className="flex flex-col items-center justify-center h-full bg-muted/20 text-center p-8">
+                  <CheckCircle className="h-16 w-16 text-green-600 mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">PDF Viewer Debug Mode</h3>
+                  <p className="text-muted-foreground mb-4 max-w-md">
+                    The PDF viewer components are successfully loaded and initialized. 
+                    Worker URL is set and the layout plugin is ready.
+                  </p>
+                  <div className="text-sm text-muted-foreground bg-background p-4 rounded border">
+                    <strong>Ready to display PDF!</strong><br/>
+                    • PDF.js Worker: ✅ {workerUrl ? 'Loaded Locally' : 'Not Ready'}<br/>
+                    • Original PDF URL: ✅ {pdfUrl ? 'Available' : 'Not Set'}<br/>
+                    • Actual PDF URL: ✅ {actualPdfUrl ? 'Available' : 'Not Set'}<br/>
+                    • Layout Plugin: ✅ Configured<br/>
+                    • Proxy Status: {proxyStatus}<br/>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              actualPdfUrl && (
-                <Viewer
-                  key={viewerKey}
-                  fileUrl={actualPdfUrl}
-                  plugins={[defaultLayoutPluginInstance]}
-                />
-              )
-            )}
-          </div>
-        </Worker>
+              ) : (
+                actualPdfUrl && (
+                  <Viewer
+                    key={viewerKey}
+                    fileUrl={actualPdfUrl}
+                    plugins={[defaultLayoutPluginInstance]}
+                  />
+                )
+              )}
+            </div>
+          </Worker>
+        )}
       </div>
     </div>
   );
