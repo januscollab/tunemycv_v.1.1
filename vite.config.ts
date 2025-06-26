@@ -23,7 +23,8 @@ const copyPdfWorkerPlugin = () => ({
         console.log('✅ PDF.js worker copied automatically');
       }
     } catch (error) {
-      console.warn('⚠️ Could not copy PDF.js worker:', error.message);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.warn('⚠️ Could not copy PDF.js worker:', errorMessage);
     }
   }
 });
