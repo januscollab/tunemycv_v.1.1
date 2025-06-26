@@ -32,7 +32,7 @@ const isPlaceholderFile = (filePath: string) => {
     
     return hasPlaceholderComment || hasPlaceholderWarning || isTooSmall;
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorMessage = error instanceof Error ? error.message : String(error);
     console.log('Error reading existing file:', errorMessage);
     return true; // Treat as placeholder if we can't read it
   }
@@ -91,7 +91,7 @@ try {
     process.exit(1);
   }
 } catch (error) {
-  const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+  const errorMessage = error instanceof Error ? error.message : String(error);
   console.error('❌ Error downloading PDF worker:', errorMessage);
   console.error('💡 This might be due to network issues. The app will fall back to iframe viewing.');
   // Don't exit with error - let the app handle fallback
