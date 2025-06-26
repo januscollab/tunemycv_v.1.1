@@ -89,26 +89,6 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
     }
   };
 
-  // Memoize PDF source calculation to prevent re-renders
-  const pdfSource = useMemo(() => {
-    if (debugMode) {
-      return '';
-    }
-
-    // Priority: pdfUrl first (direct URL), then pdfData (base64)
-    if (pdfUrl) {
-      // We'll test the proxy in useEffect and update the actual URL
-      return pdfUrl; // Temporary, will be replaced with proxy URL
-    }
-    
-    if (pdfData) {
-      // Use data as-is, only add data URL prefix if not already present
-      return pdfData.startsWith('data:') ? pdfData : `data:application/pdf;base64,${pdfData}`;
-    }
-    
-    return '';
-  }, [pdfUrl, pdfData, debugMode]);
-
   // State for the actual URL to use (after proxy testing)
   const [actualPdfUrl, setActualPdfUrl] = useState<string>('');
 
@@ -201,25 +181,24 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
     }
   };
 
-  const handleDocumentLoad = () => {
-    addDebugInfo('PDF document loaded successfully');
-    setLoading(false);
-    setError(null);
-    setShowFallback(false);
-    if (loadingTimeoutRef.current) {
-      clearTimeout(loadingTimeoutRef.current);
+  // Memoize PDF source calculation to prevent re-renders
+  const pdfSource = useMemo(() => {
+    if (debugMode) {
+      return '';
     }
-  };
 
-  const handleDocumentLoadError = (error: any) => {
-    addDebugInfo(`PDF document load error: ${error.message || 'Unknown error'}`);
-    setError(`Failed to load PDF: ${error.message || 'Unknown error'}`);
-    setLoading(false);
-    setShowFallback(true);
-    if (loadingTimeoutRef.current) {
-      clearTimeout(loadingTimeoutRef.current);
+    // Priority: pdfUrl first (direct URL), then pdfData (base64)
+    if (pdfUrl) {
+      return actualPdfUrl; // Use the tested URL (proxy or original)
     }
-  };
+    
+    if (pdfData) {
+      // Use data as-is, only add data URL prefix if not already present
+      return pdfData.startsWith('data:') ? pdfData : `data:application/pdf;base64,${pdfData}`;
+    }
+    
+    return '';
+  }, [pdfUrl, pdfData, debugMode, actualPdfUrl]);
 
   if (!pdfSource && !debugMode) {
     return (
@@ -442,8 +421,6 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
               <Viewer
                 fileUrl={actualPdfUrl}
                 plugins={[defaultLayoutPluginInstance]}
-                onDocumentLoad={handleDocumentLoad}
-                onLoadError={handleDocumentLoadError}
               />
             )}
           </div>
