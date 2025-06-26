@@ -33,8 +33,9 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
   const [showFallback, setShowFallback] = useState(false);
   const [proxyStatus, setProxyStatus] = useState<'testing' | 'success' | 'failed' | 'idle'>('idle');
   const [actualPdfUrl, setActualPdfUrl] = useState<string>('');
-  const [viewerKey, setViewerKey] = useState(0); // Force re-render when URL changes
+  const [viewerKey, setViewerKey] = useState(0);
   const [workerUrl, setWorkerUrl] = useState<string>('');
+  const [workerLoaded, setWorkerLoaded] = useState(false);
   const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const addDebugInfo = (message: string) => {
@@ -44,17 +45,34 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
     }
   };
 
-  // Initialize worker URL when needed
+  // Initialize local worker URL
   const initializeWorker = useMemo(() => {
     return async () => {
       try {
-        // Use CDN worker URL directly since local import is causing build issues
-        const cdnWorkerUrl = 'https://unpkg.com/pdfjs-dist@5.3.31/build/pdf.worker.min.js';
-        addDebugInfo(`Using CDN PDF.js worker: ${cdnWorkerUrl}`);
-        setWorkerUrl(cdnWorkerUrl);
-        return cdnWorkerUrl;
+        // Use local worker path - this will be available after build
+        const localWorkerUrl = '/assets/pdf.worker.min.js';
+        addDebugInfo(`Using local PDF.js worker: ${localWorkerUrl}`);
+        
+        // Test if worker file exists
+        try {
+          const response = await fetch(localWorkerUrl, { method: 'HEAD' });
+          if (response.ok) {
+            setWorkerUrl(localWorkerUrl);
+            setWorkerLoaded(true);
+            addDebugInfo('Local worker file verified and ready');
+            return localWorkerUrl;
+          } else {
+            throw new Error(`Worker file not found: ${response.status}`);
+          }
+        } catch (fetchError) {
+          addDebugInfo(`Local worker not available: ${fetchError.message}`);
+          addDebugInfo('Falling back to iframe display');
+          setShowFallback(true);
+          return '';
+        }
       } catch (error) {
         addDebugInfo(`Worker initialization error: ${error.message}`);
+        setShowFallback(true);
         return '';
       }
     };
@@ -154,40 +172,45 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
 
       addDebugInfo(`Final PDF URL: ${finalUrl}`);
       setActualPdfUrl(finalUrl);
-      setViewerKey(prev => prev + 1); // Force viewer re-render
+      setViewerKey(prev => prev + 1);
     };
 
-    // Only initialize if worker is ready
-    if (workerUrl) {
+    // Only initialize if worker is ready or we're showing fallback
+    if (workerLoaded || showFallback) {
       initializePdfSource();
     }
-  }, [pdfUrl, pdfData, debugMode, workerUrl]);
+  }, [pdfUrl, pdfData, debugMode, workerUrl, workerLoaded, showFallback]);
 
   // Handle loading state when URL is ready
   useEffect(() => {
-    if (!actualPdfUrl || debugMode || !workerUrl) {
+    if (!actualPdfUrl || debugMode || showFallback) {
       setLoading(false);
+      return;
+    }
+
+    if (!workerLoaded) {
+      setLoading(false);
+      setShowFallback(true);
+      addDebugInfo('Worker not loaded - switching to iframe fallback');
       return;
     }
 
     setLoading(true);
     setError(null);
-    setShowFallback(false);
-    addDebugInfo(`Starting PDF load with simplified timeout. URL: ${actualPdfUrl}`);
+    addDebugInfo(`Starting PDF load with local worker. URL: ${actualPdfUrl}`);
 
-    // Set up 8-second timeout (reduced from 10)
+    // Set up timeout for PDF viewer
     if (loadingTimeoutRef.current) {
       clearTimeout(loadingTimeoutRef.current);
     }
     
     loadingTimeoutRef.current = setTimeout(() => {
-      addDebugInfo('PDF loading timeout - switching to iframe fallback');
+      addDebugInfo('PDF viewer timeout - switching to iframe fallback');
       setLoading(false);
       setShowFallback(true);
     }, 8000);
 
-    // Clear timeout after a moment to simulate successful load
-    // In reality, the PDF viewer will handle its own loading
+    // Clear timeout after successful load simulation
     const successTimeout = setTimeout(() => {
       if (loadingTimeoutRef.current) {
         clearTimeout(loadingTimeoutRef.current);
@@ -202,7 +225,7 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
       }
       clearTimeout(successTimeout);
     };
-  }, [actualPdfUrl, debugMode, workerUrl]);
+  }, [actualPdfUrl, debugMode, workerLoaded, showFallback]);
 
   // Direct download function that opens PDF in new tab
   const handleDirectDownload = () => {
@@ -261,9 +284,9 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
           {actualPdfUrl && !error ? (
             <div className="space-y-4">
               <div className="text-center py-4">
-                <h3 className="text-lg font-semibold mb-2">PDF Viewer (Iframe Mode)</h3>
+                <h3 className="text-lg font-semibold mb-2">PDF Viewer (Browser Native)</h3>
                 <p className="text-muted-foreground mb-4">
-                  The advanced PDF viewer couldn't load, so here's a simple iframe view:
+                  Using your browser's built-in PDF viewer:
                 </p>
               </div>
               
@@ -340,71 +363,49 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
             </div>
           )}
 
-          {/* Proxy Status */}
-          {proxyStatus !== 'idle' && (
-            <div className="mt-4 text-center">
-              <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs ${
-                proxyStatus === 'testing' ? 'bg-blue-100 text-blue-800' :
-                proxyStatus === 'success' ? 'bg-green-100 text-green-800' :
-                'bg-red-100 text-red-800'
-              }`}>
-                {proxyStatus === 'testing' && <Loader2 className="h-3 w-3 animate-spin" />}
-                {proxyStatus === 'success' && <CheckCircle className="h-3 w-3" />}
-                {proxyStatus === 'failed' && <AlertCircle className="h-3 w-3" />}
-                Proxy Status: {proxyStatus}
+          {/* Debug Info Panel */}
+          {debugMode && (
+            <div className="mt-4 p-4 bg-muted/50 border-t border-border">
+              <h4 className="text-sm font-semibold mb-2">Debug Information</h4>
+              <div className="text-xs space-y-2">
+                <div>
+                  <strong>Worker URL:</strong>
+                  <div className="bg-background p-2 rounded mt-1 font-mono break-all">
+                    {workerUrl || 'Not loaded'}
+                  </div>
+                </div>
+                <div>
+                  <strong>Worker Status:</strong>
+                  <div className="bg-background p-2 rounded mt-1">
+                    {workerLoaded ? 'Loaded Successfully' : 'Failed to Load - Using Iframe Fallback'}
+                  </div>
+                </div>
+                <div>
+                  <strong>Debug Log:</strong>
+                  <div className="bg-background p-2 rounded mt-1 max-h-32 overflow-auto">
+                    {debugInfo.map((info, idx) => (
+                      <div key={idx} className="py-0.5">{info}</div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           )}
         </div>
-
-        {/* Debug Info Panel */}
-        {debugMode && (
-          <div className="p-4 bg-muted/50 border-t border-border">
-            <h4 className="text-sm font-semibold mb-2">Debug Information</h4>
-            <div className="text-xs space-y-2">
-              <div>
-                <strong>Worker URL:</strong>
-                <div className="bg-background p-2 rounded mt-1 font-mono break-all">
-                  {workerUrl || 'Loading...'}
-                </div>
-              </div>
-              <div>
-                <strong>Original PDF URL:</strong>
-                <div className="bg-background p-2 rounded mt-1 break-all">
-                  {pdfUrl || 'None'}
-                </div>
-              </div>
-              <div>
-                <strong>Actual PDF URL (after proxy test):</strong>
-                <div className="bg-background p-2 rounded mt-1 break-all">
-                  {actualPdfUrl || 'Not set yet'}
-                </div>
-              </div>
-              <div>
-                <strong>Debug Log:</strong>
-                <div className="bg-background p-2 rounded mt-1 max-h-32 overflow-auto">
-                  {debugInfo.map((info, idx) => (
-                    <div key={idx} className="py-0.5">{info}</div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     );
   }
 
-  if (loading || !workerUrl) {
+  if (loading || !workerLoaded) {
     return (
       <div className={`bg-surface border border-border rounded-lg p-8 ${className}`}>
         <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
           <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
           <p className="text-muted-foreground">
-            {!workerUrl ? 'Initializing PDF viewer...' : 'Loading PDF document...'}
+            {!workerLoaded ? 'Loading PDF worker...' : 'Loading PDF document...'}
           </p>
           <p className="text-xs text-muted-foreground mt-2">
-            If this takes too long, an iframe fallback will appear
+            If this takes too long, we'll switch to browser native viewing
           </p>
           
           {/* Proxy Status */}
@@ -474,7 +475,7 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
 
       {/* PDF Viewer */}
       <div className="pdf-viewer-container" style={{ height: '600px' }}>
-        {workerUrl && (
+        {workerUrl && workerLoaded && (
           <Worker workerUrl={workerUrl}>
             <div style={{ height: '100%' }}>
               {debugMode ? (
@@ -483,11 +484,11 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
                   <h3 className="text-lg font-semibold mb-2">PDF Viewer Debug Mode</h3>
                   <p className="text-muted-foreground mb-4 max-w-md">
                     The PDF viewer components are successfully loaded and initialized. 
-                    Worker URL is set and the layout plugin is ready.
+                    Local worker is ready and the layout plugin is configured.
                   </p>
                   <div className="text-sm text-muted-foreground bg-background p-4 rounded border">
                     <strong>Ready to display PDF!</strong><br/>
-                    • PDF.js Worker: ✅ {workerUrl ? 'Loaded from CDN' : 'Not Ready'}<br/>
+                    • PDF.js Worker: ✅ {workerLoaded ? 'Loaded Locally' : 'Not Ready'}<br/>
                     • Original PDF URL: ✅ {pdfUrl ? 'Available' : 'Not Set'}<br/>
                     • Actual PDF URL: ✅ {actualPdfUrl ? 'Available' : 'Not Set'}<br/>
                     • Layout Plugin: ✅ Configured<br/>

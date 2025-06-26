@@ -23,18 +23,6 @@ export default defineConfig(({ mode }) => ({
   build: {
     assetsDir: 'assets',
     copyPublicDir: true,
-    rollupOptions: {
-      external: [],
-      output: {
-        // Ensure worker files are properly handled
-        assetFileNames: (assetInfo) => {
-          if (assetInfo.name && assetInfo.name.includes('pdf.worker')) {
-            return 'assets/pdf.worker-[hash][extname]';
-          }
-          return 'assets/[name]-[hash][extname]';
-        }
-      }
-    }
   },
   // Enhanced worker support for PDF.js
   worker: {
@@ -47,10 +35,7 @@ export default defineConfig(({ mode }) => ({
   // Optimize PDF.js dependencies
   optimizeDeps: {
     include: ['pdfjs-dist', '@react-pdf-viewer/core'],
-    exclude: ['pdfjs-dist/build/pdf.worker.min.js']
   },
   // Configure asset handling
   publicDir: 'public',
-  // Ensure PDF.js worker can be imported
-  assetsInclude: ['**/*.worker.js', '**/*.worker.min.js']
 }));
