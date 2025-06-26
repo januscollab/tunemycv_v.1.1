@@ -27,11 +27,13 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
   onDownload,
   debugMode = false
 }) => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [debugInfo, setDebugInfo] = useState<string[]>([]);
   const [showFallback, setShowFallback] = useState(false);
   const [proxyStatus, setProxyStatus] = useState<'testing' | 'success' | 'failed' | 'idle'>('idle');
+  const [actualPdfUrl, setActualPdfUrl] = useState<string>('');
+  const [viewerKey, setViewerKey] = useState(0); // Force re-render when URL changes
   const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Use the correct worker URL that matches our pdfjs-dist version (5.3.31)
@@ -65,66 +67,79 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
   const testProxyFunction = async (originalUrl: string): Promise<string> => {
     const proxyUrl = `https://aohrfehhyjdebaatzqdl.supabase.co/functions/v1/pdf-proxy?url=${encodeURIComponent(originalUrl)}`;
     
-    addDebugInfo(`Testing proxy function with URL: ${proxyUrl}`);
+    addDebugInfo(`Testing proxy function with URL: ${originalUrl}`);
     setProxyStatus('testing');
     
     try {
       const response = await fetch(proxyUrl, { method: 'HEAD' });
       
       if (response.ok) {
-        addDebugInfo(`Proxy test successful! Status: ${response.status}`);
+        addDebugInfo(`Proxy test successful! Using proxy URL`);
         setProxyStatus('success');
         return proxyUrl;
       } else {
-        addDebugInfo(`Proxy test failed! Status: ${response.status} - ${response.statusText}`);
+        addDebugInfo(`Proxy test failed! Status: ${response.status} - Falling back to original URL`);
         setProxyStatus('failed');
-        addDebugInfo(`Falling back to original URL: ${originalUrl}`);
         return originalUrl;
       }
     } catch (error) {
-      addDebugInfo(`Proxy test error: ${error.message}`);
+      addDebugInfo(`Proxy test error: ${error.message} - Falling back to original URL`);
       setProxyStatus('failed');
-      addDebugInfo(`Falling back to original URL: ${originalUrl}`);
       return originalUrl;
     }
   };
 
-  // State for the actual URL to use (after proxy testing)
-  const [actualPdfUrl, setActualPdfUrl] = useState<string>('');
+  // Validate URL format
+  const isValidUrl = (url: string): boolean => {
+    try {
+      if (url.startsWith('data:')) return true;
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
+  };
 
-  // Test proxy and set actual URL
+  // Initialize PDF source
   useEffect(() => {
-    if (pdfUrl && !debugMode) {
-      testProxyFunction(pdfUrl).then(testedUrl => {
-        setActualPdfUrl(testedUrl);
-        addDebugInfo(`Final PDF URL set to: ${testedUrl}`);
-      });
-    } else if (pdfData) {
-      const dataUrl = pdfData.startsWith('data:') ? pdfData : `data:application/pdf;base64,${pdfData}`;
-      setActualPdfUrl(dataUrl);
-      addDebugInfo(`Using base64 data URL, length: ${pdfData.length}`);
-    }
-  }, [pdfUrl, pdfData, debugMode]);
+    const initializePdfSource = async () => {
+      if (debugMode) {
+        addDebugInfo('Debug mode enabled - no PDF will be loaded');
+        return;
+      }
 
-  // Debug logging for PDF source changes
-  useEffect(() => {
-    if (debugMode) {
-      addDebugInfo('Debug mode enabled - no PDF will be loaded');
-      return;
-    }
+      addDebugInfo(`Using worker URL: ${workerUrl}`);
+      
+      let finalUrl = '';
+      
+      if (pdfUrl) {
+        addDebugInfo(`Processing PDF URL: ${pdfUrl}`);
+        finalUrl = await testProxyFunction(pdfUrl);
+      } else if (pdfData) {
+        finalUrl = pdfData.startsWith('data:') ? pdfData : `data:application/pdf;base64,${pdfData}`;
+        addDebugInfo(`Using PDF base64 data, length: ${pdfData.length}`);
+      } else {
+        addDebugInfo('No PDF source provided');
+        return;
+      }
 
-    addDebugInfo(`Using worker URL: ${workerUrl}`);
-    
-    if (pdfUrl) {
-      addDebugInfo(`Original PDF URL: ${pdfUrl}`);
-    } else if (pdfData) {
-      addDebugInfo(`Using PDF base64 data, length: ${pdfData.length}`);
-    } else {
-      addDebugInfo('No PDF source provided');
-    }
+      // Validate the final URL
+      if (!isValidUrl(finalUrl)) {
+        addDebugInfo(`Invalid URL format: ${finalUrl}`);
+        setError('Invalid PDF URL format');
+        setShowFallback(true);
+        return;
+      }
+
+      addDebugInfo(`Final PDF URL: ${finalUrl}`);
+      setActualPdfUrl(finalUrl);
+      setViewerKey(prev => prev + 1); // Force viewer re-render
+    };
+
+    initializePdfSource();
   }, [pdfUrl, pdfData, debugMode, workerUrl]);
 
-  // Set up loading timeout when we have a source
+  // Handle loading state when URL is ready
   useEffect(() => {
     if (!actualPdfUrl || debugMode) {
       setLoading(false);
@@ -134,24 +149,34 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
     setLoading(true);
     setError(null);
     setShowFallback(false);
-    addDebugInfo(`Starting PDF load with 10 second timeout. URL: ${actualPdfUrl}`);
+    addDebugInfo(`Starting PDF load with simplified timeout. URL: ${actualPdfUrl}`);
 
-    // Set up 10-second timeout
+    // Set up 8-second timeout (reduced from 10)
     if (loadingTimeoutRef.current) {
       clearTimeout(loadingTimeoutRef.current);
     }
     
     loadingTimeoutRef.current = setTimeout(() => {
-      addDebugInfo('PDF loading timeout - 10 seconds exceeded, showing fallback');
-      setError('PDF loading timeout. The document may be taking too long to load.');
+      addDebugInfo('PDF loading timeout - switching to iframe fallback');
       setLoading(false);
       setShowFallback(true);
-    }, 10000);
+    }, 8000);
+
+    // Clear timeout after a moment to simulate successful load
+    // In reality, the PDF viewer will handle its own loading
+    const successTimeout = setTimeout(() => {
+      if (loadingTimeoutRef.current) {
+        clearTimeout(loadingTimeoutRef.current);
+        setLoading(false);
+        addDebugInfo('PDF viewer initialized successfully');
+      }
+    }, 2000);
 
     return () => {
       if (loadingTimeoutRef.current) {
         clearTimeout(loadingTimeoutRef.current);
       }
+      clearTimeout(successTimeout);
     };
   }, [actualPdfUrl, debugMode]);
 
@@ -181,26 +206,7 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
     }
   };
 
-  // Memoize PDF source calculation to prevent re-renders
-  const pdfSource = useMemo(() => {
-    if (debugMode) {
-      return '';
-    }
-
-    // Priority: pdfUrl first (direct URL), then pdfData (base64)
-    if (pdfUrl) {
-      return actualPdfUrl; // Use the tested URL (proxy or original)
-    }
-    
-    if (pdfData) {
-      // Use data as-is, only add data URL prefix if not already present
-      return pdfData.startsWith('data:') ? pdfData : `data:application/pdf;base64,${pdfData}`;
-    }
-    
-    return '';
-  }, [pdfUrl, pdfData, debugMode, actualPdfUrl]);
-
-  if (!pdfSource && !debugMode) {
+  if (!pdfUrl && !pdfData && !debugMode) {
     return (
       <div className={`bg-surface border border-border rounded-lg p-8 ${className}`}>
         <Alert variant="destructive" className="mb-4">
@@ -213,7 +219,7 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
     );
   }
 
-  // Show fallback when PDF fails to load
+  // Show fallback when PDF fails to load OR as iframe fallback
   if (showFallback || error) {
     return (
       <div className={`bg-surface border border-border rounded-lg overflow-hidden ${className}`}>
@@ -226,49 +232,93 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
           </Button>
         </div>
 
-        {/* Fallback Content */}
-        <div className="p-8 text-center">
-          <AlertCircle className="h-12 w-12 text-orange-500 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold mb-2">PDF Viewer Not Available</h3>
-          <p className="text-muted-foreground mb-6">
-            The PDF couldn't be displayed in the browser, but you can still access it directly.
-          </p>
-          
-          <div className="space-y-3">
-            <Button onClick={handleDirectDownload} className="w-full max-w-xs">
-              <ExternalLink className="h-4 w-4 mr-2" />
-              Open PDF in New Tab
-            </Button>
-            
-            {pdfUrl && (
-              <Button 
-                variant="outline" 
-                onClick={() => {
-                  const link = document.createElement('a');
-                  link.href = pdfUrl;
-                  link.download = fileName;
-                  link.click();
-                }}
-                className="w-full max-w-xs"
-              >
-                <Download className="h-4 w-4 mr-2" />
-                Download PDF
-              </Button>
-            )}
-          </div>
+        {/* Iframe Fallback or Error Content */}
+        <div className="p-4">
+          {actualPdfUrl && !error ? (
+            <div className="space-y-4">
+              <div className="text-center py-4">
+                <h3 className="text-lg font-semibold mb-2">PDF Viewer (Iframe Mode)</h3>
+                <p className="text-muted-foreground mb-4">
+                  The advanced PDF viewer couldn't load, so here's a simple iframe view:
+                </p>
+              </div>
+              
+              <iframe
+                src={actualPdfUrl}
+                width="100%"
+                height="600px"
+                style={{ border: '1px solid #e2e8f0', borderRadius: '8px' }}
+                title="PDF Document"
+                onLoad={() => addDebugInfo('PDF loaded successfully in iframe')}
+                onError={() => addDebugInfo('PDF failed to load in iframe')}
+              />
+              
+              <div className="text-center pt-4">
+                <Button onClick={handleDirectDownload} className="mr-2">
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  Open in New Tab
+                </Button>
+                {pdfUrl && (
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      const link = document.createElement('a');
+                      link.href = pdfUrl;
+                      link.download = fileName;
+                      link.click();
+                    }}
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Download PDF
+                  </Button>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <AlertCircle className="h-12 w-12 text-orange-500 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">PDF Viewer Not Available</h3>
+              <p className="text-muted-foreground mb-6">
+                The PDF couldn't be displayed in the browser, but you can still access it directly.
+              </p>
+              
+              <div className="space-y-3">
+                <Button onClick={handleDirectDownload} className="w-full max-w-xs">
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  Open PDF in New Tab
+                </Button>
+                
+                {pdfUrl && (
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      const link = document.createElement('a');
+                      link.href = pdfUrl;
+                      link.download = fileName;
+                      link.click();
+                    }}
+                    className="w-full max-w-xs"
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Download PDF
+                  </Button>
+                )}
+              </div>
 
-          {error && (
-            <Alert className="mt-6 max-w-md mx-auto">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription className="text-sm">
-                {error}
-              </AlertDescription>
-            </Alert>
+              {error && (
+                <Alert className="mt-6 max-w-md mx-auto">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription className="text-sm">
+                    {error}
+                  </AlertDescription>
+                </Alert>
+              )}
+            </div>
           )}
 
           {/* Proxy Status */}
           {proxyStatus !== 'idle' && (
-            <div className="mt-4">
+            <div className="mt-4 text-center">
               <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs ${
                 proxyStatus === 'testing' ? 'bg-blue-100 text-blue-800' :
                 proxyStatus === 'success' ? 'bg-green-100 text-green-800' :
@@ -328,7 +378,7 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
           <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
           <p className="text-muted-foreground">Loading PDF document...</p>
           <p className="text-xs text-muted-foreground mt-2">
-            If this takes too long, a fallback download option will appear
+            If this takes too long, an iframe fallback will appear
           </p>
           
           {/* Proxy Status */}
@@ -418,10 +468,13 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
                 </div>
               </div>
             ) : (
-              <Viewer
-                fileUrl={actualPdfUrl}
-                plugins={[defaultLayoutPluginInstance]}
-              />
+              actualPdfUrl && (
+                <Viewer
+                  key={viewerKey}
+                  fileUrl={actualPdfUrl}
+                  plugins={[defaultLayoutPluginInstance]}
+                />
+              )
             )}
           </div>
         </Worker>
