@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { ChevronRight, Home } from 'lucide-react';
@@ -109,28 +110,32 @@ export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
 
   return (
     <Breadcrumb className={cn("mb-4", className)}>
-      <BreadcrumbList>
+      <BreadcrumbList className="flex-nowrap overflow-x-auto scrollbar-hide">
         {breadcrumbItems.map((item, index) => (
-          <div key={index}>
-            <BreadcrumbItem>
+          <div key={index} className="flex items-center whitespace-nowrap">
+            <BreadcrumbItem className="flex-shrink-0">
               {item.href && !item.isActive ? (
                 <BreadcrumbLink asChild>
                   <Link 
                     to={item.href}
-                    className="flex items-center hover:text-primary transition-colors duration-200"
+                    className="flex items-center hover:text-primary transition-colors duration-200 text-sm"
                   >
-                    {index === 0 && showHome && <Home className="w-4 h-4 mr-1" />}
-                    {item.label}
+                    {index === 0 && showHome && <Home className="w-3.5 h-3.5 mr-1 flex-shrink-0" />}
+                    <span className="truncate max-w-[150px] sm:max-w-none">{item.label}</span>
                   </Link>
                 </BreadcrumbLink>
               ) : (
-                <BreadcrumbPage className="flex items-center font-medium">
-                  {index === 0 && showHome && <Home className="w-4 h-4 mr-1" />}
-                  {item.label}
+                <BreadcrumbPage className="flex items-center font-medium text-sm">
+                  {index === 0 && showHome && <Home className="w-3.5 h-3.5 mr-1 flex-shrink-0" />}
+                  <span className="truncate max-w-[150px] sm:max-w-none">{item.label}</span>
                 </BreadcrumbPage>
               )}
             </BreadcrumbItem>
-            {index < breadcrumbItems.length - 1 && <BreadcrumbSeparator />}
+            {index < breadcrumbItems.length - 1 && (
+              <BreadcrumbSeparator className="flex-shrink-0 mx-1">
+                <ChevronRight className="h-3.5 w-3.5" />
+              </BreadcrumbSeparator>
+            )}
           </div>
         ))}
       </BreadcrumbList>
