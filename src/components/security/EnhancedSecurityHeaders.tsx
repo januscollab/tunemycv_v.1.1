@@ -15,7 +15,7 @@ const EnhancedSecurityHeaders = () => {
       "font-src 'self' https://fonts.gstatic.com data:",
       "img-src 'self' data: https: blob:",
       "connect-src 'self' https://aohrfehhyjdebaatzqdl.supabase.co wss://aohrfehhyjdebaatzqdl.supabase.co https://accounts.google.com https://api.openai.com",
-      "frame-src 'self' https://accounts.google.com",
+      "frame-src 'self' https://accounts.google.com https://aohrfehhyjdebaatzqdl.supabase.co",
       "object-src 'none'",
       "base-uri 'self'",
       "form-action 'self'",

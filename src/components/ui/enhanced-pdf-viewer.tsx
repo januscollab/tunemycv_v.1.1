@@ -49,9 +49,9 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
   const initializeWorker = useMemo(() => {
     return async () => {
       try {
-        // Use local worker path - this will be available after build
+        // Use local worker path
         const localWorkerUrl = '/assets/pdf.worker.min.js';
-        addDebugInfo(`Using local PDF.js worker: ${localWorkerUrl}`);
+        addDebugInfo(`Checking local PDF.js worker: ${localWorkerUrl}`);
         
         // Test if worker file exists
         try {
@@ -59,19 +59,19 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
           if (response.ok) {
             setWorkerUrl(localWorkerUrl);
             setWorkerLoaded(true);
-            addDebugInfo('Local worker file verified and ready');
+            addDebugInfo('✅ Local worker file found and ready');
             return localWorkerUrl;
           } else {
             throw new Error(`Worker file not found: ${response.status}`);
           }
         } catch (fetchError) {
-          addDebugInfo(`Local worker not available: ${fetchError.message}`);
-          addDebugInfo('Falling back to iframe display');
+          addDebugInfo(`❌ Local worker not available: ${fetchError.message}`);
+          addDebugInfo('Switching to iframe fallback mode');
           setShowFallback(true);
           return '';
         }
       } catch (error) {
-        addDebugInfo(`Worker initialization error: ${error.message}`);
+        addDebugInfo(`❌ Worker initialization error: ${error.message}`);
         setShowFallback(true);
         return '';
       }
@@ -191,13 +191,13 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
     if (!workerLoaded) {
       setLoading(false);
       setShowFallback(true);
-      addDebugInfo('Worker not loaded - switching to iframe fallback');
+      addDebugInfo('Worker not loaded - using iframe fallback');
       return;
     }
 
     setLoading(true);
     setError(null);
-    addDebugInfo(`Starting PDF load with local worker. URL: ${actualPdfUrl}`);
+    addDebugInfo(`🚀 Starting PDF load with local worker`);
 
     // Set up timeout for PDF viewer
     if (loadingTimeoutRef.current) {
@@ -205,7 +205,7 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
     }
     
     loadingTimeoutRef.current = setTimeout(() => {
-      addDebugInfo('PDF viewer timeout - switching to iframe fallback');
+      addDebugInfo('⏰ PDF viewer timeout - switching to iframe fallback');
       setLoading(false);
       setShowFallback(true);
     }, 8000);
@@ -215,7 +215,7 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
       if (loadingTimeoutRef.current) {
         clearTimeout(loadingTimeoutRef.current);
         setLoading(false);
-        addDebugInfo('PDF viewer initialized successfully');
+        addDebugInfo('✅ PDF viewer initialized successfully');
       }
     }, 2000);
 
