@@ -14,7 +14,7 @@ const setupPdfWorkerPlugin = () => ({
     const workerUrl = 'https://unpkg.com/pdfjs-dist@5.3.31/build/pdf.worker.min.js';
 
     // Check if existing file is a placeholder
-    const isPlaceholderFile = (filePath) => {
+    const isPlaceholderFile = (filePath: string) => {
       if (!existsSync(filePath)) return false;
       
       try {
@@ -24,7 +24,7 @@ const setupPdfWorkerPlugin = () => ({
         // Check for placeholder indicators
         const hasPlaceholderComment = content.includes('PDF.js worker placeholder');
         const hasPlaceholderWarning = content.includes('actual worker not loaded');
-        const isTooSmall = stats.size < 1000; // Real worker should be ~500KB+
+        const isTooSmall = stats.size < 10000; // Real worker should be ~500KB+
         
         return hasPlaceholderComment || hasPlaceholderWarning || isTooSmall;
       } catch (error) {
