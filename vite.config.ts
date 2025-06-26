@@ -3,28 +3,44 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
-import { copyFileSync, mkdirSync, existsSync } from 'fs';
+import { writeFileSync, mkdirSync, existsSync } from 'fs';
 
-// Plugin to copy PDF.js worker
-const copyPdfWorkerPlugin = () => ({
-  name: 'copy-pdf-worker',
-  buildStart() {
-    const sourceFile = path.resolve(__dirname, 'node_modules/pdfjs-dist/build/pdf.worker.min.js');
+// Plugin to download and setup PDF.js worker
+const setupPdfWorkerPlugin = () => ({
+  name: 'setup-pdf-worker',
+  async buildStart() {
     const assetsDir = path.resolve(__dirname, 'public/assets');
     const targetFile = path.resolve(assetsDir, 'pdf.worker.min.js');
+    const workerUrl = 'https://unpkg.com/pdfjs-dist@5.3.31/build/pdf.worker.min.js';
 
     try {
+      // Create assets directory if it doesn't exist
       if (!existsSync(assetsDir)) {
         mkdirSync(assetsDir, { recursive: true });
       }
       
-      if (existsSync(sourceFile)) {
-        copyFileSync(sourceFile, targetFile);
-        console.log('✅ PDF.js worker copied automatically');
+      // Check if worker file already exists
+      if (existsSync(targetFile)) {
+        console.log('✅ PDF.js worker already available locally');
+        return;
+      }
+
+      console.log('📥 Downloading PDF.js worker for local serving...');
+      
+      // Download the worker file
+      const response = await fetch(workerUrl);
+      
+      if (response.ok) {
+        const workerContent = await response.text();
+        writeFileSync(targetFile, workerContent, 'utf8');
+        console.log('✅ PDF.js worker downloaded and ready');
+      } else {
+        console.warn('⚠️ Could not download PDF.js worker - will use iframe fallback');
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.warn('⚠️ Could not copy PDF.js worker:', errorMessage);
+      console.warn('⚠️ Could not setup PDF.js worker:', errorMessage);
+      console.warn('💡 App will use iframe fallback for PDF viewing');
     }
   }
 });
@@ -37,7 +53,7 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react(),
-    copyPdfWorkerPlugin(),
+    setupPdfWorkerPlugin(),
     mode === 'development' &&
     componentTagger(),
   ].filter(Boolean),
