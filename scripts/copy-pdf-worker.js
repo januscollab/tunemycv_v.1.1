@@ -1,5 +1,5 @@
 
-import { writeFileSync, mkdirSync, existsSync } from 'fs';
+import { writeFileSync, mkdirSync, existsSync, readFileSync, statSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -17,6 +17,26 @@ console.log('🔧 Starting PDF.js worker download process...');
 console.log('Source:', workerUrl);
 console.log('Target:', targetFile);
 
+// Check if existing file is a placeholder
+const isPlaceholderFile = (filePath) => {
+  if (!existsSync(filePath)) return false;
+  
+  try {
+    const content = readFileSync(filePath, 'utf8');
+    const stats = statSync(filePath);
+    
+    // Check for placeholder indicators
+    const hasPlaceholderComment = content.includes('PDF.js worker placeholder');
+    const hasPlaceholderWarning = content.includes('actual worker not loaded');
+    const isTooSmall = stats.size < 1000; // Real worker should be ~500KB+
+    
+    return hasPlaceholderComment || hasPlaceholderWarning || isTooSmall;
+  } catch (error) {
+    console.log('Error reading existing file:', error.message);
+    return true; // Treat as placeholder if we can't read it
+  }
+};
+
 try {
   // Create assets directory if it doesn't exist
   if (!existsSync(assetsDir)) {
@@ -24,11 +44,16 @@ try {
     console.log('✅ Created public/assets directory');
   }
 
-  // Check if worker file already exists
+  // Check if worker file exists and is valid
   if (existsSync(targetFile)) {
-    console.log('✅ PDF.js worker already exists locally');
-    console.log('🎉 PDF.js worker setup complete!');
-    process.exit(0);
+    if (isPlaceholderFile(targetFile)) {
+      console.log('🔄 Found placeholder file, downloading real worker...');
+    } else {
+      const stats = statSync(targetFile);
+      console.log(`✅ Valid PDF.js worker already exists (${Math.round(stats.size / 1024)}KB)`);
+      console.log('🎉 PDF.js worker setup complete!');
+      process.exit(0);
+    }
   }
 
   console.log('📥 Downloading PDF.js worker from CDN...');
@@ -42,13 +67,23 @@ try {
   
   const workerContent = await response.text();
   
+  // Validate downloaded content
+  if (workerContent.length < 10000) {
+    throw new Error('Downloaded content appears to be too small for a valid worker');
+  }
+  
+  if (workerContent.includes('PDF.js worker placeholder')) {
+    throw new Error('Downloaded content appears to be a placeholder, not the real worker');
+  }
+  
   // Save the worker file
   writeFileSync(targetFile, workerContent, 'utf8');
   console.log('✅ PDF.js worker downloaded and saved successfully');
   
   // Verify the file
   if (existsSync(targetFile)) {
-    console.log('✅ Worker file verified at target location');
+    const stats = statSync(targetFile);
+    console.log(`✅ Worker file verified: ${Math.round(stats.size / 1024)}KB`);
     console.log('🎉 PDF.js worker setup complete!');
   } else {
     console.error('❌ Failed to verify downloaded worker file');
