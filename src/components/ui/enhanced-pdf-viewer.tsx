@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Viewer, Worker } from '@react-pdf-viewer/core';
 import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
@@ -30,6 +31,7 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [debugInfo, setDebugInfo] = useState<string[]>([]);
   const [showFallback, setShowFallback] = useState(false);
+  const [proxyStatus, setProxyStatus] = useState<'testing' | 'success' | 'failed' | 'idle'>('idle');
   const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Use the correct worker URL that matches our pdfjs-dist version (5.3.31)
@@ -59,6 +61,34 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
     };
   }, []);
 
+  // Test proxy function
+  const testProxyFunction = async (originalUrl: string): Promise<string> => {
+    const proxyUrl = `https://aohrfehhyjdebaatzqdl.supabase.co/functions/v1/pdf-proxy?url=${encodeURIComponent(originalUrl)}`;
+    
+    addDebugInfo(`Testing proxy function with URL: ${proxyUrl}`);
+    setProxyStatus('testing');
+    
+    try {
+      const response = await fetch(proxyUrl, { method: 'HEAD' });
+      
+      if (response.ok) {
+        addDebugInfo(`Proxy test successful! Status: ${response.status}`);
+        setProxyStatus('success');
+        return proxyUrl;
+      } else {
+        addDebugInfo(`Proxy test failed! Status: ${response.status} - ${response.statusText}`);
+        setProxyStatus('failed');
+        addDebugInfo(`Falling back to original URL: ${originalUrl}`);
+        return originalUrl;
+      }
+    } catch (error) {
+      addDebugInfo(`Proxy test error: ${error.message}`);
+      setProxyStatus('failed');
+      addDebugInfo(`Falling back to original URL: ${originalUrl}`);
+      return originalUrl;
+    }
+  };
+
   // Memoize PDF source calculation to prevent re-renders
   const pdfSource = useMemo(() => {
     if (debugMode) {
@@ -67,9 +97,8 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
 
     // Priority: pdfUrl first (direct URL), then pdfData (base64)
     if (pdfUrl) {
-      // Use our PDF proxy to serve the PDF with proper CORS headers
-      const proxyUrl = `https://aohrfehhyjdebaatzqdl.supabase.co/functions/v1/pdf-proxy?url=${encodeURIComponent(pdfUrl)}`;
-      return proxyUrl;
+      // We'll test the proxy in useEffect and update the actual URL
+      return pdfUrl; // Temporary, will be replaced with proxy URL
     }
     
     if (pdfData) {
@@ -78,6 +107,23 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
     }
     
     return '';
+  }, [pdfUrl, pdfData, debugMode]);
+
+  // State for the actual URL to use (after proxy testing)
+  const [actualPdfUrl, setActualPdfUrl] = useState<string>('');
+
+  // Test proxy and set actual URL
+  useEffect(() => {
+    if (pdfUrl && !debugMode) {
+      testProxyFunction(pdfUrl).then(testedUrl => {
+        setActualPdfUrl(testedUrl);
+        addDebugInfo(`Final PDF URL set to: ${testedUrl}`);
+      });
+    } else if (pdfData) {
+      const dataUrl = pdfData.startsWith('data:') ? pdfData : `data:application/pdf;base64,${pdfData}`;
+      setActualPdfUrl(dataUrl);
+      addDebugInfo(`Using base64 data URL, length: ${pdfData.length}`);
+    }
   }, [pdfUrl, pdfData, debugMode]);
 
   // Debug logging for PDF source changes
@@ -90,7 +136,7 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
     addDebugInfo(`Using worker URL: ${workerUrl}`);
     
     if (pdfUrl) {
-      addDebugInfo(`Using PDF URL: ${pdfUrl}`);
+      addDebugInfo(`Original PDF URL: ${pdfUrl}`);
     } else if (pdfData) {
       addDebugInfo(`Using PDF base64 data, length: ${pdfData.length}`);
     } else {
@@ -100,7 +146,7 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
 
   // Set up loading timeout when we have a source
   useEffect(() => {
-    if (!pdfSource || debugMode) {
+    if (!actualPdfUrl || debugMode) {
       setLoading(false);
       return;
     }
@@ -108,7 +154,7 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
     setLoading(true);
     setError(null);
     setShowFallback(false);
-    addDebugInfo('Starting PDF load with 10 second timeout');
+    addDebugInfo(`Starting PDF load with 10 second timeout. URL: ${actualPdfUrl}`);
 
     // Set up 10-second timeout
     if (loadingTimeoutRef.current) {
@@ -127,7 +173,7 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
         clearTimeout(loadingTimeoutRef.current);
       }
     };
-  }, [pdfSource, debugMode]);
+  }, [actualPdfUrl, debugMode]);
 
   // Direct download function that opens PDF in new tab
   const handleDirectDownload = () => {
@@ -141,7 +187,7 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
     // Fallback: open PDF URL in new tab
     if (pdfUrl) {
       window.open(pdfUrl, '_blank');
-      addDebugInfo('Opened PDF URL in new tab');
+      addDebugInfo(`Opened original PDF URL in new tab: ${pdfUrl}`);
     } else if (pdfData) {
       // For base64 data, create download link
       const base64Data = pdfData.startsWith('data:') ? pdfData : `data:application/pdf;base64,${pdfData}`;
@@ -160,6 +206,16 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
     setLoading(false);
     setError(null);
     setShowFallback(false);
+    if (loadingTimeoutRef.current) {
+      clearTimeout(loadingTimeoutRef.current);
+    }
+  };
+
+  const handleDocumentLoadError = (error: any) => {
+    addDebugInfo(`PDF document load error: ${error.message || 'Unknown error'}`);
+    setError(`Failed to load PDF: ${error.message || 'Unknown error'}`);
+    setLoading(false);
+    setShowFallback(true);
     if (loadingTimeoutRef.current) {
       clearTimeout(loadingTimeoutRef.current);
     }
@@ -230,6 +286,22 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
               </AlertDescription>
             </Alert>
           )}
+
+          {/* Proxy Status */}
+          {proxyStatus !== 'idle' && (
+            <div className="mt-4">
+              <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs ${
+                proxyStatus === 'testing' ? 'bg-blue-100 text-blue-800' :
+                proxyStatus === 'success' ? 'bg-green-100 text-green-800' :
+                'bg-red-100 text-red-800'
+              }`}>
+                {proxyStatus === 'testing' && <Loader2 className="h-3 w-3 animate-spin" />}
+                {proxyStatus === 'success' && <CheckCircle className="h-3 w-3" />}
+                {proxyStatus === 'failed' && <AlertCircle className="h-3 w-3" />}
+                Proxy Status: {proxyStatus}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Debug Info Panel */}
@@ -244,9 +316,15 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
                 </div>
               </div>
               <div>
-                <strong>PDF Source:</strong>
+                <strong>Original PDF URL:</strong>
                 <div className="bg-background p-2 rounded mt-1 break-all">
-                  {pdfSource ? `${pdfSource.substring(0, 100)}...` : 'None'}
+                  {pdfUrl || 'None'}
+                </div>
+              </div>
+              <div>
+                <strong>Actual PDF URL (after proxy test):</strong>
+                <div className="bg-background p-2 rounded mt-1 break-all">
+                  {actualPdfUrl || 'Not set yet'}
                 </div>
               </div>
               <div>
@@ -273,6 +351,23 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
           <p className="text-xs text-muted-foreground mt-2">
             If this takes too long, a fallback download option will appear
           </p>
+          
+          {/* Proxy Status */}
+          {proxyStatus !== 'idle' && (
+            <div className="mt-4">
+              <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs ${
+                proxyStatus === 'testing' ? 'bg-blue-100 text-blue-800' :
+                proxyStatus === 'success' ? 'bg-green-100 text-green-800' :
+                'bg-red-100 text-red-800'
+              }`}>
+                {proxyStatus === 'testing' && <Loader2 className="h-3 w-3 animate-spin" />}
+                {proxyStatus === 'success' && <CheckCircle className="h-3 w-3" />}
+                {proxyStatus === 'failed' && <AlertCircle className="h-3 w-3" />}
+                Proxy Status: {proxyStatus}
+              </div>
+            </div>
+          )}
+          
           {debugMode && (
             <div className="mt-4 text-left text-xs text-muted-foreground max-w-lg">
               <h4 className="font-semibold mb-2">Debug Info:</h4>
@@ -302,6 +397,19 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
               Debug Mode
             </div>
           )}
+          {/* Proxy Status */}
+          {proxyStatus !== 'idle' && (
+            <div className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs ${
+              proxyStatus === 'testing' ? 'bg-blue-100 text-blue-800' :
+              proxyStatus === 'success' ? 'bg-green-100 text-green-800' :
+              'bg-red-100 text-red-800'
+            }`}>
+              {proxyStatus === 'testing' && <Loader2 className="h-3 w-3 animate-spin" />}
+              {proxyStatus === 'success' && <CheckCircle className="h-3 w-3" />}
+              {proxyStatus === 'failed' && <AlertCircle className="h-3 w-3" />}
+              {proxyStatus}
+            </div>
+          )}
           <Button onClick={handleDirectDownload} variant="outline" size="sm">
             <Download className="h-4 w-4 mr-2" />
             Download
@@ -324,15 +432,18 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
                 <div className="text-sm text-muted-foreground bg-background p-4 rounded border">
                   <strong>Ready to display PDF!</strong><br/>
                   • PDF.js Worker: ✅ {workerUrl ? 'Loaded' : 'Not Ready'}<br/>
-                  • PDF Source: ✅ {pdfSource ? 'Available' : 'Not Set'}<br/>
+                  • Original PDF URL: ✅ {pdfUrl ? 'Available' : 'Not Set'}<br/>
+                  • Actual PDF URL: ✅ {actualPdfUrl ? 'Available' : 'Not Set'}<br/>
                   • Layout Plugin: ✅ Configured<br/>
+                  • Proxy Status: {proxyStatus}<br/>
                 </div>
               </div>
             ) : (
               <Viewer
-                fileUrl={pdfSource}
+                fileUrl={actualPdfUrl}
                 plugins={[defaultLayoutPluginInstance]}
                 onDocumentLoad={handleDocumentLoad}
+                onLoadError={handleDocumentLoadError}
               />
             )}
           </div>
