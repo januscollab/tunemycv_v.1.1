@@ -44,23 +44,18 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
     }
   };
 
-  // Dynamically load worker when needed
+  // Initialize worker URL when needed
   const initializeWorker = useMemo(() => {
     return async () => {
       try {
-        // Try to use local worker first
-        const workerModule = await import('pdfjs-dist/build/pdf.worker.min.js?url');
-        const localWorkerUrl = workerModule.default;
-        addDebugInfo(`Using local PDF.js worker: ${localWorkerUrl}`);
-        setWorkerUrl(localWorkerUrl);
-        return localWorkerUrl;
+        // Use CDN worker URL directly since local import is causing build issues
+        const cdnWorkerUrl = 'https://unpkg.com/pdfjs-dist@5.3.31/build/pdf.worker.min.js';
+        addDebugInfo(`Using CDN PDF.js worker: ${cdnWorkerUrl}`);
+        setWorkerUrl(cdnWorkerUrl);
+        return cdnWorkerUrl;
       } catch (error) {
-        // Fallback to CDN if local worker fails
-        const fallbackWorkerUrl = 'https://unpkg.com/pdfjs-dist@5.3.31/build/pdf.worker.min.js';
-        addDebugInfo(`Local worker failed, using CDN fallback: ${fallbackWorkerUrl}`);
-        addDebugInfo(`Worker error: ${error.message}`);
-        setWorkerUrl(fallbackWorkerUrl);
-        return fallbackWorkerUrl;
+        addDebugInfo(`Worker initialization error: ${error.message}`);
+        return '';
       }
     };
   }, []);
@@ -492,7 +487,7 @@ export const EnhancedPDFViewer: React.FC<EnhancedPDFViewerProps> = ({
                   </p>
                   <div className="text-sm text-muted-foreground bg-background p-4 rounded border">
                     <strong>Ready to display PDF!</strong><br/>
-                    • PDF.js Worker: ✅ {workerUrl ? 'Loaded Locally' : 'Not Ready'}<br/>
+                    • PDF.js Worker: ✅ {workerUrl ? 'Loaded from CDN' : 'Not Ready'}<br/>
                     • Original PDF URL: ✅ {pdfUrl ? 'Available' : 'Not Set'}<br/>
                     • Actual PDF URL: ✅ {actualPdfUrl ? 'Available' : 'Not Set'}<br/>
                     • Layout Plugin: ✅ Configured<br/>

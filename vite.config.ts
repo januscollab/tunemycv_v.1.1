@@ -23,6 +23,18 @@ export default defineConfig(({ mode }) => ({
   build: {
     assetsDir: 'assets',
     copyPublicDir: true,
+    rollupOptions: {
+      external: [],
+      output: {
+        // Ensure worker files are properly handled
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.name && assetInfo.name.includes('pdf.worker')) {
+            return 'assets/pdf.worker-[hash][extname]';
+          }
+          return 'assets/[name]-[hash][extname]';
+        }
+      }
+    }
   },
   // Enhanced worker support for PDF.js
   worker: {
