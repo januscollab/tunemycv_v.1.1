@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -235,9 +234,9 @@
 
   /* Reduce motion for accessibility */
   @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
+    *:not([data-radix-popper-content-wrapper]):not([data-state]):not([role="menu"]):not([role="menuitem"]):not([data-side]):not(.data-[state=open]):not(.data-[state=closed]),
+    *:not([data-radix-popper-content-wrapper]):not([data-state]):not([role="menu"]):not([role="menuitem"]):not([data-side]):not(.data-[state=open]):not(.data-[state=closed])::before,
+    *:not([data-radix-popper-content-wrapper]):not([data-state]):not([role="menu"]):not([role="menuitem"]):not([data-side]):not(.data-[state=open]):not(.data-[state=closed])::after {
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;

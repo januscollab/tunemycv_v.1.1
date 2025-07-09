@@ -7,9 +7,17 @@ interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
+// Feature flag to bypass authentication requirement
+const requireAuth = import.meta.env.VITE_REQUIRE_AUTH !== "false";
+
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { user, loading } = useAuth();
   const location = useLocation();
+
+  if (!requireAuth) {
+    // Auth bypass enabled: always render children
+    return <>{children}</>;
+  }
 
   if (loading) {
     return (
